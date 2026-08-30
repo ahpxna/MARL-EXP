@@ -39,6 +39,7 @@ from scripts.run_h1_calibration import build_h1_config  # noqa: E402
 
 
 V7_PROTOCOL = "h1_fixed_panel_two_level_margin_v1"
+V7_REPORT_SCHEMA = "v7_fixed_panel_reporting_v1"
 PLUGIN_CFG = {"proxy_use_doubly_robust": False, "eps": 0.05}
 
 
@@ -511,12 +512,363 @@ def _heterogeneity(seed_summary: pd.DataFrame, checkpoint: int):
     ):
         x = frame[name].to_numpy(dtype=float)
         keep = np.isfinite(x) & np.isfinite(target)
-        if int(keep.sum()) >= 3:
+        if (
+            int(keep.sum()) >= 3
+            and len(np.unique(x[keep])) > 1
+            and len(np.unique(target[keep])) > 1
+        ):
             rho, p = spearmanr(x[keep], target[keep])
             out[name] = {"spearman": float(rho), "p_value": float(p)}
         else:
             out[name] = {"spearman": float("nan"), "p_value": float("nan")}
     return out
+
+
+
+def _phase_label(values: pd.Series, cuts, labels):
+    x = pd.to_numeric(values, errors="coerce").to_numpy(dtype=float)
+    out = np.full(len(x), None, dtype=object)
+    finite = np.isfinite(x)
+    if not finite.any():
+        return pd.Series(out, index=values.index, dtype="object")
+    lower = -np.inf
+    for upper, label in zip(cuts, labels[:-1]):
+        mask = finite & (x >= lower) & (x < upper)
+        out[mask] = label
+        lower = upper
+    out[finite & (x >= lower)] = labels[-1]
+    return pd.Series(out, index=values.index, dtype="object")
+
+
+def _lambda_c_phase_table(pair_df: pd.DataFrame):
+    rows = []
+    for checkpoint, frame in pair_df.groupby("checkpoint"):
+        frame = frame[frame["oracle_extrema_unique"] == 1].copy()
+        frame["phase_bin"] = _phase_label(
+            frame["lambda_C"],
+            [0.25, 0.5, 1.0],
+            ["lt_0_25", "0_25_to_0_5", "0_5_to_1", "ge_1"],
+        )
+        for phase, group in frame.dropna(subset=["phase_bin"]).groupby("phase_bin", sort=False):
+            rows.append({
+                "checkpoint": int(checkpoint),
+                "phase_bin": str(phase),
+                "row_count": int(len(group)),
+                "lambda_C_median": float(pd.to_numeric(group["lambda_C"], errors="coerce").median()),
+                "q_gauge_sup_error_median": float(pd.to_numeric(group["q_gauge_sup_error"], errors="coerce").median()),
+                "extrema_match_rate": float(pd.to_numeric(group["both_extrema_match"], errors="coerce").mean()),
+                "extrema_swap_rate": float((1.0 - pd.to_numeric(group["both_extrema_match"], errors="coerce")).mean()),
+                "capacity_mae": float(pd.to_numeric(group["capacity_abs_error"], errors="coerce").mean()),
+                "theorem_certified_rate": float(pd.to_numeric(group["extrema_stability_certified"], errors="coerce").mean()),
+                "theorem_violation_count": int(pd.to_numeric(group["extrema_stability_violation"], errors="coerce").fillna(0).sum()),
+            })
+    return pd.DataFrame(rows)
+
+
+def _lambda_topk_phase_table(state_df: pd.DataFrame):
+    rows = []
+    for checkpoint, frame in state_df.groupby("checkpoint"):
+        frame = frame.copy()
+        frame["phase_bin"] = _phase_label(
+            frame["lambda_topk_Q"],
+            [1.0, 2.0, 5.0],
+            ["lt_1", "1_to_2", "2_to_5", "ge_5"],
+        )
+        for phase, group in frame.dropna(subset=["phase_bin"]).groupby("phase_bin", sort=False):
+            counts = pd.to_numeric(group["strict_relation_pair_count"], errors="coerce").fillna(0).clip(lower=0)
+            accuracy = pd.to_numeric(group["strict_relation_pair_order_accuracy"], errors="coerce")
+            valid = np.isfinite(accuracy.to_numpy(dtype=float)) & (counts.to_numpy(dtype=float) > 0)
+            weighted_order = float(
+                np.average(accuracy.to_numpy(dtype=float)[valid], weights=counts.to_numpy(dtype=float)[valid])
+            ) if valid.any() else float("nan")
+            rows.append({
+                "checkpoint": int(checkpoint),
+                "phase_bin": str(phase),
+                "state_count": int(len(group)),
+                "lambda_topk_Q_median": float(pd.to_numeric(group["lambda_topk_Q"], errors="coerce").median()),
+                "oracle_topk_gap_median": float(pd.to_numeric(group["oracle_topk_gap"], errors="coerce").median()),
+                "topk_match_rate": float(pd.to_numeric(group["capacity_topk_match"], errors="coerce").mean()),
+                "strict_relation_pair_order_accuracy": weighted_order,
+                "q_certificate_rate": float(pd.to_numeric(group["capacity_topk_q_certified"], errors="coerce").mean()),
+                "q_certificate_violation_count": int(pd.to_numeric(group["capacity_topk_q_certified_violation"], errors="coerce").fillna(0).sum()),
+                "interval_certificate_rate": float(pd.to_numeric(group["capacity_topk_interval_certified"], errors="coerce").mean()),
+                "interval_certificate_violation_count": int(pd.to_numeric(group["capacity_topk_interval_certified_violation"], errors="coerce").fillna(0).sum()),
+            })
+    return pd.DataFrame(rows)
+
+
+def _lambda_d_phase_table(pair_df: pd.DataFrame):
+    rows = []
+    for checkpoint, frame in pair_df.groupby("checkpoint"):
+        frame = frame.copy()
+        frame["phase_bin"] = _phase_label(
+            frame["lambda_D"],
+            [1.0, 2.0, 5.0],
+            ["lt_1", "1_to_2", "2_to_5", "ge_5"],
+        )
+        for phase, group in frame.dropna(subset=["phase_bin"]).groupby("phase_bin", sort=False):
+            rows.append({
+                "checkpoint": int(checkpoint),
+                "phase_bin": str(phase),
+                "row_count": int(len(group)),
+                "lambda_D_median": float(pd.to_numeric(group["lambda_D"], errors="coerce").median()),
+                "direction_sign_match_rate": float(pd.to_numeric(group["direction_sign_match_from_q"], errors="coerce").mean()),
+                "direction_abs_error_mean": float(pd.to_numeric(group["direction_abs_error"], errors="coerce").mean()),
+                "sign_certificate_rate": float(pd.to_numeric(group["direction_sign_certified"], errors="coerce").mean()),
+                "sign_certificate_violation_count": int(pd.to_numeric(group["direction_sign_violation"], errors="coerce").fillna(0).sum()),
+            })
+    return pd.DataFrame(rows)
+
+
+def _certificate_nonvacuity_table(pair_df: pd.DataFrame, state_df: pd.DataFrame):
+    rows = []
+    for checkpoint in sorted(int(x) for x in pair_df["checkpoint"].unique()):
+        pair = pair_df[pair_df["checkpoint"] == checkpoint]
+        state = state_df[state_df["checkpoint"] == checkpoint]
+
+        unique = pair[pair["oracle_extrema_unique"] == 1]
+        cert = unique[pd.to_numeric(unique["extrema_stability_certified"], errors="coerce") == 1]
+        rows.append({
+            "checkpoint": checkpoint,
+            "certificate": "local_extrema_lambdaC",
+            "eligible_count": int(len(unique)),
+            "certified_count": int(len(cert)),
+            "coverage_among_eligible": float(len(cert) / len(unique)) if len(unique) else float("nan"),
+            "correctness_among_certified": float(pd.to_numeric(cert["both_extrema_match"], errors="coerce").mean()) if len(cert) else float("nan"),
+            "violation_count": int(pd.to_numeric(unique["extrema_stability_violation"], errors="coerce").fillna(0).sum()),
+        })
+
+        for name, cert_col, violation_col in [
+            ("topk_q_margin", "capacity_topk_q_certified", "capacity_topk_q_certified_violation"),
+            ("topk_interval", "capacity_topk_interval_certified", "capacity_topk_interval_certified_violation"),
+        ]:
+            eligible = state
+            certified = eligible[pd.to_numeric(eligible[cert_col], errors="coerce") == 1]
+            rows.append({
+                "checkpoint": checkpoint,
+                "certificate": name,
+                "eligible_count": int(len(eligible)),
+                "certified_count": int(len(certified)),
+                "coverage_among_eligible": float(len(certified) / len(eligible)) if len(eligible) else float("nan"),
+                "correctness_among_certified": float(pd.to_numeric(certified["capacity_topk_match"], errors="coerce").mean()) if len(certified) else float("nan"),
+                "violation_count": int(pd.to_numeric(eligible[violation_col], errors="coerce").fillna(0).sum()),
+            })
+
+        finite_d = pair[np.isfinite(pd.to_numeric(pair["lambda_D"], errors="coerce"))]
+        dcert = finite_d[pd.to_numeric(finite_d["direction_sign_certified"], errors="coerce") == 1]
+        rows.append({
+            "checkpoint": checkpoint,
+            "certificate": "direction_sign_lambdaD",
+            "eligible_count": int(len(finite_d)),
+            "certified_count": int(len(dcert)),
+            "coverage_among_eligible": float(len(dcert) / len(finite_d)) if len(finite_d) else float("nan"),
+            "correctness_among_certified": float(pd.to_numeric(dcert["direction_sign_match_from_q"], errors="coerce").mean()) if len(dcert) else float("nan"),
+            "violation_count": int(pd.to_numeric(finite_d["direction_sign_violation"], errors="coerce").fillna(0).sum()),
+        })
+    return pd.DataFrame(rows)
+
+
+def _paired_longitudinal_table(pair_df: pd.DataFrame, state_df: pd.DataFrame):
+    """Paired same-panel changes between every pair of completed checkpoints."""
+    rows = []
+    checkpoints = sorted(int(x) for x in pair_df["checkpoint"].unique())
+    pair_keys = ["experiment_seed", "fixed_panel_step_hash", "ego_id", "neighbor_id"]
+    state_keys = ["experiment_seed", "fixed_panel_step_hash", "ego_id"]
+
+    for i, before_cp in enumerate(checkpoints):
+        for after_cp in checkpoints[i + 1:]:
+            before = pair_df[pair_df["checkpoint"] == before_cp].set_index(pair_keys)
+            after = pair_df[pair_df["checkpoint"] == after_cp].set_index(pair_keys)
+            common = before.index.intersection(after.index)
+            if not len(common):
+                continue
+            b = before.loc[common]
+            a = after.loc[common]
+            unique = (
+                (pd.to_numeric(b["oracle_extrema_unique"], errors="coerce") == 1)
+                & (pd.to_numeric(a["oracle_extrema_unique"], errors="coerce") == 1)
+            )
+            bq = pd.to_numeric(b["q_gauge_sup_error"], errors="coerce").to_numpy(dtype=float)
+            aq = pd.to_numeric(a["q_gauge_sup_error"], errors="coerce").to_numpy(dtype=float)
+            finite_q = np.isfinite(bq) & np.isfinite(aq)
+            bl = pd.to_numeric(b["lambda_C"], errors="coerce").to_numpy(dtype=float)
+            al = pd.to_numeric(a["lambda_C"], errors="coerce").to_numpy(dtype=float)
+            unique_np = unique.to_numpy(dtype=bool)
+            finite_l = unique_np & np.isfinite(bl) & np.isfinite(al)
+
+            bs = state_df[state_df["checkpoint"] == before_cp].set_index(state_keys)
+            aas = state_df[state_df["checkpoint"] == after_cp].set_index(state_keys)
+            scommon = bs.index.intersection(aas.index)
+            sb = bs.loc[scommon]
+            sa = aas.loc[scommon]
+            btop = pd.to_numeric(sb["capacity_topk_match"], errors="coerce").to_numpy(dtype=float)
+            atop = pd.to_numeric(sa["capacity_topk_match"], errors="coerce").to_numpy(dtype=float)
+            btl = pd.to_numeric(sb["lambda_topk_Q"], errors="coerce").to_numpy(dtype=float)
+            atl = pd.to_numeric(sa["lambda_topk_Q"], errors="coerce").to_numpy(dtype=float)
+            finite_tl = np.isfinite(btl) & np.isfinite(atl)
+
+            rows.append({
+                "before_checkpoint": before_cp,
+                "after_checkpoint": after_cp,
+                "paired_pair_rows": int(len(common)),
+                "paired_state_rows": int(len(scommon)),
+                "q_gauge_error_decrease_fraction": float(np.mean(aq[finite_q] < bq[finite_q])) if finite_q.any() else float("nan"),
+                "q_gauge_error_before_median": float(np.median(bq[finite_q])) if finite_q.any() else float("nan"),
+                "q_gauge_error_after_median": float(np.median(aq[finite_q])) if finite_q.any() else float("nan"),
+                "unique_extrema_paired_rows": int(finite_l.sum()),
+                "lambda_C_decrease_fraction": float(np.mean(al[finite_l] < bl[finite_l])) if finite_l.any() else float("nan"),
+                "lambda_C_before_median": float(np.median(bl[finite_l])) if finite_l.any() else float("nan"),
+                "lambda_C_after_median": float(np.median(al[finite_l])) if finite_l.any() else float("nan"),
+                "local_certified_before_rate": float(pd.to_numeric(b.loc[unique, "extrema_stability_certified"], errors="coerce").mean()) if unique.any() else float("nan"),
+                "local_certified_after_rate": float(pd.to_numeric(a.loc[unique, "extrema_stability_certified"], errors="coerce").mean()) if unique.any() else float("nan"),
+                "extrema_swap_before_rate": float((1.0 - pd.to_numeric(b.loc[unique, "both_extrema_match"], errors="coerce")).mean()) if unique.any() else float("nan"),
+                "extrema_swap_after_rate": float((1.0 - pd.to_numeric(a.loc[unique, "both_extrema_match"], errors="coerce")).mean()) if unique.any() else float("nan"),
+                "capacity_mae_before": float(pd.to_numeric(b["capacity_abs_error"], errors="coerce").mean()),
+                "capacity_mae_after": float(pd.to_numeric(a["capacity_abs_error"], errors="coerce").mean()),
+                "topk_match_before_rate": float(np.nanmean(btop)) if len(btop) else float("nan"),
+                "topk_match_after_rate": float(np.nanmean(atop)) if len(atop) else float("nan"),
+                "topk_gained_fraction": float(np.mean((btop == 0) & (atop == 1))) if len(btop) else float("nan"),
+                "topk_lost_fraction": float(np.mean((btop == 1) & (atop == 0))) if len(btop) else float("nan"),
+                "lambda_topk_decrease_fraction": float(np.mean(atl[finite_tl] < btl[finite_tl])) if finite_tl.any() else float("nan"),
+                "lambda_topk_before_median": float(np.median(btl[finite_tl])) if finite_tl.any() else float("nan"),
+                "lambda_topk_after_median": float(np.median(atl[finite_tl])) if finite_tl.any() else float("nan"),
+                "strict_order_before_mean": float(pd.to_numeric(sb["strict_relation_pair_order_accuracy"], errors="coerce").mean()),
+                "strict_order_after_mean": float(pd.to_numeric(sa["strict_relation_pair_order_accuracy"], errors="coerce").mean()),
+                "q_derived_direction_sign_before_rate": float(pd.to_numeric(b["direction_sign_match_from_q"], errors="coerce").mean()),
+                "q_derived_direction_sign_after_rate": float(pd.to_numeric(a["direction_sign_match_from_q"], errors="coerce").mean()),
+            })
+    return pd.DataFrame(rows)
+
+
+
+def _seed_paired_longitudinal_table(pair_df: pd.DataFrame, state_df: pd.DataFrame):
+    frames = []
+    for seed in sorted(int(x) for x in pair_df["experiment_seed"].unique()):
+        pair = pair_df[pair_df["experiment_seed"] == seed]
+        state = state_df[state_df["experiment_seed"] == seed]
+        table = _paired_longitudinal_table(pair, state)
+        if len(table):
+            table.insert(0, "experiment_seed", seed)
+            frames.append(table)
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+
+def _spearman_record(checkpoint, name, x, y):
+    x = pd.to_numeric(x, errors="coerce").to_numpy(dtype=float)
+    y = pd.to_numeric(y, errors="coerce").to_numpy(dtype=float)
+    keep = np.isfinite(x) & np.isfinite(y)
+    if int(keep.sum()) >= 3 and len(np.unique(x[keep])) > 1 and len(np.unique(y[keep])) > 1:
+        rho, p = spearmanr(x[keep], y[keep])
+        rho, p = float(rho), float(p)
+    else:
+        rho, p = float("nan"), float("nan")
+    return {
+        "checkpoint": int(checkpoint),
+        "analysis": name,
+        "n": int(keep.sum()),
+        "spearman": rho,
+        "p_value": p,
+    }
+
+
+def _phase_correlation_table(pair_df: pd.DataFrame, state_df: pd.DataFrame):
+    rows = []
+    checkpoints = sorted(int(x) for x in pair_df["checkpoint"].unique())
+    for checkpoint in checkpoints:
+        pair = pair_df[pair_df["checkpoint"] == checkpoint]
+        unique = pair[pair["oracle_extrema_unique"] == 1]
+        state = state_df[state_df["checkpoint"] == checkpoint]
+        rows.append(_spearman_record(
+            checkpoint, "lambda_C_vs_capacity_abs_error",
+            unique["lambda_C"], unique["capacity_abs_error"],
+        ))
+        rows.append(_spearman_record(
+            checkpoint, "lambda_C_vs_extrema_match",
+            unique["lambda_C"], unique["both_extrema_match"],
+        ))
+        rows.append(_spearman_record(
+            checkpoint, "lambda_topk_Q_vs_topk_match",
+            state["lambda_topk_Q"], state["capacity_topk_match"],
+        ))
+        rows.append(_spearman_record(
+            checkpoint, "lambda_topk_Q_vs_strict_pair_order_accuracy",
+            state["lambda_topk_Q"], state["strict_relation_pair_order_accuracy"],
+        ))
+        finite_d = pair[np.isfinite(pd.to_numeric(pair["lambda_D"], errors="coerce"))]
+        rows.append(_spearman_record(
+            checkpoint, "lambda_D_vs_q_derived_sign_match",
+            finite_d["lambda_D"], finite_d["direction_sign_match_from_q"],
+        ))
+    return pd.DataFrame(rows)
+
+
+def _final_scientific_report(checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations):
+    checkpoints = sorted(int(x) for x in checkpoint_summary["checkpoint"].unique()) if len(checkpoint_summary) else []
+    latest = checkpoints[-1] if checkpoints else None
+    report = {
+        "report_schema": V7_REPORT_SCHEMA,
+        "protocol": V7_PROTOCOL,
+        "development_only": True,
+        "completed_checkpoints_in_aggregate": checkpoints,
+        "latest_checkpoint": latest,
+        "claims_guardrails": [
+            "Fixed-panel longitudinal claims require v7_panel_consistency.json pass=true.",
+            "lambda_C<0.5 is a sufficient local-extrema certificate, not a global-ranking certificate.",
+            "lambda_topk_Q is a between-relation selection diagnostic/certificate ratio.",
+            "lambda_D<1 certifies direction sign only; it does not certify magnitude ranking.",
+            "Certificate coverage is reported separately from correctness; zero violations does not imply nonvacuity.",
+        ],
+        "output_tables": {
+            "paired_longitudinal": "v7_paired_longitudinal.csv",
+            "paired_longitudinal_by_seed": "v7_paired_longitudinal_by_seed.csv",
+            "lambda_C_phase": "v7_lambdaC_phase.csv",
+            "lambda_topk_phase": "v7_lambda_topk_phase.csv",
+            "lambda_D_phase": "v7_lambdaD_phase.csv",
+            "certificate_nonvacuity": "v7_certificate_nonvacuity.csv",
+            "phase_correlations": "v7_phase_correlations.csv",
+        },
+    }
+    if latest is not None:
+        cp = checkpoint_summary[checkpoint_summary["checkpoint"] == latest].iloc[0]
+        report["latest_checkpoint_snapshot"] = {
+            key: _safe_float(cp.get(key))
+            for key in checkpoint_summary.columns
+            if key != "checkpoint"
+        }
+    if len(paired):
+        report["longitudinal_transitions"] = paired.to_dict(orient="records")
+    return report
+
+
+def _write_reporting_outputs(out_root: Path, pair_df, state_df, checkpoint_summary):
+    paired = _paired_longitudinal_table(pair_df, state_df)
+    seed_paired = _seed_paired_longitudinal_table(pair_df, state_df)
+    lambda_c = _lambda_c_phase_table(pair_df)
+    lambda_topk = _lambda_topk_phase_table(state_df)
+    lambda_d = _lambda_d_phase_table(pair_df)
+    certs = _certificate_nonvacuity_table(pair_df, state_df)
+    correlations = _phase_correlation_table(pair_df, state_df)
+    paired.to_csv(out_root / "v7_paired_longitudinal.csv", index=False)
+    seed_paired.to_csv(out_root / "v7_paired_longitudinal_by_seed.csv", index=False)
+    lambda_c.to_csv(out_root / "v7_lambdaC_phase.csv", index=False)
+    lambda_topk.to_csv(out_root / "v7_lambda_topk_phase.csv", index=False)
+    lambda_d.to_csv(out_root / "v7_lambdaD_phase.csv", index=False)
+    certs.to_csv(out_root / "v7_certificate_nonvacuity.csv", index=False)
+    correlations.to_csv(out_root / "v7_phase_correlations.csv", index=False)
+    report = _final_scientific_report(
+        checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations
+    )
+    _write_json_atomic(out_root / "v7_final_scientific_report.json", report)
+    return {
+        "paired": paired,
+        "seed_paired": seed_paired,
+        "lambda_C": lambda_c,
+        "lambda_topk": lambda_topk,
+        "lambda_D": lambda_d,
+        "certificates": certs,
+        "correlations": correlations,
+        "report": report,
+    }
 
 
 def _write_json_atomic(path: Path, payload):
@@ -803,6 +1155,9 @@ def main(argv=None):
         state_df.to_csv(out_root / "v7_state_panel.csv", index=False)
         seed_summary.to_csv(out_root / "v7_seed_checkpoint_summary.csv", index=False)
         checkpoint_summary.to_csv(out_root / "v7_checkpoint_summary.csv", index=False)
+        reporting = _write_reporting_outputs(
+            out_root, pair_df, state_df, checkpoint_summary
+        )
 
         hard_gates = {
             "fixed_panel_oracle_invariance_pass": bool(consistency["pass"]),
@@ -846,9 +1201,11 @@ def main(argv=None):
 
         analysis = {
             "protocol": V7_PROTOCOL,
+            "report_schema": V7_REPORT_SCHEMA,
             "development_only": True,
             "hard_gates": hard_gates,
             "completion": completion_summary,
+            "reporting_outputs": reporting["report"].get("output_tables", {}),
             "seed_heterogeneity": {
                 str(checkpoint): _heterogeneity(seed_summary, checkpoint)
                 for checkpoint in completed_checkpoints

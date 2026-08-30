@@ -164,5 +164,87 @@ class V7ResumeAggregationTests(unittest.TestCase):
         self.assertEqual(result["seeds"]["3002"]["completed_checkpoints"], [20, 80])
 
 
+class V7ReportingTests(unittest.TestCase):
+    def _pair_frame(self):
+        import pandas as pd
+        rows = []
+        for checkpoint, qerr, lam, match, dlam, dmatch in [
+            (20, 0.10, 0.80, 0, 2.0, 0),
+            (80, 0.05, 0.40, 1, 0.8, 1),
+        ]:
+            rows.append({
+                "checkpoint": checkpoint,
+                "experiment_seed": 3001,
+                "fixed_panel_step_hash": "step-1",
+                "ego_id": 0,
+                "neighbor_id": 1,
+                "oracle_extrema_unique": 1,
+                "lambda_C": lam,
+                "q_gauge_sup_error": qerr,
+                "both_extrema_match": match,
+                "extrema_stability_certified": int(lam < 0.5),
+                "extrema_stability_violation": 0,
+                "capacity_abs_error": qerr,
+                "lambda_D": dlam,
+                "direction_sign_match_from_q": dmatch,
+                "direction_abs_error": qerr,
+                "direction_sign_certified": int(dlam < 1.0),
+                "direction_sign_violation": 0,
+            })
+        return pd.DataFrame(rows)
+
+    def _state_frame(self):
+        import pandas as pd
+        rows = []
+        for checkpoint, lam, match, order in [
+            (20, 4.0, 0, 0.5),
+            (80, 0.8, 1, 1.0),
+        ]:
+            rows.append({
+                "checkpoint": checkpoint,
+                "experiment_seed": 3001,
+                "fixed_panel_step_hash": "step-1",
+                "ego_id": 0,
+                "lambda_topk_Q": lam,
+                "oracle_topk_gap": 0.2,
+                "capacity_topk_match": match,
+                "strict_relation_pair_count": 2,
+                "strict_relation_pair_order_accuracy": order,
+                "capacity_topk_q_certified": int(lam < 1.0),
+                "capacity_topk_q_certified_violation": 0,
+                "capacity_topk_interval_certified": int(lam < 1.0),
+                "capacity_topk_interval_certified_violation": 0,
+            })
+        return pd.DataFrame(rows)
+
+    def test_reporting_phase_tables_and_longitudinal_pairing(self):
+        from scripts.run_h1_fixed_panel_v7 import (
+            _certificate_nonvacuity_table,
+            _lambda_c_phase_table,
+            _lambda_topk_phase_table,
+            _paired_longitudinal_table,
+        )
+        pair = self._pair_frame()
+        state = self._state_frame()
+        longitudinal = _paired_longitudinal_table(pair, state)
+        self.assertEqual(len(longitudinal), 1)
+        row = longitudinal.iloc[0]
+        self.assertEqual(int(row["before_checkpoint"]), 20)
+        self.assertEqual(int(row["after_checkpoint"]), 80)
+        self.assertEqual(float(row["q_gauge_error_decrease_fraction"]), 1.0)
+        self.assertEqual(float(row["topk_gained_fraction"]), 1.0)
+
+        lc = _lambda_c_phase_table(pair)
+        self.assertEqual(set(lc["phase_bin"]), {"0_5_to_1", "0_25_to_0_5"})
+        topk = _lambda_topk_phase_table(state)
+        self.assertEqual(set(topk["phase_bin"]), {"2_to_5", "lt_1"})
+
+        cert = _certificate_nonvacuity_table(pair, state)
+        local80 = cert[(cert["checkpoint"] == 80) & (cert["certificate"] == "local_extrema_lambdaC")].iloc[0]
+        self.assertEqual(int(local80["certified_count"]), 1)
+        self.assertEqual(float(local80["correctness_among_certified"]), 1.0)
+
+
+
 if __name__ == "__main__":
     unittest.main()

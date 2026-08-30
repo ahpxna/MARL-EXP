@@ -195,3 +195,20 @@ only validated complete cells.
 
 Use `--rerun-complete` only when intentionally recomputing already complete
 cells. By default, complete cells are skipped.
+
+## Final reporting layer (post fixed-panel runs)
+
+The V7 runner now regenerates paper-facing reports from validated complete cells whenever it aggregates or runs with `--analyze-only`. This reporting layer does not change training, estimators, theorem thresholds, or scientific targets.
+
+Additional outputs:
+
+- `v7_paired_longitudinal.csv`: pooled same-panel 20→80, 80→320, and 20→320 paired changes.
+- `v7_paired_longitudinal_by_seed.csv`: the same paired changes separately for each development seed.
+- `v7_lambdaC_phase.csv`: within-relation phase table for `lambda_C` bins `<0.25`, `0.25–0.5`, `0.5–1`, `>=1`.
+- `v7_lambda_topk_phase.csv`: between-relation Top-K phase table for `lambda_topk_Q` bins `<1`, `1–2`, `2–5`, `>=5`.
+- `v7_lambdaD_phase.csv`: Q-derived D-sign phase table for `lambda_D` bins `<1`, `1–2`, `2–5`, `>=5`.
+- `v7_certificate_nonvacuity.csv`: eligible count, certificate coverage, conditional correctness, and false-safe violations for local extrema, Top-K Q-margin, Top-K interval, and D-sign certificates.
+- `v7_phase_correlations.csv`: pooled checkpoint-level Spearman associations between the phase ratios and their relevant errors/selection outcomes.
+- `v7_final_scientific_report.json`: machine-readable report index and guardrails.
+
+The reports are valid only when `v7_panel_consistency.json` passes. Certificate coverage is reported separately from certificate correctness: zero false-safe violations must not be interpreted as practical nonvacuity.
