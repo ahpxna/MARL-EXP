@@ -1,0 +1,55 @@
+"""Orchestrate all high-value experimental extension screens without touching frozen V7 definitions."""
+from __future__ import annotations
+import argparse,json,sys,time
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
+from research_chains.provenance import atomic_json
+from scripts import run_master_extension_lab as master
+from scripts import run_functional_design_extension_lab as fdesign
+from scripts import run_functional_stopping_lab as fstop
+from scripts import run_query_optimal_allocation_lab as falloc
+from scripts import run_d6_extension_lab as d6
+from scripts import run_query_extension_lab as query
+from scripts import run_structural_defect_lab as structural
+from scripts import run_dynamic_extension_lab as dynamic
+from scripts import run_chain_bh_lab as foundation_bh
+from scripts import run_chain_rp_lab as foundation_rp
+from scripts import run_chain_reference_fidelity_search as foundation_ref
+from scripts import run_chain_e_semantic_lab as foundation_query
+
+PROTOCOL_VERSION='high_value_extension_suite_v1'
+PROFILES={
+ 'quick':{'master':20,'design':20,'design_rep':80,'allocation':20,'allocation_budgets':(16,32),'stopping':20,'stopping_max':256,'stopping_batch':8,'d6':40,'sharp':300,'query':60,'structural':80,'dynamic':40,'foundation':40},
+ 'screening':{'master':150,'design':150,'design_rep':300,'allocation':150,'allocation_budgets':(16,32,64,128,256),'stopping':120,'stopping_max':4096,'stopping_batch':16,'d6':500,'sharp':5000,'query':600,'structural':1500,'dynamic':300,'foundation':500},
+ 'deep':{'master':500,'design':500,'design_rep':1000,'allocation':500,'allocation_budgets':(16,32,64,128,256),'stopping':300,'stopping_max':16384,'stopping_batch':64,'d6':5000,'sharp':50000,'query':3000,'structural':5000,'dynamic':1000,'foundation':5000},
+}
+
+def main(argv=None):
+    p=argparse.ArgumentParser(); p.add_argument('--profile',choices=PROFILES,default='screening'); p.add_argument('--seeds',nargs='+',type=int,default=[0,1,2,3,4]); p.add_argument('--out-root',default='research/high_value_extensions/runs'); p.add_argument('--skip',nargs='*',default=[]); a=p.parse_args(argv)
+    cfg=PROFILES[a.profile]; root=Path(a.out_root); root.mkdir(parents=True,exist_ok=True); records=[]
+    labs={
+      'master':lambda s:master.run(cfg['master'],(16,32,64,128,256),s,.05),
+      'functional_design':lambda s:fdesign.run(cfg['design'],cfg['design_rep'],s,6),
+      'functional_allocation':lambda s:falloc.run(cfg['allocation'],(s,),cfg['allocation_budgets'],5,6,2),
+      'functional_stopping':lambda s:fstop.run(cfg['stopping'],s,6,5,.05,cfg['stopping_max'],cfg['stopping_batch'],.35),
+      'd6':lambda s:d6.run(cfg['d6'],s,cfg['sharp']),
+      'query':lambda s:query.run(cfg['query'],s,10,3),
+      'structural':lambda s:structural.run(cfg['structural'],s),
+      'dynamic':lambda s:dynamic.run(cfg['dynamic'],s),
+      'foundation_bh':lambda s:foundation_bh.run(cfg['foundation'],s),
+      'foundation_rp':lambda s:foundation_rp.run(cfg['foundation'],s),
+      'foundation_reference':lambda s:foundation_ref.run(cfg['foundation'],s),
+      'foundation_query':lambda s:foundation_query.run(),
+    }
+    for seed in a.seeds:
+        for name,fn in labs.items():
+            if name in set(a.skip): continue
+            t=time.perf_counter(); status='PASS'; error=None
+            try: payload=fn(int(seed))
+            except Exception as exc:
+                payload={'protocol_version':PROTOCOL_VERSION,'error':f'{type(exc).__name__}: {exc}'}; status='ERROR'; error=payload['error']
+            elapsed=time.perf_counter()-t; path=root/name/f'seed{int(seed)}.json'; atomic_json(path,payload); records.append({'lab':name,'seed':int(seed),'status':status,'seconds':elapsed,'path':str(path),'error':error})
+            print(json.dumps(records[-1],sort_keys=True),flush=True)
+    suite={'protocol_version':PROTOCOL_VERSION,'profile':a.profile,'seeds':a.seeds,'config':cfg,'records':records,'complete':all(r['status']=='PASS' for r in records)}; atomic_json(root/'SUITE_MANIFEST.json',suite); return 0 if suite['complete'] else 2
+if __name__=='__main__': raise SystemExit(main())

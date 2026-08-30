@@ -1,0 +1,215 @@
+# CIG-AMF experimental verification runbook
+
+This patch changes **experiment infrastructure only**. It does not modify the frozen V7 learner, C/D definitions, two-margin metrics, or existing theorem-gate code.
+
+## 0. Regression gate
+
+```bash
+python -m compileall -q research_chains scripts tests
+python -m pytest -q \
+  tests/test_high_value_extension_suite.py \
+  tests/test_new_chain_harness.py \
+  tests/test_new_chain_extended.py \
+  tests/test_new_chain_random_labs.py \
+  tests/test_h1_v7_fixed_panel.py \
+  tests/test_revised_scientific_contracts.py \
+  tests/test_round9_scientific_contract.py \
+  tests/test_p11_query_gates.py \
+  tests/test_p11_d0_omni.py
+```
+
+## 1. Whole-chain screen first
+
+Quick plumbing:
+
+```bash
+python -m scripts.run_high_value_extension_suite \
+  --profile quick --seeds 0 \
+  --out-root research/high_value_extensions/runs_quick
+```
+
+Scientific screening:
+
+```bash
+python -m scripts.run_high_value_extension_suite \
+  --profile screening --seeds 0 1 2 3 4 \
+  --out-root research/high_value_extensions/runs_screening
+
+python -m scripts.analyze_high_value_extensions \
+  --root research/high_value_extensions/runs_screening \
+  --out research/high_value_extensions/DECISION_MATRIX_screening.json
+```
+
+The suite covers MASTER, Functional covariance/allocation/stopping, D6, Query, Structural, Dynamic, plus B/H, R/P, reference-fidelity and primitive-query foundation links. `PROMOTE` is blocked below five seeds and when a certificate cascade is effectively vacuous.
+
+## 2. Functional frozen confirmatory
+
+Protocol lock only:
+
+```bash
+python -m scripts.run_h1_fixed_panel_confirmatory \
+  --dry-run \
+  --seeds 5001 5002 5003 5004 5005 5006 5007 5008 5009 5010 \
+          5011 5012 5013 5014 5015 5016 5017 5018 5019 5020 \
+  --device cpu \
+  --out-root research/confirmatory_functional
+```
+
+Then remove `--dry-run`. The wrapper hard-freezes V7 at checkpoints `20/80/320`, 24 states, 30 steps, phase length 40, reference-train episodes 1 and `panel_seed_offset=700000`. Development seeds 3001–3005 are rejected.
+
+After completion:
+
+```bash
+python -m scripts.analyze_v7_confirmatory \
+  --root research/confirmatory_functional
+```
+
+Seed/run is the inference unit. Do not tune definitions after opening confirmatory results.
+
+## 3. MASTER / merged support geometry
+
+```bash
+python -m scripts.run_master_extension_lab \
+  --instances 1000 --budgets 16 32 64 128 256 --seed 100 \
+  --out research/high_value_extensions/master/deep_seed100.json
+```
+
+Covers:
+
+- RU1–RU5 reference uncertainty and same-target error composition;
+- exact RU2 factor-2 sharpness witness;
+- RI1/RI2 missing-source-action non-identifiability and downstream Top-1 flip;
+- passive vs randomized vs targeted reference acquisition;
+- held-out score-error calibration;
+- support-score intervals;
+- operational MASTER transfer using the actual `zeta_def` object;
+- Gamma-box exact vertex bound, strict witness and tightening vs operational Gamma;
+- probability-good-event → false-certificate audit;
+- certificate → exact fallback safety/nonvacuity.
+
+## 4. Functional matched-budget acquisition — all proposed options
+
+```bash
+python -m scripts.run_query_optimal_allocation_lab \
+  --instances 1000 --seeds 100 101 102 103 104 \
+  --budgets 16 32 64 128 256 --relations 5 --actions 6 --topk 2 \
+  --out research/high_value_extensions/functional/allocation_deep.json
+```
+
+Every strategy gets exactly the same intervention budget per relation and uses common-random-number cell streams:
+
+```text
+uniform
+behavior_freq
+uncertainty_only
+D_neyman_pilot
+D_oracle
+C_extremal_confidence
+C_successive_elimination
+C_split_eval
+C_oracle
+```
+
+Primary endpoints are C MAE/Top-K, D MAE/sign, extrema recovery and Q RMSE. Oracle strategies are diagnostics, not deployable baselines.
+
+## 5. Functional covariance + sequential geometry
+
+```bash
+python -m scripts.run_functional_design_extension_lab \
+  --instances 1000 --replicates 2000 --seed 100 \
+  --out research/high_value_extensions/functional/design_seed100.json
+
+python -m scripts.run_functional_stopping_lab \
+  --instances 500 --seed 100 --K 6 --relations 5 \
+  --delta 0.05 --max-n 16384 --batch 64 --noise-scale 0.35 \
+  --out research/high_value_extensions/functional/stopping_seed100.json
+```
+
+Stopping modes are separate by target:
+
+- `C_extremal`: local unique-extrema identification;
+- `C_topk_targeted`: global C Top-K successive elimination using C-interval drivers;
+- `D_targeted`: D-specific allocation;
+- `uniform`: baseline.
+
+The runner uses cumulative data, finite-look Bonferroni Gaussian envelopes, explicit small/mid/large local and global margin strata, and records false-certificate rates.
+
+## 6. D6 — all branches
+
+```bash
+python -m scripts.run_d6_extension_lab \
+  --instances 10000 --sharpness-instances 100000 --seed 100 \
+  --out research/high_value_extensions/d6/deep_seed100.json
+```
+
+Covers current D6, S1–S3 sharpness, Q1 coordinate-specific moduli, Q2 q-averaged absolute hybrid bound, Q3 typed signed-hybrid bound, Q4 distributional residual, conditional Q5 q-L1 decision transfer, higher-order stress, assumption rejection and product-ANOVA comparison.
+
+Rules:
+
+- worst-case and distributional objectives remain separate;
+- Q2/Q3 use the exact hybrid arguments from the D6 telescoping identity;
+- the observed `(m-1)delta/2` decision constant remains only an improved-bound candidate unless separately proved;
+- any failed D6 applicability assumption returns `applicable=false`, never a certificate.
+
+## 7. Query representation + transfer
+
+```bash
+python -m scripts.run_query_extension_lab \
+  --instances 10000 --seed 100 --n-rel 12 --k 3 \
+  --out research/high_value_extensions/query/deep_seed100.json
+```
+
+Queries include sensitivity, direction, information, removal, deletion, causal contribution, synergy and staleness. Challenges include same-response/different-information, signed cancellation, higher-order synergy, reference shift, staleness, limited support, nonlinear-attribution nullspace, dynamic interaction and overlapping groups/hyperedges.
+
+Also covers QN1–QN4 representation necessity and the quantitative same-summary two-world lower bound. Synthetic success only gates investment in the real MARL/XAI baseline benchmark.
+
+## 8. Structural — exact iff stays closed
+
+```bash
+python -m scripts.run_structural_defect_lab \
+  --instances 10000 --seed 100 \
+  --out research/high_value_extensions/structural/deep_seed100.json
+```
+
+No rejected exact-iff candidate is retried. The runner checks:
+
+- SR0 nested-chain executable sanity;
+- the sole surviving open candidate `best_nested_regret <= m * all_optimal_extension_defect`;
+- negative taxonomy;
+- support/defect diagnostics;
+- exact subset-lattice DP runtime by m.
+
+If the open candidate is falsified, stop standalone Structural and retain the negative taxonomy inside MASTER.
+
+## 9. Dynamic validity
+
+```bash
+python -m scripts.run_dynamic_extension_lab \
+  --instances 5000 --seed 100 \
+  --out research/high_value_extensions/dynamic/deep_seed100.json
+```
+
+Covers score drift, reference-kernel TV drift, support-bracket lifespan, query-target error inflation and query ranking stability under a `gap > 2*drift` premise. Treat as future-work evidence until external temporal data exists.
+
+## 10. External capability gates
+
+```bash
+mkdir -p research/high_value_extensions/external
+for env in flatland rware cyborg cityflow; do
+  python -m scripts.run_external_master_capability \
+    --environment "$env" \
+    --out "research/high_value_extensions/external/${env}_master.json"
+  python -m scripts.run_external_query_capability \
+    --environment "$env" \
+    --out "research/high_value_extensions/external/${env}_query.json"
+  python -m scripts.run_external_d6_applicability \
+    --environment "$env" --manifest-only \
+    --out "research/high_value_extensions/external/${env}_d6.json"
+done
+```
+
+Blocked cells stay `NA`. In particular, command-space Cartesianity is not D6 applicability unless requested action = executed action is observable.
+
+## 11. Completeness registry
+
+`research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json` maps every active option/foundation link to a runner and primary metric. `tests/test_high_value_extension_suite.py` fails if a required proposal ID disappears.
