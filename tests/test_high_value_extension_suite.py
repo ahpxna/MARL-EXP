@@ -204,3 +204,23 @@ def test_omni_full_joint_d6_smoke():
     out=run(seed=3001,m_sources=2,n_states=1,warmup_steps=1)
     assert out['summary']['all_authority_verified'] is True
     assert out['command_support_semantics'].startswith('full Cartesian Omni command support')
+
+
+def test_omni_full_joint_near_zero_ratios_are_not_reported():
+    from scripts.run_omni_d6_full_joint import _reportable_ratio
+    assert _reportable_ratio(2.75, 1.0e-16) is None
+    assert _reportable_ratio(0.25, 1.0e-3) == 0.25
+
+
+def test_redesign_registry_has_unique_ids_and_core_p13_experiments():
+    import json
+    from pathlib import Path
+    registry=json.loads((Path(__file__).resolve().parents[1]/"research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json").read_text())
+    ids=[row["proposal_id"] for row in registry["items"]]
+    assert len(ids)==len(set(ids))
+    required={
+        "D6.HALF_FACTOR_EXACT","D6.HALF_FACTOR_OPTIMIZER","D6.OMNI_ZERO_REGRET_CAUSES",
+        "EXTERNAL.ADAPTER_CAPABILITY_AUDIT","FUNCTIONAL.UNKNOWN_VARIANCE",
+        "MASTER.EXTERNAL_HONORED_SUPPORT","MASTER.REFERENCE_RESPONSE_BUDGET",
+    }
+    assert required <= set(ids)

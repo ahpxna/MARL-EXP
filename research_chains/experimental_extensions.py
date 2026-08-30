@@ -458,11 +458,20 @@ def d6_diagnostics(world: FiniteResponseWorld, marginals: Mapping[int, Sequence[
         retained = {int(j) for j in retained}
         residuals = np.asarray([world.true_value(a)-sum(components[j][a[j]] for j in retained) for a in full],dtype=np.float64)
         return 0.5*float(np.ptp(residuals))
-    chosen=topk_indices(score,int(k)); optimum=float("inf")
-    for retained in itertools.combinations(range(m),int(k)): optimum=min(optimum,compression_loss(retained))
+    chosen=topk_indices(score,int(k)); subset_losses=[]
+    for retained in itertools.combinations(range(m),int(k)):
+        subset_losses.append((tuple(int(j) for j in retained),float(compression_loss(retained))))
+    optimum=min((loss for _,loss in subset_losses),default=0.0)
+    exact_optima=[list(S) for S,loss in subset_losses if loss<=optimum+1e-12]
+    ordered_losses=sorted(loss for _,loss in subset_losses)
+    exact_optimality_gap=float(ordered_losses[1]-ordered_losses[0]) if len(ordered_losses)>1 else float("inf")
     true_loss=compression_loss(chosen); decision_regret=float(true_loss-optimum)
     decision_rhs=float(2.0*worst_rhs)
     decision_candidate_half_rhs=float(0.5*worst_rhs)
+    score_order=np.argsort(-score,kind="stable")
+    topc_score_margin=float(score[score_order[int(k)-1]]-score[score_order[int(k)]]) if 0<int(k)<m else float("inf")
+    chosen_is_exact_optimal=bool(decision_regret<=1e-12)
+    empirical_margin_shield=bool(chosen_is_exact_optimal and topc_score_margin>2.0*sup_error+1e-12)
 
     # Separately typed q-L1 objective for Q5.  Evaluate whether Top-C is actually
     # surrogate-optimal before applying the conditional 2*mean-error transfer.
@@ -502,6 +511,8 @@ def d6_diagnostics(world: FiniteResponseWorld, marginals: Mapping[int, Sequence[
         "qsigned_distributional_candidate_violation":expected_abs-qsigned_distributional_rhs,
         "surrogate_tightness":sup_error/worst_rhs if worst_rhs>0 else (0.0 if sup_error==0 else float("inf")),
         "chosen_topc":list(chosen),"true_decision_regret":decision_regret,"decision_rhs":decision_rhs,
+        "exact_optimal_sets":exact_optima,"exact_optimality_gap":exact_optimality_gap,"topc_score_margin":topc_score_margin,
+        "chosen_is_exact_optimal":chosen_is_exact_optimal,"empirical_margin_shield_condition":empirical_margin_shield,
         "decision_candidate_half_rhs":decision_candidate_half_rhs,"decision_candidate_half_violation":decision_regret-decision_candidate_half_rhs,
         "decision_violation":decision_regret-decision_rhs,
         "decision_tightness":decision_regret/decision_rhs if decision_rhs>0 else (0.0 if decision_regret==0 else float("inf")),
