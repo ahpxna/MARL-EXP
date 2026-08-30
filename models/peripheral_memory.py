@@ -1,0 +1,1483 @@
+"""
+peripheral_memory_v2.py — Peripheral multi-memory with a slot-collapse fix.
+
+=============================================================================
+DIAGNOSIS OF THE V1 NULL RESULT
+=============================================================================
+The paper's result table reports:
+    NoMultiMemory (WITHOUT multi-memory)  Core F1 = 0.251 / 0.259, throughput 241.8
+    Final CIG-AMF (WITH multi-memory)      Core F1 = 0.244 / 0.262, throughput  74.7
+
+Removing the main module produced equivalent performance while running 3.2
+TIMES FASTER. The module therefore consumed approximately 70% of the
+computation without providing a measurable benefit.
+
+ROOT CAUSE — SLOT COLLAPSE. The v1 code was:
+
+    slot_logits = self.slot_router(enc_in)      # no task assigned to any slot
+    slot_probs  = F.softmax(slot_logits, dim=-1)
+
+No training signal specified that one slot should contain one type of item and
+another slot should contain a different type. The network was only told that
+any partition was acceptable as long as reward improved. Reward is delayed
+and noisy, so the gradient reaching the slot-assignment layer was extremely
+weak.
+
+Without an assigned task, the network selected the easiest solution. Two
+collapse modes were possible:
+  (a) UNIFORM COLLAPSE: softmax assigned every item to all four slots with
+      approximately equal weights (about 25% per slot). All four slots then
+      contained the same mixture, each slot approximated the global mean, and
+      concatenating four slots produced four copies of a single mean. Four
+      containers were present, but all contained the same representation.
+  (b) MONOPOLY COLLAPSE: one slot absorbed everything and the other three
+      remained empty, again reducing the representation to approximately one
+      mean.
+
+v1 also used `uniform_mix = 0.25` to mix a uniform memory into the slots. This
+MADE mode (a) WORSE by actively pulling every slot toward the common mean.
+
+=============================================================================
+THREE CORRECTION LAYERS, USED TOGETHER
+=============================================================================
+
+[T1] ASSIGN TASKS TO SLOTS — semantic slots.
+     Instead of leaving softmax unconstrained, each slot has a predefined
+     functional role inferred from its causal influence signature:
+        slot 0, "Beneficial": mu > 0, strong, and certain
+        slot 1, "Harmful"   : mu < 0, strong, and certain
+        slot 2, "Neutral"   : |mu| approximately 0
+        slot 3, "Uncertain" : high sigma — not yet understood, representing
+                              agents whose effects remain uncertain
+     Assignment is soft through sigmoid gates, so gradients still flow.
+
+     Compared with k-means, semantic slot meanings remain FIXED over time.
+     K-means would require periodic reclustering, and cluster meanings could
+     change after every reclustering. The policy would then have to relearn
+     their interpretation, introducing another source of non-stationarity —
+     exactly the phenomenon the paper is intended to address.
+
+     The "Uncertain" slot is particularly important: it turns sigma from a
+     control parameter into a semantic dimension. It is a routing category
+     for epistemic uncertainty, not an anomaly detector or anomaly claim.
+
+[T2] PREVENT MONOPOLY COLLAPSE — load-balancing loss (Switch Transformer).
+        L_lb = alpha * K * sum_q f_q * P_q
+     f_q is the fraction of items routed to slot q.
+     P_q is the mean routing probability assigned to slot q by the router.
+     Both equal 1/K under perfect balance, where their product is minimized.
+     The gradient scales with overload, creating a self-correcting feedback
+     loop. Fedus et al. swept alpha from 1e-1 to 1e-5 and recommended 1e-2.
+
+[T3] PREVENT UNIFORM-CONTENT COLLAPSE — orthogonality loss.
+        L_orth = mean_{q != r} cosine_similarity(m_q, m_r)^2
+     This penalizes slot vectors that are too similar. It directly prevents
+     four slots from carrying the same content. Load balancing cannot correct
+     mode (a), because routing can be perfectly even while slot contents remain
+     identical; both losses are therefore necessary.
+
+     An optional ROMA-style mutual-information regularizer is also available;
+     see slot_specialisation_loss.
+=============================================================================
+"""
+
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+from envs.causal_adapter import compact_relation_features, resolve_env_adapter
+
+from models.influence_signature import (
+    CausalPairSignal,
+    N_SEMANTIC_ROLES,
+    ROLE_UNCERTAIN,
+    ROLE_BENEFICIAL,
+    ROLE_HARMFUL,
+    ROLE_NEUTRAL,
+    SIGNATURE_DIM,
+)
+
+
+# Full H3 items contain Paper B's retained eight-dimensional profile
+# ``[C,D,sigma_C,sigma_D,v_ctx,m_ctx,L_tilde,m_L]``, followed by opaque
+# adapter-owned relation fields. Allocation still reads only the first five
+# coordinates; latency is representation information with an explicit mask.
+# The nine-dimensional layout used before H3 was
+# wired to the tracker is still accepted, but is upgraded explicitly and is
+# reported as ``legacy_derived`` in diagnostics.  A run that claims to test the
+# full signature must set ``require_full_signature=True``.
+LEGACY_ITEM_DIM = 9
+FULL_ITEM_DIM = 13
+
+ITEM_ACTION = 0
+ITEM_CAPACITY = 1
+ITEM_DIRECTION = 2
+ITEM_SIGMA_CAPACITY = 3
+ITEM_SIGMA_DIRECTION = 4
+ITEM_CONTEXT_STD = 5
+ITEM_CONTEXT_VALID = 6
+ITEM_LATENCY_NORM = 7
+ITEM_LATENCY_VALID = 8
+# Compatibility aliases for callers that still import the former names.
+ITEM_SIGNED_MU = ITEM_DIRECTION
+ITEM_ABS_MU = ITEM_CAPACITY
+ITEM_SIGMA = ITEM_SIGMA_DIRECTION
+ITEM_TEMPORAL_STD = ITEM_SIGMA_CAPACITY
+ITEM_REL_ROW = 9
+ITEM_REL_COL = 10
+ITEM_ZONE_DIFF = 11
+ITEM_DISTANCE = 12
+
+ROUTING_MODES = ("semantic", "unconstrained")
+SIGNATURE_MODES = ("full", "scalar")
+
+
+class PeripheralMultiMemory(nn.Module):
+    """
+    Peripheral encoder with semantic and free slots.
+
+    Hybrid architecture: four fixed beneficial/harmful/neutral/uncertain
+    semantic slots plus n_free_slots learned by the router to capture residual
+    structure. Total slots equal 4+n_free_slots.
+
+    Full item format has thirteen dimensions:
+        0: action_j
+        1: structural capacity C
+        2: behavioural direction D
+        3: sigma_C
+        4: sigma_D
+        5: context_std(v_C)
+        6: context_valid
+        7: normalized latency centre of mass L_cm/(H-1), zero iff invalid
+        8: latency-valid mask m_L
+        9--12: compact adapter-owned relation features (opaque to this model)
+
+    Nine-dimensional legacy items are upgraded only for compatibility.  They
+    do not provide separate C/D uncertainty and cannot support the redesigned
+    representation claim.
+
+    Input:
+        periph_items: np/tensor [N_p, 13]
+    Output:
+        forward()      -> [out_dim]
+        forward_full() returns memory and auxiliary losses.
+
+    Args:
+        n_free_slots:
+            Free slots beyond the four semantic slots; zero means semantic only.
+        lb_coeff:
+            Load-balancing coefficient; Fedus et al. recommend 1e-2.
+        orth_coeff:
+            Orthogonality-loss coefficient.
+        temperature_D, temperature_0, temperature_sigma:
+            Frozen router temperatures for the Paper-B valence softmax and
+            uncertainty sigmoid.  The retired ``role_sharpness`` parameter is
+            intentionally not accepted because it described a different,
+            non-contract routing rule.
+        use_uniform_mix:
+            v1 uniform-memory mixing pulled every slot toward a
+            common mean and induced uniform collapse. v2 disables it by
+            default; enable only for the before-correction ablation.
+        routing_mode:
+            ``semantic`` uses fixed influence-role gates plus optional free
+            slots. ``unconstrained`` routes all slots with a learned softmax
+            and is the faithful no-semantic ablation.
+        signature_mode:
+            ``full`` uses all five signature dimensions. ``scalar`` masks all
+            influence-signature channels except the behavioural-direction
+            coordinate while retaining
+            action, belief membership, and geometry as controls.
+    """
+
+    def __init__(
+        self,
+        action_dim: int,
+        memory_dim: int = 32,
+        out_dim: int = 64,
+        item_hidden: int = 48,
+        item_dim: int = FULL_ITEM_DIM,
+        n_free_slots: int = 2,
+        # Role thresholds should come from tracker.auto_calibrate().
+        tau_role: float = 0.05,
+        sigma_hi: float = 0.5,
+        temperature_D: float = 0.05,
+        temperature_0: float = 0.05,
+        temperature_sigma: float = 0.05,
+        # Regularization coefficients.
+        lb_coeff: float = 1e-2,
+        orth_coeff: float = 1e-2,
+        # Backward compatibility.
+        num_slots: Optional[int] = None,
+        use_uniform_mix: bool = False,
+        uniform_mix: float = 0.0,
+        routing_mode: str = "semantic",
+        signature_mode: str = "full",
+        require_full_signature: bool = True,
+        allow_legacy_items: bool = False,
+        mu_floor: float = 0.0,
+        beta_floor: float = 0.0,
+        beta_mode: str = "capacity",
+        semantic_mass: float = 0.5,
+        lambda_sigma: float = 1.0,
+        eps: float = 1e-6,
+    ):
+        super().__init__()
+
+        self.action_dim = int(action_dim)
+        self.memory_dim = int(memory_dim)
+        self.out_dim = int(out_dim)
+        self.item_hidden = int(item_hidden)
+        self.item_dim = int(item_dim)
+
+        if self.item_dim != FULL_ITEM_DIM:
+            raise ValueError(
+                f"PeripheralMultiMemory uses the {FULL_ITEM_DIM}D full item "
+                f"layout; got item_dim={self.item_dim}. Pass legacy 9D arrays "
+                "to forward only when allow_legacy_items=True."
+            )
+
+        self.routing_mode = str(routing_mode).strip().lower()
+        self.signature_mode = str(signature_mode).strip().lower()
+        if self.routing_mode not in ROUTING_MODES:
+            raise ValueError(
+                f"routing_mode must be one of {ROUTING_MODES}, got "
+                f"{routing_mode!r}"
+            )
+        if self.signature_mode not in SIGNATURE_MODES:
+            raise ValueError(
+                f"signature_mode must be one of {SIGNATURE_MODES}, got "
+                f"{signature_mode!r}"
+            )
+
+        self.require_full_signature = bool(require_full_signature)
+        self.allow_legacy_items = bool(allow_legacy_items)
+        self.signature_full_items_seen = 0
+        self.signature_legacy_items_seen = 0
+        self.last_signature_source = "none"
+        # Evaluation/scaling probes may disable streaming diagnostics so the
+        # measured policy forward is numerically side-effect free. Training
+        # and dedicated H3 diagnostic passes leave this enabled.
+        self.diagnostics_enabled = True
+        # Typed Paper-A signals are retained alongside the 5D allocator view.
+        # The full Paper-B profile, including latency/masks, is concatenated
+        # into the representation item; allocation remains 5D C/D-based.
+        self._last_causal_pair_signals = {}
+
+        self.n_semantic_slots = int(N_SEMANTIC_ROLES)
+        self.n_free_slots = int(max(0, n_free_slots))
+
+        # Interpret legacy num_slots as the total slot count.
+        if num_slots is not None:
+            total = int(num_slots)
+            if total < self.n_semantic_slots:
+                raise ValueError(
+                    f"num_slots={total} is smaller than the four fixed "
+                    "semantic slots"
+                )
+            self.n_free_slots = int(max(0, total - self.n_semantic_slots))
+
+        self.num_slots = self.n_semantic_slots + self.n_free_slots
+
+        self.tau_role = float(tau_role)
+        self.sigma_hi = float(sigma_hi)
+        self.temperature_D = float(temperature_D)
+        self.temperature_0 = float(temperature_0)
+        self.temperature_sigma = float(temperature_sigma)
+        if self.temperature_D <= 0.0 or self.temperature_0 <= 0.0 or self.temperature_sigma <= 0.0:
+            raise ValueError("semantic routing temperatures must be positive")
+        # Retained as a compatibility diagnostic; canonical routing uses the
+        # explicit temperature_sigma parameter above.
+        self.sigma_iqr_floor = float(sigma_hi)
+
+        self.register_buffer("g_uncertain_usage_ema", torch.zeros(1))
+        self.uncertain_ema_alpha = 0.05
+
+        self.lb_coeff = float(lb_coeff)
+        self.orth_coeff = float(orth_coeff)
+
+        self.use_uniform_mix = bool(use_uniform_mix)
+        self.uniform_mix = float(uniform_mix)
+        self.mu_floor = float(mu_floor)
+        self.beta_floor = float(beta_floor)
+        if abs(self.mu_floor) > 1e-12 or abs(self.beta_floor) > 1e-12:
+            raise ValueError(
+                "canonical CIG-AMF uses strict structural capacity weighting; "
+                "mu_floor and beta_floor must both be zero"
+            )
+        self.lambda_sigma = float(lambda_sigma)
+        if self.lambda_sigma < 0.0:
+            raise ValueError("lambda_sigma must be non-negative")
+        self.beta_mode = str(beta_mode).strip().lower()
+        if self.beta_mode not in {"capacity", "abs_direction", "attention"}:
+            raise ValueError("beta_mode must be capacity, abs_direction, or attention")
+        self.semantic_mass = float(np.clip(semantic_mass, 0.0, 1.0))
+        self.eps = float(eps)
+
+        # Action one-hot plus the remaining item fields.
+        self.non_action_dim = self.item_dim - 1
+        self.encoder_in_dim = self.action_dim + self.non_action_dim
+
+        self.item_encoder = nn.Sequential(
+            nn.Linear(self.encoder_in_dim, self.item_hidden),
+            nn.ReLU(),
+            nn.Linear(self.item_hidden, self.memory_dim),
+            # A terminal ReLU forced every slot into the positive orthant.
+            # Weighted means of such vectors had cosine approximately one, so
+            # the orthogonality objective had almost no useful geometry.  A
+            # centered output preserves signed directions for cosine-based
+            # specialization while retaining a nonlinear hidden layer.
+            nn.LayerNorm(self.memory_dim),
+        )
+        self.importance_attention = nn.Sequential(
+            nn.Linear(self.item_dim, self.item_hidden),
+            nn.ReLU(),
+            nn.Linear(self.item_hidden, 1),
+        )
+
+        # ---------------------------------------------------------------
+        # The router controls only free slots; rules assign semantic slots.
+        #
+        # Condition the router on semantic group. Synthetic four-role data
+        # empirically validated this design:
+        # (blocker / relay / consumer / inert):
+        #     global signature k-means: 0.767 purity
+        #     semantic grouping plus within-group k-means: 0.967 purity
+        # Global normalization is dominated by strong blocker/relay roles and
+        # compresses weak consumer/inert roles. Sign grouping first yielded
+        # 1.000 purity for blocker/consumer separation in the harmful group.
+        #
+        # Concatenate sem_probs to router input for differentiable within-group
+        # specialization instead of hard grouping followed by discrete k-means.
+        # ---------------------------------------------------------------
+        if self.n_free_slots > 0:
+            self.router_in_dim = self.encoder_in_dim + self.n_semantic_slots
+
+            self.slot_router = nn.Sequential(
+                nn.Linear(self.router_in_dim, self.item_hidden),
+                nn.ReLU(),
+                nn.Linear(self.item_hidden, self.n_free_slots),
+            )
+        else:
+            self.router_in_dim = self.encoder_in_dim
+            self.slot_router = None
+
+        # Faithful no-semantic ablation.  This router is constructed for every
+        # variant so switching modes does not mutate the module or optimizer
+        # after runner construction.  Its parameters are dormant in semantic
+        # runs and receive no gradients there.
+        self.unconstrained_router = nn.Sequential(
+            nn.Linear(self.encoder_in_dim, self.item_hidden),
+            nn.ReLU(),
+            nn.Linear(self.item_hidden, self.num_slots),
+        )
+
+        self.out_proj = nn.Sequential(
+            nn.Linear(self.num_slots * self.memory_dim, self.out_dim),
+            nn.ReLU(),
+        )
+
+        # Slot-usage diagnostics required to demonstrate collapse removal.
+        self.register_buffer(
+            "slot_usage_ema",
+            torch.zeros(self.num_slots),
+        )
+        self.register_buffer("slot_hard_usage_ema", torch.zeros(self.num_slots))
+        self.register_buffer(
+            "slot_memory_ema", torch.zeros(self.num_slots, self.memory_dim)
+        )
+        self.register_buffer(
+            "slot_signature_ema", torch.zeros(self.num_slots, SIGNATURE_DIM)
+        )
+        self.register_buffer(
+            "slot_signature_support_ema", torch.zeros(self.num_slots)
+        )
+        self.register_buffer("signature_mean_ema", torch.zeros(SIGNATURE_DIM))
+        self.register_buffer("signature_sq_mean_ema", torch.zeros(SIGNATURE_DIM))
+        self.register_buffer(
+            "slot_role_joint_ema",
+            torch.zeros(self.num_slots, self.n_semantic_slots),
+        )
+        self.register_buffer("assignment_entropy_ema", torch.zeros(1))
+        self.register_buffer("assignment_max_prob_ema", torch.zeros(1))
+        self.register_buffer(
+            "slot_diag_updates", torch.zeros((), dtype=torch.long)
+        )
+        self.usage_ema_alpha = 0.05
+    # =====================================================================
+    # Helper
+    # =====================================================================
+
+    def _device(self):
+        return next(self.parameters()).device
+
+    def _one_hot_actions(self, actions: torch.Tensor) -> torch.Tensor:
+        """actions: [N] long -> [N, action_dim]"""
+        raw = actions
+        if not bool(torch.all(torch.isfinite(raw))):
+            raise ValueError("peripheral action identities must be finite")
+        if not bool(torch.all(raw == torch.floor(raw))):
+            raise ValueError("peripheral action identities must be integers")
+        a = raw.long()
+        if bool(torch.any((a < 0) | (a >= self.action_dim))):
+            raise ValueError(
+                f"peripheral action identities must lie in [0, {self.action_dim})"
+            )
+        return F.one_hot(a, num_classes=self.action_dim).to(dtype=torch.float32)
+
+    def _normalise_inputs(self, periph_items) -> torch.Tensor:
+        device = self._device()
+
+        if periph_items is None:
+            return torch.zeros(0, self.item_dim, dtype=torch.float32, device=device)
+
+        if isinstance(periph_items, np.ndarray):
+            x = torch.from_numpy(periph_items).to(device=device, dtype=torch.float32)
+        elif isinstance(periph_items, torch.Tensor):
+            x = periph_items.to(device=device, dtype=torch.float32)
+        else:
+            x = torch.tensor(
+                np.asarray(periph_items, dtype=np.float32),
+                dtype=torch.float32,
+                device=device,
+            )
+
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+
+        if x.numel() == 0:
+            return torch.zeros(0, self.item_dim, dtype=torch.float32, device=device)
+
+        if x.shape[-1] == LEGACY_ITEM_DIM:
+            if self.require_full_signature or not self.allow_legacy_items:
+                raise ValueError(
+                    "Received legacy 9D peripheral items, but this module "
+            "requires the tracker-derived retained C/D/validity profile"
+                )
+            legacy = x
+            upgraded = torch.zeros(
+                legacy.shape[0], FULL_ITEM_DIM,
+                dtype=torch.float32, device=device,
+            )
+            upgraded[:, ITEM_ACTION] = legacy[:, 0]
+            upgraded[:, ITEM_SIGNED_MU] = legacy[:, 1]
+            upgraded[:, ITEM_ABS_MU] = torch.abs(legacy[:, 1])
+            upgraded[:, ITEM_SIGMA] = legacy[:, 2]
+            # temporal_std and context_std are unavailable in v1.
+            # No legacy source can supply context validity. It remains zero.
+            # deliberately left at zero, distinct from valid zero values.
+            upgraded[:, ITEM_CONTEXT_VALID] = 0.0
+            upgraded[:, ITEM_REL_ROW:] = legacy[:, 5:]
+            x = upgraded
+            if self.diagnostics_enabled:
+                self.signature_legacy_items_seen += int(legacy.shape[0])
+                self.last_signature_source = "legacy_derived"
+
+        if x.shape[-1] != FULL_ITEM_DIM:
+            raise ValueError(
+                f"PeripheralMultiMemory expected {FULL_ITEM_DIM}D full or "
+                f"{LEGACY_ITEM_DIM}D legacy items, "
+                f"got {x.shape[-1]}"
+            )
+
+        return x
+
+    def _prepare_encoder_input(self, items: torch.Tensor) -> torch.Tensor:
+        """Convert full items to the action-one-hot encoder representation."""
+        action_col = items[:, ITEM_ACTION].long()
+        if bool(torch.any((action_col < 0) | (action_col >= self.action_dim))):
+            raise ValueError("peripheral item contains an out-of-range action")
+        action_oh = self._one_hot_actions(action_col)  # [N, action_dim]
+        rest = items[:, 1:].to(dtype=torch.float32).clone()
+
+        if self.signature_mode == "scalar":
+            # Keep D only; remove the other retained-profile coordinates.
+            # Indices are relative to ``rest`` (item columns 1..).
+            rest[:, [
+                ITEM_CAPACITY - 1,
+                ITEM_SIGMA_CAPACITY - 1,
+                ITEM_SIGMA_DIRECTION - 1,
+                ITEM_CONTEXT_STD - 1,
+                ITEM_CONTEXT_VALID - 1,
+                ITEM_LATENCY_NORM - 1,
+                ITEM_LATENCY_VALID - 1,
+            ]] = 0.0
+
+        return torch.cat([action_oh, rest], dim=-1)
+
+    def set_ablation_modes(
+        self,
+        *,
+        routing_mode: Optional[str] = None,
+        signature_mode: Optional[str] = None,
+        require_full_signature: Optional[bool] = None,
+    ):
+        """Set H3 modes without rebuilding the runner or its optimizer."""
+        if routing_mode is not None:
+            mode = str(routing_mode).strip().lower()
+            if mode not in ROUTING_MODES:
+                raise ValueError(
+                    f"routing_mode must be one of {ROUTING_MODES}, got {mode!r}"
+                )
+            self.routing_mode = mode
+        if signature_mode is not None:
+            mode = str(signature_mode).strip().lower()
+            if mode not in SIGNATURE_MODES:
+                raise ValueError(
+                    f"signature_mode must be one of {SIGNATURE_MODES}, got {mode!r}"
+                )
+            self.signature_mode = mode
+        if require_full_signature is not None:
+            self.require_full_signature = bool(require_full_signature)
+
+    # =====================================================================
+    # [T1] Differentiable soft semantic-slot assignment.
+    # =====================================================================
+
+    def _semantic_slot_probs(self, items: torch.Tensor) -> torch.Tensor:        
+        """
+        Soft-assign each peripheral item to four influence-signature roles.
+
+        items: [N,13], with Paper B's retained validity-masked profile.
+        The semantic router reads C/D/uncertainty; context and latency remain
+        available to the learned item encoder without changing slot meaning.
+
+        Returns:
+            [N,4], with each row summing to approximately one.
+
+        The three directional roles use the paper's explicit temperature-
+        parameterized logits, whose neutral logit dominates at D=0. An
+        independent uncertainty gate then moves mass to the uncertain slot.
+        """
+        direction = items[:, ITEM_DIRECTION]
+        if self.signature_mode == "scalar":
+            # A genuine scalar-signature ablation has no uncertainty channel,
+            # so it cannot use the uncertain route as a hidden second feature.
+            sigma = torch.zeros_like(direction)
+        else:
+            sigma = torch.clamp(items[:, ITEM_SIGMA_DIRECTION], min=0.0)
+
+        uncertainty = (
+            torch.zeros_like(sigma)
+            if self.signature_mode == "scalar"
+            else torch.sigmoid((sigma - self.sigma_hi) / self.temperature_sigma)
+        )
+        # Paper B semantic routing: positive/negative/neutral logits are
+        # defined directly from D and tau_D.  Neutral is therefore dominant
+        # at D=0, while the uncertainty gate independently transfers mass to
+        # the uncertain slot.
+        directional_logits = torch.stack(
+            [
+                (direction - self.tau_role) / self.temperature_D,
+                (-direction - self.tau_role) / self.temperature_D,
+                (self.tau_role - torch.abs(direction)) / self.temperature_0,
+            ],
+            dim=1,
+        )
+        directional = F.softmax(directional_logits, dim=1)
+        certain = 1.0 - uncertainty
+
+        probs = torch.zeros(
+            items.shape[0], self.n_semantic_slots,
+            dtype=torch.float32, device=items.device,
+        )  # [N, 4]
+
+        probs[:, ROLE_BENEFICIAL] = certain * directional[:, 0]
+        probs[:, ROLE_HARMFUL] = certain * directional[:, 1]
+        probs[:, ROLE_NEUTRAL] = certain * directional[:, 2]
+        probs[:, ROLE_UNCERTAIN] = uncertainty
+
+        row_sum = torch.clamp(probs.sum(dim=1, keepdim=True), min=self.eps)  # [N,1]
+
+        if self.diagnostics_enabled:
+            with torch.no_grad():
+                self.g_uncertain_usage_ema.mul_(1.0 - self.uncertain_ema_alpha).add_(
+                    self.uncertain_ema_alpha * uncertainty.mean()
+                )
+
+        return probs / row_sum  # [N, 4]
+
+    def _importance_beta(self, items: torch.Tensor) -> torch.Tensor:
+        """
+        Confidence weight for within-slot pooling.
+
+        The canonical structural path is exactly
+        ``beta=C/(1+lambda_sigma*sigma_C)``.  Direction controls semantic
+        routing, not structural mass; alternative beta modes are labelled
+        ablations only.
+
+        Returns: [N]
+        """
+        capacity = torch.clamp(items[:, ITEM_CAPACITY], min=0.0)
+        sigma = (
+            torch.zeros_like(capacity)
+            if self.signature_mode == "scalar"
+            else torch.clamp(items[:, ITEM_SIGMA_CAPACITY], min=0.0)
+        )
+        confidence = 1.0 / (1.0 + self.lambda_sigma * sigma)  # [N]
+
+        if self.beta_mode == "capacity":
+            # Paper B Eq. (22): causally null pairs carry no structural mass.
+            # Empty slots are handled by the support mask below, never by a
+            # capacity floor that would make C=0 structurally important.
+            beta = capacity * confidence
+        elif self.beta_mode == "abs_direction":
+            direction = torch.abs(items[:, ITEM_DIRECTION])
+            beta = direction * confidence
+        else:
+            # This is an observational aggregate comparator, never a core
+            # selection signal.
+            beta = torch.softmax(
+                self.importance_attention(items).squeeze(-1), dim=0
+            )
+
+        return torch.clamp(beta, min=0.0)
+
+    def _route_items(
+        self,
+        items: torch.Tensor,
+        enc_in: torch.Tensor,
+    ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
+        """Return active, semantic-reference, and trainable-router probabilities."""
+        sem_probs = self._semantic_slot_probs(items)
+
+        if self.routing_mode == "unconstrained":
+            logits = self.unconstrained_router(enc_in)
+            probs = F.softmax(logits, dim=-1)
+            return probs, sem_probs, probs
+
+        if self.n_free_slots <= 0:
+            return sem_probs, sem_probs, None
+
+        # Free slots are conditioned on the fixed semantic group and learn
+        # residual within-role structure.  Detaching the role posterior keeps
+        # the semantic definition fixed while allowing the free router and
+        # item encoder to learn end-to-end.
+        router_in = torch.cat([enc_in, sem_probs.detach()], dim=-1)
+        free_logits = self.slot_router(router_in)
+        free_probs = F.softmax(free_logits, dim=-1)
+        return (
+            torch.cat(
+                [
+                    self.semantic_mass * sem_probs,
+                    (1.0 - self.semantic_mass) * free_probs,
+                ],
+                dim=1,
+            ),
+            sem_probs,
+            free_probs,
+        )
+
+    def _update_slot_diagnostics(
+        self,
+        *,
+        slot_probs: torch.Tensor,
+        semantic_probs: torch.Tensor,
+        memories: torch.Tensor,
+        items: torch.Tensor,
+    ):
+        """Update streaming diagnostics that distinguish both collapse modes."""
+        if not self.diagnostics_enabled:
+            return
+        with torch.no_grad():
+            n_items = int(slot_probs.shape[0])
+            if n_items == 0:
+                return
+
+            usage = slot_probs.mean(dim=0)
+            hard = F.one_hot(
+                slot_probs.argmax(dim=1), num_classes=self.num_slots
+            ).to(dtype=torch.float32)
+            hard_usage = hard.mean(dim=0)
+
+            p = torch.clamp(slot_probs, min=self.eps)
+            conditional_entropy = -torch.mean(
+                torch.sum(p * torch.log(p), dim=1)
+            )
+            max_prob = torch.mean(torch.max(slot_probs, dim=1).values)
+
+            signatures = items[:, ITEM_CAPACITY:ITEM_CONTEXT_STD + 1]
+            support = slot_probs.sum(dim=0)
+            centroids = (slot_probs.t() @ signatures) / torch.clamp(
+                support.unsqueeze(1), min=self.eps
+            )
+
+            semantic_hard = F.one_hot(
+                semantic_probs.argmax(dim=1),
+                num_classes=self.n_semantic_slots,
+            ).to(dtype=torch.float32)
+            role_joint = (slot_probs.t() @ semantic_hard) / float(n_items)
+
+            first = int(self.slot_diag_updates.item()) == 0
+            alpha = float(self.usage_ema_alpha)
+
+            def update_ema(target, value):
+                if first:
+                    target.copy_(value)
+                else:
+                    target.mul_(1.0 - alpha).add_(alpha * value)
+
+            update_ema(self.slot_usage_ema, usage)
+            update_ema(self.slot_hard_usage_ema, hard_usage)
+            update_ema(self.slot_memory_ema, memories.detach())
+            update_ema(self.slot_signature_ema, centroids)
+            update_ema(
+                self.slot_signature_support_ema,
+                support / float(n_items),
+            )
+            update_ema(self.signature_mean_ema, signatures.mean(dim=0))
+            update_ema(
+                self.signature_sq_mean_ema,
+                torch.mean(signatures ** 2, dim=0),
+            )
+            update_ema(self.slot_role_joint_ema, role_joint)
+            update_ema(
+                self.assignment_entropy_ema,
+                conditional_entropy.reshape_as(self.assignment_entropy_ema),
+            )
+            update_ema(
+                self.assignment_max_prob_ema,
+                max_prob.reshape_as(self.assignment_max_prob_ema),
+            )
+            self.slot_diag_updates.add_(1)
+
+    # =====================================================================
+    # [T2][T3] Auxiliary losses.
+    # =====================================================================
+
+    def _load_balancing_loss(self, slot_probs: torch.Tensor) -> torch.Tensor:
+        """
+        [T2] Switch Transformer load-balancing loss.
+
+            L = K * sum_q  f_q * P_q
+
+        slot_probs: [N, K] for an exchangeable trainable router. Fixed
+        semantic-role probabilities must not be passed here because their
+        empirical prevalence is not expected to be uniform.
+
+        f_q is the discrete argmax routing fraction and acts as a coefficient;
+        P_q is mean routing probability and carries gradients.
+
+        Perfect balance gives f_q=P_q=1/K and L=1. Imbalance increases L.
+
+        Returns: scalar
+        """
+        N, K = slot_probs.shape
+
+        if N == 0:
+            return torch.zeros((), dtype=torch.float32, device=slot_probs.device)
+
+        # f_q is the mean argmax one-hot and needs no gradient.
+        with torch.no_grad():
+            hard = F.one_hot(
+                slot_probs.argmax(dim=1), num_classes=K
+            ).to(dtype=torch.float32)  # [N, K]
+            f = hard.mean(dim=0)       # [K]
+
+        P = slot_probs.mean(dim=0)     # [K], gradient path.
+
+        return float(K) * torch.sum(f * P)
+
+    def _orthogonality_loss(
+        self,
+        memories: torch.Tensor,
+        slot_support: torch.Tensor,
+    ) -> torch.Tensor:
+        """
+        [T3] Penalize overly similar slot vectors to prevent uniform content.
+
+        memories: [K, memory_dim]
+
+        L = mean over q != r of  cos(m_q, m_r)^2
+
+        Squared cosine is nonnegative and penalizes both identical and
+        antipodal vectors. Antipodal beneficial/harmful semantics may be valid,
+        so allow_antipodal provides an alternative when opposites should not
+        be penalized.
+
+        Returns: scalar
+        """
+        K = memories.shape[0]
+
+        if K < 2:
+            return torch.zeros((), dtype=torch.float32, device=memories.device)
+
+        supported = slot_support.reshape(-1) > self.eps
+        if int(supported.sum().item()) < 2:
+            return torch.zeros((), dtype=torch.float32, device=memories.device)
+
+        normed = F.normalize(memories, p=2, dim=1, eps=self.eps)  # [K, D]
+        gram = normed @ normed.t()                                 # [K, K]
+
+        # Empty or near-empty slots have no semantic content.  Including them
+        # lets the model lower this loss by killing slots instead of separating
+        # their representations.
+        mask = (
+            ~torch.eye(K, dtype=torch.bool, device=memories.device)
+            & supported.unsqueeze(0)
+            & supported.unsqueeze(1)
+        )
+        off_diag = gram[mask]                                            # [K*(K-1)]
+
+        if off_diag.numel() == 0:
+            return torch.zeros((), dtype=torch.float32, device=memories.device)
+
+        return torch.mean(off_diag ** 2)
+
+    # =====================================================================
+    # Forward
+    # =====================================================================
+
+    def forward_full(self, periph_items) -> Dict[str, torch.Tensor]:
+        """
+        Full forward pass returning memory and all auxiliary losses.
+
+        Returns dict:
+            memory:      [out_dim]           — supplied to the policy
+            lb_loss:     scalar              — load balancing
+            orth_loss:   scalar              — orthogonality
+            aux_loss:    scalar              — lb_coeff*lb + orth_coeff*orth
+            slot_probs:  [N, K]              — diagnostics
+            slot_usage:  [K]                 — usage fraction per slot
+            memories:    [K, memory_dim]     — vector for each slot
+        """
+        items = self._normalise_inputs(periph_items)  # [N, 13]
+        device = self._device()
+
+        zero = torch.zeros((), dtype=torch.float32, device=device)
+
+        # Empty input.
+        if items.shape[0] == 0:
+            x = torch.zeros(
+                1, self.num_slots * self.memory_dim,
+                dtype=torch.float32, device=device,
+            )
+            return {
+                "memory": self.out_proj(x).squeeze(0),   # [out_dim]
+                "lb_loss": zero,
+                "orth_loss": zero,
+                "aux_loss": zero,
+                "slot_probs": torch.zeros(
+                    0, self.num_slots, dtype=torch.float32, device=device
+                ),
+                "semantic_probs": torch.zeros(
+                    0, self.n_semantic_slots,
+                    dtype=torch.float32, device=device,
+                ),
+                "balance_probs": None,
+                "slot_usage": torch.zeros(
+                    self.num_slots, dtype=torch.float32, device=device
+                ),
+                "memories": torch.zeros(
+                    self.num_slots, self.memory_dim,
+                    dtype=torch.float32, device=device,
+                ),
+            }
+
+        N = items.shape[0]
+
+        enc_in = self._prepare_encoder_input(items)   # [N, action_dim+8]
+        h = self.item_encoder(enc_in)                 # [N, memory_dim]
+
+        slot_probs, sem_probs, balance_probs = self._route_items(items, enc_in)
+
+        # Pool within each slot.
+        beta = self._importance_beta(items)           # [N]
+
+        # weighted[n, q] = slot_probs[n,q] * beta[n]
+        weighted = slot_probs * beta.unsqueeze(1)     # [N, K]
+
+        # memories[q] = sum_n weighted[n,q] * h[n] / sum_n weighted[n,q]
+        num = weighted.t() @ h                        # [K, memory_dim]
+        den = torch.clamp(
+            weighted.sum(dim=0), min=self.eps
+        ).unsqueeze(1)                                # [K, 1]
+
+        memories = num / den                          # [K, memory_dim]
+
+        # v1 uniform mix, disabled by default. Enable only for ablation: it
+        # actively pulls every slot toward the global mean and CAUSES uniform
+        # collapse.
+        if self.use_uniform_mix:
+            num_u = slot_probs.t() @ h                              # [K, D]
+            den_u = torch.clamp(
+                slot_probs.sum(dim=0), min=self.eps
+            ).unsqueeze(1)                                          # [K, 1]
+            uniform_mem = num_u / den_u                             # [K, D]
+
+            mix = float(np.clip(self.uniform_mix, 0.0, 1.0))
+            memories = (1.0 - mix) * memories + mix * uniform_mem
+
+        # Auxiliary losses.
+        # Semantic roles are fixed and need not occur equally often. Applying
+        # a Switch-style equal-load objective to them is both conceptually
+        # wrong and gradient-free because their gates contain no trainable
+        # parameters. Balance only the exchangeable learned router: free slots
+        # in Full, or every slot in the unconstrained ablation.
+        lb_loss = (
+            self._load_balancing_loss(balance_probs)
+            if balance_probs is not None
+            else zero
+        )
+        if self.routing_mode == "semantic":
+            orth_memories = memories[self.n_semantic_slots:]
+            orth_support = weighted.sum(dim=0)[self.n_semantic_slots:]
+        else:
+            orth_memories = memories
+            orth_support = weighted.sum(dim=0)
+        orth_loss = self._orthogonality_loss(
+            orth_memories,
+            slot_support=orth_support,
+        )
+        aux_loss = self.lb_coeff * lb_loss + self.orth_coeff * orth_loss
+
+        usage = slot_probs.mean(dim=0)
+        self._update_slot_diagnostics(
+            slot_probs=slot_probs,
+            semantic_probs=sem_probs,
+            memories=memories,
+            items=items,
+        )
+
+        flat = memories.reshape(1, -1)                # [1, K*memory_dim]
+        memory_out = self.out_proj(flat).squeeze(0)   # [out_dim]
+
+        return {
+            "memory": memory_out,
+            "lb_loss": lb_loss,
+            "orth_loss": orth_loss,
+            "aux_loss": aux_loss,
+            "slot_probs": slot_probs,
+            "semantic_probs": sem_probs,
+            "balance_probs": balance_probs,
+            "slot_usage": usage,
+            "memories": memories,
+        }
+
+    def forward_excluding_all(self, periph_items, item_ids) -> Dict[int, torch.Tensor]:
+        """
+        [GPU_OPTIMIZATION_CONTRACT.md section 2.1] Compute M_i^{-j}
+        simultaneously for every j in one ego's current peripheral set using
+        sum-minus-one. The old path called forward_full separately for each
+        exclusion: build_inputs plus a full forward N times per ego, rerunning
+        item_encoder/slot_router on almost the entire set each time.
+
+        This is VALID ONLY FOR WEIGHTED-SUM POOLING. Eq. 25 is a weighted mean,
+        permutation-invariant in the Deep Sets style. Each item contributes
+        independently through h[n], slot_probs[n], and beta[n], with no
+        cross-item normalization before pooling. item_encoder, semantic gates,
+        and the free-slot router were verified to be per-item MLPs without
+        cross-item BatchNorm or attention. If pooling later changes to
+        attention or max, including the paper's proposed Set Transformer
+        variant, this method is wrong and must revert to a separate
+        forward_full call for every exclusion.
+
+        Do not use this method for training because it does not compute
+        lb_loss/orth_loss. It only constructs M_i^{-j} proxy context. Train the
+        peripheral module with forward_full() on the complete set.
+
+        Args:
+            periph_items: [N,item_dim], the complete current peripheral set.
+            item_ids: N neighbour IDs corresponding to the rows.
+
+        Returns:
+            {item_id: memory_out [out_dim]} for every item ID.
+        """
+        items = self._normalise_inputs(periph_items)
+        N = items.shape[0]
+
+        if N == 0:
+            return {}
+
+        with torch.no_grad():
+            enc_in = self._prepare_encoder_input(items)   # [N, enc_in_dim]
+            h = self.item_encoder(enc_in)                 # [N, D]
+            slot_probs, _, _ = self._route_items(items, enc_in)
+
+            beta = self._importance_beta(items)          # [N]
+            weighted = slot_probs * beta.unsqueeze(1)     # [N, K]
+
+            num = weighted.t() @ h                         # [K,D], complete sum.
+            den = weighted.sum(dim=0)                       # [K]
+
+            # Each item's per-slot contribution is [N,K,D], vectorized over N
+            # instead of a Python loop.
+            contrib = weighted.unsqueeze(2) * h.unsqueeze(1)   # [N, K, D]
+            num_excl = num.unsqueeze(0) - contrib               # [N, K, D]
+            den_excl = torch.clamp(
+                den.unsqueeze(0) - weighted, min=self.eps
+            ).unsqueeze(2)                                       # [N, K, 1]
+            memories = num_excl / den_excl                        # [N, K, D]
+
+            if self.use_uniform_mix:
+                num_u = slot_probs.t() @ h                          # [K, D]
+                den_u = slot_probs.sum(dim=0)                        # [K]
+                contrib_u = slot_probs.unsqueeze(2) * h.unsqueeze(1)  # [N,K,D]
+                num_u_excl = num_u.unsqueeze(0) - contrib_u
+                den_u_excl = torch.clamp(
+                    den_u.unsqueeze(0) - slot_probs, min=self.eps
+                ).unsqueeze(2)
+                uniform_mem = num_u_excl / den_u_excl                  # [N,K,D]
+
+                mix = float(np.clip(self.uniform_mix, 0.0, 1.0))
+                memories = (1.0 - mix) * memories + mix * uniform_mem
+
+            flat = memories.reshape(N, -1)          # [N, K*memory_dim]
+            outs = self.out_proj(flat)              # [N, out_dim]
+
+        return {int(item_ids[n]): outs[n] for n in range(N)}
+
+    def forward(self, periph_items) -> torch.Tensor:
+        """
+        Preserve the v1 signature and exact [out_dim] return. Legacy runners
+        work unchanged; call forward_full() when auxiliary loss is required.
+        """
+        return self.forward_full(periph_items)["memory"]
+
+    # =====================================================================
+    # Input construction and explicit legacy compatibility.
+    # =====================================================================
+
+    def build_inputs(
+        self,
+        ego_id,
+        peripheral_ids,
+        env,
+        belief_state,
+        prev_core_set=None,
+        influence_signatures: Optional[
+            Mapping[int, Sequence[float]]
+        ] = None,
+        context_validity: Optional[Mapping[int, float]] = None,
+        causal_pair_signals: Optional[Mapping[int, CausalPairSignal]] = None,
+        require_full_signature: Optional[bool] = None,
+    ) -> np.ndarray:
+        """
+        Build the item matrix for one ego agent.
+
+        ``influence_signatures`` maps neighbour IDs to the five-coordinate
+        allocator view. The authoritative ``CausalPairSignal`` additionally
+        carries ``m_ctx``, normalized latency, and ``m_L`` into the full
+        representation item exactly as specified in Paper B Eq. (3).
+        Compatibility
+        data are rejected when ``require_full_signature`` is true.
+
+        This distinction is an experiment-validity requirement: derived
+        vectors cannot support a five-dimensional-versus-scalar H3 claim.
+
+        Returns:
+            np.ndarray float32 [len(peripheral_ids), 13]
+        """
+        ego_id = int(ego_id)
+        prev_core_set = set() if prev_core_set is None else set(prev_core_set)
+        require_full = (
+            self.require_full_signature
+            if require_full_signature is None
+            else bool(require_full_signature)
+        )
+
+        ids = [int(j) for j in list(peripheral_ids) if int(j) != ego_id]
+        self._last_causal_pair_signals = {}
+
+        if len(ids) == 0:
+            return np.zeros((0, self.item_dim), dtype=np.float32)
+
+        adapter = resolve_env_adapter(env)
+
+        last_actions = getattr(
+            env, "last_actions", [0] * int(env.n_agents)
+        )
+
+        rows = []
+        full_count = 0
+        legacy_count = 0
+
+        for j in ids:
+            signal = None
+            if causal_pair_signals is not None:
+                signal = causal_pair_signals.get(int(j))
+                if signal is None or not isinstance(signal, CausalPairSignal):
+                    raise ValueError(
+                        "causal_pair_signals must contain a typed CausalPairSignal "
+                        f"for neighbour={j}"
+                    )
+                if signal.ego_id != ego_id or signal.target_id != int(j):
+                    raise ValueError("typed pair signal IDs do not match build_inputs")
+                self._last_causal_pair_signals[int(j)] = signal
+            relation = compact_relation_features(adapter, ego_id, j, width=4)
+            b = belief_state[j]
+
+            action_j = int(last_actions[j])
+            if action_j < 0 or action_j >= self.action_dim:
+                raise ValueError(
+                    f"peripheral action for neighbour={j} must lie in "
+                    f"[0, {self.action_dim}), got {action_j}"
+                )
+
+            signature = None
+            if influence_signatures is not None:
+                try:
+                    signature = np.asarray(
+                        influence_signatures[int(j)], dtype=np.float32
+                    ).reshape(-1)
+                except (KeyError, TypeError, ValueError):
+                    signature = None
+
+            # The typed Paper-A object is the authoritative cross-paper
+            # boundary.  The five-vector is merely its fixed-width allocator
+            # projection.  A separately supplied vector/mask may be used as
+            # a consistency check, never as an alternative source of truth.
+            if signal is not None:
+                typed_signature = signal.allocator_profile
+                if signature is not None and not np.allclose(
+                    signature, typed_signature, rtol=1e-5, atol=1e-6
+                ):
+                    raise ValueError(
+                        "influence signature disagrees with typed CausalPairSignal"
+                    )
+                signature = typed_signature
+
+            if signature is None:
+                if require_full:
+                    raise ValueError(
+                        "Full retained pair profile required but missing "
+                        f"for ego={ego_id}, neighbour={j}"
+                    )
+                mu_legacy = float(b["mu_bar"])
+                sigma_legacy = float(b["sigma_bar"])
+                if not self.allow_legacy_items:
+                    raise ValueError(
+                        "Missing C/D profile cannot be upgraded in final CIG-AMF mode"
+                    )
+                signature = np.asarray(
+                    [abs(mu_legacy), mu_legacy, sigma_legacy, sigma_legacy, 0.0],
+                    dtype=np.float32,
+                )
+                legacy_count += 1
+            else:
+                if signature.shape[0] != SIGNATURE_DIM:
+                    raise ValueError(
+                        f"Influence signature for ego={ego_id}, neighbour={j} "
+                        f"must have {SIGNATURE_DIM} values, got "
+                        f"{signature.shape[0]}"
+                    )
+                if not np.all(np.isfinite(signature)):
+                    raise ValueError(
+                        f"Influence signature for ego={ego_id}, neighbour={j} "
+                        "contains non-finite values"
+                    )
+                full_count += 1
+
+            if signal is not None:
+                typed_context_valid = float(bool(signal.context_valid))
+                if context_validity is not None:
+                    supplied_context_valid = float(
+                        context_validity.get(int(j), typed_context_valid)
+                    )
+                    if not np.isclose(
+                        supplied_context_valid, typed_context_valid, rtol=0.0, atol=1e-6
+                    ):
+                        raise ValueError(
+                            "context validity disagrees with typed CausalPairSignal"
+                        )
+                context_valid = typed_context_valid
+                latency_normalized = float(signal.normalized_latency)
+                latency_valid = float(bool(signal.latency_representation_valid))
+            else:
+                context_valid = 0.0 if context_validity is None else float(
+                    context_validity.get(int(j), 0.0)
+                )
+                latency_normalized = 0.0
+                latency_valid = 0.0
+            if not np.isfinite(context_valid):
+                raise ValueError("context_validity must be finite")
+            if not np.isfinite(latency_normalized):
+                raise ValueError("normalized latency must be finite")
+            rows.append([
+                float(action_j),
+                *[float(v) for v in signature],
+                context_valid,
+                latency_normalized,
+                latency_valid,
+                *[float(value) for value in relation],
+            ])
+
+        if self.diagnostics_enabled:
+            self.signature_full_items_seen += int(full_count)
+            self.signature_legacy_items_seen += int(legacy_count)
+            if full_count and legacy_count:
+                self.last_signature_source = "mixed"
+            elif full_count:
+                self.last_signature_source = "full_profile"
+            else:
+                self.last_signature_source = "legacy_derived"
+
+        return np.asarray(rows, dtype=np.float32)
+
+    def get_last_causal_pair_signals(self) -> Dict[int, CausalPairSignal]:
+        """Return the typed Paper-A signals attached to the last input batch."""
+        return dict(self._last_causal_pair_signals)
+
+    # =====================================================================
+    # Diagnostics.
+    # =====================================================================
+
+    def set_diagnostics_enabled(self, enabled: bool):
+        """Enable/disable streaming-only diagnostics without changing inference."""
+        previous = bool(self.diagnostics_enabled)
+        self.diagnostics_enabled = bool(enabled)
+        return previous
+
+    def reset_slot_diagnostics(self):
+        """Reset streaming statistics before a fixed held-out probe pass.
+
+        Training-time calls are not exchangeable across variants: auxiliary
+        objectives and routing change how often particular paths execute, and
+        an exponential moving average over that stream overweights the most
+        recent minibatches.  H3 therefore clears these buffers after training
+        and recomputes diagnostics on the same ordered held-out states for
+        every arm.
+        """
+        with torch.no_grad():
+            self.slot_usage_ema.zero_()
+            self.slot_hard_usage_ema.zero_()
+            self.slot_memory_ema.zero_()
+            self.slot_signature_ema.zero_()
+            self.slot_signature_support_ema.zero_()
+            self.signature_mean_ema.zero_()
+            self.signature_sq_mean_ema.zero_()
+            self.slot_role_joint_ema.zero_()
+            self.assignment_entropy_ema.zero_()
+            self.assignment_max_prob_ema.zero_()
+            self.slot_diag_updates.zero_()
+            self.g_uncertain_usage_ema.zero_()
+        self.signature_full_items_seen = 0
+        self.signature_legacy_items_seen = 0
+        self.last_signature_source = "none"
+
+    def get_slot_diagnostics(self) -> Dict[str, object]:
+        """
+        Anti-collapse evidence that must be included in the paper.
+
+        usage_entropy_ratio:
+            Usage-distribution entropy divided by log(K). Approximately 1.0
+            means even use of all K slots; approximately 0.0 means monopoly
+            collapse. High entropy alone does not establish absence of
+            collapse: uniform-content collapse has perfect entropy 1.0 while
+            remaining useless. Report orthogonality too, using a centroid
+            heatmap.
+
+        max_usage / min_usage:
+            min_usage near zero indicates a dead slot.
+        """
+        usage = self.slot_usage_ema.detach().cpu().numpy()
+        hard_usage = self.slot_hard_usage_ema.detach().cpu().numpy()
+        K = int(usage.shape[0])
+        n_updates = int(self.slot_diag_updates.item())
+
+        def entropy_ratio(values):
+            values = np.asarray(values, dtype=np.float64)
+            total = float(values.sum())
+            if total <= 1e-12 or K <= 1:
+                return float("nan")
+            probs = np.clip(values / total, 1e-12, 1.0)
+            return float(-np.sum(probs * np.log(probs)) / np.log(K))
+
+        max_entropy = float(np.log(K)) if K > 1 else 1.0
+        usage_entropy_ratio = entropy_ratio(usage)
+        hard_usage_entropy_ratio = entropy_ratio(hard_usage)
+        p = np.clip(usage / max(float(usage.sum()), 1e-12), 1e-12, 1.0)
+        marginal_entropy = float(-np.sum(p * np.log(p)))
+        conditional_entropy = float(self.assignment_entropy_ema.item())
+        assignment_mi_ratio = float(
+            max(0.0, marginal_entropy - conditional_entropy)
+            / max(max_entropy, 1e-12)
+        )
+
+        full_seen = int(self.signature_full_items_seen)
+        legacy_seen = int(self.signature_legacy_items_seen)
+        total_seen = full_seen + legacy_seen
+
+        out = {
+            "n_slots": K,
+            "n_semantic_slots": int(self.n_semantic_slots),
+            "n_free_slots": int(self.n_free_slots),
+            "routing_mode": str(self.routing_mode),
+            "signature_mode": str(self.signature_mode),
+            "signature_source": str(self.last_signature_source),
+            "signature_full_fraction": (
+                float(full_seen) / float(total_seen) if total_seen else float("nan")
+            ),
+            "signature_full_items_seen": full_seen,
+            "signature_legacy_items_seen": legacy_seen,
+            "require_full_signature": bool(self.require_full_signature),
+            "uniform_mix_enabled": bool(self.use_uniform_mix),
+            "uniform_mix": float(self.uniform_mix),
+            "diagnostic_updates": n_updates,
+            "usage_entropy_ratio": usage_entropy_ratio,
+            "hard_usage_entropy_ratio": hard_usage_entropy_ratio,
+            "assignment_entropy_ratio": float(
+                conditional_entropy / max(max_entropy, 1e-12)
+            ),
+            "assignment_mutual_info_ratio": assignment_mi_ratio,
+            "mean_assignment_max_prob": float(
+                self.assignment_max_prob_ema.item()
+            ),
+            "effective_soft_slots": float(np.exp(marginal_entropy)),
+            "max_usage": float(np.max(usage)) if usage.size else float("nan"),
+            "min_usage": float(np.min(usage)) if usage.size else float("nan"),
+            "max_hard_usage": (
+                float(np.max(hard_usage)) if hard_usage.size else float("nan")
+            ),
+            "min_hard_usage": (
+                float(np.min(hard_usage)) if hard_usage.size else float("nan")
+            ),
+            "lb_coeff": float(self.lb_coeff),
+            "orth_coeff": float(self.orth_coeff),
+        }
+
+        for q in range(min(K, self.n_semantic_slots)):
+            name = ("beneficial", "harmful", "neutral", "uncertain")[q]
+            out[f"usage_{name}"] = float(usage[q])
+
+        support = self.slot_signature_support_ema.detach().cpu().numpy()
+        mem = self.slot_memory_ema.detach().cpu().numpy()
+        mem_norm = np.linalg.norm(mem, axis=1)
+        active = np.flatnonzero((support > 1e-4) & (mem_norm > 1e-8))
+        if active.size >= 2:
+            active_mem = mem[active]
+            normed = active_mem / np.clip(
+                np.linalg.norm(active_mem, axis=1, keepdims=True), 1e-8, None
+            )
+            gram = normed @ normed.T
+            off_mask = ~np.eye(active.size, dtype=bool)
+            out["mean_offdiag_cosine"] = float(np.mean(np.abs(gram[off_mask])))
+        else:
+            out["mean_offdiag_cosine"] = float("nan")
+
+        # Content separation in the actual five signature dimensions.  Scale
+        # by the streaming item standard deviation so high-variance channels
+        # do not dominate the distance.
+        centroids = self.slot_signature_ema.detach().cpu().numpy()
+        sig_mean = self.signature_mean_ema.detach().cpu().numpy()
+        sig_sq = self.signature_sq_mean_ema.detach().cpu().numpy()
+        sig_scale = np.sqrt(np.clip(sig_sq - sig_mean ** 2, 1e-8, None))
+        active_sig = np.flatnonzero(support > 1e-4)
+        if active_sig.size >= 2:
+            standardized = centroids[active_sig] / sig_scale[None, :]
+            diffs = standardized[:, None, :] - standardized[None, :, :]
+            distances = np.sqrt(np.sum(diffs ** 2, axis=-1))
+            off = distances[~np.eye(active_sig.size, dtype=bool)]
+            out["mean_signature_centroid_distance"] = float(np.mean(off))
+            out["min_signature_centroid_distance"] = float(np.min(off))
+        else:
+            out["mean_signature_centroid_distance"] = float("nan")
+            out["min_signature_centroid_distance"] = float("nan")
+
+        # Normalized mutual information between active slots and the semantic
+        # role posterior.  Unlike entropy alone, it is zero when every item is
+        # diffusely copied into every slot.
+        joint = self.slot_role_joint_ema.detach().cpu().numpy().astype(np.float64)
+        joint_total = float(joint.sum())
+        if joint_total > 1e-12:
+            joint /= joint_total
+            q = joint.sum(axis=1, keepdims=True)
+            r = joint.sum(axis=0, keepdims=True)
+            denom = np.clip(q @ r, 1e-12, None)
+            nz = joint > 1e-12
+            mi = float(np.sum(joint[nz] * np.log(joint[nz] / denom[nz])))
+            hq = float(-np.sum(q[q > 1e-12] * np.log(q[q > 1e-12])))
+            hr = float(-np.sum(r[r > 1e-12] * np.log(r[r > 1e-12])))
+            out["semantic_role_nmi"] = float(
+                mi / max(np.sqrt(max(hq, 0.0) * max(hr, 0.0)), 1e-12)
+            )
+        else:
+            out["semantic_role_nmi"] = float("nan")
+
+        mem_cos = float(out["mean_offdiag_cosine"])
+        monopoly = bool(
+            np.isfinite(hard_usage_entropy_ratio)
+            and (
+                hard_usage_entropy_ratio < 0.5
+                or float(np.max(hard_usage)) > 0.90
+            )
+        )
+        diffuse = bool(
+            out["assignment_entropy_ratio"] > 0.90
+            and assignment_mi_ratio < 0.10
+        )
+        uniform_content = bool(np.isfinite(mem_cos) and mem_cos > 0.95)
+        out["monopoly_collapse"] = monopoly
+        out["diffuse_assignment_collapse"] = diffuse
+        out["uniform_content_collapse"] = uniform_content
+        out["collapse_detected"] = bool(
+            monopoly or diffuse or uniform_content
+        )
+        out["g_uncertain_mean"] = float(self.g_uncertain_usage_ema.item())
+        return out
+
+    def set_role_thresholds(self, tau_role: float, sigma_hi: float, sigma_iqr: float = None):
+        """
+        Update thresholds after tracker.auto_calibrate().
+
+        IMPORTANT: mu scale depends entirely on environment reward scale. A
+        hard-coded tau_role can make every neighbour neutral under small
+        rewards or no neighbour neutral under large rewards. Both outcomes
+        make semantic slots useless.
+        """
+        self.tau_role = float(tau_role)
+        self.sigma_hi = float(sigma_hi)
+        # tau_role is the public compatibility name for the paper's tau_D.
+        self.sigma_iqr_floor = float(sigma_iqr) if sigma_iqr is not None else float(sigma_hi)
+
+
+# =========================================================================
+# Optional ROMA-style MI regularizer as an orthogonality alternative.
+# =========================================================================
+
+def slot_specialisation_loss(
+    slot_probs: torch.Tensor,
+    eps: float = 1e-8,
+) -> torch.Tensor:
+    """
+    ROMA-style mutual-information specialization regularizer.
+
+        I(slot; item) = H(E_n[p(slot|n)]) - E_n[H(p(slot|n))]
+
+    H(mean) is entropy of aggregate usage. High values evenly use all slots and
+    prevent monopoly collapse. E[H] is the mean entropy of individual
+    assignments. Low values assign each item decisively rather than diffusely
+    and prevent uniform-content collapse.
+
+    Maximizing I is equivalent to minimizing -I; this function returns -I as loss.
+
+    ROMA (Wang et al., ICML 2020) uses MI to bind role and trajectory. This
+    method binds slot and influence signature. Its interventional signal differs
+    from ROMA's observational signal, making this an adapted use rather than a
+    direct copy.
+
+    Args:
+        slot_probs: [N, K]
+
+    Returns:
+        Scalar -I; lower values indicate stronger specialization.
+    """
+    if slot_probs.shape[0] == 0:
+        return torch.zeros((), dtype=torch.float32, device=slot_probs.device)
+
+    p = torch.clamp(slot_probs, min=eps)             # [N, K]
+
+    marginal = p.mean(dim=0)                          # [K]
+    h_marginal = -torch.sum(marginal * torch.log(marginal + eps))
+
+    h_conditional = -torch.mean(torch.sum(p * torch.log(p), dim=1))
+
+    mutual_info = h_marginal - h_conditional
+
+    return -mutual_info
+
+
+# Backward-compatible alias.
+PeripheralMultiMemory = PeripheralMultiMemory

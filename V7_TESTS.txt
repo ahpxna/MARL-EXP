@@ -1,0 +1,92 @@
+CIG-AMF V7 fixed-panel / two-level-margin verification
+======================================================
+
+Canonical base reconstruction
+-----------------------------
+Fresh base:
+  cig-amf-main-chain-harness-v4-runchecked (1).zip
+  SHA256 da60cf9f1e76da42806d6c044ac83d4b02bbb91a5a4dc502256f20b25b357c1a
+
+Applied in order:
+  CIG_AMF_OMNI_SUPPORT_V5.patch
+  SHA256 0f430750e752d4499f5c70ec4402024851890a8609a1682e9c75897393e81a17
+
+  CIG_AMF_FUNCTIONAL_BOUNDARY_V6.patch
+  SHA256 e4f712cbf86da115a484dfda30af84b0aceea9970f3e88cc9829d57fbebc900d
+
+Both patches:
+  patch --dry-run -p1  PASS
+  patch -p1            PASS
+
+V6 result archive re-read before V7 design:
+  930ff2de-7e04-4ce7-8522-3878e0ef7355.zip
+  SHA256 f44a5ea170df113c3e7a360ca8d9a154bdef4f9eec0fc14fd5b21cf80381351e
+
+Key design findings confirmed from raw V6 outputs:
+  5,400 pair rows total
+  691 lambda_C<0.5 certified rows
+  0 certified extrema-stability violations
+  matching-key oracle_range equality across budgets only ~14-17%, so
+  20/80/320 was not a clean longitudinal fixed-state panel.
+
+V7 code regression
+------------------
+python -m compileall -q .
+  PASS
+
+python -m pytest -q
+  266 passed in 18.57s
+
+python smoke_test.py
+  35 PASS / 0 FAIL / 0 SKIP
+
+python test_bc_loss_control.py
+  T1 PASS / T2 PASS
+
+Targeted V7 regression:
+  tests/test_h1_v7_fixed_panel.py
+  included in full pytest; PASS
+
+Actual V7 executable smoke
+--------------------------
+Command shape:
+  python -m scripts.run_h1_fixed_panel_v7 \
+    --seeds 3001 \
+    --checkpoints 2 3 \
+    --tiny-states 3 \
+    --max-steps 8 \
+    --reference-train-episodes 1 \
+    --device cpu
+
+Result:
+  PASS
+
+Same fixed panel used for both checkpoints:
+  fingerprint = 9fff5bd394b9f7623c3f5f9f0de7106a4e643df6f63b4e23c51426bae6335813
+
+Oracle invariance 2 vs 3 checkpoints:
+  oracle_range          100%
+  oracle_signed         100%
+  oracle_argmax_action  100%
+  oracle_argmin_action  100%
+  oracle_extrema_gap    100%
+  step-hash sets        identical
+
+Hard deterministic checks in smoke:
+  local extrema theorem violations       0
+  Q->C error-bound violations             0
+  TopK Q-certificate violations           0
+  TopK interval-certificate violations    0
+  D sign-certificate violations           0
+  fixed-panel oracle invariance            PASS
+  all_deterministic_checks_pass            true
+
+Scientific scope
+----------------
+V7 is development evidence only.
+It does not change frozen H1 confirmatory gates.
+It separates:
+  within-relation extrema stability via lambda_C
+from
+  between-relation C/TopK stability via oracle C margins and lambda_topk_Q.
+It also adds lambda_D for sign/direction certification.

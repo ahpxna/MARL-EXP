@@ -1,0 +1,98 @@
+
+======================================================================
+1. SEMANTIC SLOTS — four-role assignment
+======================================================================
+       mu=+0.30 sigma=0.10 -> beneficial
+       mu=-0.30 sigma=0.10 -> harmful
+       mu=+0.00 sigma=0.10 -> neutral
+       mu=+0.02 sigma=0.10 -> neutral
+       mu=-0.02 sigma=0.10 -> neutral
+       mu=+0.25 sigma=0.90 -> uncertain
+  [PASS] all six examples map to the expected role
+  [PASS] each probability row sums to one
+
+======================================================================
+2. C/D SIGNATURE — capacity remains independent of direction
+======================================================================
+       stable direction : C=0.516 D=+0.500 sigma_D=0.100
+       reversing D      : C=0.500 D=+0.100 sigma_D=0.100
+  [PASS] reversing direction remains near D=0
+  [PASS] capacity remains high despite direction cancellation
+
+======================================================================
+3. BELIEF — core size follows structural capacity
+======================================================================
+       n_true=1 -> core_size=1.0  F1=1.00
+       n_true=3 -> core_size=3.0  F1=1.00
+       n_true=6 -> core_size=6.0  F1=1.00
+  [PASS] core size increases with the true core
+  [PASS] F1 is high at each cardinality
+
+======================================================================
+4. UNCERTAINTY INFLATION — recovery after a structural shift
+======================================================================
+       before shift       : core=[1, 2, 3]
+  [PASS] T4: inflation preserves the estimate while re-anchoring  |  mu before=0.6046 mu after=0.6046
+  [PASS] T4: inflation materially increases uncertainty  |  sigma before=0.1943 sigma after=0.4857
+       no inflation, 40   : core=[1, 2, 3]
+       after inflation    : core=[1, 2, 3]  sigma 0.192->0.480
+       inflation, 80      : core=[7, 8]
+  [PASS] inflation permits recovery to new structural neighbours
+  [PASS] without inflation the old core remains sticky
+
+======================================================================
+5. TARGETED EPSILON FORCING — budget and positivity
+======================================================================
+       epsilon by agent : [0.0115 0.0115 0.0703 0.0636 0.0115 0.0115]
+       mean             : 0.0300 (target 0.0300)
+  [PASS] total budget is preserved
+  [PASS] positivity: every agent has epsilon > 0  |  min=0.0115
+  [PASS] priority allocation is nonuniform  |  6.1x
+  [PASS] logged propensities are normalized
+
+======================================================================
+6. SCHEDULER — trigger and refractory period
+======================================================================
+       first  (z=5): fired=True reason=probe_cusum
+       immediate retry: fired=False reason=refractory
+       after refractory: fired=True reason=probe_cusum
+  [PASS] triggers when z exceeds the threshold
+  [PASS] refractory period blocks repeated triggers
+  [PASS] triggers again after the refractory period
+  [PASS] belief uncertainty is inflated
+
+======================================================================
+7. TORCH — proxy, memory, and ego latents
+======================================================================
+       torch 2.10.0+cpu
+       mu         shape=(8,)
+       sigma      shape=(8,)
+       mu_per_h   shape=(8, 3)
+       mu_range   shape=(8,)
+  [PASS] directional output remains signed
+  [PASS] mu_per_h shape [B,H]
+  [PASS] allocator projection remains 5D while latency is retained in the typed masked profile
+  [PASS] capacity range is nonnegative
+  [PASS] ensemble members are non-identical  |  disagreement=0.05361 (v1 = 0.000)
+  [PASS] T1: vmap matches the reference implementation (BB4, layout B*A)  |  max diff=0.00e+00
+  [PASS] T3: member-0 gradient scale matches E=1 and E=4 (BB3)  |  loss_e1=0.8727 loss_e4_m0=0.8694 rel_diff=0.004
+       memory shape=(64,) slot_probs=(14, 6)
+       slot usage = [0.156 0.154 0.082 0.107 0.26  0.24 ]
+  [PASS] memory shape [out_dim]
+  [PASS] six slots (four semantic plus two free)
+  [PASS] aux_loss > 0
+  [PASS] no slot is dead  |  min usage=0.0825
+  [PASS] usage entropy is adequate  |  entropy ratio=0.958
+       L_influence=0.1073 L_contrastive=1.7549
+  [PASS] influence loss is finite
+  [PASS] contrastive loss > 0  |  requires same-neighbour, different-ego samples in the batch
+       probe phase=monitoring frozen=True
+  [PASS] probe can be frozen
+  [PASS] frozen probe has no trainable parameters
+       matrix z: small change=-1.17  large change=1337.57
+  [PASS] matrix distinguishes small and large changes
+
+======================================================================
+RESULT: 35 PASS | 0 FAIL | 0 SKIP
+======================================================================
+All mechanism checks passed. Next: read RUN_GUIDE.md.
