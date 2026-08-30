@@ -1,0 +1,12 @@
+@@ -140,7 +140,10 @@
+         if callable(provider):
+             mask = np.asarray(provider(int(agent)), dtype=bool).reshape(-1)
+         else:
+-            mask = np.ones((self.max_action_dim,), dtype=bool)
++            raise AttributeError(
++                "scientific action-support audit requires an explicit "
++                "valid_action_mask provider; refusing an all-actions fallback"
++            )
+         if mask.shape != (self.max_action_dim,) or not np.any(mask):
+             raise ValueError(
+                 "valid_action_mask must contain at least one valid action and "

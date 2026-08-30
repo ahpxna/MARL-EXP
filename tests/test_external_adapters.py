@@ -32,6 +32,8 @@ class _RWAREDouble:
         return tuple(np.asarray([i, 0.0], dtype=np.float32) for i in range(self.n_agents)), {}
     def step(self, actions):
         self.t += 1
+        for agent, action in zip(self.agents, actions):
+            agent.req_action = SimpleNamespace(value=int(action))
         obs = tuple(np.asarray([i, self.t], dtype=np.float32) for i in range(self.n_agents))
         return obs, [float(a) for a in actions], self.t >= 4, False, {}
 

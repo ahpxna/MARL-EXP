@@ -23,14 +23,34 @@ class RWARECIGEnvironment(ExternalPopulationMixin):
         result = self.raw_env.reset(seed=seed)
         observations = result[0] if isinstance(result, tuple) else result
         self._obs = pad_observations(observations, self.obs_dim)
-        self.last_actions = [0] * self.n_agents
+        self.last_requested_actions = [0] * self.n_agents
+        self.last_executed_actions = [0] * self.n_agents
+        self.last_actions = list(self.last_executed_actions)
         return self._obs
 
     def step(self, actions):
-        result = self.raw_env.step([int(a) for a in actions])
+        requested = [int(a) for a in actions]
+        result = self.raw_env.step(requested)
         observations, rewards, terminated, truncated, info = result
         self._obs = pad_observations(observations, self.obs_dim)
-        self.last_actions = [int(a) for a in actions]
+        # The pinned RWARE resolver leaves each agent.req_action at the
+        # post-conflict command (failed movement requests are rewritten to
+        # NOOP).  This is an execution/resolution receipt, distinct from the
+        # request tuple and from whether the state physically changed.
+        resolved = []
+        for idx, agent in enumerate(self.raw_env.agents):
+            action = getattr(agent, "req_action", None)
+            value = getattr(action, "value", action)
+            if value is None:
+                raise RuntimeError(
+                    f"RWARE did not expose a post-resolution action receipt for agent {idx}"
+                )
+            resolved.append(int(value))
+        self.last_requested_actions = requested
+        self.last_executed_actions = resolved
+        # Generic clone-state intervention code consumes last_actions as the
+        # trusted execution receipt, so it must not contain the request tuple.
+        self.last_actions = list(resolved)
         return self._obs, [float(x) for x in rewards], bool(terminated or truncated), dict(info)
 
     def valid_action_mask(self, agent):
@@ -50,10 +70,23 @@ class RWARECIGEnvironment(ExternalPopulationMixin):
         return np.asarray([dx, dy, manhattan, same_axis, carrying, heading_match], dtype=np.float32)
 
     def clone_state(self):
-        return (copy.deepcopy(self.raw_env), copy.deepcopy(self._obs), list(self.last_actions), self._behaviour_override)
+        return (
+            copy.deepcopy(self.raw_env),
+            copy.deepcopy(self._obs),
+            list(self.last_actions),
+            list(getattr(self, "last_requested_actions", self.last_actions)),
+            list(getattr(self, "last_executed_actions", self.last_actions)),
+            self._behaviour_override,
+        )
 
     def restore_state(self, state):
-        self.raw_env, self._obs, self.last_actions, self._behaviour_override = copy.deepcopy(state)
+        raw, obs, last, requested, executed, behaviour = copy.deepcopy(state)
+        self.raw_env = raw
+        self._obs = obs
+        self.last_actions = list(last)
+        self.last_requested_actions = list(requested)
+        self.last_executed_actions = list(executed)
+        self._behaviour_override = behaviour
 
     def fixed_continuation_policy(self, agent):
         # NOOP is a stable fixed reference action in RWARE.

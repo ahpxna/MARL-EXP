@@ -1,0 +1,29 @@
+@@ -45,7 +45,7 @@
+             raise ValueError("invalid outcome_agent")
+ 
+     @staticmethod
+-    def _normalize_executed_actions(raw_actions, *, n_agents: int, fallback: Sequence[int]) -> Tuple[int, ...]:
++    def _normalize_executed_actions(raw_actions, *, n_agents: int) -> Tuple[int, ...]:
+         """Return actions in canonical agent-index order.
+ 
+         ``OmniArena.last_actions`` is a dict. Iterating a dict yields its keys,
+@@ -54,7 +54,10 @@
+         fail closed on incomplete/ill-shaped execution telemetry.
+         """
+         if raw_actions is None:
+-            raw_actions = fallback
++            raise RuntimeError(
++                "environment does not expose executed-action telemetry; "
++                "requested actions cannot be treated as executed actions"
++            )
+         if isinstance(raw_actions, Mapping):
+             missing = [agent for agent in range(int(n_agents)) if agent not in raw_actions]
+             if missing:
+@@ -89,7 +92,6 @@
+         executed = self._normalize_executed_actions(
+             getattr(self.env, "last_actions", None),
+             n_agents=int(self.env.n_agents),
+-            fallback=requested,
+         )
+         verified = all(executed[source] == action for source, action in zip(source_agents, assignment))
+         reward = float(rewards[self.outcome_agent])

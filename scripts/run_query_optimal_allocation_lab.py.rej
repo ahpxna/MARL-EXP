@@ -1,0 +1,78 @@
+@@ -14,11 +14,14 @@
+ from scipy.stats import spearmanr
+ from research_chains.provenance import atomic_json
+ 
+-PROTOCOL_VERSION='functional_matched_budget_allocation_v1'
++PROTOCOL_VERSION='functional_matched_budget_allocation_v2'
+ STRATEGIES=(
+  'uniform','behavior_freq','uncertainty_only','D_neyman_pilot','D_oracle',
+- 'C_extremal_confidence','C_successive_elimination','C_split_eval','C_oracle',
++ 'C_extremal_confidence','C_successive_elimination','C_successive_known_sigma',
++ 'C_split_eval','C_oracle',
+ )
++DIAGNOSTIC_STRATEGIES=('D_oracle','C_oracle','C_successive_known_sigma')
++DEPLOYABLE_STRATEGIES=tuple(s for s in STRATEGIES if s not in DIAGNOSTIC_STRATEGIES)
+ 
+ def _allocate_remaining(counts,weights,remaining):
+     counts=np.asarray(counts,int).copy(); w=np.asarray(weights,float); w=np.maximum(w,0)
+@@ -61,17 +64,26 @@
+         return _allocate_remaining(base,weights,remain),{'selected_hi':hi,'selected_lo':lo,'oracle_selection':False}
+     raise ValueError(strategy)
+ 
+-def _successive_counts(B,truth,sigma,obs):
+-    K=len(truth); counts=np.ones(K,dtype=int); z=2.0
++def _successive_counts(B,obs,known_sigma=None):
++    """Successive extremal allocation without hidden oracle leakage.
++
++    The deployable branch estimates per-cell noise from accumulated samples.
++    ``known_sigma`` is retained only as an explicitly diagnostic known-noise
++    ceiling, never as the deployable strategy used for endpoint winners.
++    """
++    K=len(obs); pilot=2 if B>=2*K else 1; counts=np.full(K,pilot,dtype=int); z=2.0
+     while int(counts.sum())<B:
+         means=np.asarray([_mean(obs[a],counts[a]) for a in range(K)])
+-        rad=z*sigma/np.sqrt(counts)
++        if known_sigma is None:
++            sig=np.asarray([_pilot_sigma(obs[a],counts[a]) for a in range(K)])
++        else:
++            sig=np.asarray(known_sigma,float)
++        rad=z*sig/np.sqrt(np.maximum(counts,1))
+         L=means-rad; U=means+rad
+         maxcand=np.flatnonzero(U>=np.max(L)-1e-12); mincand=np.flatnonzero(L<=np.min(U)+1e-12)
+         cand=np.unique(np.concatenate([maxcand,mincand]));
+-        # sample most uncertain surviving extremal contender
+         a=int(cand[np.argmax(rad[cand])]); counts[a]+=1
+-    return counts,None
++    return counts,{'known_sigma_diagnostic':bool(known_sigma is not None)}
+ 
+ def _split_estimate(B,truth,sigma,obs):
+     K=len(truth); pilot=max(K,B//2); pilot=min(pilot,B-2) if B>=K+2 else K
+@@ -116,7 +128,8 @@
+                 for strategy in STRATEGIES:
+                     qhat=np.zeros_like(truths); C_hat=np.zeros(R); D_hat=np.zeros(R); ext=[]; total=0
+                     for r in range(R):
+-                        if strategy=='C_successive_elimination': counts,meta=_successive_counts(B,truths[r],sigmas[r],obs[r])
++                        if strategy=='C_successive_elimination': counts,meta=_successive_counts(B,obs[r],known_sigma=None)
++                        elif strategy=='C_successive_known_sigma': counts,meta=_successive_counts(B,obs[r],known_sigma=sigmas[r])
+                         elif strategy=='C_split_eval': counts,meta=_split_estimate(B,truths[r],sigmas[r],obs[r])
+                         else: counts,meta=_counts_fixed(strategy,B,truths[r],sigmas[r],behaviors[r],obs[r])
+                         means=np.asarray([_mean(obs[r][a],counts[a]) for a in range(K)]); qhat[r]=means; total+=int(counts.sum())
+@@ -130,11 +143,14 @@
+                     top_hat=set(np.argsort(-C_hat,kind='stable')[:topk]); nonzero=np.abs(D_true)>1e-10
+                     all_rows[str(B)][strategy].append({'C_mae':float(np.mean(np.abs(C_hat-C_true))),'D_mae':float(np.mean(np.abs(D_hat-D_true))),'C_topk_exact':int(top_hat==top_true),'D_sign_accuracy':float(np.mean(np.sign(D_hat[nonzero])==np.sign(D_true[nonzero]))) if np.any(nonzero) else 1.0,'extrema_match':float(np.mean(ext)),'Q_rmse':float(np.sqrt(np.mean((qhat-truths)**2))),'C_hat':float(np.mean(C_hat)),'C_true':float(np.mean(C_true)),'D_hat':float(np.mean(D_hat)),'D_true':float(np.mean(D_true)),'samples':total})
+     summary={B:{s:_metrics(rows) for s,rows in by.items()} for B,by in all_rows.items()}
+-    # Native winners by downstream endpoint; oracle strategies are diagnostics, not deployable methods.
+-    winners={}
++    # Report deployable and diagnostic winners separately.  Previous output
++    # accidentally allowed oracle strategies to win the headline table.
++    winners={}; winners_all={}
+     for B,by in summary.items():
+-        winners[B]={'C_mae':min(by,key=lambda s:by[s]['C_mae']),'C_topk_exact':max(by,key=lambda s:by[s]['C_topk_exact']),'D_mae':min(by,key=lambda s:by[s]['D_mae']),'D_sign_accuracy':max(by,key=lambda s:by[s]['D_sign_accuracy'])}
+-    return {'protocol_version':PROTOCOL_VERSION,'development_only':True,'instances_per_seed':int(instances),'seeds':list(map(int,seeds)),'budgets_per_relation':list(map(int,budgets)),'relations':int(R),'actions':int(K),'strategies':STRATEGIES,'matched_budget_contract':'every strategy uses exactly B samples per relation; common-random-number cell streams shared within instance','by_budget':summary,'endpoint_winners':winners}
++        deploy={name:by[name] for name in DEPLOYABLE_STRATEGIES}
++        winners[B]={'C_mae':min(deploy,key=lambda x:deploy[x]['C_mae']),'C_topk_exact':max(deploy,key=lambda x:deploy[x]['C_topk_exact']),'D_mae':min(deploy,key=lambda x:deploy[x]['D_mae']),'D_sign_accuracy':max(deploy,key=lambda x:deploy[x]['D_sign_accuracy'])}
++        winners_all[B]={'C_mae':min(by,key=lambda x:by[x]['C_mae']),'C_topk_exact':max(by,key=lambda x:by[x]['C_topk_exact']),'D_mae':min(by,key=lambda x:by[x]['D_mae']),'D_sign_accuracy':max(by,key=lambda x:by[x]['D_sign_accuracy'])}
++    return {'protocol_version':PROTOCOL_VERSION,'development_only':True,'instances_per_seed':int(instances),'seeds':list(map(int,seeds)),'budgets_per_relation':list(map(int,budgets)),'relations':int(R),'actions':int(K),'strategies':STRATEGIES,'deployable_strategies':DEPLOYABLE_STRATEGIES,'diagnostic_strategies':DIAGNOSTIC_STRATEGIES,'matched_budget_contract':'every strategy uses exactly B samples per relation; common-random-number cell streams shared within instance','by_budget':summary,'endpoint_winners':winners,'endpoint_winners_all':winners_all}
+ 
+ def main(argv=None):
+     p=argparse.ArgumentParser(); p.add_argument('--instances',type=int,default=200); p.add_argument('--seeds',nargs='+',type=int,default=[0,1,2,3,4]); p.add_argument('--budgets',nargs='+',type=int,default=[16,32,64,128,256]); p.add_argument('--relations',type=int,default=5); p.add_argument('--actions',type=int,default=6); p.add_argument('--topk',type=int,default=2); p.add_argument('--out',default='research/high_value_extensions/functional/allocation_summary.json'); a=p.parse_args(argv)

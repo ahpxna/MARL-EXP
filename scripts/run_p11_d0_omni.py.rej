@@ -1,0 +1,15 @@
+@@ -113,8 +113,12 @@
+ def main(argv=None):
+     parser=argparse.ArgumentParser(); modes=parser.add_mutually_exclusive_group(required=True); modes.add_argument("--quick",action="store_true"); modes.add_argument("--confirmatory",action="store_true")
+     parser.add_argument("--seeds",type=int,nargs="+",default=[0,1,2]); parser.add_argument("--replicates-per-seed",type=int); parser.add_argument("--horizon",type=int); parser.add_argument("--burn-in",type=int,default=2); parser.add_argument("--out",required=True); args=parser.parse_args(argv)
+-    mode="quick" if args.quick else "confirmatory"; seeds=tuple(args.seeds[:1] if mode=="quick" else args.seeds); replicates=args.replicates_per_seed or (2 if mode=="quick" else 8); horizon=args.horizon or (4 if mode=="quick" else 8)
+-    try: payload=collect(mode=mode,seeds=seeds,replicates_per_seed=replicates,horizon=horizon,burn_in=args.burn_in); code=0
++    mode="quick" if args.quick else "confirmatory"; requested_seeds=tuple(int(x) for x in args.seeds); seeds=tuple(requested_seeds[:1] if mode=="quick" else requested_seeds); replicates=args.replicates_per_seed or (2 if mode=="quick" else 8); horizon=args.horizon or (4 if mode=="quick" else 8)
++    try:
++        payload=collect(mode=mode,seeds=seeds,replicates_per_seed=replicates,horizon=horizon,burn_in=args.burn_in); code=0
++        payload["requested_seeds"] = list(requested_seeds)
++        payload["used_seeds"] = list(seeds)
++        payload["quick_uses_first_seed_only"] = bool(mode == "quick")
+     except Exception as error:
+         payload={"protocol_version":PROTOCOL_VERSION,"mode":mode,"collection_complete":False,"d0_status":"FAILED","raw_d0_adjudication":"FAILED","evidence_class":"NONE","reasons":[f"collector failed closed: {error}"],"records":[]}; code=2
+     atomic_json(Path(args.out),payload); print(json.dumps({"out":str(Path(args.out).resolve()),"collection_complete":payload["collection_complete"],"d0_status":payload["d0_status"],"records":len(payload["records"])},indent=2)); return code

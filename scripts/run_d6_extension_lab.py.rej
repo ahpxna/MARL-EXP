@@ -1,0 +1,38 @@
+@@ -7,12 +7,12 @@
+ import argparse,json,itertools
+ from pathlib import Path
+ import numpy as np
+-from research_chains.experimental_extensions import d6_diagnostics,d6_sharpness_search,product_anova_decomposition,arbitrary_full_world
++from research_chains.experimental_extensions import d6_diagnostics,d6_sharpness_search,d6_decision_adversarial_search,product_anova_decomposition,arbitrary_full_world
+ from research_chains.finite_world import FiniteResponseWorld
+ from research_chains.provenance import atomic_json
+ from research_chains.support import SupportModel
+ 
+-PROTOCOL_VERSION='d6_extension_lab_v1'
++PROTOCOL_VERSION='d6_extension_lab_v2'
+ 
+ def _interaction_table(rng,m,kind,alpha):
+     shape=(2,)*m; arr=np.zeros(shape,dtype=float)
+@@ -37,7 +37,7 @@
+     for a in full: residual[a]=float(interact[a])
+     return FiniteResponseWorld(SupportModel(shape,full,key='full'),primitives,residual=residual)
+ 
+-def run(instances=500,seed=0,sharpness_instances=5000):
++def run(instances=500,seed=0,sharpness_instances=5000,adversarial_instances=0,adversarial_steps=25):
+     rng=np.random.default_rng(seed); kinds=('pairwise_sparse','pairwise_dense','third_order','spike','adversarial_cancellation'); alphas=(0.0,.05,.1,.25,.5,1.0)
+     rows=[]; violations={'worst':0.0,'decision':0.0,'decision_half_candidate':0.0,'coord':0.0,'qavg_uniform':0.0,'qsigned_uniform':0.0,'qavg_pointwise_uniform':0.0,'qsigned_pointwise_uniform':0.0,'qavg_distributional':0.0,'qsigned_distributional':0.0,'residual_identity':0.0,'qL1_conditional':0.0}
+     for idx in range(int(instances)):
+@@ -85,9 +85,10 @@
+     decision_ratio_den=np.asarray([r['worst_case_rhs'] for r in rows],float)
+     decision_ratio=np.asarray([r['true_decision_regret'] for r in rows],float)/np.maximum(decision_ratio_den,1e-12)
+     ql1_rows=[r for r in rows if r['qL1_topc_surrogate_optimal']]
+-    return {'protocol_version':PROTOCOL_VERSION,'development_only':True,'instances':int(instances),'seed':int(seed),'lean_alignment':{'hybrid_telescoping':True,'s1_exact_reproduction':{'surrogate_tightness':s1_exact['surrogate_tightness'],'delta_square':s1_exact['delta_square'],'surrogate_sup_error':s1_exact['surrogate_sup_error'],'residual_identity_worst_error':s1_exact['residual_identity_worst_error']}},'worst_candidate_violations':violations,'stress_by_family':by,'sharpness':d6_sharpness_search(instances=int(sharpness_instances),seed=seed+99),'decision_improvement_candidate':{'candidate_rhs':'(m-1)*delta_square/2','safe_fraction':float(np.mean([r['decision_candidate_half_violation']<=1e-10 for r in rows])),'worst_violation':float(max(r['decision_candidate_half_violation'] for r in rows)),'max_regret_over_original_approx_rhs':float(np.max(decision_ratio))},'qL1_distributional':{'surrogate_optimal_fraction':float(np.mean([r['qL1_topc_surrogate_optimal'] for r in rows])),'conditional_cases':len(ql1_rows),'conditional_worst_violation':float(max([r['qL1_conditional_violation'] for r in ql1_rows],default=0.0))},'assumption_rejection':rejection,'anova_comparison':anova_compare}
++    adversarial=(d6_decision_adversarial_search(instances=int(adversarial_instances),steps=int(adversarial_steps),seed=seed+313) if int(adversarial_instances)>0 else {'instances':0,'steps':int(adversarial_steps),'seed':seed+313,'candidate_ratio_threshold':0.5,'best_ratio_to_worst_rhs':None,'candidate_killed':False,'best_witness':None})
++    return {'protocol_version':PROTOCOL_VERSION,'development_only':True,'instances':int(instances),'seed':int(seed),'lean_alignment':{'hybrid_telescoping':True,'s1_exact_reproduction':{'surrogate_tightness':s1_exact['surrogate_tightness'],'delta_square':s1_exact['delta_square'],'surrogate_sup_error':s1_exact['surrogate_sup_error'],'residual_identity_worst_error':s1_exact['residual_identity_worst_error']}},'worst_candidate_violations':violations,'stress_by_family':by,'sharpness':d6_sharpness_search(instances=int(sharpness_instances),seed=seed+99),'decision_improvement_candidate':{'candidate_rhs':'(m-1)*delta_square/2','safe_fraction':float(np.mean([r['decision_candidate_half_violation']<=1e-10 for r in rows])),'worst_violation':float(max(r['decision_candidate_half_violation'] for r in rows)),'max_regret_over_original_approx_rhs':float(np.max(decision_ratio)),'adversarial_search':adversarial},'qL1_distributional':{'surrogate_optimal_fraction':float(np.mean([r['qL1_topc_surrogate_optimal'] for r in rows])),'conditional_cases':len(ql1_rows),'conditional_worst_violation':float(max([r['qL1_conditional_violation'] for r in ql1_rows],default=0.0))},'assumption_rejection':rejection,'anova_comparison':anova_compare}
+ 
+ def main(argv=None):
+-    p=argparse.ArgumentParser(); p.add_argument('--instances',type=int,default=500); p.add_argument('--sharpness-instances',type=int,default=5000); p.add_argument('--seed',type=int,default=0); p.add_argument('--out',default='research/high_value_extensions/d6/summary.json'); a=p.parse_args(argv)
+-    payload=run(a.instances,a.seed,a.sharpness_instances); atomic_json(Path(a.out),payload); print(json.dumps(payload,indent=2)); return 0 if payload['worst_candidate_violations']['worst']<=1e-8 and payload['worst_candidate_violations']['decision']<=1e-8 else 2
++    p=argparse.ArgumentParser(); p.add_argument('--instances',type=int,default=500); p.add_argument('--sharpness-instances',type=int,default=5000); p.add_argument('--adversarial-instances',type=int,default=500); p.add_argument('--adversarial-steps',type=int,default=25); p.add_argument('--seed',type=int,default=0); p.add_argument('--out',default='research/high_value_extensions/d6/summary.json'); a=p.parse_args(argv)
++    payload=run(a.instances,a.seed,a.sharpness_instances,a.adversarial_instances,a.adversarial_steps); atomic_json(Path(a.out),payload); print(json.dumps(payload,indent=2)); return 0 if payload['worst_candidate_violations']['worst']<=1e-8 and payload['worst_candidate_violations']['decision']<=1e-8 else 2
+ if __name__=='__main__': raise SystemExit(main())
