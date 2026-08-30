@@ -20,20 +20,20 @@ from scripts import run_chain_e_semantic_lab as foundation_query
 
 PROTOCOL_VERSION='high_value_extension_suite_v1'
 PROFILES={
- 'quick':{'master':20,'design':20,'design_rep':80,'allocation':20,'allocation_budgets':(16,32),'stopping':20,'stopping_max':256,'stopping_batch':8,'d6':40,'sharp':300,'query':60,'structural':80,'dynamic':40,'foundation':40},
- 'screening':{'master':150,'design':150,'design_rep':300,'allocation':150,'allocation_budgets':(16,32,64,128,256),'stopping':120,'stopping_max':4096,'stopping_batch':16,'d6':500,'sharp':5000,'query':600,'structural':1500,'dynamic':300,'foundation':500},
- 'deep':{'master':500,'design':500,'design_rep':1000,'allocation':500,'allocation_budgets':(16,32,64,128,256),'stopping':300,'stopping_max':16384,'stopping_batch':64,'d6':5000,'sharp':50000,'query':3000,'structural':5000,'dynamic':1000,'foundation':5000},
+ 'quick':{'master':20,'design':20,'design_rep':80,'allocation':20,'allocation_budgets':(16,32),'stopping':20,'stopping_max':256,'stopping_batch':8,'d6':40,'sharp':300,'d6_adv':8,'d6_adv_steps':5,'query':60,'structural':80,'dynamic':40,'foundation':40},
+ 'screening':{'master':150,'design':150,'design_rep':300,'allocation':150,'allocation_budgets':(16,32,64,128,256),'stopping':120,'stopping_max':4096,'stopping_batch':16,'d6':500,'sharp':5000,'d6_adv':80,'d6_adv_steps':10,'query':600,'structural':1500,'dynamic':300,'foundation':500},
+ 'deep':{'master':500,'design':500,'design_rep':1000,'allocation':500,'allocation_budgets':(16,32,64,128,256),'stopping':300,'stopping_max':16384,'stopping_batch':64,'d6':5000,'sharp':50000,'d6_adv':500,'d6_adv_steps':25,'query':3000,'structural':5000,'dynamic':1000,'foundation':5000},
 }
 
 def main(argv=None):
-    p=argparse.ArgumentParser(); p.add_argument('--profile',choices=PROFILES,default='screening'); p.add_argument('--seeds',nargs='+',type=int,default=[0,1,2,3,4]); p.add_argument('--out-root',default='research/high_value_extensions/runs'); p.add_argument('--skip',nargs='*',default=[]); a=p.parse_args(argv)
+    p=argparse.ArgumentParser(); p.add_argument('--profile',choices=PROFILES,default='screening'); p.add_argument('--seeds',nargs='+',type=int,default=[0,1,2,3,4]); p.add_argument('--out-root',default='research/high_value_extensions/runs'); p.add_argument('--skip',nargs='*',default=[]); p.add_argument('--no-auto-analyze',action='store_true'); a=p.parse_args(argv)
     cfg=PROFILES[a.profile]; root=Path(a.out_root); root.mkdir(parents=True,exist_ok=True); records=[]
     labs={
       'master':lambda s:master.run(cfg['master'],(16,32,64,128,256),s,.05),
       'functional_design':lambda s:fdesign.run(cfg['design'],cfg['design_rep'],s,6),
       'functional_allocation':lambda s:falloc.run(cfg['allocation'],(s,),cfg['allocation_budgets'],5,6,2),
       'functional_stopping':lambda s:fstop.run(cfg['stopping'],s,6,5,.05,cfg['stopping_max'],cfg['stopping_batch'],.35),
-      'd6':lambda s:d6.run(cfg['d6'],s,cfg['sharp']),
+      'd6':lambda s:d6.run(cfg['d6'],s,cfg['sharp'],cfg['d6_adv'],cfg['d6_adv_steps']),
       'query':lambda s:query.run(cfg['query'],s,10,3),
       'structural':lambda s:structural.run(cfg['structural'],s),
       'dynamic':lambda s:dynamic.run(cfg['dynamic'],s),
@@ -51,5 +51,12 @@ def main(argv=None):
                 payload={'protocol_version':PROTOCOL_VERSION,'error':f'{type(exc).__name__}: {exc}'}; status='ERROR'; error=payload['error']
             elapsed=time.perf_counter()-t; path=root/name/f'seed{int(seed)}.json'; atomic_json(path,payload); records.append({'lab':name,'seed':int(seed),'status':status,'seconds':elapsed,'path':str(path),'error':error})
             print(json.dumps(records[-1],sort_keys=True),flush=True)
-    suite={'protocol_version':PROTOCOL_VERSION,'profile':a.profile,'seeds':a.seeds,'config':cfg,'records':records,'complete':all(r['status']=='PASS' for r in records)}; atomic_json(root/'SUITE_MANIFEST.json',suite); return 0 if suite['complete'] else 2
+    suite={'protocol_version':PROTOCOL_VERSION,'profile':a.profile,'seeds':a.seeds,'config':cfg,'records':records,'complete':all(r['status']=='PASS' for r in records),'decision_matrix_auto':None}; atomic_json(root/'SUITE_MANIFEST.json',suite)
+    if suite['complete'] and not a.no_auto_analyze:
+        from scripts.analyze_high_value_extensions import main as analyze_main
+        decision_path=root/'DECISION_MATRIX_AUTO.json'
+        rc=analyze_main(['--root',str(root),'--out',str(decision_path)])
+        if rc != 0: return int(rc)
+        suite['decision_matrix_auto']=str(decision_path); atomic_json(root/'SUITE_MANIFEST.json',suite)
+    return 0 if suite['complete'] else 2
 if __name__=='__main__': raise SystemExit(main())

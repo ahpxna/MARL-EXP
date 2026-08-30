@@ -136,12 +136,14 @@ def empirical_kernel_from_counts(
 def sample_kernel_counts(
     kernel: ConditionalReferenceKernel, total_budget: int, rng: np.random.Generator, mode: str = "passive", passive_probs: Sequence[float] | None = None,
 ) -> tuple[dict[int, dict[tuple[int, ...], int]], np.ndarray]:
-    """Simulate reference acquisition without per-intervention Python loops.
+    """Simulate reference acquisition with explicit acquisition semantics.
 
-    Passive/randomized source counts are sampled from their exact multinomial
-    laws. Targeted scheduling is the exact balanced-count outcome of repeatedly
-    sampling among currently least-observed source actions: counts differ by at
-    most one, with the remainder assigned to a random subset.
+    ``targeted`` is intentionally the historical balanced least-observed
+    scheduler.  ``uncertainty_targeted`` is a genuinely adaptive policy: after
+    a small pilot it repeatedly samples the source-action row with the largest
+    Dirichlet-posterior multinomial uncertainty proxy.  The latter uses only
+    observations collected so far; the true kernel is used solely to generate
+    the next synthetic observation.
     """
     total_budget = int(total_budget)
     if total_budget <= 0:
@@ -150,38 +152,82 @@ def sample_kernel_counts(
     if passive_probs is None:
         passive_probs = np.geomspace(1.0, 0.1, n_actions)
     passive_probs = _normalise_probabilities(passive_probs)
-    if mode == "passive":
-        source_counts = rng.multinomial(total_budget, passive_probs).astype(int)
-    elif mode == "randomized":
-        source_counts = rng.multinomial(total_budget, np.full(n_actions, 1.0/n_actions)).astype(int)
-    elif mode == "targeted":
-        base, rem = divmod(total_budget, n_actions)
-        source_counts = np.full(n_actions, base, dtype=int)
-        if rem:
-            source_counts[rng.choice(n_actions, size=rem, replace=False)] += 1
-    else:
-        raise ValueError(f"unknown acquisition mode {mode}")
-    counts = {a: {} for a in range(n_actions)}
+
     complement = [j for j in range(len(kernel.action_sizes)) if j != kernel.source]
     keys = list(itertools.product(*(range(kernel.action_sizes[j]) for j in complement)))
+    truth_probs = {}
     for a in range(n_actions):
-        n=int(source_counts[a])
-        if n<=0: continue
-        row_lookup = {}
-        for joint, p in kernel.by_source_action[a].items():
+        lookup = {}
+        for joint, prob in kernel.by_source_action[a].items():
             key = tuple(joint[j] for j in complement)
-            row_lookup[key] = row_lookup.get(key, 0.0) + float(p)
-        probs = _normalise_probabilities([row_lookup.get(key, 0.0) for key in keys])
-        draws = rng.multinomial(n, probs)
-        for key,count in zip(keys,draws):
-            if int(count)<=0: continue
-            joint=[0]*len(kernel.action_sizes); joint[kernel.source]=a
-            for j,value in zip(complement,key): joint[j]=value
-            counts[a][tuple(joint)]=int(count)
+            lookup[key] = lookup.get(key, 0.0) + float(prob)
+        truth_probs[a] = _normalise_probabilities([lookup.get(key, 0.0) for key in keys])
+
+    counts = {a: {} for a in range(n_actions)}
+    source_counts = np.zeros(n_actions, dtype=int)
+
+    def draw_row(a: int, n: int) -> None:
+        if n <= 0:
+            return
+        draws = rng.multinomial(int(n), truth_probs[int(a)])
+        source_counts[int(a)] += int(n)
+        for key, count in zip(keys, draws):
+            if int(count) <= 0:
+                continue
+            joint = [0] * len(kernel.action_sizes)
+            joint[kernel.source] = int(a)
+            for j, value in zip(complement, key):
+                joint[j] = value
+            joint = tuple(joint)
+            counts[int(a)][joint] = counts[int(a)].get(joint, 0) + int(count)
+
+    if mode == "passive":
+        alloc = rng.multinomial(total_budget, passive_probs).astype(int)
+        for a, n in enumerate(alloc):
+            draw_row(a, int(n))
+    elif mode == "randomized":
+        alloc = rng.multinomial(total_budget, np.full(n_actions, 1.0 / n_actions)).astype(int)
+        for a, n in enumerate(alloc):
+            draw_row(a, int(n))
+    elif mode == "targeted":
+        # Historical stratified/balanced scheduler retained for backwards
+        # compatibility.  It is NOT uncertainty-adaptive.
+        base, rem = divmod(total_budget, n_actions)
+        alloc = np.full(n_actions, base, dtype=int)
+        if rem:
+            alloc[rng.choice(n_actions, size=rem, replace=False)] += 1
+        for a, n in enumerate(alloc):
+            draw_row(a, int(n))
+    elif mode == "uncertainty_targeted":
+        # Give every source action coverage when the budget permits, then adapt.
+        pilot = min(2, total_budget // n_actions)
+        if pilot > 0:
+            for a in range(n_actions):
+                draw_row(a, pilot)
+        remaining = total_budget - int(source_counts.sum())
+        smoothing = 0.5
+        while remaining > 0:
+            scores = []
+            for a in range(n_actions):
+                observed = np.asarray([counts[a].get(tuple([a if j == kernel.source else key[complement.index(j)] for j in range(len(kernel.action_sizes))]), 0) for key in keys], dtype=np.float64)
+                alpha = observed + smoothing
+                alpha0 = float(alpha.sum())
+                p = alpha / alpha0
+                # Posterior expected multinomial variance / sample-size proxy.
+                # Larger for poorly sampled/high-entropy rows.
+                score = math.sqrt(max(0.0, float(np.sum(p * (1.0 - p))) / (alpha0 + 1.0)))
+                scores.append(score)
+            max_score = max(scores)
+            candidates = [a for a, score in enumerate(scores) if abs(score - max_score) <= 1e-15]
+            a = int(rng.choice(candidates))
+            draw_row(a, 1)
+            remaining -= 1
+    else:
+        raise ValueError(f"unknown acquisition mode {mode}")
+
     if int(np.sum(source_counts)) != total_budget:
         raise AssertionError("source allocation did not conserve budget")
     return counts, source_counts
-
 
 
 
@@ -490,6 +536,46 @@ def d6_sharpness_search(*, instances: int = 5000, seed: int = 0, m_values: Seque
     return {"instances":int(instances),"seed":int(seed),"best_surrogate_ratio":best_sur[0],"best_surrogate_witness":best_sur[1],"best_decision_ratio":best_dec[0],"best_decision_witness":best_dec[1],"best_joint_min_ratio":best_joint[0],"best_joint_witness":best_joint[1]}
 
 
+def d6_decision_adversarial_search(*, instances: int = 500, steps: int = 25, seed: int = 0, m_values: Sequence[int] = (3,4), alphabet: int = 2) -> dict:
+    """Targeted falsification search for the proposed half-factor decision bound.
+
+    Objective is regret / ((m-1) delta_square).  The proposed improved bound
+    corresponds to ratio <= 1/2.  Search uses integer response tables plus a
+    small local hill-climb and non-uniform product references.  It is a
+    falsifier only: surviving this search is not a proof.
+    """
+    rng=np.random.default_rng(seed); best=(-float('inf'),None); qgrid=(0.1,0.25,0.5,0.75,0.9)
+    for restart in range(int(instances)):
+        m=int(m_values[restart % len(m_values)]); shape=(int(alphabet),)*m
+        values=rng.integers(-4,5,size=shape).astype(np.float64)
+        probs=[float(rng.choice(qgrid)) for _ in range(m)]
+        k=int(rng.integers(1,max(2,m)))
+        def marginals(ps):
+            if alphabet != 2:
+                return {j:np.full(alphabet,1.0/alphabet) for j in range(m)}
+            return {j:np.asarray([ps[j],1.0-ps[j]],dtype=np.float64) for j in range(m)}
+        def score(table,ps):
+            row=d6_diagnostics(arbitrary_full_world(table),marginals(ps),k)
+            den=float(row['worst_case_rhs'])
+            ratio=float(row['true_decision_regret']/den) if den>1e-12 else (0.0 if row['true_decision_regret']<=1e-12 else float('inf'))
+            return ratio,row
+        current,current_row=score(values,probs)
+        if np.isfinite(current) and current>best[0]:
+            best=(current,{'values':values.tolist(),'m':m,'k':k,'product_probs':probs.copy(),'ratio_to_worst_rhs':current,'candidate_half_violation':float(current_row['decision_candidate_half_violation']),'decision_regret':float(current_row['true_decision_regret']),'worst_case_rhs':float(current_row['worst_case_rhs'])})
+        for _ in range(int(steps)):
+            cand=values.copy(); cand_probs=probs.copy()
+            if rng.random()<0.8:
+                idx=tuple(int(rng.integers(0,alphabet)) for _ in range(m)); cand[idx]+=float(rng.choice((-2,-1,1,2)))
+            else:
+                j=int(rng.integers(0,m)); cand_probs[j]=float(rng.choice(qgrid))
+            candidate,candidate_row=score(cand,cand_probs)
+            if candidate>=current-1e-15:
+                values,probs,current,current_row=cand,cand_probs,candidate,candidate_row
+                if np.isfinite(candidate) and candidate>best[0]:
+                    best=(candidate,{'values':values.tolist(),'m':m,'k':k,'product_probs':probs.copy(),'ratio_to_worst_rhs':candidate,'candidate_half_violation':float(candidate_row['decision_candidate_half_violation']),'decision_regret':float(candidate_row['true_decision_regret']),'worst_case_rhs':float(candidate_row['worst_case_rhs'])})
+    return {'instances':int(instances),'steps':int(steps),'seed':int(seed),'candidate_ratio_threshold':0.5,'best_ratio_to_worst_rhs':float(best[0]),'candidate_killed':bool(best[0]>0.5+1e-10),'best_witness':best[1]}
+
+
 def epsilon_good_sets(loss_matrix: Sequence[Sequence[float]], epsilon: float) -> list[set[int]]:
     loss = np.asarray(loss_matrix, dtype=np.float64)
     if loss.ndim != 2 or not np.all(np.isfinite(loss)):
@@ -602,13 +688,24 @@ def all_optimal_extension_defect(world: FiniteResponseWorld, nested_result: Mapp
 def cascade_evaluation(world: FiniteResponseWorld, estimated_scores: Sequence[float], errors: Sequence[float], k: int, tolerance: float) -> dict:
     selected = topk_indices(estimated_scores, int(k)); z = zeta_def(world,int(k)); eta=world.residual_supnorm()
     gamma = operational_gamma(estimated_scores,errors,int(k),selected); cert=pairwise_master_bound(gamma,z,eta)
+    # Compute the exact optimum once.  We need it both to audit the candidate
+    # certificate and, when necessary, to model the exact fallback branch.
+    t0=time.perf_counter(); optimum, sets=exact_optimum(world,int(k),true_loss=True); exact_runtime=time.perf_counter()-t0
+    candidate_regret=float(world.true_compression_loss(selected)-optimum)
     start=time.perf_counter()
     if cert <= float(tolerance):
-        chosen=selected; fallback=False; exact_runtime=0.0
+        chosen=selected; fallback=False; branch_exact_runtime=0.0
     else:
-        t0=time.perf_counter(); _, sets=exact_optimum(world,int(k),true_loss=True); exact_runtime=time.perf_counter()-t0; chosen=sets[0]; fallback=True
-    total_runtime=time.perf_counter()-start; optimum,_=exact_optimum(world,int(k),true_loss=True); regret=world.true_compression_loss(chosen)-optimum
-    return {"certificate":float(cert),"tolerance":float(tolerance),"fallback":bool(fallback),"regret":float(regret),"certificate_safe":bool(regret<=max(float(tolerance),1e-9)),"exact_runtime_seconds":float(exact_runtime),"cascade_runtime_seconds":float(total_runtime)}
+        chosen=sets[0]; fallback=True; branch_exact_runtime=exact_runtime
+    total_runtime=time.perf_counter()-start + branch_exact_runtime
+    regret=float(world.true_compression_loss(chosen)-optimum)
+    return {
+        "certificate":float(cert),"tolerance":float(tolerance),"fallback":bool(fallback),
+        "candidate_regret":candidate_regret,"regret":regret,
+        "certificate_safe":bool((not fallback and candidate_regret<=max(float(tolerance),1e-9)) or fallback),
+        "exact_runtime_seconds":float(branch_exact_runtime),"exact_optimum_runtime_seconds":float(exact_runtime),
+        "cascade_runtime_seconds":float(total_runtime),
+    }
 
 
 def product_anova_decomposition(world: FiniteResponseWorld, marginals: Mapping[int, Sequence[float]]) -> dict:
