@@ -134,8 +134,19 @@ class ExternalAdapterTests(unittest.TestCase):
     def test_rware_contract(self):
         self._exercise(RWARECIGEnvironment(_RWAREDouble(), observation_width=8))
 
+    def test_rware_receipt_is_explicitly_trusted(self):
+        env = RWARECIGEnvironment(_RWAREDouble(), observation_width=8)
+        env.reset(seed=1)
+        env.step([1, 2, 3])
+        self.assertEqual(tuple(env.trusted_execution_receipt()), (1, 2, 3))
+
     def test_cyborg_contract(self):
         self._exercise(CybORGCIGEnvironment(_CyborgDouble(), observation_width=8))
+
+    def test_cyborg_submitted_actions_are_not_a_trusted_receipt(self):
+        env = CybORGCIGEnvironment(_CyborgDouble(), observation_width=8)
+        env.reset(seed=1)
+        self.assertFalse(callable(getattr(env, 'trusted_execution_receipt', None)))
 
 
     def test_cityflow_records_applied_not_invalid_padded_action(self):

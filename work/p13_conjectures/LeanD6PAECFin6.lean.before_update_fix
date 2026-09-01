@@ -1,0 +1,107 @@
+import Mathlib
+import «LeanD6PAECCanonical»
+import «LeanD6CycleDual»
+
+/-! # The canonical binary `m=6` five-cycle PAEC branch. -/
+
+namespace CIGAMF.P13.D6PAECFin6
+
+open CIGAMF.V4.ProductSurrogate
+open CIGAMF.V4.ProductMixedDifference
+open CIGAMF.V4.SupportGeometry
+
+def a6 (a b c d e f : Fin 2) : Fin 6 → Fin 2 := ![a,b,c,d,e,f]
+def z6 := a6 0 0 0 0 0 0
+def o6 := a6 1 1 1 1 1 1
+def s6 := a6 1 1 1 0 0 0
+def t6 := a6 0 0 0 1 1 1
+def e60 := a6 1 0 0 0 0 0
+def e61 := a6 0 1 0 0 0 0
+def e62 := a6 0 0 1 0 0 0
+def e63 := a6 0 0 0 1 0 0
+def e64 := a6 0 0 0 0 1 0
+def e65 := a6 0 0 0 0 0 1
+def p62 := a6 1 1 0 0 0 0
+def b60 := a6 1 0 0 1 1 1
+def b61 := a6 1 1 0 1 1 1
+
+noncomputable def rS6 (F : (Fin 6 → Fin 2) → ℝ)
+    (x : Fin 6 → Fin 2) : ℝ :=
+  F x - (if x 0 = 0 then F z6 else F e60) -
+    (if x 1 = 0 then F z6 else F e61) -
+    (if x 2 = 0 then F z6 else F e62)
+
+noncomputable def rT6 (F : (Fin 6 → Fin 2) → ℝ)
+    (x : Fin 6 → Fin 2) : ℝ :=
+  F x - (if x 3 = 0 then F z6 else F e63) -
+    (if x 4 = 0 then F z6 else F e64) -
+    (if x 5 = 0 then F z6 else F e65)
+
+noncomputable def topCorrection6 (F : (Fin 6 → Fin 2) → ℝ) : ℝ :=
+  ((F z6 - F e65) - (F z6 - F e60)) +
+  ((F z6 - F e64) - (F z6 - F e61)) +
+  ((F z6 - F e63) - (F z6 - F e62))
+
+noncomputable def cycleSum6 (F : (Fin 6 → Fin 2) → ℝ) : ℝ :=
+  mixedDifference F 1 p62 z6 + mixedDifference F 2 s6 z6 +
+  mixedDifference F 0 b60 z6 + mixedDifference F 1 b61 z6 +
+  mixedDifference F 2 o6 z6
+
+theorem five_cycle_identity (F : (Fin 6 → Fin 2) → ℝ) :
+    rS6 F s6 - rS6 F t6 - (rT6 F z6 - rT6 F o6) =
+      cycleSum6 F + topCorrection6 F := by
+  simp [rS6, rT6, cycleSum6, topCorrection6, mixedDifference,
+    s6, t6, z6, o6, e60, e61, e62, e63, e64, e65,
+    p62, b60, b61, a6, Function.update]
+  ring
+
+theorem topCorrection6_nonpos
+    (F : (Fin 6 → Fin 2) → ℝ)
+    (h05 : F z6 - F e65 ≤ F z6 - F e60)
+    (h14 : F z6 - F e64 ≤ F z6 - F e61)
+    (h23 : F z6 - F e63 ≤ F z6 - F e62) :
+    topCorrection6 F ≤ 0 := by
+  unfold topCorrection6
+  linarith
+
+theorem cycleSum6_le
+    (F : (Fin 6 → Fin 2) → ℝ) (delta : ℝ)
+    (hdelta : ∀ i x c, |mixedDifference F i x c| ≤ delta) :
+    cycleSum6 F ≤ 5 * delta := by
+  have h0 := hdelta 1 p62 z6
+  have h1 := hdelta 2 s6 z6
+  have h2 := hdelta 0 b60 z6
+  have h3 := hdelta 1 b61 z6
+  have h4 := hdelta 2 o6 z6
+  unfold cycleSum6
+  have h0' := le_trans (le_abs_self _) h0
+  have h1' := le_trans (le_abs_self _) h1
+  have h2' := le_trans (le_abs_self _) h2
+  have h3' := le_trans (le_abs_self _) h3
+  have h4' := le_trans (le_abs_self _) h4
+  linarith
+
+private theorem point_sub_point_le_osc
+    {A : Type*} [Fintype A] [Nonempty A]
+    (f : A → ℝ) (a b : A) : f a - f b ≤ osc f := by
+  have ha := le_maxVal f a
+  have hb := minVal_le f b
+  simp only [osc]
+  linarith
+
+theorem balanced_direct_fin6_from_five_cycles
+    (F : (Fin 6 → Fin 2) → ℝ) (delta : ℝ)
+    (hdelta : ∀ i x c, |mixedDifference F i x c| ≤ delta)
+    (h05 : F z6 - F e65 ≤ F z6 - F e60)
+    (h14 : F z6 - F e64 ≤ F z6 - F e61)
+    (h23 : F z6 - F e63 ≤ F z6 - F e62)
+    (hActive : osc (rS6 F) = rS6 F s6 - rS6 F t6) :
+    osc (rS6 F) / 2 - osc (rT6 F) / 2 ≤ 5 * delta / 2 := by
+  have hId := five_cycle_identity F
+  have hCycle := cycleSum6_le F delta hdelta
+  have hTop := topCorrection6_nonpos F h05 h14 h23
+  have hT := point_sub_point_le_osc (rT6 F) z6 o6
+  rw [hActive]
+  linarith
+
+end CIGAMF.P13.D6PAECFin6

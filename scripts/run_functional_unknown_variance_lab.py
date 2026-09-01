@@ -13,7 +13,7 @@ import numpy as np
 from scipy.stats import t as student_t
 from research_chains.provenance import atomic_json
 
-PROTOCOL_VERSION='functional_unknown_variance_v1'
+PROTOCOL_VERSION='functional_unknown_variance_v2'
 DEPLOYABLE=('uniform','variance_plugin','variance_shrinkage','time_uniform_t_proxy')
 DIAGNOSTIC=('known_sigma_oracle',)
 
@@ -28,6 +28,21 @@ def _alloc(base, weights, remaining):
     if left:
         order=np.argsort(-(raw-add),kind='stable'); out[order[:left]]+=1
     return out
+
+
+def _exact_integer_variance_alloc(base, coefficient_sq, remaining):
+    """Minimize ``sum coefficient_sq[a] / n[a]`` over integer additions.
+
+    The one-step marginal decrease is ``c/(n(n+1))``.  Greedily assigning
+    each additional sample to the largest current decrease is exact for this
+    separable discrete-convex objective and avoids rounding a continuous
+    oracle allocation.
+    """
+    counts=np.asarray(base,int).copy(); coeff=np.maximum(np.asarray(coefficient_sq,float),0.0)
+    if np.any(counts<=0): raise ValueError('integer variance allocation requires positive base counts')
+    for _ in range(max(0,int(remaining))):
+        gain=coeff/(counts*(counts+1.0)); counts[int(np.argmax(gain))]+=1
+    return counts
 
 
 def _stats(streams, counts):
@@ -49,20 +64,21 @@ def _strategy_counts(name,B,streams,true_q,true_sigma,alpha=0.05):
     if B<K: raise ValueError('budget must be >= number of actions')
     if name=='uniform': return _alloc(np.ones(K,int),np.ones(K),B-K),{'oracle':False}
     if name=='known_sigma_oracle':
-        w=np.zeros(K); hi=int(np.argmax(true_q)); lo=int(np.argmin(true_q)); w[hi]=true_sigma[hi]; w[lo]=true_sigma[lo]
-        return _alloc(np.ones(K,int),w,B-K),{'oracle':True,'hi':hi,'lo':lo}
+        c=np.zeros(K); hi=int(np.argmax(true_q)); lo=int(np.argmin(true_q)); c[hi]=1.; c[lo]=-1.
+        coeff=(c*true_sigma)**2
+        return _exact_integer_variance_alloc(np.ones(K,int),coeff,B-K),{'oracle':True,'hi':hi,'lo':lo,'allocation':'exact_integer_variance'}
     pilot=min(max(2, int(math.ceil(math.sqrt(B)/2))), max(2,B//K))
     counts=np.full(K,pilot,int)
     if counts.sum()>B: counts=np.ones(K,int)
     means,sig=_stats(streams,counts)
     if name=='variance_plugin':
         w,hi,lo=_candidate_weights(means,sig)
-        return _alloc(counts,w,B-int(counts.sum())),{'oracle':False,'hi':hi,'lo':lo,'pilot':int(pilot)}
+        return _exact_integer_variance_alloc(counts,w**2,B-int(counts.sum())),{'oracle':False,'pilot_hi':hi,'pilot_lo':lo,'pilot':int(pilot),'allocation':'exact_integer_variance'}
     if name=='variance_shrinkage':
         pooled=float(np.sqrt(np.mean(sig**2)))
         shrunk=np.sqrt(0.5*sig**2+0.5*pooled**2)
         w,hi,lo=_candidate_weights(means,shrunk)
-        return _alloc(counts,w,B-int(counts.sum())),{'oracle':False,'hi':hi,'lo':lo,'pilot':int(pilot),'pooled_sigma':pooled}
+        return _exact_integer_variance_alloc(counts,w**2,B-int(counts.sum())),{'oracle':False,'pilot_hi':hi,'pilot_lo':lo,'pilot':int(pilot),'pooled_sigma':pooled,'allocation':'exact_integer_variance'}
     if name=='time_uniform_t_proxy':
         # Repeated-look finite-grid Bonferroni t radii.  This is an experimental
         # proxy, not a claim of an asymptotically optimal BAI algorithm.
@@ -92,8 +108,8 @@ def _fixed_contrast_plugin_counts(B,streams,true_contrast):
     """
     K=len(streams); pilot=min(max(2,int(math.ceil(math.sqrt(B)/2))),max(2,B//K)); counts=np.full(K,pilot,int)
     if counts.sum()>B: counts=np.ones(K,int)
-    _,sig=_stats(streams,counts); weights=np.abs(np.asarray(true_contrast,float))*sig
-    return _alloc(counts,weights,B-int(counts.sum())),sig
+    _,sig=_stats(streams,counts); coefficient_sq=(np.asarray(true_contrast,float)*sig)**2
+    return _exact_integer_variance_alloc(counts,coefficient_sq,B-int(counts.sum())),sig,counts
 
 def run(instances=1000,seeds=(100,101,102,103,104),budgets=(32,64,128,256),K=6,alpha=0.05):
     strategies=DEPLOYABLE+DIAGNOSTIC; rows={str(B):{s:[] for s in strategies} for B in budgets}
@@ -112,22 +128,39 @@ def run(instances=1000,seeds=(100,101,102,103,104),budgets=(32,64,128,256),K=6,a
                     if strategy=='known_sigma_oracle':
                         # Diagnostic ceiling knows both the extrema identity and sigma.
                         Chat=float(means[hi]-means[lo])
-                    elif meta.get('hi') is not None and meta.get('lo') is not None:
-                        Chat=float(means[int(meta['hi'])]-means[int(meta['lo'])])
+                        final_hi,final_lo=hi,lo
                     else:
+                        # Deployable methods reselect extrema after spending the
+                        # full budget.  Pilot-locked evaluation is a different
+                        # estimand and made the old comparison unfair.
                         Chat=float(np.ptp(means))
+                        final_hi,final_lo=est_hi,est_lo
                     rel=np.max(np.abs(sighat-sigma)/np.maximum(sigma,1e-12)); var_obj=_variance_objective(counts,sigma,c)
-                    fixed_counts,fixed_sighat=_fixed_contrast_plugin_counts(int(B),streams,c)
-                    fixed_rel=float(np.max(np.abs(fixed_sighat-sigma)/np.maximum(sigma,1e-12))); rho=min(fixed_rel,0.999999)
-                    fixed_var=_variance_objective(fixed_counts,sigma,c); robust_factor=((1+rho)/(1-rho))**2
+                    fixed_counts,fixed_sighat,fixed_base=_fixed_contrast_plugin_counts(int(B),streams,c)
+                    fixed_rel=float(np.max(np.abs(fixed_sighat-sigma)/np.maximum(sigma,1e-12)))
+                    fixed_oracle_counts=_exact_integer_variance_alloc(fixed_base,(c*sigma)**2,int(B)-int(fixed_base.sum()))
+                    plugin_objective=_variance_objective(fixed_counts,fixed_sighat,c)
+                    comparator_plugin_objective=_variance_objective(fixed_oracle_counts,fixed_sighat,c)
+                    plugin_optimal=bool(plugin_objective<=comparator_plugin_objective+1e-12)
+                    premise=bool(fixed_rel<1.0 and plugin_optimal)
+                    fixed_var=_variance_objective(fixed_counts,sigma,c)
+                    fixed_oracle_var=_variance_objective(fixed_oracle_counts,sigma,c)
+                    robust_factor=((1+fixed_rel)/(1-fixed_rel))**2 if premise else None
+                    bound_holds=bool(fixed_var <= robust_factor*max(fixed_oracle_var,1e-12)+1e-10) if premise else None
+                    selected_c=np.zeros(K); selected_c[final_hi]=1.; selected_c[final_lo]-=1.
                     rows[str(B)][strategy].append({
-                        'C_abs_error':abs(Chat-C),'extrema_correct':int(est_hi==hi and est_lo==lo),
+                        'C_abs_error':abs(Chat-C),'extrema_correct':int(final_hi==hi and final_lo==lo),
                         'variance_rel_error_max':float(rel),'true_contrast_variance':var_obj,
+                        'final_selected_contrast_variance':_variance_objective(counts,sigma,selected_c),
                         'variance_ratio_to_known_sigma_oracle':float(var_obj/max(oracle_var,1e-12)),
-                        'selection_error_present':bool(meta.get('hi') is not None and (int(meta['hi'])!=hi or int(meta['lo'])!=lo)),
+                        'pilot_selection_error_present':bool(meta.get('pilot_hi') is not None and (int(meta['pilot_hi'])!=hi or int(meta['pilot_lo'])!=lo)),
+                        'final_selection_error_present':bool(final_hi!=hi or final_lo!=lo),
                         'fixed_contrast_variance_rel_error':fixed_rel,'fixed_contrast_true_variance':fixed_var,
-                        'deterministic_relative_error_factor':float(robust_factor),
-                        'relative_error_bound_holds':bool(fixed_var <= robust_factor*max(oracle_var,1e-12)+1e-10),
+                        'fixed_contrast_oracle_variance_same_pilot':fixed_oracle_var,
+                        'plugin_optimality_against_same_pilot_comparator':plugin_optimal,
+                        'relative_error_premise_holds':premise,
+                        'deterministic_relative_error_factor':float(robust_factor) if premise else None,
+                        'relative_error_bound_holds':bound_holds,
                         'counts':counts.tolist(),'meta':meta,
                     })
     summary={}
@@ -139,8 +172,10 @@ def run(instances=1000,seeds=(100,101,102,103,104),budgets=(32,64,128,256),K=6,a
                 'extrema_accuracy':float(np.mean([r['extrema_correct'] for r in rr])),
                 'mean_variance_rel_error_max':float(np.mean([r['variance_rel_error_max'] for r in rr])),
                 'median_variance_ratio_to_known_sigma_oracle':float(np.median([r['variance_ratio_to_known_sigma_oracle'] for r in rr])),
-                'relative_error_bound_violation_count':int(sum(not r['relative_error_bound_holds'] for r in rr)),
-                'selection_error_fraction':float(np.mean([r['selection_error_present'] for r in rr])),
+                'relative_error_premise_rate':float(np.mean([r['relative_error_premise_holds'] for r in rr])),
+                'relative_error_bound_violation_count':int(sum(r['relative_error_bound_holds'] is False for r in rr)),
+                'pilot_selection_error_fraction':float(np.mean([r['pilot_selection_error_present'] for r in rr])),
+                'final_selection_error_fraction':float(np.mean([r['final_selection_error_present'] for r in rr])),
             }
     winners={B:min(DEPLOYABLE,key=lambda s:summary[B][s]['C_mae']) for B in summary}
     return {'protocol_version':PROTOCOL_VERSION,'development_only':True,'known_sigma_policy':'diagnostic oracle ceiling only; never included in deployable winner','instances_per_seed':int(instances),'seeds':list(map(int,seeds)),'budgets':list(map(int,budgets)),'actions':int(K),'alpha':float(alpha),'deployable':list(DEPLOYABLE),'diagnostic':list(DIAGNOSTIC),'by_budget':summary,'deployable_C_mae_winner':winners}

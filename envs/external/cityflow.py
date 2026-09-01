@@ -198,6 +198,10 @@ class CityFlowCIGEnvironment(ExternalPopulationMixin):
         mask = self.valid_action_mask(agent)
         return action if 0 <= action < mask.size and mask[action] else int(np.flatnonzero(mask)[0])
 
+    def trusted_execution_receipt(self):
+        """Phases explicitly applied through ``set_tl_phase`` in the last step."""
+        return tuple(int(action) for action in self.last_actions)
+
 
 def make_cityflow_environment(seed=0, repo_path=None, config_path=None, max_steps=60, observation_width=64, **_):
     import os

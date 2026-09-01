@@ -40,7 +40,16 @@ from scripts.run_h1_calibration import build_h1_config  # noqa: E402
 
 V7_PROTOCOL = "h1_fixed_panel_two_level_margin_v1"
 V7_REPORT_SCHEMA = "v7_fixed_panel_reporting_v1"
+EVIDENCE_CLASSES = ("DEVELOPMENT_EMPIRICAL", "CONFIRMATORY_EMPIRICAL")
 PLUGIN_CFG = {"proxy_use_doubly_robust": False, "eps": 0.05}
+
+
+def _development_only(args) -> bool:
+    return str(args.evidence_class) == "DEVELOPMENT_EMPIRICAL"
+
+
+def _evidence_protocol(args) -> str:
+    return str(args.evidence_protocol or V7_PROTOCOL)
 
 
 def _json_hash(payload) -> str:
@@ -198,7 +207,9 @@ def _run_checkpoint(args, seed: int, checkpoint: int, panel_path: Path, panel_fi
 
     summary.update({
         "v7_protocol": V7_PROTOCOL,
-        "v7_development_only": True,
+        "v7_evidence_protocol": _evidence_protocol(args),
+        "v7_evidence_class": str(args.evidence_class),
+        "v7_development_only": _development_only(args),
         "v7_checkpoint_episodes": int(checkpoint),
         "v7_fixed_panel_fingerprint": str(panel_fingerprint),
         "v7_training_mode": "independent_same_seed_from_scratch",
@@ -802,13 +813,15 @@ def _phase_correlation_table(pair_df: pd.DataFrame, state_df: pd.DataFrame):
     return pd.DataFrame(rows)
 
 
-def _final_scientific_report(checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations):
+def _final_scientific_report(checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations, *, evidence_class, evidence_protocol):
     checkpoints = sorted(int(x) for x in checkpoint_summary["checkpoint"].unique()) if len(checkpoint_summary) else []
     latest = checkpoints[-1] if checkpoints else None
     report = {
         "report_schema": V7_REPORT_SCHEMA,
         "protocol": V7_PROTOCOL,
-        "development_only": True,
+        "evidence_protocol": str(evidence_protocol),
+        "evidence_class": str(evidence_class),
+        "development_only": str(evidence_class) == "DEVELOPMENT_EMPIRICAL",
         "completed_checkpoints_in_aggregate": checkpoints,
         "latest_checkpoint": latest,
         "claims_guardrails": [
@@ -840,7 +853,7 @@ def _final_scientific_report(checkpoint_summary, paired, seed_paired, lambda_c, 
     return report
 
 
-def _write_reporting_outputs(out_root: Path, pair_df, state_df, checkpoint_summary):
+def _write_reporting_outputs(out_root: Path, pair_df, state_df, checkpoint_summary, *, evidence_class, evidence_protocol):
     paired = _paired_longitudinal_table(pair_df, state_df)
     seed_paired = _seed_paired_longitudinal_table(pair_df, state_df)
     lambda_c = _lambda_c_phase_table(pair_df)
@@ -856,7 +869,8 @@ def _write_reporting_outputs(out_root: Path, pair_df, state_df, checkpoint_summa
     certs.to_csv(out_root / "v7_certificate_nonvacuity.csv", index=False)
     correlations.to_csv(out_root / "v7_phase_correlations.csv", index=False)
     report = _final_scientific_report(
-        checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations
+        checkpoint_summary, paired, seed_paired, lambda_c, lambda_topk, lambda_d, certs, correlations,
+        evidence_class=evidence_class, evidence_protocol=evidence_protocol,
     )
     _write_json_atomic(out_root / "v7_final_scientific_report.json", report)
     return {
@@ -924,6 +938,12 @@ def _check_manifest_compatibility(existing, args):
             "Existing V7 output root was created with incompatible scientific settings: "
             f"{mismatched}. Use a different --out-root or restore matching settings."
         )
+    previous_evidence = existing.get("evidence_class")
+    if previous_evidence is not None and str(previous_evidence) != str(args.evidence_class):
+        raise RuntimeError(
+            "Existing V7 output root has incompatible evidence_class: "
+            f"{previous_evidence} != {args.evidence_class}"
+        )
 
 
 def _completion_payload(out_root: Path, args, cells, invocation=None):
@@ -974,7 +994,9 @@ def _completion_payload(out_root: Path, args, cells, invocation=None):
     payload = {
         "manifest_version": 2,
         "protocol": V7_PROTOCOL,
-        "development_only": True,
+        "evidence_protocol": _evidence_protocol(args),
+        "evidence_class": str(args.evidence_class),
+        "development_only": _development_only(args),
         "scientific_config": _stable_scientific_config(args),
         "scientific_config_fingerprint": _json_hash(_stable_scientific_config(args)),
         "expected_seeds": expected_seeds,
@@ -1012,6 +1034,49 @@ def _set_invocation_status(out_root: Path, invocation_id: str, status: str, **ex
     _write_json_atomic(path, manifest)
 
 
+def _validate_evidence_context(out_root: Path, args) -> None:
+    if str(args.evidence_class) != "CONFIRMATORY_EMPIRICAL":
+        return
+    if not args.evidence_protocol:
+        raise RuntimeError("confirmatory evidence requires --evidence-protocol")
+    protocol_path = out_root / "CONFIRMATORY_PROTOCOL.json"
+    if not protocol_path.is_file():
+        raise RuntimeError("confirmatory evidence requires CONFIRMATORY_PROTOCOL.json in --out-root")
+    payload = _load_json_if_exists(protocol_path)
+    if not payload or str(payload.get("protocol_version")) != str(args.evidence_protocol):
+        raise RuntimeError("confirmatory protocol identifier does not match --evidence-protocol")
+    if payload.get("development_seed_overlap") is not False:
+        raise RuntimeError("confirmatory protocol must explicitly record development_seed_overlap=false")
+    frozen = payload.get("frozen", {})
+    if frozen and list(map(int, frozen.get("checkpoints", []))) != list(map(int, args.checkpoints)):
+        raise RuntimeError("confirmatory checkpoint grid differs from frozen protocol")
+    allowed = set(map(int, payload.get("seeds", [])))
+    if not set(map(int, args.seeds)) <= allowed:
+        raise RuntimeError("requested confirmatory seeds are not contained in the frozen protocol")
+
+
+def _cell_evidence_matches(run_dir: Path, args) -> bool:
+    """Confirm that a completed cell was generated under this evidence layer.
+
+    Historical development artifacts are never relabeled confirmatory after
+    completion. Confirmatory reuse is allowed only when the cell itself records
+    the frozen evidence protocol and class.
+    """
+    summary_path = run_dir / "tiny_oracle_summary.json"
+    if not summary_path.is_file():
+        return False
+    summary = _load_json_if_exists(summary_path)
+    if not summary:
+        return False
+    if _development_only(args):
+        return summary.get("v7_evidence_class") in (None, "DEVELOPMENT_EMPIRICAL")
+    return bool(
+        summary.get("v7_evidence_class") == str(args.evidence_class)
+        and summary.get("v7_evidence_protocol") == _evidence_protocol(args)
+        and summary.get("v7_development_only") is False
+    )
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, nargs="+", default=[3001, 3002, 3003, 3004, 3005])
@@ -1028,6 +1093,14 @@ def main(argv=None):
     ap.add_argument("--panel-root", default=None)
     ap.add_argument("--rebuild-panels", action="store_true")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument(
+        "--evidence-class", choices=EVIDENCE_CLASSES, default="DEVELOPMENT_EMPIRICAL",
+        help="Scientific evidence class for provenance; confirmatory mode requires a frozen protocol file.",
+    )
+    ap.add_argument(
+        "--evidence-protocol", default=None,
+        help="Protocol identifier for the evidence layer. Defaults to the underlying V7 protocol.",
+    )
     ap.add_argument(
         "--analyze-only", action="store_true",
         help="Do not train. Re-discover all complete cells under --out-root and rebuild cumulative V7 aggregates.",
@@ -1051,6 +1124,7 @@ def main(argv=None):
 
     out_root = Path(args.out_root).resolve()
     out_root.mkdir(parents=True, exist_ok=True)
+    _validate_evidence_context(out_root, args)
     if args.panel_root is None:
         args.panel_root = str(out_root / "panels")
 
@@ -1069,6 +1143,8 @@ def main(argv=None):
         "requested_seeds": [int(x) for x in args.seeds],
         "requested_checkpoints": [int(x) for x in args.checkpoints],
         "resume_skip_complete": not bool(args.rerun_complete),
+        "evidence_class": str(args.evidence_class),
+        "evidence_protocol": _evidence_protocol(args),
     }
     _write_json_atomic(
         out_root / "v7_manifest.json",
@@ -1097,6 +1173,11 @@ def main(argv=None):
                         panel_fingerprint=payload["panel_fingerprint"],
                     )
                     if valid and not args.rerun_complete:
+                        if not _cell_evidence_matches(run_dir, args):
+                            raise RuntimeError(
+                                "completed cell belongs to a different evidence layer; "
+                                "do not relabel it. Use a fresh --out-root for confirmatory execution"
+                            )
                         if not _completion_marker_path(run_dir).exists():
                             _write_completion_marker(run_dir, metadata, backfilled=True)
                         skipped_cells.append({"seed": int(seed), "checkpoint": int(checkpoint)})
@@ -1140,6 +1221,16 @@ def main(argv=None):
         complete_cells = _completed_cell_tuples(cells)
         if not complete_cells:
             raise RuntimeError("No complete V7 cells are available under --out-root")
+        mismatched = [
+            str(_run_dir(out_root, seed, checkpoint))
+            for seed, checkpoint in complete_cells
+            if not _cell_evidence_matches(_run_dir(out_root, seed, checkpoint), args)
+        ]
+        if mismatched:
+            raise RuntimeError(
+                "aggregate contains cells from a different evidence layer; "
+                f"use a fresh output root: {mismatched[:3]}"
+            )
 
         pair_df, state_df, summary_df = _read_cells(out_root, complete_cells)
         consistency = _assert_panel_consistency(pair_df)
@@ -1156,7 +1247,8 @@ def main(argv=None):
         seed_summary.to_csv(out_root / "v7_seed_checkpoint_summary.csv", index=False)
         checkpoint_summary.to_csv(out_root / "v7_checkpoint_summary.csv", index=False)
         reporting = _write_reporting_outputs(
-            out_root, pair_df, state_df, checkpoint_summary
+            out_root, pair_df, state_df, checkpoint_summary,
+            evidence_class=args.evidence_class, evidence_protocol=_evidence_protocol(args),
         )
 
         hard_gates = {
@@ -1189,6 +1281,9 @@ def main(argv=None):
         completed_checkpoints = sorted(int(x) for x in seed_summary["checkpoint"].unique())
         completion_manifest = _completion_payload(out_root, args, cells)
         completion_summary = {
+            "evidence_protocol": _evidence_protocol(args),
+            "evidence_class": str(args.evidence_class),
+            "development_only": _development_only(args),
             "expected_seeds": completion_manifest["expected_seeds"],
             "expected_checkpoints": completion_manifest["expected_checkpoints"],
             "completed_checkpoints": completion_manifest["completed_checkpoints"],
@@ -1201,8 +1296,10 @@ def main(argv=None):
 
         analysis = {
             "protocol": V7_PROTOCOL,
+            "evidence_protocol": _evidence_protocol(args),
+            "evidence_class": str(args.evidence_class),
             "report_schema": V7_REPORT_SCHEMA,
-            "development_only": True,
+            "development_only": _development_only(args),
             "hard_gates": hard_gates,
             "completion": completion_summary,
             "reporting_outputs": reporting["report"].get("output_tables", {}),

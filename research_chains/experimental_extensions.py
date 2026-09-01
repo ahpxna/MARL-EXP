@@ -31,6 +31,32 @@ def _normalise_probabilities(values: Sequence[float]) -> np.ndarray:
     return arr / total
 
 
+
+
+def _validate_probability_distribution(values: Sequence[float], expected_size: int, *, atol: float = 1e-10) -> np.ndarray:
+    """Validate a theorem-level probability vector without silently renormalizing.
+
+    D6 assumes normalized non-negative product weights.  Diagnostics must fail
+    closed when callers violate that assumption; auto-normalization would
+    change the scientific object being certified.
+    """
+    arr = np.asarray(values, dtype=np.float64)
+    if arr.ndim != 1 or arr.shape != (int(expected_size),):
+        raise ValueError("probability vector has the wrong action-alphabet width")
+    if not np.all(np.isfinite(arr)) or np.any(arr < 0.0):
+        raise ValueError("probabilities must be finite and non-negative")
+    total = float(arr.sum())
+    if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=float(atol)):
+        raise ValueError(f"probabilities must be normalized; sum={total:.17g}")
+    return arr.copy()
+
+
+def _validate_product_marginals(marginals: Mapping[int, Sequence[float]], sizes: Sequence[int]) -> dict[int, np.ndarray]:
+    expected_keys = set(range(len(sizes)))
+    if set(marginals) != expected_keys:
+        raise ValueError(f"product marginals must have exactly coordinate keys {sorted(expected_keys)}")
+    return {j: _validate_probability_distribution(marginals[j], sizes[j]) for j in range(len(sizes))}
+
 def total_variation(p: Sequence[float], q: Sequence[float]) -> float:
     p = _normalise_probabilities(p); q = _normalise_probabilities(q)
     if p.shape != q.shape:
@@ -396,9 +422,10 @@ def d6_diagnostics(world: FiniteResponseWorld, marginals: Mapping[int, Sequence[
     sizes = world.support.action_sizes; full = tuple(world.support.full_product())
     if set(world.support.omega) != set(full):
         return {"applicable": False, "reason": "support_not_full_cartesian"}
-    q = {j: _normalise_probabilities(marginals[j]) for j in range(len(sizes))}
-    if any(q[j].shape != (sizes[j],) for j in range(len(sizes))):
-        return {"applicable": False, "reason": "invalid_product_marginal"}
+    try:
+        q = _validate_product_marginals(marginals, sizes)
+    except (TypeError, ValueError) as exc:
+        return {"applicable": False, "reason": "invalid_product_marginal", "detail": str(exc)}
     baseline, rows, surrogate = product_reference_surrogate(world, q)
     errors = np.asarray([world.true_value(a) - surrogate(a) for a in full], dtype=np.float64)
     sup_error = float(np.max(np.abs(errors)))
@@ -697,25 +724,40 @@ def all_optimal_extension_defect(world: FiniteResponseWorld, nested_result: Mapp
 
 
 def cascade_evaluation(world: FiniteResponseWorld, estimated_scores: Sequence[float], errors: Sequence[float], k: int, tolerance: float) -> dict:
+    certificate_started=time.perf_counter()
     selected = topk_indices(estimated_scores, int(k)); z = zeta_def(world,int(k)); eta=world.residual_supnorm()
-    gamma = operational_gamma(estimated_scores,errors,int(k),selected); cert=pairwise_master_bound(gamma,z,eta)
+    gamma = operational_gamma(estimated_scores,errors,int(k),selected)
+    box = box_gamma_diagnostics(estimated_scores, errors, int(k), selected)
+    operational_cert=pairwise_master_bound(gamma,z,eta)
+    box_cert=pairwise_master_bound(float(box["box_gamma"]),z,eta)
+    # The frozen MASTER keeps Gamma_op active.  BOX7 is a proved optional
+    # tightening, but promotion waits for this utility lab's evidence.
+    cert=operational_cert
+    certificate_runtime=time.perf_counter()-certificate_started
     # Compute the exact optimum once.  We need it both to audit the candidate
     # certificate and, when necessary, to model the exact fallback branch.
     t0=time.perf_counter(); optimum, sets=exact_optimum(world,int(k),true_loss=True); exact_runtime=time.perf_counter()-t0
     candidate_regret=float(world.true_compression_loss(selected)-optimum)
-    start=time.perf_counter()
     if cert <= float(tolerance):
         chosen=selected; fallback=False; branch_exact_runtime=0.0
     else:
         chosen=sets[0]; fallback=True; branch_exact_runtime=exact_runtime
-    total_runtime=time.perf_counter()-start + branch_exact_runtime
+    modelled_runtime=certificate_runtime+branch_exact_runtime
+    speedup=float(exact_runtime/max(modelled_runtime,1e-15))
     regret=float(world.true_compression_loss(chosen)-optimum)
     return {
-        "certificate":float(cert),"tolerance":float(tolerance),"fallback":bool(fallback),
+        "certificate":float(cert),"active_certificate":"Gamma_op","tolerance":float(tolerance),"fallback":bool(fallback),
+        "box_certificate":float(box_cert),"operational_certificate":float(operational_cert),
+        "gamma_operational":float(gamma),"gamma_box":float(box["box_gamma"]),
+        "gamma_box_over_operational":float(box["box_gamma"] / max(gamma, 1e-15)),
         "candidate_regret":candidate_regret,"regret":regret,
         "certificate_safe":bool((not fallback and candidate_regret<=max(float(tolerance),1e-9)) or fallback),
+        "certificate_runtime_seconds":float(certificate_runtime),
         "exact_runtime_seconds":float(branch_exact_runtime),"exact_optimum_runtime_seconds":float(exact_runtime),
-        "cascade_runtime_seconds":float(total_runtime),
+        "always_exact_runtime_seconds":float(exact_runtime),
+        "modelled_cascade_runtime_seconds":float(modelled_runtime),
+        "cascade_runtime_seconds":float(modelled_runtime),
+        "modelled_speedup_vs_always_exact":speedup,
     }
 
 
@@ -728,7 +770,7 @@ def product_anova_decomposition(world: FiniteResponseWorld, marginals: Mapping[i
     sizes=world.support.action_sizes; m=len(sizes); full=tuple(world.support.full_product())
     if set(world.support.omega)!=set(full):
         raise ValueError("product ANOVA baseline requires full Cartesian support")
-    q={j:_normalise_probabilities(marginals[j]) for j in range(m)}
+    q=_validate_product_marginals(marginals, sizes)
     subsets=[S for r in range(m+1) for S in itertools.combinations(range(m),r)]
     components={}
     # Each component is a mapping from local assignment tuple to value.

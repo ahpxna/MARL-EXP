@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Mapping, Sequence
 
 import numpy as np
@@ -9,7 +10,26 @@ import numpy as np
 from .certificates import topk_indices
 
 
+@dataclass(frozen=True)
+class ScoreErrorTerm:
+    """A score-error radius tied to one explicit estimand/target key.
+
+    The MASTER theorem only permits additive composition when every radius
+    covers the same underlying score target.  Keeping the target key next to
+    each term makes that invariant executable instead of relying on comments.
+    """
+
+    target_key: str
+    values: Sequence[float]
+    source: str = "unspecified"
+
+
 def compose_score_error(*terms: Sequence[float]) -> np.ndarray:
+    """Legacy untyped vector sum retained for backwards compatibility.
+
+    New scientific code should prefer :func:`compose_same_target_score_error`
+    so that incompatible estimands fail closed.
+    """
     if not terms:
         raise ValueError("at least one error term is required")
     arrays = [np.asarray(term, dtype=np.float64) for term in terms]
@@ -19,6 +39,21 @@ def compose_score_error(*terms: Sequence[float]) -> np.ndarray:
     if any(np.any(arr < -1e-12) or not np.all(np.isfinite(arr)) for arr in arrays):
         raise ValueError("error terms must be finite and non-negative")
     return np.sum(arrays, axis=0)
+
+
+def compose_same_target_score_error(*terms: ScoreErrorTerm) -> np.ndarray:
+    """Compose non-negative score radii only when all terms share one target.
+
+    This mirrors the P12 ``SameTargetScoreChain`` contract.  It deliberately
+    rejects silent composition across isolated-reference, feasible-reference,
+    product-reference, or otherwise distinct score semantics.
+    """
+    if not terms:
+        raise ValueError("at least one typed error term is required")
+    target_keys = {str(term.target_key) for term in terms}
+    if len(target_keys) != 1:
+        raise ValueError(f"score-error terms do not share one target: {sorted(target_keys)}")
+    return compose_score_error(*(term.values for term in terms))
 
 
 def sharp_gamma(true_scores: Sequence[float], estimated_scores: Sequence[float], errors: Sequence[float], k: int) -> float:

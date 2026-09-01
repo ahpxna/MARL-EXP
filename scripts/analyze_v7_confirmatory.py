@@ -66,11 +66,12 @@ def analyze(root: Path, bootstrap_reps=10000, bootstrap_seed=20260830):
     completion = _load_json(root / "v7_completion_status.json")
     hard = _load_json(root / "v7_hard_gates.json")
     panel_consistency = _load_json(root / "v7_panel_consistency.json")
-    required = [protocol, manifest, completion, hard, panel_consistency]
+    completion_marker = _load_json(root / "CONFIRMATORY_RUN_COMPLETE.json")
+    required = [protocol, manifest, completion, hard, panel_consistency, completion_marker]
     if any(x is None for x in required):
         missing = [n for n, x in zip(
             ["CONFIRMATORY_PROTOCOL.json", "v7_manifest.json", "v7_completion_status.json",
-             "v7_hard_gates.json", "v7_panel_consistency.json"], required) if x is None]
+             "v7_hard_gates.json", "v7_panel_consistency.json", "CONFIRMATORY_RUN_COMPLETE.json"], required) if x is None]
         raise RuntimeError(f"missing confirmatory artifacts: {missing}")
 
     expected_seeds = [int(x) for x in protocol.get("seeds", [])]
@@ -83,6 +84,22 @@ def analyze(root: Path, bootstrap_reps=10000, bootstrap_seed=20260830):
         and len(expected_seeds) >= 10
         and len(expected_seeds) == len(set(expected_seeds))
     )
+    manifest_semantics_ok = bool(
+        manifest.get("development_only") is False
+        and manifest.get("evidence_class") == "CONFIRMATORY_EMPIRICAL"
+        and completion_marker.get("development_only") is False
+        and completion_marker.get("evidence_class") == "CONFIRMATORY_EMPIRICAL"
+        and completion_marker.get("run_completed") is True
+    )
+    cell_files = sorted(root.glob("runs/ep*/seed*/tiny_oracle_summary.json"))
+    cell_semantics = []
+    for path in cell_files:
+        row = _load_json(path) or {}
+        cell_semantics.append(bool(
+            row.get("v7_development_only") is False
+            and row.get("v7_evidence_class") == "CONFIRMATORY_EMPIRICAL"
+        ))
+    cells_semantics_ok = len(cell_files) == len(expected_seeds) * len(expected_cp) and all(cell_semantics)
     completion_ok = bool(
         sorted(map(int, completion.get("expected_seeds", []))) == sorted(expected_seeds)
         and sorted(map(int, completion.get("expected_checkpoints", []))) == expected_cp
@@ -144,6 +161,8 @@ def analyze(root: Path, bootstrap_reps=10000, bootstrap_seed=20260830):
 
     gates = {
         "frozen_protocol": protocol_ok,
+        "manifest_confirmatory_not_development": manifest_semantics_ok,
+        "every_cell_confirmatory_not_development": cells_semantics_ok,
         "complete_seed_checkpoint_grid": completion_ok and grid_ok,
         "fixed_panel_invariance": panel_ok,
         "deterministic_hard_gates": hard_ok,
@@ -156,6 +175,7 @@ def analyze(root: Path, bootstrap_reps=10000, bootstrap_seed=20260830):
         "root": str(root), "seed_is_inference_unit": True,
         "n_seeds": len(expected_seeds), "seeds": expected_seeds,
         "checkpoints": expected_cp, "gates": gates,
+        "cell_artifact_count": len(cell_files),
         "all_integrity_gates_pass": bool(all(gates.values())),
         "violations": violations,
         "paired_20_to_320": result_metrics,
@@ -172,7 +192,7 @@ def analyze(root: Path, bootstrap_reps=10000, bootstrap_seed=20260830):
 
 def main(argv=None):
     p = argparse.ArgumentParser()
-    p.add_argument("--root", default=str(ROOT / "research" / "confirmatory_functional"))
+    p.add_argument("--root", default=str(ROOT / "research" / "confirmatory_functional_v2_fresh"))
     p.add_argument("--bootstrap-reps", type=int, default=10000)
     p.add_argument("--bootstrap-seed", type=int, default=20260830)
     p.add_argument("--out", default=None)

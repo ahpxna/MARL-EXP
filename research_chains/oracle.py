@@ -24,6 +24,27 @@ import numpy as np
 from .support import SupportModel
 
 
+def trusted_execution_receipt(env):
+    """Return an explicit post-resolution execution receipt.
+
+    ``last_actions`` is not a universal execution contract: several external
+    adapters only use it to remember submitted commands.  Scientific oracles
+    therefore require the environment to opt in with a callable
+    ``trusted_execution_receipt`` provider.  This prevents requested commands
+    from being silently relabelled as executed actions.
+    """
+    provider = getattr(env, "trusted_execution_receipt", None)
+    if not callable(provider):
+        raise RuntimeError(
+            "environment does not expose trusted post-resolution executed-action telemetry / execution "
+            "receipt; submitted/requested actions cannot be treated as executed"
+        )
+    receipt = provider()
+    if receipt is None:
+        raise RuntimeError("trusted execution-receipt provider returned None")
+    return receipt
+
+
 @dataclass(frozen=True)
 class JointOracleRecord:
     assignment: Tuple[int, ...]
@@ -90,8 +111,7 @@ class CloneStateJointOracle:
         _, rewards, _, _ = self.env.step(actions)
         requested = tuple(int(x) for x in actions)
         executed = self._normalize_executed_actions(
-            getattr(self.env, "last_actions", None),
-            n_agents=int(self.env.n_agents),
+            trusted_execution_receipt(self.env), n_agents=int(self.env.n_agents)
         )
         verified = all(executed[source] == action for source, action in zip(source_agents, assignment))
         reward = float(rewards[self.outcome_agent])

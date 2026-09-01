@@ -3,17 +3,17 @@
 This matrix is intentionally fail-closed. `requestable support` and
 `resolved/honored support` are different scientific objects.
 
-| Adapter | Clone | Explicit mask | Execution receipt | Coupled support candidate | D6 full-product candidate | Reference/Query | Dynamic |
+| Adapter | Clone | Explicit mask | Execution receipt | Pre-execution joint feasibility | Honored-support diagnostic | D6 full-product candidate | Reference/Query | Dynamic |
 |---|---|---|---|---|---|---|---|
-| Omni | yes | yes | verified | **no** in canonical Omni | yes, but current decision tasks are easy | limited | D0 only |
-| RWARE | yes | all 5 requests | **new resolved-action receipt** | **promising for honored support** because conflicts may cancel requests | only at states/panels where every required tuple is honored | good coordination/removal primitive | restricted |
-| Flatland | yes | topology-dependent | not yet stable in adapter | promising, but must expose motion-resolution receipt first | blocked until execution receipt is trusted | coordination/removal | restricted |
-| CybORG | yes | heterogeneous discrete | submitted-action receipt only | no current coupled-feasibility contract | claim-specific audit required | **promising for reference/query** | promising after learned-policy hook |
-| CityFlow | yes | phase masks | applied phase receipt | no current coupled command constraint | **promising**: independent phase tuple + dynamically coupled traffic response | promising | promising after learned-policy hook |
+| Omni | yes | yes | verified | **not exposed** | Cartesian control only | yes, but current decision tasks are easy | limited | D0 only |
+| RWARE | yes | all 5 requests | runtime verification required | **not exposed** | post-collision cancellation can be measured but is not feasible-command support | only at states/panels where every required tuple is honored | coordination/removal primitive | restricted |
+| Flatland | yes | topology-dependent | not yet stable | **not exposed** | blocked until motion-resolution receipt exists | blocked until execution receipt is trusted | coordination/removal | restricted |
+| CybORG | yes | heterogeneous discrete | submitted-action only | **not exposed** | no coupled-feasibility contract | claim-specific audit required | promising after receipt/query contracts | promising after learned-policy hook |
+| CityFlow | yes | phase masks | applied phase receipt | **not exposed** | independent current command space | **promising**: Cartesian phases + coupled traffic response | possible | promising after learned-policy hook |
 
 ## Recommended roles
 
-- **MASTER coupled support:** synthetic exact supports + RWARE honored-support probe if runtime enumeration finds non-Cartesian resolved support. Flatland is second choice after movement-resolution telemetry is instrumented.
+- **MASTER coupled support:** none of the current external adapters exposes a genuine pre-execution joint-feasibility oracle. Keep exact synthetic supports as theorem tests. RWARE/Flatland post-resolution probes are diagnostics only until an explicit command-admissibility contract exists.
 - **D6 external:** CityFlow first; canonical Omni remains an applicability/authority sanity environment. RWARE is usable only on panels with a verified full product of honored commands.
 - **QUERY external:** CybORG + RWARE/Flatland coordination states; CityFlow for control/interaction queries. MPE2 `Simple Spread` / `Simple Reference` is a good *next* package for communication/coordination, but is not added to the pinned runtime in this patch to avoid silently expanding the dependency lock.
 - **DYNAMIC/F3:** defer until an adapter exposes a claim-specific learned-policy update hook.

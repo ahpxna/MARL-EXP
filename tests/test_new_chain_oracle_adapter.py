@@ -14,6 +14,7 @@ class ToyEnv:
         self.last_actions=list(actions); self.state['t']+=1
         rewards=[float(actions[1]-actions[2]),float(actions[0]+actions[2]),float(actions[0]-actions[1])]
         return [None]*3,rewards,False,{}
+    def trusted_execution_receipt(self): return self.last_actions
 
 
 class DictActionToyEnv(ToyEnv):

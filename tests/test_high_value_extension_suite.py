@@ -29,13 +29,20 @@ REQUIRED_IDS={
 'FUNCTIONAL.ALLOC_UNIFORM','FUNCTIONAL.ALLOC_BEHAVIOR','FUNCTIONAL.ALLOC_UNCERTAINTY','FUNCTIONAL.ALLOC_D_NEYMAN','FUNCTIONAL.ALLOC_D_ORACLE','FUNCTIONAL.ALLOC_C_EXTREMAL','FUNCTIONAL.ALLOC_C_SUCCESSIVE','FUNCTIONAL.ALLOC_C_SPLIT','FUNCTIONAL.ALLOC_C_ORACLE',
 'QUERY.DELETION','QUERY.LIMITED_SUPPORT','QUERY.NONLINEAR_NULLSPACE','QUERY.DYNAMIC_INTERACTION','QUERY.OVERLAPPING_GROUPS','QUERY.DRIFT_ERROR','QUERY.DRIFT_RANK',
 'MASTER.ACTIVE_REF_UNCERTAINTY_TARGETED','MASTER.CASCADE_FRONTIER','FUNCTIONAL.ALLOC_C_SUCCESSIVE_KNOWN_SIGMA_DIAG','QUERY.ENTANGLED_STRESS','D6.S2_ADVERSARIAL','D6.OMNI_FULL_JOINT',
+'FUNCTIONAL.UNKNOWN_VARIANCE','FUNCTIONAL.VARIANCE_STOPPING','MASTER.REFERENCE_RESPONSE_BUDGET','EXTERNAL.ADAPTER_CAPABILITY_AUDIT',
 }
 
 def test_registry_covers_every_proposal_node():
-    payload=json.loads((ROOT/'research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json').read_text())
+    payload=json.loads((ROOT/'config/PROPOSAL_EXPERIMENT_REGISTRY.json').read_text())
     got={item['proposal_id'] for item in payload['items']}
     assert REQUIRED_IDS <= got
+    assert payload['schema'] == 'cig_amf_proposal_experiment_registry_v2'
+    assert payload['source_metadata'] is True
+    assert 'ignored research/' in payload['artifact_policy']
     assert payload['paper3_merged_into_master'] is True
+    assert not (ROOT/'research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json').exists()
+    assert not (ROOT/'research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json.orig').exists()
+    assert not (ROOT/'research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json.org').exists()
 
 
 def test_reference_uncertainty_bounds_smoke():
@@ -178,7 +185,10 @@ def test_master_uncertainty_targeted_and_cascade_frontier():
     assert payload['active_acquisition_semantics']['uncertainty_targeted'].startswith('adaptive posterior')
     frontier=payload['cascade']['frontier']
     assert '0.05' in frontier
+    assert '0.3' in frontier
     assert frontier['0.05']['false_safe_count'] == 0
+    for key in ('certified_fraction','worst_regret_when_certified','runtime_saved_seconds','certificate_computation_cost_seconds','mean_bound_width','mean_gamma_box_over_operational'):
+        assert key in frontier['0.05']
 
 def test_functional_deployable_winners_exclude_oracles():
     from scripts.run_query_optimal_allocation_lab import run
@@ -215,7 +225,7 @@ def test_omni_full_joint_near_zero_ratios_are_not_reported():
 def test_redesign_registry_has_unique_ids_and_core_p13_experiments():
     import json
     from pathlib import Path
-    registry=json.loads((Path(__file__).resolve().parents[1]/"research/high_value_extensions/PROPOSAL_EXPERIMENT_REGISTRY.json").read_text())
+    registry=json.loads((Path(__file__).resolve().parents[1]/"config/PROPOSAL_EXPERIMENT_REGISTRY.json").read_text())
     ids=[row["proposal_id"] for row in registry["items"]]
     assert len(ids)==len(set(ids))
     required={

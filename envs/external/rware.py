@@ -93,6 +93,15 @@ class RWARECIGEnvironment(ExternalPopulationMixin):
         del agent
         return 0
 
+    def trusted_execution_receipt(self):
+        """Post-conflict RWARE commands, never the submitted request tuple."""
+        return tuple(int(action) for action in self.last_executed_actions)
+
+    def query_noop_action(self, agent):
+        """Literal RWARE NOOP used by removal/necessity query primitives."""
+        del agent
+        return 0
+
 
 def make_rware_environment(seed=0, n_agents=6, max_steps=60, observation_width=192, **_):
     from rware.warehouse import Warehouse, RewardType, ObservationType

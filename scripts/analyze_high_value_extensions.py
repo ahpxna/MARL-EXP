@@ -6,6 +6,8 @@ ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 import numpy as np
 from research_chains.provenance import atomic_json
+from research_chains.proposal_registry import HIGH_VALUE_SUITE_RUNNERS, load_registry, runner_coverage
+from scripts.run_query_optimal_allocation_lab import DEPLOYABLE_STRATEGIES
 
 def _load(root,name):
     out=[]
@@ -22,6 +24,32 @@ def _load(root,name):
 
 def _mean(rows,fn):
     vals=[fn(r) for r in rows]; vals=[float(v) for v in vals if v is not None and np.isfinite(float(v))]; return float(np.mean(vals)) if vals else None
+
+
+
+def _deployable_allocation_winner(row, budget, metric, *, maximize):
+    """Return a deployable winner, including migration of legacy artifacts.
+
+    Older screening artifacts predate the explicit deployable/diagnostic split
+    and their ``endpoint_winners`` can name oracle ceilings.  Recompute from
+    stored per-strategy metrics instead of propagating stale oracle headlines.
+    """
+    budget=str(budget)
+    declared=row.get('deployable_strategies')
+    allowed=set(map(str, declared if declared is not None else DEPLOYABLE_STRATEGIES))
+    by=row.get('by_budget',{}).get(budget,{})
+    candidates=[]
+    for strategy,metrics in by.items():
+        if strategy not in allowed or metric not in metrics:
+            continue
+        value=metrics.get(metric)
+        if value is None or not np.isfinite(float(value)):
+            continue
+        candidates.append((float(value),str(strategy)))
+    if not candidates:
+        return None
+    best=(max if maximize else min)(value for value,_ in candidates)
+    return sorted(strategy for value,strategy in candidates if abs(value-best)<=1e-12)[0]
 
 def main(argv=None):
     p=argparse.ArgumentParser(); p.add_argument('--root',default='research/high_value_extensions/runs'); p.add_argument('--out',default='research/high_value_extensions/DECISION_MATRIX.json'); p.add_argument('--min-promote-seeds',type=int,default=5); p.add_argument('--max-promote-fallback',type=float,default=.80); a=p.parse_args(argv); root=Path(a.root)
@@ -48,14 +76,24 @@ def main(argv=None):
         if FA:
             common=sorted(set.intersection(*[set(r['by_budget'].keys()) for r in FA]),key=lambda x:int(x)) if FA else []
             for b in common:
-                allocation_latest[b]={'C_mae_winners':[r['endpoint_winners'][b]['C_mae'] for r in FA],'C_topk_winners':[r['endpoint_winners'][b]['C_topk_exact'] for r in FA],'D_mae_winners':[r['endpoint_winners'][b]['D_mae'] for r in FA],'D_sign_winners':[r['endpoint_winners'][b]['D_sign_accuracy'] for r in FA]}
+                allocation_latest[b]={
+                    'C_mae_winners':[_deployable_allocation_winner(r,b,'C_mae',maximize=False) for r in FA],
+                    'C_topk_winners':[_deployable_allocation_winner(r,b,'C_topk_exact',maximize=True) for r in FA],
+                    'D_mae_winners':[_deployable_allocation_winner(r,b,'D_mae',maximize=False) for r in FA],
+                    'D_sign_winners':[_deployable_allocation_winner(r,b,'D_sign_accuracy',maximize=True) for r in FA],
+                }
         false_max=max([x for x in (false_ext,false_top,false_d) if x is not None],default=0.0)
         decisions['FUNCTIONAL']={'status':'FIX' if false_max>0 else 'CONTINUE','covariance_reversal_found':reversal,'C_full_vs_diag_mse_ratio':c_ratio,'D_full_vs_diag_mse_ratio':d_ratio,'C_targeted_stopping_ratio':stop_c,'D_targeted_stopping_ratio':stop_d,'matched_budget_winners':allocation_latest,'sequential_false_certificate_rates':{'extrema_max':false_ext,'topk_max':false_top,'Dsign_max':false_d},'next_gate':'run disjoint-seed fixed-panel confirmatory; promote acquisition only if matched-budget endpoint gains replicate'}
     if D:
         theorem=max(max(r['worst_candidate_violations']['worst'],r['worst_candidate_violations']['decision']) for r in D); sur=max(r['sharpness']['best_surrogate_ratio'] for r in D); dec=max(r['sharpness']['best_decision_ratio'] for r in D)
         qavg_uniform=_mean(D,lambda r:1.0 if r['worst_candidate_violations']['qavg_uniform']<=1e-10 else 0.0); qavg_dist=_mean(D,lambda r:1.0 if r['worst_candidate_violations']['qavg_distributional']<=1e-10 else 0.0)
         half_safe=_mean(D,lambda r:1.0 if r.get('decision_improvement_candidate',{}).get('worst_violation',float('inf'))<=1e-10 else 0.0); ql1_safe=_mean(D,lambda r:1.0 if r.get('qL1_distributional',{}).get('conditional_worst_violation',float('inf'))<=1e-10 else 0.0)
-        adversarial_ratio=max([r.get('decision_improvement_candidate',{}).get('adversarial_search',{}).get('best_ratio_to_worst_rhs',-float('inf')) for r in D],default=None)
+        adversarial_candidates=[]
+        for r in D:
+            value=r.get('decision_improvement_candidate',{}).get('adversarial_search',{}).get('best_ratio_to_worst_rhs')
+            if value is not None and np.isfinite(float(value)):
+                adversarial_candidates.append(float(value))
+        adversarial_ratio=max(adversarial_candidates) if adversarial_candidates else None
         candidate_killed=any(r.get('decision_improvement_candidate',{}).get('adversarial_search',{}).get('candidate_killed',False) for r in D)
         decisions['D6']={'status':'FIX' if theorem>1e-8 else ('HALF_FACTOR_KILLED_CONTINUE_D6' if candidate_killed else 'CONTINUE'),'evidence_seeds':len(D),'current_bound_worst_violation':theorem,'best_surrogate_sharpness_ratio':sur,'best_decision_sharpness_ratio':dec,'half_factor_candidate_seed_safe_fraction':half_safe,'half_factor_adversarial_best_ratio_to_worst_rhs':adversarial_ratio,'half_factor_candidate_killed':bool(candidate_killed),'qavg_uniform_seed_safe_fraction':qavg_uniform,'qavg_distributional_seed_safe_fraction':qavg_dist,'qL1_conditional_seed_safe_fraction':ql1_safe,'next_gate':'promote q-sensitive branch only if exact-hybrid quantities remain violation-free and materially tighter; half-factor candidate must survive targeted adversarial search and still requires proof'}
     if Q:
@@ -83,5 +121,7 @@ def main(argv=None):
             'reference_worst_failure_count':max([r.get('failure_count',0) for r in FREF],default=None),
             'query_primitive_statuses':[r.get('overall_status') for r in FQ],
         }
-    payload={'schema':'high_value_extension_decision_matrix_v2','min_promote_seeds':int(a.min_promote_seeds),'evidence_seed_counts':{'master':len(M),'functional_design':len(FD),'functional_allocation':len(FA),'functional_stopping':len(FS),'d6':len(D),'query':len(Q),'structural':len(S),'dynamic':len(DY)},'root':str(root),'decisions':decisions,'missing_labs':[x for x,rows in [('master',M),('functional_design',FD),('functional_allocation',FA),('functional_stopping',FS),('d6',D),('query',Q),('structural',S),('dynamic',DY),('foundation_bh',FBH),('foundation_rp',FRP),('foundation_reference',FREF),('foundation_query',FQ)] if not rows]}; atomic_json(Path(a.out),payload); print(json.dumps(payload,indent=2)); return 0
+    registry=load_registry(ROOT/'config/PROPOSAL_EXPERIMENT_REGISTRY.json')
+    coverage=runner_coverage(registry,HIGH_VALUE_SUITE_RUNNERS)
+    payload={'schema':'high_value_extension_decision_matrix_v2','min_promote_seeds':int(a.min_promote_seeds),'evidence_seed_counts':{'master':len(M),'functional_design':len(FD),'functional_allocation':len(FA),'functional_stopping':len(FS),'d6':len(D),'query':len(Q),'structural':len(S),'dynamic':len(DY)},'root':str(root),'decisions':decisions,'missing_labs':[x for x,rows in [('master',M),('functional_design',FD),('functional_allocation',FA),('functional_stopping',FS),('d6',D),('query',Q),('structural',S),('dynamic',DY),('foundation_bh',FBH),('foundation_rp',FRP),('foundation_reference',FREF),('foundation_query',FQ)] if not rows],'proposal_coverage':coverage}; atomic_json(Path(a.out),payload); print(json.dumps(payload,indent=2)); return 0
 if __name__=='__main__': raise SystemExit(main())

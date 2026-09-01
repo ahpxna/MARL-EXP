@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import subprocess
 from typing import Mapping
 
 
@@ -33,6 +34,41 @@ def atomic_json(path, payload) -> None:
         os.replace(tmp, path)
     finally:
         if os.path.exists(tmp): os.unlink(tmp)
+
+
+def source_fingerprint(root: Path | None = None) -> str:
+    """HEAD plus dirty-tree digest, so an edited tree is never called plain HEAD."""
+    root = Path(root or Path(__file__).resolve().parents[1])
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, check=True,
+                              capture_output=True, text=True).stdout.strip()
+        diff = subprocess.run(["git", "diff", "--binary", "HEAD"], cwd=root, check=True,
+                              capture_output=True).stdout.encode()
+        untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=root,
+                                   check=True, capture_output=True, text=True).stdout.splitlines()
+        digest = hashlib.sha256(diff)
+        for name in sorted(untracked):
+            path = root / name; digest.update(name.encode())
+            if path.is_file(): digest.update(path.read_bytes())
+        dirty_sha = digest.hexdigest()
+        return head if not diff and not untracked else f"{head}+dirty:{dirty_sha}"
+    except Exception as exc:
+        return f"UNAVAILABLE:{type(exc).__name__}"
+
+
+def write_artifact_with_provenance(path, payload, *, protocol, seed=None,
+                                   evidence_class="DEVELOPMENT_EMPIRICAL", chain="UNSPECIFIED"):
+    """Write result plus a non-recursive hash sidecar."""
+    path = Path(path); atomic_json(path, payload)
+    manifest = {
+        "manifest_version": "claim_evidence_run_v1", "chain": str(chain),
+        "seed": None if seed is None else int(seed), "evidence_class": str(evidence_class),
+        "source_sha": source_fingerprint(), "protocol_sha": canonical_json_sha256(dict(protocol)),
+        "artifact": path.name, "artifact_sha": file_sha256(path),
+    }
+    manifest["manifest_sha"] = canonical_json_sha256(manifest)
+    atomic_json(path.with_suffix(path.suffix + ".manifest.json"), manifest)
+    return manifest
 
 
 def build_manifest(*, protocol_version: str, chain: str, development_only: bool, seed: int | None, source_sha: str, config: Mapping, estimand_key: str, reference_semantics: str, support_version: str, continuation_version: str, metric_availability: Mapping[str, str]):

@@ -41,6 +41,10 @@ except ModuleNotFoundError:
     from envs.tiny_oracle_dig import OracleInfluenceProfile
 
 class OmniArena:
+    def trusted_execution_receipt(self):
+        """Commands accepted by canonical Omni for the immediately prior step."""
+        return copy.deepcopy(self.last_actions)
+
     UP = 0
     DOWN = 1
     LEFT = 2

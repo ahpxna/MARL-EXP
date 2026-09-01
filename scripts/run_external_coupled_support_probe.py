@@ -23,7 +23,8 @@ def _rectangularity(rows,n_sources):
     if not omega:return {'honored_cells':0,'projection_product_size':0,'rectangular':False,'coupled':False,'omega':[]}
     projections=[sorted({a[j] for a in omega}) for j in range(int(n_sources))]
     product=set(itertools.product(*projections))
-    return {'honored_cells':len(omega),'projection_product_size':len(product),'rectangular':bool(omega==product),'coupled':bool(omega!=product),'projection_sizes':[len(x) for x in projections],'omega':[list(x) for x in sorted(omega)]}
+    rejected_inside=[tuple(r['requested']) for r in rows if r.get('verified') and not r.get('fully_honored') and tuple(r['requested']) in product]
+    return {'honored_cells':len(omega),'projection_product_size':len(product),'rectangular':bool(not rejected_inside and omega==product),'coupled':bool(rejected_inside),'coupling_witnesses':[list(x) for x in rejected_inside],'projection_sizes':[len(x) for x in projections],'omega':[list(x) for x in sorted(omega)]}
 
 
 def run(key='rware',seed=3001,n_states=16,n_sources=2,warmup_steps=2,max_cells=512,env=None):

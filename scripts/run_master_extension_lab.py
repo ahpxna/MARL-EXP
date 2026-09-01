@@ -16,7 +16,9 @@ from research_chains.experimental_extensions import (
     box_gamma_lean_witness_diagnostics, probability_lift_diagnostics, ru2_factor_two_sharpness_diagnostics,
 )
 from research_chains.finite_world import FiniteResponseWorld
-from research_chains.pairwise import compose_score_error, operational_gamma, pairwise_master_bound
+from research_chains.pairwise import (
+    ScoreErrorTerm, compose_same_target_score_error, operational_gamma, pairwise_master_bound,
+)
 from research_chains.provenance import atomic_json
 from research_chains.reference import ConditionalReferenceKernel
 from research_chains.support import SupportModel, SupportBracket, projected_span_bracket
@@ -141,16 +143,32 @@ def run(instances=100,budgets=(16,32,64,128,256),seed=0,tolerance=0.05):
         ref_shift=rng.uniform(-ref_errors,ref_errors)
         after_reference=after_support+ref_shift
         estimate=after_reference+rng.uniform(-stat_err,stat_err)
-        total_error=compose_score_error(stat_err,ref_errors,support_chain_err,model_err)
+        score_target_key="primitive_capacity_span"
+        total_error=compose_same_target_score_error(
+            ScoreErrorTerm(score_target_key, stat_err, "statistical"),
+            ScoreErrorTerm(score_target_key, ref_errors, "reference"),
+            ScoreErrorTerm(score_target_key, support_chain_err, "support"),
+            ScoreErrorTerm(score_target_key, model_err, "model"),
+        )
         composed_viol=max(composed_viol,float(np.max(np.abs(estimate-primitive_scores)-total_error)))
-        selected=topk_indices(estimate,k); gamma=operational_gamma(estimate,total_error,k,selected)
+        selected=topk_indices(estimate,k); gamma_op=operational_gamma(estimate,total_error,k,selected)
+        box=box_gamma_diagnostics(estimate,total_error,k,selected)
+        gamma_box=float(box["box_gamma"])
         # Exact support-deficit object used by the operational MASTER theorem.
         # Do not substitute selected-set regret: zeta_def is the uniform structural
         # bridge from modular Top-C geometry to support-aware compression.
         z=float(zeta_def(world,k))
-        bound=pairwise_master_bound(gamma,z,world.residual_supnorm()); true_opt,_=exact_optimum(world,k,true_loss=True); true_reg=world.true_compression_loss(selected)-true_opt
-        topk_records.append({"match":int(set(selected)==set(topk_indices(primitive_scores,k))),"true_regret":true_reg,"bound":bound,"violation":true_reg-bound,"gamma":gamma})
-        box_records.append(box_gamma_diagnostics(estimate,total_error,k,selected))
+        # Keep the frozen operational Gamma as the active certificate.  Box
+        # Gamma is a proved optional tightening whose empirical utility is
+        # measured below; it is not promoted silently.
+        bound=pairwise_master_bound(gamma_op,z,world.residual_supnorm()); true_opt,_=exact_optimum(world,k,true_loss=True); true_reg=world.true_compression_loss(selected)-true_opt
+        topk_records.append({
+            "match":int(set(selected)==set(topk_indices(primitive_scores,k))),
+            "true_regret":true_reg,"bound":bound,"violation":true_reg-bound,
+            "gamma_active":float(gamma_op),"gamma_box":gamma_box,"gamma_operational":float(gamma_op),
+            "active_certificate":"Gamma_op",
+        })
+        box_records.append(box)
         # Cascade utility uses a centered noisy score with a guaranteed cover.
         noise=rng.normal(scale=0.03,size=m); noisy=primitive_scores+noise; err=np.abs(noise)+1e-10
         cascade.append(cascade_evaluation(world,noisy,err,k,tolerance))
@@ -175,7 +193,7 @@ def run(instances=100,budgets=(16,32,64,128,256),seed=0,tolerance=0.05):
     # Evaluate utility over a tolerance frontier.  This prevents a single
     # arbitrarily chosen tolerance from being mistaken for universal
     # non-vacuity and makes high fallback rates explicit.
-    frontier_tolerances=sorted(set([0.0,0.01,0.02,0.05,0.1,0.2,0.5,1.0,2.0,float(tolerance)]))
+    frontier_tolerances=sorted(set([0.0,0.01,0.02,0.05,0.1,0.2,0.3,0.5,1.0,float(tolerance)]))
     cascade_frontier={}
     for tol in frontier_tolerances:
         accepted=[r for r in cascade if r['certificate'] <= tol + 1e-15]
@@ -185,11 +203,23 @@ def run(instances=100,budgets=(16,32,64,128,256),seed=0,tolerance=0.05):
             'tolerance':float(tol),
             'fallback_rate':fallback_rate,
             'accepted_fraction':1.0-fallback_rate,
+            'certified_fraction':1.0-fallback_rate,
             'accepted_count':len(accepted),
             'false_safe_count':int(false_safe),
             'false_safe_rate':float(false_safe/max(1,len(accepted))),
             'mean_candidate_regret_when_accepted':float(np.mean([r['candidate_regret'] for r in accepted])) if accepted else None,
+            'empirical_regret_when_certified':float(np.mean([r['candidate_regret'] for r in accepted])) if accepted else None,
+            'worst_regret_when_certified':float(max([r['candidate_regret'] for r in accepted])) if accepted else None,
+            'mean_bound_width':float(np.mean([r['certificate'] for r in accepted])) if accepted else None,
+            'mean_gamma_box_over_operational':float(np.mean([r['gamma_box_over_operational'] for r in cascade])),
+            'mean_certificate_runtime_seconds':float(np.mean([r['certificate_runtime_seconds'] for r in cascade])),
+            'certificate_computation_cost_seconds':float(np.mean([r['certificate_runtime_seconds'] for r in cascade])),
+            'mean_modelled_cascade_runtime_seconds':float(np.mean([r['certificate_runtime_seconds']+(r['always_exact_runtime_seconds'] if r['certificate']>tol+1e-15 else 0.0) for r in cascade])),
+            'mean_always_exact_runtime_seconds':float(np.mean([r['always_exact_runtime_seconds'] for r in cascade])),
         }
+        modelled=cascade_frontier[str(tol)]['mean_modelled_cascade_runtime_seconds']
+        cascade_frontier[str(tol)]['speedup_vs_always_exact']=float(cascade_frontier[str(tol)]['mean_always_exact_runtime_seconds']/max(modelled,1e-15))
+        cascade_frontier[str(tol)]['runtime_saved_seconds']=float(cascade_frontier[str(tol)]['mean_always_exact_runtime_seconds']-modelled)
     return {
         "protocol_version":PROTOCOL_VERSION,"development_only":True,"instances":int(instances),"seed":int(seed),"budgets":list(map(int,budgets)),
         "reference_uncertainty":{"worst_violation":ru_viol,"composed_score_worst_violation":float(composed_viol),"RU2_factor_two_sharpness":ru2_factor_two_sharpness_diagnostics()},
@@ -204,13 +234,21 @@ def run(instances=100,budgets=(16,32,64,128,256),seed=0,tolerance=0.05):
             "uncertainty_targeted":"adaptive posterior row-uncertainty targeting after a small pilot; uses only accumulated observations",
         },
         "heldout_calibration":calibration,
-        "master_transfer":{"mean_true_regret":float(np.mean([r['true_regret'] for r in topk_records])),"mean_bound":float(np.mean([r['bound'] for r in topk_records])),"worst_violation":float(max(r['violation'] for r in topk_records)),"topk_match_rate":float(np.mean([r['match'] for r in topk_records]))},
+        "master_transfer":{
+            "active_certificate":"Gamma_op",
+            "mean_true_regret":float(np.mean([r['true_regret'] for r in topk_records])),
+            "mean_bound":float(np.mean([r['bound'] for r in topk_records])),
+            "worst_violation":float(max(r['violation'] for r in topk_records)),
+            "topk_match_rate":float(np.mean([r['match'] for r in topk_records])),
+            "mean_gamma_box":float(np.mean([r['gamma_box'] for r in topk_records])),
+            "mean_gamma_operational":float(np.mean([r['gamma_operational'] for r in topk_records])),
+        },
         "support_uncertainty":{
             "coverage_rate":float(np.mean([r['truth_covered'] for r in support_records])),
             "mean_span_interval_width":float(np.mean([r['mean_width'] for r in support_records])),
             "nonzero_width_fraction":float(np.mean([r['nonzero_width'] for r in support_records])),
         },
-        "cascade":{"tolerance":float(tolerance),"fallback_rate":float(np.mean([r['fallback'] for r in cascade])),"safe_rate":float(np.mean([r['certificate_safe'] for r in cascade])),"mean_regret":float(np.mean([r['regret'] for r in cascade])),"mean_candidate_regret":float(np.mean([r['candidate_regret'] for r in cascade])),"mean_exact_runtime_when_called":float(np.mean([r['exact_runtime_seconds'] for r in cascade if r['fallback']])) if any(r['fallback'] for r in cascade) else 0.0,"mean_cascade_runtime":float(np.mean([r['cascade_runtime_seconds'] for r in cascade])),"frontier":cascade_frontier},
+        "cascade":{"tolerance":float(tolerance),"fallback_rate":float(np.mean([r['fallback'] for r in cascade])),"safe_rate":float(np.mean([r['certificate_safe'] for r in cascade])),"mean_regret":float(np.mean([r['regret'] for r in cascade])),"mean_candidate_regret":float(np.mean([r['candidate_regret'] for r in cascade])),"mean_certificate_runtime":float(np.mean([r['certificate_runtime_seconds'] for r in cascade])),"mean_exact_runtime_when_called":float(np.mean([r['exact_runtime_seconds'] for r in cascade if r['fallback']])) if any(r['fallback'] for r in cascade) else 0.0,"mean_always_exact_runtime":float(np.mean([r['always_exact_runtime_seconds'] for r in cascade])),"mean_cascade_runtime":float(np.mean([r['modelled_cascade_runtime_seconds'] for r in cascade])),"mean_speedup_vs_always_exact":float(np.mean([r['modelled_speedup_vs_always_exact'] for r in cascade])),"frontier":cascade_frontier},
     }
 
 

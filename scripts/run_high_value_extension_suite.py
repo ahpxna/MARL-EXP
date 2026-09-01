@@ -5,6 +5,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 from research_chains.provenance import atomic_json
+from research_chains.proposal_registry import HIGH_VALUE_SUITE_RUNNERS, load_registry, runner_coverage
 from scripts import run_master_extension_lab as master
 from scripts import run_functional_design_extension_lab as fdesign
 from scripts import run_functional_stopping_lab as fstop
@@ -51,7 +52,12 @@ def main(argv=None):
                 payload={'protocol_version':PROTOCOL_VERSION,'error':f'{type(exc).__name__}: {exc}'}; status='ERROR'; error=payload['error']
             elapsed=time.perf_counter()-t; path=root/name/f'seed{int(seed)}.json'; atomic_json(path,payload); records.append({'lab':name,'seed':int(seed),'status':status,'seconds':elapsed,'path':str(path),'error':error})
             print(json.dumps(records[-1],sort_keys=True),flush=True)
-    suite={'protocol_version':PROTOCOL_VERSION,'profile':a.profile,'seeds':a.seeds,'config':cfg,'records':records,'complete':all(r['status']=='PASS' for r in records),'decision_matrix_auto':None}; atomic_json(root/'SUITE_MANIFEST.json',suite)
+    actual_runner_modules={master.__name__,fdesign.__name__,falloc.__name__,fstop.__name__,d6.__name__,query.__name__,structural.__name__,dynamic.__name__,foundation_bh.__name__,foundation_rp.__name__,foundation_ref.__name__,foundation_query.__name__}
+    if actual_runner_modules != set(HIGH_VALUE_SUITE_RUNNERS):
+        raise RuntimeError(f'high-value suite runner registry drift: {sorted(actual_runner_modules ^ set(HIGH_VALUE_SUITE_RUNNERS))}')
+    registry=load_registry(ROOT/'config/PROPOSAL_EXPERIMENT_REGISTRY.json')
+    coverage=runner_coverage(registry,actual_runner_modules)
+    suite={'protocol_version':PROTOCOL_VERSION,'profile':a.profile,'seeds':a.seeds,'config':cfg,'records':records,'complete':all(r['status']=='PASS' for r in records),'decision_matrix_auto':None,'proposal_coverage':coverage}; atomic_json(root/'SUITE_MANIFEST.json',suite)
     if suite['complete'] and not a.no_auto_analyze:
         from scripts.analyze_high_value_extensions import main as analyze_main
         decision_path=root/'DECISION_MATRIX_AUTO.json'

@@ -24,7 +24,8 @@ def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument("--seeds", nargs="+", type=int, default=list(range(5001, 5021)))
     p.add_argument("--device", default="cpu")
-    p.add_argument("--out-root", default=str(ROOT / "research" / "confirmatory_functional"))
+    # Never default into the historical interrupted/development-only evidence root.
+    p.add_argument("--out-root", default=str(ROOT / "research" / "confirmatory_functional_v2_fresh"))
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--quiet", action="store_true")
     a = p.parse_args(argv)
@@ -36,6 +37,8 @@ def main(argv=None):
 
     protocol = {
         "protocol_version": PROTOCOL_VERSION,
+        "evidence_class": "CONFIRMATORY_EMPIRICAL",
+        "development_only": False,
         "underlying_v7_protocol": v7.V7_PROTOCOL,
         "frozen": FROZEN,
         "seeds": seeds,
@@ -58,6 +61,8 @@ def main(argv=None):
         "--reference-train-episodes", str(FROZEN["reference_train_episodes"]),
         "--panel-seed-offset", str(FROZEN["panel_seed_offset"]),
         "--out-root", str(out),
+        "--evidence-class", "CONFIRMATORY_EMPIRICAL",
+        "--evidence-protocol", PROTOCOL_VERSION,
     ]
     if a.quiet:
         args.append("--quiet")
@@ -65,12 +70,15 @@ def main(argv=None):
         print(json.dumps({
             "protocol": protocol,
             "command": ["python", "-m", "scripts.run_h1_fixed_panel_v7", *args],
+            "evidence_class": "CONFIRMATORY_EMPIRICAL",
         }, indent=2))
         return 0
     rc = int(v7.main(args) or 0)
     if rc == 0:
         atomic_json(out / "CONFIRMATORY_RUN_COMPLETE.json", {
             "protocol_version": PROTOCOL_VERSION,
+            "evidence_class": "CONFIRMATORY_EMPIRICAL",
+            "development_only": False,
             "seeds": seeds,
             "checkpoints": FROZEN["checkpoints"],
             "run_completed": True,

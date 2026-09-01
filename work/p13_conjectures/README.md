@@ -14,3 +14,13 @@ Promotion rule:
 
 Experiments can **falsify, prioritize, or stress** these conjectures. They never
 turn a `sorry` into a universal proof.
+
+`LeanFunctionalUnknownVarianceConjecture.lean` is a historical filename: its
+three deterministic robustness theorems now contain zero `sorry` and fresh
+compile under the pinned runtime. It remains quarantined until the active
+ledger/promotion gate is updated and does not certify an acquisition policy.
+
+`LeanReferenceResponseTopKBudgetConjecture.lean` is the only new P13 bridge in
+the redesign batch.  Its conditional Top-K wrapper is compiled with zero
+`sorry`; the statistical coverage premise and the 2/3-power allocation optimum
+remain separate open dependencies and are not proved by that wrapper.
