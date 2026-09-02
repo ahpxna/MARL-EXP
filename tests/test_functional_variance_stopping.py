@@ -11,7 +11,9 @@ def test_variance_stopping_uses_certificate_count_and_keeps_oracle_diagnostic():
     assert out["deployable_variants"] == list(DEPLOYABLE)
     assert out["diagnostic_variants"] == list(DIAGNOSTIC)
     assert "C_known_sigma" not in DEPLOYABLE
-    assert out["deployable_winner_by_median_N_certificate"] in DEPLOYABLE
+    assert out["deployable_winner_by_median_N_certificate"] in DEPLOYABLE or out["deployable_winner_by_median_N_certificate"] is None
+    assert out["deployable_winner_status"] in {"IDENTIFIED_BY_MEDIAN", "NO_MEDIAN_IDENTIFIED_CENSORING", "NO_MEDIAN_IDENTIFIED_TIE"}
+    assert set(out["deployable_secondary_order"]) == set(DEPLOYABLE)
     for variant in DEPLOYABLE + DIAGNOSTIC:
         assert "median_N_certificate" in out["by_variant"][variant]
         assert out["by_variant"][variant]["false_safe_count"] == 0

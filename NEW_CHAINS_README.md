@@ -72,3 +72,18 @@ Remaining scientific adapters are intentionally not faked:
 - construction of statistically certified `Omega^- / Omega^+` from logged MARL data is a research/statistical task, not inferred from observed tuples;
 - high-probability `delta_circ`, `eta`, `rho`, and support bounds need estimator-specific coverage methods before an oracle bound becomes a deployed certificate;
 - arbitrary transported AIPW is not implemented; use direct frozen standardization of history-level `mu` unless a transport ratio is added and validated.
+
+## 2026-09-01 post-P13 reframe: certificate objects, not generic active learning
+
+The novelty-critical Lean batch added typed certificate completion, selective
+maintenance, support-critical identification, prefix-cover dimension,
+cost-aware PAEC completion, D6 first-order insufficiency, and query
+identifiability.  Python experiment support now lives in
+`research_chains/novelty_completion.py` plus the six
+`run_*_..._lab.py` runners documented in `RUN_REDESIGNED_EXPERIMENTS.md`.
+
+Historical active-acquisition experiments remain valid historical evidence.
+They are **not deleted**.  Their scientific role is narrower: acquisition is a
+runtime consequence of completing a typed proof obligation.  The new runners
+measure evidence cost/query count/refresh count and preserve fail-closed scope
+boundaries.

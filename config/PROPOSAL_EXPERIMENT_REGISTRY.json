@@ -791,10 +791,67 @@
       "primary_metric": "blocked_methods,blocked_queries,reason_code",
       "proposal_id": "QUERY.METHOD_CAPABILITY_MATRIX",
       "runner": "scripts.run_adapter_capability_audit"
+    },
+    {
+      "proposal_id": "MASTER.TYPED_CERTIFICATE_COMPLETION",
+      "paper": "MASTER",
+      "runner": "scripts.run_typed_certificate_completion_lab",
+      "evidence_kind": "synthetic exact certificate-completion",
+      "primary_metric": "mean_cost_ratio_vs_individual_direct",
+      "notes": "Typed proof obligations; wrong-type evidence cannot discharge an obligation. Active acquisition is not itself the novelty claim."
+    },
+    {
+      "proposal_id": "FUNCTIONAL.SELECTIVE_CERTIFICATE_MAINTENANCE",
+      "paper": "FUNCTIONAL",
+      "runner": "scripts.run_functional_selective_maintenance_lab",
+      "evidence_kind": "synthetic drift maintenance",
+      "primary_metric": "mean_refresh_cost_fraction_vs_full,false_safe_rate",
+      "notes": "Refresh only certificate-critical relations under declared drift budgets; simple lifetime bound is a lemma, not headline novelty."
+    },
+    {
+      "proposal_id": "SUPPORT.DECISION_CRITICAL_IDENTIFICATION",
+      "paper": "SUPPORT",
+      "runner": "scripts.run_support_critical_identification_lab",
+      "evidence_kind": "finite exact support discovery",
+      "primary_metric": "mean_queries_decision_critical,mean_query_fraction_of_full_product,false_safe_count",
+      "notes": "Identify only joint-support cells needed to close the relational decision certificate; not full support reconstruction."
+    },
+    {
+      "proposal_id": "STRUCTURAL.PREFIX_COVER_DIMENSION",
+      "paper": "STRUCTURAL",
+      "runner": "scripts.run_structural_prefix_cover_lab",
+      "evidence_kind": "exact finite structural search",
+      "primary_metric": "max_dimension_found,chi_ge_3_found,dimension_histogram",
+      "notes": "Budget-transversal prefix-cover dimension; search-first target for chi>=3/growing families."
+    },
+    {
+      "proposal_id": "D6.COST_AWARE_PAEC_COMPLETION",
+      "paper": "D6",
+      "runner": "scripts.run_d6_cost_aware_paec_lab",
+      "evidence_kind": "certificate-completion mechanics conditional on valid certificate",
+      "primary_metric": "mean_paid_cost_fraction_of_measure_all,median_measured_atoms",
+      "notes": "B1-B6 only; does not assume EveryTopCPairHasPAEC. Proof/certificate completion, not generic interaction screening."
+    },
+    {
+      "proposal_id": "D6.FIRST_ORDER_INSUFFICIENCY_B7",
+      "paper": "D6",
+      "runner": "scripts.run_d6_cost_aware_paec_lab",
+      "evidence_kind": "exact finite witness reproduction",
+      "primary_metric": "b7_exact_reproduction.full_singleton_optima_disjoint",
+      "notes": "Reproduces same complete first-order responses with incompatible optimal singleton decisions; justifies escalation to interaction evidence."
+    },
+    {
+      "proposal_id": "QUERY.IDENTIFIABILITY_VERIFIER",
+      "paper": "QUERY",
+      "runner": "scripts.run_query_identifiability_lab",
+      "evidence_kind": "finite exact semantic verifier",
+      "primary_metric": "insufficient_fraction,mean_minimax_floor",
+      "notes": "Typed query identifiability/witness generation. Natural-language technique routing is UI and not the novelty headline."
     }
   ],
   "paper3_merged_into_master": true,
-  "schema": "cig_amf_proposal_experiment_registry_v2",
+  "schema": "cig_amf_proposal_experiment_registry_v3",
   "source_metadata": true,
-  "artifact_policy": "experiment outputs belong under ignored research/; this registry is the canonical tracked source authority"
+  "artifact_policy": "experiment outputs belong under ignored research/; this registry is the canonical tracked source authority",
+  "novelty_reframe": "proof/certificate objects are the organizing principle; active acquisition is a runtime consequence"
 }

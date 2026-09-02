@@ -233,14 +233,35 @@ def run(instances=200, seeds=(100, 101, 102, 103, 104), relations=5, actions=6,
     summary = {}
     for variant, rr in rows.items():
         emitted = [x for x in rr if x["certificate_emitted"]]
+        censored = [x["censored_N_certificate"] for x in rr]
         summary[variant] = {
-            "median_N_certificate": float(np.median([x["censored_N_certificate"] for x in rr])),
+            # Historical field retained for artifact compatibility.  It is a
+            # median of right-censored times, not a valid tie-breaker when <50%
+            # of runs emit a certificate.
+            "median_N_certificate": float(np.median(censored)),
+            "median_censored_N_certificate": float(np.median(censored)),
+            "restricted_mean_censored_N_certificate": float(np.mean(censored)),
             "certificate_fraction": float(np.mean([x["certificate_emitted"] for x in rr])),
             "false_safe_count": int(sum(x["false_safe"] is True for x in rr)),
             "false_safe_rate_among_emitted": float(np.mean([x["false_safe"] for x in emitted])) if emitted else None,
             "mean_final_capacity_interval_width": float(np.mean([x["final_mean_capacity_interval_width"] for x in rr])),
         }
-    winner = min(DEPLOYABLE, key=lambda v: summary[v]["median_N_certificate"])
+    med = {v: summary[v]["median_censored_N_certificate"] for v in DEPLOYABLE}
+    best_med = min(med.values())
+    tied = [v for v in DEPLOYABLE if abs(med[v] - best_med) <= 1e-12]
+    # A median at max_n+1 means at least half the runs are censored.  Calling
+    # the first tuple entry a "winner" in that regime was a stale-analysis bug
+    # (it reported uniform simply because uniform is first in DEPLOYABLE).
+    winner = tied[0] if len(tied) == 1 and best_med <= int(max_n) else None
+    winner_status = "IDENTIFIED_BY_MEDIAN" if winner is not None else (
+        "NO_MEDIAN_IDENTIFIED_CENSORING" if best_med > int(max_n) else "NO_MEDIAN_IDENTIFIED_TIE"
+    )
+    secondary_order = sorted(DEPLOYABLE, key=lambda v: (
+        -summary[v]["certificate_fraction"],
+        summary[v]["restricted_mean_censored_N_certificate"],
+        summary[v]["mean_final_capacity_interval_width"],
+        v,
+    ))
     return {
         "protocol_version": PROTOCOL_VERSION,
         "development_only": True,
@@ -258,6 +279,9 @@ def run(instances=200, seeds=(100, 101, 102, 103, 104), relations=5, actions=6,
         "relations": int(relations), "actions": int(actions), "topk": int(topk),
         "max_n": int(max_n), "by_variant": summary,
         "deployable_winner_by_median_N_certificate": winner,
+        "deployable_winner_status": winner_status,
+        "deployable_secondary_order": secondary_order,
+        "censoring_note": "do not name a median-N winner when the best median is max_n+1 or tied; certificate_fraction/RMST-like summaries are secondary diagnostics",
     }
 
 

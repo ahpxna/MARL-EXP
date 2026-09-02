@@ -320,3 +320,72 @@ python -m scripts.analyze_external_query_transfer \
 
 Missing attention, communication, information, or causal-context providers stay
 `BLOCKED_NA` with reason codes.  No foreign score is substituted.
+
+## Post-P13 novelty-critical experiment layer (2026-09-01)
+
+The research reports were reframed around **proof/certificate objects**, not
+"active acquisition" as a standalone novelty claim.  The following runners are
+new development experiments.  They do not delete or supersede historical
+artifacts; write them under `research/novelty_critical/`.
+
+```bash
+python -m scripts.run_typed_certificate_completion_lab --instances 1000 --seed 6101
+python -m scripts.run_functional_selective_maintenance_lab --instances 2000 --seed 6201
+python -m scripts.run_support_critical_identification_lab --instances 500 --seed 6301 --m 4 --k 2 --epsilon .05
+python -m scripts.run_structural_prefix_cover_lab --instances 2000 --seed 6401 --m-values 3 4 5 6
+python -m scripts.run_d6_cost_aware_paec_lab --instances 2000 --seed 6501
+python -m scripts.run_query_identifiability_lab --instances 5000 --seed 6601
+```
+
+Scientific scope gates:
+
+- `D6.COST_AWARE_PAEC_COMPLETION` is conditional on an **available valid
+  certificate**.  It must never be interpreted as evidence for the still-open
+  `EveryTopCPairHasPAEC` theorem.
+- `D6.FIRST_ORDER_INSUFFICIENCY_B7` reproduces the exact Lean witness and may be
+  reported as a necessity/escalation result.
+- Structural prefix-cover runs are search/falsification evidence.  Finding no
+  `chi>=3` world is not a theorem; an exact witness should be ported to Lean
+  before promotion.
+- Query identifiability is a typed semantic verifier.  Natural-language XAI
+  technique routing is not the novelty headline and external real-method
+  transfer remains a separate requirement.
+- Functional maintenance uses an idealized refresh model first; external MARL
+  drift experiments must later replace synthetic drift before deployment
+  claims.
+
+Before interpreting archived results after changing source/registry, run:
+
+```bash
+python -m scripts.audit_post_p13_results --root . --out research/post_p13_result_audit.json
+```
+
+The audit is append-only: it marks old artifacts `STALE_*`/`INCOMPLETE` but does
+not rewrite them.
+
+### One-command novelty-critical suite
+
+For a cheap plumbing/smoke run:
+
+```bash
+python -m scripts.run_novelty_critical_suite --profile quick
+```
+
+For the planned development screening sizes:
+
+```bash
+python -m scripts.run_novelty_critical_suite --profile screening
+```
+
+Each child runner writes its own provenance sidecar. `SUITE_SUMMARY.json` is orchestration metadata only. Historical result directories are not rewritten by the suite.
+
+When auditing an older result-rich checkout against the current source tree, keep the two roots explicit:
+
+```bash
+python -m scripts.audit_post_p13_results \
+  --root /path/to/historical/result_checkout \
+  --source-root . \
+  --out research/post_p13_historical_result_audit.json
+```
+
+This comparison never rewrites the historical checkout.
