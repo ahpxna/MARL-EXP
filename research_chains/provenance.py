@@ -36,24 +36,68 @@ def atomic_json(path, payload) -> None:
         if os.path.exists(tmp): os.unlink(tmp)
 
 
+def _source_tree_fingerprint(root: Path) -> str:
+    """Deterministic fallback for source archives that are not Git checkouts.
+
+    Generated research outputs, caches, compiled objects and large binary artifacts
+    are deliberately excluded: the fingerprint should identify the source/config tree,
+    not depend on the result file that is being written.
+    """
+    excluded_parts = {
+        ".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
+        "research", "results", "outputs", "compile_logs", "wandb",
+    }
+    source_suffixes = {
+        ".py", ".md", ".txt", ".toml", ".yaml", ".yml", ".json", ".sh", ".bat",
+        ".lean", ".csv", ".tsv", ".ini", ".cfg", ".lock",
+    }
+    digest = hashlib.sha256()
+    count = 0
+    for path in sorted(root.rglob("*"), key=lambda p: p.as_posix()):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(root)
+        if any(part in excluded_parts for part in rel.parts):
+            continue
+        if path.suffix.lower() not in source_suffixes and path.name not in {"Dockerfile", "Makefile"}:
+            continue
+        digest.update(rel.as_posix().encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+        digest.update(b"\0")
+        count += 1
+    if count == 0:
+        raise RuntimeError("no source files found for fallback fingerprint")
+    return f"TREE:{digest.hexdigest()}:{count}"
+
+
 def source_fingerprint(root: Path | None = None) -> str:
-    """HEAD plus dirty-tree digest, so an edited tree is never called plain HEAD."""
+    """HEAD plus dirty digest, with a deterministic source-tree fallback.
+
+    Research artifacts are often exchanged as ZIPs without `.git`; provenance must
+    remain usable in that normal workflow instead of emitting `UNAVAILABLE:*`.
+    """
     root = Path(root or Path(__file__).resolve().parents[1])
     try:
         head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, check=True,
                               capture_output=True, text=True).stdout.strip()
         diff = subprocess.run(["git", "diff", "--binary", "HEAD"], cwd=root, check=True,
-                              capture_output=True).stdout.encode()
+                              capture_output=True).stdout
         untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard"], cwd=root,
                                    check=True, capture_output=True, text=True).stdout.splitlines()
         digest = hashlib.sha256(diff)
         for name in sorted(untracked):
-            path = root / name; digest.update(name.encode())
-            if path.is_file(): digest.update(path.read_bytes())
+            path = root / name
+            digest.update(name.encode("utf-8"))
+            if path.is_file():
+                digest.update(path.read_bytes())
         dirty_sha = digest.hexdigest()
         return head if not diff and not untracked else f"{head}+dirty:{dirty_sha}"
-    except Exception as exc:
-        return f"UNAVAILABLE:{type(exc).__name__}"
+    except (subprocess.SubprocessError, OSError):
+        try:
+            return _source_tree_fingerprint(root)
+        except Exception as exc:
+            return f"UNAVAILABLE:{type(exc).__name__}"
 
 
 def write_artifact_with_provenance(path, payload, *, protocol, seed=None,

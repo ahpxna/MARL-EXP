@@ -25,11 +25,89 @@
       "runner": "scripts.run_d6_extension_lab"
     },
     {
+      "evidence_kind": "generated exact-rank-one falsification",
+      "notes": "Pairwise scalar-latent rank-one class B1; survival is not proof.",
+      "paper": "D6",
+      "primary_metric": "results.B1_pairwise.best_witness.diagnostics.two_regret_over_delta",
+      "proposal_id": "D6.CONTRAST_RANK_B1",
+      "runner": "scripts.run_d6_contrast_rank_falsification",
+      "status": "ACTIVE"
+    },
+    {
+      "evidence_kind": "generated exact-rank-one falsification",
+      "notes": "Full multiaffine scalar-latent class B2 with arbitrary interaction order.",
+      "paper": "D6",
+      "primary_metric": "results.B2_multiaffine.best_witness.diagnostics.two_regret_over_delta",
+      "proposal_id": "D6.CONTRAST_RANK_B2",
+      "runner": "scripts.run_d6_contrast_rank_falsification",
+      "status": "ACTIVE"
+    },
+    {
+      "evidence_kind": "heuristic direct constrained falsification",
+      "notes": "Full-table B3 numerical rank-one penalty search; survival is not proof and any kill requires exact rationalization.",
+      "paper": "D6",
+      "primary_metric": "results.B3_direct.best_witness.diagnostics.two_regret_over_delta",
+      "proposal_id": "D6.CONTRAST_RANK_B3",
+      "runner": "scripts.run_d6_contrast_rank_falsification",
+      "status": "ACTIVE"
+    },
+    {
+      "evidence_kind": "generated exact-rank-one falsification",
+      "notes": "Single full-product high-order rank-one class.",
+      "paper": "D6",
+      "primary_metric": "results.Bproduct.best_witness.diagnostics.two_regret_over_delta",
+      "proposal_id": "D6.CONTRAST_RANK_BPRODUCT",
+      "runner": "scripts.run_d6_contrast_rank_falsification",
+      "status": "ACTIVE"
+    },
+    {
+      "proposal_id": "D6.COST_AWARE_PAEC_COMPLETION",
+      "paper": "D6",
+      "runner": "scripts.run_d6_cost_aware_paec_lab",
+      "evidence_kind": "certificate-completion mechanics conditional on valid certificate",
+      "primary_metric": "mean_paid_cost_fraction_of_measure_all,median_measured_atoms",
+      "notes": "B1-B6 only; does not assume EveryTopCPairHasPAEC. Proof/certificate completion, not generic interaction screening."
+    },
+    {
+      "proposal_id": "D6.FIRST_ORDER_INSUFFICIENCY_B7",
+      "paper": "D6",
+      "runner": "scripts.run_d6_cost_aware_paec_lab",
+      "evidence_kind": "exact finite witness reproduction",
+      "primary_metric": "b7_exact_reproduction.full_singleton_optima_disjoint",
+      "notes": "Reproduces same complete first-order responses with incompatible optimal singleton decisions; justifies escalation to interaction evidence."
+    },
+    {
+      "evidence_kind": "exhaustive finite exact rational",
+      "notes": "falsification gate for quarantined half-factor conjecture Unrestricted normalized m-1/half-factor law is falsified by the exact ternary strict-margin branch; retained only as historical evidence.",
+      "paper": "D6",
+      "primary_metric": "candidate_killed,best_ratio_witness",
+      "proposal_id": "D6.HALF_FACTOR_EXACT",
+      "runner": "scripts.run_d6_exact_small_search",
+      "status": "HISTORICAL_FALSIFIED_GENERAL_LAW"
+    },
+    {
+      "evidence_kind": "directed falsification",
+      "notes": "survival is not proof Unrestricted normalized m-1/half-factor law is falsified by the exact ternary strict-margin branch; retained only as historical evidence.",
+      "paper": "D6",
+      "primary_metric": "candidate_killed,best_witness",
+      "proposal_id": "D6.HALF_FACTOR_OPTIMIZER",
+      "runner": "scripts.run_d6_counterexample_optimizer",
+      "status": "HISTORICAL_FALSIFIED_GENERAL_LAW"
+    },
+    {
       "evidence_kind": "controlled Omni",
       "notes": "full-joint 2-4 source Omni D6 stress; Cartesian command support only, not coupled-support evidence",
       "paper": "D6",
       "primary_metric": "summary.positive_decision_regret_fraction",
       "proposal_id": "D6.OMNI_FULL_JOINT",
+      "runner": "scripts.run_omni_d6_full_joint"
+    },
+    {
+      "evidence_kind": "controlled Omni",
+      "notes": "diagnoses no-interaction/tie/margin/order-preserving/decision-failure regimes",
+      "paper": "D6",
+      "primary_metric": "summary.zero_regret_cause_counts",
+      "proposal_id": "D6.OMNI_ZERO_REGRET_CAUSES",
       "runner": "scripts.run_omni_d6_full_joint"
     },
     {
@@ -82,19 +160,21 @@
     },
     {
       "evidence_kind": "synthetic exact",
-      "notes": "Tests open candidate (m-1)*delta_square/2 separately from the verified 2(m-1)delta bound.",
+      "notes": "Tests open candidate (m-1)*delta_square/2 separately from the verified 2(m-1)delta bound. Unrestricted normalized m-1/half-factor law is falsified by the exact ternary strict-margin branch; retained only as historical evidence.",
       "paper": "D6",
       "primary_metric": "decision_improvement_candidate.worst_violation + sharpness.best_decision_ratio",
       "proposal_id": "D6.S2",
-      "runner": "scripts.run_d6_extension_lab"
+      "runner": "scripts.run_d6_extension_lab",
+      "status": "HISTORICAL_FALSIFIED_GENERAL_LAW"
     },
     {
       "evidence_kind": "deterministic falsification",
-      "notes": "targeted hill-climb falsification of proposed half-factor decision bound",
+      "notes": "targeted hill-climb falsification of proposed half-factor decision bound Unrestricted normalized m-1/half-factor law is falsified by the exact ternary strict-margin branch; retained only as historical evidence.",
       "paper": "D6",
       "primary_metric": "decision_improvement_candidate.adversarial_search",
       "proposal_id": "D6.S2_ADVERSARIAL",
-      "runner": "scripts.run_d6_extension_lab"
+      "runner": "scripts.run_d6_extension_lab",
+      "status": "HISTORICAL_FALSIFIED_GENERAL_LAW"
     },
     {
       "evidence_kind": "synthetic exact",
@@ -111,6 +191,14 @@
       "primary_metric": "stress_by_family",
       "proposal_id": "D6.STRESS_HIGHER_ORDER",
       "runner": "scripts.run_d6_extension_lab"
+    },
+    {
+      "evidence_kind": "external fail-closed",
+      "notes": "requestable vs honored support semantics are separate",
+      "paper": "PORTFOLIO",
+      "primary_metric": "claim_readiness",
+      "proposal_id": "EXTERNAL.ADAPTER_CAPABILITY_AUDIT",
+      "runner": "scripts.run_adapter_capability_audit"
     },
     {
       "evidence_kind": "external capability",
@@ -257,6 +345,14 @@
       "runner": "scripts.run_functional_stopping_lab"
     },
     {
+      "proposal_id": "FUNCTIONAL.SELECTIVE_CERTIFICATE_MAINTENANCE",
+      "paper": "FUNCTIONAL",
+      "runner": "scripts.run_functional_selective_maintenance_lab",
+      "evidence_kind": "synthetic drift maintenance",
+      "primary_metric": "mean_refresh_cost_fraction_vs_full,false_safe_rate",
+      "notes": "Refresh only certificate-critical relations under declared drift budgets; simple lifetime bound is a lemma, not headline novelty."
+    },
+    {
       "evidence_kind": "synthetic sequential",
       "notes": "",
       "paper": "FUNCTIONAL",
@@ -281,12 +377,28 @@
       "runner": "scripts.run_functional_stopping_lab"
     },
     {
+      "evidence_kind": "synthetic development",
+      "notes": "known sigma is diagnostic ceiling only; separates variance-learning from extrema-selection error",
+      "paper": "FUNCTIONAL",
+      "primary_metric": "by_budget.*.variance_shrinkage / time_uniform_t_proxy",
+      "proposal_id": "FUNCTIONAL.UNKNOWN_VARIANCE",
+      "runner": "scripts.run_functional_unknown_variance_lab"
+    },
+    {
       "evidence_kind": "existing development evidence",
       "notes": "",
       "paper": "FUNCTIONAL",
       "primary_metric": "fixed development 20/80/320 panel",
       "proposal_id": "FUNCTIONAL.V7_BASELINE",
       "runner": "scripts.run_h1_fixed_panel_v7"
+    },
+    {
+      "evidence_kind": "synthetic fixed-confidence development",
+      "notes": "learn-variance-then-exploit redesign; known sigma is an oracle diagnostic only",
+      "paper": "FUNCTIONAL",
+      "primary_metric": "by_variant.*.median_N_certificate",
+      "proposal_id": "FUNCTIONAL.VARIANCE_STOPPING",
+      "runner": "scripts.run_functional_variance_stopping_lab"
     },
     {
       "evidence_kind": "synthetic+operational",
@@ -361,6 +473,14 @@
       "runner": "scripts.run_dynamic_extension_lab"
     },
     {
+      "evidence_kind": "external runtime",
+      "notes": "diagnostic post-resolution honored/executable support only; not evidence of pre-execution MASTER feasible support",
+      "paper": "PORTFOLIO",
+      "primary_metric": "summary.coupled_state_fraction",
+      "proposal_id": "MASTER.EXTERNAL_HONORED_SUPPORT",
+      "runner": "scripts.run_external_coupled_support_probe"
+    },
+    {
       "evidence_kind": "external capability",
       "notes": "Fail closed until adapter exposes the needed scientific semantics.",
       "paper": "MASTER",
@@ -399,6 +519,14 @@
       "primary_metric": "marginal invariance/witness",
       "proposal_id": "MASTER.REFERENCE_FIDELITY",
       "runner": "scripts.run_chain_reference_fidelity_search"
+    },
+    {
+      "evidence_kind": "synthetic development",
+      "notes": "joint allocation between response estimation and reference-kernel estimation",
+      "paper": "MASTER",
+      "primary_metric": "Q_error,kernel_tv,chi_error,final_score_interval_width,topk_regret,certificate_coverage",
+      "proposal_id": "MASTER.REFERENCE_RESPONSE_BUDGET",
+      "runner": "scripts.run_reference_response_budget_lab"
     },
     {
       "evidence_kind": "synthetic+operational",
@@ -473,6 +601,71 @@
       "runner": "scripts.run_master_extension_lab"
     },
     {
+      "proposal_id": "MASTER.TYPED_CERTIFICATE_COMPLETION",
+      "paper": "MASTER",
+      "runner": "scripts.run_typed_certificate_completion_lab",
+      "evidence_kind": "synthetic exact certificate-completion",
+      "primary_metric": "mean_cost_ratio_vs_individual_direct",
+      "notes": "Typed proof obligations; wrong-type evidence cannot discharge an obligation. Active acquisition is not itself the novelty claim."
+    },
+    {
+      "evidence_kind": "portfolio orchestration",
+      "notes": "Current six-report development suite; supersedes historical orchestration for current-state checks.",
+      "paper": "PORTFOLIO",
+      "primary_metric": "hard_gate_pass",
+      "proposal_id": "PORTFOLIO.CURRENT_SIX_REPORT_SUITE",
+      "runner": "scripts.run_current_six_report_suite",
+      "status": "ACTIVE"
+    },
+    {
+      "evidence_kind": "external method contract",
+      "notes": "requires actual policy attention tensors and frozen reduction metadata; no feature-norm fallback",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.ATTENTION",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "identified causal context",
+      "notes": "graph, intervention, identification, and context-distribution contract required",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.CAUSAL_CONTEXT",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "exact intervention primitive",
+      "notes": "exact Shapley on the declared noop coalition table; not branded as a full paper-method reproduction",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.COALITION_SHAPLEY",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "external communication intervention",
+      "notes": "explicit lag queue semantics required",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.COMMUNICATION_DELAY",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "external communication intervention",
+      "notes": "same-state message deletion provider required",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.MESSAGE_DELETION",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "external information intervention",
+      "notes": "information available-vs-absent provider required; entropy/variance is not substituted",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q",
+      "proposal_id": "QUERY.BASELINE.VOI",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
       "evidence_kind": "synthetic benchmark",
       "notes": "Deletion/logit-stability query card plumbing.",
       "paper": "QUERY",
@@ -529,12 +722,36 @@
       "runner": "scripts.run_query_extension_lab"
     },
     {
+      "proposal_id": "QUERY.IDENTIFIABILITY_VERIFIER",
+      "paper": "QUERY",
+      "runner": "scripts.run_query_identifiability_lab",
+      "evidence_kind": "finite exact semantic verifier",
+      "primary_metric": "insufficient_fraction,mean_minimax_floor",
+      "notes": "Typed query identifiability/witness generation. Natural-language technique routing is UI and not the novelty headline."
+    },
+    {
       "evidence_kind": "synthetic benchmark",
       "notes": "Limited-support semantic substitution challenge.",
       "paper": "QUERY",
       "primary_metric": "by_challenge_family limited_support",
       "proposal_id": "QUERY.LIMITED_SUPPORT",
       "runner": "scripts.run_query_extension_lab"
+    },
+    {
+      "evidence_kind": "external matched-budget",
+      "notes": "reports full-information and matched-information-budget transfer separately",
+      "paper": "QUERY",
+      "primary_metric": "R_m_to_q,information_budget",
+      "proposal_id": "QUERY.MATCHED_INFORMATION_BUDGET",
+      "runner": "scripts.run_external_query_transfer"
+    },
+    {
+      "evidence_kind": "source capability metadata",
+      "notes": "environment, policy, communication, and causal-context capabilities remain separate",
+      "paper": "QUERY",
+      "primary_metric": "blocked_methods,blocked_queries,reason_code",
+      "proposal_id": "QUERY.METHOD_CAPABILITY_MATRIX",
+      "runner": "scripts.run_adapter_capability_audit"
     },
     {
       "evidence_kind": "synthetic benchmark",
@@ -649,6 +866,14 @@
       "runner": "scripts.run_structural_defect_lab"
     },
     {
+      "proposal_id": "STRUCTURAL.PREFIX_COVER_DIMENSION",
+      "paper": "STRUCTURAL",
+      "runner": "scripts.run_structural_prefix_cover_lab",
+      "evidence_kind": "exact finite structural search",
+      "primary_metric": "max_dimension_found,chi_ge_3_found,dimension_histogram",
+      "notes": "Budget-transversal prefix-cover dimension; search-first target for chi>=3/growing families."
+    },
+    {
       "evidence_kind": "synthetic runtime",
       "notes": "",
       "paper": "MASTER_STRUCTURAL",
@@ -665,148 +890,13 @@
       "runner": "scripts.run_structural_defect_lab"
     },
     {
-      "evidence_kind": "exhaustive finite exact rational",
-      "notes": "falsification gate for quarantined half-factor conjecture",
-      "paper": "D6",
-      "primary_metric": "candidate_killed,best_ratio_witness",
-      "proposal_id": "D6.HALF_FACTOR_EXACT",
-      "runner": "scripts.run_d6_exact_small_search"
-    },
-    {
-      "evidence_kind": "directed falsification",
-      "notes": "survival is not proof",
-      "paper": "D6",
-      "primary_metric": "candidate_killed,best_witness",
-      "proposal_id": "D6.HALF_FACTOR_OPTIMIZER",
-      "runner": "scripts.run_d6_counterexample_optimizer"
-    },
-    {
-      "evidence_kind": "controlled Omni",
-      "notes": "diagnoses no-interaction/tie/margin/order-preserving/decision-failure regimes",
-      "paper": "D6",
-      "primary_metric": "summary.zero_regret_cause_counts",
-      "proposal_id": "D6.OMNI_ZERO_REGRET_CAUSES",
-      "runner": "scripts.run_omni_d6_full_joint"
-    },
-    {
-      "evidence_kind": "external fail-closed",
-      "notes": "requestable vs honored support semantics are separate",
-      "paper": "PORTFOLIO",
-      "primary_metric": "claim_readiness",
-      "proposal_id": "EXTERNAL.ADAPTER_CAPABILITY_AUDIT",
-      "runner": "scripts.run_adapter_capability_audit"
-    },
-    {
-      "evidence_kind": "synthetic development",
-      "notes": "known sigma is diagnostic ceiling only; separates variance-learning from extrema-selection error",
-      "paper": "FUNCTIONAL",
-      "primary_metric": "by_budget.*.variance_shrinkage / time_uniform_t_proxy",
-      "proposal_id": "FUNCTIONAL.UNKNOWN_VARIANCE",
-      "runner": "scripts.run_functional_unknown_variance_lab"
-    },
-    {
-      "evidence_kind": "synthetic fixed-confidence development",
-      "notes": "learn-variance-then-exploit redesign; known sigma is an oracle diagnostic only",
-      "paper": "FUNCTIONAL",
-      "primary_metric": "by_variant.*.median_N_certificate",
-      "proposal_id": "FUNCTIONAL.VARIANCE_STOPPING",
-      "runner": "scripts.run_functional_variance_stopping_lab"
-    },
-    {
-      "evidence_kind": "external runtime",
-      "notes": "diagnostic post-resolution honored/executable support only; not evidence of pre-execution MASTER feasible support",
-      "paper": "PORTFOLIO",
-      "primary_metric": "summary.coupled_state_fraction",
-      "proposal_id": "MASTER.EXTERNAL_HONORED_SUPPORT",
-      "runner": "scripts.run_external_coupled_support_probe"
-    },
-    {
-      "evidence_kind": "synthetic development",
-      "notes": "joint allocation between response estimation and reference-kernel estimation",
-      "paper": "MASTER",
-      "primary_metric": "Q_error,kernel_tv,chi_error,final_score_interval_width,topk_regret,certificate_coverage",
-      "proposal_id": "MASTER.REFERENCE_RESPONSE_BUDGET",
-      "runner": "scripts.run_reference_response_budget_lab"
-    },
-    {
-      "evidence_kind": "external method contract",
-      "notes": "requires actual policy attention tensors and frozen reduction metadata; no feature-norm fallback",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.ATTENTION",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "external communication intervention",
-      "notes": "same-state message deletion provider required",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.MESSAGE_DELETION",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "external communication intervention",
-      "notes": "explicit lag queue semantics required",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.COMMUNICATION_DELAY",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "external information intervention",
-      "notes": "information available-vs-absent provider required; entropy/variance is not substituted",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.VOI",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "identified causal context",
-      "notes": "graph, intervention, identification, and context-distribution contract required",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.CAUSAL_CONTEXT",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "exact intervention primitive",
-      "notes": "exact Shapley on the declared noop coalition table; not branded as a full paper-method reproduction",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q",
-      "proposal_id": "QUERY.BASELINE.COALITION_SHAPLEY",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "external matched-budget",
-      "notes": "reports full-information and matched-information-budget transfer separately",
-      "paper": "QUERY",
-      "primary_metric": "R_m_to_q,information_budget",
-      "proposal_id": "QUERY.MATCHED_INFORMATION_BUDGET",
-      "runner": "scripts.run_external_query_transfer"
-    },
-    {
-      "evidence_kind": "source capability metadata",
-      "notes": "environment, policy, communication, and causal-context capabilities remain separate",
-      "paper": "QUERY",
-      "primary_metric": "blocked_methods,blocked_queries,reason_code",
-      "proposal_id": "QUERY.METHOD_CAPABILITY_MATRIX",
-      "runner": "scripts.run_adapter_capability_audit"
-    },
-    {
-      "proposal_id": "MASTER.TYPED_CERTIFICATE_COMPLETION",
-      "paper": "MASTER",
-      "runner": "scripts.run_typed_certificate_completion_lab",
-      "evidence_kind": "synthetic exact certificate-completion",
-      "primary_metric": "mean_cost_ratio_vs_individual_direct",
-      "notes": "Typed proof obligations; wrong-type evidence cannot discharge an obligation. Active acquisition is not itself the novelty claim."
-    },
-    {
-      "proposal_id": "FUNCTIONAL.SELECTIVE_CERTIFICATE_MAINTENANCE",
-      "paper": "FUNCTIONAL",
-      "runner": "scripts.run_functional_selective_maintenance_lab",
-      "evidence_kind": "synthetic drift maintenance",
-      "primary_metric": "mean_refresh_cost_fraction_vs_full,false_safe_rate",
-      "notes": "Refresh only certificate-critical relations under declared drift budgets; simple lifetime bound is a lemma, not headline novelty."
+      "evidence_kind": "exact finite combinatorial discovery",
+      "notes": "Reconstructs the source-audited Lean staircase supportOsc family and computes exact chi with coverage-mask DP plus MILP cross-check.",
+      "paper": "STRUCTURAL",
+      "primary_metric": "observed_sequence",
+      "proposal_id": "STRUCTURAL.STAIRCASE_EXACT_CHI",
+      "runner": "scripts.run_structural_staircase_exact_lab",
+      "status": "ACTIVE"
     },
     {
       "proposal_id": "SUPPORT.DECISION_CRITICAL_IDENTIFICATION",
@@ -815,38 +905,6 @@
       "evidence_kind": "finite exact support discovery",
       "primary_metric": "mean_queries_decision_critical,mean_query_fraction_of_full_product,false_safe_count",
       "notes": "Identify only joint-support cells needed to close the relational decision certificate; not full support reconstruction."
-    },
-    {
-      "proposal_id": "STRUCTURAL.PREFIX_COVER_DIMENSION",
-      "paper": "STRUCTURAL",
-      "runner": "scripts.run_structural_prefix_cover_lab",
-      "evidence_kind": "exact finite structural search",
-      "primary_metric": "max_dimension_found,chi_ge_3_found,dimension_histogram",
-      "notes": "Budget-transversal prefix-cover dimension; search-first target for chi>=3/growing families."
-    },
-    {
-      "proposal_id": "D6.COST_AWARE_PAEC_COMPLETION",
-      "paper": "D6",
-      "runner": "scripts.run_d6_cost_aware_paec_lab",
-      "evidence_kind": "certificate-completion mechanics conditional on valid certificate",
-      "primary_metric": "mean_paid_cost_fraction_of_measure_all,median_measured_atoms",
-      "notes": "B1-B6 only; does not assume EveryTopCPairHasPAEC. Proof/certificate completion, not generic interaction screening."
-    },
-    {
-      "proposal_id": "D6.FIRST_ORDER_INSUFFICIENCY_B7",
-      "paper": "D6",
-      "runner": "scripts.run_d6_cost_aware_paec_lab",
-      "evidence_kind": "exact finite witness reproduction",
-      "primary_metric": "b7_exact_reproduction.full_singleton_optima_disjoint",
-      "notes": "Reproduces same complete first-order responses with incompatible optimal singleton decisions; justifies escalation to interaction evidence."
-    },
-    {
-      "proposal_id": "QUERY.IDENTIFIABILITY_VERIFIER",
-      "paper": "QUERY",
-      "runner": "scripts.run_query_identifiability_lab",
-      "evidence_kind": "finite exact semantic verifier",
-      "primary_metric": "insufficient_fraction,mean_minimax_floor",
-      "notes": "Typed query identifiability/witness generation. Natural-language technique routing is UI and not the novelty headline."
     }
   ],
   "paper3_merged_into_master": true,

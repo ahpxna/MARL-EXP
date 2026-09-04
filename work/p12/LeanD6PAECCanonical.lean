@@ -1,0 +1,103 @@
+import Mathlib
+import «LeanD6BalancedCycleCertificate»
+import «LeanD6ResidualAPI»
+
+/-!
+# Canonical PAEC path algebra
+
+The `m-1` pattern discovered by the LP has two telescoping paths: `d-1`
+cycles from zero to the selected endpoint and `d` cycles from the rejected
+endpoint to the all-one endpoint.  This module proves that scalar identity
+and its sharp budget consequence.  It is the branch-independent algebraic
+core; proving that every active-extrema/sign branch reduces to this canonical
+form remains a separate step.
+-/
+
+namespace CIGAMF.P13.D6PAECCanonical
+
+open scoped BigOperators
+
+noncomputable def firstPath
+    (d : ℕ) (pref selectedSingleton : ℕ → ℝ) (f0 : ℝ) : ℝ :=
+  ∑ k ∈ Finset.range (d - 1),
+    (pref (k + 2) - pref (k + 1) - selectedSingleton (k + 1) + f0)
+
+noncomputable def secondPath
+    (d : ℕ) (augmented selectedSingleton : ℕ → ℝ) (f0 : ℝ) : ℝ :=
+  ∑ k ∈ Finset.range d,
+    (augmented (k + 1) - augmented k - selectedSingleton k + f0)
+
+theorem firstPath_telescope
+    (d : ℕ) (hd : 1 ≤ d)
+    (pref selectedSingleton : ℕ → ℝ) (f0 : ℝ) :
+    firstPath d pref selectedSingleton f0 =
+      pref d - pref 1 -
+        (∑ k ∈ Finset.range (d - 1), selectedSingleton (k + 1)) +
+        (d - 1 : ℕ) * f0 := by
+  have htel :
+      (∑ k ∈ Finset.range (d - 1),
+        (pref (k + 2) - pref (k + 1))) =
+        pref d - pref 1 := by
+    have h :=
+      Finset.sum_range_sub (fun j => pref (j + 1)) (d - 1)
+    simpa [Nat.sub_add_cancel hd] using h
+  simp only [firstPath, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+  rw [← Finset.sum_sub_distrib, htel]
+  simp
+
+theorem secondPath_telescope
+    (d : ℕ) (augmented selectedSingleton : ℕ → ℝ) (f0 : ℝ) :
+    secondPath d augmented selectedSingleton f0 =
+      augmented d - augmented 0 -
+        (∑ k ∈ Finset.range d, selectedSingleton k) + d * f0 := by
+  have htel :
+      (∑ k ∈ Finset.range d,
+        (augmented (k + 1) - augmented k)) =
+        augmented d - augmented 0 := by
+    exact Finset.sum_range_sub augmented d
+  simp only [secondPath, Finset.sum_add_distrib, Finset.sum_sub_distrib]
+  rw [← Finset.sum_sub_distrib, htel]
+  simp
+
+theorem selected_sum_split
+    (d : ℕ) (s : ℕ → ℝ) (hd : 1 ≤ d) :
+    (∑ k ∈ Finset.range d, s k) =
+      s 0 + ∑ k ∈ Finset.range (d - 1), s (k + 1) := by
+  cases d with
+  | zero =>
+      omega
+  | succ r =>
+      simpa [add_comm] using (Finset.sum_range_succ' s r)
+
+/- The literal scalar identity behind the `d-1 + d = 2d-1` certificate. -/
+theorem canonical_PAEC_identity
+    (d : ℕ) (hd : 1 ≤ d)
+    (pref augmented selectedSingleton rejectedSingleton : ℕ → ℝ)
+    (f0 : ℝ)
+    (hPrefixOne : pref 1 = selectedSingleton 0) :
+    firstPath d pref selectedSingleton f0 +
+        secondPath d augmented selectedSingleton f0 +
+        ((∑ k ∈ Finset.range d, selectedSingleton k) -
+          ∑ k ∈ Finset.range d, rejectedSingleton k) =
+      pref d + augmented d - augmented 0 -
+        (∑ k ∈ Finset.range d, selectedSingleton k) -
+        (∑ k ∈ Finset.range d, rejectedSingleton k) +
+        (2 * d - 1 : ℕ) * f0 := by
+  rw [firstPath_telescope d hd, secondPath_telescope, hPrefixOne,
+    selected_sum_split d selectedSingleton hd]
+  have hsub : 2 * d - 1 = (d - 1) + d := by omega
+  rw [hsub, Nat.cast_add]
+  ring
+
+/- A canonical branch with `2d-1` paid cycles and nonpositive correction is
+already enough for the sharp half-factor. -/
+theorem canonical_branch_half_factor
+    (d : ℕ) (delta decision cycleSum correction : ℝ)
+    (hdelta : 0 ≤ delta)
+    (hCycle : cycleSum ≤ (2 * d - 1 : ℕ) * delta)
+    (hCorrection : correction ≤ 0)
+    (hCert : 2 * decision ≤ cycleSum + correction) :
+    decision ≤ (2 * d - 1 : ℕ) * delta / 2 := by
+  nlinarith
+
+end CIGAMF.P13.D6PAECCanonical

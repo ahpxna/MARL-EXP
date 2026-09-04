@@ -1,0 +1,31 @@
+LeanD6HalfFactorSharpness.lean:48:6: warning: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+LeanD6HalfFactorSharpness.lean:162:41: error: unsolved goals
+r : (Fin 3 → Fin 2) → ℝ := fun x => sharpWorld3 x - ∑ j ∈ {2}, productResponse pointMassAnchor3 sharpWorld3 j (x j)
+h : r (action3 0 1 0) ≤ maxVal r
+⊢ 2 - productResponse pointMassAnchor3 sharpWorld3 2 (![0, 1, 0] 2) = 1
+LeanD6HalfFactorSharpness.lean:169:42: error: unsolved goals
+r : (Fin 3 → Fin 2) → ℝ := fun x => sharpWorld3 x - ∑ j ∈ {2}, productResponse pointMassAnchor3 sharpWorld3 j (x j)
+hmax : maxVal r = 1
+h : minVal r ≤ r (action3 0 0 1)
+⊢ productResponse pointMassAnchor3 sharpWorld3 2 (![0, 0, 1] 2) = 2
+LeanD6HalfFactorSharpness.lean:152:17: error: unsolved goals
+r : (Fin 3 → Fin 2) → ℝ := fun x => sharpWorld3 x - ∑ j ∈ {2}, productResponse pointMassAnchor3 sharpWorld3 j (x j)
+hmax : maxVal r = 1
+hmin : minVal r = -2
+⊢ ((maxVal fun x => sharpWorld3 x - productResponse pointMassAnchor3 sharpWorld3 2 (x 2)) -
+      minVal fun x => sharpWorld3 x - productResponse pointMassAnchor3 sharpWorld3 2 (x 2)) =
+    3
+LeanD6HalfFactorSharpness.lean:181:17: error: unsolved goals
+r : (Fin 3 → Fin 2) → ℝ := fun x => sharpWorld3 x - ∑ j ∈ {1}, productResponse pointMassAnchor3 sharpWorld3 j (x j)
+hmax : maxVal r = 1
+hmin : minVal r = 0
+⊢ ((maxVal fun x => sharpWorld3 x - productResponse pointMassAnchor3 sharpWorld3 1 (x 1)) -
+      minVal fun x => sharpWorld3 x - productResponse pointMassAnchor3 sharpWorld3 1 (x 1)) =
+    1
+EXIT_CODE=1

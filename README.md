@@ -1,17 +1,23 @@
 # CIG-AMF
 
-CIG-AMF is a research codebase for two linked MARL studies:
+The active development portfolio now contains **six scientific reports**:
+MASTER, Functional, Support, Structural, D6, and Query. Historical Paper-A /
+Paper-B runners remain in the repository for provenance, but they are not the
+current portfolio entry point.
 
-1. **Paper A — Causal Influence Spectrum**: interventional response recovery,
-   structural capacity `C`, behavioural direction `D`, retained validity-masked latency,
-   and regime-wise structural tracking.
-2. **Paper B — CIG-AMF**: capacity-aware allocation of explicit pair modelling
-   and direction-aware peripheral compression.
+Use `CURRENT_SIX_REPORTS_RUNBOOK.md` and
+`config/CURRENT_SIX_REPORT_TEST_PLAN.json` for the current claim-to-test map.
+The one-command local validation entry point is:
 
-The confirmatory code path is deliberately fail-closed.  A green unit suite is
-not sufficient by itself: H1 requires oracle-only threshold/support artifacts,
-H2 requires a provenance-bound Page-CUSUM calibration, and Paper-B claim
-validation requires all allocation/representation/scaling panels.
+```bash
+python scripts/run_current_six_report_validation.py --profile quick
+```
+
+The validation path is deliberately fail-closed. A green local suite does not
+stand in for unavailable external capabilities, disjoint-seed confirmatory
+evidence, or open formal theorems. In particular, the unrestricted normalized
+D6 `m-1` law is historical/falsified; the current live D6 program adversarially
+tests the rank-one restricted replacement conjecture.
 
 ## First checks
 

@@ -1,0 +1,43 @@
+{
+  "protocol_version": "ieee_three_tier_confirmatory_v1",
+  "freeze_before_confirmatory": true,
+  "statistics": {
+    "confidence": 0.95,
+    "report": ["mean", "95pct_ci", "median_when_skewed", "n_seeds"],
+    "confirmatory_seed_count": 10,
+    "confirmatory_seeds": [701, 709, 719, 727, 733, 743, 751, 757, 761, 769],
+    "failed_run_policy": "FAIL_CLOSED_REPORT_ALL",
+    "hyperparameter_search": "DEVELOPMENT_ONLY_DISJOINT_FROM_CONFIRMATORY",
+    "false_safe_rate_required_for_certificate_methods": true
+  },
+  "tiers": {
+    "A": {
+      "name": "exact_finite_worlds",
+      "status": "RUNNABLE_IN_REPO",
+      "purposes": ["theorem_sanity", "sharpness", "counterexamples", "exact_oracle", "certificate_calibration"]
+    },
+    "B": {
+      "name": "standard_marl",
+      "status": "EXTERNAL_ADAPTER_REQUIRED",
+      "purposes": ["literature_comparability", "scalability", "multiple_seeds", "learned_policies"],
+      "required_capabilities": ["deterministic_seed", "learned_policy", "snapshot_or_replayable_state", "intervention_receipt"]
+    },
+    "C": {
+      "name": "crossroad_interaction_rich",
+      "status": "EXTERNAL_ADAPTER_REQUIRED",
+      "purposes": ["physical_interactions", "policy_drift", "v2v", "weather", "emergencies", "downstream_interventions"],
+      "required_capabilities": ["shared_transition_kernel_gui_headless", "snapshot_restore", "force_joint_action", "requested_and_executed_action_receipts"]
+    }
+  },
+  "ablations": {
+    "D6": [
+      "no_interaction_certificate",
+      "fixed_pairwise",
+      "fixed_higher_order",
+      "adaptive_order_without_formal_trigger",
+      "certificate_driven_adaptive_order"
+    ],
+    "STRUCTURAL": ["K_eq_1", "K_gt_1", "prefix_consistency_off", "prefix_consistency_on"],
+    "MASTER": ["remove_reference", "remove_support", "remove_interaction", "remove_score", "remove_query_semantics"]
+  }
+}
