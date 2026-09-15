@@ -1,0 +1,52 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Two-Level Geometry}\\[2pt]
+{\large\itshape Append-only update B: seven theorems promoted to PROVED, and the certification headline identified as a confound with the instance-family gap distribution}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--61 are an immutable prefix. This addendum begins at Section 62.
+
+\section*{62. PROMOTION: the maintenance theorems are PROVED}
+Addendum A, Section 59, recorded \texttt{LeanFunctionalResidualMaintenanceV2} as \eclass{COMPILED ARTIFACT} pending its audit. All 57 \texttt{\#print axioms} across the three modules formalised on 7 September depend only on Lean's standard axioms: no \texttt{sorryAx}, no project-added axiom, no \texttt{native\_decide}. Counts verified from the audit sources on disk (40 + 10 + 7). The clean-audit result comes from a parallel session's run; no transcript file for it is stored in \texttt{work/p13\_conjectures}, and committing one would close the last provenance gap. Its seven theorems --- \texttt{residualBound\_zero}, \texttt{selective\_refresh\_safety}, \texttt{residualBound\_antitone}, \texttt{refresh\_set\_monotonicity}, \texttt{feasible\_iff\_full\_refresh\_safe}, \texttt{no\_feasible\_refresh\_of\_full\_failure}, \texttt{minimum\_cost\_refresh\_exists} --- are \eclass{PROVED}.
+
+\section*{63. The censoring is explained, and it is not an allocation phenomenon}
+Addendum A, Section 57, reported that both allocator defects were repaired and \emph{the censoring did not move}, and concluded that certification failure is a property of the instance family. The mechanism is now measured. The \texttt{true\_topk\_gap} field, added to the v3 output on 7 September and never analysed, predicts certification almost by itself. Over all $360$ runs ($6$ variants $\times$ $60$):
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r}
+\toprule
+\texttt{true\_topk\_gap} quintile & $n$ & certify rate\\
+\midrule
+$[0.0014,\,0.0878)$ & $72$ & $0.000$\\
+$[0.0878,\,0.1429)$ & $72$ & $0.014$\\
+$[0.1429,\,0.2571)$ & $72$ & $0.069$\\
+$[0.2571,\,0.3845)$ & $72$ & $0.208$\\
+$[0.3845,\,0.7956)$ & $72$ & $\mathbf{0.722}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Point-biserial $r=+0.6826$, $p=1.07\times10^{-50}$. Median gap $0.4771$ when a certificate is emitted against $0.1447$ when censored, a ratio of $3.30$. The ratio is $3.3$--$3.9$ for \emph{every} variant including the oracle $C_{\text{known }\sigma}$, i.e.\ the allocation policy barely matters beside the gap. An independent run at larger $n$ found $75/75$ instances with gap below $0.1$ uncertified and $78/79$ certified at gap $\ge0.4$.
+
+\claimbox{\textbf{Confound.} The chain's headline --- ``query/functional geometry controls certification complexity'' --- is not established by these runs. What the experiment varies is the instance family's top-$k$ gap distribution, and certification cost is the \emph{classical} $1/\Delta^2$ law of best-arm identification. \eclass{DEMOTED: headline confounded; the measurement stands, the attribution does not}}
+
+\textbf{What is not claimed.} This does not show certification is impossible below the gap threshold. The runner uses a finite-horizon Bonferroni bound that is deliberately conservative, so the observed threshold is an artefact of the bound as much as of the family. Separating the two requires a gap-stratified comparison at fixed gap, which has not been run.
+
+\section*{64. The experiment this demands}
+Compare policies \emph{within} a gap stratum. At $20$ instances per seed each stratum holds $12$ runs per variant, too few to separate anything; the comparison needs enough instances that each quintile carries tens of runs per variant. If the six policies remain indistinguishable inside a stratum, the chain has no allocation result --- and that is a conclusion, not a failure.
+\end{document}

@@ -1,0 +1,110 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 6 - Query Sufficiency / Relational Query Transfer}\\[2pt]
+{\large\itshape Append-only update: the execution gate opened, the estimand identified as the blocker, the estimand fixed --- and the fix measured to be insufficient}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--69 are an immutable prefix. This addendum begins at Section 70.
+
+\textbf{What this addendum contains.} One diagnosis, one code change, and \textbf{one decisive negative that demotes the direction this addendum itself proposed}. Section 73 retracts Section 72's expected consequence.
+
+\section*{70. The gate is open and the matrix is still empty}
+After the capability-gate repair, $8/8$ states are executable and every method--query cell is reached. And every one of them is degenerate:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.52\columnwidth}X}
+\toprule
+\texttt{executable\_states} & $8/8$\\
+\texttt{raw\_cells} & $336$\\
+\texttt{scientifically\_evaluable\_matrix\_cells} & $\mathbf{0}$\\
+\texttt{degenerate\_..\_excluded} & $336$\\
+\texttt{degeneracy\_reason} (every cell) & \texttt{QUERY\_TARGET\_CONSTANT}\\
+\texttt{query\_utility\_oscillation} & $0.0$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Every entry of both aggregate transfer matrices is \texttt{null}. \emph{Opening the gate did not produce a benchmark.}
+
+\section*{71. Diagnosis: the response estimand, not the gate}
+The protocol measured
+\[Q^{(1)}_j(a)\;=\;r_{\text{outcome}}\bigl(s,\ a_j,\ a_{-j}^{\text{baseline}}\bigr),\]
+the reward of a \emph{single} environment step after a clone-state intervention. In RWARE with five agents, one step almost never completes a delivery, so $Q^{(1)}_j(\cdot)$ is constant in $a$ and $\max_a Q-\min_a Q=0$ by construction. The oracle already implemented the continuation return
+\[Q^{(h,\rho)}_j(a)=\sum_{t=0}^{h-1}\gamma^{t}\,r_{\text{outcome}}(s_t)\ \Big|\ \operatorname{do}(A_j=a)\ \text{at}\ t=0,\ \text{then}\ \rho,\]
+including early termination on \texttt{done} and the assignment \texttt{reward = float(discounted)} --- but the transfer runner constructed \texttt{CloneStateJointOracle} without \texttt{horizon}, so $h=1$ always.
+
+\section*{72. Code change: the estimand is now selectable and self-declaring}
+\texttt{run\_external\_query\_transfer} gains \texttt{--horizon}, \texttt{--discount}, \texttt{--continuation-policy}. Defaults $h=1$, $\gamma=1$ reproduce protocol v4 byte for byte, so \textbf{no existing artifact is invalidated}. For $h>1$ the artifact rewrites its own declaration: \texttt{protocol\_version} becomes \texttt{external\_query\_transfer\_v5\_continuation\_return\_frozen\_policy}, \texttt{response\_estimand} becomes \texttt{Q\_continuation\_h\{h\}\_gamma\{g\}}, and the definition string states that the result is \emph{not} comparable with any \texttt{Q\_one\_step} artifact. $\rho$ must be explicit and frozen; the oracle refuses $h>1$ without it.
+
+\section*{73. RETRACTION: horizon is necessary but not sufficient}
+Three runs, seed $8301$, $8$ states, $\gamma=0.95$, $\rho=$ \texttt{forward}:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{l r r r}
+\toprule
+ & $h=1$ & $h=4$ & $h=8$\\
+\midrule
+protocol & v4 & v5 & v5\\
+evaluable cells & $0$ & $\mathbf{0}$ & $\mathbf{0}$\\
+degenerate cells & $336$ & $336$ & $336$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\oldclaim{Switching the estimand from the one-step $Q$ to a continuation return will make the targets non-degenerate.} \textbf{It does not.} The plumbing is confirmed correct --- the protocol version, estimand name, horizon and discount all propagate --- and the measured outcome is identical at $h=1$, $4$ and $8$. \eclass{DEMOTED: proposed direction, measured insufficient}
+
+\textbf{Narrowed root cause.} The blocker is the \emph{competence} of $\rho$, not the horizon. RWARE's \texttt{fixed\_continuation\_policy} returns action $0$ (NOOP) for every agent unconditionally, so under $\rho=$\texttt{noop} the continuation contributes exactly zero and $Q^{(h,\rho)}$ collapses onto $Q^{(1)}$ identically. The declared reference policy \texttt{forward} (each agent takes its first non-idle valid action) does move the agents and still yields no delivery within $h\le8$; it is deterministic in the state and carries no hidden counter, so the estimand does not depend on enumeration order, but it is not task-competent and is recorded in the artifact as never constituting a policy-performance claim.
+
+\section*{74. What remains, and the non-claim}
+Three hypotheses survive, in increasing cost:
+\begin{enumerate}
+\item A task-competent frozen $\rho$ (move toward the requested shelf, then toward a goal) makes $Q^{(h,\rho)}$ non-degenerate. The adapter exposes \texttt{raw\_env.agents[i].x/.y/.carrying\_shelf} and \texttt{grid\_size}, so this is writable, but RWARE requires turn-then-advance control and it must be tested in the external runtime before it enters the ledger.
+\item The reward is too sparse for any short horizon and the estimand must change kind, not length.
+\item The state distribution is the blocker: reset-plus-warmup states are far from delivery. The \texttt{delivery\_opportunity} positive control produced $28$ evaluable cells against $0$ for reset states --- but its own \texttt{evidence\_class} is \textsf{DEVELOPMENT\_POSITIVE\_CONTROL}, so it diagnoses plumbing and establishes nothing about transfer.
+\end{enumerate}
+\claimbox{\textbf{Non-claim.} No transfer performance result exists for this chain at any horizon. \texttt{benchmark\_readiness} remains \textsf{EXTERNAL\_PRIMITIVE\_FRAMEWORK\_READY\_FULL\_RELATIONAL\_QUERY\_BENCHMARK\_NOT\_READY}. Five methods and four queries remain \textsf{BLOCKED\_NA} for missing capabilities, unchanged.}
+
+\section*{75. Formal inventory for this chain, complete}
+The corpus holds \textbf{6} Lean modules attributable to this chain, carrying \textbf{33} theorems; 6 produce a \texttt{.olean}; \textbf{0} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak Query\allowbreak Semantic\allowbreak Compiler\allowbreak V1} & 10 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Query\allowbreak Identifiability\allowbreak Verifier\allowbreak V1} & 7 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Query\allowbreak Representation\allowbreak Necessity\allowbreak V1} & 6 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Query\allowbreak Sufficiency\allowbreak V4} & 4 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Query\allowbreak Sufficiency\allowbreak Quantitative\allowbreak V1} & 3 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak TCCQuery\allowbreak Separation\allowbreak V1} & 3 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{6} of this chain's 6 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+
+\section*{76. Code changes of 7 September affecting this chain}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.32\columnwidth}X}
+\toprule
+File & Change\\
+\midrule
+\texttt{scripts/run\_external\_query\_transfer.py} & \texttt{--horizon}, \texttt{--discount}, \texttt{--continuation-policy} threaded through \texttt{run} and \texttt{\_state\_panel} into \texttt{CloneStateJointOracle}; two declared frozen policies (\texttt{noop}, \texttt{forward}), both deterministic in the state with no hidden counter; the artifact self-declares \texttt{response\_estimand}, \texttt{response\_horizon}, \texttt{response\_discount}, \texttt{continuation\_policy} and switches \texttt{protocol\_version} to v5 for $h>1$. Defaults $h{=}1,\gamma{=}1$ reproduce v4 byte for byte.\\
+\texttt{envs/external/capability\_audit.py} & capability-gate audit; the repair behind $8/8$ executable states.\\
+\texttt{scripts/run\_query\_signal\_probe.py} & positive control constructing delivery-opportunity states; relocated into \texttt{scripts/} so its \texttt{parents[1]} root resolves without \texttt{PYTHONPATH}.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\end{document}

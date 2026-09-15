@@ -1,0 +1,135 @@
+{
+  "requirement": "stopping / allocation / evidence-choice each from a certified interval; no phase chosen from the sign of a float",
+  "zeta": 0.05,
+  "rows": [
+    {
+      "family": "D6 (nuisance profiled)",
+      "q": 3,
+      "mu": 0.25,
+      "I_lower_at_optimal_design": 0.2423140977282413,
+      "Gamma_upper_from_dual": 0.24231410418061528,
+      "interval_width": 6.452373968457437e-09,
+      "dual_certificate_checked": null,
+      "I_lower_at_blind_design": 0.15000000000000002,
+      "I_upper_at_blind_design": 0.15000000000000002,
+      "blind_interval_width": 0.0,
+      "allocation_verdict_for_blind_design": "REJECT",
+      "allocation_verdict_if_interval_were_collapsed": "REJECT",
+      "arithmetic": "float LP; the interval is the solver's own primal-dual gap, NOT a rational certificate"
+    },
+    {
+      "family": "D6 (nuisance profiled)",
+      "q": 3,
+      "mu": 0.5,
+      "I_lower_at_optimal_design": 0.10769514912013362,
+      "Gamma_upper_from_dual": 0.10769515557273497,
+      "interval_width": 6.452601356010668e-09,
+      "dual_certificate_checked": null,
+      "I_lower_at_blind_design": 0.06666666666666664,
+      "I_upper_at_blind_design": 0.06666666666666665,
+      "blind_interval_width": 1.3877787807814457e-17,
+      "allocation_verdict_for_blind_design": "REJECT",
+      "allocation_verdict_if_interval_were_collapsed": "REJECT",
+      "arithmetic": "float LP; the interval is the solver's own primal-dual gap, NOT a rational certificate"
+    },
+    {
+      "family": "D6 (nuisance profiled)",
+      "q": 4,
+      "mu": 0.25,
+      "I_lower_at_optimal_design": 0.241712855681751,
+      "Gamma_upper_from_dual": 0.24171286901208505,
+      "interval_width": 1.333033405881423e-08,
+      "dual_certificate_checked": null,
+      "I_lower_at_blind_design": 0.15050551470588233,
+      "I_upper_at_blind_design": 0.15050551470588233,
+      "blind_interval_width": 0.0,
+      "allocation_verdict_for_blind_design": "REJECT",
+      "allocation_verdict_if_interval_were_collapsed": "REJECT",
+      "arithmetic": "float LP; the interval is the solver's own primal-dual gap, NOT a rational certificate"
+    },
+    {
+      "family": "D6 (nuisance profiled)",
+      "q": 4,
+      "mu": 0.5,
+      "I_lower_at_optimal_design": 0.10742793853626503,
+      "Gamma_upper_from_dual": 0.10742795186271836,
+      "interval_width": 1.3326453329742804e-08,
+      "dual_certificate_checked": null,
+      "I_lower_at_blind_design": 0.06689133986928092,
+      "I_upper_at_blind_design": 0.06689133986928092,
+      "blind_interval_width": 0.0,
+      "allocation_verdict_for_blind_design": "REJECT",
+      "allocation_verdict_if_interval_were_collapsed": "REJECT",
+      "arithmetic": "float LP; the interval is the solver's own primal-dual gap, NOT a rational certificate"
+    },
+    {
+      "family": "Functional (moving extrema)",
+      "n": 256,
+      "c": "1",
+      "J_w_lower": "1/40",
+      "J_w_upper": "289/11296",
+      "Gamma_lower": "1/40",
+      "Gamma_upper": "289/11296",
+      "interval_width": "33/56480",
+      "inside_domain": true,
+      "allocation_verdict_for_explicit_design": "ACCEPT",
+      "arithmetic": "exact Fraction; the verdict is computed on Fractions, never on floats"
+    },
+    {
+      "family": "Functional (moving extrema)",
+      "n": 256,
+      "c": "2",
+      "J_w_lower": "1/16",
+      "J_w_upper": "81/1160",
+      "Gamma_lower": "1/16",
+      "Gamma_upper": "81/1160",
+      "interval_width": "17/2320",
+      "inside_domain": true,
+      "allocation_verdict_for_explicit_design": "UNDECIDED",
+      "arithmetic": "exact Fraction; the verdict is computed on Fractions, never on floats"
+    },
+    {
+      "family": "Functional (moving extrema)",
+      "n": 4096,
+      "c": "1",
+      "J_w_lower": "1/40",
+      "J_w_upper": "4225/167968",
+      "Gamma_lower": "1/40",
+      "Gamma_upper": "4225/167968",
+      "interval_width": "129/839840",
+      "inside_domain": true,
+      "allocation_verdict_for_explicit_design": "ACCEPT",
+      "arithmetic": "exact Fraction; the verdict is computed on Fractions, never on floats"
+    },
+    {
+      "family": "Functional (moving extrema)",
+      "n": 4096,
+      "c": "2",
+      "J_w_lower": "1/16",
+      "J_w_upper": "1089/16904",
+      "Gamma_lower": "1/16",
+      "Gamma_upper": "1089/16904",
+      "interval_width": "65/33808",
+      "inside_domain": true,
+      "allocation_verdict_for_explicit_design": "ACCEPT",
+      "arithmetic": "exact Fraction; the verdict is computed on Fractions, never on floats"
+    }
+  ],
+  "corrections": [
+    "the REJECT branch compared the design's LOWER bound with the optimum's LOWER bound; a low lower bound does not make a design bad. It now needs the design's UPPER bound to fall below (1-zeta) times the optimum's LOWER bound, and the design carries two bounds of its own.",
+    "verdicts were computed after casting Fractions to float, so the claim that no rule decides from a float was false; they are now computed on Fractions and a regression test exhibits J = 1 - 2^-60 where float and exact disagree.",
+    "the D6 dual check inspected a different call than the one producing the reported interval, so it certified nothing; the claim is withdrawn and no dual certificate is asserted for D6.",
+    "the fix above was applied to the HELPER only: d6_layers still called it as allocation_verdict(lo_blind, lo_blind, ...), passing the blind design's floor as its own ceiling and so reproducing the very collapse the helper was fixed to reject. The caller now keeps both ends, and a regression test drives the real d6_layers plumbing with a stub where Gamma = 1 exactly and the design is bounded only into [0,1]: keeping both ends gives UNDECIDED, collapsing gives REJECT.",
+    "functional_layers made the same collapse in the other family, passing the design's floor as its ceiling on the strength of an unverified claim that the EE witness attains the pair minimum. The corpus only has L <= value <= (1+d)^2 L, so the ceiling is now the witness bound and some Functional verdicts weaken from ACCEPT to UNDECIDED.",
+    "J(w) is an INFIMUM over alternatives, so evaluating one alternative bounds it ABOVE. The floor must come from a statement covering every alternative -- energy_ge_pairV for Functional, the full finite minimisation for D6. The docstring said the opposite."
+  ],
+  "what_is_certified": {
+    "Functional": "both ends exact rational: the floor is the minimum over ordered pairs of the two-quadratic pinch EVALUATED at the explicit allocation, the ceiling is the two-witness bound that holds for every allocation",
+    "D6": "float LP; the interval is the solver's own primal-dual gap. No dual certificate is checked, and an exact-rational reimplementation of the coefficient matrix is NOT done, so the D6 ends are numerical and the D6 verdicts inherit that"
+  },
+  "not_established": [
+    "no algorithm is run: there is no transcript, no stopping time, and no expected cost here -- only the certification layers a scheduler would consult",
+    "the D6 dual is checked for non-negativity and normalisation only; its rows are not re-derived in exact arithmetic",
+    "the calibration purchase boundary is exercised on a synthetic interval, not computed from the real kernel"
+  ]
+}

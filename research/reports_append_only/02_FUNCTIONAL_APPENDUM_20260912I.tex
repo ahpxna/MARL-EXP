@@ -1,0 +1,83 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Acquisition}\\[2pt]
+{\large\itshape Append-only update I: the de-confounded panel returns, and the advantage survives}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 12 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--84 are an immutable prefix. This addendum begins at Section 85.
+
+\section*{85. The panel}
+
+\texttt{functional\_v4\_ieee10seed\_cellv1.json} and \texttt{functional\_v4\_shift50\_cellv1.json}: protocol \texttt{functional\_variance\_stopping\_v4\_permuted\_random\_extrema}, \texttt{rng\_protocol = instance\_cell\_v1}, $\max n = 131072$, the ten frozen confirmatory seeds, 100 instances each, $R=5$, $K=6$, $k=2$. Common random streams, and the 1000 paired instances agree on \texttt{world\_sha256} across all seven variants with zero mismatches.
+
+The generator guard reports \texttt{zero\_information\_accuracy} $=0.0890$ and $0.0920$ against the unbiased $0.1$, extrema at the endpoints in a fraction $0.0$ of relations, and all ten possible Top-$k$ sets realised. Under $v3$ these were $1.0$, $1.0$ and one set. The confound of Section 83's successor is gone.
+
+\section*{86. The advantage survives, and it is one policy, not a class}
+
+Paired against \texttt{uniform} on censored $N_{\mathrm{certificate}}$, on the non-shifted panel:
+
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+vs \texttt{uniform} & win--lose--tie & med.\ $\Delta N$ & sign $p$\\
+\midrule
+\texttt{C\_anytime} & 745--4--251 & 10104 & $8.8\mathrm{e}{-216}$\\
+\texttt{C\_extrema\_oracle}$^\ast$ & 756--1--243 & 12736 & $2.0\mathrm{e}{-225}$\\
+\texttt{C\_known\_sigma}$^\ast$ & 749--1--250 & 10656 & $2.5\mathrm{e}{-223}$\\
+\texttt{C\_pilot} & 475--252--273 & 0 & --\\
+\texttt{C\_shrink} & 482--248--270 & 0 & --\\
+\texttt{C\_split} & 265--444--291 & 0 & loses\\
+\bottomrule
+\end{tabular}
+\end{center}
+{\scriptsize $^\ast$ diagnostic oracles, excluded from the deployable winner.}
+
+Median $N$: \texttt{uniform} 74252, \texttt{C\_anytime} 29884, ratio $2.4847$. Under the confounded $v3$ the same ratio was $2.5445$. Removing the confound cost the effect about two percent of its size.
+
+\texttt{false\_safe} is $0$ across all seven variants and 1000 instances on both panels, 14000 runs.
+
+What must not be carried forward is the plural. \texttt{C\_split} is significantly \emph{worse} than uniform; \texttt{C\_pilot} and \texttt{C\_shrink} have a median paired difference of exactly zero. The result belongs to \texttt{C\_anytime}. Any sentence of the form ``the adaptive policies beat uniform'' is false on this panel. \eclass{NUMERICAL EVIDENCE, frozen seeds, exact paired counts}
+
+\section*{87. Extrema that move after perturbation change nothing}
+
+The \texttt{--extrema-shift 0.5} panel resamples the extrema of half the relations after the world is drawn. Ratio $2.4932$, \texttt{C\_anytime} 759--1--240, median $N$ 29820 against uniform 74348. The two panels are indistinguishable at this resolution. The fourth mandatory item is therefore answered in the direction of robustness, not fragility.
+
+\section*{88. The extrema oracle is nearly matched, which retires a proposed target}
+
+\texttt{C\_extrema\_oracle} is told \texttt{argmin} and \texttt{argmax} and offers the identical guarantee. Median $N$: uniform 74252, \texttt{C\_anytime} 29884, oracle 26428. \texttt{C\_anytime} closes
+\[ \frac{74252-29884}{74252-26428}=92.8\% \]
+of the distance, and $92.5\%$ on the shifted panel.
+
+This corrects a number recorded earlier in this session's working notes. A 20-instance development smoke at $\max n = 4096$ put the figure at $63\%$; at that horizon every deployable variant certified nothing and the comparison was between censored values. It should not have been quoted.
+
+The consequence is strategic. A matching lower bound of the form ``no deployable policy recovers more than $X\%$ of the oracle'' now has $7.2\%$ of headroom to argue about. That is no longer the strongest available target. The better question is why an anytime confidence sequence, given no extrema information, lands within seven percent of a policy that is handed the extrema, and whether the residual is irreducible. \eclass{NUMERICAL EVIDENCE}
+
+\section*{89. Two provenance defects, recorded rather than quietly repaired}
+
+\textbf{(a) A meaningless admissibility label.} \texttt{development\_only} was a hard-coded literal: \texttt{v3} line 324, \texttt{v4} line 479. It was \texttt{True} in every artifact this lab ever produced, including the $v3$ panel cited in Sections 74--79 as evidence. It therefore never distinguished anything and must not be cited in either direction. The scripts now compute it from the seeds actually used against the frozen confirmatory set, verified at runtime on both branches and both scripts. The existing artifacts are not edited; each carries a \texttt{.LABEL\_CORRECTION.json} sidecar.
+
+\textbf{(b) A look at confirmatory data before the confirmatory run.} The $v4$ development smoke used seed 701, a member of the frozen set, and its paired margins were analysed before the full panel ran. \texttt{freeze\_before\_confirmatory} is breached in the strict sense. Mitigating: the smoke ran at $\max n = 4096$, a regime where every deployable variant certified nothing, and neither the policies nor the protocol were changed after it. This belongs in the paper, not in a footnote of a working note.
+
+\section*{90. What this does not settle}
+
+The panel measures certification complexity for a fixed $(R,K,k)=(5,6,2)$ under one noise model. Nothing here is a theorem; the stopping rule's guarantee is the Bonferroni contract already recorded, and no lower bound is established.
+
+The two legacy $v4$ jobs launched before the \texttt{main()} argument-passing repair produced no output and their configurations were the pre-repair ones; nothing in this addendum uses them.
+
+Sections 74--79 stand as measurements of what they measured. They do not support a claim about learning Top-$C$ when both the label and the extrema positions are unknown; Sections 85--88 do.
+\end{document}

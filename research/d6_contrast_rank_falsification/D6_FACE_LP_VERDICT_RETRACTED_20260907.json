@@ -1,0 +1,41 @@
+{
+  "corrected_characterisation": "The face LP is a STRONG LOCAL IMPROVER and NOT a global finder, the same character as the ascent. What the (S,T) enumeration buys is that the face need not be guessed; what it does not buy is escaping a bad basin. It must actually VISIT the face, so subsampling pairs is not a speed knob, it is a correctness knob.",
+  "decisive_single_face_test": {
+    "achieved_margin_relative": 0.0010009742562032374,
+    "face": {
+      "competitor": [
+        1,
+        2,
+        3
+      ],
+      "note": "T is the complement of S and the true argmin at the seed",
+      "selected": [
+        0,
+        4,
+        5
+      ]
+    },
+    "improved": true,
+    "margin_used": "1/1000",
+    "result_ratio": "340572020684734463518587/285410615501461739929600",
+    "result_ratio_float": 1.1932703346942966,
+    "rounds": 10,
+    "seed_ratio": 1.000440019018698,
+    "starts": 1
+  },
+  "development_only": true,
+  "evidence_class": "NUMERICAL_EVIDENCE",
+  "independent_agreement": "At the same StrictTopC margin 1/1000 the exact LP ascent reached 1.1932566 and the face LP reaches 1.1932703. Two instruments with different formulations -- one climbing from a seed, one enumerating (S,T) and linearising per face -- land on the same value. That is real convergence and it strengthens the conjecture sup = m/(m-1) = 6/5 at m=6, which remains a conjecture.",
+  "lesson": "A negative verdict on an instrument needs the same evidence discipline as a positive one. This one was published on a single run whose sampling made it blind to the only face that mattered.",
+  "nature": "The verdict rested on a test the author designed wrong, not on the instrument. The seeded m=6 run used --pairs-limit 60 out of 380 (S,T) pairs, sampled at random. The face containing the witness is S={0,4,5}, T={1,2,3}; the chance a random 60 of 380 includes it is about 16 percent. It did not. The reported 0.7383 therefore measured faces that do not contain the seed, and says nothing about the instrument.",
+  "protocol_version": "d6_face_lp_verdict_retraction_v1",
+  "retracted_text": "THE POLYHEDRAL ROUTE IS CURRENTLY WORSE THAN THE STOCHASTIC SEARCH IT WAS MEANT TO REPLACE ... This is not a tuning gap to be closed by more starts.",
+  "retracts": "D6_FACE_LP_INSTRUMENT_20260907.json",
+  "retracts_field": "honest_verdict",
+  "what_is_now_unclear_again": "The m=4 comparison. All 30 faces were visited there, and the face LP reached 0.666 against the stochastic sweep's 0.905106 -- but from RANDOM starts. The fair m=4 test is to seed every face with the stochastic best m=4 world and ask whether any face improves it. That test has not been run.",
+  "what_still_stands_from_the_retracted_artifact": [
+    "All three engineering defects and their measured effects: iterate-vs-accept, box-in-A_ub (DEGENERATE_ACTIVE_SET 10/30 -> 0), and taking the LP vertex (feasible 4 -> 16).",
+    "That 2(k-1)/(m-1) is an attractor for RANDOM-START local methods.",
+    "That every instrument so far returns a LOWER bound, they disagree, and c*(m) needs an UPPER bound, i.e. a proof, not a better search."
+  ]
+}

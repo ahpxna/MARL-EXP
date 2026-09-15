@@ -1,0 +1,62 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Acquisition}\\[2pt]
+{\large\itshape Append-only update H: a wrong number in Section 76, a stated rule that does not apply in Section 78, and a code audit}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--79 are an immutable prefix. This addendum begins at Section 80.
+
+\section*{80. Correction: one number in Section 76 is wrong}
+
+Section 76 reads: \emph{``$86$ of $300$ instances are certified by no variant at $131\,072$. The gap distributions separate strongly --- median true Top-$K$ gap $0.059$ for the never-certified against $0.297$ for the certified.''}
+
+The sentence defines ``never-certified'' as \emph{certified by no variant}. On that set the median true Top-$K$ gap is $\mathbf{0.0565}$, not $0.059$. The value $0.059$ belongs to a different set: the $88$ instances on which \texttt{C\_anytime} alone failed to certify, whose median is $0.05977$. Two adjacent clauses of one sentence therefore use two different definitions of the same phrase. \oldclaim{median true Top-$K$ gap $0.059$ for the never-certified}
+
+Everything else in that sentence and in Sections 74--76 is confirmed by direct recomputation from the artifact: the count $86$, the certified median $0.29703$, the $38$ never-certified instances above the smallest certified gap, the $20$ certified instances below the largest never-certified gap, all six marginal medians, the ratio $2.6698$, the $163/163$ sweep with $p = 1.71\times10^{-49}$, set equality $212=212$ with $|A\setminus B|=|B\setminus A|=0$, \texttt{false\_safe\_count} $=0$ across $1\,800$ runs, and the regression slope $-1.5720$ with $R^2 = 0.8049$.
+
+\section*{81. Correction: the index rule stated in Section 77 does not apply in Section 78}
+
+Section 77 states the rule \emph{``a distribution-free $95\%$ confidence interval for a median at $n=300$ runs between order statistics $X_{(133)}$ and $X_{(168)}$''} and applies it correctly to the six marginal medians; all twelve endpoints of that table reproduce exactly, including the censored upper limit for \texttt{uniform}.
+
+Section 78 then reports the paired interval $[2.067,\,2.324]$ without restating the rule. That interval is \emph{not} computed at $n=300$. Paired ratios exist only on the $163$ instances where both variants certify, so the applicable indices are $X_{(69)}$ and $X_{(95)}$ at $n=163$, with coverage $0.9586$. The reported endpoints are correct --- $X_{(69)} = 2.0672$ and $X_{(95)} = 2.3242$ --- but a reader carrying the Section 77 rule forward computes indices that lie outside a $163$-element sample. The numbers stand; the stated rule must be read as belonging to Section 77 only. The median $2.1831$, minimum $1.1115$, maximum $3.8585$ and interquartile range $[1.7612,\,2.6031]$ all reproduce.
+
+\section*{82. What a read of the experiment code did and did not find}
+
+Five scripts were read in full: the stopping-lab generator, the paired-censoring analyser, the exact reference-fibre sweep, the exact query-width and flip witness, and the artifact auditor. No defect was found that alters any recorded number. Four load-bearing arguments were checked by hand and hold: the finite-horizon Bonferroni union is valid under \emph{adaptive} sampling precisely because the streams are pre-drawn and the allocation only chooses prefix lengths, so every fixed-$n$ prefix remains i.i.d.\ and independent of the rule ($2\,\tau\,\text{cells}\,\text{looks} = \alpha$ exactly); the capacity intervals satisfy $c_{\mathrm{lo}} \le C_r \le c_{\mathrm{hi}}$; the rational game certificates recompute both bounds exactly from the rounded vectors, so no float enters a reported value; and the per-world modular gauge pins $Q_j(0) = -t\,\theta_j$ as well as the slope, which is what makes the fibre common under \emph{every} product reference and not only at the corner.
+
+Three defects that do not affect recorded results are recorded here so they are not rediscovered.
+
+\textbf{A silent failure mode, not currently reached.} \texttt{\_prefix\_stats} slices \texttt{streams[r,a,offset:offset+counts[r,a]]}. NumPy does not raise on an over-range slice; it returns a shorter array, while the full \texttt{counts[r,a]} still enters $\text{radius} = c\,\hat\sigma/\sqrt{n}$. An over-run therefore shrinks the radius and can emit an \emph{invalid} certificate with no exception anywhere. The margin in this configuration is large --- the worst cell reads to index $34\,717$ of $131\,736$ --- but the guard is one line and belongs in the function:
+\begin{center}\footnotesize\texttt{assert len(x) == int(counts[r, a])}\end{center}
+
+\textbf{A fragile idiom.} \texttt{x['N\_certificate'] or H} silently substitutes the horizon for a value of $0$. No run in the artifact has $N\_\text{certificate} = 0$, and \texttt{certificate\_emitted} agrees with \texttt{N\_certificate is not None} on all $1\,800$ rows.
+
+\textbf{Degenerate entries in an unused panel.} $25$ of the $250$ functional flip panels report cost exactly $0$, because the Top-$C$ tie-break by index admits $i \in T$ and $j \notin T$ with $C_i = C_j$. No report cites these panels, so nothing recorded is affected; any future aggregate over them would be.
+
+\section*{83. Two artifacts were stale; both are now resolved}
+
+\texttt{functional\_131072\_confirm\_paired\_analysis.json} carries \texttt{script\_sha256 = 79597680\dots} against the analyser's current \texttt{62f6fbea\dots}. The older version had no \texttt{median\_distribution\_free\_interval\_95} field, which is why Section 77's interval table has no backing artifact: it was computed outside that pipeline. Its input hash does match. The only file carrying distribution-free intervals is \texttt{functional\_paired\_censoring\_v2.json}, whose input is the $65\,536$ probe at $n=100$, not this run.
+
+\texttt{chain\_closure\_manifest.json} was pinned at $36$ modules and $171$ axiom prints because the auditor is fail-closed and was aborting on a module with no \texttt{.olean}. With that module compiled the auditor completes: the manifest now records $\mathbf{55}$ modules and $\mathbf{265}$ axiom prints, $25$ closed items against $4$ open, toolchain \texttt{leanprover/lean4:v4.34.0-rc2}. The superseded manifest is retained as \texttt{chain\_closure\_manifest\_20260911\_0241\_superseded.json}. Its scope line is unchanged and still governs: selected modules against existing local dependencies, not a clean full-corpus build.
+
+\section*{84. Scope of this audit}
+
+Five scripts of roughly sixty in \texttt{scripts/} were read. The unread remainder includes \texttt{run\_d6\_margin\_regret\_frontier.py}, \texttt{verify\_structural\_tolerance\_curves.py} and \texttt{run\_d6\_integer\_block\_evidence.py}, each of which backs recorded claims in the D6 and Structural chains. Nothing in this addendum licenses any statement about those.
+
+One further correction belongs here, about the audit itself rather than the experiments. Its first summary was headed with the claim that no error had been found, above a list of findings that included a wrong number in Section 76. A wrong number in the ledger is an error whatever layer produced it. The correct summary is the one in Section 80: the experiment code is sound as far as it was read, every value traceable to that code reproduces, and the defect is in the transcription from artifact to prose.
+\end{document}

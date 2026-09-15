@@ -1,0 +1,79 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 1 - MASTER Cross-Chain Synthesis}\\[2pt]
+{\large\itshape Append-only update E: two Mathlib names in the new module did not exist, one tactic choice was unsound, and the ten disputed statements are true}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (fifth update)}
+\end{center}\vspace{2mm}}]
+\textbf{Append-only rule.} Sections 1--72, including addenda A--D, are an immutable prefix. This addendum begins at Section 73.
+
+\section*{73. Checking names against the pinned Mathlib, before compiling}
+D6 Section 151 recorded that \texttt{Lean\allowbreak D6\allowbreak Information\allowbreak LimitV1} used Mathlib lemma names \emph{as recalled} and unverified. Grepping the pinned copy in \texttt{.lake/packages/mathlib} found three defects. All are now fixed; the recalled draft is preserved beside the module as \texttt{.recall\_draft\_20260908}, deleted nothing.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Defect & Resolution\\
+\midrule
+\texttt{Nat.succ\_mul\_choose\_eq} \textbf{does not exist} in the pinned Mathlib & renamed upstream to \texttt{Nat.add\_one\_mul\_choose\_eq} (\texttt{Data/Nat/Choose/Basic}~131), same statement $(n{+}1)\binom nk=\binom{n+1}{k+1}(k{+}1)$\\
+\texttt{choose\_shift} closed by \texttt{omega} & \textbf{unsound choice}: the goal $(2j{+}1)\binom{2j}{j+1}=j\binom{2j+1}{j+1}$ is a product of two \emph{variables}, and \texttt{omega} decides linear arithmetic only. Replaced by an explicit additive cancellation through \texttt{Nat.add\_left\_cancel}\\
+\texttt{Finset.card\_filter} assumed to be in \texttt{Data/Finset/Card} & it exists, but in \texttt{Algebra/BigOperators/Group/Finset/Piecewise}~278, and the summand orientation is \texttt{ite (p i) 1 0}; the calc steps were restated in that orientation so both uses share one lemma shape\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Seven further names were confirmed present with the expected statements: \texttt{sdiff\_eq\_filter}, \texttt{card\_powersetCard}, \texttt{mem\_powersetCard}, \texttt{subset\_erase}, \texttt{card\_erase\_of\_mem}, \texttt{powersetCard\_nonempty}, \texttt{exists\_max\_image} (whose conclusion is $\exists x\in s,\ \forall x'\in s,\ f x'\le f x$, matching the destructuring used). \texttt{Nat.mul\_le\_mul\_left}, whose signature has moved between versions, was replaced by the stable \texttt{Nat.mul\_le\_mul}.
+\claimbox{\textbf{Method, added to the standing notes.} A source file quoting lemma names from memory is not a proof proposal, it is a guess. Grepping the pinned dependency costs one command and caught an \emph{unsound tactic choice} that no amount of re-reading the mathematics would have surfaced --- \texttt{omega} on a nonlinear goal fails at compile time, but the failure is about the instrument, not the claim. This check now precedes every hand-off of unfamiliar Lean.}
+
+\section*{74. The ten disputed statements are true}
+The $\chi\ge5$ promotion (Structural Sections 66, 71) replaces ten \texttt{native\_decide} steps with kernel \texttt{decide}. Whether those steps are \emph{true} is a separate question from whether the tactic discharges them, and it was checked independently by exhaustive enumeration outside Lean:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r X}
+\toprule
+Statement & claimed & found & \\
+\midrule
+$|w(\mathrm{opt}_1^c)|$ & $1$ & $1$ & OK\\
+$|w(\mathrm{opt}_2^c)|$ & $0$ & $0$ & OK\\
+$|w(\mathrm{opt}_3^c)|$ & $1$ & $1$ & OK\\
+$|w(\mathrm{opt}_4^c)|$ & $2$ & $2$ & OK\\
+$|w(\mathrm{opt}_5^c)|$ & $0$ & $0$ & OK\\
+uniqueness at card $1,\dots,5$ & $1$ set each & $1$ set each & OK\\
+\bottomrule
+\end{tabularx}
+\end{center}
+All $2^7=128$ subsets were scanned for each budget; at every budget exactly one set meets the bound, and it is the designated optimum. The five optima are pairwise non-nested, so they form an antichain and $\chi_{\mathrm{prefix}}\ge5>7/2$.
+\claimbox{\textbf{What this does and does not settle.} The promotion is now a pure \emph{tactic} question: the arithmetic is confirmed true, so if kernel \texttt{decide} discharges it the claim becomes \eclass{PROVED}, and if \texttt{decide} exceeds its limits the claim stays \eclass{COMPILED ARTIFACT} --- but it will not turn out to be \emph{false}. This enumeration is itself only \eclass{NUMERICAL EVIDENCE} and licenses nothing on its own; its role is to tell us which kind of failure to expect.}
+
+\section*{75. If kernel \texttt{decide} does not fit}
+Recorded now so the fallback is not invented under pressure. Direct \texttt{decide} scans $128$ subsets, and the expensive part is not the arithmetic ($896$ integer additions) but forcing \texttt{Finset.univ} on \texttt{Finset (Fin 7)}, a powerset with de-duplication. The cheaper decomposition uses \texttt{Finset.card\_eq\_one}, \texttt{card\_eq\_two}, \texttt{card\_eq\_three}: $7+21+35=63$ cases for budgets $1,2,3$. Mathlib has no \texttt{card\_eq\_four} or \texttt{card\_eq\_five}, so budgets $4$ and $5$ must go through the complement, whose cardinalities are $3$ and $2$ --- which suits this witness, since \texttt{complementAbs7} is defined on the complement already.
+\textbf{This fallback is not written.} Shipping a second, more elaborate proof that also cannot be compiled here would raise the failure probability, not lower it. It gets written when the first attempt's error message says it is needed.
+
+\section*{76. Order of work, revised by cost}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r X X}
+\toprule
+& Action & Why here\\
+\midrule
+1 & compile + audit \texttt{Lean\allowbreak D6\allowbreak Information\allowbreak LimitV1} & names now checked; on success a bound at \emph{every} even $m$ becomes \eclass{PROVED} in one step, and the $m{=}10$ gap stops blocking that programme\\
+2 & compile + audit the $\chi\ge5$ kernel promotion & content confirmed true; removes the corpus's only \texttt{ofReduceBool} exposure in a witness that answers a question the ledger had recorded as open\\
+3 & Functional $300\times3$ & the $55$-vs-$0$ within-instance result is the one experimental claim resting on $3$ seeds\\
+4 & Query, \texttt{forward} continuation $+$ \texttt{noop} control & separates policy competence from horizon; the control is what makes it evidence\\
+5 & $m{=}8$ at $\mu=\tfrac12,1$; then $m{=}10$ & both exceed 150\,s here; background jobs, not blockers\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The reordering is a consequence of Section 149: the two D6 programmes are independent, and the width-uniform one is now also the cheaper one.
+\end{document}

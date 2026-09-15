@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+"""G03 -- theorem-level comparison with the nearest prior, with SOURCES.
+
+The previous G03 recorded six prior columns with `verified: false` and no source.
+This version attaches, for each prior, a URL and the characterisation actually read,
+and records HOW FAR that reading goes:
+
+  verified_level = "abstract"     -- the abstract / landing page was read
+  verified_level = "full_text"    -- the statement of the cited theorem was read
+  theorem_level_verified          -- True only when the prior's THEOREM statement was
+                                     compared against ours, clause by clause
+
+Every row below is `verified_level = "abstract"` and
+`theorem_level_verified = False`.  That is an honest advance on "no source at all",
+and it is NOT a novelty claim: an abstract cannot settle a theorem-level comparison,
+and not finding an overlap is not evidence of novelty.
+
+What each row DOES settle is the shape of the boundary the manuscript has to defend:
+what the prior's input, output and guarantee TYPE are, versus ours.
+"""
+import json, os
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[1]
+OUT = REPO / "research/worker_G03_prior_20260915"
+
+ROWS = [
+  {
+    "paper": "Structural",
+    "our_result": "minimum MENU of m-1 rankings so that every budget has an "
+                  "epsilon-good prefix; V_path/V_avg = m-1 exactly for every m>=5 on "
+                  "g_m = (-3,(-1)^p,(+1)^q,3); additive error normalised by "
+                  "D = sum|g_i| = m+4",
+    "our_guarantee_type": "EXACT two-sided law, additive normalised error, one fixed "
+                          "family, every m >= 5",
+    "prior": "Bernstein, Disser, Gross (+ Himburg), General Bounds for Incremental "
+             "Maximization, ICALP 2017; lower bound 2.246 by Disser, Klimm, Schewior, "
+             "Weckbecker; Bienkowski et al., Incremental Submodular Maximization",
+    "prior_url": ["https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ICALP.2017.43",
+                  "https://arxiv.org/abs/2305.01310",
+                  "https://arxiv.org/abs/2606.28558"],
+    "prior_characterisation": "ONE ordering serving every cardinality; MULTIPLICATIVE "
+                              "competitive ratio 1+phi ~ 2.618 for monotone "
+                              "'accountable' objectives (a property generalising "
+                              "submodularity); best known lower bound 2.246",
+    "boundary_to_defend": "prior is monotone + accountable and multiplicative; ours is "
+                          "a SIGNED cancellation geometry (weights -3,-1,+1,+3), not "
+                          "monotone and not submodular, and the error is ADDITIVE and "
+                          "normalised.  Also prior asks for ONE ordering; ours asks "
+                          "for the MINIMUM MENU.  Both are 'one schedule for all "
+                          "budgets', so the comparison must be made explicitly, not "
+                          "by citing non-submodularity alone.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+  {
+    "paper": "Support",
+    "our_result": "k0 (1-s)^N <= R_dec(N) <= B (1-s)^N and "
+                  "(1/2)(1-p_min)^N <= R_rec(N) <= (sum b_i)(1-p_min)^N; growing K "
+                  "with total mass P fixed gives R_dec = (1/2)(1-P)^N exactly, flat "
+                  "in K, against a recovery count growing like K log K",
+    "our_guarantee_type": "EXACT exponent law in N, two-sided, explicit constants",
+    "prior": "Javdani, Chen, Karbasi, Krause, Bagnell, Srinivasa, Near Optimal "
+             "Bayesian Active Learning for Decision Making, AISTATS 2014 (DRD / HEC)",
+    "prior_url": ["https://arxiv.org/abs/1402.5886",
+                  "https://proceedings.mlr.press/v33/javdani14.html"],
+    "prior_characterisation": "Bayesian active learning with OVERLAPPING decision "
+                              "regions; objective: drive uncertainty into a single "
+                              "decision region as fast as possible; HEC is an "
+                              "efficient policy 'competitive with the intractable "
+                              "optimal policy'",
+    "boundary_to_defend": "the IDEA 'decide without identifying the world' is prior "
+                          "and must be credited.  The prior's output is a POLICY with "
+                          "an approximation guarantee against the optimal policy; "
+                          "ours is a RATE LAW in N with explicit constants and a "
+                          "separation between the decide and recover exponents.  "
+                          "Different output type, so the comparison is about what is "
+                          "quantified, not about who solves the harder problem.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+  {
+    "paper": "Functional",
+    "our_result": "for the explicit allocation w*, inf over flipping alternatives of "
+                  "the energy equals A d^2/2 = c^2/(n(32+2c^2 H_n)); the "
+                  "known/unknown-variance sandwich is within (1+d/(2 g_min))^2 <= 4",
+    "our_guarantee_type": "EXACT value AT a named allocation + a uniform 4-factor "
+                          "sandwich; NOT an optimum over the design polytope",
+    "prior": "Jourdan, Degenne, Kaufmann, Dealing with Unknown Variances in Best-Arm "
+             "Identification, COLT 2023",
+    "prior_url": ["https://arxiv.org/abs/2210.00974",
+                  "https://proceedings.mlr.press/v201/jourdan23a/jourdan23a.pdf"],
+    "prior_characterisation": "first ASYMPTOTICALLY OPTIMAL algorithms for BAI in "
+                              "Gaussian bandits with unknown variances; two approaches "
+                              "(plug-in empirical variance, adapted transportation "
+                              "costs); new time-uniform concentration inequalities for "
+                              "the stopping rule",
+    "boundary_to_defend": "unknown-variance STOPPING is prior and must not be claimed. "
+                          "Ours is a DESIGN/GEOMETRY statement: the value of an "
+                          "explicit allocation on an extrema family, the H_n law, and "
+                          "the factor-4 sandwich.  The manuscript must keep the "
+                          "algorithmic contribution out of the headline unless it "
+                          "beats a same-information comparator.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+  {
+    "paper": "Query",
+    "our_result": "a measurement class that moves the LEAKAGE ORDER r; "
+                  "H^2 asymptotics of order h^{2r} with a proved lower bound from one "
+                  "interval, a proved integrable envelope, and N* = Theta(h^{-2r}) "
+                  "carried to an integer count and back to the regret of a decision",
+    "our_guarantee_type": "order law + two-sided sample complexity + regret bridge "
+                          "(lower for all policies, upper for one)",
+    "prior": "Ho, Nguyen, Singularity structures and impacts on parameter estimation "
+             "in finite mixtures of distributions (Annals of Statistics)",
+    "prior_url": ["https://arxiv.org/abs/1609.02655"],
+    "prior_characterisation": "a general framework for the singularity structures of "
+                              "the parameter space of finite mixtures, with MINIMAX "
+                              "LOWER BOUNDS and MLE convergence rates over a compact "
+                              "parameter space, linking model singularities to the "
+                              "algebraic geometry of the parameter space",
+    "boundary_to_defend": "the phenomenon 'singularity degrades the rate' is prior, "
+                          "with minimax lower bounds already proved.  Ours varies the "
+                          "ADMISSIBLE MEASUREMENT, not the parameter space: the same "
+                          "two worlds acquire different leakage orders under different "
+                          "legal queries, and the cost of restoring distinguishability "
+                          "is the quantity.  If the manuscript claims only 'the rate "
+                          "is h^{-4}', it is inside the prior.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+  {
+    "paper": "MASTER (design/duality)",
+    "our_result": "a PRICE threshold for a calibration/anchor query: "
+                  "c* = (m-1)^2/(m+3)^2 on the symmetric family; a mandatory-anchor "
+                  "certificate U0 < L1 at c0 = 1/10; and the full-class rate "
+                  "Delta^2/(2K(sqrt m + sqrt kappa)^2)",
+    "our_guarantee_type": "EXACT threshold / exact rate, with separated primal and "
+                          "dual certificates",
+    "prior": "Dette, Titoff, Optimal discrimination designs, Ann. Statist. 37 (2009) "
+             "2056-2082",
+    "prior_url": ["https://projecteuclid.org/euclid.aos/1245332840",
+                  "https://arxiv.org/pdf/0908.1912"],
+    "prior_characterisation": "new properties of T-optimal discrimination designs that "
+                              "often determine them explicitly; in NESTED LINEAR "
+                              "models the number of support points is usually too "
+                              "small to estimate all parameters of the extended model; "
+                              "T-optimal designs are usually NOT unique, and all of "
+                              "them are characterised",
+    "boundary_to_defend": "optimal discrimination design, profiling out a nuisance, "
+                          "and the primal/dual certificate machinery are ALL prior and "
+                          "cannot be the novelty.  What is left is the PRICE law: at "
+                          "what price does a calibration query become mandatory, and "
+                          "what is the exact rate once it is bought.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+  {
+    "paper": "MASTER (sufficiency)",
+    "our_result": "hidden-shift witness: a group with no calibration query leaves the "
+                  "answer unidentifiable (Gamma = 0), certified in exact rationals",
+    "our_guarantee_type": "a single exact witness, plus the price of removing it",
+    "prior": "Bennouna et al., data informativeness / what data enables optimal "
+             "decisions (linear optimisation under uncertainty)",
+    "prior_url": ["https://arxiv.org/abs/2505.21692",
+                  "https://arxiv.org/abs/2602.15365"],
+    "prior_characterisation": "a decision-focused notion of data sufficiency with an "
+                              "EXACT GEOMETRIC CHARACTERISATION -- a data set is "
+                              "sufficient iff, with prior knowledge, it captures every "
+                              "cost direction that can change the optimal solution -- "
+                              "plus a tractable algorithm for MINIMAL sufficient data",
+    "boundary_to_defend": "the sufficiency half of our witness is exactly the kind of "
+                          "statement this prior characterises in general.  MASTER must "
+                          "therefore claim the PRICE and the RATE, not the "
+                          "identifiability fact.",
+    "verified_level": "abstract", "theorem_level_verified": False,
+  },
+]
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    out = {
+        "gate": "G03",
+        "date": "2026-09-15",
+        "rule": "verified_level records HOW FAR the prior was read.  Every row here is "
+                "'abstract', and theorem_level_verified is False for all of them.  An "
+                "abstract cannot settle a theorem-level comparison, and not finding an "
+                "overlap is not evidence of novelty.",
+        "what_this_changes": "the previous G03 had six prior columns with "
+                             "verified=false and NO source.  Each row now carries a "
+                             "URL and the characterisation actually read, and states "
+                             "the boundary the manuscript has to defend.",
+        "still_required_before_submission": [
+            "read the cited THEOREM of each prior and compare clause by clause: input, "
+            "output, objective, additive vs multiplicative, exact vs epsilon, Bayesian "
+            "vs minimax, static vs adaptive",
+            "for Structural, check whether the signed cancellation family is or is not "
+            "'accountable' in the prior's sense -- citing non-submodularity is not "
+            "enough",
+            "for Support, state which of DRD/HEC's guarantees our law does NOT give "
+            "(no policy approximation guarantee is claimed)",
+            "for Query, state the admissible-measurement constraint explicitly; "
+            "without it the h^{-4} exponent alone sits inside Ho-Nguyen",
+        ],
+        "rows": ROWS,
+    }
+    path = OUT / "G03_prior_comparison.json"
+    path.write_text(json.dumps(out, indent=1) + "\n")
+    for r in ROWS:
+        print(f"[{r['paper']:22s}] prior read at level '{r['verified_level']}', "
+              f"theorem_level_verified={r['theorem_level_verified']}")
+        print(f"    prior : {r['prior_characterisation'][:110]}...")
+        print(f"    defend: {r['boundary_to_defend'][:110]}...")
+    print(f"\nartifact: {path}")
+
+
+if __name__ == "__main__":
+    main()

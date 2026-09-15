@@ -1,0 +1,2474 @@
+{
+  "witness": {
+    "matrix": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "D": 4,
+    "OPT_by_budget": [
+      "1/4",
+      "0",
+      "0",
+      "1/4",
+      "0"
+    ],
+    "eta": "1/4"
+  },
+  "fractional_path": {
+    "x_k": [
+      [
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      [
+        "0",
+        "1",
+        "0",
+        "0"
+      ],
+      [
+        "1/3",
+        "1",
+        "1/3",
+        "1/3"
+      ],
+      [
+        "2/3",
+        "1",
+        "2/3",
+        "2/3"
+      ],
+      [
+        "1",
+        "1",
+        "1",
+        "1"
+      ]
+    ],
+    "L_of_x_k": [
+      "1/4",
+      "0",
+      "0",
+      "0",
+      "0"
+    ],
+    "status": "EXACT: monotone, cardinality k, and L(x^k) = 0 for k >= 1, so the path meets or beats every integer optimum"
+  },
+  "integral_minimax": {
+    "value": "1/4",
+    "argmin_rankings": [
+      [
+        1,
+        0,
+        2,
+        3
+      ],
+      [
+        1,
+        0,
+        3,
+        2
+      ],
+      [
+        1,
+        2,
+        0,
+        3
+      ],
+      [
+        1,
+        2,
+        3,
+        0
+      ],
+      [
+        1,
+        3,
+        0,
+        2
+      ],
+      [
+        1,
+        3,
+        2,
+        0
+      ],
+      [
+        2,
+        1,
+        0,
+        3
+      ],
+      [
+        2,
+        1,
+        3,
+        0
+      ],
+      [
+        2,
+        3,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        1,
+        0
+      ],
+      [
+        3,
+        1,
+        0,
+        2
+      ],
+      [
+        3,
+        1,
+        2,
+        0
+      ],
+      [
+        3,
+        2,
+        0,
+        1
+      ],
+      [
+        3,
+        2,
+        1,
+        0
+      ]
+    ],
+    "min_over_pi_of_g1_plus_g2": "1/4",
+    "status": "EXACT (all 4! = 24 rankings enumerated)"
+  },
+  "randomized_minimax": {
+    "value": "1/8",
+    "primal_certificate": {
+      "(1,0,2,3)": "1/2",
+      "(2,3,0,1)": "1/2",
+      "E_g_by_budget": [
+        "0",
+        "1/8",
+        "1/8",
+        "0",
+        "0"
+      ]
+    },
+    "dual_certificate": "g_1(pi) + g_2(pi) >= 1/4 for every one of the 24 rankings; averaging gives max_k E g_k >= 1/8",
+    "float_LP_cross_check": 0.125,
+    "status": "EXACT (rational primal and rational dual agree; the float LP is only a cross-check and raises if it fails)",
+    "gap_factor_vs_integral": "2"
+  },
+  "marginal_matching": {
+    "x1": [
+      "0",
+      "1",
+      "0",
+      "0"
+    ],
+    "forced_first_component": 1,
+    "min_L_S2_over_admissible_rankings": "1/4",
+    "L_of_x2": "0",
+    "ROUNDGAP": "1/4",
+    "float_LP_value": 0.25,
+    "status": "EXACT: every distribution matching the path's budget-1 marginal must place row 1 first, so at budget 2 EVERY realization has loss 1/4 while the fractional residual has loss 0.  Randomization halves the gap only when the marginals are FREE (1/8); matching them costs the full 1/4.",
+    "mechanism": "osc(E Z) <= E osc(Z) with STRICT inequality: the relaxation cancels across realizations that never co-occur"
+  },
+  "jensen_strict": {
+    "admissible_budget_2_sets": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "residual_vectors": [
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        1
+      ],
+      [
+        1,
+        1,
+        0
+      ]
+    ],
+    "mean_residual_equals_fractional_residual": [
+      "2/3",
+      "2/3",
+      "2/3"
+    ],
+    "osc_of_mean": "0",
+    "mean_of_osc": "1",
+    "status": "EXACT strict inequality osc(E Z) < E osc(Z): the mean of the three admissible realizations is exactly the fractional residual and is perfectly balanced, while every single realization has oscillation 1"
+  },
+  "open_question_roundgap": {
+    "quantity": "ROUNDGAP = min over P on permutations MATCHING the path's marginals of max_k [E_P L(S_k) - L(x^k)]",
+    "conjecture": "ROUNDGAP <= C sqrt(eta log(m d))",
+    "status": "NUMERICAL EVIDENCE ONLY -- neither branch (a) nor (b) closed",
+    "exact_LP_cells": [
+      {
+        "family": "split witness N=1",
+        "m": 4,
+        "d": 3,
+        "eta": "1/4",
+        "ROUNDGAP": 0.08333333333333333,
+        "sqrt_eta_log_md": 0.7881793339380322
+      },
+      {
+        "family": "split witness N=2",
+        "m": 8,
+        "d": 3,
+        "eta": "1/8",
+        "ROUNDGAP": null,
+        "sqrt_eta_log_md": 0.6302830545028901
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "1/3",
+        "ROUNDGAP": 0.2222222222222222,
+        "sqrt_eta_log_md": 0.9101111012376457,
+        "ratio": 0.24417043360972712,
+        "matrix": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            -2,
+            0
+          ],
+          [
+            0,
+            1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "1/4",
+        "ROUNDGAP": 0.16666666666666674,
+        "sqrt_eta_log_md": 0.85005466852082,
+        "ratio": 0.19606582122145552,
+        "matrix": [
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            1,
+            -1
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            1,
+            -2
+          ],
+          [
+            0,
+            0,
+            -2
+          ],
+          [
+            0,
+            1,
+            1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "9/19",
+        "ROUNDGAP": 0.16541353383458646,
+        "sqrt_eta_log_md": 1.170095493652806,
+        "ratio": 0.14136755053914293,
+        "matrix": [
+          [
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            2,
+            2
+          ],
+          [
+            0,
+            2,
+            -2
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            9,
+            9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "6/13",
+        "ROUNDGAP": 0.23076923076923078,
+        "sqrt_eta_log_md": 1.0709248303265018,
+        "ratio": 0.21548592789549406,
+        "matrix": [
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            1,
+            -1
+          ],
+          [
+            0,
+            0,
+            -2
+          ],
+          [
+            0,
+            -3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "27/29",
+        "ROUNDGAP": 0.041603721948549534,
+        "sqrt_eta_log_md": 1.5210304985071232,
+        "ratio": 0.02735232593257215,
+        "matrix": [
+          [
+            0,
+            -1,
+            0
+          ],
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            -27,
+            27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "3/5",
+        "ROUNDGAP": 0.09195326278659613,
+        "sqrt_eta_log_md": 1.380880986257964,
+        "ratio": 0.0665902881578371,
+        "matrix": [
+          [
+            0,
+            2,
+            -2,
+            2
+          ],
+          [
+            0,
+            -2,
+            2,
+            -1
+          ],
+          [
+            0,
+            -2,
+            2,
+            -2
+          ],
+          [
+            0,
+            1,
+            1,
+            2
+          ],
+          [
+            0,
+            2,
+            2,
+            -2
+          ],
+          [
+            0,
+            -27,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "9/20",
+        "ROUNDGAP": 0.04545436507936508,
+        "sqrt_eta_log_md": 1.1610682680614848,
+        "ratio": 0.03914874459126811,
+        "matrix": [
+          [
+            0,
+            -2,
+            -1,
+            1
+          ],
+          [
+            0,
+            -2,
+            0,
+            0
+          ],
+          [
+            0,
+            -2,
+            0,
+            -2
+          ],
+          [
+            0,
+            -2,
+            2,
+            -1
+          ],
+          [
+            0,
+            -9,
+            -9,
+            -9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "27/35",
+        "ROUNDGAP": 0.10541836734693885,
+        "sqrt_eta_log_md": 1.3845316850759735,
+        "ratio": 0.07614009017146778,
+        "matrix": [
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "18/23",
+        "ROUNDGAP": 0.014492753623188406,
+        "sqrt_eta_log_md": 1.5770772215972815,
+        "ratio": 0.009189628399115411,
+        "matrix": [
+          [
+            0,
+            -2,
+            0,
+            2
+          ],
+          [
+            0,
+            2,
+            0,
+            2
+          ],
+          [
+            0,
+            2,
+            2,
+            1
+          ],
+          [
+            0,
+            -2,
+            -1,
+            2
+          ],
+          [
+            0,
+            -1,
+            -1,
+            2
+          ],
+          [
+            0,
+            27,
+            -27,
+            27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "6/7",
+        "ROUNDGAP": 0.01993008314436886,
+        "sqrt_eta_log_md": 1.6024264476690138,
+        "ratio": 0.012437440216591758,
+        "matrix": [
+          [
+            0,
+            0,
+            -1,
+            -2
+          ],
+          [
+            0,
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            1,
+            2,
+            -1
+          ],
+          [
+            0,
+            -2,
+            -1,
+            -2
+          ],
+          [
+            0,
+            27,
+            27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "6/7",
+        "ROUNDGAP": 0.0373469387755102,
+        "sqrt_eta_log_md": 1.5415915863362348,
+        "ratio": 0.024226221203158864,
+        "matrix": [
+          [
+            0,
+            -1,
+            2,
+            0
+          ],
+          [
+            0,
+            -2,
+            0,
+            2
+          ],
+          [
+            0,
+            1,
+            -1,
+            0
+          ],
+          [
+            0,
+            -27,
+            27,
+            27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "1/3",
+        "ROUNDGAP": 0.2275132275132275,
+        "sqrt_eta_log_md": 1.0292479180365868,
+        "ratio": 0.22104803276866095,
+        "matrix": [
+          [
+            0,
+            -2,
+            -1,
+            -1
+          ],
+          [
+            0,
+            1,
+            1,
+            -1
+          ],
+          [
+            0,
+            0,
+            2,
+            -1
+          ],
+          [
+            0,
+            2,
+            2,
+            -1
+          ],
+          [
+            0,
+            2,
+            2,
+            1
+          ],
+          [
+            0,
+            -3,
+            -3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "3/8",
+        "ROUNDGAP": 0.13586061507936506,
+        "sqrt_eta_log_md": 1.059905468701217,
+        "ratio": 0.1281818228995888,
+        "matrix": [
+          [
+            0,
+            1,
+            2,
+            -2
+          ],
+          [
+            0,
+            1,
+            1,
+            1
+          ],
+          [
+            0,
+            2,
+            -1,
+            1
+          ],
+          [
+            0,
+            -2,
+            0,
+            -1
+          ],
+          [
+            0,
+            -3,
+            3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "54/67",
+        "ROUNDGAP": 0.029850746268656716,
+        "sqrt_eta_log_md": 1.6004426012768862,
+        "ratio": 0.018651556916093586,
+        "matrix": [
+          [
+            0,
+            2,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            -1,
+            2
+          ],
+          [
+            0,
+            2,
+            1,
+            0
+          ],
+          [
+            0,
+            -2,
+            2,
+            1
+          ],
+          [
+            0,
+            1,
+            0,
+            2
+          ],
+          [
+            0,
+            -27,
+            27,
+            27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "2/3",
+        "ROUNDGAP": 0.037037037037037035,
+        "sqrt_eta_log_md": 1.388133460897802,
+        "ratio": 0.02668117877735086,
+        "matrix": [
+          [
+            0,
+            -2,
+            -2
+          ],
+          [
+            0,
+            -1,
+            0
+          ],
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            0,
+            2
+          ],
+          [
+            0,
+            -1,
+            1
+          ],
+          [
+            0,
+            -9,
+            9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 3,
+        "eta": "9/17",
+        "ROUNDGAP": 0.058823529411764705,
+        "sqrt_eta_log_md": 1.197361113397976,
+        "ratio": 0.04912764307572187,
+        "matrix": [
+          [
+            0,
+            -1,
+            -2
+          ],
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            -1,
+            1
+          ],
+          [
+            0,
+            -9,
+            -9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "3/10",
+        "ROUNDGAP": 0.13888492063492064,
+        "sqrt_eta_log_md": 0.9764303093945741,
+        "ratio": 0.14223741243861515,
+        "matrix": [
+          [
+            0,
+            2,
+            1,
+            -2
+          ],
+          [
+            0,
+            1,
+            0,
+            -1
+          ],
+          [
+            0,
+            1,
+            0,
+            1
+          ],
+          [
+            0,
+            -1,
+            -1,
+            2
+          ],
+          [
+            0,
+            -2,
+            2,
+            1
+          ],
+          [
+            0,
+            -3,
+            -3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "9/13",
+        "ROUNDGAP": 0.05128205128205129,
+        "sqrt_eta_log_md": 1.4145764742920128,
+        "ratio": 0.03625258316820068,
+        "matrix": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            -2
+          ],
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            -2,
+            1
+          ],
+          [
+            0,
+            -2,
+            0
+          ],
+          [
+            0,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "4/13",
+        "ROUNDGAP": 0.10256410256410256,
+        "sqrt_eta_log_md": 0.9888694135375697,
+        "ratio": 0.10371855086223261,
+        "matrix": [
+          [
+            0,
+            -1,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            -2,
+            2,
+            1
+          ],
+          [
+            0,
+            0,
+            -2,
+            -2
+          ],
+          [
+            0,
+            -2,
+            -2,
+            -1
+          ],
+          [
+            0,
+            -1,
+            -1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "2/7",
+        "ROUNDGAP": 0.21428571428571427,
+        "sqrt_eta_log_md": 0.8900383173516875,
+        "ratio": 0.24076009999583192,
+        "matrix": [
+          [
+            0,
+            -1,
+            -2,
+            0
+          ],
+          [
+            0,
+            -1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            2
+          ],
+          [
+            0,
+            1,
+            -1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "3/7",
+        "ROUNDGAP": 0.050422335600907024,
+        "sqrt_eta_log_md": 1.0900698645184788,
+        "ratio": 0.04625605866389151,
+        "matrix": [
+          [
+            0,
+            2,
+            -1,
+            -1
+          ],
+          [
+            0,
+            1,
+            0,
+            -2
+          ],
+          [
+            0,
+            -1,
+            -2,
+            -1
+          ],
+          [
+            0,
+            3,
+            3,
+            -3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 3,
+        "eta": "3/4",
+        "ROUNDGAP": 0.034722222222222224,
+        "sqrt_eta_log_md": 1.4251447824086707,
+        "ratio": 0.024363996311685173,
+        "matrix": [
+          [
+            0,
+            -2,
+            -1
+          ],
+          [
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            -1,
+            -2
+          ],
+          [
+            0,
+            -2,
+            0
+          ],
+          [
+            0,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "1/3",
+        "ROUNDGAP": 0.1777777777777778,
+        "sqrt_eta_log_md": 0.9613512577339219,
+        "ratio": 0.18492489227801298,
+        "matrix": [
+          [
+            0,
+            -2,
+            0,
+            -2
+          ],
+          [
+            0,
+            -1,
+            0,
+            1
+          ],
+          [
+            0,
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            -1,
+            1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "3/5",
+        "ROUNDGAP": 0.05,
+        "sqrt_eta_log_md": 1.2210421736667412,
+        "ratio": 0.0409486265735212,
+        "matrix": [
+          [
+            0,
+            -2,
+            0
+          ],
+          [
+            0,
+            -1,
+            -1
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            -3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "2/5",
+        "ROUNDGAP": 0.24000000000000002,
+        "sqrt_eta_log_md": 1.0752435552740904,
+        "ratio": 0.22320524389362334,
+        "matrix": [
+          [
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            2,
+            -2
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            -1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "1/2",
+        "ROUNDGAP": 0.2777777777777778,
+        "sqrt_eta_log_md": 1.2605661090057803,
+        "ratio": 0.22035954782003747,
+        "matrix": [
+          [
+            0,
+            -2,
+            2,
+            2
+          ],
+          [
+            0,
+            2,
+            -2,
+            1
+          ],
+          [
+            0,
+            1,
+            -1,
+            0
+          ],
+          [
+            0,
+            2,
+            -2,
+            -1
+          ],
+          [
+            0,
+            0,
+            -2,
+            2
+          ],
+          [
+            0,
+            -9,
+            9,
+            -9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "3/5",
+        "ROUNDGAP": 0.07281084656084655,
+        "sqrt_eta_log_md": 1.3406861542256616,
+        "ratio": 0.05430864362353307,
+        "matrix": [
+          [
+            0,
+            -2,
+            2,
+            -2
+          ],
+          [
+            0,
+            2,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            -1,
+            -2
+          ],
+          [
+            0,
+            -2,
+            -1,
+            2
+          ],
+          [
+            0,
+            -9,
+            -9,
+            9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "6/17",
+        "ROUNDGAP": 0.2309368191721133,
+        "sqrt_eta_log_md": 1.0282593413235086,
+        "ratio": 0.22459005222832837,
+        "matrix": [
+          [
+            0,
+            2,
+            -1,
+            2
+          ],
+          [
+            0,
+            -2,
+            -2,
+            -2
+          ],
+          [
+            0,
+            -2,
+            0,
+            2
+          ],
+          [
+            0,
+            2,
+            1,
+            0
+          ],
+          [
+            0,
+            3,
+            3,
+            -3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 3,
+        "eta": "4/9",
+        "ROUNDGAP": 0.16666666666666666,
+        "sqrt_eta_log_md": 1.050905778584043,
+        "ratio": 0.15859334876931405,
+        "matrix": [
+          [
+            0,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            -2,
+            2
+          ],
+          [
+            0,
+            -1,
+            1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "2/5",
+        "ROUNDGAP": 0.1,
+        "sqrt_eta_log_md": 1.0531075390936637,
+        "ratio": 0.09495706401082556,
+        "matrix": [
+          [
+            0,
+            0,
+            -2,
+            -1
+          ],
+          [
+            0,
+            2,
+            0,
+            1
+          ],
+          [
+            0,
+            2,
+            -2,
+            2
+          ],
+          [
+            0,
+            -1,
+            1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "6/7",
+        "ROUNDGAP": 0.023809523809523808,
+        "sqrt_eta_log_md": 1.5415915863362348,
+        "ratio": 0.0154447676158572,
+        "matrix": [
+          [
+            0,
+            -2,
+            2,
+            2
+          ],
+          [
+            0,
+            -1,
+            1,
+            0
+          ],
+          [
+            0,
+            1,
+            -1,
+            2
+          ],
+          [
+            0,
+            -27,
+            27,
+            27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "27/41",
+        "ROUNDGAP": 0.06560104529616721,
+        "sqrt_eta_log_md": 1.3796432683425235,
+        "ratio": 0.047549280891269106,
+        "matrix": [
+          [
+            0,
+            -2,
+            2
+          ],
+          [
+            0,
+            1,
+            -1
+          ],
+          [
+            0,
+            -2,
+            2
+          ],
+          [
+            0,
+            -2,
+            -2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "1/4",
+        "ROUNDGAP": 0.16175843253968258,
+        "sqrt_eta_log_md": 0.891354843811928,
+        "ratio": 0.18147478937559117,
+        "matrix": [
+          [
+            0,
+            2,
+            -2,
+            -1
+          ],
+          [
+            0,
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            -2,
+            -1,
+            1
+          ],
+          [
+            0,
+            1,
+            -1,
+            2
+          ],
+          [
+            0,
+            -2,
+            0,
+            -2
+          ],
+          [
+            0,
+            -1,
+            -1,
+            1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 4,
+        "d": 4,
+        "eta": "3/7",
+        "ROUNDGAP": 0.3177239229024943,
+        "sqrt_eta_log_md": 1.0900698645184788,
+        "ratio": 0.29147115542254154,
+        "matrix": [
+          [
+            0,
+            2,
+            2,
+            -1
+          ],
+          [
+            0,
+            0,
+            -1,
+            -2
+          ],
+          [
+            0,
+            1,
+            -2,
+            0
+          ],
+          [
+            0,
+            -3,
+            3,
+            3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 5,
+        "d": 4,
+        "eta": "3/4",
+        "ROUNDGAP": 0.10461640211640211,
+        "sqrt_eta_log_md": 1.498932688670673,
+        "ratio": 0.06979392931191664,
+        "matrix": [
+          [
+            0,
+            2,
+            2,
+            -1
+          ],
+          [
+            0,
+            1,
+            2,
+            2
+          ],
+          [
+            0,
+            -1,
+            1,
+            1
+          ],
+          [
+            0,
+            -2,
+            -1,
+            -1
+          ],
+          [
+            0,
+            -27,
+            -27,
+            -27
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "2/7",
+        "ROUNDGAP": 0.10714285714285714,
+        "sqrt_eta_log_md": 0.9528984101673237,
+        "ratio": 0.11243890849187527,
+        "matrix": [
+          [
+            0,
+            0,
+            1,
+            1
+          ],
+          [
+            0,
+            -2,
+            -1,
+            0
+          ],
+          [
+            0,
+            -2,
+            -1,
+            2
+          ],
+          [
+            0,
+            -1,
+            0,
+            1
+          ],
+          [
+            0,
+            2,
+            -1,
+            0
+          ],
+          [
+            0,
+            -1,
+            -1,
+            1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 3,
+        "eta": "1/5",
+        "ROUNDGAP": 0.1,
+        "sqrt_eta_log_md": 0.7603120093614416,
+        "ratio": 0.13152495129464858,
+        "matrix": [
+          [
+            0,
+            0,
+            1
+          ],
+          [
+            0,
+            1,
+            -1
+          ],
+          [
+            0,
+            0,
+            -2
+          ],
+          [
+            0,
+            0,
+            -1
+          ],
+          [
+            0,
+            2,
+            2
+          ],
+          [
+            0,
+            1,
+            -1
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "1/3",
+        "ROUNDGAP": 0.1166666666666667,
+        "sqrt_eta_log_md": 1.0292479180365868,
+        "ratio": 0.11335137494299943,
+        "matrix": [
+          [
+            0,
+            0,
+            -2,
+            -1
+          ],
+          [
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            2,
+            -2,
+            -2
+          ],
+          [
+            0,
+            -1,
+            2,
+            -1
+          ],
+          [
+            0,
+            -3,
+            3,
+            -3
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "9/22",
+        "ROUNDGAP": 0.13222943722943722,
+        "sqrt_eta_log_md": 1.1402249473664778,
+        "ratio": 0.11596785137427587,
+        "matrix": [
+          [
+            0,
+            -1,
+            -1,
+            0
+          ],
+          [
+            0,
+            0,
+            -1,
+            2
+          ],
+          [
+            0,
+            -2,
+            2,
+            2
+          ],
+          [
+            0,
+            -2,
+            -2,
+            -2
+          ],
+          [
+            0,
+            -1,
+            -1,
+            2
+          ],
+          [
+            0,
+            -9,
+            -9,
+            -9
+          ]
+        ]
+      },
+      {
+        "family": "random",
+        "m": 6,
+        "d": 4,
+        "eta": "1/3",
+        "ROUNDGAP": 0.16666666666666666,
+        "sqrt_eta_log_md": 1.0292479180365868,
+        "ratio": 0.16193053563285628,
+        "matrix": [
+          [
+            0,
+            -2,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            2,
+            1
+          ],
+          [
+            0,
+            -2,
+            2,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            -1,
+            -1,
+            1
+          ],
+          [
+            0,
+            1,
+            1,
+            -1
+          ]
+        ]
+      }
+    ],
+    "exact_LP_limitation": "m <= 6 is forced by the m! LP, and eta >= 1/m always, so the exact LP can never reach eta < 1/6",
+    "max_ratio_ROUNDGAP_over_sqrt_eta_log_md": 0.29147115542254154,
+    "support_lower_bound_cells": [
+      {
+        "family": "witness (hand path)",
+        "m": 4,
+        "eta": "1/4",
+        "lower_bound": "1/4",
+        "skipped_budgets": []
+      },
+      {
+        "family": "split witness N=1 (transported path)",
+        "m": 4,
+        "d": 3,
+        "eta": "1/4",
+        "lower_bound": "1/4",
+        "skipped_budgets": []
+      },
+      {
+        "family": "split witness N=2 (transported path)",
+        "m": 8,
+        "d": 3,
+        "eta": "1/8",
+        "lower_bound": "1/8",
+        "skipped_budgets": []
+      },
+      {
+        "family": "split witness N=3 (transported path)",
+        "m": 12,
+        "d": 3,
+        "eta": "1/12",
+        "lower_bound": "1/12",
+        "skipped_budgets": []
+      },
+      {
+        "family": "split witness N=4 (transported path)",
+        "m": 16,
+        "d": 3,
+        "eta": "1/16",
+        "lower_bound": "1/16",
+        "skipped_budgets": []
+      },
+      {
+        "family": "split witness N=6 (transported path)",
+        "m": 24,
+        "d": 3,
+        "eta": "1/24",
+        "lower_bound": "1/24",
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/16",
+        "ratio_vs_sqrt_eta_log_md": 0.08984670396140876,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/8",
+        "lower_bound": "1/16",
+        "ratio_vs_sqrt_eta_log_md": 0.09338350250372512,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12543085354969982,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/6",
+        "ratio_vs_sqrt_eta_log_md": 0.22900435965432508,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/17",
+        "lower_bound": "1/85",
+        "ratio_vs_sqrt_eta_log_md": 0.01743282120218772,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/6",
+        "lower_bound": "1/24",
+        "ratio_vs_sqrt_eta_log_md": 0.054823486468106655,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/11",
+        "lower_bound": "1/11",
+        "ratio_vs_sqrt_eta_log_md": 0.15927543703672112,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/6",
+        "ratio_vs_sqrt_eta_log_md": 0.22900435965432508,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12543085354969982,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "2/17",
+        "lower_bound": "2/17",
+        "ratio_vs_sqrt_eta_log_md": 0.18119060918258353,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "2/13",
+        "ratio_vs_sqrt_eta_log_md": 0.20421897398543584,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12011224087864499,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/15",
+        "lower_bound": "13/360",
+        "ratio_vs_sqrt_eta_log_md": 0.051490161201281665,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "2/11",
+        "lower_bound": "1/33",
+        "ratio_vs_sqrt_eta_log_md": 0.038534656040211446,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/19",
+        "lower_bound": "3/95",
+        "ratio_vs_sqrt_eta_log_md": 0.04946939406037848,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "1/8",
+        "lower_bound": "1/16",
+        "ratio_vs_sqrt_eta_log_md": 0.09585374663308778,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/6",
+        "lower_bound": "1/15",
+        "ratio_vs_sqrt_eta_log_md": 0.08771757834897066,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/8",
+        "lower_bound": "1/8",
+        "ratio_vs_sqrt_eta_log_md": 0.1983235930380337,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/19",
+        "lower_bound": "0",
+        "ratio_vs_sqrt_eta_log_md": 0.0,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/32",
+        "ratio_vs_sqrt_eta_log_md": 0.04492335198070438,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/6",
+        "lower_bound": "1/12",
+        "ratio_vs_sqrt_eta_log_md": 0.10964697293621331,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "1/7",
+        "lower_bound": "1/7",
+        "ratio_vs_sqrt_eta_log_md": 0.19679032739071617,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "17/130",
+        "ratio_vs_sqrt_eta_log_md": 0.17358612788762046,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "1/7",
+        "lower_bound": "0",
+        "ratio_vs_sqrt_eta_log_md": 0.0,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/12",
+        "ratio_vs_sqrt_eta_log_md": 0.11450217982716254,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/8",
+        "ratio_vs_sqrt_eta_log_md": 0.18408049553178385,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "2/11",
+        "lower_bound": "6/77",
+        "ratio_vs_sqrt_eta_log_md": 0.0981621670184941,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/16",
+        "ratio_vs_sqrt_eta_log_md": 0.08984670396140876,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/7",
+        "lower_bound": "0",
+        "ratio_vs_sqrt_eta_log_md": 0.0,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "1/13",
+        "ratio_vs_sqrt_eta_log_md": 0.10210948699271792,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/15",
+        "lower_bound": "2/15",
+        "ratio_vs_sqrt_eta_log_md": 0.19011751828165538,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/24",
+        "ratio_vs_sqrt_eta_log_md": 0.0539149903083958,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12124646464850142,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "2/11",
+        "lower_bound": "1/11",
+        "ratio_vs_sqrt_eta_log_md": 0.11262474160511649,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12011224087864499,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "1/7",
+        "lower_bound": "1/28",
+        "ratio_vs_sqrt_eta_log_md": 0.04802508336492809,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/8",
+        "ratio_vs_sqrt_eta_log_md": 0.18408049553178385,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/6",
+        "lower_bound": "1/12",
+        "ratio_vs_sqrt_eta_log_md": 0.10964697293621331,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "2/13",
+        "ratio_vs_sqrt_eta_log_md": 0.21069080815910632,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "2/13",
+        "lower_bound": "1/52",
+        "ratio_vs_sqrt_eta_log_md": 0.025899923581507753,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "1/7",
+        "lower_bound": "0",
+        "ratio_vs_sqrt_eta_log_md": 0.0,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/17",
+        "lower_bound": "3/34",
+        "ratio_vs_sqrt_eta_log_md": 0.1307461590164079,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "2/13",
+        "lower_bound": "2/13",
+        "ratio_vs_sqrt_eta_log_md": 0.2126803682651888,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "2/13",
+        "ratio_vs_sqrt_eta_log_md": 0.21069080815910632,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/15",
+        "lower_bound": "1/15",
+        "ratio_vs_sqrt_eta_log_md": 0.09279327684111041,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/17",
+        "lower_bound": "1/34",
+        "ratio_vs_sqrt_eta_log_md": 0.043582053005469294,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/8",
+        "lower_bound": "1/24",
+        "ratio_vs_sqrt_eta_log_md": 0.06225566833581675,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/24",
+        "ratio_vs_sqrt_eta_log_md": 0.0539149903083958,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 3,
+        "eta": "1/7",
+        "lower_bound": "1/28",
+        "ratio_vs_sqrt_eta_log_md": 0.04991558170655515,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "2/11",
+        "lower_bound": "3/44",
+        "ratio_vs_sqrt_eta_log_md": 0.08670297609047574,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "1/8",
+        "lower_bound": "1/16",
+        "ratio_vs_sqrt_eta_log_md": 0.09204024776589192,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 4,
+        "eta": "2/13",
+        "lower_bound": "1/13",
+        "ratio_vs_sqrt_eta_log_md": 0.10210948699271792,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "2/11",
+        "lower_bound": "1/11",
+        "ratio_vs_sqrt_eta_log_md": 0.11560396812063432,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 12,
+        "d": 4,
+        "eta": "2/17",
+        "lower_bound": "1/17",
+        "ratio_vs_sqrt_eta_log_md": 0.08716410601093859,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 10,
+        "d": 3,
+        "eta": "1/6",
+        "lower_bound": "1/12",
+        "ratio_vs_sqrt_eta_log_md": 0.11068237284289484,
+        "skipped_budgets": []
+      },
+      {
+        "family": "random small-eta",
+        "m": 8,
+        "d": 4,
+        "eta": "1/5",
+        "lower_bound": "1/10",
+        "ratio_vs_sqrt_eta_log_md": 0.12011224087864499,
+        "skipped_budgets": []
+      }
+    ],
+    "best_small_eta_lower_bound": {
+      "family": "random small-eta",
+      "m": 8,
+      "d": 3,
+      "eta": "1/6",
+      "lower_bound": "1/6",
+      "ratio_vs_sqrt_eta_log_md": 0.22900435965432508,
+      "skipped_budgets": [],
+      "matrix": [
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ],
+        [
+          0,
+          1,
+          -1
+        ],
+        [
+          0,
+          1,
+          -1
+        ],
+        [
+          0,
+          -1,
+          1
+        ],
+        [
+          0,
+          -1,
+          0
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          0,
+          -1,
+          1
+        ]
+      ]
+    },
+    "not_done": "no rounding algorithm with a PROVED guarantee was built (branch (a) open); no family with eta -> 0 and non-vanishing ROUNDGAP was found (branch (b) open); the support lower bound is only a lower bound, so a small value of it does NOT prove ROUNDGAP is small"
+  },
+  "source_sha256": "0673622e6930299fe37d4ce00c03e26fbc154c06ebb792e91d8db6eda676ca75",
+  "wall_seconds": 20.5
+}

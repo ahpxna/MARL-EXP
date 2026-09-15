@@ -1,0 +1,88 @@
+{
+  "generated_utc": "2026-09-15T01:42:55Z",
+  "batch": "six per-paper packages, batch 2",
+  "packages": [
+    {
+      "paper": "D6",
+      "question": "phase law of the full-game optimum as q -> infinity",
+      "script": "scripts/P1_d6_phase_law.py",
+      "artifact": "research/worker_P1_d6_phase_20260914/P1_d6_phase_law.json",
+      "lean": null,
+      "headline": "primal converges uniformly at rate C/q in certified rational intervals (q*sup|e| bounded and decreasing, inside the derived C at every sampled eta); max/limit exchange verified; t_end = g^2/(4 mu^2 log2) + 1/(2 log2) reproduced to 3e-7.  BUT the binding dual orbit is ALWAYS (s,t,b) = (2,0,0), its slack decays like 1/q (q*slack converges), and it CHANGES SIGN: T_c(1/4) in (1.5, 2] against t_end = 3.967, T_c(2/5) in (0.75, 1] against t_end = 1.533.  So the scalar+pair certificate has a boundary strictly BELOW t_end, and t_end is NOT the phase boundary of the full game.",
+      "status": "NUMERICAL EVIDENCE (certified rational intervals for the primal and the charges; grid sup over eta)"
+    },
+    {
+      "paper": "Support",
+      "question": "error exponent of safe decision vs full recovery",
+      "script": "scripts/P2_support_exponent_law.py",
+      "artifact": "research/worker_P2_support_20260914/P2_support_exponent_law.json",
+      "lean": "work/p13_conjectures/LeanSupportRecoverySandwichV1.lean",
+      "headline": "two finite-N two-sided brackets pin BOTH prefactors; exponents -log(1-sum p) vs -log(1-min p) follow from the brackets, not from a fitted slope; sample-complexity ratio grows like log(1-p_min)/log(1-s)",
+      "status": "PROVED (pointwise loss sandwich, Lean, 8 audits) + NUMERICAL EVIDENCE (brackets verified on 4 configurations x 8 values of N)"
+    },
+    {
+      "paper": "Structural",
+      "question": "does the average/execution gap grow with b?",
+      "script": "scripts/P3_avg_path_amplification.py",
+      "artifact": "research/worker_P3_structural_20260914/P3_avg_path_amplification.json",
+      "lean": "work/p13_conjectures/LeanStructuralAvgPathGapV1.lean",
+      "headline": "YES, linearly, and it SATURATES the universal bound: an explicit family g_m = (-3, -1^ceil((m-2)/2), +1^floor((m-2)/2), 3) has eps_nest = 2/(m+4), V_avg = 2/((m+4)(m-1)), ratio = m-1 = b exactly, for m = 5..14; exhaustive search shows b is also the best ratio at every m <= 7; concatenation does NOT amplify",
+      "status": "PROVED (the two bounds and the saturation lemma, Lean, 6 audits) + exact rational computation of the family"
+    },
+    {
+      "paper": "Functional",
+      "question": "when does setup cost change the design topology?",
+      "script": "scripts/P4_functional_measurement_topology.py",
+      "artifact": "research/worker_P4_functional_20260914/P4_functional_topology.json",
+      "lean": null,
+      "headline": "the brief's Gamma_complete and Gamma_star are UNIFORM-allocation values, not the sup over w: the true Gamma of the complete graph is 2-sqrt3 at K=3 and 3/16 at K=4, and the star at the TOP arm reaches the brief's Gamma_complete with K-1 edges; the frontier over T/kappa has 2 regimes at K=3 and 3 at K=4; the fully optimised SYMMETRIC baseline is never beaten (gain 0.000%); realising a contrast as two scalar reads DOES change the winner to cells",
+      "status": "NUMERICAL EVIDENCE (convex solver, floating point; supports read at a tolerance)"
+    },
+    {
+      "paper": "Query",
+      "question": "how far does the h^4 law survive measurement error?",
+      "script": "scripts/P5_query_h4_robustness.py",
+      "artifact": "research/worker_P5_query_20260914/P5_query_h4_robustness.json",
+      "lean": null,
+      "headline": "all three regimes confirmed: KL/h^4 -> (1/2)||lambda A + B||^2 for eps = lambda h at 6 values of lambda, KL ~ (1/2)||A||^2 h^2 eps^2 for h << eps, and the Gram determinant is 5.87e-8 > 0 so the worst-case coefficient inf_lambda is 7.335e-5 > 0",
+      "status": "NUMERICAL EVIDENCE (exact rational construction; float64 quadrature with a stabilised integrand and a refinement check)"
+    },
+    {
+      "paper": "MASTER",
+      "question": "when must a GROUP of calibration queries be bought?",
+      "script": "scripts/P6_master_group_calibration.py",
+      "artifact": "research/worker_P6_master_20260914/P6_master_group_calibration.json",
+      "lean": "work/p13_conjectures/LeanMasterGroupCalibrationV1.lean",
+      "headline": "rank >= 2 in the nuisance is NECESSARY (rank-one G admits no complementarity, proved) and SUFFICIENT (a four-item/two-instrument family gives G = 3 V_0 . I_2 from real query means: each control alone moves the value by exactly -V_0, the pair by +V_0/2); full-class optimum in closed form V = 3(3-2 sqrt2)/32 = (18-12 sqrt2) V_0 with a dual tight on every ordinary query and every control",
+      "status": "PROVED (the rank dichotomy, Lean, 5 audits) + NUMERICAL EVIDENCE (the construction and the full-class certificate, floating point)"
+    }
+  ],
+  "lean_accepted_this_batch": [
+    {
+      "module": "LeanMasterGroupCalibrationV1",
+      "audits": 5
+    },
+    {
+      "module": "LeanStructuralAvgPathGapV1",
+      "audits": 6
+    },
+    {
+      "module": "LeanSupportRecoverySandwichV1",
+      "audits": 8
+    }
+  ],
+  "not_done": [
+    "Functional: instantiate the heterogeneous lower bound at a specific allocation, prove every alternative type, then sandwich the complexity",
+    "Query: from the real observation law prove the KL order in the leakage degree, then splice transcript and matching testing bound",
+    "MASTER: move from one alternative to the active set of the whole game before discussing an optimal acquisition threshold",
+    "Adaptive: scheduler + revalidation + stopping are still not joined",
+    "D6 package 2 (full-design optimum as a theorem) is numerical only; PART 6 of P1 now says a formalisation must carry the T_c(mu) boundary",
+    "Structural: the 1/2 vs 2/3 constant for eps_nest itself is NOT closed by this batch; G6_nesting_upper_rule.py was still running when this was written"
+  ],
+  "structural_G6_finished_after_index_was_first_written": {
+    "script": "scripts/G6_nesting_upper_rule.py",
+    "artifact": "research/worker_G6_nesting_20260914/G6_nesting_upper_rule.json",
+    "result": "of four ordering rules, `desc` is REFUTED (max eps 5/8 at g=(-3,1,2,2), 12 of 496 exhaustive two-action instances exceed 1/2); greedy_R, greedy_reg and altern never exceed 1/2 on any of the 496.  Scans at 3 and 4 actions (up to 4.1e7 instances) never exceed 1/2 either.",
+    "status": "does NOT close the constant: per the stated acceptance condition a larger scan that still returns 1/2 is not a proof.  What is new is that three concrete rules survive as proof candidates and one is dead."
+  }
+}

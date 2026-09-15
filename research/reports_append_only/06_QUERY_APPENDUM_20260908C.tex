@@ -1,0 +1,35 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 6 - Query Sufficiency / Relational Query Transfer}\\[2pt]
+{\large\itshape Append-only update C: the deficiency framing of update B is narrowed --- naming is not an equivalence}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (second update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--78 are an immutable prefix. This addendum begins at Section 79.
+
+\section*{79. NARROWING: the transfer matrix is not yet a deficiency}
+Addendum B, Section 77, stated:
+\begin{center}\scriptsize\oldclaim{the quantity the transfer matrix reports is a deficiency, measured in one simulator under one budget}\end{center}
+That goes too far. Relabelling a regret matrix as a Le Cam deficiency does not create the equivalence. A deficiency statement is relative to a specified class of loss functions and a specified optimisation over transition kernels; the current matrix reports regret of a chosen decision rule on a fixed panel, against a fixed reference, at a fixed budget.
+
+\claimbox{\textbf{What is required before the word is used.} An explicit correspondence between (i) the method--query cell's reported regret and (ii) the optimal value of the transition-kernel problem defining deficiency, over the loss class the chain actually cares about. Until that is proved, the report should say ``transfer regret under a matched budget'' and cite deficiency only as the adjacent framework.}
+
+\section*{80. Status unchanged, and the precondition for any experiment}
+Nothing in Sections 70--78 is amended. At $h=1,4,8$ the result stands: $0$ scientifically evaluable cells out of $336$, every cell \texttt{QUERY\_TARGET\_CONSTANT}. \textbf{A delivery-capable frozen policy and a state distribution on which the target is provably non-constant are preconditions for this chain having any experiment at all}, not refinements of one. No transfer result exists at any horizon.
+\end{document}

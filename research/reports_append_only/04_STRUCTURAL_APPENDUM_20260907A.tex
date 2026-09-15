@@ -1,0 +1,91 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update: why the three-seed confirmation showed nothing, and an exact staircase family with known prefix-cover dimension $\chi=r$}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--59 are an immutable prefix. This addendum begins at Section 60.
+
+\section*{60. DEMOTION: the confirmation instance family was too easy}
+The three-seed run (\texttt{kprefix\_three\_level\_tierA\_v1}, $m=6$, $K\in\{1,2,3,4\}$, seeds $8201$--$8203$) reproduced: exact and greedy reach worst-budget regret $0$ from $K=2$ on $36/36$ worlds, and the learned network is worse on all three seeds. \oldclaim{Exact and greedy reach zero regret from two menus, so two menus suffice for budget-independent ranking on this family.} The measurement is real; the \emph{inference} is not available, because $34/36$ of those worlds are already solved at $K=1$. A family in which almost every instance is solvable with one menu cannot demonstrate the benefit of two. \eclass{DEMOTED: reproducible but uninformative; the family, not the algorithm, is the confound}
+
+\section*{61. The staircase family: $\chi=r$, exactly}
+\texttt{structural\_staircase\_exact\_v1} computes the exact prefix-cover dimension for the dense staircase objective at $r=1,\dots,6$ ($m=2r$ relations), by coverage-mask DP with an independent MILP check of the set-cover objective.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r r r X}
+\toprule
+$r$ & $m$ & $\chi$ & MILP & agree & solve (s)\\
+\midrule
+$1$ & $2$ & $1$ & $1.0$ & yes & $0.0105$\\
+$2$ & $4$ & $2$ & $2.0$ & yes & $0.0012$\\
+$3$ & $6$ & $\mathbf{3}$ & $3.0$ & yes & $0.0016$\\
+$4$ & $8$ & $\mathbf{4}$ & $4.0$ & yes & $0.0045$\\
+$5$ & $10$ & $\mathbf{5}$ & $5.0$ & yes & $0.0155$\\
+$6$ & $12$ & $\mathbf{6}$ & $6.0$ & yes & $0.0894$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\texttt{observed\_sequence} $=[1,2,3,4,5,6]$, \texttt{exact\_chi\_equals\_r\_on\_tested\_range} true, \texttt{all\_dp\_milp\_agree} true. Every designated optimum satisfies \texttt{all\_designated\_zero} (radius $0$), \texttt{all\_designated\_unique} (unique optimum at its budget) and \texttt{all\_designated\_pairwise\_incomparable}. At $r=6$ the six forced optima occur at budgets $10,9,8,7,6,5$ with selected masks $4092,4082,4042,3882,3242,682$.
+
+\section*{62. Why this is the family the chain needed}
+The prefix-cover dimension is \emph{known by construction}, so for every $r\ge3$ the family supplies instances that provably cannot be solved with two menus. That is exactly the property the $36$-world family lacked. The correct comparison --- exact versus greedy versus learned at $K<\chi$, $K=\chi$, $K>\chi$ --- is now well posed for the first time, with a ground truth to be right or wrong against.
+
+\section*{62. CORRECTION: this law is already PROVED, parametrically}
+\textbf{The run above is a re-verification, not a discovery, and the first draft of this section said otherwise.} The companion record
+\texttt{staircase\_\allowbreak exact\_\allowbreak r7\_\allowbreak 20260904.\allowbreak FORMAL\_\allowbreak TARGET\_\allowbreak MET.json}
+(recorded 5 September, \eclass{PROVED}) states:
+\[\chi_{\text{prefix}}(F_r,0)=r=m/2\qquad\text{for every }r>0,\]
+proved parametrically in \texttt{Lean\allowbreak Structural\allowbreak Staircase\allowbreak Exact\allowbreak PrefixCoverV1}, compile errors $0$, axiom audit present. The status of this family moved
+\begin{center}\scriptsize\textsf{EXACT\_FINITE\_THEOREM\_DISCOVERY}\\$\longrightarrow$\\\textsf{PROVED (parametric in }$r$)\end{center}
+on 5 September, and its stated consequence is that \emph{``the Structural chain no longer rests on a $\Theta(m)$ bound plus finite computation.''}
+
+Tonight's $r=1..6$ computation agrees with the proved law at every tested $r$ and is therefore a consistency check of the instrument, not new evidence about $\chi$.
+
+\textbf{Why the mistake happened, recorded so it is not repeated.} The result artifact still carries the field
+\begin{quote}\scriptsize\texttt{next\_formal\_target}: ``construct $r$ rankings for every $r$ and prove \textsf{PrefixCoverDimensionAtMost} staircase $0$ $r$''\end{quote}
+and that field was quoted verbatim as an open target. It is not open: the companion record marks it \textsf{MET}. The artifact was not edited, deliberately --- \emph{``rewriting \texttt{next\_formal\_target} in place would invalidate the manifest hash and destroy the record of what the artifact claimed when it was produced.''} \textbf{The lesson is that a result artifact's own ``next target'' field is not authoritative; the companion status records are.} Read \texttt{*.FORMAL\_TARGET\_MET.json} before quoting any \texttt{next\_formal\_target}.
+
+\section*{63. What is actually still open}
+Verbatim from the companion record's \texttt{still\_open}: \emph{``This is the law for the staircase family $F_r$ specifically. It is NOT a minimax statement over arbitrary relation families, and nothing here claims one.''}
+
+So the open question is not the parametric upper bound --- that is closed --- but whether any relation family forces $\chi$ above $m/2$, i.e.\ whether the staircase is extremal. The value of tonight's run is unchanged by the correction and lies entirely in Section 60: it supplies instances of \emph{known} $\chi$, so an exact-vs-greedy-vs-learned comparison at $K<\chi$, $K=\chi$, $K>\chi$ is now well posed against a proved ground truth rather than against a family where $34/36$ instances are trivial.
+
+\claimbox{\textbf{Evidence classes, corrected.} $\chi_{\text{prefix}}(F_r,0)=r$: \eclass{PROVED, parametric, axiom-audited, 5 September}. Tonight's $r=1..6$ table: \eclass{consistency check}. The $36$-world confirmation: \eclass{reproducible but uninformative}.}
+
+\section*{64. Formal inventory for this chain, complete}
+The corpus holds \textbf{19} Lean modules attributable to this chain, carrying \textbf{138} theorems; 19 produce a \texttt{.olean}; \textbf{0} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak Structural\allowbreak Staircase\allowbreak Exact\allowbreak Prefix\allowbreak Cover\allowbreak V1} & 35 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Geometry\allowbreak Witnesses\allowbreak V4} & 21 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Auxiliary\allowbreak BH6\allowbreak Structural\allowbreak V4} & 18 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Minimum\allowbreak Transversal\allowbreak Width\allowbreak V1} & 12 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Prefix\allowbreak Cover\allowbreak Dimension\allowbreak V1} & 8 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak Witness\allowbreak V1} & 7 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Ordinary\allowbreak Chain\allowbreak Characterization\allowbreak V1} & 5 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Prefix\allowbreak Cover\allowbreak Universal\allowbreak Upper\allowbreak V1} & 5 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{19} of this chain's 19 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+\end{document}

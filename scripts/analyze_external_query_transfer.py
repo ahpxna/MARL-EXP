@@ -16,12 +16,17 @@ from scripts.run_external_query_transfer import PROTOCOL_VERSION
 
 def analyze(paths):
     artifacts=[]; cells={}; blocked_methods={}; blocked_queries={}; invalid=[]
+    degenerate_cells=0; evaluable_cells=0; scientific_status_counts={}
     for path in map(Path,paths):
         row=json.loads(path.read_text())
         if row.get('protocol_version')!=PROTOCOL_VERSION:
             invalid.append({'path':str(path),'reason_code':'PROTOCOL_MISMATCH'}); continue
         artifacts.append(str(path))
+        st=str(row.get('scientific_transfer_status','UNKNOWN'))
+        scientific_status_counts[st]=scientific_status_counts.get(st,0)+1
         blocked_methods.update(row.get('blocked_methods',{})); blocked_queries.update(row.get('blocked_queries',{}))
+        evaluable_cells += int(row.get('scientifically_evaluable_matrix_cells',0) or 0)
+        degenerate_cells += int(row.get('degenerate_matrix_cells_excluded_from_aggregate',0) or 0)
         for method,queries in row.get('aggregate_transfer_matrix',{}).items():
             for query,metric in queries.items():
                 if metric is None: continue
@@ -31,13 +36,16 @@ def analyze(paths):
         matrix.setdefault(method,{})[query]={key:float(np.mean([r[key] for r in rows]))
             for key in ('R_m_to_q','topk_exact','jaccard','ndcg','spearman','kendall')}
     faithful_missing=sorted(set(('AttentionWeights','MessageDeletion','CommunicationDelay','VoI','CausalContextAttribution')) & set(blocked_methods))
-    return {'schema':'external_query_transfer_analysis_v2','protocol_version':PROTOCOL_VERSION,
+    return {'schema':'external_query_transfer_analysis_v3','protocol_version':PROTOCOL_VERSION,
         'artifacts':artifacts,'invalid_artifacts':invalid,'primary_endpoint':'R_m_to_q',
         'aggregate_transfer_matrix':matrix,'blocked_methods':blocked_methods,'blocked_queries':blocked_queries,
+        'scientific_status_counts':scientific_status_counts,
+        'scientifically_evaluable_matrix_cells':int(evaluable_cells),
+        'degenerate_matrix_cells_excluded_from_aggregate':int(degenerate_cells),
         'primitive_framework_ready':bool(artifacts and matrix and not invalid),
         'full_relational_query_benchmark_ready':bool(artifacts and matrix and not invalid and not faithful_missing),
         'faithful_method_blockers':faithful_missing,
-        'interpretation':'NA cells preserve typed semantic capability; they are not replaced by foreign-query scores.'}
+        'interpretation':'NA cells preserve typed semantic capability; degenerate query targets are retained diagnostically but excluded from transfer-performance aggregation.'}
 
 
 def main(argv=None):

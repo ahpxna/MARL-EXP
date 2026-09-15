@@ -1,0 +1,68 @@
+{
+  "protocol_version": "d6_centred_rankone_conditional_proved_false_v1",
+  "evidence_class": "PROVED_FALSE_LEAN4_AXIOM_AUDITED",
+  "development_only": false,
+  "generated_utc": "2026-09-05T23:07:54.264898+00:00",
+  "promotes": {
+    "from": "EXACT_RATIONAL_COUNTEREXAMPLE_INDEPENDENTLY_RECOMPUTED",
+    "to": "PROVED_FALSE_LEAN4_AXIOM_AUDITED",
+    "prior_artifacts": [
+      "research/d6_contrast_rank_falsification/D6_STRICT_RANKONE_M6_MINIMAL_INTEGER_WITNESS.json",
+      "research/d6_contrast_rank_falsification/B3strict_m6_c0_margin0.01.json"
+    ]
+  },
+  "claim_refuted": "RankOneDecisionInteractionConstantAtMost witnessCell 5, i.e. the CENTRED rank-one conditional form of D6: AllCoordinatesInteractionContrastRankOne(q,F) does NOT imply 2D <= (m-1) delta_square, at m = 6, K = 3, corner reference.",
+  "toolchain": {
+    "lean": "v4.34.0-rc2",
+    "mathlib": "as pinned by work/p13_conjectures/lakefile.toml"
+  },
+  "axiom_audit": {
+    "command": "cd /Users/phanan/cig-amf-main/work/p13_conjectures && LEAN_PATH=\"$PWD:$LEAN_PATH\" lake env lean AxiomAuditD6FalsificationV1.lean",
+    "n_audited": 16,
+    "theorems": [
+      "witness_rankOne_constant_five_false",
+      "strict_twoProfile_rankOne_m6_violates_m_minus_one",
+      "cornerQ6_nonnegative",
+      "cornerQ6_normalized",
+      "witnessWorld_unitInteraction",
+      "witness_allCoordinatesRankOne",
+      "witness_atMostTwoProfiles",
+      "witness_strictTopC",
+      "witness_balanced",
+      "witness_cell_valid",
+      "witness_rankOneNormalizedBalanced",
+      "witness_response_spans",
+      "witness_selected_loss",
+      "witness_competitor_loss",
+      "witness_doubled_gap",
+      "witness_violates_five"
+    ],
+    "result": "every one depends on axioms: [propext, Classical.choice, Quot.sound]",
+    "interpretation": "The standard Lean 4 axiom set. No new axiom, no sorry, no admit, no native_decide anywhere in the dependency chain.",
+    "sorry_count_in_source": 0
+  },
+  "why_this_is_a_real_refutation": "Nine of the sixteen audited theorems are the HYPOTHESES of D6, proved for this witness rather than assumed: the reference is a nonnegative normalised product measure, the world satisfies UnitInteractionBound, every coordinate is centred rank one, every coordinate has at most two interaction profiles, the Top-C selection is STRICT, the cell is balanced and Valid. A negation of a premise nobody can satisfy would be vacuous; this one is not.",
+  "explicit_non_claims": [
+    "This refutes the conditional at m = 6, K = 3 with a corner reference. It does NOT say the decision bound fails for every m, nor for other references.",
+    "It says nothing about D6-prime, the RAW local contrast rank one conditional, which remains OPEN.",
+    "It does not weaken D6.world_approximation or D6.symmetric_difference, which are separate and still stand."
+  ],
+  "errata_for_prior_artifact": {
+    "artifact": "research/d6_raw_contrast_rank/RAW_RANKONE_NORMAL_FORM_PROVED_20260905.json",
+    "correction": "That artifact's novelty section says the normal form serves as an EXHAUSTIVENESS CERTIFICATE for the fibre search. That is overstated. What is proved is that for each phi the raw-rank-one worlds form exactly a linear subspace of dimension 2^m, so the VARIETY is the union over phi of V^raw_phi. The search enumerates a finite rational grid of phi, so coverage in phi remains a sampling argument, not a proof. The normal form makes the fibre parameterisation exact; it does not make the search exhaustive."
+  },
+  "artifacts": [
+    {
+      "path": "work/p13_conjectures/LeanD6StrictTwoProfileRankOneM6CounterexampleV2.lean",
+      "sha256": "bdf3e7b14b48a9770436533c272fa3ee174f6262a06cb37935b4ba8f7bcffe19"
+    },
+    {
+      "path": "work/p13_conjectures/AxiomAuditD6FalsificationV1.lean",
+      "sha256": "985cf82d5b8990d7959759f9e8e8842df36a0ed667b2b8da2e0fcfc55ed33023"
+    }
+  ],
+  "related": [
+    "research/d6_contrast_rank_falsification/AB_RAW_VS_CENTRED_20260905.json",
+    "research/d6_raw_contrast_rank/RAW_RANKONE_NORMAL_FORM_PROVED_20260905.json"
+  ]
+}

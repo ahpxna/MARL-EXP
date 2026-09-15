@@ -226,6 +226,11 @@ def claim_readiness(capabilities: Mapping[str, CapabilityEntry], runtime: Mappin
         return capabilities[key].status in allowed
     runtime = runtime or {}
     receipt_ok = bool(runtime.get("all_receipts_verified", False)) or capabilities["execution_receipt"].status == STATUS_SUPPORTED
+    # Runtime evidence can discharge the static UNVERIFIED authority status.
+    # This only opens the core-query gate; every queried cell still needs its own receipt.
+    runtime_authority = bool(runtime.get("cells_probed", 0) > 0
+                             and runtime.get("all_receipts_verified", False)
+                             and runtime.get("all_probed_honored", False))
     coupled = bool(runtime.get("coupled_honored_support_observed", False))
     return {
         "MASTER_support": {
@@ -249,7 +254,7 @@ def claim_readiness(capabilities: Mapping[str, CapabilityEntry], runtime: Mappin
             "reason": "requires verified full-product response table and execution authority",
         },
         "QUERY": {
-            "ready": bool(at_least("clone_restore") and receipt_ok and at_least("intervention_authority")),
+            "ready": bool(at_least("clone_restore") and receipt_ok and (at_least("intervention_authority") or runtime_authority)),
             "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA",
         },
         "DYNAMIC": {

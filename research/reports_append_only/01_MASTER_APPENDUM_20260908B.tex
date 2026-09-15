@@ -1,0 +1,93 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 1 - MASTER / Reference $\to$ Support $\to$ Decision}\\[2pt]
+{\large\itshape Append-only update B: the axiom audit closes 57 theorems, three novelty collisions are named, one measurement is withdrawn, and the two independent lines of attack on D6 are identified as one object}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--57, including addendum A of 7 September, are an immutable prefix. Nothing there is rewritten or removed. This addendum begins at Section 58.
+
+\section*{58. The audit deficit is partially closed}
+Addendum A, Section 56, recorded that \textbf{135 of 139 compiled modules had never had \texttt{\#print axioms} run}. That number is unchanged as a corpus statistic. What has changed is the status of the three modules formalised on 7 September.
+
+All 57 \texttt{\#print axioms} across the three modules formalised on 7 September depend only on Lean's standard axioms: no \texttt{sorryAx}, no project-added axiom, no \texttt{native\_decide}. Counts verified from the audit sources on disk (40 + 10 + 7). The clean-audit result comes from a parallel session's run; no transcript file for it is stored in \texttt{work/p13\_conjectures}, and committing one would close the last provenance gap.
+
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X c c}
+\toprule
+Module & before & after\\
+\midrule
+\texttt{Lean\allowbreak D6M6\allowbreak Sharpness\allowbreak BridgeV1} & COMPILED & \textbf{PROVED}\\
+\texttt{Lean\allowbreak Support\allowbreak Fibre\allowbreak SufficiencyV1} & COMPILED & \textbf{PROVED}\\
+\texttt{Lean\allowbreak Functional\allowbreak Residual\allowbreak MaintenanceV2} & COMPILED & \textbf{PROVED}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The remaining $132$ compiled modules stay \eclass{COMPILED ARTIFACT}. Addendum A, Section 56 stands unamended.
+
+\section*{59. Three novelty collisions, named}
+A deliberate search for prior art found that three chains sit closer to established theory than their reports claimed. None of this removes a result; it relocates the claim.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.22\columnwidth}X}
+\toprule
+Chain & Collision, and what survives\\
+\midrule
+Support & Adjacent to \emph{decision-region determination}. The equivalence \textsf{FibreSafe} $\iff$ existence of a controller is a \texttt{choose} argument and is \textbf{not} claimed novel. What survives is the concrete Helly-shaped instance separating \textsf{Separates} from \textsf{FibreSafe} inside this chain's own regret API.\\
+Query & Adjacent to \emph{sufficiency / deficiency} theory (Blackwell--Le Cam). The transfer matrix is a deficiency measurement in a specific simulator; the framing must say so.\\
+Functional & Adjacent to \emph{pure exploration with multiple correct answers}. The certification-cost result is the classical $1/\Delta^2$ gap law, not a new phenomenon.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{60. WITHDRAWAL, cross-chain}
+An unpublished measurement, taken in this project and reported into this ledger before it was checked against the frontier, claimed an ``exchange rate'' of $-k$ between Top-C margin and certificate quality along the D6 interpolation family. The arithmetic converges cleanly to $-3$ at $m=6$. \textbf{The interpretation is withdrawn}: the family is not on the margin--regret frontier ($2D=3$ against $9/2$ at margin $1/2$, both confirmed twice by independent routes), so the derivative describes a path, not the problem. Report 5 Section 137 carries the full record. \eclass{WITHDRAWN: correct arithmetic, void interpretation}
+
+\section*{61. Two lines of attack turn out to be one object}
+Two independent efforts converged this week from opposite directions on the same quantity, and neither had named it:
+\[R_m(\mu)=\max\{\,2D:\ \delta_\square\le1,\ \text{Top-C margin}\ \ge\mu\,\}.\]
+One line supplied the \textbf{margin axis} --- regret as a function of required selection strictness, with the first frontier point $R_6(1/2)=9/2$ and a matching dual certificate. The other supplied the \textbf{symmetry axis} --- a block ansatz reducing the search over $2^{2^m}$ worlds to a $4k^2$-variable linear program. Composed, they make $R_m(\mu)$ computable in seconds for any $m,\mu$.
+
+\claimbox{This is the first cross-chain object in the project that is \emph{computed} rather than searched. Every previous D6 instrument --- countersearch, exact LP ascent, tangent-cone seeding, tie-locus LP, face enumeration --- either failed or returned a demonstrated false negative on the same question. The lesson is recorded as a rule: \textbf{before building a search, check whether fixing the combinatorial data turns the question into a linear program.}}
+
+\section*{62. Cross-chain ledger delta, 8 September}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.20\columnwidth}X}
+\toprule
+Chain & Movement\\
+\midrule
+D6 & $c^\ast(4)=3=m-1$ (law FALSE at $m=4$); $c^\ast(6)=c^\ast(8)=m$; $(m-1)$ identified as the symmetric bound; sharpness PROVED; one measurement withdrawn\\
+Support & \texttt{pairwise\_separation\_not\_sufficient} PROVED; novelty relocated\\
+Functional & maintenance theorems PROVED; certification cost identified as the classical gap law, so the chain's headline is confounded by the instance-family gap distribution\\
+Query & novelty relocated to deficiency theory; no transfer result at any horizon\\
+Structural & unchanged since 7 September\\
+MASTER & audit partially closed; two lines unified\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{63. Outstanding evidence items, revised}
+\begin{enumerate}
+\item Commit the \texttt{\#print axioms} transcript for the 57 audited names.
+\item Run the audit for the remaining $132$ compiled modules, or state plainly in every citation that they are compiled artifacts.
+\item Prove or refute that the D6 block ansatz is without loss of generality.
+\item Map $R_m(\mu)$ at $m=6,8$ and test whether it is piecewise linear.
+\item Functional: a gap-stratified ablation, comparing policies \emph{within} a gap stratum.
+\item Query: a task-competent frozen $\rho$, tested in the external runtime.
+\end{enumerate}
+\end{document}

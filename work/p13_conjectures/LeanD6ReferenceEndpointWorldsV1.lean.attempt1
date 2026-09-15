@@ -1,0 +1,173 @@
+import «LeanD6ReferenceOrbitAverageV1»
+import «LeanD6SameResponseMarginCertificateV1»
+
+/-! D05: endpoint prior on ACTUAL same-response worlds. Parameter restrictions
+are explicit. Endpoint averaging applies to every deterministic decision S,
+not only orbit-uniform policies; finite randomization then commutes with it.
+-/
+namespace CIGAMF.P13.D6ReferenceEndpointWorlds
+open scoped BigOperators
+open Finset
+open CIGAMF.P13.D6Threshold CIGAMF.P13.D6ReferenceBridge
+open CIGAMF.P13.D6ReferenceResponseJoin CIGAMF.P13.D6ReferenceCenteredCompensated
+open CIGAMF.P13.D6ReferenceRetainedOscillation CIGAMF.P13.D6ReferenceFullCountLoss
+open CIGAMF.P13.D6ReferenceLegalCountMinimum CIGAMF.P13.D6ReferencePhaseRegretBridge
+open CIGAMF.P13.D6ReferenceOrbitAverage CIGAMF.P13.D6SameResponseMarginCertificate
+noncomputable section
+
+structure Region (q : ℕ) (j : I (2*q+1)) (T : Finset (I (2*q+1))) where
+  t : ℝ
+  rho : ℝ
+  hq : 2 ≤ q
+  hT : T ∈ worlds q j
+  ht0 : 0 ≤ t
+  ht1 : t ≤ 1
+  hr : 1 ≤ rho
+  hr2 : rho ≤ 2
+  hp : 1/2 ≤ rho-2*slopeBval t T j
+  strong : 1 ≤ ((q:ℝ)-1)*slopeBval t T j
+
+variable {q : ℕ} {j : I (2*q+1)} {T : Finset (I (2*q+1))}
+
+def a (M : Region q j T) : ℝ := gateMass M.t T j
+def b (M : Region q j T) : ℝ := slopeBval M.t T j
+def p (M : Region q j T) : ℝ := M.rho-2*M.b
+def c (M : Region q j T) : ℝ := M.a-M.b
+def e (M : Region q j T) : ℝ := min M.a (2*M.b)
+def r (M : Region q j T) : ℝ := 2*M.a-M.rho
+
+def regret (M : Region q j T) (A S : Finset (I (2*q+1))) : ℝ :=
+  actualLoss A T S j M.rho M.t-legalMinimum A T j M.rho M.t
+
+lemma B_card (M : Region q j T) (A : Finset (I (2*q+1))) (hA : A ∈ worlds q j) :
+    (others A j).card=q := by
+  have hp := world_parameters q j M.hq hA
+  change (Aᶜ.erase j).card=q
+  rw [Finset.card_erase_of_mem (by simp [hp.1]),hp.2.2.1,hp.2.1]
+  omega
+
+lemma overlap_positive (M : Region q j T) (A : Finset (I (2*q+1))) (hA : A ∈ worlds q j) :
+    1 ≤ (T ∩ A).card := by
+  have ht := Finset.mem_powersetCard.mp M.hT
+  have ha := Finset.mem_powersetCard.mp hA
+  have hu : T ∪ A ⊆ positiveGround q j := Finset.union_subset ht.1 ha.1
+  have hc := Finset.card_le_card hu
+  rw [positiveGround_card] at hc
+  have he := Finset.card_union_add_card_inter T A
+  rw [ht.2,ha.2] at he
+  omega
+
+lemma common_slopes (M : Region q j T) (A : Finset (I (2*q+1))) (hA : A ∈ worlds q j) :
+    gateMass M.t A j=M.a ∧ slopeBval M.t A j=M.b := by
+  have ha := world_parameters q j M.hq hA
+  have ht := world_parameters q j M.hq M.hT
+  unfold a b gateMass tailFactor slopeBval
+  rw [ha.2.1,ht.2.1,B_card M A hA,B_card M T M.hT]
+  exact ⟨rfl,rfl⟩
+
+/-- Literal full-family actual regret with common reference coefficients. -/
+theorem regret_counts (M : Region q j T) (A S : Finset (I (2*q+1))) (hA : A ∈ worlds q j) :
+    M.regret A S = (variableCost M.a M.b M.rho ((T \ S) ∩ A).card
+      ((T \ S) ∩ others A j).card+max M.e (M.r*((T ∩ A).card:ℝ)))/2 := by
+  have ha := world_parameters q j M.hq hA
+  have ht := world_parameters q j M.hq M.hT
+  have hs := common_slopes M A hA
+  have hroom : 2*T.card ≤ Fintype.card (I (2*q+1)) := by rw [ht.2.1]; simp [I]; omega
+  have hstrong : 1 ≤ (((q+1:ℕ):ℝ)-2)*slopeBval M.t A j := by
+    rw [hs.2]; simpa only [Nat.cast_add,Nat.cast_one,add_sub_assoc,show (1:ℝ)-2 = -1 by norm_num,add_neg_eq_sub] using M.strong
+  unfold regret
+  rw [actual_regret M.t M.ht0 M.ht1 A T S j ha.1 ht.1 (q+1) (by omega) ha.2.1
+    (by simpa using B_card M A hA) ht.2.1 hroom (overlap_positive M A hA) M.rho M.hr
+    (by rw [hs.2]; have := M.hp; dsimp [b] at *; linarith) hstrong,hs.1,hs.2]
+  rfl
+
+/-- Incidence calculation for a fixed decision against a random singleton world. -/
+theorem singleton_regret_point (M : Region q j T) (S : Finset (I (2*q+1)))
+    (i : I (2*q+1)) (hi : i ∈ T) :
+    M.regret (singletonWorld T j i) S =
+      if i ∈ T \ S then (variableCost M.a M.b M.rho 1 ((T \ S).card-1)+max M.e M.r)/2
+      else (variableCost M.a M.b M.rho 0 (T \ S).card+max M.e M.r)/2 := by
+  classical
+  have ha := singleton_valid q M.hq j T M.hT i hi
+  have hs := singleton_inter T j i hi
+  have hTi : T ∩ singletonWorld T j i={i} := by rw [Finset.inter_comm,hs]
+  have hDA : (T \ S) ∩ singletonWorld T j i=if i ∈ T \ S then {i} else ∅ := by
+    have hD : T \ S ⊆ T := Finset.sdiff_subset
+    ext l
+    have he : l ∈ singletonWorld T j i ∩ T ↔ l=i := by rw [hs]; simp
+    by_cases hid : i ∈ T \ S <;> simp only [if_pos hid,if_neg hid,Finset.mem_inter,Finset.mem_singleton,Finset.not_mem_empty]
+    · constructor
+      · intro h; exact he.mp ⟨h.2,hD h.1⟩
+      · intro h; subst l; exact ⟨hid,(he.mpr rfl).1⟩
+    · intro h
+      have hli := he.mp ⟨h.2,hD h.1⟩
+      subst l
+      exact hid h.1
+  have hjD : j ∉ T \ S := fun h => (world_parameters q j M.hq M.hT).1 (Finset.mem_sdiff.mp h).1
+  have hsum : ((T \ S) ∩ singletonWorld T j i).card+
+      ((T \ S) ∩ others (singletonWorld T j i) j).card=(T \ S).card := by
+    exact_mod_cast card_split (singletonWorld T j i) (T \ S) j hjD
+  rw [regret_counts M _ S ha,hTi,Finset.card_singleton,Nat.cast_one,mul_one,hDA]
+  by_cases hid : i ∈ T \ S
+  · rw [if_pos hid,if_pos hid,Finset.card_singleton]
+    rw [hDA,if_pos hid,Finset.card_singleton] at hsum
+    have he : ((T \ S) ∩ others (singletonWorld T j i) j).card=(T \ S).card-1 := by omega
+    rw [he]
+  · rw [if_neg hid,if_neg hid,Finset.card_empty]
+    rw [hDA,if_neg hid,Finset.card_empty,zero_add] at hsum
+    rw [hsum]
+
+/-- Exact binary-mixture calculation, including the empty decision. -/
+theorem singleton_shape (a b rho k : ℝ) (d : ℕ) (hk : k ≠ 0) :
+    ((d:ℝ)*(variableCost a b rho 1 (d-1)+max (min a (2*b)) (2*a-rho))/2+
+      (k-(d:ℝ))*(variableCost a b rho 0 d+max (min a (2*b)) (2*a-rho))/2)/k =
+      orbitRisk k (rho-2*b) (a-b) (min a (2*b)) (2*a-rho) b 1 d := by
+  by_cases h0 : d=0
+  · subst d
+    simp [orbitRisk,D6ReferencePhaseValue.base,variableCost,correction]
+    field_simp
+    ring
+  by_cases h1 : d=1
+  · subst d
+    simp [orbitRisk,D6ReferencePhaseValue.base,variableCost,correction]
+    field_simp
+    ring
+  · have hd : 2 ≤ d := by omega
+    have hdn : ((d-1:ℕ):ℝ)=(d:ℝ)-1 := by rw [Nat.cast_sub (by omega),Nat.cast_one]
+    simp only [orbitRisk,if_neg h0,if_neg h1,variableCost,correction,
+      show ¬ ((1:ℕ)=0 ∧ d-1=0) by omega,show ¬ ((1:ℕ)=0 ∧ d-1=1) by omega,
+      show ¬ ((0:ℕ)=0 ∧ d=0) by omega,show ¬ ((0:ℕ)=0 ∧ d=1) by omega,
+      ite_false,Nat.cast_one,Nat.cast_zero,mul_zero,sub_zero,hdn]
+    unfold D6ReferencePhaseValue.base
+    field_simp
+    ring
+
+/-- Uniform prior on k valid singleton-intersection worlds, tested against any S. -/
+theorem actual_singleton_average (M : Region q j T) (S : Finset (I (2*q+1))) :
+    (∑ i ∈ T,M.regret (singletonWorld T j i) S)/((q:ℝ)+1) =
+      orbitRisk ((q:ℝ)+1) M.p M.c M.e M.r M.b 1 (T \ S).card := by
+  classical
+  have ht := world_parameters q j M.hq M.hT
+  rw [Finset.sum_congr rfl (fun i hi => singleton_regret_point M S i hi)]
+  have hsplit (x y : ℝ) : (∑ i ∈ T,if i ∈ T \ S then x else y)=
+      ((T \ S).card:ℝ)*x+(((q:ℝ)+1)-((T \ S).card:ℝ))*y := by
+    have he : ∀ i,(if i ∈ T \ S then x else y)=y+(if i ∈ T \ S then x-y else 0) := by
+      intro i;split_ifs <;> ring
+    simp_rw [he]
+    rw [Finset.sum_add_distrib,Finset.sum_const,nsmul_eq_mul,Finset.sum_ite_mem,
+      Finset.inter_eq_right.mpr Finset.sdiff_subset,Finset.sum_const,nsmul_eq_mul,ht.2.1]
+    push_cast
+    ring
+  rw [hsplit]
+  have hh := singleton_shape M.a M.b M.rho ((q:ℝ)+1) (T \ S).card (by positivity)
+  dsimp [p,c,e,r]
+  convert hh using 1 <;> ring
+
+#print axioms overlap_positive
+#print axioms common_slopes
+#print axioms regret_counts
+#print axioms singleton_regret_point
+#print axioms singleton_shape
+#print axioms actual_singleton_average
+end
+end CIGAMF.P13.D6ReferenceEndpointWorlds

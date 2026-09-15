@@ -1,0 +1,305 @@
+# Observatory report
+
+rows=252471  runs=1  equations with data=54/55  symbols emitted=490/499
+
+## Instrumentation gaps
+
+None: every declared symbol was emitted at least once.
+
+## Expected findings (the ledger predicts these)
+
+- `FUNC.selective_maintenance.infeasible_maintenance`: 222 rows
+- `FUNC.two_level_chain.counterexample_local_ok_global_bad`: 33 rows
+- `STR.scalar_prefix_rankable.topc_but_not_coext`: 23 rows
+
+## Violations (candidate counterexamples)
+
+- `SUP.modular_formula.holds`: 30 rows
+
+## Sharpest instances (smallest non-negative slack)
+
+- `D6.decision_transfer` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "ref_name": "point_
+- `D6.world_approximation` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "ref_name": "point_
+- `FUNC.capacity_transfer` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1}
+- `FUNC.direction_transfer` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1}
+- `FUNC.gauge_error` slack=0 at {"world_id": "b34da7bcc2327a0c", "family": "cartesian", "m": 4, "arity": 2, "omega_size": 16, "omega_full": 16, "cartesian": 1, "additive": 1}
+- `FUNC.local_extremal` slack=0 at {"world_id": "7abda212a969bb5b", "family": "cartesian", "m": 3, "arity": 3, "omega_size": 27, "omega_full": 27, "cartesian": 1, "additive": 1}
+- `FUNC.selective_maintenance` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 2, "refresh_si
+- `FUNC.topk_pair_order` slack=0 at {"world_id": "c58ab843a9246ce9", "family": "cartesian", "m": 4, "arity": 2, "omega_size": 16, "omega_full": 16, "cartesian": 1, "additive": 1, "k": 1, "pair": "
+- `FUNC.unknown_variance` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "rho": "0"}
+- `MASTER.deficit_identity` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "omitted": 
+- `MASTER.gamma_operational` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "selected":
+- `MASTER.global_E_half` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "retained":
+- `MASTER.lp_lower_bound` slack=0.0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "retained":
+- `MASTER.two_source_split` slack=0.0 at {"family": "synthetic", "m": 0, "arity": 0, "A": "1", "B": "1", "N": 100}
+- `MASTER.zeta_half` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "retained":
+- `QRY.quantitative_floor` slack=0 at {"family": "same_summary", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 0, "w_twin": "A", "n_models": 24, "query": "removal
+- `QRY.transfer_regret` slack=0 at {"world_id": "b34da7bcc2327a0c", "family": "cartesian", "m": 4, "arity": 2, "omega_size": 16, "omega_full": 16, "cartesian": 1, "additive": 1, "capability_set":
+- `STR.budget_optima` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 0}
+- `STR.max_of_modular` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 0, "retained":
+- `SUP.component_perturbation` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 0, "retained":
+- `SUP.deficit` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "omitted": "(0,)", 
+- `SUP.modular_formula` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 0, "retained":
+- `SUP.support_brackets` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 0, "retained":
+- `X.certificate_coverage` slack=0 at {"world_id": "499e284609ca5d0b", "family": "cartesian", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 1, "k": 1, "route": "z
+- `D6.symmetric_difference` slack=1/4 at {"world_id": "c00f597436901bc0", "family": "interaction_light", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 0, "ref_name":
+- `D6.half_factor` slack=7/20 at {"world_id": "215be6d5d03bd774", "family": "interaction_heavy", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 0, "ref_name":
+- `D6.decision_interaction_complexity` slack=7/5 at {"world_id": "215be6d5d03bd774", "family": "interaction_heavy", "m": 3, "arity": 2, "omega_size": 8, "omega_full": 8, "cartesian": 1, "additive": 0, "ref_name":
+
+## Candidate inequalities never declared (X <= Y on all data)
+
+Filtered to relations that vary on both sides, are tight somewhere and slack somewhere, and are not definitional restatements. This is the RAW discover_inequalities() output, before dedup.py classification -- see candidate_inequalities.json / --no-dedup.
+
+- `STR.budget_optima.opt_value|max` <= `STR.budget_optima.topc_value|min`  support=403 tight=395 (98%) distinct=44/44
+- `SUP.exact_radius.radius|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) distinct=45/47
+- `SUP.modular_formula.radius_exact|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) distinct=45/47
+- `SUP.component_perturbation.r_hat|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) distinct=45/47
+- `SUP.component_perturbation.r_true|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) distinct=45/47
+- `SUP.exact_radius.radius|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) distinct=45/47
+- `SUP.modular_formula.radius_exact|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) distinct=45/47
+- `SUP.modular_formula.radius_modular|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=296 (98%) distinct=47/47
+- `SUP.modular_formula.gap|max` <= `SUP.support_brackets.bracket_width|min`  support=303 tight=272 (90%) distinct=13/13
+- `SUP.component_perturbation.r_hat|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) distinct=45/47
+- `SUP.component_perturbation.r_true|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) distinct=45/47
+- `SUP.support_brackets.r_lower|max` <= `SUP.exact_radius.radius|min`  support=303 tight=277 (91%) distinct=46/45
+- `SUP.support_brackets.r_lower|max` <= `SUP.modular_formula.radius_exact|min`  support=303 tight=277 (91%) distinct=46/45
+- `SUP.support_brackets.r_lower|max` <= `SUP.modular_formula.radius_modular|min`  support=303 tight=258 (85%) distinct=46/47
+- `SUP.support_brackets.r_lower|max` <= `SUP.component_perturbation.r_hat|min`  support=303 tight=277 (91%) distinct=46/45
+- `SUP.support_brackets.r_lower|max` <= `SUP.component_perturbation.r_true|min`  support=303 tight=277 (91%) distinct=46/45
+- `SUP.support_brackets.r_lower|max` <= `SUP.support_brackets.r_actual|min`  support=303 tight=277 (91%) distinct=46/45
+- `SUP.support_brackets.r_lower|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=253 (83%) distinct=46/47
+- `SUP.support_brackets.r_actual|max` <= `SUP.modular_formula.radius_modular|min`  support=303 tight=275 (91%) distinct=45/47
+- `SUP.support_brackets.r_actual|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) distinct=45/47
+- `SUP.exact_radius.omega_size|max` <= `SUP.support_brackets.upper_size|min`  support=303 tight=151 (50%) distinct=27/4
+- `SUP.support_brackets.actual_size|max` <= `SUP.support_brackets.upper_size|min`  support=303 tight=151 (50%) distinct=27/4
+- `STR.budget_optima.opt_value|max` <= `SUP.exact_radius.radius|min`  support=302 tight=300 (99%) distinct=44/44  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.modular_formula.radius_exact|min`  support=302 tight=300 (99%) distinct=44/44  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.modular_formula.radius_modular|min`  support=302 tight=274 (91%) distinct=44/45  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.component_perturbation.r_hat|min`  support=302 tight=300 (99%) distinct=44/44  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.component_perturbation.r_true|min`  support=302 tight=300 (99%) distinct=44/44  [cross-chain]
+- `STR.budget_optima.topc_value|max` <= `SUP.modular_formula.radius_modular|min`  support=302 tight=275 (91%) distinct=44/45  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.support_brackets.r_actual|min`  support=296 tight=294 (99%) distinct=44/44  [cross-chain]
+- `STR.budget_optima.opt_value|max` <= `SUP.support_brackets.r_upper|min`  support=296 tight=263 (89%) distinct=44/45  [cross-chain]
+- `STR.budget_optima.topc_value|max` <= `SUP.support_brackets.r_upper|min`  support=296 tight=264 (89%) distinct=44/45  [cross-chain]
+- `SUP.support_brackets.r_lower|max` <= `STR.budget_optima.topc_value|min`  support=296 tight=271 (92%) distinct=44/44  [cross-chain]
+- `SUP.modular_formula.ratio|max` <= `STR.budget_optima.n_optima|min`  support=286 tight=215 (75%) distinct=28/3  [cross-chain]
+- `SUP.exact_radius.omega_density|max` <= `STR.budget_optima.n_optima|min`  support=302 tight=118 (39%) distinct=26/3  [cross-chain]
+- `STR.budget_optima.topc_regret_k|max` <= `STR.budget_optima.topc_value|min`  support=403 tight=111 (28%) distinct=4/44
+- `SUP.exact_radius.osc_omitted|max` <= `MASTER.deficit_identity.M|min`  support=221 tight=215 (97%) distinct=32/32  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `X.certificate_coverage.mean_slack|min`  support=221 tight=210 (95%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `X.certificate_coverage.median_slack|min`  support=221 tight=210 (95%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=206 (93%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.bound|min`  support=221 tight=210 (95%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.slack|min`  support=221 tight=210 (95%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=6/11  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=171 (77%) distinct=6/11  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=171 (77%) distinct=6/12  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.certificate_min.zeta_half|min`  support=221 tight=210 (95%) distinct=6/9  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=171 (77%) distinct=6/11  [cross-chain]
+- `X.certificate_coverage.mean_slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=12/11  [cross-chain]
+- `X.certificate_coverage.mean_slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=219 (99%) distinct=12/11  [cross-chain]
+- `X.certificate_coverage.mean_slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=219 (99%) distinct=12/11  [cross-chain]
+- `X.certificate_coverage.median_slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=12/11  [cross-chain]
+- `X.certificate_coverage.median_slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=219 (99%) distinct=12/11  [cross-chain]
+- `X.certificate_coverage.median_slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=219 (99%) distinct=12/11  [cross-chain]
+- `SUP.critical_cell.critical_fraction|max` <= `SUP.critical_cell.n_critical|min`  support=221 tight=204 (92%) distinct=9/9
+- `MASTER.deficit_identity.F_Omega|max` <= `MASTER.deficit_identity.M|min`  support=221 tight=215 (97%) distinct=32/32
+- `MASTER.deficit_identity.d_Omega|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=210 (95%) distinct=6/9
+- `MASTER.deficit_identity.d_Omega|max` <= `MASTER.global_E_half.E|min`  support=221 tight=171 (77%) distinct=6/11
+- `MASTER.deficit_identity.e_plus|max` <= `MASTER.deficit_identity.d_Omega|min`  support=221 tight=218 (99%) distinct=4/6
+- `MASTER.deficit_identity.e_plus|max` <= `MASTER.deficit_identity.sum_check|min`  support=221 tight=218 (99%) distinct=4/6
+- `MASTER.deficit_identity.e_plus|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=208 (94%) distinct=4/9
+- `MASTER.deficit_identity.e_plus|max` <= `MASTER.global_E_half.E|min`  support=221 tight=170 (77%) distinct=4/11
+- `MASTER.deficit_identity.e_minus|max` <= `MASTER.deficit_identity.d_Omega|min`  support=221 tight=217 (98%) distinct=4/6
+- `MASTER.deficit_identity.e_minus|max` <= `MASTER.deficit_identity.sum_check|min`  support=221 tight=217 (98%) distinct=4/6
+- `MASTER.deficit_identity.e_minus|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=207 (94%) distinct=4/9
+- `MASTER.deficit_identity.e_minus|max` <= `MASTER.global_E_half.E|min`  support=221 tight=170 (77%) distinct=4/11
+- `MASTER.deficit_identity.sum_check|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=210 (95%) distinct=6/9
+- `MASTER.deficit_identity.sum_check|max` <= `MASTER.global_E_half.E|min`  support=221 tight=171 (77%) distinct=6/11
+- `MASTER.zeta_half.topc_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=215 (97%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.exact_radius.radius|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.modular_formula.radius_exact|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=214 (97%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.component_perturbation.r_hat|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.component_perturbation.r_true|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `MASTER.zeta_half.topc_radius|min`  support=221 tight=219 (99%) distinct=32/32
+- `MASTER.zeta_half.optimal_radius|max` <= `MASTER.lp_lower_bound.topc_radius|min`  support=221 tight=219 (99%) distinct=32/32
+- `MASTER.zeta_half.zeta_def|max` <= `MASTER.global_E_half.E|min`  support=221 tight=177 (80%) distinct=9/11
+- `MASTER.zeta_half.bound|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=9/11
+- `MASTER.zeta_half.bound|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=177 (80%) distinct=9/11
+- `MASTER.zeta_half.bound|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=177 (80%) distinct=9/11
+- `MASTER.zeta_half.slack|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=206 (93%) distinct=9/9
+- `MASTER.zeta_half.slack|max` <= `MASTER.zeta_half.bound|min`  support=221 tight=219 (99%) distinct=9/9
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=9/11
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=176 (80%) distinct=9/11
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=177 (80%) distinct=9/12
+- `MASTER.zeta_half.slack|max` <= `MASTER.certificate_min.zeta_half|min`  support=221 tight=219 (99%) distinct=9/9
+- `MASTER.zeta_half.slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=176 (80%) distinct=9/11
+- `MASTER.global_E_half.slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) distinct=12/11
+- `MASTER.global_E_half.slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=219 (99%) distinct=12/11
+- `MASTER.global_E_half.slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=219 (99%) distinct=12/11
+- `MASTER.lp_lower_bound.topc_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=215 (97%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.exact_radius.radius|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.modular_formula.radius_exact|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=214 (97%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.component_perturbation.r_hat|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.component_perturbation.r_true|min`  support=221 tight=219 (99%) distinct=32/32  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `MASTER.zeta_half.topc_radius|min`  support=221 tight=219 (99%) distinct=32/32
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `MASTER.lp_lower_bound.topc_radius|min`  support=221 tight=219 (99%) distinct=32/32
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.exact_radius.radius|min`  support=221 tight=185 (84%) distinct=62/32  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.modular_formula.radius_exact|min`  support=221 tight=185 (84%) distinct=62/32  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=183 (83%) distinct=62/32  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.component_perturbation.r_hat|min`  support=221 tight=185 (84%) distinct=62/32  [cross-chain]
+
+## dedup.py classification of the candidates above
+
+tier counts: TAUTOLOGY=18, ALIAS=14, DEGENERATE=115, REPARAM=23, NOVEL_CANDIDATE=187
+
+1 alias equivalence class(es) found (collapsed same-quantity aliases, see alias_classes.json):
+- {MASTER.lp_lower_bound.topc_radius, MASTER.zeta_half.topc_radius, STR.max_of_modular.max_modular_value, STR.max_of_modular.radius_doubled, SUP.component_perturbation.r_hat, SUP.component_perturbation.r_true, SUP.exact_radius.radius, SUP.modular_formula.radius_exact, SUP.support_brackets.r_actual}
+
+### Surviving NOVEL_CANDIDATE relations
+
+- `SUP.exact_radius.radius|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) families=13
+- `SUP.component_perturbation.r_hat|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) families=13
+- `SUP.component_perturbation.r_true|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=281 (91%) families=13
+- `SUP.exact_radius.radius|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) families=13
+- `SUP.modular_formula.radius_exact|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) families=13
+- `SUP.modular_formula.radius_modular|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=296 (98%) families=13
+- `SUP.modular_formula.gap|max` <= `SUP.support_brackets.bracket_width|min`  support=303 tight=272 (90%) families=13
+- `SUP.component_perturbation.r_hat|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) families=13
+- `SUP.component_perturbation.r_true|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.exact_radius.radius|min`  support=303 tight=277 (91%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.modular_formula.radius_exact|min`  support=303 tight=277 (91%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.modular_formula.radius_modular|min`  support=303 tight=258 (85%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.component_perturbation.r_hat|min`  support=303 tight=277 (91%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.component_perturbation.r_true|min`  support=303 tight=277 (91%) families=13
+- `SUP.support_brackets.r_lower|max` <= `SUP.support_brackets.r_actual|min`  support=303 tight=277 (91%) families=13
+- `SUP.support_brackets.r_actual|max` <= `SUP.modular_formula.radius_modular|min`  support=303 tight=275 (91%) families=13
+- `SUP.support_brackets.r_actual|max` <= `SUP.support_brackets.r_upper|min`  support=303 tight=270 (89%) families=13
+- `SUP.exact_radius.omega_size|max` <= `SUP.support_brackets.upper_size|min`  support=303 tight=151 (50%) families=13
+- `SUP.support_brackets.actual_size|max` <= `SUP.support_brackets.upper_size|min`  support=303 tight=151 (50%) families=13
+- `STR.budget_optima.topc_regret_k|max` <= `STR.budget_optima.topc_value|min`  support=403 tight=111 (28%) families=12
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=206 (93%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.bound|min`  support=221 tight=210 (95%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.slack|min`  support=221 tight=210 (95%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=171 (77%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=171 (77%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.certificate_min.zeta_half|min`  support=221 tight=210 (95%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=171 (77%) families=13  [cross-chain]
+- `MASTER.zeta_half.topc_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=215 (97%) families=13  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=214 (97%) families=13  [cross-chain]
+- `MASTER.zeta_half.zeta_def|max` <= `MASTER.global_E_half.E|min`  support=221 tight=177 (80%) families=13
+- `MASTER.zeta_half.bound|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.zeta_half.bound|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=177 (80%) families=13
+- `MASTER.zeta_half.bound|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=177 (80%) families=13
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=176 (80%) families=13
+- `MASTER.zeta_half.slack|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=177 (80%) families=13
+- `MASTER.zeta_half.slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=176 (80%) families=13
+- `MASTER.lp_lower_bound.topc_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=215 (97%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=214 (97%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.exact_radius.radius|min`  support=221 tight=185 (84%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.modular_formula.radius_exact|min`  support=221 tight=185 (84%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.modular_formula.radius_modular|min`  support=221 tight=183 (83%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.component_perturbation.r_hat|min`  support=221 tight=185 (84%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.component_perturbation.r_true|min`  support=221 tight=185 (84%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `MASTER.zeta_half.topc_radius|min`  support=221 tight=185 (84%) families=13
+- `MASTER.lp_lower_bound.LB_LP|max` <= `MASTER.zeta_half.optimal_radius|min`  support=221 tight=185 (84%) families=13
+- `MASTER.lp_lower_bound.LB_LP|max` <= `MASTER.lp_lower_bound.topc_radius|min`  support=221 tight=185 (84%) families=13
+- `MASTER.lp_lower_bound.bound|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.bound|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.bound|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.bound|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.slack|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.slack|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.slack|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=169 (76%) families=13
+- `MASTER.lp_lower_bound.slack|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.zeta_half|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.zeta_half|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=177 (80%) families=13
+- `MASTER.certificate_min.zeta_half|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=177 (80%) families=13
+- `MASTER.certificate_min.lp_gap|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.lp_gap|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.lp_gap|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.lp_gap|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.zeta_half.zeta_def|min`  support=221 tight=206 (93%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.zeta_half.bound|min`  support=221 tight=207 (94%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.global_E_half.E|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.global_E_half.bound|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.global_E_half.slack|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.lp_lower_bound.bound|min`  support=221 tight=197 (89%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.certificate_min.zeta_half|min`  support=221 tight=207 (94%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.certificate_min.E_half|min`  support=221 tight=169 (76%) families=13
+- `MASTER.certificate_min.min_certificate|max` <= `MASTER.certificate_min.lp_gap|min`  support=221 tight=197 (89%) families=13
+- `SUP.support_brackets.r_lower|max` <= `MASTER.zeta_half.topc_radius|min`  support=217 tight=215 (99%) families=13  [cross-chain]
+- `SUP.support_brackets.r_lower|max` <= `MASTER.lp_lower_bound.topc_radius|min`  support=217 tight=215 (99%) families=13  [cross-chain]
+- `MASTER.zeta_half.topc_radius|max` <= `SUP.support_brackets.r_upper|min`  support=217 tight=206 (95%) families=13  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.support_brackets.r_actual|min`  support=217 tight=215 (99%) families=13  [cross-chain]
+- `MASTER.zeta_half.optimal_radius|max` <= `SUP.support_brackets.r_upper|min`  support=217 tight=205 (94%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.topc_radius|max` <= `SUP.support_brackets.r_upper|min`  support=217 tight=206 (95%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.support_brackets.r_actual|min`  support=217 tight=215 (99%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.optimal_radius|max` <= `SUP.support_brackets.r_upper|min`  support=217 tight=205 (94%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.support_brackets.r_actual|min`  support=217 tight=181 (83%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.support_brackets.r_upper|min`  support=217 tight=177 (82%) families=13  [cross-chain]
+- `STR.budget_optima.topc_regret_k|max` <= `STR.budget_optima.k|min`  support=403 tight=91 (23%) families=12
+- `STR.budget_optima.topc_regret_k|max` <= `STR.budget_optima.optimum_set|min`  support=403 tight=91 (23%) families=12
+- `SUP.modular_formula.ratio|max` <= `SUP.exact_radius.omitted_card|min`  support=293 tight=75 (26%) families=13
+- `SUP.exact_radius.osc_omitted|max` <= `SUP.modular_formula.sum_spans|min`  support=309 tight=66 (21%) families=13
+- `STR.max_of_modular.radius_doubled|max` <= `SUP.modular_formula.sum_spans|min`  support=246 tight=65 (26%) families=11  [cross-chain]
+- `STR.max_of_modular.max_modular_value|max` <= `SUP.modular_formula.sum_spans|min`  support=246 tight=65 (26%) families=11  [cross-chain]
+- `SUP.modular_formula.ratio|max` <= `STR.max_of_modular.active_scenario_count|min`  support=231 tight=53 (23%) families=11  [cross-chain]
+- `SUP.exact_radius.omega_density|max` <= `SUP.exact_radius.omitted_card|min`  support=309 tight=43 (14%) families=13
+- `SUP.exact_radius.omega_density|max` <= `STR.max_of_modular.active_scenario_count|min`  support=246 tight=22 (9%) families=11  [cross-chain]
+- `SUP.exact_radius.min_omitted|max` <= `SUP.exact_radius.max_omitted|min`  support=309 tight=16 (5%) families=13
+- `SUP.modular_formula.gap|max` <= `SUP.exact_radius.osc_omitted|min`  support=309 tight=16 (5%) families=13
+- `SUP.modular_formula.gap|max` <= `SUP.modular_formula.radius_modular|min`  support=309 tight=16 (5%) families=13
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.topc_radius|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.zeta_half.optimal_radius|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.lp_lower_bound.topc_radius|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.lp_lower_bound.optimal_radius|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+- `SUP.modular_formula.gap|max` <= `MASTER.lp_lower_bound.LB_LP|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+- `MASTER.lp_lower_bound.LB_LP|max` <= `SUP.exact_radius.osc_omitted|min`  support=221 tight=16 (7%) families=13  [cross-chain]
+
+## Strongest correlations
+
+- r=+1.000 n=309  `SUP.exact_radius.radius|min` ~ `SUP.exact_radius.osc_omitted|min`
+- r=+1.000 n=221  `SUP.exact_radius.radius|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=303  `SUP.exact_radius.omega_size|min` ~ `SUP.support_brackets.lower_size|min`
+- r=+1.000 n=309  `SUP.exact_radius.osc_omitted|min` ~ `SUP.modular_formula.radius_exact|min`
+- r=+1.000 n=303  `SUP.exact_radius.osc_omitted|min` ~ `SUP.support_brackets.r_actual|min`
+- r=+1.000 n=309  `SUP.exact_radius.osc_omitted|min` ~ `SUP.component_perturbation.r_hat|min`
+- r=+1.000 n=309  `SUP.exact_radius.osc_omitted|min` ~ `SUP.component_perturbation.r_true|min`
+- r=+1.000 n=302  `SUP.exact_radius.osc_omitted|min` ~ `STR.budget_optima.topc_value|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.exact_radius.osc_omitted|min` ~ `MASTER.zeta_half.topc_radius|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.exact_radius.osc_omitted|min` ~ `MASTER.lp_lower_bound.topc_radius|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.modular_formula.radius_exact|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.modular_formula.radius_modular|min` ~ `MASTER.deficit_identity.M|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.modular_formula.gap|min` ~ `MASTER.deficit_identity.d_Omega|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.modular_formula.gap|min` ~ `MASTER.deficit_identity.sum_check|min`  [cross-chain]
+- r=+1.000 n=217  `SUP.support_brackets.r_actual|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=303  `SUP.support_brackets.lower_size|min` ~ `SUP.support_brackets.actual_size|min`
+- r=+1.000 n=221  `SUP.component_perturbation.r_hat|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=221  `SUP.component_perturbation.r_true|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=216  `STR.budget_optima.topc_value|min` ~ `MASTER.deficit_identity.F_Omega|min`  [cross-chain]
+- r=+1.000 n=221  `MASTER.deficit_identity.F_Omega|min` ~ `MASTER.zeta_half.topc_radius|min`
+- r=+1.000 n=221  `MASTER.deficit_identity.F_Omega|min` ~ `MASTER.lp_lower_bound.topc_radius|min`
+- r=+1.000 n=221  `MASTER.zeta_half.zeta_def|min` ~ `MASTER.zeta_half.bound|min`
+- r=+1.000 n=221  `MASTER.zeta_half.zeta_def|min` ~ `MASTER.certificate_min.zeta_half|min`
+- r=+1.000 n=221  `MASTER.zeta_half.zeta_def|min` ~ `MASTER.gamma_operational.zeta_half|min`
+- r=+1.000 n=221  `MASTER.zeta_half.zeta_def|min` ~ `MASTER.gamma_operational.bound_op|min`
+- r=+1.000 n=221  `MASTER.zeta_half.zeta_def|min` ~ `MASTER.gamma_operational.bound_box|min`
+- r=+1.000 n=221  `MASTER.global_E_half.E|min` ~ `MASTER.global_E_half.bound|min`
+- r=+1.000 n=221  `MASTER.global_E_half.E|min` ~ `MASTER.certificate_min.E_half|min`
+- r=+1.000 n=221  `MASTER.global_E_half.bound|min` ~ `MASTER.typed_elimination.deficit_max|min`
+- r=+1.000 n=221  `MASTER.certificate_min.E_half|min` ~ `MASTER.typed_elimination.deficit_max|min`
+- r=+1.000 n=123  `D6.world_approximation.bound|min` ~ `D6.decision_transfer.bound|min`
+- r=+1.000 n=123  `D6.decision_transfer.bound|min` ~ `D6.half_factor.denominator|min`
+- r=+1.000 n=89  `STR.prefix_cover_dimension.m|min` ~ `STR.prefix_cover_dimension.upper_bound_m_plus_1|min`
+- r=+1.000 n=89  `STR.prefix_cover_dimension.m|min` ~ `STR.prefix_cover_dimension.layers_covered|min`
+- r=+1.000 n=89  `STR.prefix_cover_dimension.upper_bound_m_plus_1|min` ~ `STR.nested_regret.m|min`
+- r=+1.000 n=89  `STR.prefix_cover_dimension.layers_covered|min` ~ `STR.nested_regret.m|min`
+- r=+1.000 n=86  `FUNC.gauge_error.delta_circ|min` ~ `FUNC.capacity_transfer.bound|min`
+- r=+1.000 n=86  `FUNC.gauge_error.delta_circ|min` ~ `FUNC.direction_transfer.bound|min`
+- r=+1.000 n=86  `FUNC.local_extremal.delta_circ|min` ~ `FUNC.capacity_transfer.bound|min`
+- r=+1.000 n=86  `FUNC.local_extremal.delta_circ|min` ~ `FUNC.direction_transfer.bound|min`

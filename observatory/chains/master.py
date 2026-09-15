@@ -13,6 +13,9 @@ from ..schema import (Emitter, MODE_EXACT, MODE_FLOAT, ROLE_INPUT, ROLE_TERM,
                       ROLE_LHS, ROLE_RHS, ROLE_SLACK, ROLE_RATIO, ROLE_FLAG,
                       ROLE_DIAG, ST_OK, ST_UNDEFINED, ST_SKIPPED)
 from ..worlds import Support, World
+from research_chains.novelty_completion import (
+    EvidenceItem, greedy_typed_completion, minimum_cost_typed_completion,
+)
 from ._common import (exact_optimum, topc_set, deficit_terms, zeta_def, global_E,
                       lp_lower_bound, world_key)
 
@@ -236,81 +239,91 @@ TYPES = ("response", "reference", "support", "interaction", "query")
 
 def probe_typed_completion(em: Emitter, key: Dict, rng, *, n_obligations: int = 5,
                            n_evidence: int = 9) -> None:
-    """MASTER.typed_completion -- minimum-cost cover over *typed* evidence.
+    """MASTER.typed_completion -- exact weighted completion versus typed greedy.
 
-    Each evidence item discharges a subset of obligations and carries a cost.
-    The exact optimum is compared against the greedy cost-effectiveness rule,
-    which is the only algorithm here with a proved guarantee.  Types are carried
-    so that a later analysis can ask whether cheap covers concentrate on one
-    semantic type -- the thing direct-product indispensability says they cannot
-    do in the worst case.
+    This probe uses the same canonical typed object as the standalone TCC lab:
+    obligations declare a required semantic type and an evidence item may
+    discharge only obligations of that exact type.  The exact oracle minimizes
+    *cost*, not cardinality.  Direct singleton evidence guarantees feasibility;
+    additional same-type bundles/decoys create the hardness variation.
     """
-    obligations = list(range(n_obligations))
+    n_obligations = int(n_obligations)
+    target_items = max(int(n_evidence), n_obligations + 2)
+    obligation_ids = [f"o{j}" for j in range(n_obligations)]
+    # Rotate a shuffled type schedule so the experiment is not tied to a fixed
+    # obligation index while still using only the declared five semantic types.
+    type_schedule = list(TYPES)
+    rng.shuffle(type_schedule)
+    obligations = {o: type_schedule[j % len(type_schedule)]
+                   for j, o in enumerate(obligation_ids)}
+
     items = []
-    for i in range(n_evidence):
-        cov = frozenset(o for o in obligations if rng.random() < 0.45)
-        cost = Q(rng.randint(1, 9), 4)
-        items.append((cov, cost, TYPES[i % len(TYPES)]))
-    universe = frozenset(obligations)
-    covered_all = frozenset().union(*[c for c, _, _ in items]) if items else frozenset()
-    feasible = covered_all >= universe
+    cost_units = {}
+    for j, o in enumerate(obligation_ids):
+        units = rng.randint(3, 12)
+        item = EvidenceItem(f"direct_{j}", obligations[o], units / 4.0, frozenset({o}))
+        items.append(item); cost_units[item.key] = units
 
-    best = None
-    if feasible:
-        for size in range(1, n_evidence + 1):
-            for combo in itertools.combinations(range(n_evidence), size):
-                cov = frozenset().union(*[items[i][0] for i in combo])
-                if cov >= universe:
-                    c = sum(items[i][1] for i in combo)
-                    if best is None or c < best[0]:
-                        best = (c, combo)
-            if best is not None:
-                break
+    extra_id = 0
+    while len(items) < target_items:
+        ty = rng.choice(TYPES)
+        compatible = [o for o, required in obligations.items() if required == ty]
+        # A type absent from this draw can only contribute a semantically inert
+        # decoy.  It remains in the catalogue to measure typed non-substitutability.
+        if not compatible:
+            units = rng.randint(1, 4)
+            item = EvidenceItem(f"decoy_{extra_id}", ty, units / 4.0, frozenset())
+        else:
+            chosen = [o for o in compatible if rng.random() < 0.65]
+            if not chosen:
+                chosen = [rng.choice(compatible)]
+            units = rng.randint(1, max(2, 3 * len(chosen) + 4))
+            item = EvidenceItem(f"bundle_{extra_id}", ty, units / 4.0, frozenset(chosen))
+        items.append(item); cost_units[item.key] = units; extra_id += 1
 
-    remaining = set(universe)
-    greedy_cost = ZERO
-    greedy_types = set()
-    while remaining and feasible:
-        pick, score = None, None
-        for i, (cov, cost, ty) in enumerate(items):
-            gain = len(cov & remaining)
-            if gain == 0:
-                continue
-            s = cost / Q(gain)
-            if score is None or s < score:
-                pick, score = i, s
-        if pick is None:
-            break
-        greedy_cost += items[pick][1]
-        greedy_types.add(items[pick][2])
-        remaining -= items[pick][0]
+    optimum = minimum_cost_typed_completion(obligations, items)
+    greedy = greedy_typed_completion(obligations, items)
+    if not optimum["complete"] or not greedy["complete"]:
+        raise AssertionError("direct singleton catalogue must make typed completion feasible")
+    if float(greedy["cost"]) + 1e-10 < float(optimum["cost"]):
+        raise AssertionError(
+            "greedy typed completion cost fell below the exact minimum; oracle/protocol bug"
+        )
 
-    inst = dict(key, n_obligations=n_obligations, n_evidence=n_evidence)
+    # Every cost is generated in quarter units, so convert back to exact Q for
+    # the Observatory rather than smuggling floating solver output into exact mode.
+    opt_q = Q(int(round(float(optimum["cost"]) * 4)), 4)
+    greedy_q = Q(int(round(float(greedy["cost"]) * 4)), 4)
+    item_costs = [Q(cost_units[x.key], 4) for x in items]
+    gr = ratio(greedy_q, opt_q) if opt_q != 0 else None
+    greedy_types = set(greedy.get("selected_types", ()))
+    optimal_types = set(optimum.get("selected_types", ()))
+    inst = dict(key, n_obligations=n_obligations, n_evidence=len(items))
     e = "MASTER.typed_completion"
     em.emit(chain=CHAIN, eq_id=e, symbol="n_obligations", value=n_obligations,
             role=ROLE_INPUT, instance=inst)
-    em.emit(chain=CHAIN, eq_id=e, symbol="n_evidence", value=n_evidence,
+    em.emit(chain=CHAIN, eq_id=e, symbol="n_evidence", value=len(items),
             role=ROLE_INPUT, instance=inst)
-    em.emit(chain=CHAIN, eq_id=e, symbol="is_complete", value=1 if feasible else 0,
+    em.emit(chain=CHAIN, eq_id=e, symbol="is_complete", value=1,
             role=ROLE_FLAG, instance=inst)
-    em.emit(chain=CHAIN, eq_id=e, symbol="completion_cost",
-            value=best[0] if best else None, role=ROLE_LHS,
-            status=ST_OK if best else ST_UNDEFINED, instance=inst)
-    em.emit(chain=CHAIN, eq_id=e, symbol="greedy_cost",
-            value=greedy_cost if feasible else None, role=ROLE_RHS,
-            status=ST_OK if feasible else ST_UNDEFINED, instance=inst)
-    gr = ratio(greedy_cost, best[0]) if (best and best[0] != 0) else None
+    em.emit(chain=CHAIN, eq_id=e, symbol="completion_cost", value=opt_q,
+            role=ROLE_LHS, instance=inst,
+            note="global minimum weighted cost under typed discharge")
+    em.emit(chain=CHAIN, eq_id=e, symbol="greedy_cost", value=greedy_q,
+            role=ROLE_RHS, instance=inst)
     em.emit(chain=CHAIN, eq_id=e, symbol="greedy_ratio", value=gr, role=ROLE_RATIO,
             status=ST_OK if gr is not None else ST_UNDEFINED, instance=inst)
-    em.emit(chain=CHAIN, eq_id=e, symbol="n_active_after", value=len(remaining),
+    em.emit(chain=CHAIN, eq_id=e, symbol="n_active_after", value=0,
             role=ROLE_TERM, instance=inst)
     em.emit(chain=CHAIN, eq_id=e, symbol="cheapest_single",
-            value=min((c for _, c, _ in items), default=None), role=ROLE_DIAG, instance=inst)
-    costs = [c for _, c, _ in items]
+            value=min(item_costs) if item_costs else None, role=ROLE_DIAG, instance=inst)
     em.emit(chain=CHAIN, eq_id=e, symbol="cost_spread",
-            value=(max(costs) - min(costs)) if costs else ZERO, role=ROLE_DIAG, instance=inst)
+            value=(max(item_costs) - min(item_costs)) if item_costs else ZERO,
+            role=ROLE_DIAG, instance=inst)
     em.emit(chain=CHAIN, eq_id=e, symbol="types_used", value=len(greedy_types),
-            role=ROLE_TERM, instance=inst)
+            role=ROLE_TERM, instance=inst,
+            note="distinct semantic types used by typed greedy; optimum types="
+                 + str(sorted(optimal_types)))
 
 
 def probe_indispensability(em: Emitter, key: Dict) -> None:

@@ -1,0 +1,60 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Response Geometry}\\[2pt]
+{\large\itshape Append-only update G: the ratio that is identified, and the one that is not}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--76 are an immutable prefix. This addendum begins at Section 77.
+
+\section*{77. The headline ratio is a point estimate, not an identified coefficient}
+Section 74 reported $2.670\times$ against \texttt{uniform} and noted that \texttt{uniform} clears the censoring line by only $4.33$ percentage points. That caveat was directionally right but not quantified, and quantifying it changes what may be claimed.
+
+A distribution-free $95\%$ confidence interval for a median at $n=300$ runs between order statistics $X_{(133)}$ and $X_{(168)}$:
+
+\begin{center}\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+variant & median & CI lower & CI upper \\
+\midrule
+\texttt{C\_anytime}     & $34\,788$ & $27\,068$ & $52\,188$ \\
+\texttt{C\_known\_sigma} & $34\,532$ & $26\,732$ & $51\,596$ \\
+\texttt{C\_pilot}       & $45\,957$ & $38\,029$ & $65\,069$ \\
+\texttt{C\_shrink}      & $46\,613$ & $37\,405$ & $67\,117$ \\
+\texttt{C\_split}       & $74\,817$ & $60\,473$ & $89\,289$ \\
+\texttt{uniform}        & $92\,876$ & $79\,164$ & \textbf{censored} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Only $163$ of \texttt{uniform}'s $300$ runs certified, so $X_{(168)}$ falls beyond the horizon: its upper confidence limit exceeds $131\,072$ and is not identified. Five variants have fully identified intervals; \texttt{uniform} does not. Consequently the ratio $2.670$ has an identified \emph{lower} confidence side and an unidentified upper one, and must be reported as a measured point estimate rather than as a population coefficient. Dividing the marginal interval endpoints gives a valid but very weak one-sided bound, $79\,164/52\,188 = 1.52\times$.
+
+\section*{78. The paired ratio is identified, and it is the statement to use}
+The design uses common random streams (\texttt{common\_random\_streams = true}), so the variants are matched instance by instance and the paired comparison is both valid and far tighter than dividing marginal intervals. On the $163$ instances where both certify:
+
+\begin{center}\footnotesize
+median paired ratio $= \mathbf{2.183}$, \quad $95\%$ CI $= [\,2.067,\ 2.324\,]$
+\end{center}
+
+with minimum paired ratio $1.111$ -- \texttt{C\_anytime} is faster on \emph{every one} of the $163$ -- interquartile range $[1.761,\ 2.603]$, and maximum $3.859$.
+
+Two features make this the right vehicle. It is free of censoring, because both members of every pair certified. And the instances it drops are $49$ where \texttt{C\_anytime} certified and \texttt{uniform} did not, against $0$ in the other direction: the selection removes exactly the cases where \texttt{uniform} performed worst, so the interval is biased \textbf{against} the conclusion it supports.
+\claimbox{The revised reading of Sections 74--75. Identified: a paired median speed-up of $2.18\times$, $95\%$ CI $[2.07,\ 2.32]$, conservative by construction. Measured but not identified: the marginal median ratio $2.670\times$. Unchanged and not dependent on either: the sweep itself --- $163$ of $163$ paired wins, sign test $p \approx 1.7\times10^{-49}$, plus $49$ instances certified by \texttt{C\_anytime} alone --- and \texttt{false\_safe\_count} $=0$ across all $1\,800$ runs.}
+
+\section*{79. The horizon comparison is still not available}
+Section 76 recorded that the $65\,536$ probe used seed $8301$ and cannot be differenced against seeds $8201$--$8203$. The matched re-run at $131\,072$ on seed $8301$ has been launched twice: the first attempt lost its process before writing output and left an empty log, and the relaunch under a managed session has not yet produced a result file. Until it does, no horizon effect is claimed.
+\end{document}

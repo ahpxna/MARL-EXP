@@ -1,0 +1,517 @@
+{
+  "scope": "Exact finite uniform-prior probe for R5. Parity is a BENCHMARK, not the claim; the claim is the bundle-size separation between geometries under the same membership primitive.",
+  "exact_checks": 15793,
+  "skipped": {
+    "radius_bridge": "d in 2..8 only (2^d worlds enumerated); larger d not attempted",
+    "parity_bundles": "d in 2..8; all 2^d bundles per d",
+    "geometry_bundle_sizes": "multitip m in 3..7, intervals n<=7, dyadic laminar n in {4,8}; bundle search capped at k<=2 because k=1 already succeeds",
+    "greedy": "d in 2..6, M in {d+1, 2d, d^2+1}; M=1 excluded because bit and direct gain-per-cost tie there",
+    "cliff_dp": "full-state DP d in 2..5 only (state space is the power set of the cube); d>5 not attempted here, but parity_bundle_probe.json covers d<=6 full-state and d<=10 symmetry-reduced",
+    "not_probed": [
+      "non-uniform priors",
+      "noisy answers",
+      "expected-cost (non-pathwise) budgets",
+      "query classes other than single-tip membership"
+    ]
+  },
+  "A_radius_bridge": "raw max-min recomputation agrees with the indicator (2/(m-1))*selectedRadius(W_x,{j}) = [j != b(x)]",
+  "B_parity_bundles": [
+    {
+      "d": 2,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 2
+    },
+    {
+      "d": 3,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 3
+    },
+    {
+      "d": 4,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 4
+    },
+    {
+      "d": 5,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 5
+    },
+    {
+      "d": 6,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 6
+    },
+    {
+      "d": 7,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 7
+    },
+    {
+      "d": 8,
+      "risk_by_bundle_size": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "bundle_size": 8
+    }
+  ],
+  "C_geometry_bundle_sizes": [
+    {
+      "geometry": "multitip_dense",
+      "n": 3,
+      "worlds": 3,
+      "bundle_size": 1,
+      "risk_0": "2/3",
+      "risk_1": "1/3"
+    },
+    {
+      "geometry": "multitip_dense",
+      "n": 4,
+      "worlds": 4,
+      "bundle_size": 1,
+      "risk_0": "3/4",
+      "risk_1": "1/2"
+    },
+    {
+      "geometry": "multitip_dense",
+      "n": 5,
+      "worlds": 5,
+      "bundle_size": 1,
+      "risk_0": "4/5",
+      "risk_1": "3/5"
+    },
+    {
+      "geometry": "multitip_dense",
+      "n": 6,
+      "worlds": 6,
+      "bundle_size": 1,
+      "risk_0": "5/6",
+      "risk_1": "2/3"
+    },
+    {
+      "geometry": "multitip_dense",
+      "n": 7,
+      "worlds": 7,
+      "bundle_size": 1,
+      "risk_0": "6/7",
+      "risk_1": "5/7"
+    },
+    {
+      "geometry": "interval_membership",
+      "n": 3,
+      "worlds": 6,
+      "bundle_size": 1,
+      "risk_0": "1/2",
+      "risk_1": "1/6"
+    },
+    {
+      "geometry": "interval_membership",
+      "n": 4,
+      "worlds": 10,
+      "bundle_size": 1,
+      "risk_0": "2/5",
+      "risk_1": "1/10"
+    },
+    {
+      "geometry": "interval_membership",
+      "n": 5,
+      "worlds": 15,
+      "bundle_size": 1,
+      "risk_0": "1/3",
+      "risk_1": "1/15"
+    },
+    {
+      "geometry": "interval_membership",
+      "n": 6,
+      "worlds": 21,
+      "bundle_size": 1,
+      "risk_0": "2/7",
+      "risk_1": "1/21"
+    },
+    {
+      "geometry": "interval_membership",
+      "n": 7,
+      "worlds": 28,
+      "bundle_size": 1,
+      "risk_0": "1/4",
+      "risk_1": "1/28"
+    },
+    {
+      "geometry": "laminar_dyadic",
+      "n": 4,
+      "worlds": 7,
+      "bundle_size": 1,
+      "risk_0": "3/7",
+      "risk_1": "1/7"
+    },
+    {
+      "geometry": "laminar_dyadic",
+      "n": 8,
+      "worlds": 15,
+      "bundle_size": 1,
+      "risk_0": "4/15",
+      "risk_1": "1/15"
+    }
+  ],
+  "D_greedy": [
+    {
+      "d": 2,
+      "direct_cost_M": 3,
+      "optimal_cost": 2,
+      "risk_greedy_cost": 3,
+      "world_entropy_greedy_cost": 2,
+      "decision_entropy_greedy_cost": 3,
+      "risk_greedy_ratio": "3/2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 2,
+      "direct_cost_M": 4,
+      "optimal_cost": 2,
+      "risk_greedy_cost": 4,
+      "world_entropy_greedy_cost": 2,
+      "decision_entropy_greedy_cost": 4,
+      "risk_greedy_ratio": "2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 2,
+      "direct_cost_M": 5,
+      "optimal_cost": 2,
+      "risk_greedy_cost": 5,
+      "world_entropy_greedy_cost": 2,
+      "decision_entropy_greedy_cost": 5,
+      "risk_greedy_ratio": "5/2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 4,
+      "optimal_cost": 3,
+      "risk_greedy_cost": 4,
+      "world_entropy_greedy_cost": 3,
+      "decision_entropy_greedy_cost": 4,
+      "risk_greedy_ratio": "4/3",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 6,
+      "optimal_cost": 3,
+      "risk_greedy_cost": 6,
+      "world_entropy_greedy_cost": 3,
+      "decision_entropy_greedy_cost": 6,
+      "risk_greedy_ratio": "2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 10,
+      "optimal_cost": 3,
+      "risk_greedy_cost": 10,
+      "world_entropy_greedy_cost": 3,
+      "decision_entropy_greedy_cost": 10,
+      "risk_greedy_ratio": "10/3",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 5,
+      "optimal_cost": 4,
+      "risk_greedy_cost": 5,
+      "world_entropy_greedy_cost": 4,
+      "decision_entropy_greedy_cost": 5,
+      "risk_greedy_ratio": "5/4",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 8,
+      "optimal_cost": 4,
+      "risk_greedy_cost": 8,
+      "world_entropy_greedy_cost": 4,
+      "decision_entropy_greedy_cost": 8,
+      "risk_greedy_ratio": "2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 17,
+      "optimal_cost": 4,
+      "risk_greedy_cost": 17,
+      "world_entropy_greedy_cost": 4,
+      "decision_entropy_greedy_cost": 17,
+      "risk_greedy_ratio": "17/4",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 6,
+      "optimal_cost": 5,
+      "risk_greedy_cost": 6,
+      "world_entropy_greedy_cost": 5,
+      "decision_entropy_greedy_cost": 6,
+      "risk_greedy_ratio": "6/5",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 10,
+      "optimal_cost": 5,
+      "risk_greedy_cost": 10,
+      "world_entropy_greedy_cost": 5,
+      "decision_entropy_greedy_cost": 10,
+      "risk_greedy_ratio": "2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 26,
+      "optimal_cost": 5,
+      "risk_greedy_cost": 26,
+      "world_entropy_greedy_cost": 5,
+      "decision_entropy_greedy_cost": 26,
+      "risk_greedy_ratio": "26/5",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 6,
+      "direct_cost_M": 7,
+      "optimal_cost": 6,
+      "risk_greedy_cost": 7,
+      "world_entropy_greedy_cost": 6,
+      "decision_entropy_greedy_cost": 7,
+      "risk_greedy_ratio": "7/6",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 6,
+      "direct_cost_M": 12,
+      "optimal_cost": 6,
+      "risk_greedy_cost": 12,
+      "world_entropy_greedy_cost": 6,
+      "decision_entropy_greedy_cost": 12,
+      "risk_greedy_ratio": "2",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    },
+    {
+      "d": 6,
+      "direct_cost_M": 37,
+      "optimal_cost": 6,
+      "risk_greedy_cost": 37,
+      "world_entropy_greedy_cost": 6,
+      "decision_entropy_greedy_cost": 37,
+      "risk_greedy_ratio": "37/6",
+      "world_entropy_greedy_ratio": "1",
+      "root_one_step_bit_risk_gain": "0",
+      "root_one_step_bit_world_entropy_gain_bits": "1"
+    }
+  ],
+  "E_budget_cliff": [
+    {
+      "d": 2,
+      "direct_cost_M": 2,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 2
+    },
+    {
+      "d": 2,
+      "direct_cost_M": 4,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 2
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 3,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 3
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 6,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 3
+    },
+    {
+      "d": 3,
+      "direct_cost_M": 9,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 3
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 4,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 4
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 8,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 4
+    },
+    {
+      "d": 4,
+      "direct_cost_M": 16,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 4
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 5,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 5
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 10,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 5
+    },
+    {
+      "d": 5,
+      "direct_cost_M": 25,
+      "hard_budget_risk": [
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "1/2",
+        "0"
+      ],
+      "cliff_at": 5
+    }
+  ],
+  "headline": "bundle size is a property of how the danger region sits relative to the query class: 1 for multitip, interval and laminar danger sets under membership queries, exactly d for the parity danger set under the same primitive.",
+  "greedy_caveat": "risk-greedy and decision-entropy-greedy both overspend by M/d; WORLD-entropy-greedy is optimal here, so the failure is not a failure of greedy acquisition in general.",
+  "source_sha256": "a132934f1ca48e2535c57ffd28798ee0f4d0c80a86ad8aed37cc8e53e7346e8d"
+}

@@ -1,0 +1,77 @@
+{
+  "by_parity": {
+    "even_m": {
+      "bound": "m*delta_square",
+      "k": "m/2",
+      "max_sdiff": "m/2",
+      "status": "the (m-1) law is PROVED FALSE at m=6; the balanced complement is the only geometry the reduction does not cover"
+    },
+    "odd_m": {
+      "bound": "(m-1)*delta_square",
+      "k": "(m-1)/2",
+      "max_sdiff": "(m-1)/2",
+      "status": "the (m-1) law is PROVED for every odd m; the half-factor hypothesis 2|S\\T| <= m-1 is automatic"
+    }
+  },
+  "corrected_lean_target": "Parameterise the tie-witness perturbation family W_t; prove strict Top-C and the interaction bound on an interval t>0; show 2D/delta_square -> 6; conjoin with pair_loss_le_sdiff_card to pin the optimal constant at 6 for m=6. This is a Lean target, not a search target.",
+  "derived_upper_bound": "2D <= 2*|S\\T|*delta_square <= 2*min(k, m-k)*delta_square",
+  "development_only": true,
+  "evidence_class": "PROVED_LEAN4_PREEXISTING",
+  "experiments_now_cancelled": [
+    {
+      "experiment": "all 380 faces at m=6 seeded from the witness, asking whether any exceeds 6/5",
+      "reason": "answered in advance: none can, 6/5 is the proved ceiling"
+    },
+    {
+      "experiment": "testing the T = S^c regularity",
+      "reason": "forced by pair_half_factor_except_balanced_complement; no test needed"
+    }
+  ],
+  "nature": "The proof was already in the repository and the author of the search programme did not look for it. This is the largest single error of the campaign: two days of instrument building aimed at a quantity a sibling module had already bounded.",
+  "non_claims": [
+    "Sharpness at m=6 is NOT proved; only the upper bound is.",
+    "Nothing here is claimed for even m other than 6.",
+    "The upper-bound theorems were verified by reading their statements and hypotheses in source; this artifact does not re-run their compilation."
+  ],
+  "preexisting_theorems": {
+    "pair_half_factor_except_balanced_complement": {
+      "docstring_scope": "proves the headline coefficient everywhere except the unique maximal-distance geometry: an even universe split into two complementary equal halves",
+      "file": "work/p13_conjectures/LeanD6SymmetricDifferenceReductionV1.lean",
+      "line": 76
+    },
+    "pair_half_factor_of_small_symmetric_difference": {
+      "file": "work/p13_conjectures/LeanD6SmallSymmetricDifference.lean",
+      "line": 184,
+      "statement": "with 2*|selected \\ competitor| <= n, loss difference <= n*delta/2, i.e. 2D <= (m-1)*delta_square -- the original D6 bound"
+    },
+    "pair_loss_le_sdiff_card": {
+      "file": "work/p13_conjectures/LeanD6SmallSymmetricDifference.lean",
+      "hypotheses": [
+        "q nonnegative",
+        "q normalized",
+        "0 <= delta",
+        "forall i x c, |mixedDifference F i x c| <= delta",
+        "IsTopKByScore (osc . productResponse) selected k",
+        "competitor.card = k"
+      ],
+      "line": 86,
+      "statement": "productCompressionLoss selected - productCompressionLoss competitor <= |selected \\ competitor| * delta"
+    }
+  },
+  "process_lesson": "Search the corpus before building an instrument to measure what it may already prove. The four instruments retain value as lower-bound machinery, but the constant was never unbounded above.",
+  "protocol_version": "d6_upper_bound_synthesis_v1",
+  "retracted_text": "Every instrument so far returns a LOWER bound, they disagree, and c*(m) needs an UPPER bound, i.e. a proof. The face LP would supply one only if the family were enumerated completely, which is 6.4e9 faces at m=6.",
+  "retracts": "D6_FACE_LP_INSTRUMENT_20260907.json and the addendum C/D claim that c*(m) needs an upper bound",
+  "state_of_c_star_at_m6": {
+    "lower_bound": 5.99966,
+    "lower_bound_sources": {
+      "ascent": "5 * 1.1932566 = 5.966283",
+      "face_lp": "5 * 1.1932703346942966 = 5.966351673471483",
+      "margin_sweep_extrapolation": "6/5 with deficit linear in mu, coefficient about 6.74"
+    },
+    "upper_bound": 6,
+    "upper_bound_status": "PROVED (pair_loss_le_sdiff_card with |S\\T| = 3)",
+    "what_is_open": "sharpness only: attainment of m*delta_square in the balanced complement"
+  },
+  "why_the_counterexample_lives_where_it_does": "The witness has S={0,4,5}, T={1,2,3}, m=6 even, T = complement(S), |S|=|T|=3: exactly the balanced complement. The empirical regularity 'the winning face has T = S^c', observed independently at m=4 and m=6 by the face-enumeration LP, is therefore FORCED, not luck. Everywhere else the (m-1) bound is a theorem, so no counterexample can exist there. Four instruments kept rediscovering that one geometry because it is the only one available."
+}

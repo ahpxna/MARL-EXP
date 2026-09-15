@@ -1,0 +1,86 @@
+"""Exact binary product responses and rational certificates, no rounded LP claims."""
+from fractions import Fraction as F
+from itertools import combinations
+from pathlib import Path
+import argparse
+import json
+import numpy as np
+
+_ap=argparse.ArgumentParser(description=__doc__)
+_ap.add_argument('--out',default='research/high_risk_20260910/d6_reference_fibre_exact.json')
+_OUT=Path(_ap.parse_args().out)
+if _OUT.exists(): raise SystemExit(f'refusing to overwrite existing ledger artifact: {_OUT}')
+_OUT.parent.mkdir(parents=True,exist_ok=True)
+from scipy.optimize import linprog
+
+def gadget(k,A):
+    m=2*k;z=m-1;B=set(range(m-1))-set(A)
+    return [F(int(not(x>>z&1) and (any(x>>i&1 for i in A) or sum(x>>i&1 for i in B)>=2))) for x in range(1<<m)]
+def response(f,m,t):
+    out=[]
+    for j in range(m):
+        vals=[]
+        for b in (0,1):
+            vals.append(sum((t**((x&~(1<<j)).bit_count())*(1-t)**(m-1-(x&~(1<<j)).bit_count())*f[x|((1<<j) if b else 0)] for x in range(1<<m) if not(x>>j&1)),F(0)))
+        out.append(vals)
+    return out
+def delta(f,m):
+    return max(max(d)-min(d) for i in range(m) for d in [[f[x|(1<<i)]-f[x] for x in range(1<<m) if not(x>>i&1)]])
+def losses(f,m,k,Q):
+    return {S:(max(v)-min(v))/2 for S in combinations(range(m),k) for v in [[f[x]-sum(Q[j][x>>j&1] for j in S) for x in range(1<<m)]]}
+def cert_game(rows):
+    a=np.array([[float(v) for v in row] for row in rows]); n,w=a.shape
+    p=linprog([0]*w+[1],A_ub=np.c_[a,-np.ones(n)],b_ub=np.zeros(n),A_eq=[[1]*w+[0]],b_eq=[1],bounds=[(0,None)]*w+[(None,None)],method='highs')
+    assert p.success,p.message
+    mix=[max(F(0),F(float(v)).limit_denominator(10**6)) for v in p.x[:-1]]
+    dual=[max(F(0),F(float(-v)).limit_denominator(10**6)) for v in p.ineqlin.marginals]
+    mix=[v/sum(mix) for v in mix];dual=[v/sum(dual) for v in dual]
+    assert sum(mix)==sum(dual)==1 and min(mix)>=0 and min(dual)>=0
+    upper=max(sum(x*y for x,y in zip(row,mix)) for row in rows)
+    lower=min(sum(dual[i]*rows[i][j] for i in range(n)) for j in range(w))
+    assert lower<=upper
+    return dict(value=str(lower) if lower==upper else None, lower=str(lower), upper=str(upper), exact_gap=str(upper-lower),primal=[str(v) for v in mix],dual=[str(v) for v in dual],rational_primal_dual_bounds_verified=True,exact_value_verified=(lower==upper))
+
+out={'reference_sweep':[],'sharp_threshold_witness':[],'same_response_fibres':[],'scope':'finite exact witnesses; no general noisy-query or adaptive-rate claim'}
+for t in map(F,['0','1/16','1/8','1/4','1/2']):
+    k=3;m=6;A=tuple(range(k));g=gadget(k,A)
+    f=[g[x]+sum(F(x>>i&1) for i in range(k,m-1))-F(x>>(m-1)&1) for x in range(1<<m)]
+    Q=response(f,m,t);C=[abs(b-a) for a,b in Q];S=tuple(sorted(sorted(range(m),key=lambda j:(-C[j],j))[:k]));loss=losses(f,m,k,Q)
+    out['reference_sweep'].append(dict(t=str(t),C=list(map(str,C)),top=S,optimal=[s for s,v in loss.items() if v==min(loss.values())],top_regret=str(loss[S]-min(loss.values())),two_regret_A=str(2*(loss[A]-min(loss.values()))),delta=str(delta(f,m))))
+for k in (3,4,5):
+    m=2*k;A=tuple(range(k));g=gadget(k,A)
+    for rho in map(F,['1','5/4','3/2','7/4','15/8','2','9/4']):
+        f=[g[x]+(rho-1)*sum(x>>i&1 for i in A) for x in range(1<<m)]
+        Q=response(f,m,F(0));loss=losses(f,m,k,Q);gap=2*(loss[A]-min(loss.values()))
+        assert delta(f,m)==1
+        assert gap==max(0,k*(2-rho)),(k,rho,gap)
+        out['sharp_threshold_witness'].append(dict(k=k,rho=str(rho),margin=str(rho),delta='1',two_regret=str(gap),predicted=str(max(0,k*(2-rho)))))
+# Reference-aware modular gauge: centered base + prescribed slope vector.
+# This is world-dependent compensation, not a common modular perturbation.
+print('verified reference and sharp threshold cells',out['reference_sweep'],flush=True)
+for k in (3,4):
+    m=2*k;A0=set(range(k));worlds=list(combinations(range(m-1),k))
+    for t in map(F,['0','1/64','1/16','1/2']):
+        for rho in map(F,['1/2','1','3/2','7/4','15/8','2']):
+            target=[rho if j in A0 else F(0) for j in range(m)]
+            rows=[];profiles=[];opts=[];fv=[]
+            for A in worlds:
+                base=gadget(k,A);qb=response(base,m,t);sl=[b-a for a,b in qb]
+                mean=qb[0][0]+t*sl[0]
+                f=[base[x]-mean+sum((target[j]-sl[j])*(F(x>>j&1)-t) for j in range(m)) for x in range(1<<m)]
+                Q=response(f,m,t);profiles.append(Q);assert delta(f,m)==1
+                loss=losses(f,m,k,Q);mn=min(loss.values());rows.append([v-mn for v in loss.values()]);opts.append({S for S,v in loss.items() if v==mn});fv.append(f)
+            assert all(Q==profiles[0] for Q in profiles)
+            cell=dict(k=k,t=str(t),rho=str(rho),same_full_Q=True,expected_corner_value=str(F(k)*rho*(2-rho)/4) if 1<=rho<=2 else None,common_optima=[list(v) for v in set.intersection(*opts)],**cert_game(rows))
+            if k==3 and rho==F(3,2):
+                cell.update(worlds=worlds,world_values=[[str(v) for v in f] for f in fv],regret_matrix=[[str(v) for v in row] for row in rows],profile=[[str(v) for v in pair] for pair in profiles[0]])
+            if t==0 and 1<=rho<=2:
+                assert F(cell['lower'])==F(cell['upper'])==F(k)*rho*(2-rho)/4
+            out['same_response_fibres'].append(cell)
+            print('fibre',k,str(t),str(rho),cell['value'],flush=True)
+            _OUT.write_text(json.dumps(out,indent=2)+'\n')
+_OUT.write_text(json.dumps(out,indent=2)+'\n')
+for section,rows in out.items():
+    if isinstance(rows,list):
+        print(section,flush=True)
+        for row in rows:print({k:v for k,v in row.items() if k not in {'primal','dual','world_values','regret_matrix','profile','worlds'}},flush=True)

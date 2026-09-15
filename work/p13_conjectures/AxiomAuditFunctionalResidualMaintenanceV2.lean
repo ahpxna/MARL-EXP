@@ -1,0 +1,9 @@
+import «LeanFunctionalResidualMaintenanceV2»
+
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.residualBound_zero
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.selective_refresh_safety
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.residualBound_antitone
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.refresh_set_monotonicity
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.feasible_iff_full_refresh_safe
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.no_feasible_refresh_of_full_failure
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.minimum_cost_refresh_exists

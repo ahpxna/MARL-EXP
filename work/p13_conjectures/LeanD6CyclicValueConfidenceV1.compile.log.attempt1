@@ -1,0 +1,67 @@
+LeanD6CyclicValueConfidenceV1.lean:25:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.D6CyclicValueConfidence.model_estimate_mem`:
+  [DecidableEq C]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq C] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+LeanD6CyclicValueConfidenceV1.lean:60:2: error: linarith failed to find a contradiction
+n : ℕ
+C : Type u_1
+inst✝¹ : Fintype C
+inst✝ : DecidableEq C
+G : C → Finset (I n)
+A : Finset (I n)
+j : I n
+hj : j ∉ A
+halt : ∃ A' nu, Admissible A A' j nu
+q L0 : ℕ
+hq : 1 ≤ q
+hL : 0 < L0
+hC : 0 < Fintype.card C
+mu : ℝ
+hmu : 0 ≤ mu
+hmu1 : mu ≤ 1
+hm : ∑ t, actualMean A j mu (Sum.inr (G t, false)) = ↑(Fintype.card C) + ↑q ^ 2 * (1 - mu)
+delta : ℝ
+hd : 0 < delta
+hd1 : delta ≤ 1
+E : Finset (Measurement n)
+w v : ℕ → Sample C → Measurement n → ℝ
+tau : ℕ → Sample C → ℝ
+ht : ∀ (s : ℕ) (x : Sample C), 0 ≤ tau s x
+hf : ∀ (s : ℕ) (x : Sample C), Feasible j (↑q) E (w s x)
+hv : ∀ (s : ℕ) (x : Sample C), ∀ e ∈ E, 0 ≤ v s x e
+hopt :
+  ∀ (s : ℕ) (x : Sample C),
+    oracleValue A j (↑q) (modelEstimate q L0 s x) ≤ allocationValue A j (modelEstimate q L0 s x) E (w s x) + tau s x
+x : Sample C
+hx :
+  x ∈
+    ⋃ s,
+      {x |
+        2 * marginModulus ↑q * width q L0 s delta + tau s x + informationCap ↑q * ∑ e ∈ E, |w s x e - v s x e| <
+          oracleRegret A j (↑q) mu E (v s x)}
+s : ℕ
+hs :
+  x ∈
+    {x |
+      2 * marginModulus ↑q * width q L0 s delta + tau s x + informationCap ↑q * ∑ e ∈ E, |w s x e - v s x e| <
+        oracleRegret A j (↑q) mu E (v s x)}
+hn : x ∉ {x | width q L0 s delta ≤ |pathEstimate q (epochLength L0 s) x - mu|}
+herr : |mu - modelEstimate q L0 s x| ≤ width q L0 s delta
+hr :
+  oracleRegret A j (↑q) mu E (v s x) ≤
+    2 * marginModulus ↑q * |mu - modelEstimate q L0 s x| + tau s x + informationCap ↑q * ∑ e ∈ E, |w s x e - v s x e|
+hcoef : 0 ≤ 2 * marginModulus ↑q
+hbound : 2 * marginModulus ↑q * |mu - modelEstimate q L0 s x| ≤ 2 * marginModulus ↑q * width q L0 s delta
+⊢ False
+failed
+'CIGAMF.P13.D6CyclicValueConfidence.model_estimate_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6CyclicValueConfidence.cyclic_value_confidence' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicValueConfidence.actual_world_value_confidence' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

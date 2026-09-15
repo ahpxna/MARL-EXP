@@ -1,0 +1,88 @@
+{
+  "audit_modules": [
+    "work/p13_conjectures/AxiomAuditBinaryCounterexampleV1.lean",
+    "work/p13_conjectures/AxiomAuditBinaryBridgeV1.lean"
+  ],
+  "axiom_audit_result": "Every theorem depends on a subset of [propext, Classical.choice, Quot.sound]; several need only [propext] or no axioms. Lean.ofReduceBool appears nowhere, so no native_decide is involved.",
+  "development_only": true,
+  "engineering_defects_recorded": [
+    {
+      "cost": "one failed compile, 64 GB",
+      "defect": "decide over a PI type",
+      "detail": "forall z : Fin 6 -> Fin 2 forces the Fintype instance for a function type; the kernel term is enormous. The first bridge exhausted 64 GB of RAM on it. The same facts stated over six explicit Fin 2 arguments compile in seconds. Rule: quantify over elements, not over functions, then lift with an eta lemma."
+    },
+    {
+      "cost": "one compile cycle",
+      "defect": "simp only carries no simprocs",
+      "detail": "After fin_cases the index is <k,_> and the if-condition is a Fin.val equality; both need reduceIte and Fin.mk_zero, which a closed simp only list does not invoke. Second time this fin_cases trap bit the corpus; the first was the twelve Fin.mk companion lemmas in V2."
+    },
+    {
+      "cost": "one compile cycle",
+      "defect": "guessing the shape of PolyhedralCellValid",
+      "detail": "Its last component compares responseWitnessSpan, a difference of two responses, not osc. Three errors had this single root. Reading the definition would have cost one grep."
+    },
+    {
+      "cost": "one error",
+      "defect": "guessing Mathlib division lemma names",
+      "detail": "div_lt_div_of_pos_left concludes a/b < a/c, same numerator; the goal had the same denominator. Replaced by two local helpers proved with linarith, since division by a numeral is linear."
+    },
+    {
+      "cost": "one error",
+      "defect": "rw across a cast boundary",
+      "detail": "rw with an integer equation cannot match a real literal. Fixed by four intermediate lemmas stating the residual extremes directly over R."
+    }
+  ],
+  "evidence_class": "PROVED_FALSE_LEAN4_AXIOM_AUDITED",
+  "headline_theorems": {
+    "binary_decisionInteraction_constant_five_false": "not (DecisionInteractionConstantAtMost witnessCell2 5) -- the (m-1) decision bound is FALSE on this cell, stated in the chain's own vocabulary, with NO rank hypothesis",
+    "binary_witness_summary": "the same five conditions without the raw clause",
+    "raw_rankOne_does_not_rescue_m_minus_one": "AllCoordinatesRawLocalContrastRankOne Wr AND Valid AND UnitInteractionBound AND StrictTopC AND 5 < 2*(loss_selected - loss_competitor)"
+  },
+  "integer_certificate": {
+    "competitor": [
+      1,
+      2,
+      3
+    ],
+    "delta_square": 17,
+    "doubled_decision_gap": 86,
+    "m_minus_one_delta": 85,
+    "ratio": "86/85",
+    "rescale": "1/17",
+    "selected": [
+      0,
+      4,
+      5
+    ],
+    "top_c_margin": 1,
+    "violation_margin": 1
+  },
+  "lean_modules": [
+    "work/p13_conjectures/LeanD6BinaryIntegerCounterexampleV1.lean",
+    "work/p13_conjectures/LeanD6BinaryBridgeV1.lean"
+  ],
+  "non_claims": [
+    "m=6, corner reference. Nothing is claimed for other m or other references.",
+    "The 6/5 supremum is conjectural and is not part of this promotion."
+  ],
+  "protocol_version": "d6_binary_bridge_lean_promotion_v1",
+  "supersedes": "D6_BINARY_PROVED_FALSE_SCOPE_CORRECTION_20260907.json",
+  "supersession_note": "That correction narrowed the earlier claim because the identification of the module's own definitions with the chain's quantities rested on prose. The bridge now discharges exactly that identification in Lean, so the narrowing is lifted. The correction file stays in the ledger as the record of a real gap that existed for one day.",
+  "theorems_audited": {
+    "base": 18,
+    "bridge": 42,
+    "total": 60
+  },
+  "what_remains_open": [
+    "The sharp constant c*(m) on the binary cube. Measured at m=6 as approaching 6/5 = m/(m-1) but NOT established; the tie-locus LP that would settle it is written, correct in formulation (it holds 6/5 when seeded at the known tie point) and locally trapped from random starts.",
+    "Whether the bound fails exactly for even m. The derivation 2k/(m-1) assumes a tie point whose loss spectrum has step delta_square; at m=4 the tie points found have step delta_square/2, so the parity statement is not established."
+  ],
+  "what_the_bridge_discharges": [
+    "retainedResidual cornerQ2 Wr selected2 = gSel / 17, and likewise for the competitor",
+    "productResponse cornerQ2 Wr i u = resp i u / 17 (corner reference is a point mass)",
+    "UnitInteractionBound Wr from |mixedDifference| <= 17 at the integer scale",
+    "witnessCell2.Valid Wr via activeDecisionCell_valid_iff_polyhedral",
+    "StrictTopC via osc = span, and responseWitnessSpan for the polyhedral form",
+    "2*(productCompressionLoss selected - productCompressionLoss competitor) = 86/17 > 5"
+  ]
+}

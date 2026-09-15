@@ -1,0 +1,342 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update D: the $(m-1)$ law and the raw rescue closed in Lean, a one-day scope gap, five formalisation defects, and the sharp constant after four instruments}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--110, including addenda A, B and C, are an immutable prefix. Nothing there is rewritten. This addendum begins at Section 111. Where an earlier line is now stale it is quoted and struck here.
+
+\textbf{What this addendum contains.} Two promotions to \eclass{PROVED\_FALSE\_LEAN4\_AXIOM\_AUDITED}; one scope correction issued and then lifted within a day; five formalisation defects, three of which were the author guessing instead of reading; one derivation that explains a measured constant; one retracted verdict on an instrument; and the current state of the only open question. As in addendum C, the failures are written out at the same length as the successes.
+
+\section*{111. The $(m-1)$ decision law is PROVED FALSE in Lean, unconditionally}
+Addendum C Section 109 recorded the module as written but uncompiled, and refused the label. Both files now compile and both audits are clean.
+
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.42\columnwidth}X}
+\toprule
+Item & Value\\
+\midrule
+\texttt{LeanD6BinaryIntegerCounter\-exampleV1} & 173 lines, 18 theorems\\
+\texttt{LeanD6BinaryBridgeV1} & 519 lines, 42 theorems\\
+\texttt{.olean} sizes & 436\,320 B and 1\,101\,552 B, both newer than source\\
+\texttt{sorry} / \texttt{admit} / \texttt{native\_decide} in code & 0\\
+Theorems audited & 60\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Reading the axiom audit.} The criterion is that \emph{nothing appears beyond} the standard three. Of the 60 theorems, 15 use strictly less: eleven depend on \texttt{[propext]} alone and four on no axioms at all, because they are decided by \texttt{decide} over integer arithmetic on the $2^6=64$ points. A subset of the standard three is stronger, not weaker. \texttt{Lean.ofReduceBool} appears nowhere, so no \texttt{native\_decide} is involved; the modules were written with \texttt{decide} precisely to make that impossible.
+
+An earlier instruction in this campaign said every line must read exactly \texttt{[propext, Classical.choice, Quot.sound]}. That was a misstatement by the author and is corrected here: subsets are admissible and better.
+
+\subsection*{111.1 The integer certificate}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xr}
+\toprule
+Quantity, integer scale & Value\\
+\midrule
+response oscillations $\operatorname{osc}_i$ & $(15,14,14,14,15,15)$\\
+selected, strict Top-3, margin $1$ & $\{0,4,5\}$\\
+competitor $=\arg\min_T\ell_T$, unique & $\{1,2,3\}$\\
+$2\ell_S$, between $(0,1,1,0,0,0)$ and $(1,0,0,1,1,1)$ & $101$\\
+$2\ell_{T^\ast}$, between $(1,0,0,0,0,0)$ and $\mathbf{0}$ & $15$\\
+$2D$ & $\mathbf{86}$\\
+$\delta_{\square}$, attained at coordinate $0$ & $17$\\
+$(m-1)\delta_{\square}$ & $85$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\[
+\boxed{2D=86>85=(m{-}1)\delta_{\square}}
+\]
+a violation by exactly one integer unit, echoing the $131$ against $130$ of the flagship. After the single positive rescale by $1/17$,
+\[
+2D=\frac{86}{17}=5.0588\ldots>5=m-1,\qquad \frac{2D}{(m-1)\delta_\square}=\frac{86}{85}.
+\]
+
+\textbf{Class transition.} The unconditional binary $(m-1)$ law: \eclass{EXACT\_RATIONAL\_COUNTEREXAMPLE\_INDEPENDENTLY\_RECOMPUTED} $\longrightarrow$ \eclass{PROVED\_FALSE\_LEAN4\_AXIOM\_AUDITED}.
+
+\section*{112. A scope gap that stood for one day}
+When the first module compiled, the promotion artifact was written with a field claiming it closed ``the universal $(m-1)$ decision law''. That was false at the time and the author caught it in the same session.
+
+\claimbox{\oldclaim{what\_this\_closes: The universal $(m-1)$ decision law, at $m=6$, corner reference. The binary $(m-1)$ law, which is the same statement. Any rescue of the bound by a rank hypothesis on the interaction contrast.}}
+\textbf{Why it was wrong.} The module proved eighteen arithmetic facts about \emph{its own} definitions -- \texttt{Wf}, \texttt{resp}, \texttt{osc6}, \texttt{gSel}, \texttt{gCom}, \texttt{rho}$_i$. That these \emph{are} the chain's $2D$ and $\delta_{\square}$ rested on the author's prose, not on a theorem. The correct reading was: the arithmetic is proved, the identification is not.
+
+\textbf{How it was handled.} \texttt{D6\_BINARY\_PROVED\_FALSE\_SCOPE\_CORRECTION\_2026\-0907.json} was written the same day, narrowing the claim and naming what was missing. The bridge of Section 113 then discharged exactly that, and \texttt{D6\_BRIDGE\_PROVED\_FALSE\_LEAN\_20260907.json} supersedes the correction. The correction file stays in the ledger: it is the record of a real gap, and of the interval during which the label was ahead of the evidence.
+
+\section*{113. What the bridge discharges}
+\begin{itemize}
+\item $\texttt{retainedResidual}\ \texttt{cornerQ2}\ W\ S = \texttt{gSel}/17$, and likewise for the competitor;
+\item $\texttt{productResponse}\ \texttt{cornerQ2}\ W\ i\ u = \texttt{resp}\ i\ u/17$, the corner reference being a point mass;
+\item \texttt{UnitInteractionBound} from $|\texttt{mixedDifference}|\le17$ at the integer scale;
+\item \texttt{witnessCell2.Valid} via \texttt{activeDecisionCell\_valid\_iff\_polyhedral};
+\item \texttt{StrictTopC} via $\operatorname{osc}=$ span, and \texttt{responseWitnessSpan} for the polyhedral form;
+\item $2(\ell_S-\ell_{T^\ast})=86/17>5$.
+\end{itemize}
+Two facts made this far lighter than the $|U|=3$ bridge of \texttt{...CounterexampleV2}: first, $\texttt{Wf}\,\mathbf{0}=0$, so $\texttt{resp}\,i\,0=0$ and the corner-referenced additive component \emph{is} the response, which removes the baseline term and makes \texttt{retainedResidual} coincide with \texttt{gSel} exactly; second, at $|U|=2$ every identification is a statement over a finite decidable type.
+
+The headline theorem is
+\[
+\texttt{\bfseries $\lnot$ DecisionInteractionConstantAtMost witnessCell2 5}
+\]
+stated in the chain's own vocabulary, with \emph{no} rank hypothesis anywhere in it.
+
+\section*{114. Five formalisation defects, recorded so they are not repeated}
+\begin{enumerate}
+\item \textbf{\texttt{decide} over a $\Pi$ type is a machine kill, not a slowdown.} Stating a finite check as $\forall z:\mathrm{Fin}\,6\to\mathrm{Fin}\,2$ forces Lean to build the \texttt{Fintype} instance for a \emph{function} type; the kernel term is enormous. The first bridge exhausted 64\,GB of RAM on one such theorem, $6\cdot64\cdot64$ cases over a $\Pi$ type. The same facts over six explicit $\mathrm{Fin}\,2$ arguments compile in seconds. \textbf{Rule: quantify over elements, not over functions, then lift with an $\eta$ lemma.} The mixed-difference bound was restated as six lemmas of twelve explicit arguments, $4096$ integer cases each.
+\item \textbf{\texttt{simp only} carries no simprocs.} After \texttt{fin\_cases} the index is $\langle k,\_\rangle$ and the conditional is a \texttt{Fin.val} equality; reducing them needs the \texttt{reduceIte} simproc and \texttt{Fin.mk\_zero}, neither of which a closed \texttt{simp only} list invokes. The linter said so, reporting the supplied \texttt{if\_true} and \texttt{if\_false} as unused. This is the \emph{second} time the \texttt{fin\_cases} numeral trap has cost this corpus a compile cycle; the first was the twelve \texttt{Fin.mk} companion lemmas of addendum B Section 92.
+\item \textbf{Guessing the shape of \texttt{PolyhedralCellValid}.} Its last component compares \texttt{responseWitnessSpan}, a difference of two responses, not $\operatorname{osc}$. Three simultaneous errors had this single root. Reading the definition would have cost one \texttt{grep}.
+\item \textbf{Guessing Mathlib division lemma names.} \texttt{div\_lt\_div\_of\_pos\_left} concludes $a/b<a/c$, same numerator; every goal here has the same \emph{denominator}. Replaced by two local helpers proved with \texttt{linarith}, division by a numeral being linear. Thirteen sites collapsed to \texttt{exact div17\_le \ldots}.
+\item \textbf{\texttt{rw} across a cast boundary.} An integer equation cannot rewrite a real literal: \texttt{rw} looked for $(42:\mathbb{Z})$ in a term containing $(42:\mathbb{R})$. Fixed by four intermediate lemmas stating the residual extremes directly over $\mathbb{R}$.
+\end{enumerate}
+\textbf{Three of the five were the author guessing rather than reading a definition.} That is the ratio worth remembering; Lean was not the difficulty.
+
+\subsection*{114.1 Bisection, and two operational notes}
+The memory blow-up was localised by splitting the module: \texttt{LeanD6BinaryBridgePart\-AV1.lean}, 267 lines, carries only the $\mathbb{Z}$ / \texttt{Fin} layer and no $\mathbb{R}$. It compiled with \texttt{EXIT=0} and warnings only, which placed every remaining error in the $240$-line real-valued tail. That file is retained in the tree as the bisection artifact rather than deleted.
+
+\textbf{\texttt{ulimit -v} does not work on macOS.} The guarded compile command returned \texttt{ulimit: setrlimit failed: invalid argument} and ran unguarded. Darwin does not honour the virtual-memory resource limit, so a runaway Lean process cannot be capped that way; the protection has to come from the proof engineering, not the shell.
+
+\textbf{Compile timings and sizes.} Base module \texttt{.olean} 436\,320\,B; bridge \texttt{.olean} 1\,101\,552\,B; audit oleans 2\,136\,B and 2\,576\,B. Both modules compiled on the first attempt after the fixes above, with no error output at all -- the audit output shown was the entire result of the command.
+
+\subsection*{114.2 A sixth defect, in this report's own source}
+The preamble of addendum C contained
+\begin{quote}\ttfamily\scriptsize
+$\backslash$newcommand\{$\backslash$CIGunderscore\}\{$\backslash$\_\}\\
+$\backslash$renewcommand\{$\backslash$\_\}\{$\backslash$CIGunderscore$\backslash$allowbreak\}
+\end{quote}
+\texttt{$\backslash$newcommand} creates a macro that \emph{re-expands}, so \texttt{$\backslash$\_} expanded to \texttt{$\backslash$CIGunderscore}, which expanded to \texttt{$\backslash$\_}, until \texttt{TeX capacity exceeded, input stack size=10000} and no PDF was produced. The correct form binds the current meaning: \texttt{$\backslash$let$\backslash$CIGunderscore$\backslash$\_}. Addendum C was therefore \emph{unrenderable as delivered on 6 September}, independently of whether a \TeX{} installation was present, and both C and D carry the corrected preamble. Recorded because a report that cannot be built is a defect of the report.
+
+\section*{115. The raw rescue dies in Lean, at one line}
+At $|U|=2$ the raw local contrast is rank one for every world, already proved as \texttt{binary\_allCoordinatesRawLocalContrastRankOne}. The witness therefore satisfies the raw hypothesis for free:
+\begin{quote}\ttfamily\scriptsize
+theorem Wr\_allCoordinatesRawRankOne :\\
+\ \ AllCoordinatesRawLocalContrastRankOne Wr :=\\
+\ \ binary\_allCoordinatesRawLocalContrastRankOne Wr
+\end{quote}
+and \texttt{raw\_rankOne\_does\_not\_rescue\_m\_minus\_one} conjoins the five conditions. \textbf{Class transition.} The raw rank-one rescue: \eclass{EXACT\_RATIONAL\_COUNTEREXAMPLE} $\longrightarrow$ \eclass{PROVED\_FALSE\_LEAN4\_AXIOM\_AUDITED}.
+
+The sharper statement is the one worth keeping: the invariant never could have rescued the bound, because the bound fails exactly where the invariant carries no information.
+
+\section*{116. Solving for the direction, and where the derivation stops}
+Addendum C Section 108 left seeding blocked: the departure direction at a tie point could not be sampled. It does not need to be sampled.
+
+At a tie point $F_0$ set $F(t)=F_0+td$. As $t\to0^+$ every $\ell_T$ and $\delta_{\square}$ is continuous, but the Top-C \emph{selection} is not: tied coordinates are separated by the first-order term $\varepsilon_ic_i(d)$ with $\varepsilon_i=\operatorname{sign}c_i(F_0)$. Hence
+\[
+\lim_{t\to0^+}\frac{2D(F_0+td)}{(m-1)\delta_{\square}(F_0+td)}
+=\frac{2\bigl(\ell_{S(d)}(F_0)-\min_T\ell_T(F_0)\bigr)}{(m-1)\,\delta_{\square}(F_0)},
+\]
+which depends on $d$ \emph{only through the selection} $S(d)$. The limit therefore takes finitely many values, enumerable exactly over the achievable top-$k$ sets. A direction realising a chosen $S$ is written down explicitly: $d(e_i)=+\varepsilon_i$ for $i\in S\cap G$, $-\varepsilon_i$ for $i\in G\setminus S$, zero elsewhere, touching only $m$ of the $2^m$ values.
+
+\subsection*{116.1 Validation at $m=6$}
+At the integer tie point all six oscillations equal $1$ and $\delta_{\square}=1$. The tie-break selects $\{0,1,2\}$ and gives ratio $2/5=0.4$, exactly the measured attractor. Enumerating the twenty achievable selections gives \emph{four} limit values:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xcc}
+\toprule
+$S$ & $\ell_S$ & limit ratio\\
+\midrule
+$\{0,4,5\}$ & $7/2$ & $\mathbf{6/5}$\\
+nine sets & $5/2$ & $4/5$\\
+nine sets & $3/2$ & $2/5$\\
+$\{1,2,3\}$ & $1/2$ & $0$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+and the maximum $6/5=m/(m-1)$ is predicted with no search. Stepping off along the derived direction gives seeds with tiny denominators: $t=1/16$ already yields ratio $1.0666667$ with max denominator $18$.
+
+\subsection*{116.2 The derivation, and its premise}
+At that tie point the selected losses take $\ell_{\min}+\{0,1,\dots,k\}$ with step exactly $\delta_{\square}$, whence
+\[
+\max_S\frac{2(\ell_S-\ell_{\min})}{(m-1)\delta_{\square}}=\frac{2k}{m-1},\qquad k=\lfloor m/2\rfloor .
+\]
+For even $m$ this is $m/(m-1)>1$; for odd $m$ it is exactly $1$. That \emph{derives} the value $6/5$ which the margin sweep of Section 107 had only fitted.
+
+\claimbox{\oldclaim{The bound $2D\le(m-1)\delta_\square$ fails if and only if $m$ is even, with sharp constant $2k/(m-1)$.}}
+\textbf{Reason for demotion.} The step-$\delta_{\square}$ premise is a property of the \emph{particular} tie point, not of $m$. At $m=4$ the tie points reached from random starts have loss spectrum $\{1/2,1,3/2\}$, step $\delta_{\square}/2$, giving $\max=2/3$ rather than $4/3$. The parity statement is therefore not established, and the question moved one level again: from the direction to the choice of tie point.
+
+\subsection*{116.3 The tie-locus LP, and why it was abandoned}
+Before the face enumeration, the tie locus itself was made the feasible set: maximise the loss spread subject to $\varepsilon_ic_i=\varepsilon_jc_j$ for all pairs. That formulation is \emph{correct} -- seeded at the known $m=6$ tie point it returns LP objective exactly $6.0000$ and limit ratio $6/5$, stable across all six rounds, with spectrum $\{1/2,3/2,5/2,7/2\}$ and all oscillations equal -- but from a random start it converges to $4/5$ with spectrum $\{1,3/2,2,5/2,3\}$, step $\delta_{\square}/2$. Two further faults were identified in it and are the reason it was replaced rather than tuned:
+
+\begin{itemize}
+\item it forced \emph{all} $m-1$ tie equalities, when only the pairs straddling the $S/S^{c}$ boundary need to lie on the tie face; forcing the whole ranking spectrum cuts away most of the domain;
+\item it omitted $\ell_{T^\ast}\le\ell_U$ for every $U$, so the LP optimised $\ell_S-\ell_{T^\ast}$ for a competitor that need not be the argmin. Because $\ell_{\min}\le\ell_{T^\ast}$ the reported value \emph{understates} and no false certificate is possible, but the LP lands on the wrong face.
+\end{itemize}
+The auxiliary-variable direction in that file was checked and is \emph{sound}: $p,q$ bound $\ell_{T^\ast}$ from above and the objective drives $p-q$ down to exactly $2\ell_{T^\ast}$. It is the opposite of the unsound pattern described in Section 118.1.
+
+\section*{117. Three instruments, one attractor}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xc}
+\toprule
+Seeding, $m=6$ unless stated & best ratio\\
+\midrule
+random multi-start, $m=4$ & $0.666663$\\
+random multi-start & $0.399685$\\
+tie-perturb, random tie points & $0.768161$\\
+tie-perturb, \emph{correct} tie point, random directions & $0.790934$\\
+the derived direction & $\mathbf{1.199933}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The quantity $2(k-1)/(m-1)$ -- $2/3$ at $m=4$, $4/5$ at $m=6$ -- has now captured three independent \emph{random-start} local instruments: the exact LP ascent, tie-point perturbation, and the face-enumeration LP of Section 118. The stochastic countersearch exceeds it, so the geometry has better regions than any random-start polyhedral method has reached. That is a finding about the methods, not about $c^\ast$.
+
+\section*{118. The face-enumeration LP}
+\subsection*{118.1 Formulation}
+Enumerate $(S,T)$ exhaustively -- the dimension the tie-locus LP wrongly froze to a single choice, $380$ pairs at $m=6$ -- and obtain the four extremal points by pattern iteration. Then $\delta_{\square}\le1$ is convex and needs no cell pattern: introduce $u_i,l_i$ with $l_i\le\rho_i(z)\le u_i$ and $u_i-l_i\le1$. No tie locus occurs anywhere.
+
+\textbf{One formulation trap, recorded because it is easy to fall into.} The competitor loss must be bounded \emph{above}, by auxiliaries $p,q$ with $q\le G_T(a)\le p$ and the objective subtracting $(p-q)$; the optimiser then drives $p-q$ down to exactly $2\ell_T$. Bounding $\ell_{\min}$ from \emph{below} by a variable $y\le L_T$ and maximising $L_S-y$ is \textbf{wrong}: the optimiser pushes $y$ down without limit. That is why the competitor is enumerated rather than minimised, and why $T$ is forced to be the argmin by $p-q\le G_U(a_U^+)-G_U(a_U^-)$ at every other $U$.
+
+\subsection*{118.2 Three defects, with their measured effect}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xc}
+\toprule
+Defect & Measured effect\\
+\midrule
+iterate and accept conflated & 28 of 30 faces looked infeasible at $m=4$\\
+box in \texttt{linprog}'s \texttt{bounds}, not in $A_{ub}$ & \texttt{DEGENERATE\_ACTIVE\_SET} $10/30\to0$\\
+taking the LP vertex & feasible faces $4\to16$; best $1/3\to0.666$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The second is the instructive one: \emph{a variable resting on a bound is an active constraint}, and the exact vertex is recovered from the active set, so bounds passed separately to the solver are invisible to that recovery and it can never reach full rank.
+
+\subsection*{118.3 A retracted verdict}
+\claimbox{\oldclaim{THE POLYHEDRAL ROUTE IS CURRENTLY WORSE THAN THE STOCHASTIC SEARCH IT WAS MEANT TO REPLACE. This is not a tuning gap to be closed by more starts.}}
+\textbf{Reason for retraction.} That verdict rested on a test the author designed wrong. The seeded $m=6$ run used \texttt{--pairs-limit 60} of $380$ pairs, sampled at random; the face containing the witness is $S=\{0,4,5\}$, $T=\{1,2,3\}$, and a random $60$ of $380$ includes it about $16\%$ of the time. It did not. The reported $0.7383$ measured faces that do not contain the seed.
+
+Run on that single face, the LP takes the seed from $1.000440$ to $1.1932703$ in ten rounds. \textbf{Subsampling pairs is not a speed knob; it is a correctness knob.}
+
+\subsection*{118.4 What the instrument actually does}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{ccXc}
+\toprule
+$m$ & seed & face LP & $2k/(m-1)$\\
+\midrule
+4 & $0.905106$ & $\mathbf{0.995274}$ & $4/3$\\
+6 & $1.000440$ & $\mathbf{1.193270}$ & $6/5$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+At $m=4$, seeded with the stochastic sweep's best world and visiting all thirty faces, it exceeds that world. At $m=6$ it reaches $1.1932703$ against the ascent's $1.1932566$ at the same margin $1/1000$: \textbf{two instruments of different formulation landing on the same value}, which is real convergence and strengthens $6/5$ without establishing it.
+
+The corrected characterisation: \emph{a strong local improver, not a global finder}, the same character as the ascent. What $(S,T)$ enumeration buys is that the face need not be guessed; what it does not buy is escaping a bad basin.
+
+\textbf{A structural regularity worth a cheap test.} The winning face has $T=S^{c}$ at both $m=4$ and $m=6$, and $T=S^c$ is also the shape of the $m=6$ extremum of Section 107.1. If that holds it reduces $380$ pairs to $20$.
+
+\subsection*{118.5 The complete run record}
+Nothing here is summarised away; these are all the face-LP runs performed.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.30\columnwidth}cXc}
+\toprule
+Run & faces & best & feasible\\
+\midrule
+$m{=}4$ smoke, random & 30 & $4/9=0.4444$ & 2\\
+$m{=}4$ v2, iterate/accept split & 30 & $1/3=0.3333$ & 2\\
+$m{=}4$ v3, box in $A_{ub}$ & 30 & $1/3$ & 4\\
+$m{=}4$ v4, line search & 30 & $0.666329$ & 16\\
+$m{=}4$ seeded, all faces & 30 & $\mathbf{0.995274}$ & 5\\
+$m{=}6$ seeded, 60 of 380 & 60 & $0.738337$ & --\\
+$m{=}6$ single correct face & 1 & $\mathbf{1.193270}$ & 1\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Exact values: $m=4$ v4 best $16768711/25165824$, max denominator $8\,388\,608$; $m=4$ seeded best on $S=\{0,3\}$, $T=\{1,2\}$, ratio $0.9952742995403673$, max denominator $489\,783\,041\,089\,595\,392$, runners-up $0.897907$ on three non-complementary faces; $m=6$ single face $340572020684734463518587/285410615501461739929600 = 1.1932703346942966$ at achieved margin $0.0010009742562032374$ after ten rounds from one start.
+
+Failure-reason counters, $m=4$: v2 gave \texttt{LP\_INFEASIBLE} 12, \texttt{DEGENERATE\_ACTIVE\_SET} 10, \texttt{BELOW\_GATE} 6; v3 gave 14, 0, 12; v4 gave 8 \texttt{LP\_INFEASIBLE} and 6 \texttt{NO\_ADMISSIBLE\_STEP}; the seeded run gave 9 and 16.
+
+\textbf{How to read \texttt{NO\_ADMISSIBLE\_STEP} 16 in the seeded run.} It is not emptiness. A single seed is pushed into thirty different faces, and it has one selection of its own; for the faces whose $S$ differs, the seed is simply not in the face and the line search finds nothing admissible there. \texttt{pairs\_feasible: 5} means ``five faces contain the seed or its neighbourhood'', not ``twenty-five faces are empty''.
+
+\subsection*{118.6 A loader defect, and the artifact-shape lesson}
+The fair $m=4$ command failed first with \texttt{KeyError: 'binary\_world'}. The sweep artifacts store their witness under \texttt{strict\_top\_c\_witness.world}, while the ascent and LP artifacts store it at top level under \texttt{world}. The loader now tries \texttt{world}, \texttt{binary\_world}, \texttt{tie\_world}, then \texttt{counterexample.world}, \texttt{strict\_top\_c\_witness.world}, \texttt{tightness\_witness.world}, and rejects anything not on the binary cube. Recorded because the ledger's artifact shapes are not uniform and any future cross-instrument tool will meet the same wall.
+
+Also recorded: the $m=8$ binary sweep reached $0.912553$ in $578.1$\,s over $256$ dimensions, and the $m=8$ face family is $70\times69=4830$ pairs, which is why no face-LP run was attempted there.
+
+\section*{119. Lineage transition table, delta only}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.30\columnwidth}>{\raggedright\arraybackslash}p{0.20\columnwidth}X}
+\toprule
+Earlier visible state & Later status & Reason\\
+\midrule
+Unconditional binary $(m-1)$ law, ``written and not yet compiled'' & \textbf{PROVED FALSE, LEAN, AUDITED} & 60 theorems, nothing beyond the standard three axioms, no \texttt{ofReduceBool}.\\
+Raw rank-one rescue, exact rational & \textbf{PROVED FALSE, LEAN, AUDITED} & One line: the hypothesis is vacuous at $|U|=2$.\\
+``what\_this\_closes'' on the first promotion & \textbf{CORRECTED, then LIFTED} & Identification was prose for one day; the bridge discharged it.\\
+Every line must read exactly the three axioms & \textbf{CORRECTED} & A subset is stronger.\\
+Departure direction cannot be sampled & \textbf{SOLVED} & Limit depends on $d$ only through $S(d)$; finitely many values.\\
+Failure iff $m$ even, constant $2k/(m-1)$ & \textbf{DEMOTED} & Step-$\delta_\square$ spectrum is a property of the tie point, not of $m$; $m=4$ gives step $\delta_\square/2$.\\
+Polyhedral route worse than stochastic search & \textbf{RETRACTED} & Test designed wrong: $60$ of $380$ pairs missed the only face that mattered.\\
+Face LP characterisation & \textbf{LOCAL IMPROVER} & Beats the seed at $m=4$ and $m=6$; agrees with the ascent to six digits.\\
+$c^\ast(m)$ & \textbf{OPEN} & Four instruments, four lower bounds, mutually inconsistent.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{New Lean artifacts.} \texttt{LeanD6BinaryIntegerCounter\-exampleV1.lean}\slash\allowbreak\texttt{.olean}; \texttt{LeanD6BinaryBridgeV1.lean}\slash\allowbreak\texttt{.olean}; \texttt{LeanD6BinaryBridgePart\-AV1.lean} (retained as the bisection file that localised the memory blow-up); \texttt{AxiomAuditBinaryCounter\-exampleV1.lean}; \texttt{AxiomAuditBinaryBridgeV1.lean}.
+
+\textbf{New research artifacts.} \texttt{D6\_BINARY\_PROVED\_FALSE\_LEAN\_20260907.json}; \texttt{D6\_BINARY\_PROVED\_FALSE\_SCOPE\_CORRECTION\_20260907.json}; \texttt{D6\_BRIDGE\_PROVED\_FALSE\_LEAN\_20260907.json}; \texttt{D6\_TANGENT\_CONE\_DERIVATION\_20260906.json}; \texttt{D6\_STRUCTURAL\_TRANSFER\_FAILED\_20260906.json}; \texttt{D6\_FACE\_LP\_INSTRUMENT\_20260907.json}; \texttt{D6\_FACE\_LP\_VERDICT\_RETRACTED\_20260907.json}; \texttt{FaceLP\_m4\_K2\_\{smoke,v2,v3,v4,seeded\}.json}; \texttt{TieLP\_m6\_K2\_smoke.json}; \texttt{TangentSeed\_m\{4,6\}\_K2\_*.json}.
+
+\textbf{New instruments.} \texttt{scripts/run\_d6\_tangent\_cone\_seeding.py}; \texttt{scripts/run\_d6\_tie\_locus\_lp.py}; \texttt{scripts/run\_d6\_face\_enumeration\_lp.py}.
+
+\textbf{Literature boundary.} Unchanged from Sections 91, 101 and 110. LP over a polyhedral cell decomposition is standard optimisation and is \emph{not} claimed as novel; what is claimed is the exact rational fixed point with an independent certifier, the tangent-cone selection enumeration, and the measured constant. Attributions still require a targeted firstness audit before any submission claim.
+
+\section*{120. The upper bound already exists, and it closes the picture}
+\claimbox{\oldclaim{$c^\ast(m)$ will not be settled by a better search; it needs an upper bound, that is, a proof. The face family would supply one only if enumerated completely.}}
+\textbf{Reason for retraction.} The proof is already in the corpus, and the author of Sections 116--119 did not look for it. \texttt{LeanD6SmallSymmetricDifference.lean} contains
+\[
+\ell_S-\ell_{T}\ \le\ |S\setminus T|\cdot\delta_{\square}
+\]
+as \texttt{pair\_loss\_le\_sdiff\_card}, under exactly the hypotheses in force here: $q$ nonnegative and normalised, $|\texttt{mixedDifference}|\le\delta_{\square}$, \texttt{IsTopKByScore} for the selected set, and $|T|=k$. Hence
+\[
+\boxed{\,2D\ \le\ 2|S\setminus T|\,\delta_{\square}\ \le\ 2\min(k,m-k)\,\delta_{\square}\,}
+\]
+and the same file already derives, as \texttt{pair\_half\_factor\_of\_small\_symmetric\_difference}, that $2|S\setminus T|\le m-1$ forces $2D\le(m-1)\delta_{\square}$: \emph{the original D6 bound}. \texttt{LeanD6SymmetricDifference\-ReductionV1} then proves, as \texttt{pair\_half\_factor\_except\_balanced\_complement}, that this covers every geometry \emph{except one}, and its docstring names it: ``an even universe split into two complementary equal halves''.
+
+\subsection*{120.1 The counterexample sits in the only hole the reduction leaves}
+The witness of Section 111 has $S=\{0,4,5\}$, $T=\{1,2,3\}$, $m=6$ even, $T=S^{c}$, $|S|=|T|=3$. That is precisely the balanced complement. \textbf{So the empirical regularity of Section 118.4 -- the winning face has $T=S^{c}$ at both $m=4$ and $m=6$ -- is not luck; it is forced.} It is the only place a counterexample can live, because everywhere else the $(m-1)$ bound is a theorem. Four instruments kept rediscovering that geometry because it is the only one available.
+
+\subsection*{120.2 The parity statement, corrected}
+For odd $m$, $k=(m-1)/2$ and $|S\setminus T|\le k$, so $2|S\setminus T|\le m-1$ \emph{always}: the hypothesis of the half-factor theorem is automatic and
+\[
+2D\le(m-1)\delta_{\square}\quad\text{is PROVED for every odd }m.
+\]
+For even $m$, $k=m/2$ and the balanced complement attains $|S\setminus T|=m/2$, giving the bound $m\,\delta_{\square}$ and no more. The earlier demoted formula $2k/(m-1)$ was numerically right and derived from the wrong object; the correct reading is
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xcc}
+\toprule
+ & odd $m$ & even $m$\\
+\midrule
+proved upper bound on $2D/\delta_{\square}$ & $m-1$ & $m$\\
+$(m-1)$ law & \textbf{PROVED} & \textbf{FALSE at $m{=}6$}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+so the law does not ``fail iff $m$ is even'' as a conjecture: for odd $m$ it is a theorem, and for even $m$ it is refuted at the one $m$ tested.
+
+\subsection*{120.3 What is actually left}
+\[
+c^\ast(6)\ \le\ 6\ \ \text{(proved)},\qquad
+c^\ast(6)\ \ge\ 5.99966\ldots\ \text{(measured)}
+\]
+the lower value being $5\times1.1932703$ from the face LP and $5\times1.1932566$ from the ascent, and the margin sweep extrapolating to $6/5$ with deficit linear in $\mu$ at coefficient $\approx6.74$. \textbf{Upper bound proved, lower bound measured to four decimal places; only sharpness -- attainment of $m\,\delta_{\square}$ in the balanced complement -- is open.} That is a far smaller gap than Sections 116--119 supposed, and it is a Lean target rather than a search target: parameterise the tie-witness perturbation family $W_t$, prove strict Top-C and the interaction bound on an interval $t>0$, show $2D/\delta_{\square}\to6$, and conjoin with \texttt{pair\_loss\_le\_sdiff\_card}.
+
+\textbf{Consequence for the two experiments named below.} Both are now much less interesting. Asking whether any of the $380$ faces at $m=6$ exceeds $6/5$ is answered in advance: none can, because $6/5$ is the proved ceiling. And the $T=S^{c}$ regularity needs no test, being forced by the reduction theorem. \textbf{Neither should be run.} The search programme of the last two days was aimed at a question that a theorem in the same repository had already bounded.
+
+\textbf{The state of the only open question.} What remains is the sharpness of a proved bound in one geometry at one $m$, not the location of an unknown supremum. The four instruments of Sections 116--119 retain their value as \emph{lower-bound machinery} and as a record of how a measured constant was approached, but the constant itself was never unbounded above.
+
+\section*{121. Final status}
+\textbf{Final appended status label.} As of 7 September the centred rank programme, the unconditional $(m-1)$ law, and the raw rank-one rescue are all closed in Lean 4 with clean axiom audits. What replaced them is a measurement problem with a conjectured answer $m/(m-1)$, supported at a single $m$ by two independent instruments agreeing to six digits, derived once from a tie-point spectrum whose defining property is not known to hold at any other $m$, and not bounded above by anything. The honest summary of this campaign is that it converted a false theorem into a well-posed open constant, and that every instrument built along the way was found to be weaker than its author first reported. The last correction is the sharpest: the open constant was bounded above, in this repository, before any of those instruments were written. \textbf{Search the corpus before building an instrument to measure what it may already prove.}
+\end{document}

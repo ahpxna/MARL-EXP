@@ -1,0 +1,54 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Response Geometry}\\[2pt]
+{\large\itshape Append-only update D: the primary endpoint was undefined by censoring, not by the data, and once the budget is raised a deployable winner is identified}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--66, including addenda A--C, are an immutable prefix. This addendum begins at Section 67.
+
+\section*{67. The endpoint was undefined, and the artifact said so}
+The $300$-instance allocation run reported \texttt{deployable\_winner\_status = "NO\_MEDIAN\_IDENTIFIED\_CENSORING"} with the winner field literally \texttt{null}: every variant's median sample count to certificate sat at $16385=\max_n+1$. Certificate fractions ($40.0\%$ for \texttt{C\_anytime} against $21.7\%$ for \texttt{uniform}) were, by the artifact's own censoring contract, secondary diagnostics. The primary endpoint did not exist in that run.
+
+\section*{68. Raising the budget identifies it}
+Re-running at $\max_n=65536$ ($4\times$):
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r r}
+\toprule
+variant & @$16384$ & @$65536$ & median $N$\\
+\midrule
+\textbf{C\_anytime} & $40.0\%$ & $59.0\%$ & $\mathbf{39\,484}$\\
+C\_known\_sigma \emph{(oracle)} & $41.3\%$ & $59.0\%$ & $39\,076$\\
+C\_shrink & $30.0\%$ & $61.0\%$ & $47\,967$\\
+C\_pilot & $29.3\%$ & $59.0\%$ & $48\,839$\\
+C\_split & $21.3\%$ & $51.0\%$ & $63\,595$\\
+uniform & $21.7\%$ & $37.0\%$ & $65\,537$ \emph{(still censored)}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\texttt{deployable\_winner\_status} becomes \texttt{IDENTIFIED\_BY\_MEDIAN}, winner \texttt{C\_anytime}. Every variant gains $15$--$31$ percentage points; nothing saturates.
+\claimbox{\texttt{C\_anytime} reaches a certificate in a median $39\,484$ samples against \texttt{uniform}'s $>65\,537$, hence \textbf{at least $1.66\times$ faster} --- a \emph{lower} bound on the advantage, since \texttt{uniform} is still censored --- while sitting within $\mathbf{1.0\%}$ of the known-$\sigma$ oracle. \texttt{false\_safe\_count} is $0$ for all six. \eclass{DEVELOPMENT EXPERIMENT}, one seed, $100$ instances.}
+
+\section*{69. A retraction}
+This session earlier argued from the censored distribution that the non-certifying $60\%$ might be \emph{structurally uncertifiable} rather than merely slow --- the certified-$N$ quantiles looked bimodal, with medians around $7\,000$ among certifiers --- and concluded that raising $\max_n$ might not produce a median at all.
+\claimbox{\textbf{That was wrong, and wrong by a familiar mechanism}: extrapolating a shape from a censored sample with no model of the process. In a stationary Gaussian design, once every cell is sampled enough the interval contracts and a certificate appears; the correct reading was that the budget, not the population, was the binding constraint. Recorded because the same error --- reading a truncated view as if it were the whole --- has now occurred several times in this chain.}
+
+\section*{70. What is still required}
+One seed and $100$ instances is not a confirmatory result, and \texttt{uniform} remains censored, so the $1.66\times$ figure is a floor rather than a measurement. The confirmatory run is $300$ instances across three seeds at $\max_n=131072$, which should also uncensor \texttt{uniform} and turn the ratio into a number. Certification rate as a function of budget remains the honest secondary curve to report alongside the median.
+\end{document}

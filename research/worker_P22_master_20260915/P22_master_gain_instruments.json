@@ -1,0 +1,85 @@
+{
+ "script": "P22_master_gain_instruments.py",
+ "identity": "d/dalpha I_u((1-alpha)x + alpha e_l) = G_{u,l} - I_u  with  G_{u,l} = (c_l^T K^{-1} M_u)^2/(2 nu_l),  M_u = Delta_u a_u/q_u",
+ "why_this_matters": "M_u is the PROFILED contrast Delta_u a_u/(a_u^T K^{-1} a_u), not a free vector.  Writing G with a free M is what lets a matrix witness stand in for an instrument model.",
+ "part1_rows": [
+  {
+   "trial": 0,
+   "d": 3,
+   "L": 5,
+   "U": 4,
+   "worst_relative_error": 9.57165912570061e-10,
+   "ok": true
+  },
+  {
+   "trial": 1,
+   "d": 3,
+   "L": 3,
+   "U": 4,
+   "worst_relative_error": 1.9696200438282575e-09,
+   "ok": true
+  },
+  {
+   "trial": 2,
+   "d": 3,
+   "L": 3,
+   "U": 2,
+   "worst_relative_error": 3.355433871764285e-09,
+   "ok": true
+  },
+  {
+   "trial": 3,
+   "d": 4,
+   "L": 5,
+   "U": 4,
+   "worst_relative_error": 2.606534493546688e-08,
+   "ok": true
+  },
+  {
+   "trial": 4,
+   "d": 4,
+   "L": 5,
+   "U": 3,
+   "worst_relative_error": 1.2155533582824642e-09,
+   "ok": true
+  },
+  {
+   "trial": 5,
+   "d": 2,
+   "L": 5,
+   "U": 4,
+   "worst_relative_error": 1.5945830718324638e-10,
+   "ok": true
+  }
+ ],
+ "part1_all_ok": true,
+ "part2_ranks": [
+  {
+   "case": "rank-one B (one alternative)",
+   "rank_B": 1,
+   "rank_G": 1,
+   "hadamard_square_bound": 1,
+   "within_bound": true
+  },
+  {
+   "case": "rank-two B (two alternatives)",
+   "rank_B": 2,
+   "rank_G": 2,
+   "hadamard_square_bound": 3,
+   "within_bound": true
+  },
+  {
+   "case": "rank-three B",
+   "rank_B": 3,
+   "rank_G": 3,
+   "hadamard_square_bound": 6,
+   "within_bound": true
+  }
+ ],
+ "rank_rule": "G is the entrywise square of B, so rank(G) <= rank(B)(rank(B)+1)/2; a rank-one B gives a rank-one G, a rank-two B gives rank <= 3",
+ "not_established": [
+  "This is a numerical verification of the derivative identity and the rank bound; it is not a Lean theorem.",
+  "kappa_l enters only as the budget normalisation; the identity above is stated per unit of design mass, and the priced version divides by kappa_l.",
+  "No optimality of any design is claimed here."
+ ]
+}

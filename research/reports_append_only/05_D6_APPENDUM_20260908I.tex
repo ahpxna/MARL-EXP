@@ -1,0 +1,68 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update I: the information limit's three links written in Lean without any enumeration, and the m=10 gap measured to be out of reach of the current instrument}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (fourth update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--150, including addenda A--H, are an immutable prefix. This addendum begins at Section 151.
+
+\section*{151. The three links, formalised}
+Section 148 established $V\ge k(k-1)/(2k-1)$ by exact linear programming over the permutation family. A new module \texttt{Lean\allowbreak D6\allowbreak Information\allowbreak LimitV1} states and proves the argument itself, with \textbf{no} \texttt{decide}, \textbf{no} \texttt{native\_decide}, and \textbf{no} case enumeration anywhere.
+
+\textbf{Link 1 --- indistinguishability.} \texttt{selector\_constant\_on\_family}: if the observation map is constant on a family of worlds, every selector reading only that observation returns one fixed set across the family. One line; the content is that the hypothesis is the right one.
+
+\textbf{Link 2 --- regret is a distance.} \texttt{regretOn S T = (S \textbackslash{} T).card}, a definition, recorded as such so that no later section can treat it as a theorem.
+
+\textbf{Link 3 --- the averaging identity.} The combinatorial heart, stated for arbitrary $U$, $r$ and $S\subseteq U$:
+\[\sum_{T\in\binom{U}{r}}|S\setminus T| \;=\; |S|\cdot\binom{|U|-1}{r}.\]
+Proof: rewrite $|S\setminus T|$ as $\sum_{i\in S}\mathbf 1[i\notin T]$, exchange the two sums, and observe that the $r$-subsets of $U$ avoiding a fixed $i\in U$ are exactly the $r$-subsets of $U\setminus\{i\}$. \textbf{No induction on $U$ and no enumeration.}
+
+Specialising to $|U|=2j+1$, $r=j+1$ (that is $m=2j+2$, $k=m/2$) gives \texttt{information\_limit\_exact}, stated as an exact product over $\mathbb N$ so that neither division nor truncated subtraction appears:
+\[(2j+1)\sum_{T}\mathrm{regret}(S,T)=(j+1)\,j\,\Big|\binom{U}{j+1}\Big|.\]
+The binomial step is $ (2j+1)\binom{2j}{j+1}=j\binom{2j+1}{j+1}$, i.e.\ $n\binom{n-1}{r}=(n-r)\binom{n}{r}$, derived additively from $\binom{n}{r}=\binom{n-1}{r-1}+\binom{n-1}{r}$ and $r\binom{n}{r}=n\binom{n-1}{r-1}$, then closed by \texttt{omega} --- again no subtraction in $\mathbb N$.
+
+Finally \texttt{information\_limit\_worst\_case} converts the average into a worst case: some world in the family has regret at least the average, for every $S$. That is the lower bound for every algorithm.
+\claimbox{\textbf{Status: WRITTEN, NOT YET COMPILED.} Mathlib lemma names (\texttt{sdiff\_eq\_filter}, \texttt{card\_filter}, \texttt{sum\_comm}, \texttt{card\_powersetCard}, \texttt{subset\_erase}, \texttt{card\_erase\_of\_mem}, \texttt{choose\_succ\_succ'}, \texttt{succ\_mul\_choose\_eq}, \texttt{exists\_max\_image}) are used as recalled and not verified against the pinned Mathlib. Until \texttt{Axiom\allowbreak Audit\allowbreak D6\allowbreak Information\allowbreak LimitV1} reports \texttt{[propext, Classical.choice, Quot.sound]} for all eight names, Section 148 remains \eclass{EXACT LP ON A CONSTRUCTED FAMILY} and this section is a \eclass{PROOF PROPOSAL}.}
+
+\section*{152. Why this formalisation is the right shape}
+The lower bound is now stated for an \emph{arbitrary} ground set and an \emph{arbitrary} subset size, and the closed form is a corollary obtained by substituting $|U|=2j+1$. Three consequences.
+\begin{itemize}
+\item It applies at \textbf{every} even $m$ with no width-specific witness, so the $m=10$ gap of Section 147 does not touch it --- the point already made in Section 149, now structural rather than observed.
+\item It is \textbf{independent of the frontier programme}: nothing in it mentions $\delta_\square$, the margin, or Top-C. The two D6 results now rest on disjoint machinery, which is what makes Section 149's warning against merging them enforceable.
+\item The identity $\sum_T|S\setminus T|=|S|\binom{|U|-1}{r}$ is elementary and certainly known; the contribution is not the identity but \emph{that this is the quantity governing the selection problem}, together with the indistinguishability construction that makes it a lower bound. Stated narrowly, per the novelty ledger.
+\end{itemize}
+
+\section*{153. The $m=10$ gap: measured, and out of reach here}
+The frontier instrument was run at $m=10$, $\mu=0$, block ansatz. It \textbf{exceeded 150 seconds without producing an artifact} (exit 124). The cost is in the argmax/argmin corner-class enumeration, which grows with $m$; the block ansatz's $4k^2=100$ variables are not the bottleneck.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Target & Status\\
+\midrule
+$R_6(\mu)=6-3\mu$ at $\mu=0,\tfrac14,\tfrac12,\tfrac34,1$ & \eclass{EXACT LOWER $=$ PROVED UPPER}\\
+$R_8(0)=8$ & \eclass{EXACT LOWER $=$ PROVED UPPER}\\
+$R_8(\tfrac12)$, $R_8(1)$ (predicted $6$, $4$) & \eclass{NOT RUN}\\
+$R_{10}(0)$ (predicted $10$) & \eclass{TIMED OUT}, the one width $\langle6,8\rangle$ misses\\
+$R_m(\mu)=m-\tfrac m2\mu$, even $m\ge6$ & \eclass{TARGET}; needs composition formalised $+$ $m=10$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Consequence for sequencing.} The frontier programme is now the \emph{more expensive} of the two D6 directions and the one with a hard missing case, while the information limit is width-uniform and needs only a compile. Section 71 of MASTER's ordering is revised accordingly: audit and compile the information limit first; the $m=10$ witness is a background computation, not a blocker.
+\end{document}

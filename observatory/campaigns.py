@@ -54,6 +54,8 @@ from observatory.schema import (Emitter, make_context, MODE_EXACT, MODE_FLOAT,
 from observatory.worlds import Support, World, ProductReference, Action
 from observatory.chains._common import exact_optimum, topc_set, world_key
 from observatory.chains import d6 as C_d6
+from observatory.chains.d6 import (response_marginals, response_spans,
+                                   d6_loss, d6_topc, centered_profile)
 from observatory.chains import structural as C_structural
 from observatory.chains import support as C_support
 from observatory.chains import master as C_master
@@ -132,6 +134,24 @@ def build_rank_one_world(cls: str, m: int, arity: int, *, rng: random.Random,
                  {"family": "rankone_" + cls, "arity": int(arity), "cls": cls})
 
 
+def _verify_all_rank_one(w: World, ref: ProductReference, *,
+                         max_contexts: int = 6) -> bool:
+    """Every 2x2 minor of every coordinate's centered profile must vanish."""
+    contexts = list(w.support.omega)[:max_contexts]
+    for i in range(w.m):
+        n_i = w.support.action_sizes[i]
+        if n_i < 2:
+            continue
+        prof = {u: [centered_profile(w, ref, i, u, 0, z) for z in contexts]
+                for u in range(n_i)}
+        for u, v in itertools.combinations(range(n_i), 2):
+            for x in range(len(contexts)):
+                for y in range(x + 1, len(contexts)):
+                    if prof[u][x] * prof[v][y] - prof[u][y] * prof[v][x] != 0:
+                        return False
+    return True
+
+
 def campaign_rank_one(em: Emitter, *, ms=(4,), arities=(3, 4), n_per=60,
                       seed=1, classes=RANK_ONE_CLASSES, deadline=None) -> Dict:
     """A: hunt for an exact rank-one violation of the m-1 decision bound."""
@@ -141,6 +161,7 @@ def campaign_rank_one(em: Emitter, *, ms=(4,), arities=(3, 4), n_per=60,
     n_seen = 0
     n_rank_one = 0
     violations = []
+    rank_one_failures: List[str] = []
     t0 = time.time()
     for cls in classes:
         for m in ms:
@@ -159,15 +180,17 @@ def campaign_rank_one(em: Emitter, *, ms=(4,), arities=(3, 4), n_per=60,
                     if delta == 0:
                         continue
                     n_seen += 1
-                    spans = w.component_spans()
+                    ref = ProductReference.point_mass(w.support.action_sizes)
+                    # response spans, not primitive spans: Top-C ranks Q_j^q
+                    marg = response_marginals(w, ref)
+                    spans = response_spans(w, ref, marg)
                     S = topk(spans, k)
                     T = tuple(j for j in range(m) if j not in set(S))
-                    L_S = w.true_compression_loss(S)
-                    L_T = w.true_compression_loss(T)
+                    L_S = d6_loss(w, ref, S, marg)
+                    L_T = d6_loss(w, ref, T, marg)
                     l_C = 2 * (L_S - L_T)
                     kappa = l_C / delta
                     hist.append(float(kappa))
-                    ref = ProductReference.point_mass(w.support.action_sizes)
                     key = world_key(w, cls=cls, k=k, campaign="A_rank_one")
                     inst = dict(key, selected=str(S), competitor=str(T))
                     e = "D6.decision_interaction_complexity"
@@ -197,9 +220,17 @@ def campaign_rank_one(em: Emitter, *, ms=(4,), arities=(3, 4), n_per=60,
                             value=1, role=ROLE_FLAG, instance=inst)
                     em.emit(chain="D6", eq_id=e, symbol="reference_mass_check",
                             value=ONE, role=ROLE_DIAG, instance=inst)
-                    # self-check: the generator claims rank one; verify it
+                    # Self-check.  The generator is rank one by construction,
+                    # but "by construction" is a claim about the algebra, not
+                    # about this code -- so the minors are actually computed and
+                    # the counter only advances when they all vanish.  The
+                    # previous version incremented unconditionally, which made
+                    # n_rank_one_confirmed a silent copy of n_worlds.
                     C_d6.probe_profile_rank(em, w, ref, key, max_contexts=6)
-                    n_rank_one += 1
+                    if _verify_all_rank_one(w, ref):
+                        n_rank_one += 1
+                    else:
+                        rank_one_failures.append(w.content_id())
                     if best["ratio"] is None or kappa > best["ratio"]:
                         best = {"ratio": kappa, "world": {
                             "cls": cls, "m": m, "arity": arity,
@@ -216,6 +247,8 @@ def campaign_rank_one(em: Emitter, *, ms=(4,), arities=(3, 4), n_per=60,
         "campaign": "A_rank_one_ladder",
         "n_worlds": n_seen,
         "n_rank_one_confirmed": n_rank_one,
+        "n_rank_one_generator_failures": len(rank_one_failures),
+        "rank_one_failure_ids": rank_one_failures[:20],
         "classes": list(classes),
         "max_kappa": (float(best["ratio"]) if best["ratio"] is not None else None),
         "max_kappa_over_bound": (
@@ -304,7 +337,7 @@ def campaign_test_cover(em: Emitter, *, ms=(3, 4), arities=(2,), n_per=6,
                             continue
                         C_support.probe_test_cover(em, w, fam_list, k, ZERO,
                                                    dict(key, family_size=max_family),
-                                                   exact_cap=3)
+                                                   exact_cap=None)
                         rows.append({"m": m, "arity": arity, "family": fam,
                                      "n_supports": len(fam_list)})
     return {"campaign": "C_test_cover_scaling", "n_instances": len(rows),

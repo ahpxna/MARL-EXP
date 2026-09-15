@@ -23,7 +23,7 @@ from scipy.stats import norm, t as student_t
 
 from research_chains.provenance import write_artifact_with_provenance
 
-PROTOCOL_VERSION = "functional_variance_stopping_v1"
+PROTOCOL_VERSION = "functional_variance_stopping_v2_balanced_batches"
 DEPLOYABLE = ("uniform", "C_split", "C_pilot", "C_shrink", "C_anytime")
 DIAGNOSTIC = ("C_known_sigma",)
 VARIANTS = DEPLOYABLE + DIAGNOSTIC
@@ -90,8 +90,10 @@ def _allocate_batch(variant, n_add, means, sigmas, lower, upper, counts, k,
     R, K = counts.shape
     draw = np.zeros_like(counts)
     if variant == "uniform":
+        # Continue across batches; restarting at zero starves cells when batch < R*K.
+        start = int(counts.sum())
         for t in range(int(n_add)):
-            draw.flat[t % (R * K)] += 1
+            draw.flat[(start + t) % (R * K)] += 1
         return draw
 
     if variant in {"C_pilot", "C_shrink", "C_split"}:
@@ -99,8 +101,12 @@ def _allocate_batch(variant, n_add, means, sigmas, lower, upper, counts, k,
         scale = np.asarray(fixed_scale if fixed_scale is not None else sigmas, float)
         # Keep 20% uniform exploration so every capacity interval can contract.
         explore = int(math.ceil(0.2 * int(n_add)))
-        for t in range(explore):
-            draw.flat[t % (R * K)] += 1
+        # Allocate exploration to the least-sampled cells, including prior batches.
+        working = counts.copy()
+        for _ in range(explore):
+            cell = int(np.argmin(working))
+            draw.flat[cell] += 1
+            working.flat[cell] += 1
         weighted = sorted(drivers, key=lambda x: (-float(scale[x]), x))
         for t in range(int(n_add) - explore):
             draw[weighted[t % len(weighted)]] += 1
@@ -207,7 +213,7 @@ def run(instances=200, seeds=(100, 101, 102, 103, 104), relations=5, actions=6,
     rows = {v: [] for v in VARIANTS}
     for seed in seeds:
         rng = np.random.default_rng(int(seed))
-        for _ in range(int(instances)):
+        for instance_id in range(int(instances)):
             capacities = np.sort(rng.uniform(.35, 2.0, size=int(relations)))[::-1]
             # Avoid exact relation ties; the experiment studies certification cost.
             capacities -= np.arange(int(relations)) * 1e-3
@@ -228,7 +234,7 @@ def run(instances=200, seeds=(100, 101, 102, 103, 104), relations=5, actions=6,
                     truth, sigma, streams, variant, k=int(topk), alpha=float(alpha),
                     max_n=int(max_n), batch=int(batch), pilot_fraction=float(pilot_fraction),
                 )
-                result.update({"seed": int(seed), "variant": variant})
+                result.update({"seed": int(seed), "instance_id": instance_id, "variant": variant})
                 rows[variant].append(result)
     summary = {}
     for variant, rr in rows.items():
@@ -278,6 +284,8 @@ def run(instances=200, seeds=(100, 101, 102, 103, 104), relations=5, actions=6,
         "instances_per_seed": int(instances), "seeds": list(map(int, seeds)),
         "relations": int(relations), "actions": int(actions), "topk": int(topk),
         "max_n": int(max_n), "by_variant": summary,
+        "runs_by_variant": rows,
+        "allocation_policy": "continuous uniform batches; least-sampled exploration",
         "deployable_winner_by_median_N_certificate": winner,
         "deployable_winner_status": winner_status,
         "deployable_secondary_order": secondary_order,
@@ -304,7 +312,7 @@ def main(argv=None):
         "relations":a.relations,"actions":a.actions,"topk":a.topk,"alpha":a.alpha,
         "max_n":a.max_n,"batch":a.batch,"pilot_fraction":a.pilot_fraction},
         evidence_class="DEVELOPMENT_EMPIRICAL",chain="FUNCTIONAL")
-    print(json.dumps(payload, indent=2))
+    print(json.dumps({k: v for k, v in payload.items() if k != "runs_by_variant"}, indent=2))
     return 0
 
 

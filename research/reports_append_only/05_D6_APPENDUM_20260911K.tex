@@ -1,0 +1,68 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update K: the cyclic phase design is proved optimal in its class, and the integer-budget law between the two A-free designs is settled exactly}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--158, including addenda A--J, are an immutable prefix. This addendum begins at Section 159.
+
+\section*{159. The cyclic design attains the linear lower bound}
+Two results stood in the corpus unjoined: \texttt{Lean\allowbreak D6\allowbreak Blind\allowbreak Linear\allowbreak OptimalityV1.actual\_variance\_lower}, bounding every fixed linear $A$-invariant off-query statistic by
+\[|U|^2\ \le\ q^4\,|T|\;\mathrm{Var}\big(\mathrm{estimator}\,w\,a\big),\]
+and \texttt{Lean\allowbreak D6\allowbreak Cyclic\allowbreak Phase\allowbreak LawV1.estimate\_variance}, computing the variance of the concrete cyclic estimator. Neither implied the bound was attained.
+
+\texttt{Lean\allowbreak D6\allowbreak Cyclic\allowbreak OptimalV1} closes it. Three steps, all compiled and audited:
+\begin{itemize}
+\item \texttt{estimate\_eq\_estimator}: the cyclic estimator \emph{is} the generic linear statistic with unit weights and $a=Lq^2$ --- not merely similar in form;
+\item \texttt{coefficient\_cyclic}: its design coefficient equals $Lq^2$ on \emph{every} admissible hidden set, which is what places it inside the comparison class;
+\item \texttt{cyclic\_attains\_linear\_lower\_bound}: substituting gives $q^4|T|\,\mathrm{Var}=|U|^2$ \textbf{exactly}.
+\end{itemize}
+\claimbox{\eclass{PROVED}. Four names audited to \texttt{[propext, Classical.choice, Quot.sound]}, no \texttt{sorryAx}, no \texttt{native\_decide}. The equality is exact and holds at every $q\ge3$ and every block count $L\ge1$; it is not an asymptotic statement.}
+The cyclic design is therefore not just better than the three-group design --- it is \emph{optimal in its class}, and no further variance can be extracted by reweighting a fixed $A$-invariant linear statistic over legal off queries.
+
+\section*{160. The integer-budget law between the two designs}
+Asymptotic penalties ($9$ for three-group, $(2+1/q)^2$ for cyclic) do not see block granularity: one cyclic block costs $2q+1$ queries against three. The regime was flagged as an untested weakness. It is now settled exactly over $\mathbb Q$.
+
+\textbf{Information per query.} Cyclic $q^4/(2q+1)^2$ against three-group $q^2/9$, so
+\[\frac{\text{cyclic}}{\text{three-group}}=\frac{9q^2}{(2q+1)^2}=\frac{9}{(2+1/q)^2}\ >\ 1\quad\text{for every }q\ge1,\]
+rising to $9/4$. Values: $1.653$ at $q=3$, $1.993$ at $q=8$, $2.181$ at $q=32$.
+\claimbox{\textbf{There is no budget regime in which three-group is better per query.} The feared small-budget reversal does not exist. Its only role is to consume a remainder too short for a cyclic block.}
+
+\textbf{The law.} The optimal integer split is greedy:
+\[L^\star=\Big\lfloor\tfrac{N}{2q+1}\Big\rfloor\ \text{cyclic blocks},\qquad b^\star=\Big\lfloor\tfrac{N\bmod(2q+1)}{3}\Big\rfloor\ \text{three-group blocks},\]
+remainder wasted. Verified with \textbf{zero violations} over $7$ values of $q$ and roughly $40(2q+1)$ budgets each. The mixed design beats cyclic-only by up to $12.9\%$ in variance at the worst remainder and $4$--$5\%$ at larger $N$, never less. Feasibility threshold is exactly $N=2q+1$: below it cyclic cannot complete one block; at and above it cyclic wins from the first block.
+\eclass{EXACT RATIONAL COMPUTATION} --- \texttt{research/d6\_phase\_boundary\_20260908/block\_budget\_law.json}.
+
+\section*{161. Scope, stated narrowly}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Statement & Class it holds in\\
+\midrule
+cyclic attains the bound & fixed linear $A$-invariant statistics of legal off queries, unit independent Gaussian noise\\
+greedy budget split & the two \emph{named} designs only, compared by Fisher information\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Neither is a bound over all algorithms, over adaptive procedures, over nonlinear statistics, or over query families outside this class. Balanced-design methodology is itself classical; what is claimed is the cost law \emph{inside D6's legality constraint}, which is the part no cited prior result addresses.
+
+\section*{162. What this does not close}
+Adaptive matching regret when $A$ is unknown, termination and the expected rate $\Gamma$ for the full procedure, and the uniform-in-$q$ regime all remain open. The discovery cost currently scales as $q\log(q/\eta)$, so it cannot be dropped mechanically into the $N\asymp q$ budget regime and called matching.
+\end{document}

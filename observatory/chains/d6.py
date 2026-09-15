@@ -42,6 +42,58 @@ def reference_mean(world: World, ref: ProductReference) -> Q:
     return sum(ref.prob(a) * world.value(a) for a in world.support.omega)
 
 
+# ---------------------------------------------------------------- D6 loss
+#
+# CORRECTION (audit): D6 retains a relation through its *product-reference
+# marginal* Q_j^q, not through the additive primitive f_j.  On an interacting
+# world the two differ -- measured disagreement on 327 of 720 (S, reference)
+# cases, worst |7/4 - 23/8| = 9/8 -- so the primitive-based compression loss
+# used by the Support chain is simply a different object here.  Every D6
+# quantity below is therefore computed from the marginals.
+
+def response_marginals(world: World, ref: ProductReference):
+    """Q_j^q(a_j) for every relation and action."""
+    return tuple(
+        tuple(marginal_response(world, ref, j, a)
+              for a in range(world.support.action_sizes[j]))
+        for j in range(world.m)
+    )
+
+
+def response_spans(world: World, ref: ProductReference, marg=None):
+    """C_j = osc_a Q_j^q(a).  This -- not osc f_j -- is what Top-C ranks."""
+    marg = marg if marg is not None else response_marginals(world, ref)
+    return tuple(osc(list(mj)) for mj in marg)
+
+
+def d6_loss(world: World, ref: ProductReference, S, marg=None) -> Q:
+    """L_F(S) = (1/2) osc_a [ F(a) - sum_{j in S} Q_j^q(a_j) ]."""
+    marg = marg if marg is not None else response_marginals(world, ref)
+    keep = set(int(j) for j in S)
+    vals = [world.value(a) - sum(marg[j][a[j]] for j in keep)
+            for a in world.support.omega]
+    return HALF * osc(vals)
+
+
+def d6_optimum(world: World, ref: ProductReference, k: int, marg=None):
+    """Exact minimum D6 loss at budget k, with every optimal retained set."""
+    marg = marg if marg is not None else response_marginals(world, ref)
+    best = None
+    opts = []
+    for S in itertools.combinations(range(world.m), int(k)):
+        v = d6_loss(world, ref, S, marg)
+        if best is None or v < best:
+            best, opts = v, [S]
+        elif v == best:
+            opts.append(S)
+    return best, tuple(opts)
+
+
+def d6_topc(world: World, ref: ProductReference, k: int, marg=None):
+    marg = marg if marg is not None else response_marginals(world, ref)
+    return topk(response_spans(world, ref, marg), int(k))
+
+
 def surrogate(world: World, ref: ProductReference):
     b = reference_mean(world, ref)
     m = world.m
@@ -121,9 +173,10 @@ def probe_surrogate_and_bounds(em: Emitter, world: World, ref: ProductReference,
             instance=inst, note=str(omega[max(range(len(diffs)), key=lambda i: abs(diffs[i]))]))
 
     # -- decision transfer and the half factor -------------------------
-    S = topc_set(world, k)
-    L_sel = world.true_compression_loss(S)
-    L_opt, _ = exact_optimum(world, k, true_loss=True)
+    marg = response_marginals(world, ref)
+    S = d6_topc(world, ref, k, marg)
+    L_sel = d6_loss(world, ref, S, marg)
+    L_opt, _ = d6_optimum(world, ref, k, marg)
     regret = L_sel - L_opt
     e = "D6.decision_transfer"
     em.emit(chain=CHAIN, eq_id=e, symbol="loss_selected", value=L_sel, role=ROLE_TERM, instance=inst)
@@ -176,7 +229,8 @@ def probe_kappa_di(em: Emitter, world: World, ref: ProductReference, k: int,
     delta = world.delta_square()
     if delta == 0:
         return
-    C = world.component_spans()
+    marg = response_marginals(world, ref)
+    C = response_spans(world, ref, marg)
     S = topk(C, k)
     tied = _is_tied_topk(C, k)
     e_k = "D6.decision_interaction_complexity"
@@ -184,8 +238,8 @@ def probe_kappa_di(em: Emitter, world: World, ref: ProductReference, k: int,
     for T in itertools.combinations(range(m), k):
         if T == S:
             continue
-        L_S = world.true_compression_loss(S)
-        L_T = world.true_compression_loss(T)
+        L_S = d6_loss(world, ref, S, marg)
+        L_T = d6_loss(world, ref, T, marg)
         D_ST = L_S - L_T
         l_C = 2 * D_ST
         symdiff = len(set(S) - set(T))
@@ -254,6 +308,19 @@ def centered_profile(world: World, ref: ProductReference, i: int, u: int, u0: in
     return first - second
 
 
+def raw_profile(world: World, i: int, u: int, u0: int, context: Action) -> Q:
+    """rho_{i,u}^{u0}(z) = F(z_{i<-u}) - F(z_{i<-u0}), the UNCENTRED contrast.
+
+    Same data as `centered_profile`, minus the first-order subtraction.  That
+    subtraction is a projection: it is exactly the additive layer in which every
+    recorded D6 counterexample lives, so measuring rank on the centred profile
+    alone cannot see the mechanism.
+    """
+    zu = list(context); zu[int(i)] = int(u); zu = tuple(zu)
+    z0 = list(context); z0[int(i)] = int(u0); z0 = tuple(z0)
+    return world.value(zu) - world.value(z0)
+
+
 def probe_profile_rank(em: Emitter, world: World, ref: ProductReference, key: Dict,
                        *, max_contexts: int = 8) -> None:
     """D6.centered_interaction_profile and D6.rank_one_geometry.
@@ -266,7 +333,10 @@ def probe_profile_rank(em: Emitter, world: World, ref: ProductReference, key: Di
     sizes = world.support.action_sizes
     e_p = "D6.centered_interaction_profile"
     e_r = "D6.rank_one_geometry"
+    e_w = "D6.raw_contrast_rank_one"
     all_rank_one = True
+    all_raw_rank_one = True
+    n_misaligned = 0
     for i in range(m):
         n_i = sizes[i]
         if n_i < 2:
@@ -316,8 +386,53 @@ def probe_profile_rank(em: Emitter, world: World, ref: ProductReference, key: Di
                 role=ROLE_FLAG, instance=inst)
         em.emit(chain=CHAIN, eq_id=e_r, symbol="witness_minor_u", value=wu, role=ROLE_DIAG, instance=inst)
         em.emit(chain=CHAIN, eq_id=e_r, symbol="witness_minor_v", value=wv, role=ROLE_DIAG, instance=inst)
+
+        # ---- raw (uncentred) rank, over the same contexts and the same anchor
+        rawp = {u: [raw_profile(world, i, u, u0, z) for z in contexts]
+                for u in range(n_i)}
+        raw_worst = ZERO
+        rwu = rwv = -1
+        for u, v in itertools.combinations(range(n_i), 2):
+            for x in range(len(contexts)):
+                for y in range(x + 1, len(contexts)):
+                    minor = rawp[u][x] * rawp[v][y] - rawp[u][y] * rawp[v][x]
+                    if abs(minor) > raw_worst:
+                        raw_worst, rwu, rwv = abs(minor), u, v
+        raw_rank_one = raw_worst == 0
+        all_raw_rank_one = all_raw_rank_one and raw_rank_one
+        misaligned = rank_one and not raw_rank_one
+        if misaligned:
+            n_misaligned += 1
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="coordinate", value=i,
+                role=ROLE_INPUT, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="raw_max_abs_minor", value=raw_worst,
+                role=ROLE_LHS, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="raw_is_rank_one",
+                value=1 if raw_rank_one else 0, role=ROLE_FLAG, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="raw_rank_exceeds_one",
+                value=0 if raw_rank_one else 1, role=ROLE_FLAG, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="centred_is_rank_one",
+                value=1 if rank_one else 0, role=ROLE_FLAG, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="misaligned",
+                value=1 if misaligned else 0, role=ROLE_FLAG, instance=inst,
+                note="centred rank one but raw rank > 1: invisible to D6")
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="n_raw_profile_levels",
+                value=len({tuple(rawp[u]) for u in range(n_i)}),
+                role=ROLE_TERM, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="binary_alphabet",
+                value=1 if n_i == 2 else 0, role=ROLE_FLAG, instance=inst,
+                note="a two-letter alphabet forces raw rank one unconditionally")
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="raw_witness_minor_u", value=rwu,
+                role=ROLE_DIAG, instance=inst)
+        em.emit(chain=CHAIN, eq_id=e_w, symbol="raw_witness_minor_v", value=rwv,
+                role=ROLE_DIAG, instance=inst)
     em.emit(chain=CHAIN, eq_id=e_r, symbol="all_coordinates_rank_one",
             value=1 if all_rank_one else 0, role=ROLE_FLAG, instance=dict(key))
+    em.emit(chain=CHAIN, eq_id=e_w, symbol="all_coordinates_raw_rank_one",
+            value=1 if all_raw_rank_one else 0, role=ROLE_FLAG, instance=dict(key))
+    em.emit(chain=CHAIN, eq_id=e_w, symbol="n_misaligned_coordinates",
+            value=n_misaligned, role=ROLE_TERM, instance=dict(key),
+            note="count of coordinates D6's centred hypothesis cannot see")
 
 
 def run(em: Emitter, world: World, *, budgets: Sequence[int], rng,

@@ -1,0 +1,56 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update C: the census in Section 67 undercounted the trust holes by a factor of nearly two, and the correct number is 16}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (fourth update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--68, including addenda A and B, are an immutable prefix. This addendum begins at Section 69. Section 67 is \emph{not} removed; it is corrected here.
+
+\section*{69. CORRECTION to the census of Section 67}
+Section 67, written earlier today, reported \textbf{9} \texttt{native\_decide} uses across three modules. That number is wrong. Re-counting by taking every occurrence of the bare identifier and classifying it by reading its surrounding context:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r X}
+\toprule
+Module & §67 said & actual & lines\\
+\midrule
+\texttt{Lean\allowbreak D6\allowbreak Pair\allowbreak Contraction\allowbreak Counterexample} & $2$ & $\mathbf{2}$ & $184$, $203$\\
+\texttt{Lean\allowbreak Structural\allowbreak Actual\allowbreak Chi4\allowbreak WitnessV1} & $2$ & $\mathbf{4}$ & $1036$, $1060$, $1079$, $1089$\\
+\texttt{Lean\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak WitnessV1} & $5$ & $\mathbf{10}$ & $60$--$64$, $68$, $72$, $76$, $80$, $84$\\
+\midrule
+\textbf{total} & $9$ & $\mathbf{16}$ & across $3$ modules\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Each of the three modules exists in two copies (\texttt{work/p12} and \texttt{work/p13\_conjectures}) with identical content, so $16$ counts distinct source positions once.
+
+\textbf{Why it was wrong, and the irony.} Section 67 closed with a method note saying that searching for \texttt{by native\_decide} misses the tactic when it sits on the following line, and that the reliable procedure is to count occurrences and classify each. The count published in that same section was produced by the very pattern it warns against: it caught the five \texttt{opt*\_abs} one-liners of the $\chi\ge5$ witness and missed \texttt{unique\_abs1}--\texttt{unique\_abs5} immediately below them, whose \texttt{native\_decide} is on the line after \texttt{by}. It also missed two of the four uses in the $\chi=4$ witness for the same reason.
+\claimbox{\textbf{Writing a rule down does not apply it.} The corrected procedure was stated and then not executed in the same section. Recorded here in full rather than silently patched, because the failure is about method, and the ledger's value depends on method failures being visible.}
+
+\section*{70. What the corrected number changes, and what it does not}
+\begin{itemize}
+\item \textbf{Unchanged:} the module set is the same three; the audited $59$ names still contain \textbf{zero} \texttt{ofReduceBool}; the evidence class of the $\chi\ge5$ witness is still \eclass{COMPILED ARTIFACT resting on \texttt{native\_decide}}.
+\item \textbf{Changed:} the promotion is twice the work it looked like. The five \texttt{unique\_abs} statements are not closed evaluations but quantifications over all $128$ subsets of a $7$-element set, each requiring a signed seven-term integer sum and one \texttt{natAbs}.
+\item \textbf{Still cheap in absolute terms:} $128\times7=896$ kernel integer additions for the whole uniqueness block. That is a bounded computation, not a case explosion, so kernel \texttt{decide} remains the right instrument and \textbf{no brute-force search is involved}.
+\end{itemize}
+
+\section*{71. The promotion, implemented}
+A new module \texttt{Lean\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak KernelV1} re-proves all ten statements about the \emph{same} definitions --- it imports the original rather than copying it, so the promotion applies to the witness actually in use --- with kernel \texttt{decide} in place of \texttt{native\_decide}. Each statement is a separate theorem so a failure localises. The original module is untouched. A companion \texttt{Axiom\allowbreak Audit\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak KernelV1} prints the axiom set of all ten.
+\claimbox{\textbf{Status: WRITTEN, NOT YET COMPILED.} The kernel cost is bounded but not measured, and \texttt{decide} on a \texttt{Finset (Fin 7)} quantifier could still exceed the recursion or heartbeat limits. Until the audit reports \texttt{[propext, Classical.choice, Quot.sound]} for all ten names, $\chi\ge5$ stays a \eclass{COMPILED ARTIFACT}. The promotion is a proposal with a verification command attached, not a result.}
+\end{document}

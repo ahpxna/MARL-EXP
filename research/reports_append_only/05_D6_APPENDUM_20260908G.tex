@@ -1,0 +1,102 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update G: a margin-sensitive exchange bound proved in Lean, the frontier $R_6(\mu)=6-3\mu$ confirmed at five exact points, and three claims of addendum F narrowed}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (second update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--140, including addenda A--F, are an immutable prefix. Nothing there is rewritten or removed. This addendum begins at Section 141. Claims of addendum F that were too strong are quoted, struck, and replaced with the narrower statement the evidence supports.
+
+\section*{141. A margin-sensitive exchange bound, PROVED}
+The exchange argument behind \texttt{pair\_loss\_le\_sdiff\_card} discards a term. Retaining it gives, with $C_i=\mathrm{osc}(Q_i)$ and $d=|S\setminus T|$,
+\[2\bigl[L_F(S)-L_F(T)\bigr]\ \le\ 2d\,\delta_\square-\Bigl(\sum_{i\in S\setminus T}C_i-\sum_{j\in T\setminus S}C_j\Bigr),\]
+and if the Top-C margin is at least $\mu$, then since $|S\setminus T|=|T\setminus S|=d$ the surplus is at least $d\mu$, whence
+\[\boxed{\ 2\bigl[L_F(S)-L_F(T)\bigr]\ \le\ d\,\bigl(2\delta_\square-\mu\bigr).\ }\]
+Three theorems in \texttt{Lean\allowbreak D6\allowbreak Margin\allowbreak Sensitive\allowbreak ExchangeV1}, which imports all four modules of 7--8 September:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X}
+\toprule
+\texttt{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus}\\
+\texttt{score\_surplus\_ge\_card\_mul\_margin}\\
+\texttt{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{No symmetry assumption and no fixed active cell.} \eclass{PROVED}: the module carries its own \texttt{\#print axioms} inline, and its compile log reports all three depending only on \texttt{[propext, Classical.choice, Quot.sound]} --- no \texttt{sorryAx}. There is no separate \texttt{AxiomAudit} file for this module because the audit is in the module; this was checked rather than assumed.
+
+At $\delta_\square=1$ this is $R_m(\mu)\le d(2-\mu)$, i.e.\ $6-3\mu$ at $m=6$ ($d=3$) and $8-4\mu$ at $m=8$ ($d=4$).
+
+\section*{142. The frontier matches at five exact points}
+The block-ansatz instrument of Section 138 was run independently against that upper bound. Every value below is an exactly certified feasible world --- rounded to $\mathbb{Q}$ and re-verified on the full cube with \texttt{Fraction} --- and in every case the certificate equalled the float LP optimum to the digit (\texttt{lp\_minus\_certified} $=0.0$).
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{l r r r r r}
+\toprule
+$\mu$ & $0$ & $1/4$ & $1/2$ & $3/4$ & $1$\\
+\midrule
+certified lower bound & $6$ & $21/4$ & $9/2$ & $15/4$ & $3$\\
+Lean upper bound $6-3\mu$ & $6$ & $21/4$ & $9/2$ & $15/4$ & $3$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Upper and lower bound coincide at all five. At $m=8$, $\mu=0$ the certified value is $8$, meeting $d(2-\mu)=8$.
+
+\claimbox{\textbf{Status, split honestly.} The upper bound $R_m(\mu)\le d(2\delta_\square-\mu)$ is \eclass{PROVED} in Lean. The values $R_6(\mu)=6-3\mu$ and $R_8(\mu)=8-4\mu$ are matched by \emph{exactly certified} lower bounds at the $\mu$ listed above. The identity on the \emph{whole} interval rests on an interpolation argument with exact endpoint checks, and has \textbf{no Lean bridge yet}. \eclass{PROVED upper bound + EXACT RATIONAL lower bounds at listed points}}
+
+\section*{143. NARROWING: three claims of addendum F were too strong}
+\textbf{(a)} \oldclaim{Composed, they make $R_m(\mu)$ \emph{computable}, for any $m$ and any $\mu$.} A certified rational solution certifies \textbf{feasibility}, not global optimality. Every artifact the instrument writes carries \texttt{lower\_bound\_only: true}, and by default restricts the argmax/argmin pair to \texttt{corner\_classes}, which restricts further. The correct statement: the instrument \emph{certifies exact lower bounds} on $R_m(\mu)$ within a stated ansatz. Matching the Lean upper bound is what makes a given point exact --- the LP alone never does.
+
+\textbf{(b)} \oldclaim{Symmetrisation is strictly lossy here, and lossy by exactly one.} This is verified at $m=4,6,8$ and is \emph{not} a general law. Running \emph{every} endpoint class for the symmetric ansatz at $m=6,\mu=0$ still returns $5$, which strengthens the $m=6$ case but does not establish an exact upper bound for the symmetric problem at all $m$; that needs a dual certificate or a general proof. Restated: \textbf{at $m=4,6,8$ the symmetric optimum is $m-1$ and the true optimum is $m-1,m,m$ respectively}, and no claim is made beyond $m=8$.
+
+\textbf{(c)} \oldclaim{If that is a theorem, then $c^\ast(m)=m$ for every even $m\ge6$ follows from a finite LP computation per $m$.} Proving the block ansatz WLOG does \textbf{not} by itself give a formula for infinitely many $m$: a per-$m$ LP is still a per-$m$ computation. A parametric family of worlds, or a parametric dual, is still required. This is the same distinction the Structural chain already navigated --- finite verification at $r\le7$ versus the parametric proof of $\chi_{\text{prefix}}(F_r,0)=r$.
+
+\section*{144. The audit transcript is now in the ledger}
+Addendum F, Section 133, and Report 1, Section 58, both recorded that no \texttt{\#print axioms} transcript existed on disk. It does now: \texttt{CurrentRepoAxiomAudit.log}, $59$ audited names, $0$ occurrences of \texttt{sorryAx}, every name depending only on \texttt{[propext, Classical.choice, Quot.sound]}.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r}
+\toprule
+Module & names\\
+\midrule
+\texttt{D6M6\allowbreak SharpnessBridgeV1} & 40\\
+\texttt{Support\allowbreak FibreSufficiency} & 10\\
+\texttt{Functional\allowbreak ResidualMaintenance} & 7\\
+\texttt{Structural\allowbreak Staircase\allowbreak ExactPrefixCover} & 2\\
+\midrule
++ \texttt{D6\allowbreak Margin\allowbreak SensitiveExchange} (inline) & 3\\
+\midrule
+\textbf{total audited} & \textbf{62}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The two \texttt{StructuralStaircaseExactPrefixCover} names are the parametric $\chi=r$ proof, so that chain's central theorem is audited as well. The corpus-wide deficit recorded in Report 1, Section 56 --- $135$ of $139$ compiled modules unaudited --- is unchanged as a statistic; $62$ names across five modules is what is now covered.
+
+\section*{145. Novelty positioning against the nearest literature}
+The bound of Section 141 is a direct improvement of this project's own exchange proof, which is a contribution to the proof and not by itself a new theory. The nearest body of work is \emph{approximate modularity} --- stability and approximation results for set functions close to additive. Claiming novelty from ``nearly additive'' would be wrong. What must be stated instead, precisely, is the difference in three places: the \textbf{modulus} used ($\delta_\square$, a mixed second difference, not a uniform additive error), the \textbf{reference} (a corner product reference with retained response components, not an arbitrary additive surrogate), and the \textbf{loss} (a doubled selected-versus-competitor decision loss at a Top-C selection, not an $\ell_\infty$ approximation error). Absent that comparison, the margin law reads as a special case of known stability results.
+
+\claimbox{The defensible contribution is \textbf{the sharp law together with a construction attaining it and a description of the equality case} --- not the LP, not the $\varepsilon$-argument, and not the exchange bound in isolation.}
+
+\section*{146. What this asks next}
+\begin{enumerate}
+\item \textbf{Bridge the two interpolation families in Lean.} Both endpoint pairs are exact rationals sharing residual extrema and compatible response signs, so each family is an affine path between two integer tables --- the shape \texttt{LeanD6M6SharpnessBridgeV1} already handles. This closes $R_6$ and $R_8$ on the full interval and needs no further margin sweeping.
+\item \textbf{Find the $m$-parametric construction} and prove or refute
+\[R_{2k}(\mu)=k(2-\mu),\qquad k\ge3,\ 0\le\mu\le1.\]
+This is a research target, not a theorem. The upper bound is already Lean-proved for every $m$; what is missing is a family attaining it for every $k$.
+\item \textbf{Then} extend along budget $k$, to margin ranges outside $[0,1]$, and to a characterisation of the equality case. That is where a strong counterexample becomes a sharp theory.
+\end{enumerate}
+\textbf{Explicitly cancelled.} Dense margin sweeping inside $[0,1]$. The upper bound is proved for all $\mu$ and the lower bound is affine between certified endpoints; more interior points add nothing.
+\end{document}

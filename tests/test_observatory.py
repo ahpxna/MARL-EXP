@@ -188,3 +188,400 @@ def test_screened_candidate_agrees_with_exact_recomputation():
         Lo, _ = exact_optimum(w, res["k"], true_loss=True)
         J = (L - Lo) / ((3 - 1) * d)
         assert abs(float(J) - c["J_float"]) < 1e-9
+
+
+def test_support_partial_test_cover_exact_solver_is_not_artificially_capped():
+    from observatory.chains.support import _exact_cover
+    cells=[(0,),(1,),(2,),(3,)]
+    required=frozenset({('a','b'),('c','d'),('e','f'),('g','h')})
+    separates={
+        (0,):frozenset({('a','b')}),
+        (1,):frozenset({('c','d')}),
+        (2,):frozenset({('e','f')}),
+        (3,):frozenset({('g','h')}),
+    }
+    q_star,found=_exact_cover(cells,separates,required,cap=None)
+    assert found is True
+    assert q_star == 4
+    capped,found_capped=_exact_cover(cells,separates,required,cap=3)
+    assert capped is None and found_capped is False
+
+
+def test_master_typed_completion_probe_uses_true_cost_oracle(tmp_path):
+    from observatory.chains.master import probe_typed_completion
+    from observatory.schema import Emitter,make_context
+    p=tmp_path/'typed.jsonl'
+    rng=random.Random(20260904)
+    with Emitter(p,make_context('typed-test',20260904)) as em:
+        for draw in range(30):
+            probe_typed_completion(em,{'world_id':f'typed-{draw}','draw':draw},rng,
+                                   n_obligations=6,n_evidence=10)
+    rows=[json.loads(line) for line in p.read_text().splitlines() if line.strip()]
+    qrows=[r for r in rows if r.get('record')=='q' and r.get('eq_id')=='MASTER.typed_completion']
+    by={}
+    for row in qrows:
+        key=row['instance']['world_id']; by.setdefault(key,{})[row['symbol']]=row
+    for values in by.values():
+        exact=F(values['completion_cost']['exact'])
+        greedy=F(values['greedy_cost']['exact'])
+        assert greedy >= exact
+
+
+def test_miner_excludes_exact_affine_aliases_from_novel_inequalities(tmp_path):
+    from observatory.mine import _exact_affine_map
+    pairs=[(F(0),F(1)),(F(1),F(3)),(F(2),F(5)),(F(3),F(7))]
+    assert _exact_affine_map(pairs) == (F(2),F(1))
+    assert _exact_affine_map([(F(0),F(0)),(F(1),F(1)),(F(2),F(5))]) is None
+
+
+# ------------------------------------------------------- D6 loss definition
+
+def test_d6_loss_uses_marginals_not_primitives():
+    """Regression: D6 retains a relation via Q_j^q, not via f_j.
+
+    These two objects coincide on additive worlds and diverge on interacting
+    ones.  The observatory measured the primitive-based loss for D6 until an
+    audit caught it, so the divergence is pinned here rather than left to
+    reappear silently.
+    """
+    import random
+    from observatory.worlds import generate_world, ProductReference
+    from observatory.chains.d6 import d6_loss, response_spans
+    rng = random.Random(11)
+    diverged = False
+    for _ in range(40):
+        w = generate_world("interaction_heavy", 3, 2, rng=rng)
+        ref = ProductReference.point_mass(w.support.action_sizes)
+        for S in [(0,), (1,), (0, 2)]:
+            if d6_loss(w, ref, S) != w.true_compression_loss(S):
+                diverged = True
+    assert diverged, "the two loss definitions must not be interchangeable"
+
+
+def test_d6_loss_matches_primitive_loss_on_additive_worlds():
+    import random
+    from observatory.worlds import generate_world, ProductReference
+    from observatory.chains.d6 import d6_loss
+    rng = random.Random(5)
+    for _ in range(15):
+        w = generate_world("cartesian", 3, 2, rng=rng)
+        assert w.is_additive()
+        ref = ProductReference.point_mass(w.support.action_sizes)
+        for S in [(), (0,), (0, 1)]:
+            assert d6_loss(w, ref, S) == w.true_compression_loss(S)
+
+
+def test_ternary_probe_world_is_not_labelled_as_the_falsifier():
+    from observatory.worlds import ternary_probe_world
+    w = ternary_probe_world()
+    assert w.meta["family"] == "ternary_probe"
+
+
+# -------------------------------------------------------------------------
+# dedup.py: semantic deduplication of mined candidate relations
+#
+# Each test plants a synthetic row set (and, where relevant, a synthetic
+# `discover_inequalities`-shaped candidate) whose correct tier is known by
+# construction, and asserts dedup.classify_candidate lands it there.  Row
+# dicts are built directly in the schema mine.load() would hand back (the
+# tests do not go through Emitter/load(), since dedup.py only ever consumes
+# that in-memory shape and discover_inequalities() itself is orthogonal to
+# what is under test here).
+# --------------------------------------------------------------------------
+
+from observatory import dedup as _dedup
+
+
+def _drow(eq_id, symbol, role, val, world_id, *, k="0", family="famA", **extra_inst):
+    """One synthetic measured row in the shape dedup.py / mine.py consume."""
+    val = F(val)
+    inst = {"world_id": world_id, "k": k, "family": family}
+    inst.update(extra_inst)
+    return {
+        "eq_id": eq_id, "symbol": symbol, "role": role, "mode": "exact",
+        "status": "measured", "value": float(val),
+        "exact": "%d/%d" % (val.numerator, val.denominator),
+        "instance": inst, "tags": [], "note": "",
+    }
+
+
+def _dcand(lhs_col, rhs_col, *, support, tight, distinct_lhs=5, distinct_rhs=5,
+          cross_chain=False, cross_equation=True):
+    """A discover_inequalities()-shaped candidate dict for the two given columns."""
+    return {
+        "lhs": lhs_col, "rhs": rhs_col, "support": support, "tight": tight,
+        "tight_rate": (tight / support) if support else 0.0,
+        "min_slack": 0.0, "max_slack": 5.0,
+        "distinct_lhs": distinct_lhs, "distinct_rhs": distinct_rhs,
+        "cross_chain": cross_chain, "cross_equation": cross_equation,
+    }
+
+
+def test_dedup_exact_alias_is_classified_alias_even_across_equations():
+    """Same numbers under two (equation, symbol) names -> ALIAS, not a discovery."""
+    rows = []
+    fams = ["famA", "famB", "famC"]
+    for i in range(1, 13):
+        fam = fams[i % 3]
+        rows.append(_drow("TEST.alias_eq_a", "x", "term", i, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.alias_eq_b", "y", "term", i, "w%d" % i, family=fam))
+    cand = _dcand("TEST.alias_eq_a.x|max", "TEST.alias_eq_b.y|min", support=12, tight=12)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_ALIAS
+    assert out["reason"] == "exact_alias"
+    assert out["verified_support"] == 12
+    assert out["n_families"] == 3
+
+
+def test_dedup_affine_alias_is_classified_alias_not_novel():
+    """y = 2x + 1 exactly, verified on every shared row -> ALIAS (affine, exact)."""
+    rows = []
+    for i in range(1, 16):
+        fam = "famA" if i % 2 == 0 else "famB"
+        x = F(i)
+        y = 2 * x + 1
+        rows.append(_drow("TEST.aff_eq_a", "p", "term", x, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.aff_eq_b", "q", "term", y, "w%d" % i, family=fam))
+    cand = _dcand("TEST.aff_eq_a.p|max", "TEST.aff_eq_b.q|min", support=15, tight=0)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_ALIAS
+    assert out["reason"].startswith("affine_alias")
+    assert out["affine_exact"] is True
+    assert out["affine_alpha"] == "2"
+    assert out["affine_beta"] == "1"
+
+
+def test_dedup_declared_lhs_rhs_of_same_equation_is_tautology():
+    """Comparing an equation's own declared lhs/rhs re-derives the definition."""
+    rows = []
+    for i in range(1, 16):
+        fam = "famA" if i % 2 == 0 else "famB"
+        L = F(i)
+        R = L + F(i % 3)      # not affine in L, not identical, not always tight
+        rows.append(_drow("TEST.decl_ineq", "L", "lhs", L, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.decl_ineq", "R", "rhs", R, "w%d" % i, family=fam))
+    cand = _dcand("TEST.decl_ineq.L|max", "TEST.decl_ineq.R|min", support=15, tight=5,
+                  cross_equation=False)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_TAUTOLOGY
+    assert out["reason"] == "declared_lhs_le_rhs(TEST.decl_ineq)"
+
+
+def test_dedup_difference_equal_to_declared_slack_is_tautology():
+    """rhs - lhs literally equals an already-declared slack symbol of the same eq."""
+    rows = []
+    for i in range(1, 16):
+        fam = "famA" if i % 3 else "famB"
+        P = F(i)
+        gap = F(i % 4)
+        Q = P + gap
+        rows.append(_drow("TEST.slack_eq", "P", "term", P, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.slack_eq", "Q", "term", Q, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.slack_eq", "S", "slack", gap, "w%d" % i, family=fam))
+    cand = _dcand("TEST.slack_eq.P|max", "TEST.slack_eq.Q|min", support=15, tight=4,
+                  cross_equation=False)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_TAUTOLOGY
+    assert out["reason"].startswith("diff_equals_slack(TEST.slack_eq.S)")
+
+
+def test_dedup_ratio_vs_own_numerator_is_tautology():
+    """A ratio symbol compared against its own equation's lhs is a restatement."""
+    rows = []
+    for i in range(1, 16):
+        fam = "famA" if i % 2 else "famB"
+        num = F(i)
+        den = F(i + 3)
+        rows.append(_drow("TEST.ratio_eq", "num", "lhs", num, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.ratio_eq", "rat", "ratio", num / den, "w%d" % i, family=fam))
+    cand = _dcand("TEST.ratio_eq.rat|max", "TEST.ratio_eq.num|min", support=15, tight=3,
+                  cross_equation=False)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_TAUTOLOGY
+    assert out["reason"].startswith("ratio_vs_own_lhs")
+
+
+def test_dedup_single_family_relation_is_degenerate():
+    """A relation only ever observed on one world family is weak, not a discovery."""
+    rows = []
+    for i in range(1, 13):
+        x = F(i)
+        y = x * x + 1          # nonlinear: not affine, not identical
+        rows.append(_drow("TEST.deg_eq_a", "x", "term", x, "w%d" % i, family="only_family"))
+        rows.append(_drow("TEST.deg_eq_b", "y", "term", y, "w%d" % i, family="only_family"))
+    cand = _dcand("TEST.deg_eq_a.x|max", "TEST.deg_eq_b.y|min", support=12, tight=0)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_DEGENERATE
+    assert "single_world_family" in out["reason"]
+
+
+def test_dedup_identically_zero_side_is_degenerate():
+    rows = []
+    fams = ["famA", "famB", "famC"]
+    for i in range(1, 13):
+        fam = fams[i % 3]
+        rows.append(_drow("TEST.zero_eq_a", "x", "term", 0, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.zero_eq_b", "y", "term", i, "w%d" % i, family=fam))
+    cand = _dcand("TEST.zero_eq_a.x|max", "TEST.zero_eq_b.y|min", support=12, tight=1)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_DEGENERATE
+    assert "lhs_identically_zero" in out["reason"]
+
+
+def test_dedup_monotone_nonlinear_relation_is_flagged_reparam():
+    """y = x**3 is a monotone reparametrization: not affine, not degenerate."""
+    rows = []
+    fams = ["famA", "famB", "famC", "famD"]
+    for i in range(1, 21):
+        fam = fams[i % 4]
+        x = F(i)
+        y = x ** 3
+        rows.append(_drow("TEST.mono_eq_a", "x", "term", x, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.mono_eq_b", "y", "term", y, "w%d" % i, family=fam))
+    cand = _dcand("TEST.mono_eq_a.x|max", "TEST.mono_eq_b.y|min", support=20, tight=0)
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_REPARAM
+    assert out["reason"].startswith("monotone_reparam")
+    assert abs(out["spearman"]) >= _dedup.REPARAM_RHO
+
+
+def test_dedup_genuinely_independent_inequality_is_novel_candidate():
+    """Two independently-wiggling, non-monotonically-related quantities with x<=y
+    everywhere, multiple families, tight on some rows and slack on others: this is
+    exactly the shape a real discovery should have, and none of the disqualifying
+    checks should fire.  (x, y) pairs and their spearman rho (~0.48, far from the
+    +-1 a monotone reparametrization would show) were verified by hand offline.
+    """
+    xs = [3, 1, 4, 1, 5, 9, 2, 6, 1, 3, 5, 4, 2, 6, 3, 1, 4, 2, 5, 6]
+    gaps = [0, 4, 1, 5, 0, 2, 3, 0, 4, 1, 0, 3, 2, 0, 1, 4, 0, 2, 3, 0]
+    fams = ["famA", "famB", "famC", "famD"]
+    rows = []
+    tight_seen = False
+    for i, (x, g) in enumerate(zip(xs, gaps)):
+        fam = fams[i % 4]
+        y = x + g
+        if g == 0:
+            tight_seen = True
+        rows.append(_drow("TEST.novel_eq_a", "x", "term", x, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.novel_eq_b", "y", "term", y, "w%d" % i, family=fam))
+    assert tight_seen, "test construction bug: fixture must include a tight row"
+    cand = _dcand("TEST.novel_eq_a.x|max", "TEST.novel_eq_b.y|min", support=20, tight=7,
+                  distinct_lhs=len(set(xs)), distinct_rhs=len(set(x + g for x, g in zip(xs, gaps))))
+    idx, role_of = _dedup.build_row_index(rows)
+    out = _dedup.classify_candidate(cand, idx, role_of)
+    assert out["tier"] == _dedup.TIER_NOVEL
+    assert out["n_families"] == 4
+    assert len(out["tight_examples"]) >= 1
+    assert abs(out["spearman"]) < 0.9
+
+
+def test_dedup_coarse_join_fallback_recovers_cross_chain_alias_when_instance_shapes_differ():
+    """Two chains stamping different EXTRA instance fields for "the same"
+    (world_id, k) -- the real pattern behind the STR-vs-SUP DEGENERATE
+    false-negatives found on the live store -- make the full-instance-key
+    join come up empty even though the two quantities are the same number
+    everywhere.  classify_candidate's coarse (world_id, k) fallback must
+    still catch it as an ALIAS instead of leaving it DEGENERATE.
+    """
+    rows = []
+    for i in range(1, 16):
+        fam = "famA" if i % 2 else "famB"
+        v = F(i)
+        rows.append(_drow("TEST.chainA_eq", "x", "term", v, "w%d" % i, family=fam,
+                           chainA_only_field="present"))
+        rows.append(_drow("TEST.chainB_eq", "y", "term", v, "w%d" % i, family=fam,
+                           chainB_only_field="also present"))
+    cand = _dcand("TEST.chainA_eq.x|max", "TEST.chainB_eq.y|min", support=15, tight=15)
+    idx, role_of = _dedup.build_row_index(rows)
+    coarse = _dedup.build_coarse_index(rows)
+
+    # sanity: the strict full-instance-key join really does find nothing,
+    # exactly as it does on the live store between mismatched chains
+    assert len(_dedup._shared(idx, ("TEST.chainA_eq", "x"), ("TEST.chainB_eq", "y"))) == 0
+
+    without_fallback = _dedup.classify_candidate(cand, idx, role_of)
+    assert without_fallback["tier"] == _dedup.TIER_DEGENERATE
+    assert without_fallback["join"] == "full"
+
+    with_fallback = _dedup.classify_candidate(cand, idx, role_of, coarse=coarse)
+    assert with_fallback["tier"] == _dedup.TIER_ALIAS
+    assert with_fallback["join"] == "coarse"
+    assert with_fallback["verified_support"] == 15
+
+
+def test_dedup_alias_classes_union_transitively_across_pairs():
+    """A~B (exact) and B~C (affine) must merge into one 3-member equivalence class."""
+    rows = []
+    for i in range(1, 13):
+        fam = "famA" if i % 2 else "famB"
+        a = F(i)
+        b = a                       # A == B exactly
+        c = 2 * b + 5               # C affine in B
+        rows.append(_drow("TEST.u_eq_a", "a", "term", a, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.u_eq_b", "b", "term", b, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.u_eq_c", "c", "term", c, "w%d" % i, family=fam))
+    cands = [
+        _dcand("TEST.u_eq_a.a|max", "TEST.u_eq_b.b|min", support=12, tight=12),
+        _dcand("TEST.u_eq_b.b|max", "TEST.u_eq_c.c|min", support=12, tight=0),
+    ]
+    classified = _dedup.classify_all(rows, cands)
+    assert all(c["tier"] == _dedup.TIER_ALIAS for c in classified)
+    classes, edges = _dedup.alias_classes(classified)
+    assert len(classes) == 1
+    assert classes[0]["members"] == ["TEST.u_eq_a.a", "TEST.u_eq_b.b", "TEST.u_eq_c.c"]
+    assert len(edges) == 2
+
+
+def test_dedup_tier_counts_partitions_every_candidate_exactly_once():
+    rows = []
+    for i in range(1, 13):
+        fam = "famA" if i % 2 else "famB"
+        rows.append(_drow("TEST.tc_eq_a", "x", "term", i, "w%d" % i, family=fam))
+        rows.append(_drow("TEST.tc_eq_b", "y", "term", i, "w%d" % i, family=fam))       # exact alias
+        rows.append(_drow("TEST.tc_eq_c", "z", "term", 3 * i + 1, "w%d" % i, family=fam))  # affine alias of x
+    cands = [
+        _dcand("TEST.tc_eq_a.x|max", "TEST.tc_eq_b.y|min", support=12, tight=12),
+        _dcand("TEST.tc_eq_a.x|max", "TEST.tc_eq_c.z|min", support=12, tight=0),
+    ]
+    classified = _dedup.classify_all(rows, cands)
+    counts = _dedup.tier_counts(classified)
+    assert sum(counts.values()) == len(cands) == 2
+    assert counts[_dedup.TIER_ALIAS] == 2
+    for t in _dedup.TIERS:
+        assert t in counts
+
+
+def test_mine_report_no_dedup_flag_preserves_legacy_candidate_file(tmp_path):
+    """report(use_dedup=False) must not write the new classification artefacts,
+    and must keep feeding mined_invariants.jsonl from the raw candidate list --
+    i.e. the pre-dedup.py pipeline stays reachable behind the flag."""
+    from observatory.mine import report
+    from observatory.schema import Emitter, make_context
+    ctx = make_context("dedup-cli-test", 0)
+    p = tmp_path / "src.jsonl"
+    with Emitter(p, ctx) as em:
+        for i in range(1, 16):
+            em.emit(chain="SUPPORT", eq_id="SUP.exact_radius", symbol="radius",
+                    value=F(i), role="lhs",
+                    instance={"world_id": "w%d" % i, "k": "0", "family": "famA"})
+            em.emit(chain="SUPPORT", eq_id="SUP.support_brackets", symbol="r_upper",
+                    value=F(i) + F(i % 3), role="term",
+                    instance={"world_id": "w%d" % i, "k": "0", "family": "famA"})
+    out_raw = tmp_path / "out_raw"
+    report([p], out_raw, use_dedup=False)
+    assert (out_raw / "candidate_inequalities.json").exists()
+    assert not (out_raw / "candidate_inequalities_classified.json").exists()
+    assert not (out_raw / "alias_classes.json").exists()
+
+    out_dd = tmp_path / "out_dedup"
+    s = report([p], out_dd, use_dedup=True)
+    assert (out_dd / "candidate_inequalities.json").exists()
+    assert "dedup_tier_counts" in s

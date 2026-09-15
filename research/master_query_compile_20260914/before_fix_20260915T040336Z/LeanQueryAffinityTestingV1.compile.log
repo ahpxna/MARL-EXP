@@ -1,0 +1,38 @@
+LeanQueryAffinityTestingV1.lean:60:28: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ∫ (a : Ω), min (p a) (q a) + t ^ 2 * (p + q) a ∂μ
+in the target expression
+  2 * t * ∫ (a : Ω), √(p a * q a) ∂μ ≤ ∫ (x : Ω), ((fun x => min (p x) (q x)) + fun x => t ^ 2 * (p + q) x) x ∂μ
+
+Ω : Type u_1
+inst✝ : MeasurableSpace Ω
+μ : Measure Ω
+p q : Ω → ℝ
+hp : ∀ (x : Ω), 0 ≤ p x
+hq : ∀ (x : Ω), 0 ≤ q x
+ip : Integrable p μ
+iq : Integrable q μ
+imin : Integrable (fun x => min (p x) (q x)) μ
+iroot : Integrable (fun x => √(p x * q x)) μ
+np : ∫ (x : Ω), p x ∂μ = 1
+nq : ∫ (x : Ω), q x ∂μ = 1
+t : ℝ
+h : 2 * t * ∫ (a : Ω), √(p a * q a) ∂μ ≤ ∫ (x : Ω), ((fun x => min (p x) (q x)) + fun x => t ^ 2 * (p + q) x) x ∂μ
+⊢ 2 * t * affinity μ p q ≤ overlap μ p q + 2 * t ^ 2
+LeanQueryAffinityTestingV1.lean:89:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.QueryAffinityTesting.likelihood_ratio_loss`:
+  [MeasurableSpace Ω]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [MeasurableSpace Ω] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'CIGAMF.P13.QueryAffinityTesting.root_young' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.min_le_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.overlap_bracket' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.every_test_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.likelihood_ratio_attains' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.iid_affinity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.iid_normalized' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.iid_testing_bracket' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.QueryAffinityTesting.affinity_enclosure' depends on axioms: [propext, Classical.choice, Quot.sound]

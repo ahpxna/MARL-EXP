@@ -1,0 +1,34 @@
+{
+  "notice_type": "INVALIDITY_DOCUMENTATION",
+  "applies_to": [
+    "campaigns_20260904_003028.jsonl",
+    "summary_20260904_003028.json"
+  ],
+  "verdict": "INVALID for concluding hardness (researcher's own assessment, confirmed by code audit)",
+  "produced_by_git_rev": "418204a",
+  "defect_1_wrong_min_cost_oracle": {
+    "location": "observatory/chains/master.py (as of commit 418204a), probe_typed_completion, lines ~260-268: `for size in range(1, n_evidence+1): ... if best is not None: break`",
+    "description": "The 'exact' minimum-cost search enumerated item subsets in increasing cardinality order and stopped at the FIRST cardinality with any feasible cover, never comparing against cheaper covers reachable only at a larger cardinality. This is minimum-cardinality-then-cheapest-at-that-cardinality, not minimum cost.",
+    "numeric_reproduction": {
+      "instance": "3 obligations; one item covers all 3 at cost 2.25 (found at size 1); three singleton items cover them individually at cost 0.25 each, true minimum 0.75 (only reachable at size 3, never inspected)",
+      "buggy_oracle_reported_cost": 2.25,
+      "true_minimum_cost_exhaustive": 0.75
+    },
+    "artifact_level_evidence": "336 of 3000 recorded draws (11.2%) show greedy_cost strictly LESS than the reported 'exact' completion_cost in campaigns_20260904_003028.jsonl -- a logical impossibility if completion_cost were truly minimal, and direct proof of the bug already visible in the invalid artifact itself."
+  },
+  "defect_2_typing_not_enforced": {
+    "location": "observatory/chains/master.py (as of commit 418204a), probe_typed_completion, lines 248-253: `obligations = list(range(n_obligations))` (untyped integers) and `cov = frozenset(o for o in obligations if rng.random() < 0.45)` (coverage assigned with no reference to the item's TYPES[i % len(TYPES)] label)",
+    "description": "Obligations carried no required type at all; the per-item type label was purely descriptive (used only for the post-hoc 'types_used' diagnostic) and never gated which obligations an item could discharge. Any evidence item of any declared type could discharge any obligation.",
+    "measured_fraction": "Not well-defined as a per-draw violation rate against this code's own model, because the code never modeled a per-obligation required type to violate -- the constraint was absent, not merely unenforced on some fraction of draws. As an observable proxy: 2567 of 3000 draws (85.6%) in campaigns_20260904_003028.jsonl have MASTER.typed_completion.types_used > 1, i.e. the reported solution mixed evidence declared with different type labels with zero computational gating -- consistent with typing having no causal effect on the completion in the large majority of draws."
+  },
+  "corrected_successor": {
+    "code": "research_chains/novelty_completion.py: minimum_cost_typed_completion (exact DP over the obligation-coverage bitmask, no cardinality-based early exit) and greedy_typed_completion, both validating item.evidence_type against each discharged obligation's required type and raising ValueError on mismatch; observatory/chains/master.py: probe_typed_completion now assigns each obligation an explicit required type and calls these two functions.",
+    "protocol_version": "master_typed_completion_campaign_v2_typed_enforced_exact_dp",
+    "small_validation_run": "research/master_typed_completion_corrected_v2/ (300 draws, NOT the full 3000-draw campaign)",
+    "regression_tests_added": [
+      "tests/test_novelty_critical_experiments.py::test_minimum_cost_typed_completion_matches_exhaustive_enumeration",
+      "tests/test_novelty_critical_experiments.py::test_probe_typed_completion_draws_always_satisfy_typing_predicate"
+    ]
+  },
+  "note": "This file documents the predecessor's invalidity; it does not modify or replace campaigns_20260904_003028.jsonl or summary_20260904_003028.json, which remain unmodified in the ledger."
+}

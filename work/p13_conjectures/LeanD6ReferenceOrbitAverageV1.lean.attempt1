@@ -1,0 +1,167 @@
+import «LeanD6ReferencePhaseRegretBridgeV1»
+import «LeanUniformSubsetMomentsV1»
+
+/-! D05: exact uniform omitted-subset averaging on actual legal decisions.
+All overlap moments are derived by counting subsets. The chosen legal set
+realizing each omitted subset depends on T, D and the budget, never on A.
+This supplies the symmetrized risk SHAPE. It is not yet a theorem that an
+arbitrary policy can be symmetrized without increasing worst-world risk.
+-/
+namespace CIGAMF.P13.D6ReferenceOrbitAverage
+open scoped BigOperators
+open Finset
+open CIGAMF.P13.D6Threshold CIGAMF.P13.D6ReferenceBridge
+open CIGAMF.P13.D6ReferenceResponseJoin CIGAMF.P13.D6ReferenceCenteredCompensated
+open CIGAMF.P13.D6ReferenceRetainedOscillation CIGAMF.P13.D6ReferenceFullCountLoss
+open CIGAMF.P13.D6ReferenceLegalCountMinimum CIGAMF.P13.D6ReferencePhaseRegretBridge
+open CIGAMF.P13.UniformSubsetMoments
+noncomputable section
+variable {n : ℕ}
+
+theorem avg_congr (T : Finset (I n)) (d : ℕ) (f g : Finset (I n) → ℝ)
+    (h : ∀ D ∈ T.powersetCard d,f D=g D) : avg T d f=avg T d g := by
+  unfold avg
+  rw [Finset.sum_congr rfl h]
+
+theorem average_overlap (A T : Finset (I n)) (d : ℕ) (hd : d ≤ T.card) :
+    avg T d (fun D => ((D ∩ A).card:ℝ)) = (d:ℝ)/T.card*((T ∩ A).card:ℝ) := by
+  classical
+  by_cases h0 : d=0
+  · subst d; simp [avg]
+  by_cases h1 : d=1
+  · subst d
+    simp [avg,Finset.powersetCard_one,Finset.sum_map,Finset.sum_ite_mem,
+      Finset.inter_comm,Finset.card_filter,div_eq_mul_inv,mul_comm]
+  · have h := average_weighted T d (by omega) hd (fun i => hit A i)
+    have he : ∀ D : Finset (I n),(∑ i ∈ D,hit A i)=((D ∩ A).card:ℝ) := by
+      intro D; simp [hit]
+    simpa only [he] using h
+
+theorem avg_constant (T : Finset (I n)) (d : ℕ) (hd : d ≤ T.card) (c : ℝ) :
+    avg T d (fun _ => c)=c := by
+  have hp : 0 < ((T.powersetCard d).card:ℝ) := by
+    exact_mod_cast Finset.card_pos.mpr (Finset.powersetCard_nonempty.mpr hd)
+  simp only [avg,Finset.sum_const,nsmul_eq_mul]
+  exact mul_div_cancel_left₀ c (ne_of_gt hp)
+
+theorem average_correction (A T : Finset (I n)) (j : I n) (hjT : j ∉ T)
+    (a b : ℝ) (d : ℕ) (hd : d ≤ T.card) :
+    avg T d (fun D => correction a b (D ∩ A).card (D ∩ others A j).card) =
+      if d=0 then min a (2*b) else if d=1 then b*((T.card:ℝ)-((T ∩ A).card:ℝ))/T.card else 0 := by
+  classical
+  by_cases h0 : d=0
+  · subst d; simp [avg,correction]
+  rw [if_neg h0]
+  by_cases h1 : d=1
+  · subst d
+    rw [if_pos rfl]
+    have hval : ∀ i ∈ T, correction a b (({i}:Finset (I n)) ∩ A).card
+        (({i}:Finset (I n)) ∩ others A j).card = if i ∈ A then 0 else b := by
+      intro i hi
+      have hij : i ≠ j := by rintro rfl; exact hjT hi
+      by_cases hiA : i ∈ A <;> simp [correction,hiA,mem_others_iff,hij]
+    unfold avg
+    rw [Finset.powersetCard_one,Finset.sum_map]
+    simp only [Function.Embedding.coeFn_mk,Finset.card_map]
+    rw [Finset.sum_congr rfl hval]
+    have he : (∑ i ∈ T,if i ∈ A then (0:ℝ) else b) =
+        b*(T.card:ℝ)-b*((T ∩ A).card:ℝ) := by
+      have hf : ∀ i,(if i ∈ A then (0:ℝ) else b)=b-(if i ∈ A then b else 0) := by
+        intro i; split_ifs <;> ring
+      simp_rw [hf]
+      simp only [Finset.sum_sub_distrib,Finset.sum_const,nsmul_eq_mul,Finset.sum_ite_mem]
+      ring
+    rw [he]
+    ring
+  · rw [if_neg h1]
+    have he : ∀ D ∈ T.powersetCard d, correction a b (D ∩ A).card (D ∩ others A j).card=0 := by
+      intro D hD
+      have hsub := (Finset.mem_powersetCard.mp hD).1
+      have hcard := (Finset.mem_powersetCard.mp hD).2
+      have hsum : (D ∩ A).card+(D ∩ others A j).card=d := by
+        have h := card_split A D j (fun hm => hjT (hsub hm))
+        rw [hcard] at h
+        exact_mod_cast h
+      simp only [correction,if_neg (show ¬ ((D ∩ A).card=0 ∧ (D ∩ others A j).card=0) by omega),
+        if_neg (show ¬ ((D ∩ A).card=0 ∧ (D ∩ others A j).card=1) by omega)]
+    rw [avg_congr T d _ (fun _ => 0) he,avg_constant T d hd 0]
+
+/-- Algebraic expression for every symmetrized decision size, including d=0,1. -/
+def orbitRisk (k p c e r b h : ℝ) (d : ℕ) : ℝ :=
+  D6ReferencePhaseValue.base k p c e r h d
+    -(if d=0 then e else if d=1 then b*(k-h)/k else 0)/2
+
+theorem average_count_regret (A T : Finset (I n)) (j : I n) (hjT : j ∉ T)
+    (a b rho : ℝ) (d : ℕ) (hd : d ≤ T.card) :
+    avg T d (fun D => (variableCost a b rho (D ∩ A).card (D ∩ others A j).card+
+      max (min a (2*b)) ((2*a-rho)*((T ∩ A).card:ℝ)))/2) =
+      orbitRisk T.card (rho-2*b) (a-b) (min a (2*b)) (2*a-rho) b (T ∩ A).card d := by
+  have he : ∀ D ∈ T.powersetCard d,
+      (variableCost a b rho (D ∩ A).card (D ∩ others A j).card+
+        max (min a (2*b)) ((2*a-rho)*((T ∩ A).card:ℝ)))/2 =
+      ((rho-2*b)*(d:ℝ)+max (min a (2*b)) ((2*a-rho)*((T ∩ A).card:ℝ)))/2
+        -(a-b)*((D ∩ A).card:ℝ)-correction a b (D ∩ A).card (D ∩ others A j).card/2 := by
+    intro D hD
+    have hsub := (Finset.mem_powersetCard.mp hD).1
+    have hcard := (Finset.mem_powersetCard.mp hD).2
+    have hs := card_split A D j (fun hi => hjT (hsub hi))
+    rw [hcard] at hs
+    unfold variableCost
+    nlinarith only [congrArg (fun x : ℝ => (rho-2*b)*x) hs]
+  rw [avg_congr T d _ _ he]
+  have hsplit : avg T d (fun D =>
+      ((rho-2*b)*(d:ℝ)+max (min a (2*b)) ((2*a-rho)*((T ∩ A).card:ℝ)))/2
+        -(a-b)*((D ∩ A).card:ℝ)-correction a b (D ∩ A).card (D ∩ others A j).card/2) =
+      avg T d (fun _ => ((rho-2*b)*(d:ℝ)+max (min a (2*b)) ((2*a-rho)*((T ∩ A).card:ℝ)))/2)
+        -(a-b)*avg T d (fun D => ((D ∩ A).card:ℝ))
+        -avg T d (fun D => correction a b (D ∩ A).card (D ∩ others A j).card)/2 := by
+    unfold avg
+    simp only [Finset.sum_sub_distrib,← Finset.mul_sum,← Finset.sum_div]
+    ring
+  rw [hsplit,avg_constant T d hd,average_overlap A T d hd,average_correction A T j hjT a b d hd]
+  unfold orbitRisk D6ReferencePhaseValue.base
+  ring
+
+/-- A full map of omitted subsets to legal decisions can be chosen without A. -/
+theorem legal_rule_exists (T : Finset (I n)) (hroom : 2*T.card ≤ Fintype.card (I n)) :
+    ∃ select : Finset (I n) → Finset (I n),
+      ∀ D,D ⊆ T → (select D).card=T.card ∧ T \ select D=D := by
+  classical
+  let select := fun D => if hD : D ⊆ T then
+    Classical.choose (legal_count_realizable T D hD hroom) else T
+  refine ⟨select,?_⟩
+  intro D hD
+  dsimp [select]
+  rw [dif_pos hD]
+  exact Classical.choose_spec (legal_count_realizable T D hD hroom)
+
+/-- The orbit shape is the expectation of actual regret for a legal A-free rule. -/
+theorem actual_orbit_risk (t : ℝ) (ht0 : 0 ≤ t) (ht1 : t ≤ 1)
+    (A T : Finset (I n)) (j : I n) (hjA : j ∉ A) (hjT : j ∉ T)
+    (k : ℕ) (hk : 3 ≤ k) (hAc : A.card=k) (hBc : (others A j).card=k-1) (hTc : T.card=k)
+    (hroom : 2*T.card ≤ Fintype.card (I n)) (hh : 1 ≤ (T ∩ A).card)
+    (rho : ℝ) (hr : 1 ≤ rho) (hp : 0 ≤ rho-2*slopeBval t A j)
+    (hstrong : 1 ≤ ((k:ℝ)-2)*slopeBval t A j)
+    (select : Finset (I n) → Finset (I n))
+    (hselect : ∀ D,D ⊆ T → (select D).card=T.card ∧ T \ select D=D)
+    (d : ℕ) (hd : d ≤ k) :
+    avg T d (fun D => actualLoss A T (select D) j rho t-legalMinimum A T j rho t) =
+      orbitRisk k (rho-2*slopeBval t A j) (gateMass t A j-slopeBval t A j)
+        (min (gateMass t A j) (2*slopeBval t A j)) (2*gateMass t A j-rho)
+        (slopeBval t A j) (T ∩ A).card d := by
+  have he : ∀ D ∈ T.powersetCard d,
+      actualLoss A T (select D) j rho t-legalMinimum A T j rho t =
+      (variableCost (gateMass t A j) (slopeBval t A j) rho (D ∩ A).card (D ∩ others A j).card+
+        max (min (gateMass t A j) (2*slopeBval t A j)) ((2*gateMass t A j-rho)*((T ∩ A).card:ℝ)))/2 := by
+    intro D hD
+    rw [actual_regret t ht0 ht1 A T (select D) j hjA hjT k hk hAc hBc hTc hroom hh rho hr hp hstrong,
+      (hselect D (Finset.mem_powersetCard.mp hD).1).2]
+  rw [avg_congr T d _ _ he,average_count_regret A T j hjT _ _ rho d (by omega),hTc]
+
+#print axioms average_overlap
+#print axioms average_correction
+#print axioms average_count_regret
+#print axioms legal_rule_exists
+#print axioms actual_orbit_risk
+end
+end CIGAMF.P13.D6ReferenceOrbitAverage

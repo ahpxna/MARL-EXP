@@ -1,0 +1,22 @@
+import «LeanD6ActualDoublingEpochRiskV1»
+import «LeanFiniteAllocationTrackerMeasurableV1»
+import «LeanD6SharpMarginThresholdV1»
+import «LeanD6QueryWidthInformationV1»
+import «LeanFunctionalPairFlipCostV1»
+import «LeanD6SameResponseMarginCertificateV1»
+import «LeanD6ExpectedStoppingEpochV1»
+#print axioms CIGAMF.P13.D6ActualMultiEpochRisk.actual_finite_epoch_bound
+#print axioms CIGAMF.P13.D6ActualDoublingEpochRisk.actual_doubling_recommendation_bound
+#print axioms CIGAMF.P13.FiniteAllocationTrackerMeasurable.query_measurable
+#print axioms CIGAMF.P13.FiniteAllocationTrackerMeasurable.query_causal
+#print axioms CIGAMF.P13.D6SharpMarginThreshold.margin_two_sufficient
+#print axioms CIGAMF.P13.D6SharpMarginThreshold.every_subthreshold_margin_fails
+#print axioms CIGAMF.P13.D6QueryWidthInformation.actual_average_width_bound
+#print axioms CIGAMF.P13.FunctionalPairFlipCost.pair_flip_lower
+#print axioms CIGAMF.P13.FunctionalPairFlipCost.pair_flip_attained
+#print axioms CIGAMF.P13.D6SameResponseMarginLoss.actual_loss_formula
+#print axioms CIGAMF.P13.D6SameResponseMarginGame.actual_two_action_risk
+#print axioms CIGAMF.P13.D6SameResponseMarginCertificate.singleton_valid
+#print axioms CIGAMF.P13.D6SameResponseMarginCertificate.actual_dual_equalizer
+#print axioms CIGAMF.P13.D6SameResponseMarginCertificate.randomized_dual_equalizer
+#print axioms CIGAMF.P13.D6ExpectedStoppingEpoch.expected_settle_index

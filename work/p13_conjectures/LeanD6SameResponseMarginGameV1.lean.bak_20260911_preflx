@@ -1,0 +1,86 @@
+import «LeanD6SameResponseMarginLossV1»
+
+/-! Actual same-Q regret reduction and the two-action minimax upper strategy.
+The adversarial matching certificate is proved algebraically here; its lift to
+an arbitrary randomized finite decision rule still needs the singleton-world
+averaging bridge. Do not read the upper bound as the full minimax equality. -/
+namespace CIGAMF.P13.D6SameResponseMarginGame
+open scoped BigOperators
+open Finset
+open CIGAMF.P13.D6Threshold CIGAMF.P13.D6SameResponseMarginLoss
+open CIGAMF.V4.ProductSurrogate CIGAMF.V4.ProductMixedDifference
+open CIGAMF.V4.SupportGeometry
+noncomputable section
+variable {n : ℕ}
+
+def loss (A T S : Finset (I n)) (j : I n) (rho : ℝ) : ℝ :=
+  productCompressionLoss (fibreWorld A T j rho) (productResponse corner (fibreWorld A T j rho)) S
+
+theorem actual_regret_formula (A T S : Finset (I n)) (j : I n) (hjA : j ∉ A) (hjT : j ∉ T)
+    (rho : ℝ) (hr : 1 ≤ rho) (hB : 2 ≤ (others A j).card) :
+    loss A T S j rho-loss A T Aᶜ j rho=
+      (rho*((T \ S).card:ℝ)-2*((A ∩ (T \ S)).card:ℝ)+(2-rho)*((A ∩ T).card:ℝ))/2 := by
+  unfold loss
+  rw [actual_loss_formula A T S j hjA hjT rho hr hB,
+    actual_loss_formula A T Aᶜ j hjA hjT rho hr hB]
+  have he : T \ Aᶜ=A ∩ T := by ext i;simp [and_comm]
+  have hi : A ∩ (A ∩ T)=A ∩ T := by ext i;simp
+  rw [he,hi]
+  ring
+
+/-- The true-world complement is optimal for all decisions of the right size
+(and even for unrestricted S). Hence the regret formula uses a true optimum. -/
+theorem complement_optimal (A T S : Finset (I n)) (j : I n) (hjA : j ∉ A) (hjT : j ∉ T)
+    (rho : ℝ) (hr : 1 ≤ rho) (hr2 : rho ≤ 2) (hB : 2 ≤ (others A j).card) :
+    loss A T Aᶜ j rho ≤ loss A T S j rho := by
+  have he := actual_regret_formula A T S j hjA hjT rho hr hB
+  have hsub : A ∩ (T \ S) ⊆ A ∩ T := by
+    intro i hi
+    rcases mem_inter.mp hi with ⟨ha,hd⟩
+    exact mem_inter.mpr ⟨ha,(mem_sdiff.mp hd).1⟩
+  have hu : ((A ∩ (T \ S)).card:ℝ) ≤ (A ∩ T).card := by exact_mod_cast card_le_card hsub
+  have hd : ((A ∩ (T \ S)).card:ℝ) ≤ (T \ S).card := by exact_mod_cast card_le_card inter_subset_right
+  have h1 := mul_nonneg (show 0 ≤ 2-rho by linarith) (sub_nonneg.mpr hu)
+  have h2 := mul_nonneg (show 0 ≤ rho by linarith) (sub_nonneg.mpr hd)
+  nlinarith
+
+/-- A-free strategy: output T with probability rho/2, T-complement otherwise.
+Its expected actual regret is exactly k*rho*(2-rho)/4 at every hidden world. -/
+theorem actual_two_action_risk (A T : Finset (I n)) (j : I n) (hjA : j ∉ A) (hjT : j ∉ T)
+    (rho : ℝ) (hr : 1 ≤ rho) (hB : 2 ≤ (others A j).card) :
+    (rho/2)*(loss A T T j rho-loss A T Aᶜ j rho)+
+      (1-rho/2)*(loss A T Tᶜ j rho-loss A T Aᶜ j rho)=
+        (T.card:ℝ)*rho*(2-rho)/4 := by
+  rw [actual_regret_formula A T T j hjA hjT rho hr hB,
+    actual_regret_formula A T Tᶜ j hjA hjT rho hr hB]
+  have ht : T \ Tᶜ=T := by ext i;simp
+  simp only [sdiff_self,inter_empty,card_empty,Nat.cast_zero,mul_zero,sub_zero,zero_add,ht]
+  ring
+
+/-- Algebraic matching adversary: mix the full hidden intersection with a
+uniform singleton hidden intersection. d denotes the size of the decision's
+omitted subset of T; the expected regret is independent of d. -/
+theorem adversary_equalizer (k rho d : ℝ) (hk : 2 ≤ k) :
+    ((k*rho-2)/(2*(k-1)))*((2-rho)*(k-d)/2)+
+      (1-(k*rho-2)/(2*(k-1)))*((rho*d-2*d/k+(2-rho))/2)=
+        k*rho*(2-rho)/4 := by
+  have hk0 : k ≠ 0 := by linarith
+  have hk1 : k-1 ≠ 0 := by linarith
+  field_simp
+  <;> ring
+
+theorem mixture_weights_valid (k rho : ℝ) (hk : 2 ≤ k) (hr : 1 ≤ rho) (hr2 : rho ≤ 2) :
+    0 ≤ (k*rho-2)/(2*(k-1)) ∧ (k*rho-2)/(2*(k-1)) ≤ 1 ∧
+      0 ≤ rho/2 ∧ rho/2 ≤ 1 := by
+  have hd : 0 < 2*(k-1) := by linarith
+  have hn : 0 ≤ k*rho-2 := by nlinarith
+  have hupper : k*rho-2 ≤ 2*(k-1) := by nlinarith
+  exact ⟨div_nonneg hn hd.le,(div_le_one hd).mpr hupper,by linarith,by linarith⟩
+
+#print axioms actual_regret_formula
+#print axioms complement_optimal
+#print axioms actual_two_action_risk
+#print axioms adversary_equalizer
+#print axioms mixture_weights_valid
+end
+end CIGAMF.P13.D6SameResponseMarginGame

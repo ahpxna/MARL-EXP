@@ -1,0 +1,153 @@
+LeanD6CyclicConfidenceSequenceV1.lean:38:30: error: Application type mismatch: The argument
+  h
+has type
+  (fun t => (↑t.1, t.2)) a = (fun t => (↑t.1, t.2)) b
+but is expected to have type
+  a = b
+in the application
+  congrArg Prod.snd h
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanD6CyclicConfidenceSequenceV1.lean:56:84: error: unsolved goals
+n : ℕ
+C : Type u_1
+inst✝¹ : Fintype C
+inst✝ : DecidableEq C
+G : C → Finset (I n)
+A : Finset (I n)
+j : I n
+q L : ℕ
+hq : 0 < q
+hL : 0 < L
+mu : ℝ
+hm : ∑ t, actualMean A j mu (Sum.inr (G t, false)) = ↑(Fintype.card C) + ↑q ^ 2 * (1 - mu)
+h :
+  HasLaw (fun ω => estimate q L (restrict L ω))
+    (gaussianReal mu (↑(L * Fintype.card C) / NNReal.mk ((↑L * ↑q ^ 2) ^ 2) ⋯)) (path G A j mu)
+hq0 : ↑q ≠ 0
+hL0 : ↑L ≠ 0
+⊢ ↑(↑L * ↑(Fintype.card C) * (NNReal.mk (↑L ^ 2 * ↑q ^ 4) ⋯)⁻¹) = ↑(↑(Fintype.card C) * (↑L)⁻¹ * (↑q)⁻¹ ^ 4)
+LeanD6CyclicConfidenceSequenceV1.lean:58:33: warning: This simp argument is unused:
+  NNReal.coe_div
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [varianceParameter, NNReal.coe_mk, NNReal.coe_mul, NNReal.coe_pow, NNReal.coe_natCast, Nat.cast_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6CyclicConfidenceSequenceV1.lean:58:48: warning: This simp argument is unused:
+  NNReal.coe_mk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [varianceParameter, NNReal.coe_div, NNReal.coe_mul, NNReal.coe_pow, NNReal.coe_natCast,
+    Nat.cast_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6CyclicConfidenceSequenceV1.lean:58:62: warning: This simp argument is unused:
+  NNReal.coe_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [varianceParameter, NNReal.coe_div, NNReal.coe_mk, NNReal.coe_pow, NNReal.coe_natCast, Nat.cast_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6CyclicConfidenceSequenceV1.lean:59:6: warning: This simp argument is unused:
+  NNReal.coe_pow
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [varianceParameter, NNReal.coe_div, NNReal.coe_mk, NNReal.coe_mul, NNReal.coe_natCast, Nat.cast_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6CyclicConfidenceSequenceV1.lean:59:21: warning: This simp argument is unused:
+  NNReal.coe_natCast
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [varianceParameter, NNReal.coe_div, NNReal.coe_mk, NNReal.coe_mul, NNReal.coe_pow, Nat.cast_mul]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6CyclicConfidenceSequenceV1.lean:67:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.D6CyclicConfidenceSequence.variance_parameter_pos`:
+  [DecidableEq C]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq C] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+LeanD6CyclicConfidenceSequenceV1.lean:83:15: warning: `Set.mem_setOf_eq` has been deprecated: Use `Set.mem_ofPred_eq` instead
+LeanD6CyclicConfidenceSequenceV1.lean:86:2: error: linarith failed to find a contradiction
+Ω : Type u_2
+inst✝¹ : MeasurableSpace Ω
+P : Measure Ω
+inst✝ : IsProbabilityMeasure P
+X : Ω → ℝ
+mu : ℝ
+v : NNReal
+hlaw : HasLaw X (gaussianReal mu v) P
+eps : ℝ
+heps : 0 ≤ eps
+h : HasSubgaussianMGF (fun x => X x - mu) v P
+hp : P.real {ω | eps ≤ X ω - mu} ≤ Real.exp (-eps ^ 2 / (2 * ↑v))
+hn : P.real {ω | eps ≤ (-fun x => X x - mu) ω} ≤ Real.exp (-eps ^ 2 / (2 * ↑v))
+he : {x | eps ≤ |X x - mu|} = {x | eps ≤ X x - mu} ∪ {x | eps ≤ -(X x - mu)}
+hu :
+  P.real ({x | eps ≤ X x - mu} ∪ {x | eps ≤ -(X x - mu)}) ≤ P.real {x | eps ≤ X x - mu} + P.real {x | eps ≤ -(X x - mu)}
+a✝ : 2 * Real.exp (-eps ^ 2 / (2 * ↑v)) < P.real ({x | eps ≤ X x - mu} ∪ {x | eps ≤ -(X x - mu)})
+⊢ False
+failed
+LeanD6CyclicConfidenceSequenceV1.lean:105:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+LeanD6CyclicConfidenceSequenceV1.lean:105:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+LeanD6CyclicConfidenceSequenceV1.lean:123:2: error: linarith failed to find a contradiction
+delta : ℝ
+hd : 0 ≤ delta
+s : ℕ
+hs : 0 ≤ ↑s
+a✝ : delta * ((↑s + 1) * (↑s + 2)) < delta
+⊢ False
+failed
+LeanD6CyclicConfidenceSequenceV1.lean:135:6: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanD6CyclicConfidenceSequenceV1.lean:153:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.D6CyclicConfidenceSequence.width_formula`:
+  [DecidableEq C]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq C] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+LeanD6CyclicConfidenceSequenceV1.lean:202:14: error: No goals to be solved
+'CIGAMF.P13.D6CyclicConfidenceSequence.finite_raw_law' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.path_estimate_law' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.gaussian_tail' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.gaussian_radius_tail' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.epoch_error_partial_sum' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.epoch_error_budget' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.width_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.cyclic_confidence_sequence' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.selected_epoch_error' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6CyclicConfidenceSequence.actual_cyclic_confidence_sequence_exists' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

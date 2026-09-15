@@ -1,0 +1,159 @@
+import «LeanBinaryKLTwoPointV1»
+import Mathlib.Analysis.Convex.Deriv
+import Mathlib.Analysis.SpecialFunctions.Log.Deriv
+
+/-! # Binary Pinsker: `2*(p-q)^2 ≤ binaryKL p q`
+
+Mathlib carries no Pinsker inequality, on this pin or on master (checked by
+tree listing, not recalled). This is the sharp replacement for
+`two_point_error_weak`.
+
+Route, every Mathlib name read from the pin:
+
+* `g = fun x => binaryKL x q - 2*(x-q)^2` on the OPEN set `D = Ioo 0 1`, so
+  `interior D = D`;
+* `g' x = log (x/q) - log ((1-x)/(1-q)) - 4*(x-q)`, which vanishes at `x = q`;
+* `g'' x = 1/x + 1/(1-x) - 4 = (1-2*x)^2/(x*(1-x)) ≥ 0`
+  (`BinaryKLTwoPoint.pinsker_curvature_nonneg`);
+* `convexOn_of_hasDerivWithinAt2_nonneg` takes `f'` and `f''` as DATA, so no
+  symbolic `deriv` is computed;
+* `ConvexOn.isMinOn_of_rightDeriv_eq_zero` turns the stationary point into a
+  global minimum;
+* `g q = 0` closes it.
+
+`binaryKL` is defined by `log` of a quotient, so it is total but agrees with the
+four-term expansion only on `Ioo 0 1`. Every derivative is therefore transported
+with `HasDerivAt.congr_of_eventuallyEq` across that open set rather than proved
+for a globally equal function.
+-/
+namespace CIGAMF.BinaryPinsker
+open Real Set Filter
+open CIGAMF.BinaryKLTwoPoint
+
+/-- On `Ioo 0 1` the divergence is four elementary terms. -/
+theorem binaryKL_expand {p q : ℝ} (hp : 0 < p) (hp1 : p < 1) (hq : 0 < q) (hq1 : q < 1) :
+    binaryKL p q=p*Real.log p-p*Real.log q+((1-p)*Real.log (1-p)-(1-p)*Real.log (1-q)) := by
+  unfold binaryKL
+  rw [Real.log_div (ne_of_gt hp) (ne_of_gt hq),Real.log_div (by linarith) (by linarith)]
+  ring
+
+theorem hasDerivAt_mul_log {p : ℝ} (hp : p ≠ 0) :
+    HasDerivAt (fun x : ℝ => x*Real.log x) (Real.log p+1) p := by
+  have h := (hasDerivAt_id p).mul (Real.hasDerivAt_log hp)
+  simp only [id_eq,one_mul] at h
+  convert h using 1
+  field_simp
+
+theorem hasDerivAt_one_sub_mul_log {p : ℝ} (hp : (1:ℝ)-p ≠ 0) :
+    HasDerivAt (fun x : ℝ => (1-x)*Real.log (1-x)) (-(Real.log (1-p)+1)) p := by
+  have hin : HasDerivAt (fun x : ℝ => 1-x) (-1) p := by
+    simpa using (hasDerivAt_const p (1:ℝ)).sub (hasDerivAt_id p)
+  simpa using (hasDerivAt_mul_log hp).comp p hin
+
+/-- First derivative of the gap, transported across `Ioo 0 1`. -/
+theorem hasDerivAt_gap {p q : ℝ} (hp : 0 < p) (hp1 : p < 1) (hq : 0 < q) (hq1 : q < 1) :
+    HasDerivAt (fun x : ℝ => binaryKL x q-2*(x-q)^2)
+      (Real.log (p/q)-Real.log ((1-p)/(1-q))-4*(p-q)) p := by
+  have h1 := hasDerivAt_mul_log (ne_of_gt hp)
+  have h2 : HasDerivAt (fun x : ℝ => x*Real.log q) (Real.log q) p := by
+    simpa using (hasDerivAt_id p).mul_const (Real.log q)
+  have h3 := hasDerivAt_one_sub_mul_log (show (1:ℝ)-p ≠ 0 by intro h; linarith)
+  have h4 : HasDerivAt (fun x : ℝ => (1-x)*Real.log (1-q)) (-Real.log (1-q)) p := by
+    have hin : HasDerivAt (fun x : ℝ => 1-x) (-1) p := by
+      simpa using (hasDerivAt_const p (1:ℝ)).sub (hasDerivAt_id p)
+    simpa using hin.mul_const (Real.log (1-q))
+  have h5 : HasDerivAt (fun x : ℝ => 2*(x-q)^2) (4*(p-q)) p := by
+    have hb : HasDerivAt (fun x : ℝ => (x-q)^2) (2*(p-q)) p := by
+      simpa using ((hasDerivAt_id p).sub_const q).pow 2
+    have := hb.const_mul (2:ℝ)
+    convert this using 1
+    ring
+  have hsum := ((h1.sub h2).add (h3.sub h4)).sub h5
+  have heq : (fun x : ℝ => binaryKL x q-2*(x-q)^2) =ᶠ[nhds p]
+      (fun x : ℝ => x*Real.log x-x*Real.log q+((1-x)*Real.log (1-x)-
+        (1-x)*Real.log (1-q))-2*(x-q)^2) :=
+    eventuallyEq_of_mem (Ioo_mem_nhds hp hp1)
+      (fun x hx => by rw [binaryKL_expand hx.1 hx.2 hq hq1])
+  refine (hsum.congr_of_eventuallyEq heq).congr_deriv ?_
+  rw [Real.log_div (ne_of_gt hp) (ne_of_gt hq),
+    Real.log_div (by linarith : (1:ℝ)-p ≠ 0) (by linarith : (1:ℝ)-q ≠ 0)]
+  ring
+
+/-- Second derivative of the gap. -/
+theorem hasDerivAt_gap' {p q : ℝ} (hp : 0 < p) (hp1 : p < 1) (hq : 0 < q) (hq1 : q < 1) :
+    HasDerivAt (fun x : ℝ => Real.log (x/q)-Real.log ((1-x)/(1-q))-4*(x-q))
+      (1/p+1/(1-p)-4) p := by
+  have h1 : HasDerivAt (fun x : ℝ => Real.log (x/q)) (1/p) p := by
+    have hd : HasDerivAt (fun x : ℝ => x/q) (1/q) p := by
+      simpa using (hasDerivAt_id p).div_const q
+    have := (Real.hasDerivAt_log (by positivity : p/q ≠ 0)).comp p hd
+    convert this using 1
+    field_simp
+  have h2 : HasDerivAt (fun x : ℝ => Real.log ((1-x)/(1-q))) (-(1/(1-p))) p := by
+    have hd : HasDerivAt (fun x : ℝ => (1-x)/(1-q)) (-(1/(1-q))) p := by
+      have hin : HasDerivAt (fun x : ℝ => 1-x) (-1) p := by
+        simpa using (hasDerivAt_const p (1:ℝ)).sub (hasDerivAt_id p)
+      have := hin.div_const (1-q)
+      convert this using 1
+      field_simp
+    have hne : (1-p)/(1-q) ≠ 0 := by
+      apply div_ne_zero <;> [skip; skip] <;> intro h <;> linarith
+    have := (Real.hasDerivAt_log hne).comp p hd
+    convert this using 1
+    field_simp
+  have h3 : HasDerivAt (fun x : ℝ => 4*(x-q)) 4 p := by
+    simpa using ((hasDerivAt_id p).sub_const q).const_mul (4:ℝ)
+  have := (h1.sub h2).sub h3
+  convert this using 1
+  ring
+
+/-- **Binary Pinsker.** -/
+theorem binary_pinsker {p q : ℝ} (hp : 0 < p) (hp1 : p < 1) (hq : 0 < q) (hq1 : q < 1) :
+    2*(p-q)^2 ≤ binaryKL p q := by
+  set D : Set ℝ := Ioo 0 1 with hD
+  have hopen : interior D = D := IsOpen.interior_eq isOpen_Ioo
+  set g : ℝ → ℝ := fun x => binaryKL x q-2*(x-q)^2 with hg
+  set g' : ℝ → ℝ := fun x => Real.log (x/q)-Real.log ((1-x)/(1-q))-4*(x-q) with hg'
+  set g'' : ℝ → ℝ := fun x => 1/x+1/(1-x)-4 with hg''
+  have hderiv : ∀ x ∈ interior D,HasDerivWithinAt g (g' x) (interior D) x := by
+    intro x hx
+    rw [hopen] at hx ⊢
+    exact (hasDerivAt_gap hx.1 hx.2 hq hq1).hasDerivWithinAt
+  have hderiv2 : ∀ x ∈ interior D,HasDerivWithinAt g' (g'' x) (interior D) x := by
+    intro x hx
+    rw [hopen] at hx ⊢
+    exact (hasDerivAt_gap' hx.1 hx.2 hq hq1).hasDerivWithinAt
+  have hnn : ∀ x ∈ interior D,0 ≤ g'' x := by
+    intro x hx
+    rw [hopen] at hx
+    exact pinsker_curvature_nonneg hx.1 hx.2
+  have hcont : ContinuousOn g D := by
+    intro x hx
+    exact ((hasDerivAt_gap hx.1 hx.2 hq hq1).continuousAt).continuousWithinAt
+  have hconv : ConvexOn ℝ D g :=
+    convexOn_of_hasDerivWithinAt2_nonneg (convex_Ioo 0 1) hcont hderiv hderiv2 hnn
+  have hqD : q ∈ interior D := by rw [hopen]; exact ⟨hq,hq1⟩
+  have hzero : derivWithin g (Ioi q) q=0 := by
+    have hgq : HasDerivAt g (g' q) q := hasDerivAt_gap hq hq1 hq hq1
+    have hg'q : g' q=0 := by
+      simp only [hg']
+      rw [div_self (ne_of_gt hq),div_self (by linarith : (1:ℝ)-q ≠ 0),Real.log_one]
+      ring
+    rw [hg'q] at hgq
+    exact hgq.hasDerivWithinAt.derivWithin (uniqueDiffWithinAt_Ioi q)
+  have hmin := hconv.isMinOn_of_rightDeriv_eq_zero hqD hzero
+  have hpD : p ∈ D := ⟨hp,hp1⟩
+  have h := hmin hpD
+  simp only [hg,Set.mem_setOf_eq] at h
+  have hgq0 : binaryKL q q-2*(q-q)^2=0 := by
+    unfold binaryKL
+    rw [div_self (ne_of_gt hq),div_self (by linarith : (1:ℝ)-q ≠ 0),Real.log_one]
+    ring
+  linarith [h,hgq0.le,hgq0.ge]
+
+#print axioms binaryKL_expand
+#print axioms hasDerivAt_gap
+#print axioms hasDerivAt_gap'
+#print axioms binary_pinsker
+
+end CIGAMF.BinaryPinsker

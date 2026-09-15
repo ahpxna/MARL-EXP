@@ -166,3 +166,193 @@ def test_p13_compile_ledger_includes_verified_conditional_topk_bridge():
     root=Path(__file__).resolve().parents[1]
     text=(root/'research/p13_redesign/ACTIVE_COMPILE_RESULTS_P13.tsv').read_text()
     assert 'LeanReferenceResponseTopKBudgetConjecture.lean\tLEAN_VERIFIED_QUARANTINED_CONDITIONAL\t0\t0\t0\t0' in text
+
+
+def test_external_query_non_degeneracy_gate_rejects_constant_and_tied_targets():
+    from scripts.run_external_query_transfer import _query_discriminativeness
+    constant=_query_discriminativeness([0.,0.,0.],1)
+    assert constant['status']=='EVALUABLE_DEGENERATE'
+    assert constant['reason']=='QUERY_TARGET_CONSTANT'
+    tied=_query_discriminativeness([1.,1.,0.],1)
+    assert tied['status']=='EVALUABLE_DEGENERATE'
+    assert tied['reason']=='TOPK_BOUNDARY_TIED'
+    good=_query_discriminativeness([2.,1.,0.],1)
+    assert good['status']=='EVALUABLE'
+    assert good['scientific_evaluable'] is True
+
+
+def test_master_utility_reports_paired_gamma_on_same_worlds():
+    from scripts.run_master_certificate_utility import run
+    out=run(seed=9,instances=1,ms=(3,),tolerances=(0.05,),families=('cartesian',),
+            solver_cell_limit=64,exact_work_limit=100000,active_gamma='op')
+    assert out['paired_gamma_evaluation'] is True
+    assert out['active_gamma']=='op'
+    assert out['rows']
+    for row in out['rows']:
+        assert row['gamma_box'] <= row['gamma_operational'] + 1e-10
+        assert row['certificate_box'] <= row['certificate_operational'] + 1e-10
+        assert int(row['fallback_box']) <= int(row['fallback_operational'])
+
+
+def test_master_utility_analysis_reports_paired_frontier_delta():
+    from scripts.run_master_certificate_utility import run
+    from scripts.analyze_master_certificate_utility import analyze
+    payload=run(seed=11,instances=1,ms=(3,),tolerances=(0.05,0.2),families=('cartesian',),
+                solver_cell_limit=64,exact_work_limit=100000,active_gamma='op')
+    out=analyze(payload)
+    assert 'frontier_operational' in out and 'frontier_box' in out
+    for key,delta in out['paired_frontier_delta'].items():
+        assert delta['box_minus_operational_certified_fraction'] >= -1e-12
+        assert delta['operational_minus_box_fallback_fraction'] >= -1e-12
+    assert out['all_known_box_bounds_covered'] is True
+
+
+# ---------------------------------------------------------------------------
+# Regression tests for the 2026-09-05 semantic audit.
+#
+# Every one of these fails on the pre-audit code while the rest of the suite is
+# green, which was the whole point of the audit: a passing suite was not
+# evidence that the protocol semantics were right.
+# ---------------------------------------------------------------------------
+
+
+def test_query_regret_survives_a_tied_topk_boundary():
+    """A tie at the k/(k+1) boundary must not delete the PRIMARY endpoint.
+
+    Pre-audit, one `scientific_evaluable` flag gated everything, so a tied
+    ranking boundary silently removed R_m_to_q as well.  That is a selection
+    bias: it drops exactly the states where ranking is hard.
+    """
+    from scripts.run_external_query_transfer import _query_discriminativeness
+    tied = _query_discriminativeness([1., 1., 0.], 1)
+    assert tied['reason'] == 'TOPK_BOUNDARY_TIED'
+    assert tied['regret_evaluable'] is True      # utility is NOT constant
+    assert tied['ranking_evaluable'] is False    # but Top-k is undecidable
+    constant = _query_discriminativeness([0., 0., 0.], 1)
+    assert constant['regret_evaluable'] is False
+    assert constant['ranking_evaluable'] is False
+    good = _query_discriminativeness([2., 1., 0.], 1)
+    assert good['regret_evaluable'] is True and good['ranking_evaluable'] is True
+    undefined = _query_discriminativeness([2., 1., 0.], 3)
+    assert undefined['reason'] == 'TOPK_BOUNDARY_UNDEFINED'
+    assert undefined['regret_evaluable'] is True
+
+
+def _fake_cell(*, regret_ok, ranking_ok, r, topk, budget_blocked=False):
+    payload = {'R_m_to_q': r, 'regret': r, 'spearman': 0.5, 'kendall': 0.4,
+               'topk_exact': topk, 'jaccard': topk, 'ndcg': topk}
+    matched = ({'status': 'BLOCKED_NA', 'reason_code': 'METHOD_EXCEEDS_MATCHED_INFORMATION_BUDGET'}
+               if budget_blocked else dict(payload))
+    return {**payload, 'regret_evaluable': regret_ok, 'ranking_evaluable': ranking_ok,
+            'full_information': dict(payload), 'matched_budget': matched}
+
+
+def test_matched_budget_aggregate_is_actually_computed_and_has_its_own_denominator():
+    """`benchmark_modes` advertised a matched-budget mode that was never aggregated."""
+    from scripts.run_external_query_transfer import aggregate_transfer_matrix
+    rows = [
+        {'matrix': {'M': {'Q': _fake_cell(regret_ok=True, ranking_ok=True, r=1.0, topk=1.0)}}},
+        {'matrix': {'M': {'Q': _fake_cell(regret_ok=True, ranking_ok=True, r=3.0, topk=0.0,
+                                          budget_blocked=True)}}},
+    ]
+    full, full_counts = aggregate_transfer_matrix(rows, ['M'], ['Q'], 'full')
+    matched, matched_counts = aggregate_transfer_matrix(rows, ['M'], ['Q'], 'matched')
+    # full information sees both states
+    assert full['M']['Q']['R_m_to_q'] == 2.0
+    assert full_counts['budget_blocked_cells'] == 0
+    # matched budget sees only the affordable one, and says so
+    assert matched['M']['Q']['R_m_to_q'] == 1.0
+    assert matched_counts['budget_blocked_cells'] == 1
+    assert matched['M']['Q']['budget_blocked_state_count'] == 1
+    assert full['M']['Q']['R_m_to_q'] != matched['M']['Q']['R_m_to_q']
+
+
+def test_ranking_and_regret_metrics_use_separate_denominators():
+    from scripts.run_external_query_transfer import aggregate_transfer_matrix
+    rows = [
+        {'matrix': {'M': {'Q': _fake_cell(regret_ok=True, ranking_ok=True, r=1.0, topk=1.0)}}},
+        {'matrix': {'M': {'Q': _fake_cell(regret_ok=True, ranking_ok=False, r=3.0, topk=0.0)}}},
+    ]
+    agg, _ = aggregate_transfer_matrix(rows, ['M'], ['Q'], 'full')
+    cell = agg['M']['Q']
+    assert cell['regret_evaluable_state_count'] == 2
+    assert cell['ranking_evaluable_state_count'] == 1
+    assert cell['R_m_to_q'] == 2.0        # both states
+    assert cell['topk_exact'] == 1.0      # only the ranking-evaluable state
+
+
+class _BaselineOverridingEnv:
+    """Honours the intervention but quietly overrides a NON-source agent."""
+
+    n_agents = 3
+
+    def __init__(self):
+        self._executed = None
+
+    def restore_state(self, snapshot):
+        return None
+
+    def step(self, actions):
+        executed = [int(a) for a in actions]
+        executed[2] = 0                      # agent 2's baseline is overridden
+        self._executed = tuple(executed)
+        return None, [0.0, 0.0, 0.0], False, {}
+
+    def trusted_execution_receipt(self):
+        return self._executed
+
+
+def test_execution_receipt_requires_the_whole_joint_action_not_only_the_sources():
+    """Ceteris paribus is about the joint action, not just the intervened coordinates."""
+    from research_chains.oracle import CloneStateJointOracle
+    env = _BaselineOverridingEnv()
+    oracle = CloneStateJointOracle(env, snapshot={}, outcome_agent=0,
+                                   baseline_actions=(0, 1, 1))
+    record = oracle.evaluate((0,), (1,))
+    assert record.execution_verified_sources is True   # the intervention WAS honoured
+    assert record.execution_verified is False          # but a baseline action changed
+    assert record.requested_joint_actions == (1, 1, 1)
+    assert record.executed_joint_actions == (1, 1, 0)
+    loose = CloneStateJointOracle(env, snapshot={}, outcome_agent=0,
+                                  baseline_actions=(0, 1, 1),
+                                  execution_semantics='source_only')
+    assert loose.evaluate((0,), (1,)).execution_verified is True
+
+
+def test_oracle_reward_is_typed_as_a_one_step_estimand():
+    """A one-step reward must never be readable as a continuation return."""
+    from research_chains.oracle import CloneStateJointOracle
+    env = _BaselineOverridingEnv()
+    oracle = CloneStateJointOracle(env, snapshot={}, outcome_agent=0,
+                                   baseline_actions=(0, 1, 1),
+                                   execution_semantics='source_only')
+    record = oracle.evaluate((0,), (1,))
+    assert record.estimand == 'Q_one_step'
+    assert record.horizon == 1
+    import pytest as _pytest
+    with _pytest.raises(ValueError):
+        CloneStateJointOracle(env, snapshot={}, outcome_agent=0, baseline_actions=(0, 1, 1),
+                              horizon=5)          # no continuation policy declared
+
+
+def test_duplicate_evidence_keys_are_rejected():
+    """Selected-key provenance is ambiguous when two items share a key."""
+    import pytest as _pytest
+    from research_chains.novelty_completion import (
+        EvidenceItem, greedy_typed_completion, minimum_cost_typed_completion)
+    obligations = {'o1': 't', 'o2': 't'}
+    dupes = [EvidenceItem('k', 't', 1.0, frozenset({'o1'})),
+             EvidenceItem('k', 't', 1.0, frozenset({'o2'}))]
+    for solver in (minimum_cost_typed_completion, greedy_typed_completion):
+        with _pytest.raises(ValueError):
+            solver(obligations, dupes)
+
+
+def test_source_tree_compiler_skips_archive_debris():
+    from scripts.compile_source_tree import is_archive_debris
+    from pathlib import Path
+    assert is_archive_debris(Path('__MACOSX/._runner.py'))
+    assert is_archive_debris(Path('scripts/._exp.py'))
+    assert is_archive_debris(Path('scripts/run_external_query_transfer.py.rej'))
+    assert is_archive_debris(Path('research/.DS_Store'))
+    assert not is_archive_debris(Path('scripts/run_external_query_transfer.py'))

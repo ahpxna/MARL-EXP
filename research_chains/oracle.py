@@ -47,17 +47,74 @@ def trusted_execution_receipt(env):
 
 @dataclass(frozen=True)
 class JointOracleRecord:
+    """One clone-state joint intervention.
+
+    ``execution_verified`` is the CETERIS-PARIBUS gate: it is true only when the
+    whole requested joint action vector was executed, sources and frozen
+    baseline alike.  Verifying only the source coordinates does not establish
+    the intended counterfactual ``F(a_S, a_baseline_{-S})``: an environment that
+    honours the intervention while quietly overriding some other agent's
+    baseline action has executed a DIFFERENT joint action, and the response is
+    then not a response at the requested point.  The weaker source-only check is
+    still reported, separately, as ``execution_verified_sources``.
+
+    ``estimand`` names what ``reward`` actually is, so a one-step reward is never
+    read as a continuation return.
+    """
+
     assignment: Tuple[int, ...]
     reward: float
     requested_joint_actions: Tuple[int, ...]
     executed_joint_actions: Tuple[int, ...]
     execution_verified: bool
+    execution_verified_sources: bool = True
+    estimand: str = "Q_one_step"
+    horizon: int = 1
+    discount: float = 1.0
 
 
 class CloneStateJointOracle:
-    def __init__(self, env, *, snapshot, outcome_agent: int, baseline_actions: Sequence[int]):
+    @staticmethod
+    def _copy_snapshot(env, snapshot):
+        """Copy an environment snapshot through the adapter contract when available.
+
+        Some external simulators expose opaque native snapshot handles (for
+        example ``cityflow.Archive``) that cannot be pickled or deep-copied.
+        External adapters may therefore provide ``_copy_cloned_state`` to copy
+        only the Python-owned parts while preserving the reusable native handle.
+        Fall back to ``copy.deepcopy`` for ordinary pure-Python environments.
+        """
+        copier = getattr(env, "_copy_cloned_state", None)
+        if callable(copier):
+            return copier(snapshot)
+        return copy.deepcopy(snapshot)
+
+    #: The two execution semantics this oracle can be asked for.  They are NOT
+    #: interchangeable and are never silently mixed: ``full_joint`` is the
+    #: ceteris-paribus contract, ``source_only`` merely records that the
+    #: intervention itself was honoured and must be declared by the caller.
+    EXECUTION_SEMANTICS = ("full_joint", "source_only")
+
+    def __init__(self, env, *, snapshot, outcome_agent: int, baseline_actions: Sequence[int],
+                 execution_semantics: str = "full_joint",
+                 horizon: int = 1, discount: float = 1.0, continuation_policy=None):
+        if str(execution_semantics) not in self.EXECUTION_SEMANTICS:
+            raise ValueError(
+                "execution_semantics must be one of " + ",".join(self.EXECUTION_SEMANTICS))
+        if int(horizon) < 1:
+            raise ValueError("horizon must be at least 1")
+        if int(horizon) > 1 and continuation_policy is None:
+            raise ValueError(
+                "a continuation return needs an explicit frozen continuation policy; "
+                "pass continuation_policy=callable(env) -> joint action")
+        if not 0.0 <= float(discount) <= 1.0:
+            raise ValueError("discount must lie in [0, 1]")
+        self.execution_semantics = str(execution_semantics)
+        self.horizon = int(horizon)
+        self.discount = float(discount)
+        self.continuation_policy = continuation_policy
         self.env = env
-        self.snapshot = copy.deepcopy(snapshot)
+        self.snapshot = self._copy_snapshot(env, snapshot)
         self.outcome_agent = int(outcome_agent)
         self.baseline_actions = tuple(int(x) for x in baseline_actions)
         if len(self.baseline_actions) != int(env.n_agents):
@@ -107,21 +164,45 @@ class CloneStateJointOracle:
             if source < 0 or source >= int(self.env.n_agents):
                 raise ValueError("invalid source agent")
             actions[source] = action
-        self.env.restore_state(copy.deepcopy(self.snapshot))
+        self.env.restore_state(self._copy_snapshot(self.env, self.snapshot))
         _, rewards, _, _ = self.env.step(actions)
         requested = tuple(int(x) for x in actions)
         executed = self._normalize_executed_actions(
             trusted_execution_receipt(self.env), n_agents=int(self.env.n_agents)
         )
-        verified = all(executed[source] == action for source, action in zip(source_agents, assignment))
+        # Source-only agreement is the weaker historical check; it is kept for
+        # diagnostics but is NOT what gates the counterfactual.
+        verified_sources = all(
+            executed[source] == action for source, action in zip(source_agents, assignment))
+        verified_full = tuple(executed) == requested
+        verified = verified_full if self.execution_semantics == "full_joint" else verified_sources
         reward = float(rewards[self.outcome_agent])
-        self.env.restore_state(copy.deepcopy(self.snapshot))
+        if self.horizon > 1:
+            # Explicit continuation return: intervene only at t, then roll the
+            # frozen continuation policy forward for horizon-1 further steps.
+            discounted = reward
+            factor = 1.0
+            for _ in range(self.horizon - 1):
+                factor *= self.discount
+                follow = self.continuation_policy(self.env)
+                _, rewards_t, done, _ = self.env.step(
+                    [int(x) for x in follow])
+                discounted += factor * float(rewards_t[self.outcome_agent])
+                if bool(np.all(done)) if np.ndim(done) else bool(done):
+                    break
+            reward = float(discounted)
+        self.env.restore_state(self._copy_snapshot(self.env, self.snapshot))
         return JointOracleRecord(
             assignment=assignment,
             reward=reward,
             requested_joint_actions=requested,
             executed_joint_actions=executed,
             execution_verified=bool(verified),
+            execution_verified_sources=bool(verified_sources),
+            estimand=("Q_one_step" if self.horizon == 1
+                      else f"Q_continuation_h{self.horizon}_gamma{self.discount}"),
+            horizon=int(self.horizon),
+            discount=float(self.discount),
         )
 
     def enumerate(self, source_agents: Sequence[int], action_sets: Sequence[Sequence[int]], *, fail_on_execution_mismatch: bool = False):

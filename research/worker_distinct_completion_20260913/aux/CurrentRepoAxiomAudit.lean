@@ -1,0 +1,64 @@
+import «LeanD6M6SharpnessBridgeV1»
+import «LeanSupportFibreSufficiencyV1»
+import «LeanFunctionalResidualMaintenanceV2»
+import «LeanStructuralStaircaseExactPrefixCoverV1»
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_derivative_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_spreads
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_residual_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_response_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_spans
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_gap
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.mix_le
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_response
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_rs
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_rt
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.mix_sub
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_derivative_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_mixed_bound
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_residual_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_osc_response
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_top_three
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_strict_top_three
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_doubled_gap
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.constant_six_upper
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.every_smaller_constant_fails
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.constant_six_sharp
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.familyCell_balanced
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_response_bounds
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_span_eq_osc
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_valid
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_response
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_residual
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_span
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_valid
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_interaction
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_strict_top
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.unit_doubled_gap
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_affine
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.family_identification
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.normalized_family_bridge
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.chain_constant_six_sharp
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.endpoint_interaction_attained
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.world_interaction_attained
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.normalized_family_interaction_attained
+#print axioms CIGAMF.P13.D6M6SharpnessBridgeV1.integer_family_interaction_exact
+#print axioms CIGAMF.P13.SupportFibreSufficiency.universal_controller_iff_fibreSafe
+#print axioms CIGAMF.P13.SupportFibreSufficiency.fibreSafe_implies_separates
+#print axioms CIGAMF.P13.SupportFibreSufficiency.minimum_safe_query_set_exists
+#print axioms CIGAMF.P13.SupportFibreSufficiency.toy_good_iff
+#print axioms CIGAMF.P13.SupportFibreSufficiency.two_forbidden_have_alternative
+#print axioms CIGAMF.P13.SupportFibreSufficiency.every_pair_has_common_good
+#print axioms CIGAMF.P13.SupportFibreSufficiency.empty_queries_separate
+#print axioms CIGAMF.P13.SupportFibreSufficiency.bad_surjective
+#print axioms CIGAMF.P13.SupportFibreSufficiency.empty_queries_not_fibreSafe
+#print axioms CIGAMF.P13.SupportFibreSufficiency.pairwise_separation_not_sufficient
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.residualBound_zero
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.selective_refresh_safety
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.residualBound_antitone
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.refresh_set_monotonicity
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.feasible_iff_full_refresh_safe
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.no_feasible_refresh_of_full_failure
+#print axioms CIGAMF.P13.FunctionalResidualMaintenance.minimum_cost_refresh_exists
+
+#print axioms CIGAMF.P13.StructuralStaircaseExactPrefixCover.STRUCT_staircase_prefix_dimension_eq
+#print axioms CIGAMF.P13.StructuralStaircaseExactPrefixCover.STRUCT_staircase_chi_eq_half_ground_set

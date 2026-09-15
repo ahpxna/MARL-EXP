@@ -1,0 +1,201 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update E: the sharp constant closed in Lean by a tie-to-strict interpolation, two statements of addendum D demoted to vacuous, a failed predecessor, and the $m$-generalisation gate left unopened}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--121, including addenda A--D, are an immutable prefix. Nothing there is rewritten. This addendum begins at Section 122. Where an earlier line is now stale it is quoted and struck here, never edited in place.
+
+\textbf{What this addendum contains.} One promotion to PROVED, \emph{two demotions of statements this project itself wrote yesterday}, one failed formalisation recorded in full, one instrument defect, and one pre-registered gate that was \emph{not} run. Section 126 is the most important section in this addendum: it shows that two theorems of addendum D, both of which compiled, were nevertheless vacuous as bridges.
+
+\section*{122. The sharp constant is closed in Lean}
+\texttt{LeanD6M6SharpnessBridgeV1} (468 lines) compiles clean; \texttt{.olean} $1{,}516{,}960$ B. It proves, in the chain's own vocabulary and not merely as arithmetic on two named sequences:
+\[\textsf{DecisionInteractionConstantAtMost}\ \textit{familyCell}\ 6\]
+\[\wedge\quad \forall c<6,\ \neg\,\textsf{DecisionInteractionConstantAtMost}\ \textit{familyCell}\ c\]
+(\texttt{chain\_constant\_six\_sharp}), together with the cell-free form \texttt{constant\_six\_sharp} over \textsf{ConstantAtMost}. \eclass{COMPILED ARTIFACT; PROVED pending the \texttt{\#print axioms} transcript of Section 130}
+
+The upper half is \emph{not} new mathematics: it is \texttt{pair\_loss\_le\_sdiff\_card} with $|S\setminus T|\le 3$, giving $2D\le 6\delta_\square$. The lower half is the new content.
+
+\section*{123. The construction: a tie-to-strict interpolation}
+Let $I_b$ be the integer tie world of \texttt{D6\_INTEGER\_GRID\_WITNESS\_m6} and $D_b$ the tangent direction. Define, for $t\in[0,1]$,
+\[W_t \;:=\; 2\,I_b \;+\; t\,D_b .\]
+The endpoints are data: $W_0=\texttt{baseF}$, $W_1=\texttt{edgeF}$. Every quantity below is exact, recomputed independently over $\mathbb{Z}$ outside Lean and agreeing to the digit.
+
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r r r r}
+\toprule
+$t$ & $\delta_\square$ & $2D$ & $2D/\delta_\square$ & span$_S$ & span$_T$\\
+\midrule
+$0$ & $2.0000$ & $12$ & $\mathbf{6.000000}$ & $2.000$ & $2.000$\\
+$0.001$ & $2.0020$ & $12$ & $5.994006$ & $2.001$ & $1.999$\\
+$0.01$ & $2.0200$ & $12$ & $5.940594$ & $2.010$ & $1.990$\\
+$0.1$ & $2.2000$ & $12$ & $5.454545$ & $2.100$ & $1.900$\\
+$0.5$ & $3.0000$ & $12$ & $4.000000$ & $2.500$ & $1.500$\\
+$1$ & $4.0000$ & $12$ & $3.000000$ & $3.000$ & $1.000$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Exactly: $\delta_\square(W_t)=2+2t$, $2D(W_t)=12$ for every $t$, so
+\[\frac{2D}{\delta_\square}=\frac{12}{2+2t}\ \xrightarrow[t\to0^+]{}\ 6=m .\]
+
+\section*{124. Why the gap is constant: the mechanism}
+$D_b$ is supported \emph{only on the $m$ unit vectors}. The generator is one line:
+\[b[2^i] \;=\; a[2^i]\;+\;\bigl(\mathbf{1}[i\in S]-\mathbf{1}[i\notin S]\bigr)\cdot\operatorname{sign}\bigl(a[2^i]\bigr).\]
+Three consequences, and they are the whole theorem:
+\begin{itemize}
+\item Because the perturbation lives on the unit vectors, it enters $\textsf{response}_i$ and is subtracted again inside $r_S$ and $r_T$. Its contribution to $\ell_S-\ell_T$ \textbf{cancels exactly}: \texttt{endpoint\_gap} gives $12$ at \emph{both} endpoints, hence $12$ on the whole segment by linearity.
+\item It shifts each response span by $\pm1$ with sign given by $S$-membership, so \texttt{endpoint\_spans} reads $2$ at $t=0$ and $(3\ \text{if}\ i\in S\ \text{else}\ 1)$ at $t=1$; the span is $2+t$ on $S$ and $2-t$ off $S$, and the Top-C margin is exactly $2t$.
+\item It costs $\delta_\square$ exactly $2t$: \texttt{endpoint\_spreads} is $\le2$ at $t=0$ and $\le4$ at $t=1$.
+\end{itemize}
+\textbf{This is why every random-start search converged without arriving.} The supremum $6$ sits at $t=0$, where all six spans are equal --- the Top-C tie --- hence \emph{outside} the strict-selection region. No strict witness attains it; strictness costs ratio at rate $2t$ against a fixed gap. The constant $6$ is a \textbf{supremum, never a maximum}.
+
+\section*{125. Independent audit of every kernel fact}
+Every \texttt{decide} in the bridge was recomputed outside Lean in exact integer arithmetic:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.36\columnwidth}X}
+\toprule
+Lean fact & Independent recomputation\\
+\midrule
+\texttt{endpoint\_spans} $e{=}0$ & all six $=2$ \checkmark\\
+\texttt{endpoint\_spans} $e{=}1$ & $[3,1,1,1,3,3]$ \checkmark\\
+\texttt{endpoint\_gap} & $12$ and $12$ \checkmark\\
+\texttt{endpoint\_spreads} & attained $2$ and $4$ \checkmark\\
+\texttt{rlo}/\texttt{rhi} tables & every derivative inside \checkmark\\
+\texttt{endpoint\_interaction\_attained} & $\mathrm{MD}(I_b){=}1$, $\mathrm{MD}(D_b){=}2\Rightarrow 2,4$ \checkmark\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{126. DEMOTION: two compiled statements of addendum D are vacuous as bridges}
+Both statements below are in \texttt{LeanD6SharpnessM6V1}, both compile, and both were reported in addendum D. Neither says anything about the world $V_s$.
+
+\textbf{(a)} \oldclaim{$\delta_\square(V_s)=2s+2$, the value every coordinate attains.} The file contains only
+\[\texttt{def deltaBox (s : Z) : Z := 2 * s + 2}\]
+--- a \emph{definition}, never connected to \textsf{mixedDifference}. Consequently \texttt{family\_violates}, \texttt{gap\_to\_six} and \texttt{six\_optimal\_at\_m6} are, as stated, arithmetic identities relating two named definitions \texttt{twoD} and \texttt{deltaBox}. \texttt{twoD} is genuine (it unfolds to $I_b,D_b$); \texttt{deltaBox} is not.
+
+\textbf{(b)} \oldclaim{Strict Top-C with margin exactly $2$, for every $s\ge1$.} \texttt{strict\_topC\_margin\_two} writes \emph{both} slopes as the literal $1$:
+\[(2s\cdot1+1)-(2s\cdot1+(-1))=2 .\]
+But the actual slope vector is $\texttt{oscSlope}=[1,1,1,\mathbf{-1},1,1]$: coordinate $3$ has span $1-2s<0$, so its maximum is at $u=0$, not $u=1$. The statement is arithmetically true and \emph{empty}: it never mentions $V_s$, \texttt{respI} or \texttt{oscSlope}. Also \texttt{rhoI} is defined and used by no theorem.
+
+\textbf{Replacement.} \texttt{integer\_family\_interaction\_exact} now proves both the bound $|\textsf{mixedDifference}|\le 2s+2$ \emph{and} its attainment for the unnormalised integer family; \texttt{unit\_strict\_top} proves \textsf{StrictTopC} in chain vocabulary with the sign of coordinate $3$ handled. The demoted statements are retained, not deleted.
+
+\textbf{Lesson.} A theorem that compiles can still be vacuous. \emph{Whether a definition is ever tied to the object it is named after is a separate check from whether the file compiles.}
+
+\section*{127. The failed predecessor, in full}
+\texttt{LeanD6M6SharpnessV1} --- the direct ancestor of the bridge --- never compiled: $10$ errors. Two distinct causes, both worth never repeating.
+
+\textbf{(i) Motive mismatch from a variable-name collision.} \texttt{lift6 (h e i)} failed because $e$ was already bound as the endpoint index, forcing $h$ to bind $(a\,b\,c\,d\,f\,g)$, so the motive $?m\ ![a,b,c,d,e,f]$ would not unify. The bridge replaces the combinator by \texttt{rw [eta z]; exact h e i \_ \_ \_ \_ \_ \_}.
+
+\textbf{(ii) The \texttt{fin\_cases} numeral trap, fourth occurrence in this corpus.} At \texttt{world\_mixed\_bound}, \texttt{fin\_cases u <;> fin\_cases v} produces $\langle 0,\_\rangle$ rather than the numeral $0$; \texttt{linarith} then treats $W_t(\text{update}\ x\ i\ \langle0,\_\rangle)$ as an atom distinct from $W_t(\text{update}\ x\ i\ 0)$ in the hypotheses, and cannot close. The fix hoists the two sign cases into \texttt{have}s stated with real numerals \emph{before} the case split.
+
+\section*{128. The $V_s$ family and the interpolation are the same object}
+\texttt{family\_identification} proves
+\[\textsf{normalizedFamily}\ s \;=\; \textsf{unitWorld}\!\left(1/s\right),\qquad s\ge1 .\]
+The integer family of addendum D is the interpolation reparametrised by $t=1/s$. This is a unification, not a duplicate programme.
+
+\section*{129. The $m$-generalisation was probed on 6 September, and the instrument gave a false negative}
+\textbf{The first draft of this section said the generalisation had never been probed. That was wrong}, and the correction is more informative than the original claim. Tangent-cone seeding was run on 6 September at four widths:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r X}
+\toprule
+$m$ & prediction $2k/(m{-}1)$ & predicts viol. & status returned\\
+\midrule
+$4$ & $4/3\approx1.3333$ & yes & \textsf{NO\_VIOLATION\_FOUND}\\
+$5$ & $1.0$ & no & \textsf{NO\_VIOLATION\_FOUND}\\
+$6$ & $6/5=1.2$ & yes & \textsf{NO\_VIOLATION\_FOUND}\\
+$7$ & $1.0$ & no & \textsf{NO\_VIOLATION\_FOUND}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+All four carry \eclass{EXACT\_RATIONAL\_COUNTEREXAMPLE\_INDEPENDENTLY\_RECOMPUTED}.
+
+The odd widths are consistent and uninteresting: at $m$ odd, $k=(m-1)/2$ gives $2k/(m-1)=1$ exactly, the prediction is ``no violation'', and none was found --- the $m-1$ law is a theorem there, as recorded in addendum D.
+
+\textbf{The even widths are the finding.} At $m=6$ the instrument returned \textsf{NO\_VIOLATION\_FOUND} --- and a violation at $m=6$ is now \emph{proved in Lean} by Section 122 of this addendum. So this is a demonstrated false negative of the tangent-cone seeder, and it is therefore \textbf{not admissible as evidence about $m=4$ either}. \oldclaim{No violation exists at $m=4$.} Nothing of the kind follows.
+
+\claimbox{Three distinct local instruments have now returned a false negative or been captured by the same attractor on this problem: the countersearch (Section 105), the tangent-cone seeder (here, at $m=6$), and the tie-locus LP (below). \textbf{A negative from any local instrument on this geometry carries no weight.} The reason is Section 124: the extremum sits at a Top-C tie, which every strict-selection search is built to avoid.}
+
+\textbf{Still genuinely unrun.} The pre-registered gate of this addendum was the \emph{tie-locus LP} at $m=4$ and $m=8$ --- a different instrument, one that solves for the tie point directly instead of stepping away from it. \texttt{research/d6\_general\_m\_20260907/} is empty; that gate remains open and no statement about general even $m$ may be read from this addendum.
+
+The only tie-locus artifact present is an $m=6$ smoke, and it is instructive:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.44\columnwidth}X}
+\toprule
+\texttt{derived\_prediction} $2k/(m{-}1)$ & $6/5=1.2$\\
+\texttt{best\_limit\_ratio} & $\mathbf{4/5=0.8}$\\
+\texttt{predicts\_violation} & \textsf{False}\\
+\texttt{seed\_off\_tie.exact\_ratio} & $128/165\approx0.7758$, \textsf{strict\_top\_c} true\\
+\bottomrule
+\end{tabularx}
+\end{center}
+$4/5=2(k-1)/(m-1)$ at $k=3,m=6$: the \textbf{fourth} local instrument captured by the attractor of Sections 105 and 108.
+
+\textbf{Instrument defect fixed.} \texttt{run\_d6\_tie\_locus\_lp} writes the tie point under key \texttt{tie\_world}; \texttt{run\_d6\_tangent\_cone\_seeding} read only \texttt{integer\_world}/\texttt{world}, so chaining the two raised \texttt{KeyError}. The loader now accepts \texttt{tie\_world}, \texttt{world}, \texttt{seed\_off\_tie.world} and \texttt{strict\_top\_c\_witness.world}, and reports the available keys instead of raising. Same family as the \texttt{KeyError: 'binary\_world'} defect of Section 108.
+
+\section*{130. Novelty boundary and lineage delta}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.30\columnwidth}X}
+\toprule
+Object & Status after this addendum\\
+\midrule
+$2D\le 2|S\setminus T|\delta_\square$ & classical exchange/telescoping argument; \textbf{not novel as a method}\\
+$\varepsilon$-argument for sharpness & standard analysis; not novel\\
+Tie-point $+$ unit-vector tangent with \emph{zero} gap contribution & \textbf{the novel object}; explains the search history\\
+$c^\ast(6)=6$ as a supremum, not a maximum & new, and the reason no witness attains it\\
+$c^\ast(m)=m$, general even $m$ & \textbf{OPEN}; gate not run\\
+$m$ odd: the law is $m-1$ & unchanged domain correction\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Outstanding evidence item.} The \texttt{\#print axioms} transcript for the 41 audited names of \texttt{AxiomAuditD6M6SharpnessBridgeV1} is not yet pasted into the ledger. Until it is, Section 122 is \eclass{COMPILED ARTIFACT}, not \eclass{PROVED}.
+
+\section*{131. Formal inventory for this chain, complete}
+The corpus holds \textbf{88} Lean modules attributable to this chain, carrying \textbf{626} theorems; 85 produce a \texttt{.olean}; \textbf{2} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak D6\allowbreak Binary\allowbreak Bridge\allowbreak V1} & 42 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak D6\allowbreak M6\allowbreak Sharpness\allowbreak Bridge\allowbreak V1} & 40 & yes & yes\\
+\texttt{Lean\allowbreak D6\allowbreak Sharpness\allowbreak M6\allowbreak V1} & 34 & yes & yes\\
+\texttt{Lean\allowbreak D6\allowbreak Binary\allowbreak Bridge\allowbreak Part\allowbreak AV1} & 24 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Product\allowbreak Mixed\allowbreak Difference\allowbreak V4} & 24 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak D6\allowbreak Raw\allowbreak Local\allowbreak Contrast\allowbreak Rank\allowbreak One\allowbreak V1} & 21 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak D6\allowbreak Binary\allowbreak Integer\allowbreak Counterexample\allowbreak V1} & 18 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak D6\allowbreak Balanced\allowbreak Exchange\allowbreak Counterexample} & 15 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{83} of this chain's 85 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+
+\section*{132. Code changes of 7 September affecting this chain}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.32\columnwidth}X}
+\toprule
+File & Change\\
+\midrule
+\texttt{scripts/run\_d6\_tangent\_cone\_seeding.py} & tie-world loader now accepts \texttt{tie\_world}, \texttt{world}, \texttt{seed\_off\_tie.world} and \texttt{strict\_top\_c\_witness.world}, and reports the available keys instead of raising \texttt{KeyError}. Chaining it after \texttt{run\_d6\_tie\_locus\_lp} previously crashed.\\
+\texttt{scripts/run\_d6\_face\_enumeration\_lp.py} & multi-location seed-world loader; same defect family as the \texttt{KeyError: 'binary\_world'} of Section 108.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\end{document}

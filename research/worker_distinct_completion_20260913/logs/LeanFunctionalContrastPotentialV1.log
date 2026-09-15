@@ -1,0 +1,42 @@
+LeanFunctionalContrastPotentialV1.lean:46:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.FunctionalContrastPotential.contrastEnergy_smul`:
+  [DecidableEq I]
+  [Nonempty I]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq I] [Nonempty I] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+LeanFunctionalContrastPotentialV1.lean:69:4: error: No goals to be solved
+LeanFunctionalContrastPotentialV1.lean:99:6: error: unsolved goals
+case pos
+I : Type u_1
+inst✝² : Fintype I
+inst✝¹ : DecidableEq I
+inst✝ : Nonempty I
+b : I
+f : I → I → ℝ
+z : I → ℝ
+hsplit : ∀ (i : I), ∑ j, f i j * (z i - z j) = (∑ j, f i j) * z i - ∑ j, f i j * z j
+i : I
+hf : UnitFlow i b f
+hab : i ≠ b
+⊢ z i = z i - if i = b then z b else 0
+LeanFunctionalContrastPotentialV1.lean:101:31: error: No goals to be solved
+LeanFunctionalContrastPotentialV1.lean:116:44: error: Type mismatch
+  hleft
+has type
+  ∑ i, (∑ j, f i j) * z i = z a - z b
+but is expected to have type
+  ∑ i, ∑ j, f i j * z i = z a - z b
+LeanFunctionalContrastPotentialV1.lean:99:24: warning: This simp argument is unused:
+  Ne.symm hab
+
+Hint: Omit it from the simp argument list.
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'CIGAMF.P13.FunctionalContrastPotential.contrastEnergy_smul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.FunctionalContrastPotential.potential_upper' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.FunctionalContrastPotential.flow_green' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

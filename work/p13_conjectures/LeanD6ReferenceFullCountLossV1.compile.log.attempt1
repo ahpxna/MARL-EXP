@@ -1,0 +1,85 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanD6ReferenceFullCountLossV1.lean:87:2: error: unsolved goals
+case pos
+n : ℕ
+t : ℝ
+A D : Finset (I n)
+j : I n
+hjA : j ∉ A
+hjD : j ∉ D
+hB2 : 2 ≤ #(others A j)
+rho : ℝ
+ha : 0 ≤ gateMass t A j
+ha1 : gateMass t A j ≤ 1
+hb : 0 ≤ slopeBval t A j
+hba : slopeBval t A j ≤ gateMass t A j
+har : gateMass t A j ≤ rho
+hbr : slopeBval t A j ≤ rho
+hf : (∃ i ∈ A, i ∈ D) ∨ 2 ≤ #(D ∩ others A j)
+hc : 0 < #(D ∩ A) ∨ 2 ≤ #(D ∩ others A j)
+hn0 : ¬(#(D ∩ A) = 0 ∧ #(D ∩ others A j) = 0)
+hn1 : ¬(#(D ∩ A) = 0 ∧ #(D ∩ others A j) = 1)
+hm :
+  maxVal (core A D j rho t) =
+    1 + ((rho - gateMass t A j) * ↑(#(D ∩ A)) + (rho - slopeBval t A j) * ↑(#(D ∩ others A j)))
+⊢ 1 + rho * ↑(#(D ∩ A)) + rho * ↑(#(D ∩ others A j)) - gateMass t A j * ↑(#(D ∩ A)) -
+      slopeBval t A j * ↑(#(D ∩ others A j)) =
+    1 + rho * ↑(#(D ∩ A)) + rho * ↑(#(D ∩ others A j)) - gateMass t A j * ↑(#(D ∩ A)) -
+        slopeBval t A j * ↑(#(D ∩ others A j)) -
+      if D ∩ A = ∅ ∧ D ∩ others A j = ∅ then min (gateMass t A j) (slopeBval t A j * 2)
+      else if D ∩ A = ∅ ∧ #(D ∩ others A j) = 1 then slopeBval t A j else 0
+LeanD6ReferenceFullCountLossV1.lean:99:22: warning: This simp argument is unused:
+  hn0
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [upperCount, hn1]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6ReferenceFullCountLossV1.lean:99:27: warning: This simp argument is unused:
+  hn1
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [upperCount, hn0]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6ReferenceFullCountLossV1.lean:145:23: error: Invalid projection: Projections cannot be used on functions, and
+  ha
+has function type
+  1 ≤ #(others A j) → 0 ≤ gateMass t A j ∧ gateMass t A j ≤ 1
+LeanD6ReferenceFullCountLossV1.lean:140:60: error: unsolved goals
+n : ℕ
+t : ℝ
+ht0 : 0 ≤ t
+ht1 : t ≤ 1
+A T S : Finset (I n)
+j : I n
+hjA : j ∉ A
+hjT : j ∉ T
+hB2 : 2 ≤ #(others A j)
+rho : ℝ
+hr : 1 ≤ rho
+hjD : j ∉ T \ S
+ha : 1 ≤ #(others A j) → 0 ≤ gateMass t A j ∧ gateMass t A j ≤ 1
+hb : 0 ≤ slopeBval t A j
+hba : slopeBval t A j ≤ gateMass t A j
+⊢ productCompressionLoss (centeredWorld A T j rho t) (productResponse (bern t) (centeredWorld A T j rho t)) S =
+    countLoss (gateMass t A j) (slopeBval t A j) rho (#A) (#(others A j)) (#(T \ S ∩ A)) #(T \ S ∩ others A j)
+'CIGAMF.P13.D6ReferenceFullCountLoss.slope_gap' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.slope_order' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.nonfire_classification' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.maximum_exact' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.offValue_counts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.lowValue_counts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.actual_full_count_loss' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceFullCountLoss.same_counts_same_loss' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

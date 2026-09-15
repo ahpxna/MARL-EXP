@@ -1,0 +1,67 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product Compression}\\[2pt]
+{\large\itshape Append-only update N: a retracted conclusion, the critical-scale comparison, and an explicit one-epoch bound}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--172 are an immutable prefix. This addendum begins at Section 173.
+
+\section*{173. Retraction: a true fact, a false conclusion}
+\textbf{Retracted.} \oldclaim{Because $|\mathrm{localCurvature}|\to 1/2$, no $q$-rate exists for the matching coefficient, so the growing-$q$ programme stops here and the $64/q^2$ of Section 169 bounds a term that does not matter.}
+
+The first clause is correct and is now a theorem (Section 174). The conclusion drawn from it is wrong, and the error is worth naming precisely: \emph{I compared a coefficient against a decaying target when the quantity that must decay is the coefficient multiplied by $\varepsilon^2$.} The tolerance $\varepsilon$ is not free -- it is the plug-in error of the phase-III margin estimate, and the cyclic law of Section 149 ties it to $q$. At $N \asymp q$ the variance is $\asymp q^{-3}$, so $\varepsilon \asymp q^{-3/2}$ and
+\[ \big(\mathrm{remainderConstant} + |\mathrm{localCurvature}|\big)\varepsilon^2 = \Theta(1)\cdot O(q^{-3}) = O(q^{-3}), \]
+which sits \emph{below} the $q^{-2}$ target scale. A constant coefficient is not an obstruction when the scale it multiplies shrinks faster than the target.
+\claimbox{Rule for the ledger. A ``does not vanish'' finding is meaningless until the scale it is measured against is named. Section 169's phrase ``half the job, and the other half is not started'' should have read: the second summand is bounded, not decaying, and whether that matters depends on the $\varepsilon$ regime -- which was never stated.}
+
+\section*{174. The critical-scale comparison, proved}
+\texttt{LeanD6CriticalScaleRemainderV1.critical\_remainder\_bound}: for $q \ge 8$, every phase-III margin, and every $\varepsilon$ with $q^3\varepsilon^2 \le a^2$,
+\[ q^2\big[(\mathrm{remainderConstant}\,q\,\mu + |\mathrm{localCurvature}\,q\,\mu|)\,\varepsilon^2\big] \;\le\; \frac{3a^2}{2q}. \]
+The companion \texttt{critical\_remainder\_eventually\_small} turns this into an explicit threshold: for any tolerance, $Q = \max\{8, 3a^2/(2\,\mathrm{tol})\}$ suffices, uniformly over phase-III margins. Two names, audited on the three standard axioms.
+
+Note what the proof actually consumes. It uses $64/q^2 \le 1$ -- that is, \emph{boundedness} of the remainder constant, not its rate -- together with $|\mathrm{localCurvature}| < 1/2$ from Section 175, to get a coefficient below $3/2$. So the $q$-rate established in Section 169 is \emph{not} what makes this argument work; a crude constant bound would do. The rate earns its place elsewhere, in Section 176.
+\claimbox{The asymptotic language here describes consequences of finite inequalities. The Lean statements are the finite inequalities; no limit is formalised, and none is needed.}
+
+\section*{175. The curvature sandwich, and what survives from the retraction}
+\texttt{LeanD6LocalCurvatureLimitV1} proves, for $q \ge 8$ and every $\mu$ in the closed phase interval,
+\[ -\tfrac12 < \mathrm{localCurvature}\,q\,\mu \le -\tfrac12 + \tfrac{2}{q}, \]
+hence $1/2 - 2/q \le |\mathrm{localCurvature}| < 1/2$ and $\mathrm{remainderConstant} + |\mathrm{localCurvature}| \in [1/2 - 2/q,\; 1/2 + 64/q^2]$. Eight names audited clean.
+
+The mechanism is a property of the design: both frozen parameters vanish -- $p = (1-w)/q \le 1/q$ and $\beta \le w = \mathrm{mass} \le 1/(q-2)^2$ -- while the left allocation's coefficient $\mathrm{value}\,q\,(\mathrm{scale}\,q)$ rises to one, because $\mathrm{scale}\,q = \sqrt{q/(q+1)} \to 1$. The curvature difference $(p+\beta-c)/2$ inherits the gap.
+
+So the module was not wasted by the retraction: its upper bound is exactly the input Section 174 needs. What changed is the interpretation, not the mathematics.
+
+\section*{176. The one-epoch bound, with no unknown constant}
+\texttt{LeanD6GrowingUnknownLabelPhaseRiskV1.actual\_unknown\_label\_explicit\_bound} ($q \ge 8$): there is a cyclic design $G$, every $G_t$ legal with $|G_t| = q$, such that for every fallback world, every true world $A$, every phase-III $\mu$, every $r_0 \ge 512$, every $s$ and every $L>0$,
+\[ \mathbb{E}[\text{epochLoss}] \le \frac{64\,(2q+1)}{L\,q^{6}} + \max(0,\text{oracleValue})\cdot \eta(|\mathrm{Off}\,j|,r_0)\,4^{-s}. \]
+This is Section 170's bound with the abstract compactness constant eliminated: $C \mapsto 64/q^2$, which is where the rate of Section 169 does real work. The recommendation still never takes $A$ as an input, and the wrong-label term is still charged in full.
+\claimbox{Scope, unchanged and worth repeating because the bound now looks finished: one epoch, with the phase-III interval \emph{known}. The construction's acquisition cost is $4(2q+1)r_0(s+1) + (2q+1)L$ queries, which no part of this inequality accounts for --- so this is not a matching statement in total budget, and calling it one would be the same class of error as Section 173.}
+
+\section*{177. The bound is an expectation, not a lower integral}
+\texttt{LeanD6EpochLossMeasurabilityV1} proves \texttt{epoch\_loss\_measurable} and \texttt{epoch\_loss\_integrable}, through continuity of the allocation value, the clipped mass and the branch loss. Until this, Sections 170 and 176 bounded a lower integral of a function not yet known to be measurable; they now bound the expectation of an actual random variable. Five names audited clean.
+
+\section*{178. Corpus audit: no result anywhere depends on \texttt{native\_decide}}
+\texttt{LeanD6PairContractionKernelV1} re-proves the uniform mixed-difference bound $|mixedDifferenceZ| \le 13$ by kernel \texttt{decide}, split by coordinate into four theorems of $256$ leaves, and re-derives the headline \texttt{pair\_contraction\_route\_killed\_exact}. That headline consumed the \texttt{native\_decide} bound directly, so it had been a COMPILED ARTIFACT rather than PROVED; it is now audited on the three standard axioms. The risk flagged when the module was written -- that kernel enumeration over the function type \texttt{Fin 4 -> Fin 2} would exceed the kernel's budget through \texttt{Pi.fintype} -- did not materialise, and the prepared eta-expansion fallback was not needed.
+
+A sweep of every compile log in the tree returns \textbf{zero} occurrences of \texttt{Lean.ofReduceBool}. Combined with Section 84 of the Structural chain, the dependency count is $6 \to 0$.
+
+\section*{179. Where the chain stands, by its own manifest}
+\texttt{chain\_closure\_manifest.json} records $36$ modules and $171$ axiom prints, all clean, under toolchain \texttt{leanprover/lean4:v4.34.0-rc2}, with $18$ items closed and $4$ open. The manifest's own scope line is the honest one: \emph{selected modules compiled with existing local dependencies; this is NOT a clean full-corpus build.} The tree holds $291$ \texttt{.lean} files, $276$ \texttt{.olean} and $134$ \texttt{.compile.log} -- the reproducibility debt of Section 167 is not only unchanged but larger in absolute terms.
+
+The four open items, unedited: adaptive matching \emph{total} regret for unknown $A$; sharp growing-$q$ tracking constants together with learning the phase interval and crossing its boundaries; termination and expected $\Gamma$ rate of the full adaptive algorithm; matching discovery lower bound and uniform growing-$q$ transition. Two modules, \texttt{LeanD6RecordGapDecompositionV1} and \texttt{LeanD6ScalarExplorationSeparationV1}, still carry \texttt{sorryAx} and nothing above depends on them.
+\end{document}

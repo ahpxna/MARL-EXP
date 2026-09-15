@@ -1,0 +1,101 @@
+{
+  "protocol_version": "d6_raw_contrast_rank_normal_form_v1",
+  "evidence_class": "PROVED_LEAN4_AXIOM_AUDITED",
+  "development_only": false,
+  "generated_utc": "2026-09-05T20:23:46.883058+00:00",
+  "toolchain": {
+    "lean": "v4.34.0-rc2",
+    "note": "Mathlib revision as pinned by the p13_conjectures lakefile"
+  },
+  "axiom_audit": {
+    "command": "lake env lean AxiomAuditRawRouteV1.lean",
+    "result": "every listed theorem depends on axioms: [propext, Classical.choice, Quot.sound]",
+    "interpretation": "The standard Lean 4 axiom set. No new axiom, no sorry, no admit, no native_decide anywhere in the route.",
+    "n_theorems_audited": 12
+  },
+  "what_is_proved": {
+    "headline": "AllCoordinatesRawLocalContrastRankOne(F) implies F is multiaffine in its own normalised action coefficients: F x = sum_S c_S * prod_{i in S} theta_i(x_i).",
+    "chain": [
+      {
+        "name": "rawLocalContrastRankOne_iff_minors_zero",
+        "content": "raw rank one <-> every 2x2 minor of the (action x context) raw contrast matrix vanishes. Witness-free: no anchor witness, no reference measure, no factorisation."
+      },
+      {
+        "name": "rawLocalContrastRankOne_iff_aligned",
+        "content": "raw rank one <-> centred rank one AND the first-order response contrast is kappa * lambda, i.e. no independent additive gauge. This is the exact gap between the raw and centred invariants."
+      },
+      {
+        "name": "not_rawLocalContrastRankOne_of_misaligned",
+        "content": "nonzero alpha/lambda determinant, together with a context-separating h, refutes raw rank one. The non-degeneracy hypothesis is explicit in the statement."
+      },
+      {
+        "name": "binary_allCoordinatesRawLocalContrastRankOne",
+        "content": "a two-letter alphabet forces raw rank one at every coordinate, for every F, unconditionally."
+      },
+      {
+        "name": "rawLocalContrastRankOne_interpolation",
+        "content": "(star) F(z[i<-u]) = (1-theta_i(u)) F(z[i<-u0]) + theta_i(u) F(z[i<-r_i]). Derived from the minor identity in three lines; eliminates the existential factorisation from every later statement."
+      },
+      {
+        "name": "rawRankOne_corner_reconstruction",
+        "content": "F is the tensor-product interpolation of its 2^m corner values."
+      },
+      {
+        "name": "rawRankOne_exists_multiaffine_coefficients",
+        "content": "explicit multiaffine coefficients over subsets."
+      },
+      {
+        "name": "rawRankOne_normal_form_const_plus_interaction",
+        "content": "F = const + P(theta) with P carrying no constant term."
+      }
+    ]
+  },
+  "novelty_assessment": {
+    "classical_not_novel": [
+      "The corner reconstruction formula is the classical multilinear extension (Owen 1972 in cooperative game theory; standard multilinear interpolation on the hypercube).",
+      "The monomial/Moebius form with coefficients beta_S = sum_{T subset S} (-1)^(|S|-|T|) F(c_T) is the Moebius transform on the Boolean lattice (Rota 1964; Harsanyi dividends, Harsanyi 1963).",
+      "That a function affine in each variable separately is determined by its corner values is folklore.",
+      "ATTRIBUTIONS RECALLED, NOT VERIFIED AGAINST THE LITERATURE. Check before citing."
+    ],
+    "where_the_novelty_is": [
+      "RawLocalContrastRankOne as an invariant, and the characterisation raw <-> centred AND alpha = kappa*lambda. This is the new object.",
+      "The linearity of the raw fibre: for fixed theta, raw rank one is a LINEAR condition on F, so the raw variety is a union of linear subspaces of dimension 2^m, at codimension m(K-2) inside the centred fibre. This is what makes unconstrained exhaustive search possible.",
+      "binary implies raw rank one, unconditionally: an explanation of the alphabet phase with no analytic input.",
+      "Using the (classical) normal form as an EXHAUSTIVENESS CERTIFICATE for a falsification search. The theorem is old; the role it plays is not."
+    ]
+  },
+  "explicit_non_claims": [
+    "The all-coordinates-ACTIVE hypothesis has NOT been removed. Worlds with an inactive coordinate are not covered by the normal form. Removing it needs a canonical representative plus the convention theta_i = 0 on inactive coordinates.",
+    "The link theta <-> phi is NOT proved, so 'raw variety = union over phi of V^raw_phi' is NOT yet a theorem.",
+    "D6-prime (the decision bound under raw rank one) is COMPLETELY OPEN. Nothing here bears on whether it is true.",
+    "None of this re-proves or weakens the D6 falsification, which remains an exact rational counterexample."
+  ],
+  "artifacts": [
+    {
+      "path": "work/p13_conjectures/LeanD6RawLocalContrastRankOneV1.lean",
+      "sha256": "6a5c014e3f198f5d723da5c98f51e979b570d81d46ef43872f83ef0208985366"
+    },
+    {
+      "path": "work/p13_conjectures/LeanD6RawRankOneReconstructionV1.lean",
+      "sha256": "00c14e725131b0d3c4b2bc1ebf18fe1d4ddd495c689ddcbfb740f195bcdaf02c"
+    },
+    {
+      "path": "work/p13_conjectures/LeanD6RawRankOneMultiaffineV1.lean",
+      "sha256": "b3401ae92e8741af6b5728d1ba8c17cf6c616693b2e5f8f9a9bb46f52fb628f9"
+    },
+    {
+      "path": "work/p13_conjectures/LeanD6RawRankOneNormalFormV1.lean",
+      "sha256": "b6731ac0daa260aa6836f2e37309f9c21748ad8bfa52d9f53c0fe0b52192621b"
+    },
+    {
+      "path": "work/p13_conjectures/AxiomAuditRawRouteV1.lean",
+      "sha256": "d96af97e674b515493e24840c441fd4920f9db8eebce14db56ac13390e3eb493"
+    }
+  ],
+  "supersedes": null,
+  "related": [
+    "research/d6_contrast_rank_falsification/E1_rawfiber_m6_K3.json",
+    "research/d6_contrast_rank_falsification/MISALIGNMENT_ANNOTATION_20260905.json",
+    "research/d6_contrast_rank_falsification/TOPC_TIE_RATE_m6_K3.json"
+  ]
+}

@@ -87,3 +87,156 @@ def test_variance_analysis_does_not_call_first_variant_winner_when_all_medians_c
     assert out["deployable_winner"] is None
     assert out["deployable_winner_status"] == "NO_MEDIAN_IDENTIFIED_CENSORING"
     assert out["deployable_secondary_order"][0] == "adaptive"
+
+
+def test_typed_greedy_never_beats_exact_minimum_cost():
+    from research_chains.novelty_completion import greedy_typed_completion
+    obligations={"a":"SUPPORT","b":"SUPPORT","c":"QUERY"}
+    items=[
+        EvidenceItem("a","SUPPORT",1.0,frozenset({"a"})),
+        EvidenceItem("b","SUPPORT",1.0,frozenset({"b"})),
+        EvidenceItem("ab","SUPPORT",1.4,frozenset({"a","b"})),
+        EvidenceItem("c","QUERY",0.7,frozenset({"c"})),
+        EvidenceItem("decoy","REFERENCE",0.01,frozenset()),
+    ]
+    exact=minimum_cost_typed_completion(obligations,items)
+    greedy=greedy_typed_completion(obligations,items)
+    assert exact["complete"] and greedy["complete"]
+    assert greedy["cost"] + 1e-12 >= exact["cost"]
+    assert set(exact["selected_types"]) == {"SUPPORT","QUERY"}
+
+
+def test_minimum_cost_typed_completion_matches_exhaustive_enumeration():
+    """Regression for the 2026-09-04 MASTER campaign defect: the retired
+    ``observatory.chains.master`` oracle (commit 418204a) searched item
+    subsets in increasing cardinality order and stopped at the *first*
+    cardinality with any feasible cover, so a cheap cover reachable only at a
+    larger cardinality was never seen (e.g. one expensive item covering
+    everything beat three cheap singletons, purely because it was found at
+    size 1).  This pins the current DP oracle against a brute-force search
+    over *all* subset sizes, in exact Fraction arithmetic, on small random
+    instances -- including instances shaped exactly like the counterexample
+    that exposed the historical bug (one broad expensive item plus several
+    cheap narrow ones).
+    """
+    import itertools
+    import random as _random
+    from fractions import Fraction as F
+
+    def brute_force_min_cost(obligations, items):
+        order = sorted(obligations)
+        n = len(items)
+        best = None
+        for r in range(0, n + 1):
+            for combo in itertools.combinations(range(n), r):
+                covered = set()
+                cost = F(0)
+                for i in combo:
+                    it = items[i]
+                    covered |= set(it.discharges)
+                    cost += F(it.cost).limit_denominator(10 ** 6)
+                if set(order) <= covered:
+                    if best is None or cost < best:
+                        best = cost
+        return best
+
+    # Hand-built counterexample shape: one item covers everything at high
+    # cost; three singletons cover the same ground far more cheaply but only
+    # at a larger subset cardinality.
+    obligations = {"a": "T1", "b": "T1", "c": "T1"}
+    wide = EvidenceItem("wide", "T1", 9.0, frozenset({"a", "b", "c"}))
+    singles = [
+        EvidenceItem("s_a", "T1", 1.0, frozenset({"a"})),
+        EvidenceItem("s_b", "T1", 1.0, frozenset({"b"})),
+        EvidenceItem("s_c", "T1", 1.0, frozenset({"c"})),
+    ]
+    items = [wide] + singles
+    out = minimum_cost_typed_completion(obligations, items)
+    true_min = brute_force_min_cost(obligations, items)
+    assert out["complete"]
+    assert F(out["cost"]).limit_denominator(10 ** 6) == true_min == F(3)
+
+    # Randomized small instances, always checked against exhaustive search.
+    types = ["T1", "T2", "T3"]
+    rng = _random.Random(20260904)
+    for _ in range(60):
+        n_obl = rng.choice([2, 3, 4])
+        obligations = {f"o{j}": rng.choice(types) for j in range(n_obl)}
+        items = []
+        for j in range(n_obl):
+            o = f"o{j}"
+            items.append(EvidenceItem(f"direct_{j}", obligations[o],
+                                      rng.choice([0.25, 0.5, 1.0, 1.5, 2.0]),
+                                      frozenset({o})))
+        for j in range(rng.randint(0, 4)):
+            ty = rng.choice(types)
+            compatible = [o for o, t in obligations.items() if t == ty]
+            if not compatible:
+                continue
+            k = rng.randint(1, len(compatible))
+            items.append(EvidenceItem(f"extra_{j}", ty,
+                                      rng.choice([0.1, 0.2, 0.4, 0.75, 3.0]),
+                                      frozenset(rng.sample(compatible, k))))
+        got = minimum_cost_typed_completion(obligations, items)
+        true_min = brute_force_min_cost(obligations, items)
+        assert got["complete"] and true_min is not None
+        assert F(got["cost"]).limit_denominator(10 ** 6) == true_min
+
+
+def test_probe_typed_completion_draws_always_satisfy_typing_predicate():
+    """Regression for the 2026-09-04 MASTER campaign defect: the retired
+    oracle assigned evidence a cosmetic ``TYPES[i % len(TYPES)]`` label that
+    was never checked against any obligation, so a catalogue with obligations
+    of one type could be silently discharged by evidence declared as a
+    different type -- typing was decorative, not enforced.  This replays the
+    live Observatory generator many times and, for every draw, re-verifies
+    directly (independently of the constructor's internal check) that every
+    catalogue item's discharge set only ever contains obligations whose
+    required type equals that item's declared type, and that both the exact
+    and greedy solvers' selections stay inside that same catalogue.
+    """
+    import random as _random
+    from observatory import equations  # noqa: F401
+    import observatory.chains.master as _M
+    from observatory.schema import Emitter, make_context
+
+    captured = []
+    orig_min = _M.minimum_cost_typed_completion
+    orig_greedy = _M.greedy_typed_completion
+
+    def _capture_min(obligations, items):
+        captured.append((dict(obligations), list(items)))
+        return orig_min(obligations, items)
+
+    _M.minimum_cost_typed_completion = _capture_min
+    try:
+        rng = _random.Random(9)
+        with Emitter(_tmp_path(), make_context("typing-predicate-test", 9)) as em:
+            for draw in range(200):
+                n_obl = rng.choice([4, 5, 6, 7])
+                n_ev = rng.choice([6, 8, 10, 12])
+                _M.probe_typed_completion(
+                    em, {"world_id": f"typing-{draw}", "draw": draw},
+                    rng, n_obligations=n_obl, n_evidence=n_ev)
+    finally:
+        _M.minimum_cost_typed_completion = orig_min
+        _M.greedy_typed_completion = orig_greedy
+
+    assert len(captured) == 200
+    violations = 0
+    for obligations, items in captured:
+        for item in items:
+            for o in item.discharges:
+                if obligations[o] != item.evidence_type:
+                    violations += 1
+    assert violations == 0, (
+        f"typing predicate violated on {violations} discharge(s) across "
+        f"{len(captured)} draws"
+    )
+
+
+def _tmp_path():
+    import tempfile, os
+    fd, path = tempfile.mkstemp(suffix=".jsonl")
+    os.close(fd)
+    return __import__("pathlib").Path(path)

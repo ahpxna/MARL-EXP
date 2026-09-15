@@ -1,0 +1,137 @@
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:47:14: error: Application type mismatch: The argument
+  h e i
+has type
+  ∀ (a b c d f g : Fin 2),
+    rlo e i ≤ raw e (Function.update ![a, b, c, d, f, g] i 1) - raw e (Function.update ![a, b, c, d, f, g] i 0) ∧
+      raw e (Function.update ![a, b, c, d, f, g] i 1) - raw e (Function.update ![a, b, c, d, f, g] i 0) ≤ rhi e i
+but is expected to have type
+  ∀ (a b c d e f : Fin 2), ?m.145 ![a, b, c, d, e, f]
+in the application
+  lift6 (h e i)
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:58:14: error: Application type mismatch: The argument
+  h e
+has type
+  ∀ (a b c d f g : Fin 2),
+    rs e selMin ≤ rs e ![a, b, c, d, f, g] ∧
+      rs e ![a, b, c, d, f, g] ≤ rs e selMax ∧
+        rt e comMin ≤ rt e ![a, b, c, d, f, g] ∧ rt e ![a, b, c, d, f, g] ≤ rt e comMax
+but is expected to have type
+  ∀ (a b c d e f : Fin 2), ?m.93 ![a, b, c, d, e, f]
+in the application
+  lift6 (h e)
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:128:66: error: linarith failed to find a contradiction
+case «0».«1».left
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+x c : Fin 6 → Fin 2
+hxlo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update x i 1) - world s (Function.update x i 0)
+hxhi : world s (Function.update x i 1) - world s (Function.update x i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hclo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update c i 1) - world s (Function.update c i 0)
+hchi : world s (Function.update c i 1) - world s (Function.update c i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hwidth : mix s (rhi 0 i) (rhi 1 i) - mix s (rlo 0 i) (rlo 1 i) ≤ 16 + 2 * s
+heq :
+  mixedDifference (world s) i x c =
+    world s (Function.update x i (x i)) - world s (Function.update x i (c i)) -
+      (world s (Function.update c i (x i)) - world s (Function.update c i (c i)))
+a✝ :
+  world s (Function.update x i ((fun i => i) ⟨0, ⋯⟩)) - world s (Function.update x i ((fun i => i) ⟨1, ⋯⟩)) -
+      (world s (Function.update c i ((fun i => i) ⟨0, ⋯⟩)) - world s (Function.update c i ((fun i => i) ⟨1, ⋯⟩))) <
+    -(16 + 2 * s)
+⊢ False
+failed
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:128:66: error: linarith failed to find a contradiction
+case «0».«1».right
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+x c : Fin 6 → Fin 2
+hxlo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update x i 1) - world s (Function.update x i 0)
+hxhi : world s (Function.update x i 1) - world s (Function.update x i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hclo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update c i 1) - world s (Function.update c i 0)
+hchi : world s (Function.update c i 1) - world s (Function.update c i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hwidth : mix s (rhi 0 i) (rhi 1 i) - mix s (rlo 0 i) (rlo 1 i) ≤ 16 + 2 * s
+heq :
+  mixedDifference (world s) i x c =
+    world s (Function.update x i (x i)) - world s (Function.update x i (c i)) -
+      (world s (Function.update c i (x i)) - world s (Function.update c i (c i)))
+a✝ :
+  16 + 2 * s <
+    world s (Function.update x i ((fun i => i) ⟨0, ⋯⟩)) - world s (Function.update x i ((fun i => i) ⟨1, ⋯⟩)) -
+      (world s (Function.update c i ((fun i => i) ⟨0, ⋯⟩)) - world s (Function.update c i ((fun i => i) ⟨1, ⋯⟩)))
+⊢ False
+failed
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:128:66: error: linarith failed to find a contradiction
+case «1».«0».left
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+x c : Fin 6 → Fin 2
+hxlo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update x i 1) - world s (Function.update x i 0)
+hxhi : world s (Function.update x i 1) - world s (Function.update x i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hclo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update c i 1) - world s (Function.update c i 0)
+hchi : world s (Function.update c i 1) - world s (Function.update c i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hwidth : mix s (rhi 0 i) (rhi 1 i) - mix s (rlo 0 i) (rlo 1 i) ≤ 16 + 2 * s
+heq :
+  mixedDifference (world s) i x c =
+    world s (Function.update x i (x i)) - world s (Function.update x i (c i)) -
+      (world s (Function.update c i (x i)) - world s (Function.update c i (c i)))
+a✝ :
+  world s (Function.update x i ((fun i => i) ⟨1, ⋯⟩)) - world s (Function.update x i ((fun i => i) ⟨0, ⋯⟩)) -
+      (world s (Function.update c i ((fun i => i) ⟨1, ⋯⟩)) - world s (Function.update c i ((fun i => i) ⟨0, ⋯⟩))) <
+    -(16 + 2 * s)
+⊢ False
+failed
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:128:66: error: linarith failed to find a contradiction
+case «1».«0».right
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+x c : Fin 6 → Fin 2
+hxlo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update x i 1) - world s (Function.update x i 0)
+hxhi : world s (Function.update x i 1) - world s (Function.update x i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hclo : mix s (rlo 0 i) (rlo 1 i) ≤ world s (Function.update c i 1) - world s (Function.update c i 0)
+hchi : world s (Function.update c i 1) - world s (Function.update c i 0) ≤ mix s (rhi 0 i) (rhi 1 i)
+hwidth : mix s (rhi 0 i) (rhi 1 i) - mix s (rlo 0 i) (rlo 1 i) ≤ 16 + 2 * s
+heq :
+  mixedDifference (world s) i x c =
+    world s (Function.update x i (x i)) - world s (Function.update x i (c i)) -
+      (world s (Function.update c i (x i)) - world s (Function.update c i (c i)))
+a✝ :
+  16 + 2 * s <
+    world s (Function.update x i ((fun i => i) ⟨1, ⋯⟩)) - world s (Function.update x i ((fun i => i) ⟨0, ⋯⟩)) -
+      (world s (Function.update c i ((fun i => i) ⟨1, ⋯⟩)) - world s (Function.update c i ((fun i => i) ⟨0, ⋯⟩)))
+⊢ False
+failed
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:152:36: error(lean.unknownIdentifier): Unknown identifier `u`
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:154:36: error(lean.unknownIdentifier): Unknown identifier `u`
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:151:21: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  productResponse cornerQ2 (world ?s) ?i ?u
+in the target expression
+  ?m.47 u
+
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+u : response 0 i (respMin i) ≤ response 0 i sorry
+⊢ ?m.47 u
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:153:21: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  productResponse cornerQ2 (world ?s) ?i ?u
+in the target expression
+  ?m.58 u
+
+s : ℝ
+hs : 0 ≤ s
+hs1 : s ≤ 1
+i : Fin 6
+u : response 0 i sorry ≤ response 0 i (respMax i)
+⊢ ?m.58 u
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:163:62: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:163:72: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:170:68: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+/Users/phanan/Documents/Codex/2026-09-07/users-phanan-downloads-cig-amf-evolution/work/lean_next/LeanD6M6SharpnessV1.lean:170:78: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
