@@ -1,0 +1,158 @@
+{
+  "question": "does the Support model contain the generic decision-region problem?",
+  "embedding": "d = m+2; anchor 0; bad tip b_j = 1 - (d-1) e_j; marker p_e = z_e (e_{m+1} - e_{m+2}) with z_e > 0 distinct; K_h = {0} u {b_j : h not in D_j} u {p_e : q_e(h)=1}",
+  "verified_exactly": [
+    "selectedRadius_{K_h}({j}) = 0 iff h in D_j, else (d-1)/2",
+    "p_e in K_h iff q_e(h) = 1",
+    "anchor, bad tips and markers pairwise distinct; markers have coordinate sum 0 and bad tips coordinate sum 1",
+    "the optimal adaptive risk at every hard pathwise budget agrees between the DRD model and the physical model, over ALL deterministic trees"
+  ],
+  "catalog_side_condition": "the permitted queries must be the declared markers; a control that also allows probing bad tips changes the curve on at least one instance",
+  "instances": [
+    {
+      "instance": "4 worlds / 2 decisions / 2 tests",
+      "worlds": 4,
+      "decisions": 2,
+      "tests": 2,
+      "d": 4,
+      "budgets": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "drd_optimal": [
+        "1/2",
+        "0",
+        "0",
+        "0"
+      ],
+      "physical_optimal": [
+        "1/2",
+        "0",
+        "0",
+        "0"
+      ],
+      "identical": true,
+      "with_bad_tip_probes": [
+        "1/2",
+        "0",
+        "0",
+        "0"
+      ],
+      "catalog_restriction_matters": false
+    },
+    {
+      "instance": "6 worlds / 3 decisions / 3 tests",
+      "worlds": 6,
+      "decisions": 3,
+      "tests": 3,
+      "d": 5,
+      "budgets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "drd_optimal": [
+        "2/3",
+        "2/3",
+        "1/3",
+        "1/3",
+        "1/6",
+        "1/6"
+      ],
+      "physical_optimal": [
+        "2/3",
+        "2/3",
+        "1/3",
+        "1/3",
+        "1/6",
+        "1/6"
+      ],
+      "identical": true,
+      "with_bad_tip_probes": [
+        "2/3",
+        "1/3",
+        "0",
+        "0",
+        "0",
+        "0"
+      ],
+      "catalog_restriction_matters": true
+    },
+    {
+      "instance": "8 worlds / 3 decisions / 3 bit tests",
+      "worlds": 8,
+      "decisions": 3,
+      "tests": 3,
+      "d": 5,
+      "budgets": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "drd_optimal": [
+        "1/2",
+        "1/4",
+        "1/8",
+        "1/8",
+        "1/8"
+      ],
+      "physical_optimal": [
+        "1/2",
+        "1/4",
+        "1/8",
+        "1/8",
+        "1/8"
+      ],
+      "identical": true,
+      "with_bad_tip_probes": [
+        "1/2",
+        "1/4",
+        "1/8",
+        "1/8",
+        "1/8"
+      ],
+      "catalog_restriction_matters": false
+    },
+    {
+      "instance": "5 worlds / 2 decisions / 1 uninformative test",
+      "worlds": 5,
+      "decisions": 2,
+      "tests": 1,
+      "d": 4,
+      "budgets": [
+        0,
+        1,
+        2
+      ],
+      "drd_optimal": [
+        "3/5",
+        "3/5",
+        "3/5"
+      ],
+      "physical_optimal": [
+        "3/5",
+        "3/5",
+        "3/5"
+      ],
+      "identical": true,
+      "with_bad_tip_probes": [
+        "3/5",
+        "2/5",
+        "2/5"
+      ],
+      "catalog_restriction_matters": true
+    }
+  ],
+  "not_established": [
+    "an embedding DRD -> Support, not an equivalence of model classes",
+    "numerical evidence on the listed instances, exact per instance; the algebra is a sketch and there is no Lean module",
+    "no claim that the Support paper's own theorems are DRD theorems"
+  ]
+}

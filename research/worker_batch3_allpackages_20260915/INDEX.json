@@ -1,0 +1,91 @@
+{
+  "generated_utc": "2026-09-15T05:54:49Z",
+  "packages": [
+    {
+      "id": "A",
+      "paper": "Support",
+      "script": "scripts/P13_support_decide_exponent.py",
+      "artifact": "research/worker_P13_support_20260915/P13_support_decide_exponent.json",
+      "lean": [
+        "LeanSupportDecideExponentV1 (4 audits)",
+        "LeanSupportTupleCountV1 (3)"
+      ],
+      "result": "k0 (1-s)^N <= R_dec <= B (1-s)^N and (a/(a+1))(1-p_min)^N <= R_rec <= (sum b_i)(1-p_min)^N, by the one-tip-per-class event and a union bound; 105 exact rational checks against P2's joint law, 5 configs x 7 values of N.  No inclusion-exclusion needed.",
+      "open": "the probability (1-s)^N of the fixed tuple is checked, not proved in Lean; the K-class posterior/minimax step is not re-derived"
+    },
+    {
+      "id": "B",
+      "paper": "Structural",
+      "script": "scripts/P14_structural_family_allm.py",
+      "artifact": "research/worker_P14_structural_20260915/P14_structural_family_allm.json",
+      "lean": [
+        "LeanStructuralSaturationV1 (5 audits)"
+      ],
+      "result": "regret from SIGN COUNTS turns the 2^m subset DP into an O(m^2) DAG; eps_nest = 2/(m+4), V_avg = 2/((m+4)(m-1)), ratio = m-1 verified at 28 values of m up to m = 40 (P3 stopped at 14), together with the two saturation conditions the Lean lemma consumes.",
+      "open": "a computation at each m, not an induction; eps_nest SHRINKS like 2/(m+4) -- the ratio grows, the separation level does not"
+    },
+    {
+      "id": "C",
+      "paper": "Functional",
+      "script": "scripts/P10_functional_instantiation.py",
+      "artifact": "research/worker_P10_functional_20260914/P10_functional_instantiation.json",
+      "lean": [
+        "LeanFunctionalHeterogeneousInstanceV1 (7)",
+        "LeanFunctionalGeometryDischargeV1 (4)"
+      ],
+      "result": "the geometric hypotheses are now DERIVED from the cell layout, so the instantiation takes none; all three ordered-pair types are covered and 2472 pairs over 92 in-domain configurations pass the criterion.",
+      "open": "J(w*) = c^2/(n(32+2c^2 H_n)) -- the n must be written; the value at w* is not yet the optimum over the whole design"
+    },
+    {
+      "id": "D",
+      "paper": "D6",
+      "script": "scripts/P7_d6_full_design.py",
+      "artifact": "research/worker_P7_d6_fulldesign_20260914/P7_d6_full_design.json",
+      "lean": [
+        "LeanD6ThreeClassPhaseV1 (7 audits)"
+      ],
+      "result": "the A-pair information is a perfect square cA(q,d)(g-x)^2/2 with cA positive and increasing in d, and its blind line x = g is disjoint from the B-scalar's x = 0 -- the structural reason the mixture wins above T_c.",
+      "open": "the phase boundary and the uniform-in-q law are numerical; t_end is NOT the boundary of the full game"
+    },
+    {
+      "id": "E",
+      "paper": "Query",
+      "script": "scripts/P15_query_hellinger_order.py",
+      "artifact": "research/worker_P15_query_20260915/P15_query_hellinger_order.json",
+      "lean": [
+        "LeanQueryAffinityTestingV1 (9)",
+        "LeanQueryRateAssemblyV1 (4)"
+      ],
+      "result": "dominating level v* exhibited and tail domination verified (ratio 1.000000000 at v*+640); interval E with a_E; c_- = a_E^2/16 and c_+ measured; both orders give N* = Theta(h^{-2r}) with explicit ends.",
+      "open": "the Taylor remainder bounds are measured on a grid, not proved; c_+ is a measured supremum; the spread c_+/c_- is 28x (r=2) and 70x (r=1)"
+    },
+    {
+      "id": "F",
+      "paper": "MASTER",
+      "script": "scripts/P12_master_anchor_required.py",
+      "artifact": "research/worker_P12_master_20260915/P12_master_anchor_required.json",
+      "lean": [
+        "LeanMasterAnchorThresholdV1 (16)",
+        "LeanMasterActiveSetV1 (7)",
+        "LeanMasterGroupCalibrationV1 (5)"
+      ],
+      "result": "at c0 = 1/10 the anchor is MANDATORY: U0 = 0.013773103740 caps every anchor-free design (checked against 4 further allocations including the uniform 1/4 one), one explicit rational design with x0 = 1.374127 reaches L1 = 0.014042993094, and L1 - U0 = 2.698893537968e-04 > 0 in exact Fractions.  Separately, the symmetric family has the exact two-sided threshold c* = (m-1)^2/(m+3)^2 proved in Lean.",
+      "open": "not a threshold for the P8 instance; the alternative set is the finite one; c* and 0.118 are two different instances"
+    }
+  ],
+  "p9_defects_fixed": [
+    "-log(1-H^2) computed with log1p",
+    "the two quadratures are now compared AT THE H^2 SCALE (relative errors 4e-9 to 1.6e-7), not at rho ~ 1",
+    "N_necessary <= N* <= N_sufficient; the ratio is 2.861 at eps=0.05 and 2.431 at eps=0.01 -- the earlier 'within a factor of 2' was wrong"
+  ],
+  "p8_defects_superseded_by_P12": [
+    "the multiplier extraction kept only cuts whose shift equalled the profiling shift, giving an 'upper bound' of 0.0286687 against a primal of 0.0137731",
+    "the claim that no allocation zeroes every M_u is FALSE: the uniform 1/4 allocation does; the right reading is that cancelling the offset costs discrimination",
+    "the bisection on V > baseline + tol certified no threshold"
+  ],
+  "still_open": [
+    "G01-G13 submission work: central theorem per manuscript, claim->theorem->assumption->artifact table, readable proofs, clean dependency closure, related-work at theorem level, empirical protocol",
+    "Adaptive: delta-correctness, tracking, stopping-time tail -- only their composition is proved",
+    "Query step 5: the regret chain from the testing bound back to real decisions"
+  ]
+}

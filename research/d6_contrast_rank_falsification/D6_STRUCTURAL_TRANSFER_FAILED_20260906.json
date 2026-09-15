@@ -1,0 +1,59 @@
+{
+  "chain_note": "negative result, recorded at the same weight as a promotion",
+  "claim_tested": "The near-extremal region can be reached by locating a Top-C tie point and perturbing it, so the m=6 structure transfers to other m as a seeding recipe.",
+  "consequence": "The exact LP ascent is a LOCAL method. It climbs well when seeded inside the basin (1.000440 -> 1.0651 in 17 s, and -> 1.1999 as the StrictTopC margin is relaxed) but it does not find the basin. Testing the conjecture sup 2D/delta = m at m = 4 and m = 8 is therefore BLOCKED on seeding, not on compute.",
+  "development_only": true,
+  "diagnosis": "The obstruction is not locating the tie point, it is the DIRECTION of departure from it. The extremal directions form a measure-zero set in the tangent directions at the tie point, so sampling them fails for the same reason isotropic sampling of worlds fails (addendum B Section 98.2).",
+  "evidence_class": "NUMERICAL_EVIDENCE",
+  "experiments": [
+    {
+      "best_ratio": 0.6666633,
+      "note": "local attractor 2(k-1)/(m-1) = 2/3",
+      "seeding": "random multi-start, m=4"
+    },
+    {
+      "best_ratio": 0.3996854,
+      "note": "local attractor",
+      "seeding": "random multi-start, m=6"
+    },
+    {
+      "best_ratio": 0.7681609,
+      "note": "better than random start, still nowhere near the extremum",
+      "seeding": "tie-perturb from RANDOM tie points, m=6"
+    },
+    {
+      "best_ratio": 0.7909342,
+      "note": "decisive: even standing on the right tie point, random directions fail",
+      "seeding": "tie-perturb from the CORRECT tie point, random directions, m=6",
+      "seeds_clearing_strict_top_c": 2,
+      "trials": 4
+    },
+    {
+      "best_ratio": 1.1999326,
+      "seeding": "the correct direction (i.e. the witness itself), m=6"
+    }
+  ],
+  "protocol_version": "d6_structural_seed_transfer_v1",
+  "status_of_the_conjecture": "sup 2D/delta_square = m is supported at m=6 by a margin sweep converging to 1.2 = 6/5 with deficit linear in the margin (coefficient about 6.7). It is UNTESTED at every other m. Not promoted.",
+  "structure_measured_at_m6": {
+    "all_coordinate_derivative_spreads": 1,
+    "competitor_is_complement_of_selected": true,
+    "conjectured_sup": "m/(m-1) = 6/5",
+    "delta_square": 1,
+    "equals_m": true,
+    "extremal_matrix_note": "F depends almost entirely on t = a cap complement(S); the multilinear form of that part is u + v - w + uv - uvw on Sc = {1,2,3}, plus a correction of [s nonempty] on three columns and [0 in a] on one. This is ONE vertex of the optimal face, not a canonical formula, which is why it was not generalized directly.",
+    "integer_limit_is_a_top_c_tie": true,
+    "integer_limit_values": [
+      -1,
+      0,
+      1,
+      2,
+      3
+    ],
+    "ratio_at_the_tie_point": 0.4,
+    "sup_approached_off_the_tie": 1.1999326,
+    "two_D_at_limit": 6
+  },
+  "verdict": "FALSE as a seeding strategy",
+  "what_would_unblock": "Solve for the direction instead of sampling it. At a tie point the limiting ratio along a direction d is a ratio of directional derivatives, and the Top-C selection is decided by the sign pattern of d on the tied scores. Maximizing the limit over d on the tangent cone at the tie point is again a linear-fractional problem, hence an LP over a finite set of sign patterns. That is a construction, not a search, and it would produce seeds at every m."
+}

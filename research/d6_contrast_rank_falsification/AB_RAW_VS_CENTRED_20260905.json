@@ -1,0 +1,43 @@
+{
+  "protocol_version": "d6_ab_raw_vs_centred_v1",
+  "evidence_class": "NUMERICAL_AB_COMPARISON_WITH_POSITIVE_CONTROL",
+  "development_only": true,
+  "generated_utc": "2026-09-05T22:20:49.951851+00:00",
+  "question": "Does the RAW local contrast rank one hypothesis (D6-prime) survive the same falsification search that kills the centred one (D6)?",
+  "design": "Identical script, seed, corner, fibre count, optimizer, snapping and StrictTopC gate. The only difference is --fiber-kind. The centred arm is a POSITIVE CONTROL: it must find a violation, and it does, reproducing the recorded record B3small_m6_d16_s13 to the digit.",
+  "arms": {
+    "centred": {
+      "status": "KILLED",
+      "best_exact_ratio": "13377550871789472669355898295037/11521333580748990157598809214010",
+      "best_exact_ratio_float": 1.1611113225765841,
+      "best_float_ratio": 1.1666069379538533,
+      "wall_clock_seconds": 2812.924,
+      "fiber_dim": 70
+    },
+    "raw": {
+      "status": "NO_EXACT_COUNTEREXAMPLE_FROM_NUMERICAL_LEADS",
+      "best_exact_ratio": "5685094228500326236456130851483/5931145543076801842562502962790",
+      "best_exact_ratio_float": 0.9585153807490558,
+      "best_float_ratio": 0.9602557582657572,
+      "wall_clock_seconds": 1592.535,
+      "fiber_dim": 64
+    }
+  },
+  "reading": "Control KILLED at 1.1611; raw arm found no counterexample and topped out at 0.958515, below 1, at matched budget. First real evidence for D6-prime.",
+  "caveats": [
+    "--snap both was used. The 'project' snapping branch can leave V^raw_phi, so some raw-arm leads may not have satisfied the hypothesis. This dilutes the search; it does not turn a null into a false null, but the clean run is --snap coefficients.",
+    "The exact recheck in this script verifies CENTRED rank one (exact_rankone_verified_count), not raw rank one. The raw arm's witnesses are in the fibre by construction of the basis, not by an independent certificate.",
+    "One corner (corner 0), one seed (13), one denominator (16), 24 fibres. A null at one budget point.",
+    "A per-fibre float search maximises a LOWER bound and is path dependent. This is evidence, never proof. D6-prime remains OPEN.",
+    "The raw arm topped out at 0.9585, only 4.3% under the bound. That is NOT a comfortable margin: a modest budget increase could still cross 1."
+  ],
+  "next": [
+    "Replicate across seeds and denominators, as was done for the centred arm.",
+    "Rerun both arms with --snap coefficients so the raw arm's leads provably stay in the fibre.",
+    "Extend the exact recheck to verify raw rank one directly (raw contrast matrix rank <= 1 per coordinate)."
+  ],
+  "artifacts": [
+    "research/d6_contrast_rank_falsification/ABsweep_centred_m6_K3_s13_d16.json",
+    "research/d6_contrast_rank_falsification/ABsweep_raw_m6_K3_s13_d16.json"
+  ]
+}

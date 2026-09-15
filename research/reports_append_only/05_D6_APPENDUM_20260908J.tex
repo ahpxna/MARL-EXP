@@ -1,0 +1,82 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update J: RETRACTION. The information-limit constant of Section 148 is not a bound on the D6 loss, because regret is not the set distance --- it is about a fifth of it}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (sixth update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--153, including addenda A--I, are an immutable prefix. Nothing below is removed. Sections 148, 149 and 151 are \emph{corrected} here, and the correction is a retraction, not a narrowing.
+
+\section*{154. The defect}
+Sections 148 and 151 asserted a lower bound $V\ge k(k-1)/(2k-1)$ for the D6 selection problem, resting on the step
+\begin{center}\scriptsize\oldclaim{$r_F(S)=|S\setminus T^\star_F|$ on the permutation family}\end{center}
+which was never proved and is not true. The real objects are
+\[L_F(S)=\tfrac12\,\mathrm{osc}\Big(x\mapsto F(x)-\!\!\sum_{j\in S}Q_j(x_j)\Big),\quad Q_j=\text{\texttt{productResponse}},\]
+and $r_F(S)=L_F(S)-\min_{|T|=k}L_F(T)$. The module \texttt{Lean\allowbreak D6\allowbreak Information\allowbreak LimitV1} contains no occurrence of $L_F$, of $Q$, or of $\delta_\square$: it defines \texttt{regretOn S T} $=|S\setminus T|$ and reasons about that. So it proves a counting identity over \texttt{Finset}s and nothing about the D6 loss.
+\claimbox{\textbf{The LP of Section 148 computed the value of a game I wrote down, not of the D6 problem.} Its payoff was posited to be $|S\setminus T^\star|$. That posit is the entire content of the missing link, and it is false.}
+
+\section*{155. Measuring the real constant}
+The family is realisable. For degree-two multilinear $F$ on $\{0,1\}^6$ with uniform product reference, $Q_j$ is identical across $j\in U$ exactly when $2a_j+\sum_{l\ne j}b_{jl}$ is constant on $U$ --- a solvable linear condition, so worlds with a common observable profile can be \emph{constructed} rather than searched for. Of $9000$ such constructions at $\delta_\square=1$, \textbf{$5894$ have a unique optimal $k$-set}, so the indistinguishability construction does work: distinct optima behind one profile.
+
+What fails is the size of the regret. Writing $c=\min_{S\neq T^\star} r_F(S)/|S\setminus T^\star|$:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r}
+\toprule
+ & $c$\\
+\midrule
+assumed in §148 (implicitly) & $1$\\
+best of $9000$ random constructions & $5/32=0.1563$\\
+best after hill-climbing on $(b,K)$ & $\mathbf{15/68=0.2206}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Hence the honest form of the bound is $V\ge c\cdot k(k-1)/(2k-1)$, and what is currently \emph{achieved} at $m=6$ is
+\[V\ \ge\ \tfrac{15}{68}\cdot\tfrac65\ =\ 0.2647,\]
+against the $1.2$ reported in Section 148 --- an overstatement by a factor of $4.53$.
+
+\textbf{One earlier conclusion of mine here was also wrong and is corrected in place.} A first pass concluded $V=0$ on the family, from constructions in which every $k$-subset tied. That was an artifact of setting the free constant $K=0$, which forces the effective slope $g_j=a_j+\tfrac12 s_j$ to vanish and so removes the $S$-dependence entirely. With $K\ne0$ unique optima are the norm, not the exception. \eclass{RETRACTED before reporting}
+
+\section*{156. What this does to Section 149}
+Section 149 claimed the closed form \emph{supersedes} the proposed target $V\ge m/5$, since $k(k-1)/(2k-1)$ exceeds $m/5$ for $m>6$.
+\claimbox{\textbf{Section 149 is withdrawn.} At $m=6$, $m/5=1.2$ while the constant actually achieved is $0.2647$. The comparison set a game value against a D6 target as though they measured the same thing. They do not: one is the value of an abstract $|S\setminus T|$ game, the other a claim about $L_F$. The $m/5$ target is not weaker than what is in hand --- it is \emph{stronger than anything now established}, and remains open.}
+The one part of Section 149 that survives is structural and unaffected: the permutation family is defined directly at every even $m$, so whatever constant it yields needs no block composition and no $m{=}10$ witness. That was never the disputed step.
+
+\section*{157. What must be proved, precisely}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{l X X}
+\toprule
+Link & Statement & Status\\
+\midrule
+1 & common $Q$ $\Rightarrow$ any selector reading $Q$ is constant on the family & \eclass{PROVED, but a tautology}: it assumes the common-$Q$ hypothesis rather than establishing it\\
+1' & $\exists\{F_T\}_{T}$ with $Q(F_T)$ independent of $T$, $\delta_\square(F_T)\le1$, $\arg\min L_{F_T}=T$ & \eclass{VERIFIED NUMERICALLY} ($5894/9000$); \textbf{not formalised}, and the missing piece Section 151 did not name\\
+2 & $r_F(S)\ \ge\ c\,|S\setminus T^\star_F|$ for an explicit $c>0$ & \eclass{FALSE at $c=1$}; \eclass{NUMERICAL} at $c=15/68$; \textbf{no proof at any $c$}\\
+3 & $\sum_{T}|S\setminus T|=|S|\binom{|U|-1}{r}$, and worst $\ge$ average & written, names checked, \eclass{AWAITING COMPILE}; elementary and probably classical\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Link 3 is the only one the new module addresses, and it is the easy one. \textbf{Link 2 is the whole problem}, and it is a statement about $\mathrm{osc}$ of a residual, not about set combinatorics --- so the averaging identity is the right engine attached to no drivetrain.
+
+\section*{158. Sequencing, corrected again}
+MASTER Section 76 ranked compiling the information-limit module first, on the reasoning that success would make a bound at every even $m$ \eclass{PROVED} in one step. \textbf{That ranking was based on the overstatement and is void.} Compiling the module is still worth doing --- it is cheap and the identity is reusable --- but it closes nothing about D6.
+\begin{itemize}
+\item The $\chi\ge5$ kernel promotion moves to first: its content is confirmed true, and it removes a real \texttt{ofReduceBool} exposure.
+\item For D6, the next real step is Link 2: either prove $r_F(S)\ge c|S\setminus T^\star|$ with an explicit constant on a constructed family, or find the obstruction that forces $c$ small. The measured $c\approx0.22$ from degree-two $F$ over a binary domain with uniform reference is a \emph{lower} bound on the achievable constant; higher degree, larger alphabets, or a non-uniform reference may raise it, and none of those has been tried.
+\item The frontier programme ($R_m(\mu)=m-\tfrac m2\mu$, $m{=}10$ gap) is untouched by any of this and remains the direction with proved upper bounds and exactly certified lower bounds at $m=6,8$.
+\end{itemize}
+\end{document}

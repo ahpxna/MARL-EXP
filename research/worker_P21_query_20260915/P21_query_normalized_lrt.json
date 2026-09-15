@@ -1,0 +1,113 @@
+{
+ "script": "P21_query_normalized_lrt.py",
+ "crossover": {
+  "c_g0": 0.015239303818811807,
+  "k_g0": 3.7015109210507022,
+  "c_u": 0.00028554677194763523,
+  "k_u": 1.8749593342955968,
+  "crossover_h": 0.11332999591261489,
+  "reading": "BELOW h = 0.1133 the lower-order measurement u is the more informative one, as the order law says.  ABOVE it the constants dominate and the r = 2 measurement g0 wins.  The runs above use h = 0.6, which is ABOVE the crossover: the sample counts there must NOT be read as evidence about the order."
+ },
+ "negative_control_raw_comparator_H2": 2.9146199224379683e-33,
+ "rows": [
+  {
+   "measurement": "g0_normalised",
+   "normalisation": "E_pi[g^2] = 1",
+   "pilot_h": [
+    0.4,
+    0.3,
+    0.2,
+    0.15,
+    0.1
+   ],
+   "pilot_H2": [
+    0.00027726075400006484,
+    0.00013168870304483668,
+    3.703053641701522e-05,
+    1.3591203804621736e-05,
+    3.030080778239448e-06
+   ],
+   "local_exponent_2r": [
+    2.587987426898431,
+    3.1289941376552814,
+    3.4841242204346754,
+    3.7015109210507022
+   ],
+   "r_estimate": 1.8507554605253511,
+   "h_run": 0.6,
+   "H2_at_h_run": 0.0004921788077915196,
+   "L": 0.0004922999675374096,
+   "N_chosen": 4678,
+   "N_rule": "ceil(log(1/(2*eps))/L) with eps = 0.05, chosen from the PILOT",
+   "reps_per_world": 4000,
+   "error_world_A": 0.015,
+   "error_world_B": 0.0135,
+   "equal_prior_error": 0.014249999999999999,
+   "se": 0.0013250913883577993,
+   "ci95": [
+    0.011652820878818712,
+    0.016847179121181284
+   ],
+   "bracket_lower_rho2N_over_4": 0.0024980300008577566,
+   "bracket_upper_rhoN_over_2": 0.04998029612615112,
+   "inside_bracket_within_3se": true
+  },
+  {
+   "measurement": "u_normalised",
+   "normalisation": "E_pi[g^2] = 1",
+   "pilot_h": [
+    0.4,
+    0.3,
+    0.2,
+    0.15,
+    0.1
+   ],
+   "pilot_H2": [
+    3.864833556102405e-05,
+    2.615594558745076e-05,
+    1.3588135656267204e-05,
+    8.144827119070189e-06,
+    3.808183970124471e-06
+   ],
+   "local_exponent_2r": [
+    1.3571481079530485,
+    1.6151315674507527,
+    1.7790959756305988,
+    1.8749593342955968
+   ],
+   "r_estimate": 0.9374796671477984,
+   "h_run": 0.6,
+   "H2_at_h_run": 5.615201237450183e-05,
+   "L": 5.615358895776784e-05,
+   "N_chosen": 41006,
+   "N_rule": "ceil(log(1/(2*eps))/L) with eps = 0.05, chosen from the PILOT",
+   "reps_per_world": 4000,
+   "error_world_A": 0.0145,
+   "error_world_B": 0.0155,
+   "equal_prior_error": 0.015,
+   "se": 0.0013589977924926883,
+   "ci95": [
+    0.01233636432671433,
+    0.017663635673285667
+   ],
+   "bracket_lower_rho2N_over_4": 0.0024997551329477446,
+   "bracket_upper_rhoN_over_2": 0.049997551269514634,
+   "inside_bracket_within_3se": true
+  }
+ ],
+ "evidence_classes": {
+  "H2_curve_and_exponent": "NUMERICAL (quadrature on a fixed grid)",
+  "LRT_error": "MONTE CARLO with a reported 95% CI",
+  "testing_bracket": "THEOREM (LeanQueryAffinityTestingV1); used here only to check the simulation lands inside it"
+ },
+ "not_established": [
+  "The fitted exponent is a local slope on a finite h grid; it is NOT a certificate of H^2 ~ h^{2r}.",
+  "N was chosen from the pilot BEFORE the run, so the Monte Carlo is not tuned to the answer; but it is still a simulation, not a bound.",
+  "Normalising to E_pi[g^2] = 1 fixes the amplitude only.  A full same-cost comparison also needs the measurement price, which this harness holds equal by construction (one observation per sample, either measurement)."
+ ],
+ "lean": [
+  "LeanQueryAffinityTestingV1 (the bracket)",
+  "LeanQuerySampleComplexityV1 (log sandwich, Nat.ceil)",
+  "LeanQueryGaussianLevelV1 (why the order is r, not 1)"
+ ]
+}

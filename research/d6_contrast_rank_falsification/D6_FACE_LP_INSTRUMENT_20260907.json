@@ -1,0 +1,46 @@
+{
+  "defects_found_and_fixed": [
+    {
+      "defect": "iterate and accept were conflated",
+      "effect": "one iterate missing the StrictTopC gate aborted the whole start, discarding the trajectory before convergence",
+      "fix": "always advance on the LP iterate; record only admissible points",
+      "measured": "28 of 30 faces looked infeasible at m=4"
+    },
+    {
+      "defect": "box passed via linprog `bounds` instead of A_ub",
+      "effect": "a variable resting on a bound is an active constraint, but bounds passed separately are invisible to exact vertex recovery, which then cannot reach full rank",
+      "fix": "box rows in A_ub",
+      "measured": "DEGENERATE_ACTIVE_SET on 10 of 30 faces; 0 after the fix"
+    },
+    {
+      "defect": "taking the LP vertex",
+      "effect": "the vertex is maximally degenerate and the Top-C tie-break flips S, so the point leaves the face the LP linearised",
+      "fix": "rational line search from the incumbent toward the vertex, admissible points only",
+      "measured": "feasible faces 4 -> 16, best 1/3 -> 0.666 after adding the exact line search"
+    }
+  ],
+  "design": "Enumerate (S,T) exhaustively -- the dimension the tie-locus LP wrongly froze to one choice -- and obtain the four extremal points by pattern iteration. delta_square<=1 is convex and needs no pattern; the competitor loss is bounded ABOVE by aux p,q with the objective subtracting (p-q), which is the safe direction; T is forced to be the argmin by p-q <= G_U(aU+)-G_U(aU-) for every other U. No tie locus at all.",
+  "development_only": true,
+  "evidence_class": "NUMERICAL_EVIDENCE",
+  "honest_verdict": "THE POLYHEDRAL ROUTE IS CURRENTLY WORSE THAN THE STOCHASTIC SEARCH IT WAS MEANT TO REPLACE. At m=4 the face LP reaches 0.666 while the stochastic sweep reached 0.905106 on the same space. This is not a tuning gap to be closed by more starts: the face LP converges to 2(k-1)/(m-1), which equals 2/3 at m=4 and 4/5 at m=6.",
+  "instrument": "scripts/run_d6_face_enumeration_lp.py",
+  "measured_m4": {
+    "best_ratio": "16768711/25165824",
+    "best_ratio_float": 0.666329,
+    "faces_feasible": 16,
+    "faces_visited": 30,
+    "failure_reasons": {
+      "LP_INFEASIBLE_OR_UNBOUNDED": 8,
+      "NO_ADMISSIBLE_STEP": 6
+    }
+  },
+  "next_cheap_test": "Seed each face with a KNOWN good world instead of random starts (--seed-world). Improving a known point is the one thing the ascent was reliably good at: 1.000440 -> 1.065131 in 17 s. If the face LP cannot improve the m=6 witness either, the polyhedral route should be set aside rather than tuned further.",
+  "non_claims": [
+    "Nothing here bears on the (m-1) law, which is PROVED FALSE in Lean.",
+    "The reported numbers are lower bounds over visited faces, never c*."
+  ],
+  "protocol_version": "d6_face_enumeration_lp_v1",
+  "target": "c*(m) = sup 2D/delta_square on the binary cube under StrictTopC",
+  "the_recurring_attractor": "2(k-1)/(m-1) has now captured THREE independent local instruments: the original exact LP ascent, tie-point perturbation, and the face enumeration LP. The stochastic search exceeds it (0.905 > 2/3 at m=4), so the geometry has better regions that no local polyhedral method has reached. That is the finding, and it is a finding about the methods, not about c*.",
+  "what_this_means_for_the_programme": "Every instrument built so far returns a LOWER bound, and they disagree with each other. c*(m) will not be settled by a better search. It needs an UPPER bound, i.e. a proof. The face LP would supply one only if the family were enumerated completely, which is 6.4e9 faces at m=6 and 2e13 at m=8."
+}

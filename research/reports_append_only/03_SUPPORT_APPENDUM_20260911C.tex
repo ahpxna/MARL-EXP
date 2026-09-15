@@ -1,0 +1,64 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 3 - Support Sufficiency}\\[2pt]
+{\large\itshape Append-only update C: six modules, twenty-four audited names, and a two-sided counterexample showing obstruction order does not determine query cost}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September (backlog entry)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--62 are an immutable prefix. This addendum begins at Section 63.
+
+\claimbox{\textbf{Why this entry exists.} A ledger audit on 11 September found that of \textbf{384} theorem names audited since 9 September across \textbf{96} modules, \textbf{381} appeared in no \texttt{.tex} file, together with roughly forty experiment artifacts and two research documents. This addendum enters that chain's share of the backlog.}
+
+\section*{63. The modules}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r X}
+\toprule
+Module & names & Content\\
+\midrule
+\texttt{ThreeWorldWitness} & $5$ & \texttt{pairwise\_not\_sufficient\_in\_support\_model}, \texttt{radius\_formula}, \texttt{zeroRegret\_spec}\\
+\texttt{MultiTipGeometry} & $5$ & \texttt{radius\_formula}, \texttt{zero\_radius\_iff}, \texttt{dense\_unique\_safe}, \texttt{physical\_membership\_iff}\\
+\texttt{UnboundedObstruction} & $5$ & \texttt{full\_fibre\_not\_half\_safe}, \texttt{every\_proper\_subfamily\_safe}, \texttt{one\_query\_sound}\\
+\texttt{PhysicalQueryContract} & $4$ & \texttt{concrete\_contract\_sound}, \texttt{physical\_query\_sound}, \texttt{total\_component\_radius}\\
+\texttt{CardinalityQueryLaw} & $3$ & \texttt{adaptive\_cardinality\_lower}, \texttt{adaptive\_cardinality\_attained}\\
+\texttt{AdaptiveQuerySeparation} & $2$ & \texttt{adaptive\_depth\_lower}, \texttt{adaptive\_depth\_attained}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{64. The abstract obstruction is now realised in the actual geometry}
+Section 61 recorded that \texttt{pairwise\_separation\_not\_sufficient} was proved against \texttt{toyRegret}, an abstract regret on $\mathsf{Finset}(\mathsf{Fin}\,2)\to\mathsf{Fin}\,3$, and that nothing showed the obstruction occurs in the support-radius model. \texttt{Lean\allowbreak Support\allowbreak Three\allowbreak World\allowbreak WitnessV1} closes that gap: three worlds with support $\{$anchor$,\ \mathrm{tip}\}$, component $j$ reading coordinate $j$, and regret given by the actual \texttt{selectedRadius}, i.e.\ half the oscillation of the omitted relations. Radii $(0,0,1)$, $(1,0,0)$, $(0,1,0)$ give zero-regret sets $\{0,1\}$, $\{1,2\}$, $\{0,2\}$: every pair intersects, the triple does not.
+\claimbox{\eclass{PROVED} on \texttt{selectedRadius}, no \texttt{native\_decide}; the only two \texttt{decide} calls are on $\mathsf{Finset}(\mathsf{Fin}\,3)$. The obstruction is a property of the support geometry, not of an abstract API.}
+
+\section*{65. Obstruction order does not determine query cost --- both directions}
+Two families, deliberately opposed:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Family & Finding\\
+\midrule
+\texttt{UnboundedObstruction} & obstruction of order $m$ surviving normalisation at $\varepsilon=1/2$ (\texttt{full\_fibre\_not\_half\_safe}, \texttt{every\_proper\_subfamily\_safe}), yet \textbf{one} membership query suffices (\texttt{one\_query\_sound})\\
+\texttt{CardinalityQueryLaw} & with exactly $s<m$ possible tips, the adaptive optimum is \textbf{exactly} $s$: \texttt{adaptive\_cardinality\_lower} and \texttt{adaptive\_cardinality\_attained} match\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{The order of the minimal obstruction is not the right cost parameter.} One family has a large obstruction and trivial cost; the other has a tight cost law tracking a different quantity. Any proposal to sell ``obstruction size determines difficulty'' as a principle is refuted by the first family --- and that principle also has prior art in the proper-learning/Helly line, so it was not available in any case.}
+
+\section*{66. Scope and experiments}
+\texttt{support\_geometry\_query\_tradeoff} and \texttt{support\_order\_vs\_queries}, plus the earlier \texttt{support\_critical\_identification} ($500$ instances at $m{=}4$, $k{=}2$, $\varepsilon{=}0.05$: $5.276$ queries against $9.21$ random, \texttt{development\_only}, \texttt{false\_safe\_count} $=0$). The comparison there is against \emph{random} only; no baseline from the decision-region literature has been run, so no claim of advantage over that line is made. Prior art remains close at the problem-definition layer, and the outstanding task is a query-complexity law for unknown feasible support with $\varepsilon$-good decisions, stated in a model those results do not already cover.
+\end{document}

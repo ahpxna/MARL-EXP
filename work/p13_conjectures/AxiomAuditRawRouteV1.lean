@@ -1,0 +1,22 @@
+import «LeanD6RawLocalContrastRankOneV1»
+import «LeanD6RawRankOneReconstructionV1»
+import «LeanD6RawRankOneMultiaffineV1»
+import «LeanD6RawRankOneNormalFormV1»
+
+open CIGAMF.P13.D6RawLocalContrastRankOne
+open CIGAMF.P13.D6RawRankOneReconstruction
+open CIGAMF.P13.D6RawRankOneMultiaffine
+open CIGAMF.P13.D6RawRankOneNormalForm
+
+#print axioms rawLocalContrastRankOne_iff_minors_zero
+#print axioms rawLocalContrastRankOne_iff_aligned
+#print axioms not_rawLocalContrastRankOne_of_misaligned
+#print axioms binary_allCoordinatesRawLocalContrastRankOne
+#print axioms rawLocalContrastRankOne_interpolation
+#print axioms inactive_coordinate_constant
+#print axioms rawRankOne_partial_reconstruction
+#print axioms rawRankOne_corner_reconstruction
+#print axioms bernstein_mem_monomialSpan
+#print axioms rawRankOne_mem_monomialSpan
+#print axioms rawRankOne_exists_multiaffine_coefficients
+#print axioms rawRankOne_normal_form_const_plus_interaction

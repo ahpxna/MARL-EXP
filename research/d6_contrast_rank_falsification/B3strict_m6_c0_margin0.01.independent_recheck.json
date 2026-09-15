@@ -1,0 +1,67 @@
+{
+  "analysis_version": "b3_strict_topc_kill_independent_recheck_v1",
+  "evidence_class": "EXACT_RATIONAL_RECHECK_OF_AN_EXISTING_ARTIFACT",
+  "development_only": true,
+  "analyzes_artifact": "research/d6_contrast_rank_falsification/B3strict_m6_c0_margin0.01.json",
+  "analyzes_artifact_sha256": "958746ee67f199f125240a32aafa3162e460a1c8414270feee115e5fbec49850",
+  "claim_refuted": "AllCoordinatesInteractionContrastRankOne(q,F) => 2D <= (m-1) delta_square",
+  "refuted_under": "StrictTopC (unique, strictly separated Top-C selection) AND the plain form",
+  "independent_recheck": {
+    "recomputed_with": "scripts/run_d6_rankone_falsification.evaluate_candidate",
+    "m": 6,
+    "alphabet": 3,
+    "reference": "corner [0,0,0,0,0,0]",
+    "reference_nonnegative": true,
+    "reference_rows_sum_to_one": [
+      "1",
+      "1",
+      "1",
+      "1",
+      "1",
+      "1"
+    ],
+    "rank_one_all_coordinates": true,
+    "rank_one_failure": null,
+    "delta_square": "1362011424089/3713996016640",
+    "delta_square_positive": true,
+    "doubled_decision_gap": "28590604060775897113/13848878336707814400",
+    "m_minus_one_delta": "1362011424089/742799203328",
+    "strict_violation": true,
+    "exact_ratio": "28590604060775897113/25393579342714531575",
+    "exact_ratio_float": 1.1258989398427834,
+    "max_world_denominator": 13848878336707814400
+  },
+  "strict_top_c": {
+    "coordinate_scores": [
+      "178515898944497729/512921419878067200",
+      "4667084389465037/13380558779427840",
+      "2414493880749823/6920978679014400",
+      "790315241911618103/2308146389451302400",
+      "54654101277632641/159182509617331200",
+      "4734210630288941497/13848878336707814400"
+    ],
+    "all_scores_distinct": true,
+    "selected": [
+      0,
+      1,
+      2
+    ],
+    "min_selected_score": "178515898944497729/512921419878067200",
+    "max_unselected_score": "54654101277632641/159182509617331200",
+    "strict_holds": true,
+    "margin": "174791560073653/37228167571795200",
+    "margin_float": 0.00469514272322333,
+    "margin_relative_to_delta_square": 0.01280293326707682,
+    "selection_is_forced": true,
+    "note": "Unlike B3fiber_rankone_m6_corner0_KILLED.json, whose six scores were all exactly 13/37 so that Top-C was decided by an index-order tie-break, every score here is distinct and the selected set is the unique Top-C set. The violation is therefore NOT an artifact of the tie-break convention."
+  },
+  "context": {
+    "subsets_exceeding_bound": 1,
+    "subsets_total": 20,
+    "note": "Only the Top-C set is claimed about, and under StrictTopC that set is forced, so the 1-of-20 count carries none of the weight it carried for the tied witness."
+  },
+  "m4_comparison": {
+    "note": "The same sweep at m=4 (margins 0.01..0.2) produced strict admissible ratios 0.865891, 0.932561, 0.938771, 0.966691, 0.975579 -- all below 1. The strict violation appears at m=6 and not at m=4 in this search, which is consistent with (m-1) being too small a constant as m grows, but that is a hypothesis, not a measurement."
+  },
+  "limits": "One exact witness at one corner reference at m=6, K=3. It refutes the universally quantified claim, which needs only one counterexample, and the refutation is exact. It says nothing about what the correct constant is."
+}

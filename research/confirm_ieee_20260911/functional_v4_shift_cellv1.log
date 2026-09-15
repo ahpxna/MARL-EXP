@@ -1,0 +1,131 @@
+{
+  "protocol_version": "functional_variance_stopping_v4_permuted_random_extrema",
+  "development_only": true,
+  "world_audit": {
+    "instances": 1000,
+    "zero_information_accuracy": 0.092,
+    "zero_information_accuracy_expected_if_unbiased": 0.1,
+    "extrema_always_at_endpoints_fraction": 0.0,
+    "distinct_true_topk_sets": 10,
+    "distinct_topk_sets_possible": 10,
+    "permute_relations": true,
+    "random_extrema": true,
+    "extrema_shift": 0.5,
+    "confound_removed": true,
+    "note": "v3 reported zero_information_accuracy 1.0 and extrema_always_at_endpoints_fraction 1.0; its Top-k claims are therefore not supported by that panel."
+  },
+  "primary_endpoint": "N_certificate",
+  "scientific_headline": "query/functional geometry controls certification complexity",
+  "common_random_streams": true,
+  "rng_protocol": "instance_cell_v1",
+  "cross_horizon_common_world_and_cell_prefixes": true,
+  "fixed_confidence": 0.95,
+  "confidence_method": "finite-horizon Bonferroni over every possible per-cell sample size; fixed-n Student t (unknown sigma) or normal (oracle known sigma)",
+  "adaptive_stopping_coverage_contract": "union over n=2..max_n, not realized-look-only calibration",
+  "pilot_fraction": 0.15,
+  "deployable_variants": [
+    "uniform",
+    "C_split",
+    "C_pilot",
+    "C_shrink",
+    "C_anytime"
+  ],
+  "diagnostic_variants": [
+    "C_known_sigma",
+    "C_extrema_oracle"
+  ],
+  "known_sigma_policy": "oracle diagnostic ceiling only; excluded from deployable winner",
+  "instances_per_seed": 100,
+  "seeds": [
+    701,
+    709,
+    719,
+    727,
+    733,
+    743,
+    751,
+    757,
+    761,
+    769
+  ],
+  "relations": 5,
+  "actions": 6,
+  "topk": 2,
+  "max_n": 131072,
+  "by_variant": {
+    "uniform": {
+      "median_N_certificate": 74348.0,
+      "median_censored_N_certificate": 74348.0,
+      "restricted_mean_censored_N_certificate": 76688.671,
+      "certificate_fraction": 0.597,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.31323695995234957
+    },
+    "C_split": {
+      "median_N_certificate": 61953.0,
+      "median_censored_N_certificate": 61953.0,
+      "restricted_mean_censored_N_certificate": 76649.328,
+      "certificate_fraction": 0.693,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.39252372608857583
+    },
+    "C_pilot": {
+      "median_N_certificate": 38989.0,
+      "median_censored_N_certificate": 38989.0,
+      "restricted_mean_censored_N_certificate": 63706.468,
+      "certificate_fraction": 0.733,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.29514007582325247
+    },
+    "C_shrink": {
+      "median_N_certificate": 38685.0,
+      "median_censored_N_certificate": 38685.0,
+      "restricted_mean_censored_N_certificate": 63774.444,
+      "certificate_fraction": 0.731,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.2948041221852304
+    },
+    "C_anytime": {
+      "median_N_certificate": 29820.0,
+      "median_censored_N_certificate": 29820.0,
+      "restricted_mean_censored_N_certificate": 54363.696,
+      "certificate_fraction": 0.76,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.37732123230776743
+    },
+    "C_known_sigma": {
+      "median_N_certificate": 29364.0,
+      "median_censored_N_certificate": 29364.0,
+      "restricted_mean_censored_N_certificate": 53927.072,
+      "certificate_fraction": 0.76,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.3781757143027191
+    },
+    "C_extrema_oracle": {
+      "median_N_certificate": 26228.0,
+      "median_censored_N_certificate": 26228.0,
+      "restricted_mean_censored_N_certificate": 51829.203,
+      "certificate_fraction": 0.769,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.3835207890227541
+    }
+  },
+  "allocation_policy": "uniform round-robin; >=20% least-sampled exploration for every adaptive policy; fixed-driver exploitation maximizes sigma^2/[n(n+1)]",
+  "deployable_winner_by_median_N_certificate": "C_anytime",
+  "deployable_winner_status": "IDENTIFIED_BY_MEDIAN",
+  "deployable_secondary_order": [
+    "C_anytime",
+    "C_pilot",
+    "C_shrink",
+    "C_split",
+    "uniform"
+  ],
+  "censoring_note": "do not name a median-N winner when the best median is max_n+1 or tied; certificate_fraction/RMST-like summaries are secondary diagnostics"
+}

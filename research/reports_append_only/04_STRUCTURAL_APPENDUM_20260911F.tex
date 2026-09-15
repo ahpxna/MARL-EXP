@@ -1,0 +1,54 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update F: a retracted reading, the exact tolerance curve, and a corrected census}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--79 are an immutable prefix. This addendum begins at Section 80. Nothing earlier is edited; Section 80 states what was wrong and why.
+
+\section*{80. Retraction: the lower bound was never loose by a factor of two}
+\textbf{Retracted.} \oldclaim{The normalized lower bound holds only for $\varepsilon \le 1/(4r)$, is loose by exactly $2\times$ against the $1/(2r)$ threshold, and tightening it is this chain's cheapest remaining Lean target.}
+
+That reading was wrong, and the reason is worth recording because it is a repeatable mistake: \emph{I read the wrapper instead of the theorem.} In \texttt{LeanStructuralStaircaseToleranceLowerV1}, the theorem \texttt{normalized\_tolerance\_lower} carries the hypothesis
+\[ 2r\varepsilon < 1, \qquad\text{that is}\qquad \varepsilon < \tfrac{1}{2r}, \]
+the full range, and it was already proved. The constant $1/4$ appears only in \texttt{LeanStructuralNormalizedToleranceLawV1.normalized\_lower}, which instantiates $r = \lfloor 1/(4\varepsilon)\rfloor$ in order to state the bound as a function of $\varepsilon$ \emph{alone}. That factor is the slack the floor function needs to turn an $r$-indexed statement into an $\varepsilon$-indexed one; it is not the strength of the bound. No factor of two was ever missing, and no Lean work was needed.
+\claimbox{Rule, stated so it can be checked next time: when reporting the range of a bound, quote the hypothesis of the theorem that carries the mathematics, not of the corollary that repackages it. A corollary's constants are an artifact of its packaging.}
+
+\section*{81. The exact normalized tolerance curve, proved for all $r$}
+\texttt{LeanStructuralStaircaseToleranceCurveV1.exact\_curve} closes the curve completely. For every $r>0$ and every $\varepsilon \ge 0$,
+\[
+\chi_\varepsilon\!\left(S \mapsto \tfrac{\mathrm{selectedRadius}\, f_{\text{stair}}\, S}{r}\right)
+= \begin{cases} r, & \varepsilon < \dfrac{1}{2r},\\[4pt] 1, & \varepsilon \ge \dfrac{1}{2r}. \end{cases}
+\]
+Upper and lower meet. \texttt{normalized\_cover\_r} and \texttt{dimension\_above} give the cover; \texttt{dimension\_below} gives the matching lower bound through \texttt{normalized\_tolerance\_lower}. The threshold $1/(2r)$ is \emph{attained}: at $\varepsilon = 1/(2r)$ exactly, one ranking already suffices. Four names, all on $[\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}]$, no \texttt{sorry}, no \texttt{native\_decide}.
+
+The mechanism is an integrality argument, not a cover construction: \texttt{twice\_radius\_integer} shows $2\cdot\mathrm{selectedRadius}$ is an integer on this family, so a normalized tolerance below $1/(2r)$ cannot bridge any gap at all and $\varepsilon$-optimality collapses to exact optimality.
+
+This supersedes, as a theorem, what Sections 72--75 recorded as a census. The earlier finding --- that the staircase and every disjoint union have exactly two levels with threshold $1/(2\sum r)$ --- was an exhaustive check over a finite family. It now holds for all $r$, with the $r=1$ edge case documented in the module: both branches give $1$, so there is no strict jump there.
+
+\section*{82. What the curve does not settle}
+\texttt{normalized\_upper} gives $\chi_\varepsilon \le \lfloor 2/\varepsilon\rfloor + 1$ universally, with no balance and no order assumption, and the staircase family attains order $1/\varepsilon$. So the \emph{order} is settled. But the family that attains it \textbf{changes with $\varepsilon$}: \texttt{normalized\_lower} must pick $r = \lfloor 1/(4\varepsilon)\rfloor$ to do so, and the module's own docstring says this does not claim an unbounded dimension at a single normalized tolerance. Whether one fixed instance can have unbounded dimension at a fixed $\varepsilon$ remains open; \texttt{structural\_fixed\_epsilon\_lattice.json} records \texttt{universal\_bound\_proved = false} for exactly that question, over $22$ exact finite instances and $18$ family-width cells. The two statements must not be merged.
+
+\section*{83. Corrected \texttt{native\_decide} census: two numbers, not one}
+Section 76 recorded the corpus count falling from $16$ to $6$. That conflated two different quantities, and the count in the tree did not fall at all.
+
+\textbf{Uses in the tree: still $16$.} \texttt{LeanStructuralScalarChi5WitnessV1} ($10$), \texttt{LeanStructuralActualChi4WitnessV1} ($4$), \texttt{LeanD6PairContractionCounterexample} ($2$). Nothing was deleted, per standing policy. Nine further files \emph{mention} the tactic in prose only; a grep that counts those returns $13$ files and overstates the census.
+
+\textbf{Results that depend on it: $6$.} That is the number Section 76 should have named, and it is the one that matters for evidence class. The $\chi \ge 5$ conclusion is not among them: \texttt{LeanStructuralScalarChi5KernelV1} re-proves all ten statements by kernel \texttt{decide}, and although it \emph{imports} the original witness module --- whose \texttt{native\_decide} lemmas are tagged \texttt{@[simp]} and hence live in the default simp set --- the audit settles the question. \texttt{STRUCT\_SCALAR\_CHI5\_prefix\_cover\_not\_at\_most\_four} reports $[\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}]$ with no \texttt{Lean.ofReduceBool}. The promotion to PROVED stands, and it stands on the audit, not on the import graph.
+\claimbox{Third accounting error on this one tactic, so the rule is now explicit: report \emph{uses in the tree} and \emph{results that depend on it} as two separate numbers, and settle dependency with \texttt{\#print axioms} on the downstream theorem, never by reading imports.}
+\end{document}

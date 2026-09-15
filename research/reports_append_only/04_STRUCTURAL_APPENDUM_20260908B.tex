@@ -1,0 +1,72 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update B: the staircase-extremality question is already closed by a witness in the repository --- and that witness rests on \texttt{native\_decide}}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (third update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--64 are an immutable prefix. This addendum begins at Section 65.
+
+\section*{65. The extremality question of §63 is already answered in the repository}
+Addendum A, Section 63, set as the open question \emph{``whether any relation family forces $\chi$ above $m/2$, i.e.\ whether the staircase is extremal.''} A witness answering it \textbf{no} was already in \texttt{work/p13\_conjectures}: \texttt{Lean\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak WitnessV1}. With $7$ relations and $2$ support points,
+\[\chi_{\mathrm{prefix}}\ \ge\ 5\ >\ 7/2,\]
+from the scalar weights $(-32,\,7,\,29,\,-7,\,-8,\,-13,\,18)$ and the five designated optima
+\[\{3\},\ \{1,5\},\ \{0,1,6\},\ \{0,1,2,4\},\ \{0,2,4,5,6\},\]
+unique at budgets $1,\dots,5$ and pairwise non-nested. Adding one relation of weight $256$ keeps the five optima and gives $m=8$, $\chi\ge5>4$, so restricting to even $m$ does not rescue extremality either. \textbf{The staircase is not extremal, and Section 63 was asking a question the corpus had already settled.}
+
+\section*{66. But its evidence class is not PROVED}
+The five arithmetic facts the witness rests on are proved by \texttt{native\_decide}:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X}
+\toprule
+\texttt{@[simp] theorem opt1\_abs : complementAbs7 opt1 = 1 := by native\_decide}\\
+\dots and likewise \texttt{opt2\_abs} \dots \texttt{opt5\_abs}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+This project's stated rule rejects \texttt{native\_decide} as a trust hole. The module is \emph{not} among the $59$ audited names, and an audit of it would report \texttt{Lean.ofReduceBool}.
+
+\claimbox{$\chi_{\mathrm{prefix}}\ge5$ on this witness is \eclass{COMPILED ARTIFACT resting on \texttt{native\_decide}} --- \textbf{not} \eclass{PROVED}. The five facts are small integer identities over $\textsf{Finset}(\textsf{Fin }7)$ and should be reachable by kernel \texttt{decide}; replacing the tactic is the cheapest promotion available anywhere in the corpus.}
+
+\section*{67. Corpus-wide \texttt{native\_decide} audit}
+Counted by reading every module, and distinguishing a real tactic from a docstring mention:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r X}
+\toprule
+Module & uses & where\\
+\midrule
+\texttt{Lean\allowbreak D6\allowbreak Pair\allowbreak Contraction\allowbreak Counterexample} & 2 & \texttt{mixedDifferenceZ\_le\_thirteen}, a $\delta_\square$ bound\\
+\texttt{Lean\allowbreak Structural\allowbreak Actual\allowbreak Chi4\allowbreak WitnessV1} & 2 & a \textsf{Finset}(\textsf{Fin }6) case enumeration\\
+\texttt{Lean\allowbreak Structural\allowbreak Scalar\allowbreak Chi5\allowbreak WitnessV1} & 5 & \texttt{opt*\_abs}, marked \texttt{@[simp]}\\
+\midrule
+\textbf{total} & \textbf{9} & across \textbf{3} modules\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Two further modules mention the tactic only in a docstring asserting that it is \emph{not} used (\texttt{Lean\allowbreak D6\allowbreak Binary\allowbreak Integer\allowbreak CounterexampleV1}, \texttt{Lean\allowbreak D6\allowbreak SharpnessM6V1}), and \texttt{AxiomAuditV1} mentions it while explaining \texttt{ofReduceBool}. \textbf{The $59$ audited names contain zero occurrences of \texttt{ofReduceBool}}, so everything audited is clean; these $9$ are simply outside the audit.
+
+\textbf{Method note, recorded because it caused a miscount.} Searching for \texttt{by native\_decide} finds nothing in two of the three modules: the tactic sits on the line \emph{after} \texttt{by}. Counting \texttt{native\_decide} occurrences and then classifying each by context is the reliable procedure.
+
+\section*{68. Targets, revised}
+\begin{itemize}
+\item \textbf{Not novel on its own:} an antichain of $m-2$ sets of distinct sizes is a known object in the Erd\H{o}s--Trotter circle of results, so ``build an $m-2$ antichain'' is not a contribution. Neither is restating rankings as chain covers, nor ``one ordering serving every budget'', which is a studied problem in incremental submodular maximisation.
+\item \textbf{Recorded, not formalised:} a simpler ceiling than the one in use, $\chi_{\mathrm{prefix}}(F,0)\le m-2$ for $m\ge4$, by choosing one optimum at each budget $1,\dots,m-1$ and observing that among the optima of sizes $1$, $2$ and $m-1$ two are always nested and can share a ranking, while budgets $0$ and $m$ are free. Combined with the $7$-relation witness this gives $\chi=5$ there. \eclass{MATHEMATICAL REASONING, unformalised}
+\item \textbf{The target worth pursuing:} which budget-indexed optimal configurations are \emph{realisable by one support geometry}, in low dimension and with the optimality gaps surviving a fixed normalisation. A representability theorem, a forbidden configuration, or a trade-off law between dimension, coefficient precision and the number of rankings needed. Building more antichains, or encoding them with enormous coefficients, does not answer it.
+\end{itemize}
+\end{document}

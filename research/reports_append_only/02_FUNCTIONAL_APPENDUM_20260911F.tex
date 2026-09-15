@@ -1,0 +1,68 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Response Geometry}\\[2pt]
+{\large\itshape Append-only update F: the confirmatory run closes the censored endpoint}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--73 are an immutable prefix. This addendum begins at Section 74.
+
+\section*{74. The primary endpoint is now identified, and the floor held}
+The confirmatory run is complete: $100$ instances $\times$ seeds $\{8201,8202,8203\} = 300$ paired instances, $\max n = 131\,072$, fixed confidence $0.95$, protocol \texttt{functional\_variance\_stopping\_v3\_weighted\_shrink\_exploration}, artifact \texttt{functional\_v3\_maxn131072\_confirm.json} (sha \texttt{7f77c8a2\dots}).
+
+Every variant's median is now \emph{identified} rather than censored, because every certificate fraction exceeds one half:
+
+\begin{center}\footnotesize
+\begin{tabular}{lrrr}
+\toprule
+variant & cert.\ frac. & median $N$ & ratio \\
+\midrule
+\texttt{C\_anytime}      & $0.7067$ & $34\,788$ & $1.000$ \\
+\texttt{C\_known\_sigma}  & $0.7067$ & $34\,532$ & $0.993$ \\
+\texttt{C\_pilot}        & $0.6967$ & $45\,957$ & $1.321$ \\
+\texttt{C\_shrink}       & $0.6967$ & $46\,613$ & $1.340$ \\
+\texttt{C\_split}        & $0.6633$ & $74\,817$ & $2.151$ \\
+\texttt{uniform}         & $0.5433$ & $92\,876$ & $2.670$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Section 70 reported $\ge 1.66\times$ against \texttt{uniform} as a \emph{floor}, because \texttt{uniform} was censored at $\max n = 65\,536$. The floor held: the measured value is $\mathbf{2.670\times}$. A conservative bound that survives its own confirmatory test is worth recording as such.
+\claimbox{\eclass{DEVELOPMENT EMPIRICAL}, \texttt{development\_only = true}. One caveat attaches to the headline number and to no other row: \texttt{uniform} clears the censoring line by only $4.33$ percentage points of certified mass ($54.33\%$ against the $50\%$ needed for an identified median), where the other five have $16$--$21$ points. The $2.670$ is therefore the figure most sensitive to the horizon --- at $\max n = 65\,536$ this same endpoint for \texttt{uniform} was the censoring sentinel, not a number.}
+
+\section*{75. The paired structure is stronger than the medians}
+Matching on \texttt{(seed, instance\_id)} across all $300$ instances:
+
+\begin{itemize}
+\item Against \texttt{uniform}: on the $163$ instances where both certify, \texttt{C\_anytime} is faster on \textbf{$163$ of $163$}. Zero losses, zero ties. Sign test $p \approx 1.7\times10^{-49}$; median paired ratio $2.183$. A further $49$ instances are certified by \texttt{C\_anytime} only and $0$ by \texttt{uniform} only.
+\item Against \texttt{C\_split}: $199$ of $199$, median paired ratio $3.124$; $13$ instances certified by \texttt{C\_anytime} only, $0$ the other way.
+\item Against \texttt{C\_pilot} and \texttt{C\_shrink}: \emph{not} a sweep. $193$ wins against $15$ losses in each case, median paired ratio $\approx 1.64$.
+\item \texttt{false\_safe\_count} $=0$ for all six variants on all $300$ instances --- $1\,800$ runs, no false safe certificate.
+\end{itemize}
+
+The distinction in the third bullet is the one that matters for how the result may be stated. Over \texttt{uniform} and \texttt{C\_split} the ordering is \emph{domination} on the common support; over the pilot family it is a median statement with a measured $15/208$ loss rate, and must not be written as domination.
+
+\section*{76. What it costs not to know $\sigma$, and two boundaries}
+\textbf{The certifiable set is identical.} \texttt{C\_anytime} and the known-$\sigma$ oracle certify \emph{exactly the same $212$ instances} --- set equality, not merely equal counts ($|A \setminus B| = |B \setminus A| = 0$). On this protocol, not knowing $\sigma$ costs nothing in \emph{which} instances become certifiable.
+
+\textbf{It costs a small factor in samples, and Section 70 quoted the friendlier half of it.} On medians, $34\,788$ against $34\,532$: $0.74\%$. Instance by instance the oracle is faster on $179$ of $212$, \texttt{C\_anytime} on $32$, one tie, with median paired ratio $0.9723$ --- about $2.8\%$. Both numbers belong in the ledger; the median alone understates the gap by a factor of roughly four.
+
+\textbf{Certifiability is not a gap threshold.} $86$ of $300$ instances are certified by no variant at $131\,072$. The gap distributions separate strongly --- median true Top-$K$ gap $0.059$ for the never-certified against $0.297$ for the certified --- but they \emph{overlap}: $38$ never-certified instances have gaps above the smallest certified gap, and $20$ certified instances have gaps below the largest never-certified gap. Any future claim that certifiability is determined by a gap cutoff is already contradicted by this run.
+
+\textbf{The horizon comparison is not available.} The $65\,536$ probe used seed $8301$; this run used seeds $8201$--$8203$. The apparent lift of $+11.7$ points for \texttt{C\_anytime} and $+17.3$ for \texttt{uniform} therefore confounds horizon with instance draw and is \emph{not} evidence of a horizon effect. Establishing one requires re-running the probe seed at the larger horizon.
+\claimbox{Recorded against a specific temptation. Regressing $\log N$ on $\log(\text{gap})$ over the $212$ certified \texttt{C\_anytime} instances gives slope $-1.572$ with $R^2 = 0.805$, shallower than the $-2$ of the textbook rate. This is \emph{not} evidence against a $\text{gap}^{-2}$ law: censoring removes precisely the small-gap, large-$N$ corner, which biases the fitted slope toward zero. It is a measurement of the certified subset, not of the scaling.}
+\end{document}

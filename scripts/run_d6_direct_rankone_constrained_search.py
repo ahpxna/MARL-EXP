@@ -36,7 +36,7 @@ from scripts.run_d6_rankone_falsification import (
 )
 
 
-PROTOCOL_VERSION = "d6_direct_rankone_profile_minor_search_v1"
+PROTOCOL_VERSION = "d6_direct_rankone_profile_minor_search_v2"
 EVIDENCE_CLASS = "NUMERICAL_LEAD_WITH_EXACT_RATIONAL_RECHECK"
 
 
@@ -88,6 +88,37 @@ def _minor_basis(flat: np.ndarray, q: np.ndarray, m: int, alphabet: int, pivots:
         for col in range(profile.shape[1]):
             values.append(profile[0, col] * profile[1, pivot] - profile[0, pivot] * profile[1, col])
     return np.asarray(values, dtype=float)
+
+
+def _independent_minor_rows(flat: np.ndarray, q: np.ndarray, m: int, alphabet: int,
+                            pivots: Sequence[int], *, eps: float = 1e-6) -> tuple[np.ndarray, int, int]:
+    """Select a numerically independent local basis of the redundant minor equations.
+
+    SLSQP rejects the raw m=4,K=3 system because the number of written equality
+    equations exceeds the number of free F-values even though those minors are
+    highly redundant.  We estimate the Jacobian at the feasible rank-one start,
+    pivot its rows, and constrain only an independent local basis.  This does *not*
+    certify global equivalence: every numerical lead is still post-checked against
+    all minors and then rationally re-evaluated, so omitted equations can never
+    create a false counterexample.
+    """
+    from scipy.linalg import qr
+    base=_minor_basis(flat,q,m,alphabet,pivots)
+    free=list(range(1,len(flat)))  # x[0] is gauge-fixed by the bounds
+    jac=np.zeros((base.size,len(free)),dtype=float)
+    for col,j in enumerate(free):
+        step=float(eps)*max(1.0,abs(float(flat[j])))
+        xp=np.asarray(flat,dtype=float).copy(); xm=np.asarray(flat,dtype=float).copy()
+        xp[j]+=step; xm[j]-=step
+        jac[:,col]=(_minor_basis(xp,q,m,alphabet,pivots)-_minor_basis(xm,q,m,alphabet,pivots))/(2.0*step)
+    if not jac.size:
+        return np.asarray([],dtype=int),0,int(base.size)
+    _,r,piv=qr(jac.T,mode='economic',pivoting=True)
+    diag=np.abs(np.diag(r)) if r.ndim==2 else np.asarray([])
+    tol=(max(jac.shape)*np.finfo(float).eps*(float(diag.max()) if diag.size else 1.0))
+    rank=int(np.sum(diag>tol))
+    rows=np.asarray(piv[:rank],dtype=int)
+    return rows,rank,int(base.size)
 
 
 def _float_q(rows: Sequence[Sequence[Fraction]]) -> np.ndarray:
@@ -146,7 +177,23 @@ def run(args: argparse.Namespace) -> dict:
                 return 0.0
             return -float(2.0 * details["true_decision_regret"] / delta)
 
-        constraints = {"type": "eq", "fun": lambda x, p=tuple(pivots): _minor_basis(x, q, m, alphabet, p)}
+        basis_rows,jac_rank,all_minor_count=_independent_minor_rows(
+            x0,q,m,alphabet,tuple(pivots),eps=float(args.jacobian_eps)
+        )
+        if jac_rank <= 0:
+            leads.append({
+                "restart":restart,"optimizer_success":False,"optimizer_status":-2,
+                "optimizer_message":"rank-one start has zero numerical minor-Jacobian rank",
+                "raw_ratio":0.0,"max_minor_abs":0.0,"exact_rank_one_verified":True,
+                "exact_strict_violation":False,"constraint_basis_rank":0,
+                "all_minor_constraint_count":int(all_minor_count),
+            })
+            continue
+        constraints = {
+            "type": "eq",
+            "fun": lambda x, p=tuple(pivots), rows=tuple(map(int,basis_rows)):
+                _minor_basis(x, q, m, alphabet, p)[list(rows)],
+        }
         bounds = [(0.0, 0.0)] + [(-1.0, 1.0)] * (len(x0) - 1)
         opt = minimize(
             objective, x0, method="SLSQP", bounds=bounds, constraints=constraints,
@@ -160,6 +207,10 @@ def run(args: argparse.Namespace) -> dict:
             "restart": restart, "optimizer_success": bool(opt.success), "optimizer_status": int(opt.status),
             "optimizer_message": str(opt.message), "raw_ratio": raw_ratio,
             "max_minor_abs": float(np.max(np.abs(_minor_basis(opt.x, q, m, alphabet, pivots)))),
+            "constraint_basis_rank":int(jac_rank),
+            "basis_constraint_count":int(len(basis_rows)),
+            "all_minor_constraint_count":int(all_minor_count),
+            "free_variable_count":int(len(x0)-1),
             "exact_rank_one_verified": bool(exact["rank_one_verified"]),
             "exact_strict_violation": bool(exact["strict_violation"]),
             "exact": exact,
@@ -171,14 +222,24 @@ def run(args: argparse.Namespace) -> dict:
                 "world": world_payload(exact_world, all_actions),
             }
             break
+    successful=sum(bool(x.get("optimizer_success")) for x in leads)
+    exact_rankone=sum(bool(x.get("exact_rank_one_verified")) for x in leads)
+    if exact_counterexample:
+        status="KILLED"
+    elif successful==0:
+        status="INCONCLUSIVE_OPTIMIZER_FAILED"
+    elif exact_rankone==0:
+        status="INCONCLUSIVE_NO_EXACT_RANKONE_LEAD"
+    else:
+        status="NO_EXACT_COUNTEREXAMPLE_FROM_VERIFIED_NUMERICAL_LEADS"
     return {
         "protocol_version": PROTOCOL_VERSION, "evidence_class": EVIDENCE_CLASS,
         "development_only": True, "stage": "B3_direct_rank_one", "m": m, "alphabet": alphabet,
         "reference_mode": args.reference_mode, "seed": int(args.seed), "restarts": int(args.restarts),
         "rational_denominator": int(args.rational_denominator), "leads": leads,
-        "counterexample": exact_counterexample,
-        "status": "KILLED" if exact_counterexample else "NO_EXACT_COUNTEREXAMPLE_FROM_NUMERICAL_LEADS",
-        "interpretation": "Only an exact-rational recheck can kill the rank-one law. A failed/non-exact numerical lead is not negative evidence for or against it.",
+        "optimizer_success_count":int(successful),"exact_rankone_lead_count":int(exact_rankone),
+        "counterexample": exact_counterexample,"status":status,
+        "interpretation": "Only an exact-rational recheck can kill the rank-one law. Independent local minor constraints avoid SLSQP's redundant-equality failure, but no absence of a numerical lead is proof or certified negative evidence.",
     }
 
 
@@ -190,6 +251,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--restarts", type=int, default=4)
     parser.add_argument("--maxiter", type=int, default=80)
     parser.add_argument("--ftol", type=float, default=1e-9)
+    parser.add_argument("--jacobian-eps", type=float, default=1e-6)
     parser.add_argument("--rational-denominator", type=int, default=40)
     parser.add_argument("--seed", type=int, default=20260903)
     parser.add_argument("--out", required=True)
@@ -199,11 +261,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         Path(args.out), result,
         protocol={"protocol_version": PROTOCOL_VERSION, "stage": "B3_direct_rank_one", "m": args.m,
                   "alphabet": args.alphabet, "reference_mode": args.reference_mode,
-                  "restarts": args.restarts, "maxiter": args.maxiter, "rational_denominator": args.rational_denominator},
+                  "restarts": args.restarts, "maxiter": args.maxiter, "jacobian_eps": args.jacobian_eps,
+                  "rational_denominator": args.rational_denominator},
         seed=int(args.seed), evidence_class=EVIDENCE_CLASS, chain="D6",
     )
     print(json.dumps({"status": result["status"], "leads": len(result.get("leads", [])), "out": args.out}, indent=2))
-    return 2 if result["status"] == "KILLED" else 0
+    if result["status"] == "KILLED":
+        return 2
+    if str(result["status"]).startswith("INCONCLUSIVE") or str(result["status"]).startswith("BLOCKED"):
+        return 3
+    return 0
 
 
 if __name__ == "__main__":

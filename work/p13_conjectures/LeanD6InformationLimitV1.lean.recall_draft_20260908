@@ -1,0 +1,189 @@
+import Mathlib
+
+/-!
+# The information limit for decision selection: the three links
+
+This module formalises the lower-bound skeleton for the D6 selection problem
+*without any enumeration*.  Nothing here is proved by `decide`, by
+`native_decide`, or by case explosion.
+
+The setting.  A "world" is determined by which `k`-subset `T` of a ground set
+`U` is optimal.  All worlds in the family share the same observable response
+profile, so no algorithm can tell them apart from the profile alone.  Regret in
+world `T` for a chosen set `S` is the number of optimal elements missed,
+`(S \ T).card`.
+
+Three links:
+
+* `Link 1` -- indistinguishability: a deterministic selector reading only the
+  shared observation returns one fixed `S` across the whole family
+  (`selector_constant_on_family`).
+* `Link 2` -- regret is a distance: definitional, `regretOn S T = (S \ T).card`.
+* `Link 3` -- averaging: the *average* of `regretOn S T` over the family is a
+  constant independent of `S`, hence a lower bound on the worst case
+  (`information_limit_worst_case`).
+
+The combinatorial heart is `sum_sdiff_card_powersetCard`: for every `S ⊆ U`,
+```
+  ∑ T ∈ U.powersetCard r, (S \ T).card = S.card * (U.card - 1).choose r
+```
+proved by exchanging the two sums and counting, for each `i ∈ S`, the
+`r`-subsets of `U` avoiding `i`.  No induction on `U`, no brute force.
+-/
+
+namespace CIGAMF.P13.InformationLimit
+
+open scoped BigOperators
+open Finset
+
+variable {α : Type*} [DecidableEq α] [Fintype α]
+
+/-! ## Link 2: regret is the distance to the optimal set -/
+
+/-- Regret of choosing `S` when the optimal set is `T`: the optimal elements
+missed.  This is a definition, not a claim. -/
+def regretOn (S T : Finset α) : ℕ := (S \ T).card
+
+theorem regretOn_eq_card_sdiff (S T : Finset α) :
+    regretOn S T = (S \ T).card := rfl
+
+/-! ## Link 1: indistinguishability
+
+A selector reads an observation of type `O`.  If the observation map is
+constant on the family, the selector's output is constant on the family: no
+information in the profile separates two worlds. -/
+
+theorem selector_constant_on_family {O : Type*} (obs : Finset α → O)
+    (selector : O → Finset α) (W : Finset (Finset α)) (o : O)
+    (hconst : ∀ T ∈ W, obs T = o) :
+    ∀ T ∈ W, selector (obs T) = selector o := by
+  intro T hT
+  rw [hconst T hT]
+
+/-! ## Link 3: the averaging identity -/
+
+/-- For each `i`, the `r`-subsets of `U` that avoid `i` are exactly the
+`r`-subsets of `U.erase i`. -/
+theorem filter_not_mem_powersetCard (U : Finset α) (r : ℕ) (i : α) :
+    (U.powersetCard r).filter (fun T => i ∉ T) = (U.erase i).powersetCard r := by
+  ext T
+  simp only [mem_filter, mem_powersetCard, subset_erase]
+  constructor
+  · intro h
+    exact ⟨⟨h.1.1, h.2⟩, h.1.2⟩
+  · intro h
+    exact ⟨⟨h.1.1, h.2⟩, h.1.2⟩
+
+/-- The count of `r`-subsets of `U` avoiding a fixed member `i`. -/
+theorem card_filter_not_mem (U : Finset α) (r : ℕ) {i : α} (hi : i ∈ U) :
+    ((U.powersetCard r).filter (fun T => i ∉ T)).card = (U.card - 1).choose r := by
+  rw [filter_not_mem_powersetCard, card_powersetCard, card_erase_of_mem hi]
+
+/-- **The averaging identity.**  Summing the missed-optimum count over every
+`r`-subset of `U` gives `S.card * (U.card - 1).choose r`, for any `S ⊆ U`. -/
+theorem sum_sdiff_card_powersetCard (U : Finset α) (r : ℕ) (S : Finset α)
+    (hS : S ⊆ U) :
+    ∑ T ∈ U.powersetCard r, (S \ T).card
+      = S.card * (U.card - 1).choose r := by
+  have expand : ∀ T : Finset α, (S \ T).card = ∑ i ∈ S, if i ∈ T then 0 else 1 := by
+    intro T
+    rw [sdiff_eq_filter, card_filter]
+    refine Finset.sum_congr rfl ?_
+    intro i _
+    by_cases h : i ∈ T <;> simp [h]
+  calc ∑ T ∈ U.powersetCard r, (S \ T).card
+      = ∑ T ∈ U.powersetCard r, ∑ i ∈ S, if i ∈ T then 0 else 1 := by
+        exact Finset.sum_congr rfl (fun T _ => expand T)
+    _ = ∑ i ∈ S, ∑ T ∈ U.powersetCard r, if i ∈ T then 0 else 1 := Finset.sum_comm
+    _ = ∑ i ∈ S, ((U.powersetCard r).filter (fun T => i ∉ T)).card := by
+        refine Finset.sum_congr rfl ?_
+        intro i _
+        rw [card_filter]
+        refine Finset.sum_congr rfl ?_
+        intro T _
+        by_cases h : i ∈ T <;> simp [h]
+    _ = ∑ _i ∈ S, (U.card - 1).choose r := by
+        refine Finset.sum_congr rfl ?_
+        intro i hi
+        exact card_filter_not_mem U r (hS hi)
+    _ = S.card * (U.card - 1).choose r := by
+        rw [Finset.sum_const, smul_eq_mul]
+
+/-! ## The closed form at the balanced width
+
+With `|U| = 2j+1` and `r = j+1` (that is, `m = 2j+2` coordinates, one of which
+carries the negative response slope, and `k = j+1 = m/2`), the average regret
+is `(j+1)*j / (2j+1)`.  Stated as an exact product over `ℕ` so that no
+division and no truncated subtraction appears. -/
+
+/-- The binomial step behind the closed form: `(2j+1) * C(2j, j+1) = j * C(2j+1, j+1)`,
+i.e. `n * C(n-1,r) = (n-r) * C(n,r)` at `n = 2j+1`, `r = j+1`. -/
+theorem choose_shift (j : ℕ) :
+    (2 * j + 1) * (2 * j).choose (j + 1) = j * (2 * j + 1).choose (j + 1) := by
+  have hrec : (2 * j + 1).choose (j + 1) = (2 * j).choose j + (2 * j).choose (j + 1) :=
+    Nat.choose_succ_succ' (2 * j) j
+  have hmul : (2 * j + 1) * (2 * j).choose j = (2 * j + 1).choose (j + 1) * (j + 1) :=
+    Nat.succ_mul_choose_eq (2 * j) j
+  have expand : (2 * j + 1) * (2 * j + 1).choose (j + 1)
+      = (2 * j + 1) * (2 * j).choose j + (2 * j + 1) * (2 * j).choose (j + 1) := by
+    rw [hrec, Nat.mul_add]
+  omega
+
+/-- **The information limit in exact form.**  For every choice `S` of `j+1`
+elements of a ground set `U` of size `2j+1`, the total regret over the whole
+family of optimal sets is the same, and equals
+`(j+1)*j/(2j+1)` per world.  Written without division. -/
+theorem information_limit_exact (U : Finset α) (j : ℕ) (hU : U.card = 2 * j + 1)
+    (S : Finset α) (hS : S ⊆ U) (hcard : S.card = j + 1) :
+    (2 * j + 1) * (∑ T ∈ U.powersetCard (j + 1), regretOn S T)
+      = (j + 1) * j * (U.powersetCard (j + 1)).card := by
+  have hsum : ∑ T ∈ U.powersetCard (j + 1), regretOn S T
+      = (j + 1) * (2 * j).choose (j + 1) := by
+    unfold regretOn
+    rw [sum_sdiff_card_powersetCard U (j + 1) S hS, hcard, hU]
+  have hfam : (U.powersetCard (j + 1)).card = (2 * j + 1).choose (j + 1) := by
+    rw [card_powersetCard, hU]
+  rw [hsum, hfam]
+  calc (2 * j + 1) * ((j + 1) * (2 * j).choose (j + 1))
+      = (j + 1) * ((2 * j + 1) * (2 * j).choose (j + 1)) := by ring
+    _ = (j + 1) * (j * (2 * j + 1).choose (j + 1)) := by rw [choose_shift]
+    _ = (j + 1) * j * (2 * j + 1).choose (j + 1) := by ring
+
+/-- **Worst case dominates the average.**  Combined with `information_limit_exact`
+this is the lower bound for every algorithm: no selector, however it reads the
+shared profile, escapes regret `(j+1)*j/(2j+1)` in the worst world. -/
+theorem information_limit_worst_case (U : Finset α) (j : ℕ) (hU : U.card = 2 * j + 1)
+    (S : Finset α) (hS : S ⊆ U) (hcard : S.card = j + 1) :
+    ∃ T ∈ U.powersetCard (j + 1),
+      (2 * j + 1) * regretOn S T * (U.powersetCard (j + 1)).card
+        ≥ (j + 1) * j * (U.powersetCard (j + 1)).card := by
+  classical
+  set P := U.powersetCard (j + 1) with hP
+  have hne : P.Nonempty := by
+    rw [hP]
+    refine Finset.powersetCard_nonempty.2 ?_
+    omega
+  obtain ⟨T, hT, hmax⟩ := P.exists_max_image (fun T => regretOn S T) hne
+  refine ⟨T, hT, ?_⟩
+  have hbound : ∑ T' ∈ P, regretOn S T' ≤ P.card * regretOn S T := by
+    calc ∑ T' ∈ P, regretOn S T' ≤ ∑ _T' ∈ P, regretOn S T :=
+          Finset.sum_le_sum (fun T' hT' => hmax T' hT')
+      _ = P.card * regretOn S T := by rw [Finset.sum_const, smul_eq_mul]
+  have hexact := information_limit_exact U j hU S hS hcard
+  calc (j + 1) * j * P.card
+      = (2 * j + 1) * (∑ T' ∈ P, regretOn S T') := hexact.symm
+    _ ≤ (2 * j + 1) * (P.card * regretOn S T) := Nat.mul_le_mul_left _ hbound
+    _ = (2 * j + 1) * regretOn S T * P.card := by ring
+
+/-! ## Instances of the closed form
+
+`(j+1)*j/(2j+1)` at `j = 2,3,4,5` is `6/5, 12/7, 20/9, 30/11`, matching the
+exact linear programme run over the whole family at `m = 6, 8, 10, 12`.
+These are arithmetic checks on the formula only, proved by `norm_num`. -/
+
+example : (2 + 1) * 2 * 5 = 6 * 5 := by norm_num
+example : (3 + 1) * 3 * 7 = 12 * 7 := by norm_num
+example : (4 + 1) * 4 * 9 = 20 * 9 := by norm_num
+example : (5 + 1) * 5 * 11 = 30 * 11 := by norm_num
+
+end CIGAMF.P13.InformationLimit

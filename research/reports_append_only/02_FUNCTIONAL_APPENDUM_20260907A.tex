@@ -1,0 +1,126 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 2 - Functional Two-Level Geometry}\\[2pt]
+{\large\itshape Append-only update: an ablation that was never an ablation, a starvation defect, a Neyman repair that works, and a censoring result that no allocation policy can fix}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--53 are an immutable prefix. This addendum begins at Section 54.
+
+\textbf{What this addendum contains.} Two instrument defects found in code that had already produced ledger artifacts, a principled repair, and a \textbf{negative headline result} that survives the repair. The negative result is the point of the addendum: the repair worked and the conclusion did not change.
+
+\section*{54. DEMOTION: the shrink ablation was never an ablation}
+Protocol \texttt{functional\_variance\_stopping\_v2\_balanced\_batches} reported
+\[\textsf{cert\_frac}(C_{\text{pilot}})=\textsf{cert\_frac}(C_{\text{shrink}})=\tfrac{11}{60}=0.18\overline{3}\]
+on the three-seed confirmation --- \emph{identical to the last digit}. That is not a coincidence and not a tie. The v2 exploitation step was
+\begin{verbatim}
+weighted = sorted(drivers, key=-scale[x])
+for t in range(n_add - explore):
+    draw[weighted[t % len(weighted)]] += 1
+\end{verbatim}
+which depends on \textbf{the order of $\sigma$ and on nothing else}. Shrinkage toward a pooled variance,
+\[\tilde\sigma_i=\sqrt{\tfrac12\hat\sigma_i^2+\tfrac12\overline{\hat\sigma^2}},\]
+is \emph{monotone} in $\hat\sigma_i$, hence order-preserving. So $C_{\text{shrink}}$ and $C_{\text{pilot}}$ produced byte-identical allocations on all $60$ instances. \oldclaim{Pilot and shrink are two allocation policies compared under common random streams.} They were one policy run twice. \eclass{DEMOTED: the v2 shrink row is not evidence about shrinkage}
+
+\section*{55. Repair: Neyman-greedy allocation makes magnitude matter}
+v3 (\texttt{functional\_variance\_stopping\_v3\_weighted\_shrink\_exploration}) replaces the ordinal rule by the exact marginal reduction of $\sum_i \sigma_i^2/n_i$:
+\[\text{choose}\quad \arg\max_i \ \frac{\sigma_i^2}{n_i\,(n_i+1)} .\]
+Allocating one sample to cell $i$ changes $\sigma_i^2/n_i$ by exactly $-\sigma_i^2/[n_i(n_i+1)]$, so this is greedy-optimal for the variance objective and depends on \emph{magnitudes} and on the evolving $n_i$, not on rank. \textbf{Measured effect:} pilot and shrink allocations now differ on $60/60$ instances (v2: $0/60$).
+
+\section*{56. DEMOTION: the anytime policy was starved by construction}
+In v2 the $20\%$ exploration block sat \emph{inside} the \texttt{\{C\_pilot, C\_shrink, C\_split\}} branch. The anytime branch fell through to driver-only selection with no exploration at all, so a cell outside the driver set could remain at its initial count forever; the confirmation showed $36/60$ runs with cells at exactly two samples and correspondingly enormous intervals. \oldclaim{$C_{\text{anytime}}$ underperforms because anytime confidence sequences are conservative.} The measured cause was starvation, not conservatism. \eclass{DEMOTED: the v2 anytime row measured a bug}
+
+v3 hoists the exploration block \emph{above} the branch, so every adaptive policy reserves $\ge20\%$ of each batch for least-sampled cells. \textbf{Measured effect:} \texttt{cells\_at\_initial\_count} $=0$ for all six variants; minimum cell counts now $44$--$546$.
+
+\section*{57. v3 three-seed result, and the headline negative}
+$20$ instances $\times$ seeds $\{8201,8202,8203\}$, $R=5$, $K=6$, top-$k=2$, $\max n=16384$, batch $16$, pilot fraction $0.15$.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{l r r r r}
+\toprule
+Variant & cert.\ frac & median $N$ & RMST & mean width\\
+\midrule
+uniform & $0.1333$ & $16385$ & $15462.2$ & $0.5067$\\
+$C_{\text{split}}$ & $0.1167$ & $16385$ & $15708.5$ & $0.5985$\\
+$C_{\text{pilot}}$ & $0.1667$ & $16385$ & $15170.0$ & $0.5168$\\
+$C_{\text{shrink}}$ & $0.1833$ & $16385$ & $15062.7$ & $0.5184$\\
+$C_{\text{anytime}}$ & $\mathbf{0.2833}$ & $16385$ & $14381.5$ & $0.4646$\\
+$C_{\text{known }\sigma}$ (oracle) & $0.3333$ & $16385$ & $14244.4$ & $0.4613$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\texttt{false\_safe\_count} $=0$ for every variant.
+
+\claimbox{\textbf{Headline, negative.} The median certificate size is $16385=\max n+1$ for \emph{all six} variants, including the oracle. \texttt{deployable\_winner\_status} $=$ \textsf{NO\_MEDIAN\_IDENTIFIED\_CENSORING}. Both allocation defects were real and both were repaired, and \emph{the censoring did not move}. Certification failure at this budget is therefore a property of the instance family, not of the allocation policy.}
+
+\section*{58. What the repair actually bought, and what it cost}
+Paired against v2 on the same seeds and instances:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{l r r r}
+\toprule
+Variant & v2 & v3 & $\Delta$\\
+\midrule
+$C_{\text{anytime}}$ & $0.1333$ & $0.2833$ & $\mathbf{+0.150}$\\
+$C_{\text{shrink}}$ & $0.1833$ & $0.1833$ & $0.000$\\
+$C_{\text{pilot}}$ & $0.1833$ & $0.1667$ & $-0.017$\\
+$C_{\text{split}}$ & $0.1500$ & $0.1167$ & $-0.033$\\
+uniform & $0.1333$ & $0.1333$ & $0.000$\\
+$C_{\text{known }\sigma}$ & $0.4333$ & $0.3333$ & $\mathbf{-0.100}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The forced exploration floor rescues the starved policy and \textbf{costs the policies that were already well targeted}, the oracle most of all. That is the expected sign of an exploration constraint and it is worth stating as a finding rather than hiding it: a mandatory exploration fraction is not free.
+
+\textbf{Scope, explicitly.} v2 and v3 are different protocol versions and the comparison above is paired on seeds and instances but \emph{not} controlled --- two changes ship together. It is indicative, not a controlled ablation of the exploration floor alone. \eclass{NUMERICAL EVIDENCE, three seeds, uncontrolled pairing}
+
+\textbf{Ledger hygiene.} v2 is retained unmodified at its original path; v3 ships as a separately named module so every protocol-v2 artifact stays reproducible. The regression suite for the two repairs (23 tests: shrink changes allocation under an order-preserving transform; no starvation for any variant at batch sizes $\{1,4,16,31\}$; diagnostics present) lives in \texttt{tests/}.
+
+\section*{59. Selective maintenance formalised}
+\texttt{LeanFunctionalResidualMaintenanceV2} compiles (\texttt{.olean} $161{,}064$ B; log carries three \texttt{unusedSectionVars} warnings and no errors), with seven theorems: \texttt{residualBound\_zero}, \texttt{selective\_refresh\_safety}, \texttt{residualBound\_antitone}, \texttt{refresh\_set\_monotonicity}, \texttt{feasible\_iff\_full\_refresh\_safe}, \texttt{no\_feasible\_refresh\_of\_full\_failure}, \texttt{minimum\_cost\_refresh\_exists}. An axiom-audit file was generated for it; the transcript is not yet in the ledger, so this is \eclass{COMPILED ARTIFACT}, not \eclass{PROVED}.
+
+\section*{60. Formal inventory for this chain, complete}
+The corpus holds \textbf{7} Lean modules attributable to this chain, carrying \textbf{60} theorems; 7 produce a \texttt{.olean}; \textbf{1} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak Functional\allowbreak Ranking\allowbreak V6} & 24 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Functional\allowbreak Boundary\allowbreak V4} & 8 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Functional\allowbreak Residual\allowbreak Maintenance\allowbreak V2} & 7 & yes & yes\\
+\texttt{Lean\allowbreak Functional\allowbreak Certificate\allowbreak Lifetime\allowbreak V1} & 6 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Functional\allowbreak Covariance\allowbreak Design\allowbreak V1} & 6 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Functional\allowbreak Selective\allowbreak Maintenance\allowbreak V1} & 6 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Functional\allowbreak Unknown\allowbreak Variance\allowbreak Conjecture} & 3 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{6} of this chain's 7 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+
+\section*{61. Code changes of 7 September affecting this chain}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.32\columnwidth}X}
+\toprule
+File & Change\\
+\midrule
+\texttt{scripts/run\_functional\_variance\_stopping\_lab\_v3.py} & NEW. Neyman-greedy exploitation $\arg\max\sigma_i^2/[n_i(n_i{+}1)]$; exploration floor hoisted above the policy branch so every adaptive policy reserves $\ge20\%$; seven new diagnostic fields (\texttt{initial\_counts}, \texttt{minimum\_cell\_samples}, \texttt{cells\_at\_initial\_count}, \texttt{true\_topk\_gap}, \texttt{final\_capacity\_lower/upper}, \texttt{final\_certificate\_margin}); input validation on batch/instances/topk; a latent v2 bug fixed where \texttt{\_capacity\_intervals} was computed twice and its first result discarded. v2 retained unmodified at its original path.\\
+\texttt{tests/test\_functional\_allocation\_v3.py} & NEW, 23 tests: shrink must change allocation under an order-preserving transform; no starvation for any variant at batch $\in\{1,4,16,31\}$; uniform stays balanced on partial batches; diagnostics consistent; invalid batch rejected.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\end{document}

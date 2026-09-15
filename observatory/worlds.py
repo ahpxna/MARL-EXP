@@ -408,16 +408,16 @@ def generate_world(
 
 # --------------------------------------------------- named exact witnesses
 
-def ternary_falsifier() -> World:
-    """The 4-Sep normalized ternary counterexample to the universal m-1 law.
+def ternary_probe_world() -> World:
+    """A ternary m=4 probe world with unit response spans.
 
-    m = 4, U = {0,1,2}, point-mass reference at the all-zero action, selected
-    S = {0,2}, competitor T = {1,3}.  All four response spans equal 1 and the
-    unit mixed-difference bound holds, yet 2[L_F(S) - L_F(T)] = 4 > 3 = m-1.
-
-    Reproduced here as a *target* for the probe rather than as an assertion:
-    the probe recomputes every term and records whether the violation is still
-    observed, so a future change to the definitions shows up as data.
+    NOT the documented 4-Sep falsifier.  An audit showed this construction has
+    2[L_F(S) - L_F(T)] = 0 and delta_square = 1/2, whereas the recorded witness
+    has losses 5/2 and 1/2, a doubled gap of 4 and a unit interaction bound.
+    Keeping the honest label matters: a named witness that silently fails to
+    exhibit its phenomenon is worse than no witness, because every downstream
+    row inherits the false claim.  Use ``search_ternary_falsifier`` to look for
+    the real one; until it is found, this world is only a shape probe.
     """
     m, arity = 4, 3
     sizes = tuple([arity] * m)
@@ -432,7 +432,13 @@ def ternary_falsifier() -> World:
         nz = sum(1 for x in a if x != 0)
         if nz >= 2:
             residual[a] = Q(-(nz - 1), 2)
-    return World(full, prim, ZERO, residual, {"family": "ternary_falsifier", "arity": arity})
+    return World(full, prim, ZERO, residual,
+                 {"family": "ternary_probe", "arity": arity})
+
+
+def ternary_falsifier() -> World:
+    """Deprecated alias kept so older run scripts still import."""
+    return ternary_probe_world()
 
 
 def staircase_family(r: int) -> World:
@@ -467,8 +473,13 @@ def staircase_family(r: int) -> World:
 
 
 def coupled_support_witness() -> World:
-    """The P8/P10 witness: component spans 10 > 9 > 8, yet keeping the largest
-    span is far from optimal because joint feasibility forbids co-extremization.
+    """A coupled-support world with component spans 10 > 9 > 8.
+
+    Audit note: in this world marginal Top-C is still *optimal* at every budget
+    (k=1 gives 17/2, which is the exact optimum), so it does not by itself
+    exhibit the P8/P10 failure of the modular formula at k>=1 -- it only breaks
+    modularity at S = empty.  It is retained as a coupled-support shape, not as
+    a reproduction of the recorded counterexample.
     """
     sizes = (2, 2, 2)
     full = Support.cartesian(sizes)

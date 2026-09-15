@@ -1,0 +1,260 @@
+LeanD6ReferenceRetainedOscillationV1.lean:102:74: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+LeanD6ReferenceRetainedOscillationV1.lean:102:74: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+LeanD6ReferenceRetainedOscillationV1.lean:286:8: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:303:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:341:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:360:28: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [bit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6ReferenceRetainedOscillationV1.lean:363:30: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [bit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6ReferenceRetainedOscillationV1.lean:364:30: warning: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [bit]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanD6ReferenceRetainedOscillationV1.lean:453:10: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:456:12: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:461:10: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:464:12: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:480:10: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:486:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:492:12: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  x j
+in the target expression
+  gate A j x + (1 - gateMass t A j) * bit false ≤ 1
+
+case false
+n : ℕ
+t : ℝ
+A D : Finset (I n)
+j : I n
+hjD : j ∉ D
+rho : ℝ
+hG0 : 0 ≤ gateMass t A j
+hs0 : 0 ≤ slopeBval t A j
+hGr : gateMass t A j ≤ rho
+hsr : slopeBval t A j ≤ rho
+x : I n → Bool
+hjU : j ∈ univ
+hsplit :
+  linear (retainedCoeff A D j rho t) x =
+    retainedCoeff A D j rho t j * bit (x j) + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+hinter : univ.erase j ∩ D = D
+hbound : ∀ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i) ≤ if i ∈ D then retainedCoeff A D j rho t i else 0
+htail : ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i) ≤ ∑ i ∈ D, retainedCoeff A D j rho t i
+hP :
+  ∑ i ∈ D, retainedCoeff A D j rho t i =
+    (rho - gateMass t A j) * ↑(#(D ∩ A)) + (rho - slopeBval t A j) * ↑(#(D ∩ others A j))
+hrj : retainedCoeff A D j rho t j = 1 - gateMass t A j
+hxj : x j = false
+⊢ gate A j x + (1 - gateMass t A j) * bit false ≤ 1
+LeanD6ReferenceRetainedOscillationV1.lean:496:16: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  x j
+in the target expression
+  0 + (1 - gateMass t A j) * bit true ≤ 1
+
+case true
+n : ℕ
+t : ℝ
+A D : Finset (I n)
+j : I n
+hjD : j ∉ D
+rho : ℝ
+hG0 : 0 ≤ gateMass t A j
+hs0 : 0 ≤ slopeBval t A j
+hGr : gateMass t A j ≤ rho
+hsr : slopeBval t A j ≤ rho
+x : I n → Bool
+hjU : j ∈ univ
+hsplit :
+  linear (retainedCoeff A D j rho t) x =
+    retainedCoeff A D j rho t j * bit (x j) + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+hinter : univ.erase j ∩ D = D
+hbound : ∀ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i) ≤ if i ∈ D then retainedCoeff A D j rho t i else 0
+htail : ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i) ≤ ∑ i ∈ D, retainedCoeff A D j rho t i
+hP :
+  ∑ i ∈ D, retainedCoeff A D j rho t i =
+    (rho - gateMass t A j) * ↑(#(D ∩ A)) + (rho - slopeBval t A j) * ↑(#(D ∩ others A j))
+hrj : retainedCoeff A D j rho t j = 1 - gateMass t A j
+hxj : x j = true
+hg : gate A j x = 0
+⊢ 0 + (1 - gateMass t A j) * bit true ≤ 1
+LeanD6ReferenceRetainedOscillationV1.lean:520:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:525:8: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:532:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:557:12: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:559:12: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:575:55: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?a + 0
+in the target expression
+  1 - gateMass t A j - gateMass t A j * ↑(#(Dᶜ ∩ A)) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j)) ≤
+    1 + (0 + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i))
+
+case pos
+n : ℕ
+t : ℝ
+A D : Finset (I n)
+j : I n
+hjA : j ∉ A
+hjD : j ∉ D
+rho : ℝ
+hG0 : 0 ≤ gateMass t A j
+hs0 : 0 ≤ slopeBval t A j
+hGr : gateMass t A j ≤ rho
+hsr : slopeBval t A j ≤ rho
+hA : 1 - gateMass t A j ≤ gateMass t A j * ↑(#(Dᶜ ∩ A))
+x : I n → Bool
+hjU : j ∈ univ
+hsplit :
+  linear (retainedCoeff A D j rho t) x =
+    retainedCoeff A D j rho t j * bit (x j) + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+hrj : retainedCoeff A D j rho t j = 1 - gateMass t A j
+hsign : ∀ (i : I n), i ≠ j → i ∈ D → 0 ≤ retainedCoeff A D j rho t i
+hsign' : ∀ (i : I n), i ≠ j → i ∉ D → retainedCoeff A D j rho t i ≤ 0
+hfullEq : univ.erase j ∩ Dᶜ = Dᶜ.erase j
+hfull : ∑ i ∈ Dᶜ.erase j, retainedCoeff A D j rho t i ≤ ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+htailval :
+  ∑ i ∈ Dᶜ.erase j, retainedCoeff A D j rho t i =
+    -(gateMass t A j * ↑(#(Dᶜ ∩ A))) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j))
+hxj : x j = false
+hP : (∃ i ∈ A, x i = true) ∨ 2 ≤ count (others A j) x
+hg : gate A j x = 1
+⊢ 1 - gateMass t A j - gateMass t A j * ↑(#(Dᶜ ∩ A)) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j)) ≤
+    1 + (0 + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i))
+LeanD6ReferenceRetainedOscillationV1.lean:595:16: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:601:18: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:605:18: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanD6ReferenceRetainedOscillationV1.lean:631:16: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanD6ReferenceRetainedOscillationV1.lean:637:55: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?a + 0
+in the target expression
+  1 - gateMass t A j - gateMass t A j * ↑(#(Dᶜ ∩ A)) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j)) ≤
+    0 + (0 + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i))
+
+case neg
+n : ℕ
+t : ℝ
+A D : Finset (I n)
+j : I n
+hjA : j ∉ A
+hjD : j ∉ D
+rho : ℝ
+hG0 : 0 ≤ gateMass t A j
+hs0 : 0 ≤ slopeBval t A j
+hGr : gateMass t A j ≤ rho
+hsr : slopeBval t A j ≤ rho
+hA : 1 - gateMass t A j ≤ gateMass t A j * ↑(#(Dᶜ ∩ A))
+x : I n → Bool
+hjU : j ∈ univ
+hsplit :
+  linear (retainedCoeff A D j rho t) x =
+    retainedCoeff A D j rho t j * bit (x j) + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+hrj : retainedCoeff A D j rho t j = 1 - gateMass t A j
+hsign : ∀ (i : I n), i ≠ j → i ∈ D → 0 ≤ retainedCoeff A D j rho t i
+hsign' : ∀ (i : I n), i ≠ j → i ∉ D → retainedCoeff A D j rho t i ≤ 0
+hfullEq : univ.erase j ∩ Dᶜ = Dᶜ.erase j
+hfull : ∑ i ∈ Dᶜ.erase j, retainedCoeff A D j rho t i ≤ ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+htailval :
+  ∑ i ∈ Dᶜ.erase j, retainedCoeff A D j rho t i =
+    -(gateMass t A j * ↑(#(Dᶜ ∩ A))) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j))
+hxj : x j = false
+hP : ¬((∃ i ∈ A, x i = true) ∨ 2 ≤ count (others A j) x)
+hg : gate A j x = 0
+hAoff : ∀ i ∈ A, x i = false
+hbound2 :
+  ∀ i ∈ univ.erase j,
+    (if i ∈ others A j ∩ Dᶜ then retainedCoeff A D j rho t i else 0) ≤ retainedCoeff A D j rho t i * bit (x i)
+hsubE : univ.erase j ∩ (others A j ∩ Dᶜ) = others A j ∩ Dᶜ
+htail2 :
+  ∑ i ∈ others A j ∩ Dᶜ, retainedCoeff A D j rho t i ≤ ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i)
+hcomm : others A j ∩ Dᶜ = Dᶜ ∩ others A j
+hval2 : ∑ i ∈ others A j ∩ Dᶜ, retainedCoeff A D j rho t i = -(slopeBval t A j * ↑(#(Dᶜ ∩ others A j)))
+⊢ 1 - gateMass t A j - gateMass t A j * ↑(#(Dᶜ ∩ A)) - slopeBval t A j * ↑(#(Dᶜ ∩ others A j)) ≤
+    0 + (0 + ∑ i ∈ univ.erase j, retainedCoeff A D j rho t i * bit (x i))
+LeanD6ReferenceRetainedOscillationV1.lean:725:40: error: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.28 \ ?m.27) = #?m.28 - #(?m.27 ∩ ?m.28)
+
+Note: Expected a function because this term is being applied to the argument
+  hD
+LeanD6ReferenceRetainedOscillationV1.lean:743:43: error: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.121 \ ?m.120) = #?m.121 - #(?m.120 ∩ ?m.121)
+
+Note: Expected a function because this term is being applied to the argument
+  hD
+'CIGAMF.P13.D6ReferenceRetainedOscillation.retained_coeff_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.retained_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.retained_loss' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.mem_others_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.sdiff_A_eq_inter_others' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.sdiff_inter_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.sum_gateSlope' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.card_split' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.card_compl_split' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.linear_at_hiPoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.linear_at_loPoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.gate_at_loPoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.gate_at_hiPoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.hi_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.lo_tail_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.lo_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.expect_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.offProd_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.leOne_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.gateMass_bounds' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.slopeBval_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.gate_response_bounds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.slopeBval_le_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.core_le' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.core_ge' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.oscillation' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.retained_loss_formula' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.gateMass_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.slopeBval_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.corner_recovers_actual_loss' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.count_realizable' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.legal_count_realizable' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.count_formula_is_payoff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'CIGAMF.P13.D6ReferenceRetainedOscillation.phase_law_denominator' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

@@ -248,22 +248,70 @@ def _greedy_cover(cells: Sequence[Action], separates: Dict[Action, frozenset],
 
 
 def _exact_cover(cells: Sequence[Action], separates: Dict[Action, frozenset],
-                 required: frozenset, cap: int = 4):
-    """Exact minimum separating set by increasing cardinality, up to ``cap``."""
+                 required: frozenset, cap: int | None = None):
+    """Exact minimum-cardinality partial Test Cover by coverage-state BFS.
+
+    The old development helper stopped after a small cardinality cap and marked
+    larger feasible instances as unresolved.  Here every required incompatible
+    pair is encoded as one bit and BFS is performed over covered-pair masks.
+    Since every query has unit cardinality cost, the first depth reaching the
+    full mask is the exact optimum.  Duplicate coverage masks are collapsed;
+    reusing a mask cannot improve coverage and therefore cannot change the
+    optimum.  ``cap`` is retained only as an explicit caller-requested resource
+    limit; ``None`` means solve the finite instance exactly.
+    """
     if not required:
         return 0, True
-    for size in range(1, int(cap) + 1):
-        for combo in itertools.combinations(cells, size):
-            cov = set()
-            for a in combo:
-                cov |= separates[a]
-            if required <= cov:
-                return size, True
+    pair_order = tuple(sorted(required))
+    bit = {pair: 1 << i for i, pair in enumerate(pair_order)}
+    full = (1 << len(pair_order)) - 1
+    masks = set()
+    for a in cells:
+        mask = 0
+        for pair in separates[a]:
+            if pair in bit:
+                mask |= bit[pair]
+        if mask:
+            masks.add(mask)
+    if not masks:
+        return None, False
+    union = 0
+    for mask in masks:
+        union |= mask
+    if union != full:
+        return None, False
+
+    # A unit-cost test whose separated-pair set is contained in another test is
+    # never needed by a minimum-cardinality solution.  Removing such masks can
+    # cut the BFS state count drastically on sparse support families.
+    ordered = sorted(masks, key=lambda x: (-x.bit_count(), -x))
+    maximal = []
+    for mask in ordered:
+        if any((mask | kept) == kept for kept in maximal):
+            continue
+        maximal.append(mask)
+    masks = tuple(maximal)
+    max_depth = len(masks) if cap is None else min(int(cap), len(masks))
+    frontier = {0}
+    seen = {0}
+    for depth in range(1, max_depth + 1):
+        nxt = set()
+        for state in frontier:
+            for mask in masks:
+                merged = state | mask
+                if merged == full:
+                    return depth, True
+                if merged not in seen:
+                    seen.add(merged)
+                    nxt.add(merged)
+        if not nxt:
+            break
+        frontier = nxt
     return None, False
 
 
 def probe_test_cover(em: Emitter, base: World, supports: Sequence[Tuple[str, Support]],
-                     k: int, epsilon: Q, key: Dict, *, exact_cap: int = 2) -> None:
+                     k: int, epsilon: Q, key: Dict, *, exact_cap: int | None = None) -> None:
     """SUP.separating_query_set and SUP.test_cover_reduction.
 
     The candidate support family is the vertex set; a membership query on cell
@@ -303,7 +351,10 @@ def probe_test_cover(em: Emitter, base: World, supports: Sequence[Tuple[str, Sup
     e = "SUP.separating_query_set"
     em.emit(chain=CHAIN, eq_id=e, symbol="q_star", value=q_star,
             role=ROLE_LHS, status=ST_OK if found else ST_SKIPPED, instance=inst,
-            note="" if found else "no separating set of size <= %d" % exact_cap)
+            note="" if found else (
+                "incompatible pairs are not jointly separable by the available cells"
+                if exact_cap is None else "no separating set of size <= %d" % exact_cap
+            ))
     em.emit(chain=CHAIN, eq_id=e, symbol="n_worlds", value=n, role=ROLE_INPUT, instance=inst)
     em.emit(chain=CHAIN, eq_id=e, symbol="n_incompatible_pairs", value=len(pairs),
             role=ROLE_TERM, instance=inst)
@@ -346,7 +397,9 @@ def probe_test_cover(em: Emitter, base: World, supports: Sequence[Tuple[str, Sup
     else:
         em.emit(chain=CHAIN, eq_id=e, symbol="greedy_over_ln", value=None,
                 role=ROLE_RATIO, status=ST_SKIPPED, mode=MODE_FLOAT, instance=inst,
-                note="exact optimum not resolved within the enumeration cap")
+                note=("exact optimum unavailable because the required pairs are unseparable"
+                      if exact_cap is None else
+                      "exact optimum not resolved within the explicit cardinality cap"))
     em.emit(chain=CHAIN, eq_id=e, symbol="reduction_valid", value=1,
             role=ROLE_FLAG, instance=inst,
             note="separating-query-set == partial Test Cover by construction")

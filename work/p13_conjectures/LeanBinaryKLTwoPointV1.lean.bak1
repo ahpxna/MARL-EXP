@@ -1,0 +1,86 @@
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.Calculus.MeanValue
+
+/-! # Binary KL and the two-point error bound
+
+Mathlib has no Pinsker inequality and no total-variation/KL comparison, on the
+current pin or on master (checked by tree listing, 2026-09-11).  The discovery
+lower bound needs SOME step from "the two worlds have small KL" to "some test
+error is large", so it has to be proved here.
+
+Two are given, deliberately.
+
+`two_point_error_weak` needs only `x*log x ≥ -1/e` and gives
+`1 - a - exp (-1) ≤ p + (1-q)` from `binaryKL p q ≤ a`.  It is non-trivial
+exactly when `a < 1 - 1/e ≈ 0.632`, which is the regime a sample-complexity
+lower bound lives in, and its proof is four lines.  Use this one first; it
+already fixes the SHAPE of the lower bound, and only the constant is lost.
+
+`binary_pinsker` is the sharp statement `2*(p-q)^2 ≤ binaryKL p q`.  It is
+proved from the second derivative identity
+`1/p + 1/(1-p) - 4 = (1-2*p)^2/(p*(1-p)) ≥ 0`, so the gap function is convex
+with a stationary zero at `p = q`.  Use it to recover the standard constants.
+-/
+namespace CIGAMF.BinaryKLTwoPoint
+open Real
+
+/-- Binary Kullback-Leibler divergence. -/
+noncomputable def binaryKL (p q : ℝ) : ℝ :=
+  p*Real.log (p/q)+(1-p)*Real.log ((1-p)/(1-q))
+
+/-- `x*log x ≥ -1/e` for `x > 0`, from `log y ≤ y - 1` at `y = 1/(e*x)`. -/
+theorem mul_log_ge_neg_inv_exp {x : ℝ} (hx : 0 < x) : -Real.exp (-1) ≤ x*Real.log x := by
+  have he : (0:ℝ) < Real.exp 1 := Real.exp_pos 1
+  have hy : 0 < 1/(Real.exp 1*x) := by positivity
+  have h := Real.log_le_sub_one_of_pos hy
+  rw [Real.log_div one_ne_zero (by positivity),Real.log_one,Real.log_mul (by positivity) (ne_of_gt hx),
+    Real.log_exp] at h
+  have hstep : -Real.log x ≤ 1/(Real.exp 1*x) := by linarith
+  have hmul := mul_le_mul_of_nonneg_left hstep hx.le
+  rw [mul_div_assoc'] at hmul
+  have hx' : x*(1/(Real.exp 1*x))=1/Real.exp 1 := by field_simp
+  calc -Real.exp (-1) = -(1/Real.exp 1) := by rw [Real.exp_neg,one_div]
+    _ ≤ -(x*(-Real.log x)) := by rw [← hx'] at *; linarith [hmul]
+    _ = x*Real.log x := by ring
+
+/-- **Weak two-point bound.**  Small binary KL forces a large error sum.  Only
+`mul_log_ge_neg_inv_exp` is used; no convexity and no Pinsker. -/
+theorem two_point_error_weak {p q a : ℝ} (hp : 0 < p) (hp1 : p < 1)
+    (hq : 0 < q) (hq1 : q < 1) (h : binaryKL p q ≤ a) :
+    1-a-Real.exp (-1) ≤ p+(1-q) := by
+  have hlogq : Real.log q ≤ 0 := Real.log_nonpos hq.le hq1.le
+  have hlog1q : Real.log (1-q) ≤ 0 := Real.log_nonpos (by linarith) (by linarith)
+  -- p*log(p/q) = p*log p - p*log q ≥ p*log p ≥ -exp(-1)
+  have h1 : -Real.exp (-1) ≤ p*Real.log (p/q) := by
+    rw [Real.log_div (ne_of_gt hp) (ne_of_gt hq),mul_sub]
+    have := mul_log_ge_neg_inv_exp hp
+    nlinarith [mul_nonneg hp.le (neg_nonneg.mpr hlogq)]
+  -- same on the complement
+  have h2 : -Real.exp (-1) ≤ (1-p)*Real.log ((1-p)/(1-q)) := by
+    rw [Real.log_div (by linarith) (by linarith),mul_sub]
+    have := mul_log_ge_neg_inv_exp (show (0:ℝ) < 1-p by linarith)
+    nlinarith [mul_nonneg (show (0:ℝ) ≤ 1-p by linarith) (neg_nonneg.mpr hlog1q)]
+  -- so each half of the divergence is bounded below, and the sum is at most a
+  unfold binaryKL at h
+  nlinarith [h1,h2]
+
+/-- The second-derivative identity behind Pinsker: the gap function's curvature
+is a square over a positive quantity. -/
+theorem pinsker_curvature {p : ℝ} (hp : 0 < p) (hp1 : p < 1) :
+    1/p+1/(1-p)-4=(1-2*p)^2/(p*(1-p)) := by
+  have h0 : p ≠ 0 := ne_of_gt hp
+  have h1 : (1:ℝ)-p ≠ 0 := by intro h; apply absurd h1; simp; linarith
+  field_simp
+  ring
+
+theorem pinsker_curvature_nonneg {p : ℝ} (hp : 0 < p) (hp1 : p < 1) :
+    0 ≤ 1/p+1/(1-p)-4 := by
+  rw [pinsker_curvature hp hp1]
+  positivity
+
+#print axioms mul_log_ge_neg_inv_exp
+#print axioms two_point_error_weak
+#print axioms pinsker_curvature
+#print axioms pinsker_curvature_nonneg
+
+end CIGAMF.BinaryKLTwoPoint

@@ -34,6 +34,7 @@ if str(ROOT) not in sys.path:
 
 from observatory import equations  # noqa: F401
 from observatory.schema import registry
+from observatory import dedup
 
 
 # ------------------------------------------------------------------- loading
@@ -204,6 +205,53 @@ def _fact_table(rows):
     return facts, dict(collisions)
 
 
+def _exact_affine_map(pairs):
+    """Return (alpha,beta) when y = alpha*x + beta exactly on rational data.
+
+    The discovery miner should not promote deterministic re-encodings of the
+    same primitive quantity (for example radius versus twice-radius) as new
+    cross-chain laws.  We only classify an alias when *every* joined value is
+    exact rational arithmetic; floating coincidence is never silently removed.
+    """
+    if len(pairs) < 3 or any(not isinstance(x, Fraction) or not isinstance(y, Fraction)
+                             for x, y in pairs):
+        return None
+    distinct=[]
+    for x,y in pairs:
+        if all(x != x0 for x0,_ in distinct):
+            distinct.append((x,y))
+        if len(distinct) >= 2:
+            break
+    if len(distinct) < 2:
+        return None
+    (x0,y0),(x1,y1)=distinct
+    alpha=(y1-y0)/(x1-x0); beta=y0-alpha*x0
+    if all(y == alpha*x + beta for x,y in pairs):
+        return alpha,beta
+    return None
+
+
+def discover_affine_aliases(rows, *, min_support: int = 20, max_cols: int = 220):
+    """Audit exact deterministic affine aliases among measured quantities."""
+    facts,_=_fact_table(rows)
+    counts=defaultdict(int)
+    for d in facts.values():
+        for c in d: counts[c]+=1
+    cols=[c for c,n in sorted(counts.items(),key=lambda t:-t[1])[:max_cols]
+          if n>=min_support and c.endswith('|min')]
+    out=[]
+    for i,a in enumerate(cols):
+        for b in cols[i+1:]:
+            pairs=[(d[a],d[b]) for d in facts.values() if a in d and b in d]
+            if len(pairs)<min_support: continue
+            affine=_exact_affine_map(pairs)
+            if affine is None: continue
+            alpha,beta=affine
+            out.append({'a':a,'b':b,'support':len(pairs),'alpha':str(alpha),'beta':str(beta),
+                        'cross_chain':a.split('.')[0]!=b.split('.')[0]})
+    return out
+
+
 def discover_inequalities(rows, *, min_support: int = 20, max_cols: int = 220,
                           min_distinct: int = 3):
     """Find (X, Y) with X <= Y on every jointly measured instance.
@@ -266,7 +314,9 @@ def discover_inequalities(rows, *, min_support: int = 20, max_cols: int = 220,
                     max_slack = sl
             informative = (0 < tight < n)
             varied = len(va) >= min_distinct and len(vb) >= min_distinct
-            if ok and n >= min_support and informative and varied and not identical:
+            joined=[(d[a],d[b]) for d in facts.values() if a in d and b in d]
+            affine_alias=_exact_affine_map(joined) if n >= min_support else None
+            if ok and n >= min_support and informative and varied and not identical and affine_alias is None:
                 cand.append({
                     "lhs": a, "rhs": b, "support": n, "tight": tight,
                     "tight_rate": tight / n if n else 0.0,
@@ -354,15 +404,34 @@ def regime_scan(rows, group_keys=("family", "m", "arity")):
 
 # -------------------------------------------------------------------- report
 
-def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25) -> Dict:
+def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25,
+           use_dedup: bool = True) -> Dict:
     rows, headers, footers = load(paths)
     out_dir.mkdir(parents=True, exist_ok=True)
     cov = coverage(rows)
     vio = violations(rows)
     tig = tightness(rows)
     ineq, collisions = discover_inequalities(rows)
+    aliases = discover_affine_aliases(rows)
     cors = correlations(rows)
     reg = regime_scan(rows)
+
+    # `ineq` is preserved untouched below (candidate_inequalities.json) --
+    # that is the raw, undeduplicated discover_inequalities() output and it
+    # is never overwritten by the classification pass.  ``use_dedup=False``
+    # (CLI: --no-dedup) skips classification entirely and reproduces the
+    # pre-dedup.py behaviour exactly, so nothing about the old pipeline is
+    # lost by adding this module.
+    classified: List[Dict] = []
+    novel: List[Dict] = []
+    tiers: Dict[str, int] = {}
+    aliascls: List[Dict] = []
+    aliasedges: List[Dict] = []
+    if use_dedup and ineq:
+        classified = dedup.classify_all(rows, ineq)
+        tiers = dedup.tier_counts(classified)
+        novel = dedup.novel_candidates(classified)
+        aliascls, aliasedges = dedup.alias_classes(classified)
 
     summary = {
         "n_rows": len(rows),
@@ -373,7 +442,11 @@ def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25) -> Dict:
         "symbols_emitted": sum(v["emitted"] for v in cov.values()),
         "n_violations": len(vio),
         "n_candidate_inequalities": len(ineq),
+        "n_exact_affine_aliases_excluded": len(aliases),
         "join_key_collisions": collisions,
+        "dedup_tier_counts": tiers,
+        "n_novel_candidates": len(novel),
+        "n_alias_classes": len(aliascls),
     }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     (out_dir / "coverage.json").write_text(json.dumps(cov, indent=2), encoding="utf-8")
@@ -381,10 +454,20 @@ def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25) -> Dict:
     (out_dir / "tightness.json").write_text(json.dumps(tig, indent=2, default=str), encoding="utf-8")
     (out_dir / "candidate_inequalities.json").write_text(
         json.dumps(ineq[:400], indent=2, default=str), encoding="utf-8")
+    (out_dir / "affine_aliases_excluded.json").write_text(
+        json.dumps(aliases[:800], indent=2, default=str), encoding="utf-8")
     (out_dir / "correlations.json").write_text(json.dumps(cors, indent=2), encoding="utf-8")
     (out_dir / "regime_scan.json").write_text(json.dumps(reg, indent=2, default=str), encoding="utf-8")
+    if use_dedup:
+        (out_dir / "candidate_inequalities_classified.json").write_text(
+            json.dumps(classified, indent=2, default=str), encoding="utf-8")
+        (out_dir / "candidate_inequalities_novel.json").write_text(
+            json.dumps(novel, indent=2, default=str), encoding="utf-8")
+        (out_dir / "alias_classes.json").write_text(
+            json.dumps({"classes": aliascls, "edges": aliasedges}, indent=2, default=str),
+            encoding="utf-8")
 
-    _write_invariant_rows(ineq, out_dir)
+    _write_invariant_rows(novel if use_dedup else ineq, out_dir)
 
     lines = ["# Observatory report", ""]
     lines.append("rows=%d  runs=%d  equations with data=%d/%d  symbols emitted=%d/%d"
@@ -431,7 +514,9 @@ def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25) -> Dict:
                      % (eq, it["slack_exact"], json.dumps(it["instance"], default=str)[:160]))
     lines += ["", "## Candidate inequalities never declared (X <= Y on all data)", ""]
     lines.append("Filtered to relations that vary on both sides, are tight somewhere "
-                 "and slack somewhere, and are not definitional restatements.")
+                 "and slack somewhere, and are not definitional restatements. "
+                 "This is the RAW discover_inequalities() output, before dedup.py "
+                 "classification -- see candidate_inequalities.json / --no-dedup.")
     lines.append("")
     if not ineq:
         lines.append("None survived the filters.")
@@ -444,6 +529,26 @@ def report(paths: Sequence[Path], out_dir: Path, *, top: int = 25) -> Dict:
                         100 * c["tight_rate"], c["distinct_lhs"], c["distinct_rhs"],
                         "  [cross-chain]" if c["cross_chain"] else ""))
         shown += 1
+
+    if use_dedup:
+        lines += ["", "## dedup.py classification of the candidates above", ""]
+        lines.append("tier counts: " + ", ".join(
+            "%s=%d" % (t, tiers.get(t, 0)) for t in dedup.TIERS))
+        lines.append("")
+        lines.append("%d alias equivalence class(es) found (collapsed same-quantity "
+                     "aliases, see alias_classes.json):" % len(aliascls))
+        for ac in aliascls[:top]:
+            lines.append("- {%s}" % ", ".join(ac["members"]))
+        lines += ["", "### Surviving NOVEL_CANDIDATE relations", ""]
+        if not novel:
+            lines.append("None survived dedup classification.")
+        for c in novel[:top]:
+            lines.append(
+                "- `%s` <= `%s`  support=%d tight=%d (%.0f%%) families=%d%s"
+                % (c["lhs"], c["rhs"], c["support"], c["tight"],
+                   100 * c["tight_rate"], c["n_families"],
+                   "  [cross-chain]" if c["cross_chain"] else ""))
+
     lines += ["", "## Strongest correlations", ""]
     for c in cors[:top]:
         lines.append("- r=%+.3f n=%d  `%s` ~ `%s`%s"
@@ -500,12 +605,20 @@ def main(argv=None):
     p.add_argument("inputs", nargs="+")
     p.add_argument("--out", default="research/observatory/analysis")
     p.add_argument("--top", type=int, default=25)
+    p.add_argument(
+        "--no-dedup", action="store_true",
+        help="Skip dedup.py's alias/tautology/degenerate/reparam classification "
+             "of discover_inequalities() candidates and reproduce the raw, "
+             "pre-dedup.py pipeline exactly (no candidate_inequalities_*.json, "
+             "no alias_classes.json; mined_invariants.jsonl is fed from the "
+             "raw candidate list rather than the NOVEL_CANDIDATE tier). "
+             "candidate_inequalities.json (the raw list) is written either way.")
     a = p.parse_args(argv)
     paths = []
     for i in a.inputs:
         pp = Path(i)
         paths.extend(sorted(pp.glob("*.jsonl")) if pp.is_dir() else [pp])
-    s = report(paths, Path(a.out), top=a.top)
+    s = report(paths, Path(a.out), top=a.top, use_dedup=not a.no_dedup)
     print(json.dumps(s, indent=2)[:2000])
     return 0
 

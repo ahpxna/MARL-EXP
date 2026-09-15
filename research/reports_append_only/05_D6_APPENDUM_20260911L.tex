@@ -1,0 +1,68 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update L: the unrecorded backlog --- 62 modules and 256 audited names spanning transcript, blind design, discovery, allocation and anytime control}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September (backlog entry)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--162 are an immutable prefix. This addendum begins at Section 163.
+
+\claimbox{\textbf{Why this entry exists.} A ledger audit on 11 September found that of \textbf{384} theorem names audited since 9 September across \textbf{96} modules, \textbf{381} appeared in no \texttt{.tex} file. Roughly forty experiment artifacts and two research documents were likewise unrecorded. The corpus had run far ahead of its own ledger. This addendum and its five siblings enter that backlog. Evidence classes are assigned from compile logs and artifact fields, not from prose summaries.}
+
+\section*{163. What was built, by link}
+All modules below compile with zero \texttt{sorryAx} unless marked. Names are as they appear in the compile logs.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r X}
+\toprule
+Link & names & Representative results\\
+\midrule
+Transcript / kernel & $18$ & \texttt{actual\_full\_transcript}, \texttt{actual\_step\_from\_resource}, \texttt{adaptive\_likelihood\_normalization}, \texttt{actual\_record\_normalization}, \texttt{finite\_family\_tail}\\
+Blind ($A$-free) design & $33$ & \texttt{partition\_legal}, \texttt{actual\_block\_law}, \texttt{actual\_variance\_lower}, \texttt{cyclic\_penalty\_lt\_nine}, \texttt{crossing\_exists}, \texttt{cyclic\_attains\_linear\_lower\_bound}\\
+Discovery of $A$ & $28$ & \texttt{decoder\_terminates}, \texttt{decoder\_expected\_cost\_finite}, \texttt{decoder\_anytime\_geometric\_error}, \texttt{good\_certificate\_correct}, \texttt{eventually\_correct}, \texttt{expected\_wrong\_epoch\_work}\\
+Allocation / game & $44$ & \texttt{sharp\_actual\_game}, \texttt{value\_attained}, \texttt{all\_actual\_alternatives\_lower}, \texttt{tracked\_counts\_regret}, \texttt{realized\_tracking}, \texttt{average\_oracle\_regret}\\
+Anytime control & $14$ & \texttt{actual\_path\_marginals}, \texttt{path\_absorbing}, \texttt{anytime\_from\_actual\_marginals}, \texttt{anytime\_geometric\_error\_on\_path}\\
+Matching (known $A$) & $17$ & \texttt{actual\_constructive\_upper}, \texttt{adaptive\_lower\_leading}, \texttt{adaptive\_separation\_leading}, \texttt{matching\_neighborhood}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section*{164. The chain that now exists end to end}
+Reading the links in order, the following composite is closed in Lean: a legal $A$-free query design exists and its law is computed from the actual world means; a decoder over that design terminates almost surely with finite expected cost and a bounded probability of ever certifying a wrong label; labels are revalidated each epoch so that the total work spent under a wrong label has bounded expectation; that quantity converts into a bound on the \texttt{oracleRegret} contributed by those epochs; and an explicit tracker's query counts match the emitted schedule with bounded discrepancy.
+\claimbox{\eclass{PROVED} for each link, with the composite assembled through \texttt{Axiom\allowbreak Audit\allowbreak Novelty\allowbreak ChainsV1} ($16$ end-to-end names). \textbf{What this is not}: regret inside correctly-labelled epochs --- learning $\mu$, tracking quality near the boundary --- and the expected stopping rate $\Gamma$ are \emph{not} closed. No matching-regret claim for unknown $A$ follows from the above.}
+
+\section*{165. Two modules carry defects, recorded not hidden}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r}
+\toprule
+Module & errors & \texttt{sorryAx}\\
+\midrule
+\texttt{LeanD6RecordGapDecompositionV1} & $1$ & $2$\\
+\texttt{LeanD6ScalarExplorationSeparationV1} & $2$ & $2$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Their names (\texttt{actual\_record\_gap}, \texttt{noise\_lower}, \texttt{quadratic\_separation}, \texttt{one\_round\_information}, \texttt{forced\_rounds\_information}) are \eclass{NOT PROVED} and must not be cited. They are listed here so that a future reader does not mistake their presence in the tree for completion.
+
+\section*{166. Experimental record}
+Roughly twenty artifacts under \texttt{research/d6\_phase\_boundary\_20260908/} and \texttt{research/high\_risk\_20260910/}, all \texttt{development\_only}. The load-bearing ones: \texttt{blind\_saddle} (relative shortfall $4.61\%\to0.228\%\to0.0127\%$ at $q=16,256,4096$ with $q^2\Delta\approx0.23$--$0.26$ throughout, so the shortfall persists at the target scale); \texttt{partial\_allocation\_decision} ($2000$ paired trials, exact checks at $10^{-16}$); \texttt{d6\_nuisance\_free\_discovery} and \texttt{d6\_revalidation\_epochs} (simulation to $q=1024$: no wrong certificate observed, $1383$ epochs lacking a certificate, all counted as cost); \texttt{d6\_cyclic\_raw}; \texttt{block\_budget\_law} (Section 160).
+\claimbox{Simulation without an observed failure is \eclass{NUMERICAL EVIDENCE}, never a guarantee. Every guarantee cited in this chain rests on the Lean names of Section 163, not on these runs.}
+
+\section*{167. Standing scope for the whole chain}
+The blind results hold for fixed linear $A$-invariant statistics of legal off queries under unit independent Gaussian noise. The discovery results hold for the stated decoder with dyadic revalidation. The matching results assume $A$ known. Discovery cost currently scales as $q\log(q/\eta)$, which forbids dropping it mechanically into the $N\asymp q$ budget regime. Track-and-Stop style asymptotic optimality has a broad existing framework, so closing $\Gamma$ at fixed $q$ completes the chain without by itself creating novelty.
+\end{document}

@@ -38,6 +38,24 @@ class EvidenceItem:
             raise ValueError("evidence cost must be finite and non-negative")
 
 
+def _require_unique_evidence_keys(items: Sequence[EvidenceItem]) -> None:
+    """Reject duplicate evidence keys.
+
+    Both solvers report the SELECTED KEYS as the provenance of a solution.  If
+    two distinct items share a key that provenance is ambiguous: the reported
+    key set no longer identifies which items were chosen, so a reported cost
+    cannot be reproduced from it.  Fail closed rather than emit an
+    unreproducible selection.
+    """
+    seen = {}
+    for item in items:
+        key = str(item.key)
+        if key in seen:
+            raise ValueError(
+                f"duplicate evidence key {key!r}: selected-key provenance would be ambiguous")
+        seen[key] = item
+
+
 def minimum_cost_typed_completion(
     obligations: Mapping[str, str], evidence: Sequence[EvidenceItem]
 ) -> dict:
@@ -50,6 +68,7 @@ def minimum_cost_typed_completion(
     """
     obligations = {str(k): str(v) for k, v in obligations.items()}
     items = tuple(evidence)
+    _require_unique_evidence_keys(items)
     for item in items:
         unknown = set(item.discharges) - set(obligations)
         if unknown:
@@ -102,6 +121,70 @@ def minimum_cost_typed_completion(
         "cost": float(cost0),
         "selected": [x.key for x in chosen],
         "selected_types": [x.evidence_type for x in chosen],
+        "uncovered": [],
+    }
+
+
+def greedy_typed_completion(
+    obligations: Mapping[str, str], evidence: Sequence[EvidenceItem]
+) -> dict:
+    """Deterministic cost-per-new-obligation greedy baseline under typed discharge.
+
+    The typed contract is validated exactly as in :func:`minimum_cost_typed_completion`.
+    This helper is intentionally a baseline, not an optimality claim.  It is used by
+    the Observatory hardness campaign so the reported approximation ratio compares
+    two algorithms over the *same* typed completion object.
+    """
+    obligations = {str(k): str(v) for k, v in obligations.items()}
+    items = tuple(evidence)
+    _require_unique_evidence_keys(items)
+    for item in items:
+        unknown = set(item.discharges) - set(obligations)
+        if unknown:
+            raise ValueError(
+                f"evidence {item.key} discharges unknown obligations: {sorted(unknown)}"
+            )
+        bad = [o for o in item.discharges if obligations[o] != item.evidence_type]
+        if bad:
+            raise ValueError(
+                f"typed discharge violation for {item.key}: {bad} require "
+                f"{[obligations[o] for o in bad]} but item has {item.evidence_type}"
+            )
+
+    remaining = set(obligations)
+    selected = []
+    total_cost = 0.0
+    available = set(range(len(items)))
+    while remaining:
+        best = None
+        for i in sorted(available):
+            item = items[i]
+            newly = set(item.discharges) & remaining
+            if not newly:
+                continue
+            score = float(item.cost) / len(newly)
+            key = (score, float(item.cost), -len(newly), item.key, i)
+            if best is None or key < best[0]:
+                best = (key, i, newly)
+        if best is None:
+            return {
+                "complete": False,
+                "cost": None,
+                "selected": [items[i].key for i in selected],
+                "selected_types": [items[i].evidence_type for i in selected],
+                "uncovered": sorted(remaining),
+            }
+        _, i, newly = best
+        selected.append(i)
+        available.remove(i)
+        total_cost += float(items[i].cost)
+        remaining -= newly
+
+    return {
+        "complete": True,
+        "cost": float(total_cost),
+        "selected": [items[i].key for i in selected],
+        "selected_types": [items[i].evidence_type for i in selected],
         "uncovered": [],
     }
 

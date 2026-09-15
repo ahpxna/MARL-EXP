@@ -1,0 +1,358 @@
+{
+  "evidence_class": "COMPILED_ACTUAL_WORLD_MARGIN_INTERVAL_GEOMETRIC_ALLOCATION",
+  "verified_utc": "2026-09-08T17:36:46.047089+00:00",
+  "headline_audits": 55,
+  "new_headline_audits_beyond_half_margin_bridge": 32,
+  "foundation_audits_separately_passed": 50,
+  "allowed_axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "scope": {
+    "family": "explicit D6 threshold construction; every A in worlds r j",
+    "dimensions": "m=2(r+1), integer r>=3; geometric uniqueness separately holds for r>=2",
+    "queries": "all scalar Q_i and joint G with j on/off; j not in G; |G|<=r; |G|>=2 when j off",
+    "cost_and_information": "unit cost; (actual mean difference)^2/2; unit-variance Gaussian convention",
+    "geometry": "literal finite real support, fixed ambient coordinate projections; feasible selections liftedSelection S of cardinality r+1; interaction coordinate none omitted",
+    "optimal_design": "depends on true label A, independent of true margin throughout the interval; oracle information design, not a proved adaptive policy",
+    "alternative_margin": "continuous full interval [0,1]",
+    "upper_quantifier": "for each full allocation, one admissible alternative world and margin defeats it; alternative does not depend on sampled query"
+  },
+  "closed_form": {
+    "c": "sqrt(q/(q+1))",
+    "z": "(1-c)/(q-2+c)",
+    "R": "sqrt((q^2+2*q^2*z+z^2)/(q+1))",
+    "margin_min": "(1-c)/(q-1)",
+    "margin_max": "R/(1+R)",
+    "sharp_value": "(1-mu)^2*c^2*(q-1)^2/(2*(q-2+c)^2)",
+    "weight_B_with_j": "c/(q-2+c)",
+    "remaining_weight": "uniform over A-minus-one queries without j",
+    "interval_endpoints_included": true
+  },
+  "examples": [
+    {
+      "m": 8,
+      "q": 3,
+      "margin_min": 0.0669872981077807,
+      "margin_max": 0.6160470282583232,
+      "weight_B_with_j": 0.46410161513775455
+    },
+    {
+      "m": 10,
+      "q": 4,
+      "margin_min": 0.03519093633336138,
+      "margin_max": 0.6494948769055752,
+      "weight_B_with_j": 0.30901699437494745
+    },
+    {
+      "m": 12,
+      "q": 5,
+      "margin_min": 0.021782267706180775,
+      "margin_max": 0.675978935011395,
+      "weight_B_with_j": 0.23329952500316292
+    }
+  ],
+  "formalized": {
+    "actual_world_query_sums": true,
+    "explicit_normalized_query_distribution": true,
+    "same_distribution_for_all_true_margins_in_interval": true,
+    "all_actual_alternatives_primal_lower": true,
+    "arbitrary_allocation_actual_dual_upper": true,
+    "worst_actual_alternative_attains_bound": true,
+    "exact_margin_interval_endpoints": true,
+    "unique_geometric_optimum_over_all_cardinality_feasible_selections": true,
+    "same_hard_alternative_has_different_unique_geometric_answer": true,
+    "Gaussian_relative_entropy_identity_in_measure_theory": false,
+    "sequential_stopping_time_optimality": false,
+    "all_true_margins_in_0_1": false,
+    "unrestricted_cube_queries": false,
+    "global_D6_class_matching_upper": false
+  },
+  "exact_independent_evidence": {
+    "path": "research/d6_information_limit_20260908/margin_regime_exact.json",
+    "sha256": "8e49ac5ec2989fecb31f9a3809f4a3645057aa7eda1bd2413e09236e6b413df4",
+    "verifier": "scripts/verify_d6_margin_regime_exact.py",
+    "cases": [
+      {
+        "m": 8,
+        "true_mu": "1/10",
+        "PASS": true
+      },
+      {
+        "m": 8,
+        "true_mu": "3/5",
+        "PASS": true
+      },
+      {
+        "m": 10,
+        "true_mu": "1/25",
+        "PASS": true
+      },
+      {
+        "m": 10,
+        "true_mu": "3/5",
+        "PASS": true
+      },
+      {
+        "m": 12,
+        "true_mu": "13/20",
+        "PASS": true
+      }
+    ],
+    "alternative_margin_grid_used": false
+  },
+  "artifacts": [
+    {
+      "module": "LeanD6AllocationFiniteBridgeV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationFiniteBridge.product_second_moment",
+        "CIGAMF.P13.D6AllocationFiniteBridge.swapped_query_count",
+        "CIGAMF.P13.D6AllocationFiniteBridge.actual_query_mean",
+        "CIGAMF.P13.D6AllocationFiniteBridge.actual_swapped_query_KL",
+        "CIGAMF.P13.D6AllocationFiniteBridge.actual_dual_sum"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationFiniteBridgeV1.lean",
+          "sha256": "1f4c2122f11d5b1a96a02dd1e5fc9fdeddce883ac503867d859c917cc6b6a06e"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationFiniteBridgeV1.olean",
+          "sha256": "d55a6a057e94aa428a813f142fcd8b1dc946edcdcfbe58dfc072218e79b6b037"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationFiniteBridgeV1.compile.log",
+          "sha256": "52d4fb0ad45af6905bf8a894bdf36e6ed3de18296abd3825571400482390a46a"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationPrimalBridgeV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationPrimalBridge.B_alternative_count",
+        "CIGAMF.P13.D6AllocationPrimalBridge.actual_A_query_sum",
+        "CIGAMF.P13.D6AllocationPrimalBridge.actual_B_query_KL",
+        "CIGAMF.P13.D6AllocationPrimalBridge.actual_primal_eq",
+        "CIGAMF.P13.D6AllocationPrimalBridge.actual_primal_lower"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationPrimalBridgeV1.lean",
+          "sha256": "09218b9dbaea93b876f1f99c4e90725c68cf81dd0d99afdf4cd93aa157c15ac1"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationPrimalBridgeV1.olean",
+          "sha256": "a1dc590d6a4b1cb0597aa2a8f17a697c64150e68c0a2cd2b75e36f7e9e2b887f"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationPrimalBridgeV1.compile.log",
+          "sha256": "372aeeb7ac69c094c18b5ab797dfb975b28763d55f7e75ab698c278253b10119"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationDualBridgeV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationDualBridge.actual_scalar_sum",
+        "CIGAMF.P13.D6AllocationDualBridge.query_count_partition",
+        "CIGAMF.P13.D6AllocationDualBridge.actual_joint_dual_bound",
+        "CIGAMF.P13.D6AllocationDualBridge.actual_scalar_dual_bound",
+        "CIGAMF.P13.D6AllocationDualBridge.actual_measurement_dual_bound",
+        "CIGAMF.P13.D6AllocationDualBridge.arbitrary_allocation_upper"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDualBridgeV1.lean",
+          "sha256": "f34043fa9746ce07b7791a2edcc05676314511fdb225b9dc957e0dd847e47416"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDualBridgeV1.olean",
+          "sha256": "4d28f81eeff191542a78396dcf3045207d1eaea47fb1b4ad3cf599c18ffdddfa"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDualBridgeV1.compile.log",
+          "sha256": "6cacfc593bba327b8e77ed65f359eedbd47ca00e1d594461f3b75c7df8d2039e"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationSharpV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationSharp.alternative_distance_bounds",
+        "CIGAMF.P13.D6AllocationSharp.primal_feasible",
+        "CIGAMF.P13.D6AllocationSharp.every_alternative_primal_lower",
+        "CIGAMF.P13.D6AllocationSharp.sharp_actual_allocation",
+        "CIGAMF.P13.D6AllocationSharp.all_width_sharp",
+        "CIGAMF.P13.D6AllocationSharp.geometric_wrong_optimum_regret",
+        "CIGAMF.P13.D6AllocationSharp.all_width_geometric_upper"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationSharpV1.lean",
+          "sha256": "ea9fc26d0b389265974b073b3c940ff78d5aa1e37e4f079412d2816ca2258198"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationSharpV1.olean",
+          "sha256": "4bcd2d1f9c2aabe911ead39e0bb67b8f48ade537c8dbd3b9e41acf512cb3a177"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationSharpV1.compile.log",
+          "sha256": "c721656fd513744468028035a30b35c5a83e98b445ce948ce7509d35d96d3f59"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationDistributionV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationDistribution.primal_sum",
+        "CIGAMF.P13.D6AllocationDistribution.primal_distribution",
+        "CIGAMF.P13.D6AllocationDistribution.primal_information_eq",
+        "CIGAMF.P13.D6AllocationDistribution.primal_distribution_lower",
+        "CIGAMF.P13.D6AllocationDistribution.primal_attains_information_value",
+        "CIGAMF.P13.D6AllocationDistribution.sharp_finite_allocation_game"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDistributionV1.lean",
+          "sha256": "e6d9157a906d7421003d0913e8061d06ae6d5d3193a814d6d221d6331c671f90"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDistributionV1.olean",
+          "sha256": "499843d7363701bdda07b81554f11e8c004ef6b8688e77bdafe70eb829c01f8c"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationDistributionV1.compile.log",
+          "sha256": "d1f1c6c7fff289b33c7b8a0f569853dbd2ec238d257a38f7c36344e45c43391e"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationMarginV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationMargin.interval_in_interior",
+        "CIGAMF.P13.D6AllocationMargin.half_in_interior",
+        "CIGAMF.P13.D6AllocationMargin.joint_homogeneity",
+        "CIGAMF.P13.D6AllocationMargin.primal_homogeneity",
+        "CIGAMF.P13.D6AllocationMargin.actual_primal_margin_lower",
+        "CIGAMF.P13.D6AllocationMargin.actual_scalar_margin_sum"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginV1.lean",
+          "sha256": "6dcb3c0fd95d50db8e083ae96de35567f1c0fd60beee31ef807aea2366983aec"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginV1.olean",
+          "sha256": "9ef27a82486bbd2be26e0cb808ab41b35b690e22dfddd1c12892fbbb2490490c"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginV1.compile.log",
+          "sha256": "579608f0f4d5bf7692d5e508a053734b767e7883ba75fee51c5c5a4bfcf07054"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationMarginRegionV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationMarginRegion.radius_balance",
+        "CIGAMF.P13.D6AllocationMarginRegion.scalar_B_implies_A",
+        "CIGAMF.P13.D6AllocationMarginRegion.interior_iff",
+        "CIGAMF.P13.D6AllocationMarginRegion.marginMin_eq",
+        "CIGAMF.P13.D6AllocationMarginRegion.interior_iff_margin"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginRegionV1.lean",
+          "sha256": "03eeab51221ba490de9cb0eb8d095bccac89a25d50b8e3f14250db49f16842c8"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginRegionV1.olean",
+          "sha256": "e8eb8e88ee2184a02d9cc5063c69614c573185a674f4afecb646883537b010b5"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginRegionV1.compile.log",
+          "sha256": "6819e71eac5643d1eeed284688a3568fc2ec279dc7b7b5e506f80b77cd430b99"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationMarginSharpV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationMarginSharp.actual_joint_margin_bound",
+        "CIGAMF.P13.D6AllocationMarginSharp.actual_scalar_margin_bound",
+        "CIGAMF.P13.D6AllocationMarginSharp.measurement_margin_bound",
+        "CIGAMF.P13.D6AllocationMarginSharp.arbitrary_margin_allocation_upper",
+        "CIGAMF.P13.D6AllocationMarginSharp.margin_distribution_information",
+        "CIGAMF.P13.D6AllocationMarginSharp.margin_distribution_lower",
+        "CIGAMF.P13.D6AllocationMarginSharp.sharp_margin_game",
+        "CIGAMF.P13.D6AllocationMarginSharp.margin_value_attained"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginSharpV1.lean",
+          "sha256": "03cd2fffe32df06ec58df7f8fbc910ff3dd2d027068c175b1a06adbb35ba1e59"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginSharpV1.olean",
+          "sha256": "3eb3cbc657fc93965c04c732cecc07287f715d35ea8f23a252fb02cfadbf52fa"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginSharpV1.compile.log",
+          "sha256": "6bc03a7f0f2229af834c5feead3a14dc3da630d542d256f0baa0eedbb24f7088"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6UniqueOptimumV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6UniqueOptimum.actual_loss_eq_iff",
+        "CIGAMF.P13.D6UniqueOptimum.actual_optimal_iff",
+        "CIGAMF.P13.D6UniqueOptimum.geometric_optimal_iff",
+        "CIGAMF.P13.D6UniqueOptimum.all_width_geometric_optimal_iff"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6UniqueOptimumV1.lean",
+          "sha256": "d881d5341bebfadc8a3046023b6629c8c688420acbfd46cc8301f1747c76436b"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6UniqueOptimumV1.olean",
+          "sha256": "0999547ca613e74a120e4a26d9ad94261db0b68b651ed8f098ff1d230eaaf926"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6UniqueOptimumV1.compile.log",
+          "sha256": "89de365de6c9ed48fb77bed536a0e87a3b19cd0a83d458428b9a0218ecf90da0"
+        }
+      ]
+    },
+    {
+      "module": "LeanD6AllocationMarginTheoremV1",
+      "headline_theorems": [
+        "CIGAMF.P13.D6AllocationMarginTheorem.rate_closed_form",
+        "CIGAMF.P13.D6AllocationMarginTheorem.all_width_uniform_interval_design",
+        "CIGAMF.P13.D6AllocationMarginTheorem.all_width_interval_geometric_upper"
+      ],
+      "files": [
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginTheoremV1.lean",
+          "sha256": "9ef248fcfa2d011dbc2f5c299439af5af79de9e638390f6f30a61733f0093041"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginTheoremV1.olean",
+          "sha256": "1b016b915feeb9305ce5dc97f5a216442b60bd70dd3fe2b73567bc2b7cdeb0ff"
+        },
+        {
+          "path": "work/p13_conjectures/LeanD6AllocationMarginTheoremV1.compile.log",
+          "sha256": "28a4ae4142d1eeff6b207e9b199be0a347ee582862e1dd79e91c922657276904"
+        }
+      ]
+    }
+  ],
+  "check_command": "bash scripts/check_d6_allocation_bridge.sh --audit-existing",
+  "recompile_command": "bash scripts/check_d6_allocation_bridge.sh",
+  "next_unproved_targets": [
+    "allocation phase transitions outside the proved interval",
+    "adaptive acquisition of A and sharp sequential stopping complexity with continuous nuisance margin"
+  ]
+}

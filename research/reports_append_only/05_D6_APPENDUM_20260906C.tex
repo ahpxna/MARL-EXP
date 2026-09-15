@@ -1,0 +1,317 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update C: D6-prime falsified, the refutation shown unconditional, a countersearch false negative, an exact LP instrument, and a sharp-constant conjecture}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 6 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--101, including addenda A and B of 5 September, are an immutable prefix. Nothing there is rewritten. This addendum begins at Section 102. Where a line of an earlier addendum is now stale, that line is quoted and struck here, never edited in place.
+
+\textbf{What this addendum contains.} One promotion by refutation, three demotions, one instrument replacement, one new conjecture with a measured constant, and one \emph{failed} programme reported at the same weight as the successes. The failure in Section 108 is recorded in as much detail as the successes, because its diagnosis is what tells a future reader which door not to open twice.
+
+\section*{102. D6-prime is FALSE}
+The pre-registered gate of Section 101 was: \emph{``the raw saturation test at denominators 32 and 64: the raw ceiling is still climbing and whether it crosses $1$ is the question that decides D6-prime.''} It crossed.
+
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.30\columnwidth}X}
+\toprule
+Quantity & Exact value\\
+\midrule
+$2D$ & $192722413097/64236637920$\\
+$\delta_{\square}$ & $4674203777/7793262048$\\
+$(m-1)\delta_{\square}$ & $23371018885/7793262048$\\
+Ratio & $\dfrac{1203474573547939297}{1202945254757393525}$\\
+ & $=1.000440019018698$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Seed 5, denominator 64, \texttt{--snap coefficients}, \texttt{--min-topc-margin 0.02}, raw fibre, corner $0$, fibre index $2$, $\lambda_i=(0,1,0)$ for every $i$, $1658.0$\,s. Selected $\{0,4,5\}$, competitor $\{1,2,3\}$.
+
+\textbf{Class transition.} D6$'$: \eclass{OPEN} $\longrightarrow$ \eclass{EXACT\_RATIONAL\_COUNTEREXAMPLE\_INDEPENDENTLY\_RECOMPUTED}.
+
+\subsection*{102.1 Why the artifact's own flag was not sufficient}
+Addendum B Section 95 recorded the weak link in its own non-claims: \emph{``The exact recheck inside the search script verifies centred rank one, not raw rank one; raw-arm witnesses are in the fibre by construction of the basis, not by an independent certificate.''} That is exactly right. The field \texttt{rank\_one\_verified} is produced by \texttt{evaluate\_candidate} in \texttt{run\_d6\_rankone\_falsification.py}, which tests \emph{centred} interaction-contrast rank one. Under \texttt{--fiber-kind raw} the candidate lies in the raw fibre only because the basis was built that way. A KILLED verdict may not rest on a construction argument, so the certificate was re-derived from the $729$ stored rationals by an evaluator sharing no code with the search script (\texttt{scripts/verify\_d6prime\_killed\_witness.py}).
+
+For each coordinate $i$ the raw contrast matrix
+\[
+M^{(i)}_{u,z}=F(z[i\!\leftarrow\!u])-F(z[i\!\leftarrow\!u_0])
+\]
+was formed over the $3^5=243$ contexts $z$ and its rank computed exactly over $\mathbb{Q}$ by fraction-free elimination. Raw rank one is $\operatorname{rank}M^{(i)}\le1$.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xc}
+\toprule
+Check & Result\\
+\midrule
+raw contrast rank per coordinate & $(1,1,1,1,1,1)$\\
+centred profile rank per coordinate & $(1,1,1,1,1,1)$\\
+$\delta_{\square}$, $2D$, $(m-1)\delta_\square$ & reproduced exactly\\
+selected, selected loss, optimal loss & reproduced exactly\\
+$\arg\min_T$ & $\{1,2,3\}$, unique\\
+\bottomrule
+\end{tabularx}
+\end{center}
+All eight recomputed fields agree with the artifact.
+
+\subsection*{102.2 A near false alarm, recorded because it will recur}
+The certified witness has Top-C score margin $985/55328=0.01780$, \emph{below} the requested \texttt{--min-topc-margin 0.02}. That looks like a violated gate. It is not: the gate is applied to the margin \emph{relative} to $\delta_{\square}$,
+\[
+\frac{985/55328}{4674203777/7793262048}=0.029683\ \ge\ 0.02 ,
+\]
+because the whole objective is scale invariant and an absolute margin threshold would be meaningless. Anyone re-auditing this witness will meet the same apparent discrepancy; it is arithmetic, not a defect.
+
+\subsection*{102.3 The d32 / d64 asymmetry}
+Both denominators produced the identical float lead $1.001451519478135$, and d32 nonetheless reported no counterexample. This is resolved, and it is benign.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xcc}
+\toprule
+ & d32 & d64\\
+\midrule
+fibre index & 2 & 2\\
+$\lambda$ & identical & identical\\
+selected set & $\{0,4,5\}$ & $\{0,4,5\}$\\
+float lead & \multicolumn{2}{c}{$1.001451519478135$}\\
+exact ratio & $0.9997931$ & $\mathbf{1.0004400}$\\
+max denominator & $3.7\cdot10^{36}$ & $5.2\cdot10^{47}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Same cell, same lead; only the rational snapping resolution differs. The d32 run was \emph{resolution limited}, not geometry limited, and is not independent evidence for D6$'$. No re-run at higher \texttt{--corner-exact-leads} is needed.
+
+\subsection*{102.4 The denominator ladder measures certification, not geometry}
+Across $38$ raw runs on ten seeds, the float lead is constant in the denominator for every seed but 13. Seed 5 is the only seed whose float lead exceeds $1$, and it did so already at denominator $4$. Denominators $8,16,32,64$ found no new geometry; they raised the resolution until the lead could be certified. \textbf{The kill was visible in the first seed-5 run and took five denominators to become admissible evidence.} Convergence is not monotone in general: seed 1 falls from $0.8928950$ (d32) to $0.8920101$ (d64), seed 13 from $0.9561767$ (d16) to $0.9527879$ (d32) and back to $0.9561767$ (d64). Each denominator is an independent snapping attempt, not a refining limit.
+
+Nine of ten seeds saturate strictly below $1$ at ceilings ranging from $0.744$ (seed 21) to $0.956$ (seed 13). There is no universal raw ceiling near $0.89$.
+
+\claimbox{\oldclaim{RAW: 0/6 killed, maximum $0.8903$. Paired cell by cell, raw is below centred in 6 of 6, without exception.}}
+\textbf{Status of that line.} The six paired cells are still correctly reported; what is withdrawn is the inference drawn from them. The ceiling had not saturated, as Section 95 itself warned, and it crosses $1$ at a seed not in that pair set.
+
+\section*{103. The refutation is unconditional: the witness is a binary world}
+The violating fibre has $\lambda_i=(0,1,0)$, hence $\phi_i(a_i)=[a_i=1]$. Every basis column of \texttt{closed\_form\_raw\_basis\_exact} is a product $\prod_{i\in S}\phi_i(a_i)$, so every column -- and therefore every world in the fibre -- is a function of the binary key
+\[
+\kappa:a\longmapsto\bigl([a_i=1]\bigr)_{i=1}^{m}
+\]
+alone. Symbol $2$ is an exact duplicate of symbol $0$. The witness takes $64$ distinct values, not $729$.
+
+Restricting to $\{0,1\}^6$ and evaluating in the $K=2$ model reproduces \emph{every} quantity exactly: $\delta_{\square}=4674203777/7793262048$, selected $\{0,4,5\}$, $2D=192722413097/64236637920$, margin $985/55328$, and the ratio to the last digit.
+
+\textbf{Consequence.} At $|U|=2$ the hypothesis \texttt{AllCoordinatesRawLocalContrastRankOne} holds for \emph{every} world. This is proved in Lean (\texttt{binary\_allCoordinatesRawLocalContrastRankOne}) and confirmed independently from the dimension side, $\mathrm{codim}=m(|U|-2)=0$ (Section 96). The rank-one hypothesis therefore contributes nothing to this refutation. What fails is
+\[
+\boxed{2D\le(m-1)\delta_{\square}}
+\]
+on the plain binary cube with corner reference, with no hypothesis at all. \textbf{D6-prime dies as a corollary, not as the primary finding.}
+
+\textbf{Non-claim.} This does not touch the proved raw-route corpus. The invariant, the alignment characterization, the interpolation identity $(\star)$, corner reconstruction, the multiaffine normal form, the binary theorem and $\dim V^{\mathrm{raw}}_\phi=2^m$ are all unaffected: none of them asserts D6$'$. What the collapse shows is that \emph{the invariant cannot rescue the bound, because the bound already fails where the invariant is vacuous.}
+
+\section*{104. Demotion: misalignment is not necessary for violation}
+Addendum B Section 97 recorded:
+\claimbox{\oldclaim{14 of 14 violating witnesses have at least one misaligned coordinate. No exception. Misalignment is therefore \emph{necessary} for violation across the entire recorded corpus, which is D6-prime seen from the data side.}}
+\textbf{Reason for demotion.} With $n_{\mathrm{mis}}(F)=\#\{i:\operatorname{rank}M^{(i)}>1\}$, the definition used by \texttt{annotate\_misalignment.py}, the new witness has $\operatorname{rank}M^{(i)}=1$ at every coordinate, hence
+\[
+n_{\mathrm{mis}}=0\quad\text{and}\quad \frac{2D}{(m-1)\delta_\square}>1 .
+\]
+It is a fifteenth violating witness with zero misaligned coordinates. A universal statement over violating witnesses is refuted by one counterexample.
+
+\textbf{What survives.} The corpus fact as an \emph{observation about the recorded 14} is untouched and remains on record; only the universal reading is withdrawn. It is now known that the correlation was an artifact of where the search had been looking, which is the same lesson as Section 105.
+
+\section*{105. Instrument failure: the countersearch has false negatives}
+Re-running the sweep on the binary cube at the budget that produced the kill:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{cXcc}
+\toprule
+$m$ & $\dim$ & best exact & wall (s)\\
+\midrule
+4 & 16 & $0.905106$ & 6.3\\
+6 & 64 & $\mathbf{0.762065}$ & 44.5\\
+8 & 256 & $0.912553$ & 578.1\\
+\bottomrule
+\end{tabularx}
+\end{center}
+At $m=6$, $|U|=2$ the search reached $0.762$ \emph{in the very space in which an exact witness at $1.000440$ was already in hand}, a shortfall of 24\%. This is not a tuning problem, and it invalidates the evidential reading of every \texttt{NO\_EXACT\_COUNTEREXAMPLE} record taken alone.
+
+\claimbox{\oldclaim{At $|U|=2$ the rank-one constraint is vacuous: a single fibre is the whole $2^m$-dimensional function space, so one binary search sweeps every binary world rather than a slice. That search found no counterexample, best ratio $0.3584$.}}
+\textbf{Reason for demotion.} Coverage of the \emph{space} was confused with coverage by the \emph{search}. The recorded binary run \texttt{B3binary\_m6\_K2.json} used \texttt{corner-fibers 8}, \texttt{corner-starts 1}, \texttt{corner-exact-leads 2} and spent $66.1$\,s across $64$ corners, about $1.4$\,s per corner. The killing run spent $1658$\,s on a \emph{single} corner with $24$ fibres, $3$ starts and $10$ exact leads: roughly $1180\times$ more compute per corner. The first sentence of the struck claim is true; the last is a budget artifact.
+
+\textbf{Mechanism.} Section 98.2 already measured why: isotropic sampling reaches ratio $\approx0.17$ in both fibres while directed optimization reaches $1.16$. The violating region is effectively of measure zero, so a stochastic search that does not start inside it will not find it, at any budget that is affordable.
+
+\section*{106. New instrument: exact rational LP ascent}
+\subsection*{106.1 The functional is piecewise linear}
+On the binary cube with corner reference at the all-zero point, write $\rho_i(z)=F(z[i\!\leftarrow\!1])-F(z[i\!\leftarrow\!0])$ for the discrete derivative, $c_i=F(e_i)-F(0)$ for the corner-referenced additive component, and
+\[
+G_S(a)=F(a)-\sum_{i\in S,\;a_i=1}c_i .
+\]
+Then
+\[
+\delta_{\square}=\max_i\Bigl(\max_z\rho_i(z)-\min_z\rho_i(z)\Bigr),
+\]
+\[
+\operatorname{osc}_i=|c_i|,\qquad
+\ell_T=\tfrac12\Bigl(\max_a G_T(a)-\min_a G_T(a)\Bigr),
+\]
+$S=$ the top $k=\lfloor m/2\rfloor$ coordinates by $\operatorname{osc}_i$, and $2D=2(\ell_S-\min_T\ell_T)$. \emph{Every one of these is a maximum or a minimum of linear forms in $F$.}
+
+\subsection*{106.2 Fixing the cell turns the problem into an LP}
+Fix the combinatorial pattern: which $z$ attains each derivative extreme, which coordinate attains $\delta_{\square}$, the sign of each $c_i$ and the ordering of $\operatorname{osc}$ that selects $S$, the $\arg\max$ and $\arg\min$ of $G_S$ and of the competitor $G_{T^\ast}$, and which $T^\ast$ is cheapest. On the resulting polyhedral cell both $2D$ and $\delta_{\square}$ are linear. Because the ratio is invariant under positive scaling and under adding a constant, one may gauge-fix $F(0)=0$ and normalise $\delta_{\square}=1$; the linear-fractional problem becomes a genuine \textbf{linear program}
+\[
+\max\ \bigl(G_S(a^+_S)-G_S(a^-_S)\bigr)-\bigl(G_{T^\ast}(a^+_{T^\ast})-G_{T^\ast}(a^-_{T^\ast})\bigr)
+\]
+subject to, writing $z^\pm_i$ for the recorded derivative extremes:
+\begin{itemize}
+\item $\rho_i(z)\le\rho_i(z^+_i)$ and $\rho_i(z^-_i)\le\rho_i(z)$ for all $i,z$;
+\item $\rho_i(z^+_i)-\rho_i(z^-_i)\le1$ for all $i$, with equality at the attaining coordinate;
+\item $\varepsilon_ic_i\ge0$ for the recorded signs $\varepsilon_i$, and $\varepsilon_ic_i-\varepsilon_jc_j\ge\mu$ for $i\in S$, $j\notin S$, where $\mu$ is the imposed StrictTopC margin;
+\item $G_T(a)\le G_T(a^+_T)$ and $G_T(a^-_T)\le G_T(a)$ for all $a$, for $T\in\{S,T^\ast\}$;
+\item $G_{T^\ast}(a^+_{T^\ast})-G_{T^\ast}(a^-_{T^\ast})\le G_T(a^+_T)-G_T(a^-_T)$ for every $T$, which forces $\ell_{T^\ast}\le\ell_T$ since $\ell_T$ dominates any recorded difference.
+\end{itemize}
+Every coefficient lies in $\{0,\pm1,\pm2\}$, so by Cramer a vertex is rational with a \emph{small} denominator. That is the point: the search route produces $48$-digit denominators that \texttt{norm\_num} cannot touch.
+
+\subsection*{106.3 Exactness discipline}
+The float LP fixes the combinatorics; the vertex is then recovered exactly over $\mathbb{Q}$ from the active set by fraction-free elimination, and an independent exact evaluator decides whether to accept it. \textbf{The LP only ever proposes a point.} A wrong or degenerate cell therefore costs one iteration and never a false certificate. Before anything else, the evaluator was acid-tested: it reproduces the Section 102 witness bit for bit, including $\delta_{\square}$, the selected set and the margin.
+
+This is not the same as \texttt{cell\_lp\_ascent} inside the search script, which runs the same geometric idea in floating point to \emph{generate leads} for the rational snapper. What is new is that the ascent itself is exact and its fixed point is certified.
+
+\subsection*{106.4 Two defects, both instructive}
+\textbf{(i) Taking the LP vertex loses the cell.} An LP optimum sits on a vertex, where the active pattern is maximally degenerate; score ties let the Top-C tie-break choose a different $S$, and the ratio at the vertex collapses even though the LP objective grew. Measured: predicted $0.6533$, actual $0.0000$, selected flipping from $\{2,3\}$ to $\{0,1\}$. The mitigation was already documented in the comment of \texttt{cell\_lp\_ascent} and had not been implemented here; the fix is an \emph{exact} line search on the segment from the incumbent to the vertex.
+
+\textbf{(ii) Accepting any improvement walks onto the tie boundary.} With the line search in place but the strictness unchecked, the ascent converges to $2(k-1)/(m-1)$: $2/3$ at $m=4$ and $4/5$ at $m=6$, with relative margin $\sim10^{-17}$. That is the same attractor at exactly $0.8$ at which the superseded harness \texttt{run\_d6\_fiber\_ab\_search.py} had plateaued. The fix is to apply the StrictTopC gate to \emph{every exact candidate}, not only to the LP constraints.
+
+\subsection*{106.5 Performance}
+Seeded at the Section 102 witness, the ascent climbs $1.000440\to1.065131$ in $17.4$\,s. The stochastic search needed $1658$\,s to reach $1.000440$ and, unseeded on the same space, reaches only $0.762$.
+
+\section*{107. A sharp-constant conjecture}
+Relaxing the imposed StrictTopC margin $\mu$ and re-running the seeded ascent:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xcc}
+\toprule
+$\mu$ & ratio & deficit from $6/5$\\
+\midrule
+$1/50$ & $1.0651312$ & $1.349\cdot10^{-1}$\\
+$1/200$ & $1.1662828$ & $3.372\cdot10^{-2}$\\
+$1/1000$ & $1.1932566$ & $6.743\cdot10^{-3}$\\
+$1/100000$ & $1.1999326$ & $6.744\cdot10^{-5}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The deficit is linear in $\mu$ with coefficient $\approx6.74$, so the sequence extrapolates to $1.2$ exactly. At $m=6$,
+\[
+\frac{6}{5}=\frac{m}{m-1},
+\]
+which gives the conjecture in its scale-free form:
+\[
+\boxed{\ \sup_{F:\{0,1\}^m\to\mathbb{R}}\ \frac{2D(F)}{\delta_{\square}(F)}\;=\;m\ }
+\]
+over worlds with strict Top-C, corner reference. Equivalently the correct bound is $2D\le m\,\delta_{\square}$, and \textbf{the D6 bound is off by exactly one}.
+
+\subsection*{107.1 Structure of the extremum}
+At $\mu=10^{-5}$ the near-extremal world has $\delta_{\square}=1$ with \emph{every} coordinate derivative spread equal to $1$; the competitor is exactly the complement, $T^\ast=S^{c}$; and all $64$ values converge to integers in $\{-1,0,1,2,3\}$ with
+\[
+\ell_S=\tfrac72,\qquad \ell_{S^c}=\tfrac12,\qquad 2D=6=m .
+\]
+Writing $S=\{0,4,5\}$ and $S^c=\{1,2,3\}$, the limit depends almost entirely on $t=a\cap S^c$: with $u=[1\in t]$, $v=[2\in t]$, $w=[3\in t]$ its multilinear form is
+\[
+u+v-w+uv-uvw ,
+\]
+corrected by $[\,a\cap S\ne\emptyset\,]$ on the columns $t\in\{\emptyset,\{1\},\{2\}\}$ and by $[\,0\in a\,]$ on $t=\{1,2,3\}$. This is \emph{one vertex of the optimal face}, not a canonical formula, which is why it was not generalised directly; see Section 108.
+
+\subsection*{107.2 The supremum is not attained}
+Rounding the near-extremal world to its integer limit destroys it: the integer point is a Top-C \emph{tie}, the selection flips, and the ratio collapses to $0.4$. Every rounding to a common denominator $\le1024$ reproduces $0.4$. So $6/5$ is a supremum approached from just off a tie point and \emph{not attained}, and any witness must retain a perturbation. This is a genuine discontinuity of the functional at the tie locus, not a numerical artifact.
+
+\section*{108. Failed programme: transferring the structure to other $m$}
+\textbf{The plan.} Section 107.1 identifies where the extremum lives: infinitesimally off a Top-C tie point. Since the unseeded ascent reliably \emph{falls onto} tie points, the natural programme was two-phase seeding -- run the ascent with the gate off to land on a tie point, then perturb and ascend strictly -- giving seeds at every $m$ and so a test of $\sup=m$ beyond $m=6$.
+
+\textbf{It does not work.} Implemented as \texttt{--seed-mode tie-perturb} and tested in three tiers:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xc}
+\toprule
+Seeding & best ratio\\
+\midrule
+random multi-start, $m=4$ & $0.666663$\\
+random multi-start, $m=6$ & $0.399685$\\
+tie-perturb, \emph{random} tie points, $m=6$ & $0.768161$\\
+tie-perturb, \emph{correct} tie point, random directions & $0.790934$\\
+the correct direction (the witness itself) & $\mathbf{1.199933}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+In the fourth row the ascent stands on exactly the right tie point and still fails; two of four random directions did not even clear the gate.
+
+\textbf{Diagnosis.} The obstruction is not \emph{locating} the tie point, it is the \emph{direction} of departure from it. The extremal directions form a measure-zero set among tangent directions, for the same reason isotropic sampling of worlds fails (Section 98.2). Sampling directions is the same mistake one level down.
+
+\textbf{Consequence, stated plainly.} The exact LP ascent is a \emph{local} method. It climbs excellently when seeded inside the basin and does not find the basin. Testing $\sup=m$ at $m=4$ and $m=8$ is therefore blocked on \emph{seeding}, not on compute; more denominators, more starts and more wall-clock will not help, and should not be spent.
+
+\textbf{What would unblock it.} Solve for the direction instead of sampling it. At a tie point the limiting ratio along a direction $d$ is a ratio of directional derivatives, and the Top-C selection is decided by the sign pattern of $d$ on the tied scores. Maximising that limit over $d$ on the tangent cone is again a linear-fractional problem, hence an LP over a finite set of sign patterns. That is a construction rather than a search, and it would produce seeds at every $m$. Not attempted.
+
+\section*{109. The Lean witness}
+The Section 102 witness carries $48$-digit denominators and is hopeless for \texttt{norm\_num}. The LP route was built partly to remove that obstruction, and it does. Rounding the $\mu=1/50$ ascent output to the uniform grid $\tfrac1{16}\mathbb{Z}$ gives an \emph{integer} world $W$ after scaling by $16$, with $64$ values in $[-14,42]$ and $20$ distinct entries:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{Xr}
+\toprule
+Quantity (integer scale) & Value\\
+\midrule
+response oscillations $\operatorname{osc}_i$ & $(15,14,14,14,15,15)$\\
+selected (strict Top-3), margin $1$ & $\{0,4,5\}$\\
+competitor $=\arg\min_T\ell_T$, unique & $\{1,2,3\}$\\
+$2\ell_S$, attained $(0,1,1,0,0,0)$ vs $(1,0,0,1,1,1)$ & $101$\\
+$2\ell_{T^\ast}$, attained $(1,0,0,0,0,0)$ vs $0$ & $15$\\
+$2D$ & $\mathbf{86}$\\
+$\delta_{\square}$, attained at coordinate $0$ & $17$\\
+$(m-1)\delta_{\square}$ & $85$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\[
+\boxed{\,2D=86>85=5\cdot17=(m-1)\delta_{\square}\,}
+\]
+a violation by exactly one integer unit, echoing the $131$ against $130$ of the flagship. After the single positive rescale by $1/17$ the world has unit interaction bound and
+\[
+2D=\frac{86}{17}=5.0588\ldots>5=m-1,\qquad \frac{2D}{(m-1)\delta_\square}=\frac{86}{85}.
+\]
+
+\textbf{Module.} \texttt{LeanD6BinaryIntegerCounterexampleV1.lean}, 173 lines. The world is a six-fold nested \texttt{![\,]} table over \texttt{Fin 2}, so the integer core is discharged by \texttt{decide} over the $2^6=64$ points: no \texttt{native\_decide}, no optimizer output, no floating point in the proof. The table was emitted programmatically and decoded back and checked against the ledger artifact before writing. Two hazards from the V2 compile cycle were designed out in advance: \texttt{resp} is a vector of functions rather than a \texttt{match} on \texttt{Fin 6} numerals, because \texttt{fin\_cases} produces $\langle k,\_\rangle$ and numeral-shaped equations then silently fail to fire; and every bound is stated over explicit \texttt{Fin 2} arguments so that \texttt{decide} sees a finite decidable proposition.
+
+\textbf{Status, stated honestly.} The module is \emph{written and not yet compiled}. Its evidence class is \eclass{EXACT\_RATIONAL\_COUNTEREXAMPLE\_INDEPENDENTLY\_RECOMPUTED}; it becomes \eclass{PROVED\_FALSE\_LEAN4\_AXIOM\_AUDITED} only after a clean compile and an \texttt{\#print axioms} audit returning \texttt{[propext, Classical.choice, Quot.sound]}. Nothing in this addendum assumes that has happened.
+
+\section*{110. Lineage transition table, delta only}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.30\columnwidth}>{\raggedright\arraybackslash}p{0.20\columnwidth}X}
+\toprule
+Earlier visible state & Later status & Reason\\
+\midrule
+D6$'$ raw $m-1$ law, ``OPEN, survived one serious attempt'' & \textbf{FALSE} & Exact ratio $1.000440>1$, raw rank one certified independently at all six coordinates.\\
+The refutation needs raw rank one & \textbf{UNCON-}\\ \textbf{DITIONAL} & Witness factors through the binary key; at $|U|=2$ the hypothesis is vacuous.\\
+Misalignment necessary for violation & \textbf{DEMOTED} & Fifteenth violating witness has $n_{\mathrm{mis}}=0$.\\
+Binary sweep ceiling $0.3584$ & \textbf{DEMOTED} & $1.4$\,s per corner; space coverage confused with search coverage.\\
+Countersearch as evidence of absence & \textbf{DEMOTED} & 24\% false negative on a space with a known witness.\\
+Raw ceiling $\approx0.89$ universal & \textbf{DEMOTED} & Ceilings are per-cell, $0.744$ to $0.956$; seed 5 crosses $1$.\\
+Sharp constant & \textbf{NEW, MEASURED} & $\sup 2D/\delta_\square=m$ conjectured; $1.2=6/5$ at $m=6$, deficit linear in $\mu$.\\
+Tie-perturb seeding & \textbf{FAILED} & Direction, not tie point, is the obstruction.\\
+Lean tractability & \textbf{RESOLVED} & Integer witness $86>85$; denominators $48$ digits $\to$ $1$.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{New research artifacts.} \texttt{D6PRIME\_RAW\_RANKONE\_KILLED\_20260906.json}; \texttt{D6\_UNCONDITIONAL\_BINARY\_KILLED\_20260906.json}; \texttt{RAW\_SATURATION\_SERIES\_20260906.json}; \texttt{D6\_SMALL\_DENOMINATOR\_WITNESS\_m6\_20260906.json}; \texttt{D6\_INTEGER\_GRID\_WITNESS\_m6\_20260906.json}; \texttt{D6\_STRUCTURAL\_TRANSFER\_FAILED\_20260906.json}; \texttt{BINsweep\_m\{4,6,8\}\_K2\_d64\_s5.json}; \texttt{LPascent\_m\{4,6\}\_K2\_*.json}; figure \texttt{fig\_raw\_saturation\_20260906.png}.
+
+\textbf{New instruments.} \texttt{scripts/verify\_d6prime\_killed\_witness.py}; \texttt{scripts/build\_raw\_saturation\_series.py}; \texttt{scripts/verify\_binary\_collapse\_of\_d6prime\_witness.py}; \texttt{scripts/run\_d6\_binary\_exact\_lp\_ascent.py}. New Lean module \texttt{LeanD6BinaryIntegerCounterexampleV1.lean}, uncompiled.
+
+\textbf{Literature boundary.} Unchanged from Section 91 and Section 101. Owen (1972) and Rota (1964) continue to bound any interpolation or M\"obius novelty claim. The LP-over-cells idea is standard polyhedral optimisation and is \emph{not} claimed as novel; what is claimed is the exact rational fixed point with an independent certifier, and the measured sharp constant. All attributions still require a targeted firstness audit before any submission claim.
+
+\textbf{Next gate, in order of information value.} First, compile the Lean module and audit its axioms; that converts the strongest current result into \eclass{PROVED\_FALSE}. Second, the tangent-cone LP of Section 108, which is the only identified route to seeds at general $m$ and therefore the only route to testing $\sup=m$. Third, an upper-bound proof of $2D\le m\,\delta_{\square}$, now that the constant is measured rather than guessed. The remaining formal gaps of Section 101 -- the all-coordinates-active hypothesis and the reverse fibre inclusion -- are unchanged and lower priority, since the invariant they concern no longer carries the decision bound.
+
+\textbf{Final appended status label.} The centred rank programme was closed in Lean on 5 September; the raw programme is closed in exact arithmetic on 6 September, and closed \emph{unconditionally}, because the bound fails on the binary cube where the invariant says nothing. The honest reading of the present evidence is that $(m-1)$ was the wrong constant and $m$ is the right one, that this is measured at a single $m$ and conjectural everywhere else, and that the instrument which produced two years of ``no counterexample found'' records has been shown to miss a counterexample sitting inside the space it was sweeping.
+\end{document}

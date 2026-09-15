@@ -1,0 +1,63 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product Compression}\\[2pt]
+{\large\itshape Append-only update M: the integer allocation law becomes a theorem, an explicit constant for growing $q$, and a one-epoch bound that never sees the label}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--167 are an immutable prefix. This addendum begins at Section 168.
+
+\section*{168. The block-budget law is promoted from census to theorem}
+Sections 159--162 recorded the integer block-budget law as verified arithmetic: the greedy split $L^\star = \lfloor N/(2q+1)\rfloor$, $b^\star = \lfloor (N \bmod n)/3 \rfloor$, with zero violations over $252$ rows. That was NUMERICAL EVIDENCE. It is now PROVED.
+
+\texttt{LeanD6IntegerBlockAllocationV1.d6\_greedy\_optimal}: for every $q \ge 3$, every budget $N$, and every feasible pair $(L,b)$ with $(2q+1)L + 3b \le N$,
+\[ L\,I_{\text{cyc}}(q) + b\,I_{\text{three}}(q) \;\le\; \Big\lfloor \tfrac{N}{2q+1}\Big\rfloor I_{\text{cyc}}(q) + \Big\lfloor \tfrac{N \bmod (2q+1)}{3}\Big\rfloor I_{\text{three}}(q), \]
+with $I_{\text{cyc}} = q^4/(2q+1)$ and $I_{\text{three}} = q^2/3$. No finite-$q$ and no finite-budget enumeration is a hypothesis.
+
+The mechanism is the exchange inequality \texttt{d6\_exchange}: $(n+2)\,I_{\text{three}} \le 3\,I_{\text{cyc}}$ with $n = 2q+1$. The $\mathbf{+2}$ is what makes this an integer theorem rather than a per-query comparison --- it pays for the up to two queries lost to rounding when a long block is exchanged for short ones. Comparing information per query alone, as Section 160 did, would not have sufficed. \texttt{greedy\_feasible} supplies the companion fact that the split is feasible and wastes fewer than three queries. Four names, audited clean.
+\claimbox{Scope, from the module's own docstring. This is an optimum over \emph{mixtures of the two named block families}, not over all legal queries and not over adaptive procedures. $q \ge 3$ is a hypothesis: $q \in \{1,2\}$ lies outside the proved range, and the earlier phrasing ``the ratio exceeds one always'' was never checked there.}
+
+\section*{169. An explicit phase-III constant for growing $q$ --- half of one}
+Two modules, and the distinction between them is the point.
+
+\texttt{LeanD6UniformPhaseThreeRemainderV1.uniform\_actual\_quadratic} ($q \ge 3$) gives a constant $C \ge 0$, uniform over the whole \emph{closed} phase interval, with $\mathrm{oracleRegret} \le C(\mu_0-\mu)^2$ where $\mu_0$ is the plug-in value setting the weights and $\mu$ the truth. It is a compactness argument and deliberately supplies no dependence on $q$.
+
+\texttt{LeanD6GrowingPhaseThreeRemainderV1.remainder\_scaled} ($q \ge 8$) supplies one: $\mathrm{remainderConstant}(q,\mu) \le 64/q^2$. Because \texttt{actual\_frozen\_quadratic\_regret} is stated with exactly this constant, the phase-III quadratic regret now carries an explicit rate in $q$ rather than an unspecified $C(q)$. This was flagged as a high-risk probe; it went through, in seven lemmas from $K$-bounds up through the scaled modulus.
+
+\textbf{It is half the job, and the other half is not started.} The matching-risk bounds in \texttt{LeanD6KnownLabelMatchingRiskV1} and \texttt{LeanD6ActualSampleMatchingV1} carry the coefficient $\big(\mathrm{remainderConstant}(q,\mu_0) + |\mathrm{localCurvature}(q,\mu_0)|\big)\varepsilon^2$. Only the first summand is scaled. \texttt{localCurvature} has no $q$-rate anywhere in the tree, so the \emph{matching} risk is still not uniform in $q$.
+\claimbox{$64$ is an upper bound and is not claimed sharp --- the module says so. \texttt{d6\_phase\_three\_plugin\_risk.json} ($105$ cells, $2\,100\,000$ trials, \texttt{numpy.longdouble}, regret computed as a nonnegative square) measures empirical regret against this bound at ratios between $1.2\times10^{-4}$ and $1.4\times10^{-2}$. The bound holds in every cell and is loose by two to four orders of magnitude. A constant that is never approached is evidence that the constant is soft, not that the rate is right.}
+
+\section*{170. One epoch of phase III without knowing the label}
+\texttt{LeanD6ActualUnknownLabelPhaseRiskV1.actual\_unknown\_label\_phase\_bound} ($q \ge 3$) is the first D6 statement that joins a design, a decoder that does not see the answer, and a regret bound on the actual law. There exist a cyclic design $G$ --- every $G_t$ legal with $|G_t| = q$ --- and a constant $C \ge 0$ such that for every fallback world, every true world $A$, every $\mu$ in the phase interval, every $r_0 \ge 512$, every $s$, and every $L > 0$,
+\[
+\mathbb{E}[\text{epochLoss}] \;\le\; C\,\frac{2q+1}{L\,q^4} \;+\; \max(0,\text{oracleValue})\cdot \eta(|\mathrm{Off}\,j|,r_0)\,4^{-s},
+\]
+the expectation taken under the product law of the discovery vector path and the cyclic observations. The estimation term carries the cyclic variance rate of Section 149; the label term decays geometrically in the number of revalidation rounds $s$. \textbf{The recommendation never takes the true $A$ as an input.}
+
+Supporting modules, all audited clean on the three standard axioms: \texttt{LeanD6DiscoveryWorldRecommendationV1} supplies the decoder and its measurability ($4$ names); \texttt{LeanD6RandomLabelPhaseRegretV1} supplies the one-epoch regret with a wrong label allowed, and notably \emph{does not assume} the label estimate and the margin estimate are independent; \texttt{LeanD6CyclicMeanSquareV1} the clipped Gaussian mean square ($4$); \texttt{LeanAdaptiveGaussianQueryNoiseV1} the noise normalization and tail ($4$); \texttt{LeanD6RevalidationRegretBridgeV1} the bad-epoch expectation ($2$).
+\claimbox{What this is not, taken from the module's docstring rather than paraphrased: not an optimal total budget split, not a matching regret, not a stopping-rate or $\Gamma$ theorem. The constant $C$ here is still the abstract compactness constant of Section 169, not the explicit $64/q^2$ --- those two have not been composed.}
+
+\section*{171. The supporting numerics, with violation counts stated}
+\begin{itemize}
+\item \texttt{d6\_integer\_block\_evidence.json}: $84$ configurations, $168\,000$ trials, actual legal-query means with raw noise. Empirical MSE over exact variance lies in $[0.930,\,1.083]$; greedy violations $0$ of $84$.
+\item \texttt{d6\_revalidation\_epochs.json}: $24$ rows at $r_0 = 512$. Empirical normalized bad-epoch work never exceeds its theoretical upper bound --- $0$ of $24$ violations --- but the bound is loose, with upper values as large as $150$ against empirical maxima below $1$. The artifact's own scope line limits it to repeated discovery with a blind fallback on a missing certificate; it asserts nothing about good-epoch regret or $\Gamma$ tracking.
+\item \texttt{allocation\_tracker.json}: $72$ rows checking the constructive tracker against its formal bound.
+\end{itemize}
+
+\section*{172. The two defective modules, restated}
+\texttt{LeanD6RecordGapDecompositionV1} and \texttt{LeanD6ScalarExplorationSeparationV1} still carry \texttt{sorryAx}, as recorded in Section 165. Nothing in this addendum depends on either. They are named again here so that a growing module count is not read as a clean corpus: the tree now holds $285$ \texttt{.lean} files against $128$ \texttt{.compile.log} files, and the reproducibility debt of Section 167 is unchanged.
+\end{document}

@@ -1,0 +1,55 @@
+import «LeanStructuralStaircaseToleranceCurveV1»
+import «LeanD6CyclicOptimalV1»
+import «LeanD6IntegerBlockAllocationV1»
+import «LeanD6CyclicMeanSquareV1»
+import «LeanD6UniformPhaseThreeRemainderV1»
+import «LeanD6RandomLabelPhaseRegretV1»
+import «LeanD6DiscoveryWorldRecommendationV1»
+import «LeanD6ActualUnknownLabelPhaseRiskV1»
+import «LeanD6GrowingPhaseThreeRemainderV1»
+import «LeanD6LocalCurvatureLimitV1»
+import «LeanStructuralActualChi4KernelV1»
+import «LeanD6PairContractionKernelV1»
+import «LeanD6GrowingUnknownLabelPhaseRiskV1»
+import «LeanD6CriticalScaleRemainderV1»
+import «LeanD6EpochLossMeasurabilityV1»
+import «LeanStructuralNormalizedToleranceLawV1»
+import «LeanSupportCardinalityQueryLawV1»
+import «LeanD6DiscoveryGeometryV1»
+import «LeanD6RevalidationRegretBridgeV1»
+import «LeanD6ConstructiveTrackingV1»
+import «LeanD6RecommendationMeasurabilityV1»
+
+#print axioms CIGAMF.P13.StructuralRadiusReindex.unbalanced_upper
+#print axioms CIGAMF.P13.StructuralNormalizedToleranceLaw.normalized_upper
+#print axioms CIGAMF.P13.StructuralNormalizedToleranceLaw.normalized_lower
+#print axioms CIGAMF.P13.SupportCardinalityQueryLaw.adaptive_cardinality_lower
+#print axioms CIGAMF.P13.SupportCardinalityQueryLaw.adaptive_cardinality_attained
+#print axioms CIGAMF.P13.D6ActualDiscoveryBridge.actual_design_legal
+#print axioms CIGAMF.P13.D6DiscoveryGeometry.decoder_terminates
+#print axioms CIGAMF.P13.D6DiscoveryGeometry.decoder_expected_cost_finite
+#print axioms CIGAMF.P13.D6DiscoveryGeometry.decoder_anytime_geometric_error
+#print axioms CIGAMF.P13.D6RepeatedDiscovery.eventually_correct
+#print axioms CIGAMF.P13.D6RepeatedDiscovery.expected_wrong_epoch_work
+#print axioms CIGAMF.P13.D6RevalidationRegretBridge.actual_bad_regret_expectation
+
+#print axioms CIGAMF.P13.D6RecommendationMeasurability.recommendation_level_measurable
+#print axioms CIGAMF.P13.FiniteAllocationTracker.counts_eq_occurrences
+#print axioms CIGAMF.P13.D6ConstructiveTracking.realized_tracking
+#print axioms CIGAMF.P13.D6ConstructiveTracking.average_oracle_regret
+
+#print axioms CIGAMF.P13.StructuralStaircaseToleranceCurve.exact_curve
+#print axioms CIGAMF.P13.D6CyclicOptimal.cyclic_attains_linear_lower_bound
+#print axioms CIGAMF.P13.D6IntegerBlockAllocation.d6_greedy_optimal
+#print axioms CIGAMF.P13.D6CyclicMeanSquare.cyclic_clipped_mean_square
+#print axioms CIGAMF.P13.D6UniformPhaseThreeRemainder.uniform_actual_quadratic
+#print axioms CIGAMF.P13.D6RandomLabelPhaseRegret.random_label_expected_regret
+#print axioms CIGAMF.P13.D6DiscoveryWorldRecommendation.candidate_level_measurable
+#print axioms CIGAMF.P13.D6ActualUnknownLabelPhaseRisk.actual_unknown_label_phase_bound
+#print axioms CIGAMF.P13.D6GrowingPhaseThreeRemainder.remainder_scaled
+#print axioms CIGAMF.P13.D6LocalCurvatureLimit.matching_coefficient_theta_one
+#print axioms CIGAMF.P13.StructuralActualChi4Kernel.STRUCT_ACTUAL_CHI4_prefix_cover_not_at_most_three_kernel
+#print axioms CIGAMF.P13.D6PairContractionKernel.pair_contraction_route_killed_exact_kernel
+#print axioms CIGAMF.P13.D6GrowingUnknownLabelPhaseRisk.actual_unknown_label_explicit_bound
+#print axioms CIGAMF.P13.D6CriticalScaleRemainder.critical_remainder_eventually_small
+#print axioms CIGAMF.P13.D6EpochLossMeasurability.epoch_loss_integrable

@@ -1,0 +1,45 @@
+{
+  "record_version": "structural_formal_target_met_v1",
+  "evidence_class": "PROVED",
+  "kind": "ADDITIVE_STATUS_RECORD",
+  "annotates_artifact": "research/structural/staircase_exact_r7_20260904.json",
+  "annotates_artifact_sha256": "3e225af5b0e188148c4a04ab1bfce6a3588575fb8d2379225316e4589626c76b",
+  "why_a_companion_and_not_an_edit": "The ledger is append-only and every result artifact is pinned by a manifest hash. Rewriting next_formal_target in place would invalidate that hash and destroy the record of what the artifact claimed when it was produced. The original file is untouched.",
+  "superseded_field": {
+    "field": "next_formal_target",
+    "value_when_written": "construct r rankings for every r and prove PrefixCoverDimensionAtMost staircase 0 r",
+    "status": "MET"
+  },
+  "what_was_proved": {
+    "statement": "chi_prefix(F_r, 0) = r = m/2 for every r > 0",
+    "module": "work/p13_conjectures/LeanStructuralStaircaseExactPrefixCoverV1.lean",
+    "theorems": [
+      "CIGAMF.P13.StructuralStaircaseExactPrefixCover.STRUCT_staircase_prefix_cover_at_most_r",
+      "CIGAMF.P13.StructuralStaircaseExactPrefixCover.STRUCT_staircase_prefix_dimension_eq",
+      "CIGAMF.P13.StructuralStaircaseExactPrefixCover.STRUCT_staircase_chi_eq_half_ground_set"
+    ],
+    "hypothesis": "0 < r",
+    "sorry_count": 0
+  },
+  "evidence": {
+    "compile_log": "compile_logs/LeanStructuralStaircaseExactPrefixCoverV1.log",
+    "compile_errors": 0,
+    "axiom_audit_log": "compile_logs/axiom_audit_v1.log",
+    "axiom_audit_source": "work/p13_conjectures/AxiomAuditV1.lean",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "no_sorryAx": true,
+    "no_native_decide": true,
+    "note": "A source file free of the token `sorry` can still inherit `sorryAx` through an import, so the axiom audit -- not the token count -- is what licenses the PROVED class."
+  },
+  "status_change": {
+    "from": "EXACT_FINITE_THEOREM_DISCOVERY (chi = r verified by DP and MILP at r = 1..7)",
+    "to": "PROVED (parametric in r)",
+    "consequence": "The Structural chain no longer rests on a Theta(m) bound plus finite computation. The exact extremal family law is a theorem, and the r = 1..7 computation is now corroboration of a proved statement rather than the evidence for it."
+  },
+  "still_open": "This is the law for the staircase family F_r specifically. It is NOT a minimax statement over arbitrary relation families, and nothing here claims one.",
+  "recorded_utc": "2026-09-05"
+}

@@ -1,0 +1,85 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 3 - Certified Support Geometry}\\[2pt]
+{\large\itshape Append-only update: separation is necessary and NOT sufficient --- an exact three-world counterexample, the whole-fibre characterisation, and a scope check that came back clean}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--55 are an immutable prefix. This addendum begins at Section 56.
+
+\textbf{What this addendum contains.} One new formal module, one genuinely new separation between two notions the chain had been using interchangeably in prose, and one \emph{negative} scope check --- reported because a scope check that finds nothing is evidence too, and because the reader must know it was performed.
+
+\section*{56. New module: whole-fibre sufficiency}
+\texttt{LeanSupportFibreSufficiencyV1} compiles for the first time (\texttt{.olean} $164{,}880$ B); ten theorems. It closes a gap that Section 55 left implicit: \texttt{SUP\_B2\_universal\_query\_set\_must\_separate} gives only the \emph{necessary} direction, and the chain had no statement of what is sufficient.
+
+\section*{57. The characterisation}
+For a regret function $\textit{regret}:\mathcal{P}(A)\times D\to\mathbb{R}$, tolerance $\varepsilon$ and query set $Q\subseteq A$, define
+\[\textsf{FibreSafe}(Q):\equiv\forall \sigma\!:\!A\!\to\!\textsf{Bool},\ \exists d\in D,\]
+\[\forall\omega,\ \textsf{QueryObservation}\,Q\,\omega=\sigma\ \Rightarrow\ \textit{regret}(\omega,d)\le\varepsilon .\]
+The decision is quantified \emph{inside} the signature and \emph{outside} the world: one decision must serve the entire fibre. Then
+\begin{center}\fbox{\parbox{0.90\columnwidth}{\centering\scriptsize
+$\exists\,c,\ \forall\omega\ \ \textit{regret}\bigl(\omega,c(\textsf{QO}\,Q\,\omega)\bigr)\le\varepsilon$\\[2pt]
+$\iff\ \textsf{FibreSafe}(Q)$}}\end{center}
+(\texttt{universal\_controller\_iff\_fibreSafe}; the reverse direction is exactly \texttt{choose} applied to the existential). Two corollaries: \texttt{fibreSafe\_implies\_separates} (so \textsf{FibreSafe} $\Rightarrow$ \textsf{Separates}, via SUP-B2), and \texttt{minimum\_safe\_query\_set\_exists} --- a minimum-cardinality safe query set exists whenever any safe set does.
+
+\section*{58. The separation: pairwise is not enough}
+Take $A=\textsf{Fin }2$, $D=\textsf{Fin }3$, and let each support forbid exactly one decision:
+\[\textit{bad}(\omega)=\begin{cases}2 & 0\in\omega,\ 1\in\omega\\ 0 & 0\in\omega,\ 1\notin\omega\\ 1 & 0\notin\omega\end{cases}\qquad
+\textit{regret}(\omega,d)=\mathbf{1}[d=\textit{bad}(\omega)].\]
+Two facts, both by kernel decision:
+\begin{itemize}
+\item \texttt{two\_forbidden\_have\_alternative}: for any $i,j\in\textsf{Fin }3$ there is $d\ne i,j$. Hence \emph{any two} supports share a good decision, so $\emptyset$ separates: \texttt{empty\_queries\_separate} proves $\textsf{Separates}(\textit{toyRegret},0,\emptyset)$.
+\item \texttt{bad\_surjective}: every $d\in\textsf{Fin }3$ is forbidden by some $\omega$ (witnesses $\{0\}$, $\emptyset$, $\{0,1\}$). Hence no single decision is safe on the whole fibre: \texttt{empty\_queries\_not\_fibreSafe}.
+\end{itemize}
+Together, \texttt{pairwise\_separation\_not\_sufficient}:
+\[\textsf{Separates}(\textit{toyRegret},0,\emptyset)\ \wedge\ \neg\exists\,\text{controller}. \]
+\textbf{This is a Helly-type failure at dimension three.} The good-decision sets are pairwise intersecting with empty triple intersection --- the abstract shape $\{1,2\},\{2,3\},\{1,3\}$. Two worlds can never exhibit it, which is precisely why the chain never met it before.
+
+\section*{59. Scope check: performed, and clean}
+Because \texttt{pairwise\_separation\_not\_sufficient} refutes a converse, every prior sufficiency claim in the chain was re-read. \textbf{Result: no correction is required.} The reasons matter and are recorded so the check need not be repeated:
+\begin{itemize}
+\item \texttt{SUP\_B2\_universal\_query\_set\_must\_separate} states only \emph{universal controller $\Rightarrow$ Separates}. The direction now known false is not asserted anywhere.
+\item The single \texttt{suffices} statement in the chain, \texttt{actual\_support\_cell2\_query\_suffices}, is scoped to the \emph{two-world} compression witness $\{\textit{smallSupport},\textit{largeSupport}\}$ and is proved by \emph{exhibiting} a controller (\texttt{cell2Controller}, regret $0$ on both), not by inferring sufficiency from separation. For a two-element family pairwise intersection \emph{is} whole-fibre intersection, so the degenerate case is safe.
+\item Consequently \texttt{actual\_support\_witness\_minimum\_query\_cardinality} (minimum $=1$ for $\varepsilon<1/2$) stands unchanged.
+\end{itemize}
+\claimbox{The new result \emph{adds} the missing converse-failure; it invalidates nothing in Sections 1--55. Any \emph{future} statement that infers a universal controller from \textsf{Separates} alone is now known to be false in general and must carry a whole-fibre hypothesis or a $|{\cdot}|\le2$ world-class restriction.}
+
+\textbf{Evidence class.} \eclass{COMPILED ARTIFACT}. \texttt{AxiomAuditSupportFibreSufficiencyV1} was generated for all ten theorems; the \texttt{\#print axioms} transcript is not yet pasted into the ledger, so this is not yet \eclass{PROVED}. No \texttt{native\_decide} is used; the two finite facts are kernel \texttt{decide} over \textsf{Fin }3 and \textsf{Fin }2.
+
+\textbf{Novelty boundary.} The equivalence in Section 57 is a routine \texttt{choose} argument and is \emph{not} claimed as novel. The novel content is the concrete Helly-shaped instance in Section 58 that separates the two notions inside \emph{this} chain's abstract regret API, plus the fact --- now checked rather than assumed --- that the corpus never relied on the false direction.
+
+\section*{60. Formal inventory for this chain, complete}
+The corpus holds \textbf{7} Lean modules attributable to this chain, carrying \textbf{89} theorems; 7 produce a \texttt{.olean}; \textbf{1} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak Support\allowbreak Geometry\allowbreak V4} & 54 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Support\allowbreak Fibre\allowbreak Sufficiency\allowbreak V1} & 10 & yes & yes\\
+\texttt{Lean\allowbreak Support\allowbreak Critical\allowbreak Identification\allowbreak V1} & 6 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Structural\allowbreak Support\allowbreak Osc\allowbreak Max\allowbreak Modular\allowbreak V1} & 5 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Support\allowbreak Compression\allowbreak Critical\allowbreak Witness\allowbreak V1} & 5 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Support\allowbreak Partial\allowbreak Test\allowbreak Cover\allowbreak V1} & 5 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Support\allowbreak Compression\allowbreak Critical\allowbreak Witness\allowbreak Tightening\allowbreak V1} & 4 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{6} of this chain's 7 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+\end{document}

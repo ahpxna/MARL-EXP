@@ -1,0 +1,12 @@
+import «LeanSupportFibreSufficiencyV1»
+
+#print axioms CIGAMF.P13.SupportFibreSufficiency.universal_controller_iff_fibreSafe
+#print axioms CIGAMF.P13.SupportFibreSufficiency.fibreSafe_implies_separates
+#print axioms CIGAMF.P13.SupportFibreSufficiency.minimum_safe_query_set_exists
+#print axioms CIGAMF.P13.SupportFibreSufficiency.toy_good_iff
+#print axioms CIGAMF.P13.SupportFibreSufficiency.two_forbidden_have_alternative
+#print axioms CIGAMF.P13.SupportFibreSufficiency.every_pair_has_common_good
+#print axioms CIGAMF.P13.SupportFibreSufficiency.empty_queries_separate
+#print axioms CIGAMF.P13.SupportFibreSufficiency.bad_surjective
+#print axioms CIGAMF.P13.SupportFibreSufficiency.empty_queries_not_fibreSafe
+#print axioms CIGAMF.P13.SupportFibreSufficiency.pairwise_separation_not_sufficient

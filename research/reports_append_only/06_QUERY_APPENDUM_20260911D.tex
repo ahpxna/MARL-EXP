@@ -1,0 +1,38 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 6 - Query Sufficiency and Transfer}\\[2pt]
+{\large\itshape Append-only update D: a positive control produces evaluable cells for the first time, and the noise-normalisation module is recorded}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September (backlog entry)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--80 are an immutable prefix. This addendum begins at Section 81.
+
+\claimbox{\textbf{Why this entry exists.} A ledger audit on 11 September found that of \textbf{384} theorem names audited since 9 September across \textbf{96} modules, \textbf{381} appeared in no \texttt{.tex} file, together with roughly forty experiment artifacts and two research documents. This addendum enters that chain's share of the backlog.}
+
+\section*{81. The first evaluable cells}
+Every configuration reported through Section 80 returned $0$ evaluable cells against $336$ degenerate, at $h=1,4,8$ and under both continuation policies. A positive control built on twelve pre-constructed delivery states changes that: \textbf{$336$ cells become regret-evaluable}, while the reset/warm-up branch remains at $0$.
+\claimbox{\textbf{What this establishes and what it does not.} It establishes that the measurement path carries signal once the state affords a delivery opportunity --- so the instrument is not broken, and the earlier all-zero result was a property of the state distribution, not of the metric. It does \emph{not} establish transfer on natural trajectories, which is the claim the chain needs. \eclass{POSITIVE CONTROL}, not evidence for the transfer hypothesis.}
+This also revises the working diagnosis recorded earlier. Raising the horizon was tried at $h=1,4,8$ and failed at every setting; the binding constraint was the state distribution. The 7 September plan had already located the issue in that region --- it argued that cells which are summary-insufficient must be observed rather than filtered --- and the present control is consistent with that reading.
+
+\section*{82. Module recorded}
+\texttt{Lean\allowbreak Adaptive\allowbreak Gaussian\allowbreak Query\allowbreak NoiseV1}, four names: \texttt{query\_noise\_normalization}, \texttt{selected\_increment}, \texttt{count\_slice\_tail}, \texttt{normalized\_exponential\_tail}. Audited, no \texttt{sorryAx}. These supply tail control for query noise under adaptive selection; they are infrastructure for the transfer measurement, not a transfer result.
+
+\section*{83. What the chain still lacks}
+A panel with a verified non-constant target on natural trajectories, an optimal decoder solved on small instances so that information limits are separated from decoder error, and a budget sweep before any scale-up. Until those exist, the transfer claim has a positive control and no confirmatory evidence. The identifiability lab ($5000$ instances, \texttt{insufficient\_fraction} $=0.5052$, \texttt{mean\_minimax\_floor} $=0.4218$) supports the theoretical core and is explicitly scoped away from natural-language routing; it is synthetic and does not substitute for runtime evidence.
+\end{document}

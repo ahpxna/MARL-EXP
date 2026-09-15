@@ -1,0 +1,114 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product Compression}\\[2pt]
+{\large\itshape Append-only update Q: the reference bridge is no longer open, and the corner law becomes a special case}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 12 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--189 are an immutable prefix. This addendum begins at Section 190.
+
+\section*{190. A retraction about the architecture, not about a result}
+
+Addendum P and the derivation note both recorded the product-reference bridge as an open gap requiring new machinery. That assessment was made without reading the modules it referred to, and it is wrong.
+
+\texttt{CIGAMF.V4.ProductMixedDifference} defines
+\[ \texttt{productResponse}\;q\;F\;i\;u \;=\; \mathbb{E}_q\big[F(\texttt{update}\;c\;i\;u)\big] \]
+for an \emph{arbitrary} product weight $q$, and \texttt{productCompressionLoss}, \texttt{productA\_compression\_loss\_formula} and \texttt{D6\_product\_topC\_compression\_decision\_regret} are all already proved at that generality. The corner reference is
+\[ \texttt{corner}\;i\;u \;=\; \begin{cases}0 & u=\texttt{true}\\ 1 & u=\texttt{false}\end{cases} \]
+which is the point mass at \texttt{zero}, i.e.\ Bernoulli$(0)$. The single corner-specific step in the entire corpus is \texttt{corner\_response}, which collapses the expectation to one evaluation because \texttt{jointWeight corner} is an indicator.
+
+So the bridge was never blocked by the architecture. It was blocked by one missing computation: the expectation of the gate under a non-degenerate product weight. \eclass{RETRACTION of an assessment; no recorded theorem changes}
+
+\section*{191. The bridge, module by module}
+
+\texttt{LeanD6BernoulliReferenceBridgeV1} (8 declarations, all \texttt{[propext, Classical.choice, Quot.sound]}):
+\begin{itemize}
+\item \texttt{bern} $t$ is Bernoulli$(t)$, and \texttt{bern\_zero} proves \texttt{bern 0 = corner}. Every corner theorem in the corpus is therefore the $t=0$ instance of the general statement, not a separate branch.
+\item \texttt{expectation\_factor} replaces the role \texttt{corner\_response} played: a product expectation of a per-coordinate product factors coordinatewise. It rests on \texttt{Finset.sum\_prod\_piFinset} and \texttt{Fintype.piFinset\_univ}.
+\item \texttt{gate\_eq} rewrites the two-level conditional of \texttt{gate} as a polynomial in the bits, $\;(1-x_z)\big(1-\prod_{i\in A}(1-x_i)\cdot\mathbf{1}[|x\cap B|\le 1]\big)$. Only a polynomial has a factorable expectation.
+\item \texttt{leOne\_expand} expands the ``at most one of $B$ is on'' indicator as an explicit finite sum of per-coordinate products.
+\end{itemize}
+
+\texttt{LeanD6BernoulliTailV1} (11 declarations, all standard axioms) carries the binomial tail. The route deserves recording because it avoids the obvious one: \texttt{sing\_eq} collapses each singleton term of \texttt{leOne\_expand} into a \emph{difference} of two \texttt{offProd}s, so the whole tail is assembled from \texttt{expect\_offProd} alone. No induction over $B$, no powerset sum, no $\binom{n}{k}$. The consumable form is
+\[ \mathbb{E}_t\big[\mathrm{off}_S\cdot\mathrm{le}_1(B)\big]=(1-t)^{|S|}\Big((1-t)^{|B|}+|B|t(1-t)^{|B|-1}\Big) \]
+for disjoint $S,B$, which is exactly the shape the slopes need, because $\{z\}$, $A$ and $\mathrm{others}(A,z)$ are pairwise disjoint by construction.
+
+\section*{192. The three slopes, and an exponent error that only general block sizes expose}
+
+With $c=(1-t)^{2k-2}$, $a=c(1+(k-2)t)$, $b=c(k-2)t$, the slopes of the gate at a Bernoulli$(t)$ reference are $a$ on $A$, $b$ on $\mathrm{others}(A,z)$, and $a-1$ at $z$. These were checked exactly (rational arithmetic, directly against this corpus's own \texttt{gate}) at $k=3,4,5$ and $t\in\{0,\tfrac18,\tfrac14,\tfrac13,\tfrac12\}$: 15 of 15 cells.
+
+Stated in block sizes rather than in $k$, the slopes are
+\begin{align*}
+\text{on } A:&\quad (1-t)^{|A|}\,\mathrm{tail}(|B|)\\
+\text{at } z:&\quad (1-t)^{|A|}\,\mathrm{tail}(|B|)-1\\
+\text{on } B:&\quad (|B|-1)\,t\,(1-t)^{|A|+|B|-1}
+\end{align*}
+The first two were checked at seven $(|A|,|B|)$ configurations with the two block sizes varied \emph{independently}, five values of $t$ each: 14 of 14.
+
+The third carries a warning. The expression first derived for it was $(|B|-1)t(1-t)^{|A|+|B|}$, one power too many. In the 2$k$-coordinate instance, where $|A|=k$ and $|B|=k-1$, \emph{both} spellings reduce to $b=c(k-2)t$, so the error is invisible at the only configuration the construction actually uses. It appears only when the two blocks are allowed to differ from that relation. The corrected form was checked at ten independent settings. \eclass{NUMERICAL EVIDENCE, exact rational; the Lean statement of the $B$-slope is not yet compiled}
+
+The methodological point is worth keeping: checking a formula at the configuration it was derived for is not a check.
+
+\section*{193. The threshold is an iff}
+
+Addendum P recorded $kr\le e\Rightarrow V=0$ as a sufficient condition. \texttt{LeanD6ReferencePhaseThresholdV1} (6 declarations, all standard axioms) supplies the converse, so
+\[ V_k(t,\rho)>0 \iff e<kr \iff \rho<2a-\tfrac{e}{k}. \]
+$\rho_{\mathrm{crit}}=2a-e/k$ is therefore exact at finite $k$, not asymptotic. \texttt{corner\_threshold} recovers $\rho_{\mathrm{crit}}=2$ at $a=1$, $e=0$, and \texttt{threshold\_strictly\_below\_corner} shows every $e>0$ lowers it strictly. That is the precise sense in which reference evidence shrinks the region of decision insufficiency. \eclass{PROVED}
+
+\section*{194. The budget law}
+
+\texttt{research/master\_reference\_20260912} certifies 504 cells: 133 \texttt{CERTIFIED\_EXACT}, 371 out of the sufficient regime, 0 failures. Each certified cell carries two-action dominance at every $(h,d)$, the endpoint reduction, the primal and dual equalisers, weights in $[0,1]$, and the dual bound against every pure decision, all as rational identities.
+
+The cells then satisfy a relation that was not built into them. Writing $\tau=kt$ for the total reference budget,
+\[ \text{floor alive} \iff \tau<\tau_{\mathrm{crit}}(\rho),\qquad 2(1+\tau_{\mathrm{crit}})e^{-2\tau_{\mathrm{crit}}}=\rho, \]
+holds in 133 of 133 certified cells with no fitted parameter. The asymptotic boundary, applied to finite $k$ with no correction, predicts every cell.
+
+This reframes the claim. The price of reference evidence is not a level of $t$ but a \emph{budget} $kt$, and the critical budget is $\tau_{\mathrm{crit}}(\rho)$. The negative control is that the largest budget with a live floor $(0.500)$ exceeds the smallest with a dead one $(0.1875)$; the two ranges must overlap, because the threshold depends on $\rho$, and their separating would have indicated a fit rather than a law. \eclass{NUMERICAL EVIDENCE, exact rational; the finite-$k$ direction is \texttt{PROVED} by Section 193, the $\tau$ form is not}
+
+\section*{195. Pricing a reference change against a query}
+
+\texttt{research/d6\_reference\_pricing\_20260912} prices two purchases in one unit. A query reveals $h=|A\cap T|$ before the decision acts; its worth is the duality gap $V-V_h$ with $V_h=\max_h\min_d \bar R(h,d)$. Reducing $\min_d$ to $d\in\{0,k\}$ is licensed by \texttt{dominance\_gen} and \texttt{dominance\_one}, which are machine-checked, not assumed. A reference purchase moves $t\to t^\star$ and costs $\delta\tau=k(t^\star-t)$. The exchange rate is the $\delta\tau$ with $V(t^\star)=V_h(t)$, reported as a certified rational bracket rather than a fitted root.
+
+Of 500 cells, 120 are priced, 0 fail, and $V\ge V_h$ holds everywhere as it must. Grouped by headroom $\tau_{\mathrm{crit}}(\rho)-\tau$:
+
+\begin{center}\small
+\begin{tabular}{lrr}
+\toprule
+headroom & $n$ & median $\delta\tau$\\
+\midrule
+$[0.30,0.50)$ & 8 & 0.019655\\
+$[0.20,0.30)$ & 23 & 0.011701\\
+$[0.10,0.20)$ & 40 & 0.005821\\
+$[0.05,0.10)$ & 27 & 0.002824\\
+$[0.00,0.05)$ & 22 & 0.001332\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Near the phase boundary a query is worth almost no reference budget; far from it, roughly fifteen times more. \eclass{NUMERICAL EVIDENCE, exact rational}
+
+\textbf{What must not be claimed.} A power law does not fit: $\log\delta\tau/(V-V_h)$ against $\log$ headroom gives exponent $0.335$ with $R^2=0.56$, and $V/k$ correlates almost as well $(0.756$ against $0.796)$ while $k$ correlates at $-0.66$. The three variables are confounded. The monotone table above is what survives; the exponent is not.
+
+\section*{196. What this does not settle}
+
+The $B$-slope is not compiled. \texttt{slope\_at\_j} is proved and \texttt{slope\_at\_A} is written but not yet clean; until all three compile, the slopes remain \eclass{NUMERICAL EVIDENCE} and must not be cited as \eclass{PROVED}. The join from the slopes through \texttt{productResponse\_add} and \texttt{linear\_slope} into \texttt{productA\_compression\_loss\_formula} is written for the linear half only.
+
+The budget law $\tau=kt$ is a measured regularity over 133 cells, not a theorem. Section 193 proves the finite-$k$ threshold; nothing here proves that the asymptotic boundary governs finite $k$.
+
+The four open items of Section 179 are untouched. The Functional $v4$ confirmatory panel has not returned, so no statement in this addendum depends on it, and the Functional advantage measured on a 20-instance development smoke remains \eclass{NUMERICAL EVIDENCE from a non-protocol panel} and is not evidence under the frozen protocol.
+
+\end{document}

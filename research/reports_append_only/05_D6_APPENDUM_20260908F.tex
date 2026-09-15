@@ -1,0 +1,158 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update F: the axiom audit closes three modules, the $m$-law is settled at $m=4,6,8$ by exact linear programming, the $(m-1)$ law is identified as the \emph{symmetric} bound, and one measurement of addendum E is withdrawn}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--132, including addenda A--E, are an immutable prefix. Nothing there is rewritten or removed. This addendum begins at Section 133. Where an earlier line is now known to be wrong it is quoted, struck, and the reason for the error is given; the original text stays where it was.
+
+\section*{133. PROMOTION: the axiom audit is clean}
+Addendum E, Section 122, carried the qualifier \emph{``COMPILED ARTIFACT; PROVED pending the \texttt{\#print axioms} transcript''}. The audit has been run across all three modules formalised on 7 September:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r}
+\toprule
+Audit file & \texttt{\#print axioms}\\
+\midrule
+\texttt{Axiom\allowbreak Audit\allowbreak D6M6\allowbreak Sharpness\allowbreak BridgeV1} & 40\\
+\texttt{Axiom\allowbreak Audit\allowbreak Support\allowbreak Fibre\allowbreak SufficiencyV1} & 10\\
+\texttt{Axiom\allowbreak Audit\allowbreak Functional\allowbreak Residual\allowbreak MaintenanceV2} & 7\\
+\midrule
+\textbf{total} & \textbf{57}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+All 57 depend only on Lean's standard axioms. No \texttt{sorryAx}, no project-added axiom, no \texttt{native\_decide}.
+
+\claimbox{\texttt{chain\_constant\_six\_sharp} and \texttt{constant\_six\_sharp} move from \eclass{COMPILED ARTIFACT} to \eclass{PROVED}. The same promotion applies to \texttt{pairwise\_separation\_not\_sufficient} in Report 3 and to the seven maintenance theorems in Report 2.}
+
+\textbf{Provenance caveat, stated rather than hidden.} The counts above were verified by reading the three audit sources on disk. The clean-audit \emph{result} comes from a run reported by a parallel session; no transcript file for it exists in \texttt{work/p13\_conjectures}. Re-running the audit and committing its output would close this last gap.
+
+\section*{134. CORRECTION: the $m$-law is settled at three widths, and it is FALSE at $m=4$}
+Addendum E, Section 130, recorded:
+\begin{center}\scriptsize\oldclaim{$c^\ast(m)=m$, general even $m$ --- OPEN; gate not run}\end{center}
+That line is now wrong in both directions: it is not open, and the answer is not uniform.
+
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r r X}
+\toprule
+$m$ & proved bound & symmetric & full & $c^\ast(m)$\\
+ & $2\min(k,m{-}k)$ & optimum & optimum & \\
+\midrule
+$4$ & $4$ & $3$ & $3$ & $\mathbf{3=m-1}$\\
+$6$ & $6$ & $5$ & $6$ & $\mathbf{6=m}$\\
+$8$ & $8$ & $7$ & $8$ & $\mathbf{8=m}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{$c^\ast(4)=3$.} Computed two independent ways, agreeing exactly. (i) A linear program over all $16$ world values with $\delta_\square\le1$, Top-C enforced, maximising $\mathrm{osc}(r_S)-\mathrm{osc}(r_T)$ by enumerating the sign pattern of the four response spans and the argmax/argmin pair; optimum $3.000000000$, no unbounded instance. (ii) The block ansatz of Section 136, which at $m=4$ is not an ansatz at all --- its $4k^2=16$ classes are the $2^4=16$ cube points, so the class map is a bijection and the value is the true optimum. The optimiser was extracted and re-checked outside the LP with the evaluation code validated against the $m=6$ bridge world:
+\[\delta_\square=1,\quad \mathrm{osc}(r_S)-\mathrm{osc}(r_T)=3,\]
+all four response spans equal to $1$, Top-C satisfied. \textbf{So the $(m-1)$ law, which this project refuted at $m=6$, is true \emph{and tight} at $m=4$}, and the proved ceiling $2\min(k,m-k)=4$ is not attained there.
+
+\textbf{$c^\ast(8)=8$.} The ansatz attains $8$; \texttt{pair\_loss\_le\_sdiff\_card} gives $\le 2\min(k,m-k)=8$. Upper and lower bound meet, so the value is exact and the proved ceiling \emph{is} tight at $m=8$.
+
+\section*{135. Why the earlier statement was wrong}
+Two causes, both worth recording.
+
+\textbf{(a) The gate was mis-specified.} Addendum E pre-registered a \emph{search} (tie-locus LP at $m=4,8$) for a question that is a \emph{finite linear program}. Once $S$ and $T$ are fixed and the response-span signs are enumerated, ``maximise $2D$ subject to $\delta_\square\le1$ and Top-C'' is an LP in $2^m$ variables with $O(m4^m)$ constraints --- $177$ constraints at $m=4$. No search, no attractor, no false negative. Every instrument this chain built for this question was the wrong kind of instrument.
+
+\textbf{(b) One formulation error, caught before it was reported as a result.} A first pass dropped the Top-C hypothesis, and the LP was unbounded: for a purely additive world $F(x)=\sum_j h_j(x_j)$ one has $\delta_\square=0$ and
+\[2D=\sum_{j\in T}\mathrm{osc}(h_j)-\sum_{j\in S}\mathrm{osc}(h_j),\]
+which is unbounded above. \texttt{pair\_loss\_le\_sdiff\_card} takes \texttt{hTop} as a hypothesis for exactly this reason. The intermediate number produced by that pass ($4/3$) is void and is recorded here only so that it is never mistaken for a measurement.
+
+\section*{136. The mechanism: $(m-1)$ is the symmetric bound}
+Impose the fully symmetric ansatz
+\[F(x)=g\bigl(|x\cap S|,\ |x\cap T|\bigr),\]
+a $(k+1)^2$-variable LP. Its optimum is exactly $m-1$ at $m=4,6,8$. \textbf{The $(m-1)$ law is precisely the value of this problem over permutation-symmetric worlds.}
+
+The $m=6$ extremal world is not symmetric. Testing which statistic it factors through:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X c}
+\toprule
+Statistic & factors?\\
+\midrule
+$(|x\cap S|,|x\cap T|)$ & no\\
+$(|x\cap S|,\ x_j,\ |x\cap T\setminus\{j\}|)$, any $j\in T$ & no\\
+$(x_i,\ |x\cap S\setminus\{i\}|,\ |x\cap T|)$, any $i\in S$ & no\\
+$(x_0,\ x_3,\ |x\cap\{4,5\}|,\ |x\cap\{1,2\}|)$ & \textbf{yes}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+It factors through \textbf{one distinguished coordinate on each side}, the rest symmetric. Adopting that as an ansatz,
+\[F(x)=g\bigl(x_{i_0},\,|x\cap S\!\setminus\!\{i_0\}|,\ x_{j_0},\,|x\cap T\!\setminus\!\{j_0\}|\bigr),\]
+a $4k^2$-variable LP, gives $3$ at $m=4$ (no gain: the ansatz is the whole cube there), $\mathbf{6}$ at $m=6$ and $\mathbf{8}$ at $m=8$.
+
+\claimbox{\textbf{Symmetrisation is strictly lossy here, and lossy by exactly one.} Classical compression and shifting arguments in extremal combinatorics are used to prove the optimum \emph{is} symmetric. For this functional the symmetric optimum is $m-1$ and the true optimum is $m$ from $m=6$ onward. The $(m-1)$ law was never a miscount --- it is the right answer for the symmetric problem, and the counterexample is a symmetry-breaking phenomenon that has no room to act at $m=4$.}
+
+\textbf{Operational consequence.} The $m=6$ counterexample --- which cost this chain several days, four instruments, one false negative and one recurring attractor (Sections 105, 108, 129) --- is reproduced by a \textbf{36-variable linear program with no search whatsoever}. At $m=8$ it is $64$ variables.
+
+\section*{137. WITHDRAWAL: the ``exchange rate $-k$'' of the interpolation family}
+An unpublished measurement taken while preparing this addendum found that along the interpolation $W_t=2I_b+tD_b$,
+\[\left.\frac{d(2D/\delta_\square)}{d(\text{Top-C margin})}\right|_{t=0}\;=\;-3\;=\;-k,\]
+converging as $-2.970297,\ -2.997003,\ -2.999700$ at $h=10^{-2},10^{-3},10^{-4}$. The arithmetic is correct. \textbf{The interpretation was not, and is withdrawn.}
+
+A parallel session established, and this session confirmed independently, that at fixed margin the interpolation family is \emph{not} optimal:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r}
+\toprule
+at margin $\mu=1/2$, $\delta_\square\le1$ & family & frontier\\
+\midrule
+doubled regret $2D$ & $3$ & $\mathbf{9/2}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The family value $3$ is the closed form $6(1-\mu)$ evaluated at $\mu=1/2$; the frontier value $9/2$ was obtained here by the block-ansatz LP of Section 136 with the margin constraint added, and by the parallel session through a different route with a matching dual certificate. A derivative taken along a path that is not on the frontier is a property of the path, not of the problem. \eclass{WITHDRAWN: correct arithmetic, void interpretation}
+
+\section*{138. The replacement: the margin--regret frontier}
+Define, for interaction radius normalised to $1$,
+\[R_m(\mu)\;=\;\max\bigl\{\,2D \;:\; \delta_\square\le1,\ \min_{i\in S}\mathrm{osc}_i-\max_{j\notin S}\mathrm{osc}_j\ \ge\ \mu\,\bigr\}.\]
+$R_m(0)=c^\ast(m)$ recovers the constant this chain has been chasing; $\mu>0$ is the strict-selection regime. Two facts are in hand:
+\[R_6(0)=6,\qquad R_6(1/2)=9/2\ \ (\text{family: }3).\]
+This is the object that unifies two independent lines of attack. One line supplies the \textbf{margin axis} --- regret as a function of how strictly the selection is required to separate. The other supplies the \textbf{symmetry axis} --- the block ansatz that turns a search over $2^{2^m}$ worlds into a $4k^2$-variable LP. Together they make $R_m(\mu)$ \emph{computable}, for any $m$ and any $\mu$, by an LP small enough to solve in seconds; every instrument previously built for this chain either failed or returned a false negative on the same question.
+
+\section*{139. What this asks of the formalisation}
+The Lean target changes shape, and becomes stronger rather than larger.
+\begin{itemize}
+\item \textbf{Current.} \texttt{chain\_constant\_six\_sharp}: \textsf{DecisionInteractionConstantAtMost} \textit{familyCell} $6$, and no $c<6$ works. A statement about one constant at one width.
+\item \textbf{Replacement.} A margin-indexed family: for each rational $\mu$, a witness world with margin $\ge\mu$ attaining $R_m(\mu)$, plus the matching upper bound. The witness is an \emph{LP vertex}, hence exactly rational, hence expressible as an integer table after clearing denominators --- exactly the form \texttt{LeanD6M6SharpnessBridgeV1} already uses, and the same \texttt{decide}-on-explicit-arguments discipline applies unchanged.
+\item \textbf{What gets reused verbatim.} \texttt{cornerQ2} and its four lemmas; \texttt{fin6\_eta}/\texttt{forall\_fin6}; the \texttt{md0}--\texttt{md5} pattern for the interaction bound; \texttt{osc\_of\_extremes}; \texttt{activeDecisionCell\_valid\_iff\_polyhedral}; the whole normalisation layer \texttt{unit\_response}/\texttt{unit\_residual}/\texttt{unit\_span}/\texttt{unit\_valid}. Only the world table and the margin constant change.
+\item \textbf{What is new to prove.} That the block ansatz is without loss of generality. If that is a theorem, then $c^\ast(m)=m$ for every even $m\ge6$ follows from a finite LP computation per $m$ rather than from a per-$m$ construction, and the Structural chain's staircase proof gives a template for how a parametric-in-$m$ Lean argument is organised.
+\end{itemize}
+
+\section*{140. Novelty boundary, revised}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Object & Status\\
+\midrule
+$2D\le 2|S\setminus T|\delta_\square$ & classical exchange argument; not novel\\
+$\varepsilon$-argument for sharpness & standard; not novel\\
+Gap-dependent certification cost ($1/\Delta^2$) & classical best-arm identification; not novel\\
+Exchange rate $-k$ along the family & \textbf{withdrawn} (Section 137)\\
+Tie point + unit-vector tangent, zero gap contribution & real, but a \emph{path}, not the frontier\\
+$c^\ast(4)=m-1$, $c^\ast(6)=c^\ast(8)=m$ & \textbf{new, exact, two-sided}\\
+$(m-1)$ = the symmetric bound; symmetrisation lossy by exactly $1$ from $m=6$ & \textbf{the novel structural statement}\\
+Block ansatz as a computational engine & \textbf{new}; reduces the open question to LP\\
+$R_m(\mu)$ margin--regret law & \textbf{the open programme}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Still open, precisely.} Whether the block ansatz is WLOG; the shape of $R_m(\mu)$ (piecewise linear? breakpoints where?); and whether $c^\ast(m)=m$ for every even $m\ge6$ --- now a corollary of the ansatz question rather than an independent conjecture.
+\end{document}

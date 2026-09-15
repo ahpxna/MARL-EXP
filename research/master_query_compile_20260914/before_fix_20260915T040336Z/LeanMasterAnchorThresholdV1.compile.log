@@ -1,0 +1,119 @@
+LeanMasterAnchorThresholdV1.lean:32:2: error: Type mismatch
+  MasterAnchorCertificate.anchor_profile (a ^ 2 * (x + y) / 2) (a * (x - y)) K 0 1 t
+    (Eq.mpr (id (congrArg (LT.lt 0) (Eq.trans (congrArg (HAdd.hAdd K) (div_one 0)) (add_zero K)))) hK)
+has type
+  a ^ 2 * (x + y) / 2 - (a * (x - y)) ^ 2 / (2 * (K + 0 / 1)) ≤
+    a ^ 2 * (x + y) / 2 - t * (a * (x - y)) + t ^ 2 * (K + 0 / 1) / 2
+but is expected to have type
+  profile a x y K ≤ energy a x y K t
+LeanMasterAnchorThresholdV1.lean:39:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMasterAnchorThresholdV1.lean:57:50: warning: `if_true` has been deprecated: Use `ite_true` instead
+LeanMasterAnchorThresholdV1.lean:53:36: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMasterAnchorThresholdV1.lean:73:4: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMasterAnchorThresholdV1.lean:97:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMasterAnchorThresholdV1.lean:114:2: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMasterAnchorThresholdV1.lean:122:38: error: `simp` made no progress
+LeanMasterAnchorThresholdV1.lean:154:4: error: linarith failed to find a contradiction
+m : ℕ
+hm : 2 ≤ m
+a c x x0 : ℝ
+w : Fin m → ℝ
+hx0 : 0 ≤ x0
+hbudget : x + ∑ i, w i + c * x0 = 1
+hK : 0 < x + ∑ i, w i + x0
+hc : criticalPrice ↑m ≤ c
+hmr : 2 ≤ ↑m
+hmpos : 0 < ↑m
+hb : 0 ≤ baseValue (↑m) a
+hd :
+  (a - shift (↑m) a) ^ 2 / 2 = baseValue (↑m) a ∧
+    ((a + shift (↑m) a) ^ 2 + (↑m - 1) * shift (↑m) a ^ 2) / (2 * ↑m) = baseValue (↑m) a
+hda : shift (↑m) a ^ 2 / 2 = criticalPrice ↑m * baseValue (↑m) a
+hcoef : ((a + shift (↑m) a) ^ 2 + (↑m - 1) * shift (↑m) a ^ 2) / 2 = ↑m * baseValue (↑m) a
+hsum :
+  ∑ u, energy a x (w u) (x + ∑ i, w i + x0) (shift (↑m) a) =
+    ↑m * baseValue (↑m) a * x + ↑m * baseValue (↑m) a * ∑ i, w i + ↑m * x0 * shift (↑m) a ^ 2 / 2
+hanchor : x0 * shift (↑m) a ^ 2 / 2 ≤ c * x0 * baseValue (↑m) a
+a✝ :
+  ↑m * baseValue (↑m) a < ↑m * baseValue (↑m) a * x + ↑m * baseValue (↑m) a * ∑ i, w i + ↑m * x0 * shift (↑m) a ^ 2 / 2
+⊢ False
+failed
+LeanMasterAnchorThresholdV1.lean:156:2: warning: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanMasterAnchorThresholdV1.lean:171:83: error: unsolved goals
+m a c z : ℝ
+hm : 2 ≤ m
+hden : 1 + (1 - c) * z ≠ 0
+h1 : m + 1 ≠ 0
+h3 : m + 3 ≠ 0
+⊢ a ^ 2 * 8 - a ^ 2 * c * z * 80 - a ^ 2 * c * z * m * 192 - a ^ 2 * c * z * m ^ 2 * 160 -
+                              a ^ 2 * c * z * m ^ 2 * (1 - c * z + z)⁻¹ * 32 -
+                            a ^ 2 * c * z * m ^ 3 * 64 -
+                          a ^ 2 * c * z * m ^ 4 * 16 +
+                        a ^ 2 * c * z * m ^ 4 * (1 - c * z + z)⁻¹ * 16 +
+                      a ^ 2 * c * z * (1 - c * z + z)⁻¹ * 16 +
+                    a ^ 2 * c ^ 2 * z ^ 2 * m ^ 2 * (1 - c * z + z)⁻¹ * 16 -
+                  a ^ 2 * c ^ 2 * z ^ 2 * m ^ 4 * (1 - c * z + z)⁻¹ * 8 -
+                a ^ 2 * c ^ 2 * z ^ 2 * (1 - c * z + z)⁻¹ * 8 -
+              a ^ 2 * m ^ 2 * 16 +
+            a ^ 2 * m ^ 2 * (1 - c * z + z)⁻¹ * 16 +
+          a ^ 2 * m ^ 4 * 8 -
+        a ^ 2 * m ^ 4 * (1 - c * z + z)⁻¹ * 8 -
+      a ^ 2 * (1 - c * z + z)⁻¹ * 8 =
+    -(a ^ 2 * c * z * m * (1 - c * z + z)⁻¹ * 192) - a ^ 2 * c * z * m ^ 2 * (1 - c * z + z)⁻¹ * 176 -
+                                    a ^ 2 * c * z * m ^ 3 * (1 - c * z + z)⁻¹ * 64 -
+                                  a ^ 2 * c * z * m ^ 4 * (1 - c * z + z)⁻¹ * 8 -
+                                a ^ 2 * c * z * (1 - c * z + z)⁻¹ * 72 -
+                              a ^ 2 * c * z ^ 2 * m * (1 - c * z + z)⁻¹ * 192 -
+                            a ^ 2 * c * z ^ 2 * m ^ 2 * (1 - c * z + z)⁻¹ * 160 -
+                          a ^ 2 * c * z ^ 2 * m ^ 3 * (1 - c * z + z)⁻¹ * 64 -
+                        a ^ 2 * c * z ^ 2 * m ^ 4 * (1 - c * z + z)⁻¹ * 16 -
+                      a ^ 2 * c * z ^ 2 * (1 - c * z + z)⁻¹ * 80 +
+                    a ^ 2 * c ^ 2 * z ^ 2 * m * (1 - c * z + z)⁻¹ * 192 +
+                  a ^ 2 * c ^ 2 * z ^ 2 * m ^ 2 * (1 - c * z + z)⁻¹ * 176 +
+                a ^ 2 * c ^ 2 * z ^ 2 * m ^ 3 * (1 - c * z + z)⁻¹ * 64 +
+              a ^ 2 * c ^ 2 * z ^ 2 * m ^ 4 * (1 - c * z + z)⁻¹ * 8 +
+            a ^ 2 * c ^ 2 * z ^ 2 * (1 - c * z + z)⁻¹ * 72 -
+          a ^ 2 * z * m ^ 2 * (1 - c * z + z)⁻¹ * 16 +
+        a ^ 2 * z * m ^ 4 * (1 - c * z + z)⁻¹ * 8 +
+      a ^ 2 * z * (1 - c * z + z)⁻¹ * 8
+LeanMasterAnchorThresholdV1.lean:190:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+LeanMasterAnchorThresholdV1.lean:190:8: warning: Unused tactic linter: `ring` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+LeanMasterAnchorThresholdV1.lean:221:35: error: failed to prove positivity/nonnegativity/nonzeroness
+'CIGAMF.P13.MasterAnchorThreshold.queryEnergy_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.profile_le_energy' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.profile_attained' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.weights' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.base_attained' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.ordinary_dual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.anchor_dual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.global_upper' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.gain_identity' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.purchase_properties' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.below_threshold' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MasterAnchorThreshold.anchor_required' depends on axioms: [propext, Classical.choice, Quot.sound]

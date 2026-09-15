@@ -1,0 +1,71 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product Compression}\\[2pt]
+{\large\itshape Append-only update P: the same-response minimax value closes, and what it is not}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--185 are an immutable prefix. This addendum begins at Section 186.
+
+\section*{186. The defect of Section 184 is cleared}
+
+Both modules now compile and write artifacts.
+
+\texttt{LeanD6SameResponseMarginGameV1.olean} exists. All five declarations audit to \texttt{[propext, Classical.choice, Quot.sound]}, \texttt{actual\_two\_action\_risk} included --- its \texttt{sorryAx} is gone. The repair was one tactic: \texttt{sdiff\_self} was resolving to the lattice lemma $s\setminus s=\bot$, so an explicit \texttt{Finset} equation $T\setminus T=\emptyset$, proved by \texttt{ext}, was substituted and the residual $|A\cap\bot|$, $|\bot|$ disappeared.
+
+\texttt{LeanD6SameResponseMarginCertificateV1.olean} exists. All four declarations audit clean. Two repairs were needed, both in \texttt{singleton\_average}. First, \texttt{D} was introduced by \texttt{let D := T \textbackslash\ S}; \texttt{ring} treats a let-bound local as an opaque atom and could not identify $X(T\setminus S)$ with $X(D)$, so an explicit $D=T\setminus S$ was added and used as a rewrite. Second, a nine-argument \texttt{simp only} intended to distribute the sum was reported by the linter as \emph{entirely} unused; \texttt{field\_simp} then pushed the inverse inside a surviving $\sum$ and \texttt{ring} had no chance. It was replaced by an explicit evaluation: split the summand as
+\[ \tfrac{\rho|D|+(2-\rho)}{2}-|A_i\cap D|, \]
+then \texttt{sum\_sub\_distrib}, \texttt{sum\_const} and the counting identity $\sum_{i\in T}|A_i\cap D|=|D|$ give
+\[ \sum_{i\in T}f_i=(q+1)\cdot\tfrac{\rho|D|+(2-\rho)}{2}-|D| . \]
+No step now leaves a sum in front of a ring normaliser.
+
+\section*{187. The value, for every size and every margin in range}
+
+With $k=q+1$, $q\ge2$ and $1\le\rho\le2$, two compiled theorems meet.
+
+\emph{Upper.} \texttt{actual\_two\_action\_risk}: the rule that plays $T$ with probability $\rho/2$ and $T^{\mathsf c}$ otherwise has expected regret exactly $k\rho(2-\rho)/4$ \emph{in every hidden world}, not merely in the worst one. \texttt{complement\_optimal} supplies that $A^{\mathsf c}$ is a true optimum, so these are regrets and not differences against an arbitrary baseline; \texttt{mixture\_weights\_valid} supplies $\rho/2\in[0,1]$.
+
+\emph{Lower.} \texttt{randomized\_dual\_equalizer}: against the prior mixing the full-intersection world with weight $(k\rho-2)/(2(k-1))$ against the $k$ singleton-intersection worlds uniformly, \emph{every} finite randomized rule has expected regret exactly $k\rho(2-\rho)/4$. Its only hypothesis on the rule is $\sum_U p_U=1$.
+
+Hence
+\[ V(\rho)=\frac{k\,\rho\,(2-\rho)}{4},\qquad 1\le\rho\le2, \]
+for all $k\ge3$. \eclass{proved; compiled artifact; audit clean}
+
+This supersedes Section 182. The twelve exact rational certificates recorded there were a conjecture-stage confirmation and are now redundant; they are retained as written, in accordance with the append-only rule, and should be read as what they were --- evidence before a proof existed, not part of the proof.
+
+\texttt{AxiomAuditD6SameResponseMinimaxV1} audits all twelve declarations of the chain and \emph{throws} on any axiom outside the three kernel foundations, rather than printing a line for a human to read.
+
+\section*{188. Novelty, stated plainly}
+
+Two ingredients are classical and should not be presented otherwise.
+
+Adding a modular function leaves every mixed second difference unchanged. This is immediate from the definition and is standard in discrete convexity and in the analysis of Boolean functions. It is the engine of the construction but it is not a new fact.
+
+A least-favourable prior that equalises the risk across all decisions certifies the minimax value. Equaliser strategies are textbook game theory. That the coefficient of the decision statistic vanishes is a computation, not a new principle.
+
+What is new is their combination, and it sits in three places. First, \emph{per-world} modular compensation chosen so that the entire corner response vector is pinned across the family: the worlds become observationally identical in first order while the optimum moves, which is what makes a sharpness statement possible at all. Second, the loss identity
+\[ 2L_A(S)=\rho\,|T\setminus S|+k+1-2\,|A\cap(T\setminus S)| , \]
+which collapses an oscillation over $2^{m}$ points to two intersection cardinalities and is what makes every subsequent step elementary. Third, the two-sided conclusion at the same constant $2\delta_\square$.
+
+The margin-sensitive exchange inequality $2R\le d(2\delta_\square-\mu)$ remains flagged from earlier sections as a possible collision with the curvature, submodularity-ratio and supermodular-degree literature. No literature check has succeeded in this session and none is claimed. \eclass{unverified against prior art}
+
+\section*{189. What this does not settle}
+
+$V(\rho)$ is the value of \emph{this} family. It is not a lower bound on every family at margin $\rho$, and Section 185's separation between the Top-C threshold and the information threshold stands unchanged: they agree at $2\delta_\square$, and neither implies the other.
+
+The open items of Section 179 are untouched by this addendum: adaptive matching total regret for unknown $A$; sharp growing-$q$ constants with the phase interval learned; termination and expected $\Gamma$ rate; matching discovery lower bound. \texttt{LeanD6RecordGapDecompositionV1} and \texttt{LeanD6ScalarExplorationSeparationV1} still carry \texttt{sorryAx} and nothing above depends on them. The reproducibility gap between \texttt{.lean}, \texttt{.olean} and \texttt{.compile.log} counts is unchanged.
+\end{document}

@@ -1,0 +1,66 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update D: the family carrying the lower bound has no tolerance trade-off at all, and curve richness tracks coefficient precision rather than width}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--71, including addenda A--C, are an immutable prefix. This addendum begins at Section 72.
+
+\section*{72. The staircase family has exactly two levels}
+The programme's central object is $\chi_\varepsilon$, the number of rankings needed to stay within $\varepsilon$ of the budget-wise optimum after normalising the total component radius. The exact curve was computed for the staircase family and for disjoint unions of staircase blocks, over $\mathbb Q$, by testing directly whether a budget set is coverable by one chain and then solving the resulting set cover exactly.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r}
+\toprule
+blocks & $\chi$ below threshold & threshold\\
+\midrule
+$[2]$ / $[3]$ / $[4]$ & $2$ / $3$ / $4$ & $1/4$, $1/6$, $1/8$\\
+$[2,2]$ / $[3,2]$ & $3$ / $3$ & $1/8$, $1/10$\\
+$[3,3]$ / $[4,2]$ & $4$ / $4$ & $1/12$, $1/12$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Every configuration has \textbf{exactly two levels}, and the threshold is always precisely $1/(2\sum_b r_b)$. No intermediate value of $\chi$ occurs at any $\varepsilon$.
+\claimbox{\textbf{This is a collapse, not a trade-off.} The family that carries the lower bound exhibits no $K$-versus-$\varepsilon$ curve: exact optimality needs $r$ rankings, and a tolerance of $1/(2r)$ --- already tiny --- needs one. Disjoint unions do not help; $[2,2]$ gives $3$, not $4$.}
+
+\section*{73. The proved lower bound is loose by exactly a factor two}
+\texttt{normalized\_lower} establishes $\chi_\varepsilon\ge r$ for $\varepsilon\le1/(4r)$. The exact collapse point is $1/(2r)$, so $\chi_\varepsilon=r$ holds on the whole interval $\varepsilon<1/(2r)$. The proved statement can be strengthened by a factor two, and this is the cheapest available Lean target in the chain. The matching upper bound $\lfloor2/\varepsilon\rfloor+1$ is meanwhile vacuous on this family: at the threshold it returns $4r+1$ where the truth is $1$.
+
+\section*{74. Curve richness is governed by coefficient precision}
+The scalar two-support-point model was swept with random integer weights of $B$ bits, $30$ draws per cell, counting levels of the exact $\chi_\varepsilon$ curve. The model reproduces the \texttt{ScalarChi5} witness to the fraction ($5\to3\to2\to1$ at $0$, $1/114$, $1/57$, $7/57$), so the measurement is calibrated.
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r r r r r}
+\toprule
+$m$ & $B{=}1$ & $2$ & $3$ & $4$ & $5$ & $6$\\
+\midrule
+$5$ & $\mathbf{2}$ & $3$ & $3$ & $3$ & $3$ & $3$\\
+$6$ & $\mathbf{2}$ & $3$ & $3$ & $3$ & $3$ & $3$\\
+$7$ & $\mathbf{2}$ & $3$ & $3$ & $3$ & $\mathbf{4}$ & $\mathbf{4}$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+At one bit the level count is capped at two for every width tested. Width contributes weakly; precision contributes sharply.
+\claimbox{\textbf{The $\chi\ge5$ witness is not a geometric outlier.} Its four levels are an extreme draw from the random distribution at the same $m$ and the same bit width. This is exactly the failure mode the 7 September plan warned of: a witness whose difficulty may come from cleverly chosen coefficients rather than from support geometry.}
+
+\section*{75. Consequence: the question has to change}
+The claim ``how many rankings are forced, as a function of $m$'' now rests on two weak legs --- a family with a law that is trivial (two levels, threshold $1/m$), and a single witness whose richness traces to precision. The quantity the data actually points at is different:
+\[\text{levels of }\chi_\varepsilon\ \longleftrightarrow\ \text{bit precision of the coefficients, at fixed dimension and normalisation.}\]
+That is still a law, and still about representability, but it is not the law being sought. Stating it correctly would also change what a counterexample looks like: a family with unbounded level count at bounded precision would be the real result, and none of the families enumerated here is one.
+\eclass{EXACT RATIONAL COMPUTATION ON NAMED FAMILIES} --- \texttt{research/structural\_tolerance\_20260910/tolerance\_curves.json}. No claim is made about families outside those enumerated.
+\end{document}

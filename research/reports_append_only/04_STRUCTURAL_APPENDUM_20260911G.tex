@@ -1,0 +1,52 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 4 - Structural Rankability}\\[2pt]
+{\large\itshape Append-only update G: the chi>=4 witness becomes PROVED, and the census closes at zero}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--83 are an immutable prefix. This addendum begins at Section 84.
+
+\section*{84. The $\chi \ge 4$ witness, promoted}
+\texttt{LeanStructuralActualChi4KernelV1} re-proves the four subset enumerations of \texttt{LeanStructuralActualChi4WitnessV1} by kernel \texttt{decide} and repeats the derivation that consumes them, ending in \texttt{STRUCT\_ACTUAL\_CHI4\_prefix\_cover\_not\_at\_most\_three\_kernel}. Nine names, all on $[\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}]$.
+
+Two things made this cheap, and both are worth recording because they are the reason the same trick will not always work. First, the four facts are \emph{pure combinatorics on} \texttt{Finset (Fin 6)} -- they mention neither \texttt{chi4F} nor \texttt{selectedRadius}, so no real-number reasoning had to be redone. Second, every other step of the original was already kernel \texttt{decide}, \texttt{norm\_num} or \texttt{omega}. The kernel load is bounded by $64 \times 20 = 1280$ decidable equalities on subsets of a six-element type.
+
+The real-valued content is untouched: the original's \texttt{@[simp]} radius evaluations are reused through the simp set. They are \texttt{private}, so they cannot be named from the new module -- but a \texttt{private} theorem's \texttt{simp} attribute is global, which is what makes the reuse possible at all.
+
+\section*{85. The census closes: zero results depend on \texttt{native\_decide}}
+Section 83 set the rule -- report \emph{uses in the tree} and \emph{results that depend on it} as two separate numbers, and settle dependency with \texttt{\#print axioms} rather than by reading imports. Applying it now:
+
+\begin{center}\footnotesize
+\begin{tabular}{lcc}
+\toprule
+& Sec.\ 76 (as reported) & now (corrected basis) \\
+\midrule
+tactic uses in tree      & ``$16 \to 6$'' & $16$, unchanged \\
+results depending on it  & --- & $\mathbf{6 \to 0}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The $16$ uses sit in three modules -- \texttt{ScalarChi5Witness} ($10$), \texttt{ActualChi4Witness} ($4$), \texttt{D6PairContractionCounterexample} ($2$) -- and none was deleted, per standing policy. Each now has a kernel twin whose headline is audited clean: \texttt{ScalarChi5GeometryKernel} (Section 83), \texttt{ActualChi4Kernel} (Section 84), and \texttt{D6PairContractionKernel} (D6 Section 178).
+
+The decisive check is a sweep of every \texttt{.compile.log} in the tree for \texttt{Lean.ofReduceBool}. It returns \textbf{zero} occurrences across all $134$ logs.
+\claimbox{Stated at the precision the evidence supports, and no further. ``No audited name depends on \texttt{Lean.ofReduceBool}'' is what the sweep establishes. It is \emph{not} the claim that the corpus is free of \texttt{native\_decide} --- sixteen uses remain in the tree --- nor that every module has been audited: the tree holds $291$ \texttt{.lean} files against $134$ logs. The three original modules' own conclusions remain COMPILED ARTIFACTS; what changed is that no chain's headline routes through them.}
+
+\section*{86. What the kernel replacements did not settle}
+Each twin proves the same statement about the same instance. None of them widens the result: $\chi_{\text{prefix}} \ge 5$ at $m=7$ and $\chi \ge 4$ at $m=6$ are still statements about two specific integer instances found by search, not about a family. The negative finding of Section 73 stands -- staircases and disjoint unions have exactly two levels, so these witnesses are extreme draws rather than members of a structured family, and no construction is known that produces $\chi_{\text{prefix}} \ge k$ on demand.
+\end{document}

@@ -1,0 +1,1017 @@
+{
+  "protocol_version": "adapter_capability_audit_v1",
+  "runtime_requested": false,
+  "seed": 3001,
+  "adapters": {
+    "omni": {
+      "adapter": "omni",
+      "capabilities": {
+        "clone_restore": {
+          "status": "SUPPORTED",
+          "reason": "adapter implements clone_state/restore_state",
+          "evidence": null
+        },
+        "valid_action_mask": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes an explicit per-agent mask",
+          "evidence": null
+        },
+        "per_agent_valid_mask": {
+          "status": "SUPPORTED",
+          "reason": "alias of the explicit per-agent valid-action mask contract",
+          "evidence": null
+        },
+        "execution_receipt": {
+          "status": "SUPPORTED",
+          "reason": "Omni exposes executed last_actions and was authority-audited",
+          "evidence": null
+        },
+        "executed_action_receipt": {
+          "status": "SUPPORTED",
+          "reason": "trusted receipt exposes the action actually applied",
+          "evidence": null
+        },
+        "intervention_authority": {
+          "status": "SUPPORTED",
+          "reason": "requested Omni actions are checked against a trusted executed-action receipt",
+          "evidence": null
+        },
+        "fixed_continuation": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes a fixed continuation policy",
+          "evidence": null
+        },
+        "requestable_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "Cartesian product of per-agent request masks; this is not a joint-feasibility oracle",
+          "evidence": null
+        },
+        "honored_joint_support": {
+          "status": "SUPPORTED",
+          "reason": "executed command tuples can be enumerated from clone states",
+          "evidence": null
+        },
+        "joint_feasibility_oracle": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no pre-execution joint admissibility oracle is exposed",
+          "evidence": null
+        },
+        "coupled_honored_support_observed": {
+          "status": "NOT_SUPPORTED",
+          "reason": "Omni command support is intentionally Cartesian",
+          "evidence": null
+        },
+        "full_cartesian_testable": {
+          "status": "SUPPORTED",
+          "reason": "full finite command alphabet is enumerable",
+          "evidence": null
+        },
+        "reference_kernel_observable": {
+          "status": "NOT_SUPPORTED",
+          "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+          "evidence": null
+        },
+        "message_deletion": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized message-deletion intervention in the current adapter",
+          "evidence": null
+        },
+        "communication_delay": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized delayed-message intervention in the current adapter",
+          "evidence": null
+        },
+        "agent_removal": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized agent-removal intervention in the current adapter",
+          "evidence": null
+        },
+        "learned_policy_hook": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+          "evidence": null
+        },
+        "mixed_difference_testable": {
+          "status": "SUPPORTED",
+          "reason": "clone-state full product response tables can be built",
+          "evidence": null
+        }
+      },
+      "runtime_probe": null,
+      "claim_readiness": {
+        "MASTER_support": {
+          "ready": false,
+          "reason": "requires a pre-execution joint command-feasibility oracle; post-execution cancellation/honoring is diagnostic only"
+        },
+        "MASTER_honored_support_diagnostic": {
+          "ready": false,
+          "reason": "post-resolution honored support may diagnose interaction but is not relabeled as pre-execution feasible support"
+        },
+        "MASTER_reference": {
+          "ready": false,
+          "reason": "requires trajectory/co-action kernel estimation plus intervention response"
+        },
+        "FUNCTIONAL": {
+          "ready": true,
+          "reason": "finite intervention panels and explicit masks available"
+        },
+        "D6": {
+          "ready": true,
+          "reason": "requires verified full-product response table and execution authority"
+        },
+        "QUERY": {
+          "ready": true,
+          "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA"
+        },
+        "DYNAMIC": {
+          "ready": false,
+          "reason": "only restricted until a claim-specific learned-policy update hook is exercised"
+        }
+      },
+      "query_capability_layers": {
+        "EnvironmentCapabilities": {
+          "clone_restore": {
+            "status": "SUPPORTED",
+            "reason": "adapter implements clone_state/restore_state",
+            "evidence": null
+          },
+          "valid_action_mask": {
+            "status": "SUPPORTED",
+            "reason": "adapter exposes an explicit per-agent mask",
+            "evidence": null
+          },
+          "execution_receipt": {
+            "status": "SUPPORTED",
+            "reason": "Omni exposes executed last_actions and was authority-audited",
+            "evidence": null
+          },
+          "intervention_authority": {
+            "status": "SUPPORTED",
+            "reason": "requested Omni actions are checked against a trusted executed-action receipt",
+            "evidence": null
+          },
+          "joint_feasibility_oracle": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no pre-execution joint admissibility oracle is exposed",
+            "evidence": null
+          },
+          "full_cartesian_testable": {
+            "status": "SUPPORTED",
+            "reason": "full finite command alphabet is enumerable",
+            "evidence": null
+          },
+          "reference_kernel_observable": {
+            "status": "NOT_SUPPORTED",
+            "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+            "evidence": null
+          }
+        },
+        "PolicyCapabilities": {
+          "learned_policy_hook": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+            "evidence": null
+          },
+          "policy_attention_weights": {
+            "status": "UNVERIFIED",
+            "reason": "attention is a policy/checkpoint property, not an environment-adapter property",
+            "evidence": null
+          }
+        },
+        "CommunicationCapabilities": {
+          "message_deletion": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized message-deletion intervention in the current adapter",
+            "evidence": null
+          },
+          "communication_delay": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized delayed-message intervention in the current adapter",
+            "evidence": null
+          }
+        },
+        "CausalContextCapabilities": {
+          "information_intervention": {
+            "status": "UNVERIFIED",
+            "reason": "requires an explicit information object and available-vs-absent intervention contract",
+            "evidence": null
+          },
+          "causal_context": {
+            "status": "UNVERIFIED",
+            "reason": "requires graph, identification assumptions, interventions, and context distribution",
+            "evidence": null
+          }
+        }
+      },
+      "semantic_warning": "requestable command support and resolved/honored support are different objects; never relabel post-conflict cancellation as pre-execution infeasibility"
+    },
+    "rware": {
+      "adapter": "rware",
+      "capabilities": {
+        "clone_restore": {
+          "status": "SUPPORTED",
+          "reason": "adapter implements clone_state/restore_state",
+          "evidence": null
+        },
+        "valid_action_mask": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes an explicit per-agent mask",
+          "evidence": null
+        },
+        "per_agent_valid_mask": {
+          "status": "SUPPORTED",
+          "reason": "alias of the explicit per-agent valid-action mask contract",
+          "evidence": null
+        },
+        "execution_receipt": {
+          "status": "UNVERIFIED",
+          "reason": "runtime probe must confirm post-resolution req_action telemetry",
+          "evidence": null
+        },
+        "executed_action_receipt": {
+          "status": "UNVERIFIED",
+          "reason": "runtime must verify post-resolution actions against requests",
+          "evidence": null
+        },
+        "intervention_authority": {
+          "status": "UNVERIFIED",
+          "reason": "requires a runtime match between requested and post-resolution executed actions",
+          "evidence": null
+        },
+        "fixed_continuation": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes a fixed continuation policy",
+          "evidence": null
+        },
+        "requestable_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "Cartesian product of per-agent request masks; this is not a joint-feasibility oracle",
+          "evidence": null
+        },
+        "honored_joint_support": {
+          "status": "UNVERIFIED",
+          "reason": "RWARE can cancel conflicting movement requests; resolved tuples must be probed",
+          "evidence": null
+        },
+        "joint_feasibility_oracle": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no pre-execution joint admissibility oracle is exposed",
+          "evidence": null
+        },
+        "coupled_honored_support_observed": {
+          "status": "UNVERIFIED",
+          "reason": "requires runtime enumeration of resolved joint actions",
+          "evidence": null
+        },
+        "full_cartesian_testable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "requestable tuples are enumerable, but resolved support may be coupled",
+          "evidence": null
+        },
+        "reference_kernel_observable": {
+          "status": "NOT_SUPPORTED",
+          "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+          "evidence": null
+        },
+        "message_deletion": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized message-deletion intervention in the current adapter",
+          "evidence": null
+        },
+        "communication_delay": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized delayed-message intervention in the current adapter",
+          "evidence": null
+        },
+        "agent_removal": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized agent-removal intervention in the current adapter",
+          "evidence": null
+        },
+        "learned_policy_hook": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+          "evidence": null
+        },
+        "mixed_difference_testable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "only on a verified full-product request/receipt panel; canceled cells must not be silently treated as executed",
+          "evidence": null
+        }
+      },
+      "runtime_probe": null,
+      "claim_readiness": {
+        "MASTER_support": {
+          "ready": false,
+          "reason": "requires a pre-execution joint command-feasibility oracle; post-execution cancellation/honoring is diagnostic only"
+        },
+        "MASTER_honored_support_diagnostic": {
+          "ready": false,
+          "reason": "post-resolution honored support may diagnose interaction but is not relabeled as pre-execution feasible support"
+        },
+        "MASTER_reference": {
+          "ready": false,
+          "reason": "requires trajectory/co-action kernel estimation plus intervention response"
+        },
+        "FUNCTIONAL": {
+          "ready": true,
+          "reason": "finite intervention panels and explicit masks available"
+        },
+        "D6": {
+          "ready": false,
+          "reason": "requires verified full-product response table and execution authority"
+        },
+        "QUERY": {
+          "ready": false,
+          "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA"
+        },
+        "DYNAMIC": {
+          "ready": false,
+          "reason": "only restricted until a claim-specific learned-policy update hook is exercised"
+        }
+      },
+      "query_capability_layers": {
+        "EnvironmentCapabilities": {
+          "clone_restore": {
+            "status": "SUPPORTED",
+            "reason": "adapter implements clone_state/restore_state",
+            "evidence": null
+          },
+          "valid_action_mask": {
+            "status": "SUPPORTED",
+            "reason": "adapter exposes an explicit per-agent mask",
+            "evidence": null
+          },
+          "execution_receipt": {
+            "status": "UNVERIFIED",
+            "reason": "runtime probe must confirm post-resolution req_action telemetry",
+            "evidence": null
+          },
+          "intervention_authority": {
+            "status": "UNVERIFIED",
+            "reason": "requires a runtime match between requested and post-resolution executed actions",
+            "evidence": null
+          },
+          "joint_feasibility_oracle": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no pre-execution joint admissibility oracle is exposed",
+            "evidence": null
+          },
+          "full_cartesian_testable": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "requestable tuples are enumerable, but resolved support may be coupled",
+            "evidence": null
+          },
+          "reference_kernel_observable": {
+            "status": "NOT_SUPPORTED",
+            "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+            "evidence": null
+          }
+        },
+        "PolicyCapabilities": {
+          "learned_policy_hook": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+            "evidence": null
+          },
+          "policy_attention_weights": {
+            "status": "UNVERIFIED",
+            "reason": "attention is a policy/checkpoint property, not an environment-adapter property",
+            "evidence": null
+          }
+        },
+        "CommunicationCapabilities": {
+          "message_deletion": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized message-deletion intervention in the current adapter",
+            "evidence": null
+          },
+          "communication_delay": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized delayed-message intervention in the current adapter",
+            "evidence": null
+          }
+        },
+        "CausalContextCapabilities": {
+          "information_intervention": {
+            "status": "UNVERIFIED",
+            "reason": "requires an explicit information object and available-vs-absent intervention contract",
+            "evidence": null
+          },
+          "causal_context": {
+            "status": "UNVERIFIED",
+            "reason": "requires graph, identification assumptions, interventions, and context distribution",
+            "evidence": null
+          }
+        }
+      },
+      "semantic_warning": "requestable command support and resolved/honored support are different objects; never relabel post-conflict cancellation as pre-execution infeasibility"
+    },
+    "flatland": {
+      "adapter": "flatland",
+      "capabilities": {
+        "clone_restore": {
+          "status": "SUPPORTED",
+          "reason": "adapter implements clone_state/restore_state",
+          "evidence": null
+        },
+        "valid_action_mask": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes an explicit per-agent mask",
+          "evidence": null
+        },
+        "per_agent_valid_mask": {
+          "status": "SUPPORTED",
+          "reason": "alias of the explicit per-agent valid-action mask contract",
+          "evidence": null
+        },
+        "execution_receipt": {
+          "status": "UNVERIFIED",
+          "reason": "current adapter records requests; Flatland movement_allowed/resolution needs explicit runtime instrumentation",
+          "evidence": null
+        },
+        "executed_action_receipt": {
+          "status": "UNVERIFIED",
+          "reason": "no trusted post-motion action receipt is exposed",
+          "evidence": null
+        },
+        "intervention_authority": {
+          "status": "UNVERIFIED",
+          "reason": "submitted train actions are not yet a trusted post-resolution receipt",
+          "evidence": null
+        },
+        "fixed_continuation": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes a fixed continuation policy",
+          "evidence": null
+        },
+        "requestable_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "Cartesian product of per-agent request masks; this is not a joint-feasibility oracle",
+          "evidence": null
+        },
+        "honored_joint_support": {
+          "status": "UNVERIFIED",
+          "reason": "movement conflict resolution is not yet surfaced as a stable receipt",
+          "evidence": null
+        },
+        "joint_feasibility_oracle": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no pre-execution joint admissibility oracle is exposed",
+          "evidence": null
+        },
+        "coupled_honored_support_observed": {
+          "status": "UNVERIFIED",
+          "reason": "requires explicit movement-resolution probe",
+          "evidence": null
+        },
+        "full_cartesian_testable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "state-valid per-agent actions are topology-dependent",
+          "evidence": null
+        },
+        "reference_kernel_observable": {
+          "status": "NOT_SUPPORTED",
+          "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+          "evidence": null
+        },
+        "message_deletion": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized message-deletion intervention in the current adapter",
+          "evidence": null
+        },
+        "communication_delay": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized delayed-message intervention in the current adapter",
+          "evidence": null
+        },
+        "agent_removal": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized agent-removal intervention in the current adapter",
+          "evidence": null
+        },
+        "learned_policy_hook": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+          "evidence": null
+        },
+        "mixed_difference_testable": {
+          "status": "UNVERIFIED",
+          "reason": "requires trusted joint execution receipts",
+          "evidence": null
+        }
+      },
+      "runtime_probe": null,
+      "claim_readiness": {
+        "MASTER_support": {
+          "ready": false,
+          "reason": "requires a pre-execution joint command-feasibility oracle; post-execution cancellation/honoring is diagnostic only"
+        },
+        "MASTER_honored_support_diagnostic": {
+          "ready": false,
+          "reason": "post-resolution honored support may diagnose interaction but is not relabeled as pre-execution feasible support"
+        },
+        "MASTER_reference": {
+          "ready": false,
+          "reason": "requires trajectory/co-action kernel estimation plus intervention response"
+        },
+        "FUNCTIONAL": {
+          "ready": true,
+          "reason": "finite intervention panels and explicit masks available"
+        },
+        "D6": {
+          "ready": false,
+          "reason": "requires verified full-product response table and execution authority"
+        },
+        "QUERY": {
+          "ready": false,
+          "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA"
+        },
+        "DYNAMIC": {
+          "ready": false,
+          "reason": "only restricted until a claim-specific learned-policy update hook is exercised"
+        }
+      },
+      "query_capability_layers": {
+        "EnvironmentCapabilities": {
+          "clone_restore": {
+            "status": "SUPPORTED",
+            "reason": "adapter implements clone_state/restore_state",
+            "evidence": null
+          },
+          "valid_action_mask": {
+            "status": "SUPPORTED",
+            "reason": "adapter exposes an explicit per-agent mask",
+            "evidence": null
+          },
+          "execution_receipt": {
+            "status": "UNVERIFIED",
+            "reason": "current adapter records requests; Flatland movement_allowed/resolution needs explicit runtime instrumentation",
+            "evidence": null
+          },
+          "intervention_authority": {
+            "status": "UNVERIFIED",
+            "reason": "submitted train actions are not yet a trusted post-resolution receipt",
+            "evidence": null
+          },
+          "joint_feasibility_oracle": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no pre-execution joint admissibility oracle is exposed",
+            "evidence": null
+          },
+          "full_cartesian_testable": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "state-valid per-agent actions are topology-dependent",
+            "evidence": null
+          },
+          "reference_kernel_observable": {
+            "status": "NOT_SUPPORTED",
+            "reason": "adapter does not expose a conditional co-action kernel estimator by itself",
+            "evidence": null
+          }
+        },
+        "PolicyCapabilities": {
+          "learned_policy_hook": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+            "evidence": null
+          },
+          "policy_attention_weights": {
+            "status": "UNVERIFIED",
+            "reason": "attention is a policy/checkpoint property, not an environment-adapter property",
+            "evidence": null
+          }
+        },
+        "CommunicationCapabilities": {
+          "message_deletion": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized message-deletion intervention in the current adapter",
+            "evidence": null
+          },
+          "communication_delay": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized delayed-message intervention in the current adapter",
+            "evidence": null
+          }
+        },
+        "CausalContextCapabilities": {
+          "information_intervention": {
+            "status": "UNVERIFIED",
+            "reason": "requires an explicit information object and available-vs-absent intervention contract",
+            "evidence": null
+          },
+          "causal_context": {
+            "status": "UNVERIFIED",
+            "reason": "requires graph, identification assumptions, interventions, and context distribution",
+            "evidence": null
+          }
+        }
+      },
+      "semantic_warning": "requestable command support and resolved/honored support are different objects; never relabel post-conflict cancellation as pre-execution infeasibility"
+    },
+    "cyborg": {
+      "adapter": "cyborg",
+      "capabilities": {
+        "clone_restore": {
+          "status": "SUPPORTED",
+          "reason": "adapter implements clone_state/restore_state",
+          "evidence": null
+        },
+        "valid_action_mask": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes an explicit per-agent mask",
+          "evidence": null
+        },
+        "per_agent_valid_mask": {
+          "status": "SUPPORTED",
+          "reason": "alias of the explicit per-agent valid-action mask contract",
+          "evidence": null
+        },
+        "execution_receipt": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "adapter records submitted actions after per-agent validation, not environment-side causal execution semantics",
+          "evidence": null
+        },
+        "executed_action_receipt": {
+          "status": "UNVERIFIED",
+          "reason": "submitted actions are not an executed-action receipt",
+          "evidence": null
+        },
+        "intervention_authority": {
+          "status": "UNVERIFIED",
+          "reason": "submitted-action telemetry is insufficient to certify environment-side execution",
+          "evidence": null
+        },
+        "fixed_continuation": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes a fixed continuation policy",
+          "evidence": null
+        },
+        "requestable_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "Cartesian product of per-agent request masks; this is not a joint-feasibility oracle",
+          "evidence": null
+        },
+        "honored_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "submitted action tuples can be recorded; no coupled feasibility contract",
+          "evidence": null
+        },
+        "joint_feasibility_oracle": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no pre-execution joint admissibility oracle is exposed",
+          "evidence": null
+        },
+        "coupled_honored_support_observed": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no coupled command feasibility exposed",
+          "evidence": null
+        },
+        "full_cartesian_testable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "heterogeneous finite action spaces are enumerable per agent",
+          "evidence": null
+        },
+        "reference_kernel_observable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "policy/co-action trajectories can estimate a kernel, but the current adapter does not provide the estimator",
+          "evidence": null
+        },
+        "message_deletion": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized message-deletion intervention in the current adapter",
+          "evidence": null
+        },
+        "communication_delay": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized delayed-message intervention in the current adapter",
+          "evidence": null
+        },
+        "agent_removal": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "counterfactual noop/randomization can be defined, but literal removal semantics require a scenario contract",
+          "evidence": null
+        },
+        "learned_policy_hook": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+          "evidence": null
+        },
+        "mixed_difference_testable": {
+          "status": "UNVERIFIED",
+          "reason": "needs claim-specific outcome/receipt validation",
+          "evidence": null
+        }
+      },
+      "runtime_probe": null,
+      "claim_readiness": {
+        "MASTER_support": {
+          "ready": false,
+          "reason": "requires a pre-execution joint command-feasibility oracle; post-execution cancellation/honoring is diagnostic only"
+        },
+        "MASTER_honored_support_diagnostic": {
+          "ready": false,
+          "reason": "post-resolution honored support may diagnose interaction but is not relabeled as pre-execution feasible support"
+        },
+        "MASTER_reference": {
+          "ready": false,
+          "reason": "requires trajectory/co-action kernel estimation plus intervention response"
+        },
+        "FUNCTIONAL": {
+          "ready": true,
+          "reason": "finite intervention panels and explicit masks available"
+        },
+        "D6": {
+          "ready": false,
+          "reason": "requires verified full-product response table and execution authority"
+        },
+        "QUERY": {
+          "ready": false,
+          "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA"
+        },
+        "DYNAMIC": {
+          "ready": false,
+          "reason": "only restricted until a claim-specific learned-policy update hook is exercised"
+        }
+      },
+      "query_capability_layers": {
+        "EnvironmentCapabilities": {
+          "clone_restore": {
+            "status": "SUPPORTED",
+            "reason": "adapter implements clone_state/restore_state",
+            "evidence": null
+          },
+          "valid_action_mask": {
+            "status": "SUPPORTED",
+            "reason": "adapter exposes an explicit per-agent mask",
+            "evidence": null
+          },
+          "execution_receipt": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "adapter records submitted actions after per-agent validation, not environment-side causal execution semantics",
+            "evidence": null
+          },
+          "intervention_authority": {
+            "status": "UNVERIFIED",
+            "reason": "submitted-action telemetry is insufficient to certify environment-side execution",
+            "evidence": null
+          },
+          "joint_feasibility_oracle": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no pre-execution joint admissibility oracle is exposed",
+            "evidence": null
+          },
+          "full_cartesian_testable": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "heterogeneous finite action spaces are enumerable per agent",
+            "evidence": null
+          },
+          "reference_kernel_observable": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "policy/co-action trajectories can estimate a kernel, but the current adapter does not provide the estimator",
+            "evidence": null
+          }
+        },
+        "PolicyCapabilities": {
+          "learned_policy_hook": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+            "evidence": null
+          },
+          "policy_attention_weights": {
+            "status": "UNVERIFIED",
+            "reason": "attention is a policy/checkpoint property, not an environment-adapter property",
+            "evidence": null
+          }
+        },
+        "CommunicationCapabilities": {
+          "message_deletion": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized message-deletion intervention in the current adapter",
+            "evidence": null
+          },
+          "communication_delay": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized delayed-message intervention in the current adapter",
+            "evidence": null
+          }
+        },
+        "CausalContextCapabilities": {
+          "information_intervention": {
+            "status": "UNVERIFIED",
+            "reason": "requires an explicit information object and available-vs-absent intervention contract",
+            "evidence": null
+          },
+          "causal_context": {
+            "status": "UNVERIFIED",
+            "reason": "requires graph, identification assumptions, interventions, and context distribution",
+            "evidence": null
+          }
+        }
+      },
+      "semantic_warning": "requestable command support and resolved/honored support are different objects; never relabel post-conflict cancellation as pre-execution infeasibility"
+    },
+    "cityflow": {
+      "adapter": "cityflow",
+      "capabilities": {
+        "clone_restore": {
+          "status": "SUPPORTED",
+          "reason": "adapter implements clone_state/restore_state",
+          "evidence": null
+        },
+        "valid_action_mask": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes an explicit per-agent mask",
+          "evidence": null
+        },
+        "per_agent_valid_mask": {
+          "status": "SUPPORTED",
+          "reason": "alias of the explicit per-agent valid-action mask contract",
+          "evidence": null
+        },
+        "execution_receipt": {
+          "status": "SUPPORTED",
+          "reason": "set_tl_phase commands are applied explicitly before next_step",
+          "evidence": null
+        },
+        "executed_action_receipt": {
+          "status": "SUPPORTED",
+          "reason": "trusted receipt exposes applied traffic-light phases",
+          "evidence": null
+        },
+        "intervention_authority": {
+          "status": "SUPPORTED",
+          "reason": "valid phase commands are applied explicitly and exposed through the trusted receipt",
+          "evidence": null
+        },
+        "fixed_continuation": {
+          "status": "SUPPORTED",
+          "reason": "adapter exposes a fixed continuation policy",
+          "evidence": null
+        },
+        "requestable_joint_support": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "Cartesian product of per-agent request masks; this is not a joint-feasibility oracle",
+          "evidence": null
+        },
+        "honored_joint_support": {
+          "status": "SUPPORTED",
+          "reason": "submitted valid phase tuple is the applied command tuple",
+          "evidence": null
+        },
+        "joint_feasibility_oracle": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no pre-execution joint admissibility oracle is exposed",
+          "evidence": null
+        },
+        "coupled_honored_support_observed": {
+          "status": "NOT_SUPPORTED",
+          "reason": "intersections are commanded independently in the current scenario",
+          "evidence": null
+        },
+        "full_cartesian_testable": {
+          "status": "SUPPORTED",
+          "reason": "finite phase products are enumerable for selected intersections",
+          "evidence": null
+        },
+        "reference_kernel_observable": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "trajectory co-action frequencies can estimate a kernel; estimator is external to adapter",
+          "evidence": null
+        },
+        "message_deletion": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized message-deletion intervention in the current adapter",
+          "evidence": null
+        },
+        "communication_delay": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized delayed-message intervention in the current adapter",
+          "evidence": null
+        },
+        "agent_removal": {
+          "status": "NOT_SUPPORTED",
+          "reason": "no standardized agent-removal intervention in the current adapter",
+          "evidence": null
+        },
+        "learned_policy_hook": {
+          "status": "SUPPORTED_WITH_RESTRICTIONS",
+          "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+          "evidence": null
+        },
+        "mixed_difference_testable": {
+          "status": "SUPPORTED",
+          "reason": "clone/restore plus applied phase receipts permit finite response tables",
+          "evidence": null
+        }
+      },
+      "runtime_probe": null,
+      "claim_readiness": {
+        "MASTER_support": {
+          "ready": false,
+          "reason": "requires a pre-execution joint command-feasibility oracle; post-execution cancellation/honoring is diagnostic only"
+        },
+        "MASTER_honored_support_diagnostic": {
+          "ready": false,
+          "reason": "post-resolution honored support may diagnose interaction but is not relabeled as pre-execution feasible support"
+        },
+        "MASTER_reference": {
+          "ready": false,
+          "reason": "requires trajectory/co-action kernel estimation plus intervention response"
+        },
+        "FUNCTIONAL": {
+          "ready": true,
+          "reason": "finite intervention panels and explicit masks available"
+        },
+        "D6": {
+          "ready": true,
+          "reason": "requires verified full-product response table and execution authority"
+        },
+        "QUERY": {
+          "ready": true,
+          "reason": "core response queries require clone/restore plus a trusted executed-action receipt; unsupported query types remain NA"
+        },
+        "DYNAMIC": {
+          "ready": false,
+          "reason": "only restricted until a claim-specific learned-policy update hook is exercised"
+        }
+      },
+      "query_capability_layers": {
+        "EnvironmentCapabilities": {
+          "clone_restore": {
+            "status": "SUPPORTED",
+            "reason": "adapter implements clone_state/restore_state",
+            "evidence": null
+          },
+          "valid_action_mask": {
+            "status": "SUPPORTED",
+            "reason": "adapter exposes an explicit per-agent mask",
+            "evidence": null
+          },
+          "execution_receipt": {
+            "status": "SUPPORTED",
+            "reason": "set_tl_phase commands are applied explicitly before next_step",
+            "evidence": null
+          },
+          "intervention_authority": {
+            "status": "SUPPORTED",
+            "reason": "valid phase commands are applied explicitly and exposed through the trusted receipt",
+            "evidence": null
+          },
+          "joint_feasibility_oracle": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no pre-execution joint admissibility oracle is exposed",
+            "evidence": null
+          },
+          "full_cartesian_testable": {
+            "status": "SUPPORTED",
+            "reason": "finite phase products are enumerable for selected intersections",
+            "evidence": null
+          },
+          "reference_kernel_observable": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "trajectory co-action frequencies can estimate a kernel; estimator is external to adapter",
+            "evidence": null
+          }
+        },
+        "PolicyCapabilities": {
+          "learned_policy_hook": {
+            "status": "SUPPORTED_WITH_RESTRICTIONS",
+            "reason": "training can wrap the adapter, but no claim-specific endogenous learner hook is exposed here",
+            "evidence": null
+          },
+          "policy_attention_weights": {
+            "status": "UNVERIFIED",
+            "reason": "attention is a policy/checkpoint property, not an environment-adapter property",
+            "evidence": null
+          }
+        },
+        "CommunicationCapabilities": {
+          "message_deletion": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized message-deletion intervention in the current adapter",
+            "evidence": null
+          },
+          "communication_delay": {
+            "status": "NOT_SUPPORTED",
+            "reason": "no standardized delayed-message intervention in the current adapter",
+            "evidence": null
+          }
+        },
+        "CausalContextCapabilities": {
+          "information_intervention": {
+            "status": "UNVERIFIED",
+            "reason": "requires an explicit information object and available-vs-absent intervention contract",
+            "evidence": null
+          },
+          "causal_context": {
+            "status": "UNVERIFIED",
+            "reason": "requires graph, identification assumptions, interventions, and context distribution",
+            "evidence": null
+          }
+        }
+      },
+      "semantic_warning": "requestable command support and resolved/honored support are different objects; never relabel post-conflict cancellation as pre-execution infeasibility"
+    }
+  }
+}

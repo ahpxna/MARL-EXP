@@ -1,0 +1,967 @@
+{
+  "G01_model_scope": {
+    "Support": {
+      "world": "hidden unsafe subset W of a tip set, split into K classes; class i has a_i safe and b_i unsafe tips",
+      "reference": "none; the geometry is the tip incidence",
+      "support": "the hidden W; |W| and the class sizes are KNOWN",
+      "noise": "none -- the observation is which tip was hit, or nothing",
+      "learner_knows": "a_i, b_i, p_i and N; NOT which tips are unsafe",
+      "oracle_knows": "W",
+      "legal_queries": "passive draws only; one tip or nothing per draw",
+      "cost_unit": "one draw"
+    },
+    "Structural": {
+      "world": "a component table F over m items and h actions",
+      "reference": "the per-budget optimum min_{|T|=k} L_F(T)",
+      "support": "the retained prefix S_k of an ordering",
+      "noise": "none -- this is a deterministic combinatorial game",
+      "learner_knows": "F; the question is which ORDERING to commit to",
+      "oracle_knows": "F and the realised budget",
+      "legal_queries": "an ordering, i.e. a distribution over orderings",
+      "cost_unit": "not a sample count; the objective is regret itself"
+    },
+    "Functional": {
+      "world": "cell means theta with heterogeneous variances",
+      "reference": "the incumbent's two cells at -+1/2, variance 1",
+      "support": "the outsider family: two endpoints and n middle cells",
+      "noise": "Gaussian, variances KNOWN",
+      "learner_knows": "the family and the variances",
+      "oracle_knows": "theta",
+      "legal_queries": "sample a cell; contrasts only where stated",
+      "cost_unit": "one sample (and, in P4 only, a setup cost kappa per measurement type opened)"
+    },
+    "D6": {
+      "world": "a label C over 2q+1 coordinates plus the special coordinate j",
+      "reference": "the true label A, with nuisance nu",
+      "support": "the exchange distance d and the nuisance x = nu - mu",
+      "noise": "Gaussian; the charge of a width-r query is r^z",
+      "learner_knows": "q, mu, z; not the label",
+      "oracle_knows": "the label and nu",
+      "legal_queries": "every orbit (s,t,b): s from A, t from B, b for j",
+      "cost_unit": "budget share; a width-r query costs r^z per sample"
+    },
+    "Query": {
+      "world": "two worlds A, B raw-indistinguishable at h = 0",
+      "reference": "the common h = 0 density p_0",
+      "support": "the finite cube X with weights pi_x",
+      "noise": "Gaussian with variance sigma^2, sigma KNOWN",
+      "learner_knows": "the measurement g and h; not the world",
+      "oracle_knows": "the world",
+      "legal_queries": "Y = F_W(X) + h g(X) + Z for g in the stated class",
+      "cost_unit": "one observation"
+    },
+    "MASTER": {
+      "world": "means m_theta(e) with a common (or vector) unknown offset b",
+      "reference": "the anchor, which reads the offset directly",
+      "support": "the finite alternative set (rivals tying the leader)",
+      "noise": "Gaussian, variances v_e KNOWN",
+      "learner_knows": "the query means, variances and prices",
+      "oracle_knows": "theta and b",
+      "legal_queries": "any non-negative allocation over queries and anchor",
+      "cost_unit": "budget; query e costs kappa_e, the anchor costs c0"
+    },
+    "Adaptive": {
+      "world": "the same as the chain it wraps",
+      "reference": "the oracle budget B*",
+      "support": "the epoch schedule",
+      "noise": "as the wrapped chain",
+      "learner_knows": "everything the wrapped chain's learner knows",
+      "oracle_knows": "B*",
+      "legal_queries": "as the wrapped chain",
+      "cost_unit": "total samples across epochs"
+    }
+  },
+  "G03_comparison": [
+    {
+      "paper": "Support",
+      "nearest_prior": "Degenne-Koolen, pure exploration with multiple correct answers; Javdani et al., DRD/HEC",
+      "ours": {
+        "input": "class sizes and per-tip observation probabilities",
+        "output": "a safe decision (a tip to act on)",
+        "objective": "minimax probability of an unsafe decision",
+        "form": "multiplicative Theta of a single exponential",
+        "exactness": "exact two-sided constants k0/B and alpha/sum b",
+        "paradigm": "Bayes = minimax under the equal-mass symmetry",
+        "regime": "static, passive"
+      },
+      "prior_as_characterised_by_supervisor": "studies gathering information for a decision without identifying the whole hypothesis; framework, not this quantitative law",
+      "verified": false
+    },
+    {
+      "paper": "Structural",
+      "nearest_prior": "Kurtz menu comparison",
+      "ours": {
+        "input": "a component table and a marginal trajectory",
+        "output": "an ordering distribution",
+        "objective": "ratio of execution guarantee to average guarantee",
+        "form": "multiplicative, ratio = b",
+        "exactness": "exact rational at each m in range",
+        "paradigm": "minimax over budgets",
+        "regime": "static"
+      },
+      "prior_as_characterised_by_supervisor": "comparison needs the full policy class and assumptions checked, not just an appeal to non-concavity",
+      "verified": false
+    },
+    {
+      "paper": "Functional",
+      "nearest_prior": "Jourdan-Degenne-Kaufmann (unknown-variance stopping); Huang et al., structured BAI",
+      "ours": {
+        "input": "heterogeneous cell means and KNOWN variances",
+        "output": "an allocation and a certificate",
+        "objective": "information rate Gamma",
+        "form": "exact value at the stated allocation",
+        "exactness": "exact rational; sandwich ratio -> 1 as n grows",
+        "paradigm": "minimax over alternatives",
+        "regime": "static design; the empirical panel is adaptive"
+      },
+      "prior_as_characterised_by_supervisor": "unknown-variance stopping is very close prior; keeping KNOWN variance must be declared",
+      "verified": false
+    },
+    {
+      "paper": "D6",
+      "nearest_prior": "Dette-Titoff optimal discrimination designs; Li-Cheung resource-constrained BAI",
+      "ours": {
+        "input": "q, mu, the charge exponent z",
+        "output": "an allocation over measurement classes",
+        "objective": "Gamma over every legal orbit",
+        "form": "exact value of each design; phase change in the SUPPORT",
+        "exactness": "Lean for the uncapped profile; numerical for the boundary",
+        "paradigm": "minimax",
+        "regime": "static"
+      },
+      "prior_as_characterised_by_supervisor": "dividing KL by cost is not new; the value must be the phase law of THIS construction",
+      "verified": false
+    },
+    {
+      "paper": "Query",
+      "nearest_prior": "Ho-Nguyen, singularity and convergence rates",
+      "ours": {
+        "input": "a measurement class and a leakage amplitude h",
+        "output": "a decision, with regret",
+        "objective": "transcript length for a target regret",
+        "form": "multiplicative Theta(h^{-2r})",
+        "exactness": "constants MEASURED; the rate is two-sided",
+        "paradigm": "minimax test, then a decision reduction",
+        "regime": "static, non-adaptive"
+      },
+      "prior_as_characterised_by_supervisor": "singular-mixture rates have strong prior; the novelty must be the admissible measurement class and the cost of repairing distinguishability, not the h^4 exponent",
+      "verified": false
+    },
+    {
+      "paper": "MASTER",
+      "nearest_prior": "Bennouna et al., data informativeness",
+      "ours": {
+        "input": "query means, variances, prices and an anchor price",
+        "output": "an allocation including anchor exposure",
+        "objective": "profiled information against the active set",
+        "form": "an exact price threshold c* = (m-1)^2/(m+3)^2",
+        "exactness": "Lean on the symmetric family; separated certificates on the finite instance",
+        "paradigm": "minimax with a dual certificate",
+        "regime": "static"
+      },
+      "prior_as_characterised_by_supervisor": "geometric sufficiency and minimal sufficient data are covered; MASTER must keep the PRICE threshold or the priced synergy",
+      "verified": false
+    }
+  ],
+  "G04_taxonomy": [
+    {
+      "paper": "Support",
+      "claim": "R_dec = Theta((1-s)^N), R_rec = Theta((1-p_min)^N)",
+      "evidence": "LEAN THEOREM for the pointwise loss inequalities; EXACT FINITE CERTIFICATE for the brackets (105 rational checks); the tuple probability is CHECKED, not proved"
+    },
+    {
+      "paper": "Structural",
+      "claim": "V_path = (m-1) V_avg on the family",
+      "evidence": "LEAN THEOREM for the sandwich and the saturation mechanism; EXACT FINITE CERTIFICATE at 28 values of m; NOT an induction over m"
+    },
+    {
+      "paper": "Functional",
+      "claim": "J(w*) = c^2/(n(32+2c^2 H_n))",
+      "evidence": "LEAN THEOREM for the instantiation and the geometry; EXACT FINITE CERTIFICATE on 92 in-domain configurations; the value at w* is NOT shown optimal over the whole design"
+    },
+    {
+      "paper": "D6",
+      "claim": "above T_c the optimal support gains the A-pair",
+      "evidence": "LEAN THEOREM for the uncapped profile and the A-pair algebra; NUMERICAL EVIDENCE (cutting-plane LP, certified per cell by a rational primal/dual pair) for the support change; the LP optimum is NOT recorded as a universal optimum"
+    },
+    {
+      "paper": "Query",
+      "claim": "N* = Theta(h^{-2r}) and the regret window",
+      "evidence": "LEAN THEOREM for the testing bracket, the rate assembly and the regret chain; NUMERICAL EVIDENCE for c_- and c_+; the Taylor remainders are measured"
+    },
+    {
+      "paper": "MASTER",
+      "claim": "c* = (m-1)^2/(m+3)^2; anchor mandatory at c0 = 1/10",
+      "evidence": "LEAN THEOREM for the threshold on the symmetric family; EXACT FINITE CERTIFICATE (Fractions) for the mandatory-purchase instance"
+    },
+    {
+      "paper": "Adaptive",
+      "claim": "sound, and under 4 B*",
+      "evidence": "LEAN THEOREM for the composition only; MONTE CARLO for the realised constant and the error rate -- neither is certified"
+    }
+  ],
+  "G05_pinned_build": {
+    "toolchain": "leanprover/lean4:v4.34.0-rc2",
+    "lakefile": "name = \"p13_conjectures\"\nversion = \"0.1.0\"\n\n[[require]]\nname = \"mathlib\"\ngit = \"https://github.com/leanprover-community/mathlib4.git\"\nrev = \"1f495c611d05d2215058cd77c7897d625bc3b445\"\n",
+    "dependencies": [
+      {
+        "name": "mathlib",
+        "rev": "1f495c611d05d2215058cd77c7897d625bc3b445",
+        "url": "https://github.com/leanprover-community/mathlib4.git"
+      },
+      {
+        "name": "plausible",
+        "rev": "d9598f07b1bc701f1e3aae163d2681c1fd978793",
+        "url": "https://github.com/leanprover-community/plausible"
+      },
+      {
+        "name": "LeanSearchClient",
+        "rev": "ba67e212be1197b84c1f1f6299488a10a3002713",
+        "url": "https://github.com/leanprover-community/LeanSearchClient"
+      },
+      {
+        "name": "importGraph",
+        "rev": "d8823026ac7ef130c253089d95685f9877b95323",
+        "url": "https://github.com/leanprover-community/import-graph"
+      },
+      {
+        "name": "proofwidgets",
+        "rev": "a8acbfd87375ff4abe14ce09db5b7664d383bc7f",
+        "url": "https://github.com/leanprover-community/ProofWidgets4"
+      },
+      {
+        "name": "aesop",
+        "rev": "18889deb9e83ea7420ef51c160d6f88552e744e3",
+        "url": "https://github.com/leanprover-community/aesop"
+      },
+      {
+        "name": "Qq",
+        "rev": "507746ab8f4b643ccdacb2ec4cdb5853fa9f8ab3",
+        "url": "https://github.com/leanprover-community/quote4"
+      },
+      {
+        "name": "batteries",
+        "rev": "7e23602c91bc04586b2b06de2708a041853e4681",
+        "url": "https://github.com/leanprover-community/batteries"
+      },
+      {
+        "name": "Cli",
+        "rev": "ab3a82db9fea14cf0fd7f5a2de650f4b534640af",
+        "url": "https://github.com/leanprover/lean4-cli"
+      }
+    ],
+    "closure": {
+      "Support": [
+        "LeanSupportBayesMinimaxV1",
+        "LeanSupportDecideExponentV1",
+        "LeanSupportMinimaxCountingV1",
+        "LeanSupportRecoverySandwichV1"
+      ],
+      "Structural": [
+        "LeanStructuralAvgPathGapV1",
+        "LeanStructuralSaturationV1"
+      ],
+      "Functional": [
+        "LeanFunctionalGeometryDischargeV1",
+        "LeanFunctionalHeterogeneousInstanceV1"
+      ],
+      "D6": [
+        "LeanD6ThreeClassPhaseV1",
+        "LeanD6UncappedProfileV1"
+      ],
+      "Query": [
+        "LeanQueryAffinityTestingV1",
+        "LeanQueryRateAssemblyV1",
+        "LeanQueryRegretChainV1"
+      ],
+      "MASTER": [
+        "LeanMasterActiveSetV1",
+        "LeanMasterAnchorCertificateV1",
+        "LeanMasterAnchorThresholdV1",
+        "LeanMasterGroupCalibrationV1"
+      ],
+      "Adaptive": [
+        "LeanAdaptiveConfidenceJoinV1",
+        "LeanAdaptiveLoopJoinV1"
+      ]
+    },
+    "sources": [
+      {
+        "module": "LeanAdaptiveConfidenceJoinV1",
+        "sha256": "8c73051358f51fd20efe1db76137b34d154b8d17763d3201a1aa973c539d54df",
+        "receipt_sha256": "8c73051358f51fd20efe1db76137b34d154b8d17763d3201a1aa973c539d54df",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanAdaptiveLoopJoinV1",
+        "sha256": "748a941c5a6c5a7c7a54b27f11c969d7f1c4f634f0be560454da40575717c7b3",
+        "receipt_sha256": "748a941c5a6c5a7c7a54b27f11c969d7f1c4f634f0be560454da40575717c7b3",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanD6ThreeClassPhaseV1",
+        "sha256": "abe1d9dac5eb190418b4f45f2ee5dfd7412be15020cf7ffeb8e903f270596a49",
+        "receipt_sha256": "abe1d9dac5eb190418b4f45f2ee5dfd7412be15020cf7ffeb8e903f270596a49",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanD6UncappedProfileV1",
+        "sha256": "fe91729aa670c062335cb1319daaf29668a79553cc79026f540db68ba78fe7d1",
+        "receipt_sha256": "fe91729aa670c062335cb1319daaf29668a79553cc79026f540db68ba78fe7d1",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanFunctionalGeometryDischargeV1",
+        "sha256": "bd2861d862815bf081484431bb43a87d189c7d635318172e5a7168fd43bf7b0f",
+        "receipt_sha256": "bd2861d862815bf081484431bb43a87d189c7d635318172e5a7168fd43bf7b0f",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanFunctionalHeterogeneousInstanceV1",
+        "sha256": "dfb17223558ef752fe875dbc7aa058c039f39bb738408317aae7afa22bffc6e1",
+        "receipt_sha256": "dfb17223558ef752fe875dbc7aa058c039f39bb738408317aae7afa22bffc6e1",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanMasterActiveSetV1",
+        "sha256": "930fc78d3529e1aedc3f0fb4eb68773ae0cf795bf7c2b9f882af9ae4d995a71f",
+        "receipt_sha256": "930fc78d3529e1aedc3f0fb4eb68773ae0cf795bf7c2b9f882af9ae4d995a71f",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanMasterAnchorCertificateV1",
+        "sha256": "4b14f13358290facc1ec85a675adf8ba7e291a1a21e306971348d554d63484a3",
+        "receipt_sha256": "4b14f13358290facc1ec85a675adf8ba7e291a1a21e306971348d554d63484a3",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanMasterAnchorThresholdV1",
+        "sha256": "9a936feb24d7c512096a3d2ed50b54e0dfcfc3560d61f8999010533a5dc00b50",
+        "receipt_sha256": "9a936feb24d7c512096a3d2ed50b54e0dfcfc3560d61f8999010533a5dc00b50",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanMasterGroupCalibrationV1",
+        "sha256": "38df6d309cab5010170fb93233a4a0c9c5959733448f3fb0ace91b0b1b63a4ac",
+        "receipt_sha256": "38df6d309cab5010170fb93233a4a0c9c5959733448f3fb0ace91b0b1b63a4ac",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanQueryAffinityTestingV1",
+        "sha256": "23f55c3b8746dce4824cc4b4a6651b3d3e41c53c2aa8d416f8c20d703bb80e49",
+        "receipt_sha256": "23f55c3b8746dce4824cc4b4a6651b3d3e41c53c2aa8d416f8c20d703bb80e49",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanQueryRateAssemblyV1",
+        "sha256": "d453f8f743d769de5980c1ca8415b6ce420c4964207f49619ec3598b403229b1",
+        "receipt_sha256": "d453f8f743d769de5980c1ca8415b6ce420c4964207f49619ec3598b403229b1",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanQueryRegretChainV1",
+        "sha256": "9467a4d9bc87c846aa993d4de3f27296c676cf86774267b220f082b6ac36f376",
+        "receipt_sha256": "9467a4d9bc87c846aa993d4de3f27296c676cf86774267b220f082b6ac36f376",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanStructuralAvgPathGapV1",
+        "sha256": "e82f794bafb78afa9b20d4dca0a1c3b83e815a17db34d1eb475b41d034252c8c",
+        "receipt_sha256": "e82f794bafb78afa9b20d4dca0a1c3b83e815a17db34d1eb475b41d034252c8c",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanStructuralSaturationV1",
+        "sha256": "a67a33aa478c1edc88370175b6394120f67052e17880c77b6d4c2efb6dfd3b9d",
+        "receipt_sha256": "a67a33aa478c1edc88370175b6394120f67052e17880c77b6d4c2efb6dfd3b9d",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanSupportBayesMinimaxV1",
+        "sha256": "ea5ea75cc495bd41b37b7022b04c74fb25e675a14b1302150293eea40b5ca8d4",
+        "receipt_sha256": "ea5ea75cc495bd41b37b7022b04c74fb25e675a14b1302150293eea40b5ca8d4",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanSupportDecideExponentV1",
+        "sha256": "ceb0fdd4a6a022f26d1c465d26976a695191481b94c10fffcbacabc19ed0deb6",
+        "receipt_sha256": "ceb0fdd4a6a022f26d1c465d26976a695191481b94c10fffcbacabc19ed0deb6",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanSupportMinimaxCountingV1",
+        "sha256": "966f97133ddfe32800f8dfe98ee3b928b6c36c36f6e052f7fd337fbdabc2bf65",
+        "receipt_sha256": "966f97133ddfe32800f8dfe98ee3b928b6c36c36f6e052f7fd337fbdabc2bf65",
+        "matches_receipt": true,
+        "accepted": true
+      },
+      {
+        "module": "LeanSupportRecoverySandwichV1",
+        "sha256": "a7c9e286f042300a455bee8231207a305a09437bb66ad868c3a1d74fb55477dc",
+        "receipt_sha256": "a7c9e286f042300a455bee8231207a305a09437bb66ad868c3a1d74fb55477dc",
+        "matches_receipt": true,
+        "accepted": true
+      }
+    ],
+    "accepted": 19,
+    "hash_matches": 19,
+    "n_modules": 19,
+    "drift": []
+  },
+  "G06_G10_empirical": {
+    "G06_preregistration": {
+      "class": "CONFIRMATORY",
+      "uses_exactly_the_frozen_seed_set": true,
+      "peeks_at_frozen_seeds_without_being_confirmatory": false,
+      "seeds_used": [
+        701,
+        709,
+        719,
+        727,
+        733,
+        743,
+        751,
+        757,
+        761,
+        769
+      ],
+      "rng_protocol": "instance_cell_v1",
+      "PASS": true,
+      "still_missing": "immutable source+config snapshot at launch and the actual argv are not inside this artifact"
+    },
+    "G07_generator_oracle_units": {
+      "allocation_policy": "uniform round-robin; >=20% least-sampled exploration for every adaptive policy; fixed-driver exploitation maximizes sigma^2/[n(n+1)]",
+      "coverage_contract": "union over n=2..max_n, not realized-look-only calibration",
+      "PASS": true,
+      "still_missing": "no explicit check in the artifact that labels are random and the answer is not leaked"
+    },
+    "G08_baseline_parity": {
+      "variants": [
+        "C_anytime",
+        "C_extrema_oracle",
+        "C_known_sigma",
+        "C_lucb",
+        "C_pilot",
+        "C_shrink",
+        "C_split",
+        "uniform"
+      ],
+      "has_uniform_baseline": true,
+      "has_oracle_diagnostic": true,
+      "PASS": true,
+      "still_missing": "no literature baseline; the oracle variant is a diagnostic and must not be reported as a competitor"
+    },
+    "G09_cost_reporting": {
+      "reports_sample_counts": true,
+      "reports_wall_clock": false,
+      "reports_memory": false,
+      "PASS": false,
+      "still_missing": "compute, precomputation, certification and fallback costs are NOT reported; only sample counts"
+    },
+    "G10_uncertainty": {
+      "n_seeds": 10,
+      "censoring_handled": true,
+      "failures_reported": true,
+      "zero_error_variants": [
+        "C_anytime",
+        "C_extrema_oracle",
+        "C_known_sigma",
+        "C_lucb",
+        "C_pilot",
+        "C_shrink",
+        "C_split",
+        "uniform"
+      ],
+      "PASS": true,
+      "still_missing": "no confidence intervals on certificate_fraction or on median N; 10 seeds is the unit and that is small"
+    }
+  },
+  "G11_ownership": {
+    "map": {
+      "the safe-decision / recovery exponent law": "Support",
+      "the passive minimax value E[L/(a+L)]": "Support",
+      "the average-vs-execution gap and its saturation": "Structural",
+      "the heterogeneous lower bound and its instantiation": "Functional",
+      "the measurement-topology frontier under setup cost": "Functional",
+      "the uncapped profile and the A-pair phase": "D6",
+      "the leakage order -> transcript -> regret chain": "Query",
+      "the calibration price threshold and mandatory anchor": "MASTER",
+      "the rank dichotomy for group calibration": "MASTER",
+      "the doubling-loop composition": "Adaptive"
+    },
+    "shared_modules": {},
+    "recommendation": "Adaptive is a section, not a paper, until delta-correctness, tracking and the stopping tail are proved"
+  },
+  "G12_notation_collisions": {
+    "weight": [
+      "LeanD6BlindPrimalCertificateV1",
+      "LeanD6CalibrationBalancedDesignV1",
+      "LeanD6ExpandedAllocationV1",
+      "LeanFiniteGridSolverV1",
+      "LeanStructuralOrderedRadiusStepV1"
+    ],
+    "V": [
+      "LeanD6BlindPrimalCertificateV1",
+      "LeanD6ProfileStoppingGeometryV1"
+    ],
+    "B": [
+      "LeanD6BlindPrimalCertificateV1",
+      "LeanD6UnknownMarginAllocationV1"
+    ],
+    "C": [
+      "LeanD6BlindPrimalCertificateV1",
+      "LeanD6ProfileStoppingGeometryV1"
+    ],
+    "rate": [
+      "LeanD6AllocationMarginV1",
+      "LeanD6AllocationPhaseThreeGameV1",
+      "LeanD6PhaseThreeSharpV1",
+      "LeanD6UnknownMarginAllocationV1",
+      "LeanFunctionalFlatOutsiderRateV1"
+    ],
+    "value": [
+      "LeanD6ExpandedAllocationV1",
+      "LeanD6FrozenScalarAllocationV1",
+      "LeanD6ReferenceReducedGameV1",
+      "LeanD6ScaledReferencePhaseV1",
+      "LeanQuadraticIntervalMinimumV1"
+    ],
+    "energy": [
+      "LeanFunctionalExtremaCrossoverV1",
+      "LeanFunctionalFlatOutsiderRateV1",
+      "LeanFunctionalOneCellInformationV1",
+      "LeanFunctionalPairFlipCostV1",
+      "LeanFunctionalWeightCertificatesV1",
+      "LeanMasterAnchorThresholdV1",
+      "LeanMasterUnknownCalibrationV1"
+    ],
+    "values": [
+      "LeanFunctionalWeightCertificatesV1",
+      "LeanQueryFiberRepairV1",
+      "LeanQueryResolutionMinimaxV1"
+    ],
+    "information": [
+      "LeanD6AllocationDualBridgeV1",
+      "LeanFunctionalFlatOutsiderMinimaxV1",
+      "LeanFunctionalOneCellInformationV1",
+      "LeanFunctionalWeightCertificatesV1"
+    ],
+    "coefficient": [
+      "LeanD6AllocationPhaseThreeCoreV1",
+      "LeanD6BlindLinearVarianceV1"
+    ],
+    "witnessCell": [
+      "LeanD6StrictRankOneM6StrictTopCV1",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2"
+    ],
+    "response": [
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanReferenceFidelityV4",
+      "LeanReferenceKernelV4"
+    ],
+    "capacity": [
+      "LeanFunctionalBoundaryV4",
+      "LeanFunctionalExtremaSeparationV1",
+      "LeanReferenceFidelityV4"
+    ],
+    "curvature": [
+      "LeanD6FiniteNuisanceEvaluationV1",
+      "LeanD6PhaseBoundaryRegretV1",
+      "LeanMasterUnknownCalibrationV1"
+    ],
+    "compensation": [
+      "LeanD6ReferenceCenteredCompensatedV1",
+      "LeanD6SameResponseMarginLossV1"
+    ],
+    "badPairs": [
+      "LeanQueryCriticalResolutionV1",
+      "LeanQueryIdentifiabilityVerifierV1"
+    ],
+    "p": [
+      "LeanD6FrozenScalarAllocationV1",
+      "LeanD6ReferenceEndpointWorldsV1"
+    ],
+    "RankOneNormalizedBalancedWorld": [
+      "LeanD6ContrastRankPhaseDefinitionsV1",
+      "LeanD6ContrastRankPhaseDefinitionsV2"
+    ],
+    "RankOneDecisionInteractionConstantAtMost": [
+      "LeanD6ContrastRankPhaseDefinitionsV1",
+      "LeanD6ContrastRankPhaseDefinitionsV2"
+    ],
+    "Feasible": [
+      "LeanD6LocalOracleRegretV1",
+      "LeanStructuralRobustSeparationV1"
+    ],
+    "loss": [
+      "LeanD6SameResponseMarginGameV1",
+      "LeanSupportParityBundleSizeV1",
+      "LeanSupportRecoverySandwichV1"
+    ],
+    "anchor3": [
+      "LeanD6FirstOrderInsufficiencyWitnessV1",
+      "LeanD6HalfFactorSharpness"
+    ],
+    "anchor4": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample",
+      "LeanD6PairContractionCounterexample"
+    ],
+    "pointMassAnchor4": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample"
+    ],
+    "action4": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample",
+      "LeanD6PairContractionCounterexample"
+    ],
+    "selected": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample",
+      "LeanD6PairContractionCounterexample"
+    ],
+    "competitor": [
+      "LeanD6DBEXCreditCounterexample",
+      "LeanD6PairContractionCounterexample"
+    ],
+    "swap02": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample"
+    ],
+    "swap03": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample"
+    ],
+    "swap12": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample"
+    ],
+    "swap13": [
+      "LeanD6BalancedExchangeCounterexample",
+      "LeanD6DBEXCreditCounterexample"
+    ],
+    "z6": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6PAECFin6"
+    ],
+    "selected6": [
+      "LeanD6PAECFin6",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2"
+    ],
+    "oracle": [
+      "LeanFunctionalFullOracleV1",
+      "LeanSupportAdaptiveQuerySeparationV1",
+      "LeanSupportCardinalityQueryLawV1"
+    ],
+    "witnessWorld": [
+      "LeanD6BinaryIntegerCounterexampleV1",
+      "LeanD6StrictRankOneM6WitnessV1",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2",
+      "LeanSupportCompressionCriticalWitnessTighteningV1"
+    ],
+    "scale": [
+      "LeanD6BinaryIntegerCounterexampleV1",
+      "LeanD6ExpandedAllocationV1"
+    ],
+    "target": [
+      "LeanD6DiscoveryVectorCertificateV1",
+      "LeanD6ExpandedAllocationV1",
+      "LeanD6ReferenceCenteredCompensatedV1",
+      "LeanFiniteAllocationTrackerV1"
+    ],
+    "Valid": [
+      "LeanFunctionalFlatOutsiderMinimaxV1",
+      "LeanReferenceKernelV4"
+    ],
+    "score": [
+      "LeanD6DiscoveryVectorCertificateV1",
+      "LeanD6ProfileStoppingGeometryV1"
+    ],
+    "bad": [
+      "LeanD6DiscoveryVectorCertificateV1",
+      "LeanSupportFibreSufficiencyV1"
+    ],
+    "pointMass4": [
+      "LeanD6PAECFin4",
+      "LeanD6PairContractionCounterexample"
+    ],
+    "cornerQ2": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1"
+    ],
+    "Wr": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1"
+    ],
+    "selected2": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1"
+    ],
+    "competitor2": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1"
+    ],
+    "selMax": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanD6SharpnessM6V1"
+    ],
+    "selMin": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanD6SharpnessM6V1"
+    ],
+    "comMax": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanD6SharpnessM6V1"
+    ],
+    "comMin": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanD6SharpnessM6V1"
+    ],
+    "respMax": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1"
+    ],
+    "respMin": [
+      "LeanD6BinaryBridgePartAV1",
+      "LeanD6BinaryBridgeV1",
+      "LeanD6M6SharpnessBridgeV1"
+    ],
+    "Alternative": [
+      "LeanFunctionalContrastDesignV1",
+      "LeanFunctionalFlatOutsiderRateV1"
+    ],
+    "normalizedRadius": [
+      "LeanStructuralNestingThresholdV1",
+      "LeanStructuralRecourseUniformNestingV1",
+      "LeanSupportUnboundedObstructionV1"
+    ],
+    "path": [
+      "LeanAdaptivePathLawV1",
+      "LeanD6CyclicConfidenceSequenceV1",
+      "LeanD6DiscoveryPathLawV1"
+    ],
+    "restrict": [
+      "LeanD6CyclicConfidenceSequenceV1",
+      "LeanD6DiscoveryPathLawV1"
+    ],
+    "support": [
+      "LeanSupportKernelGeometryV1",
+      "LeanSupportMultiTipGeometryV1",
+      "LeanSupportPhysicalQueryContractV1"
+    ],
+    "point": [
+      "LeanSupportKernelGeometryV1",
+      "LeanSupportMultiTipGeometryV1"
+    ],
+    "components": [
+      "LeanSupportKernelGeometryV1",
+      "LeanSupportMultiTipGeometryV1"
+    ],
+    "Admissible": [
+      "LeanD6AllocationRiskBridgeV1",
+      "LeanQuerySemanticCompilerV1"
+    ],
+    "Sufficient": [
+      "LeanQuerySemanticCompilerV1",
+      "LeanSupportNonadaptiveLowerV1"
+    ],
+    "Good": [
+      "LeanQueryRepresentationNecessityV1",
+      "LeanQuerySemanticCompilerV1",
+      "LeanTypedCertificateCompletionV1"
+    ],
+    "queries": [
+      "LeanD6AllocationPhaseThreePrimalV1",
+      "LeanD6BlindActualPrimalV1",
+      "LeanD6NuisanceFreeDiscoveryLawV1",
+      "LeanD6PhaseThreePrimalV1"
+    ],
+    "weights": [
+      "LeanD6AllocationPhaseThreePrimalV1",
+      "LeanD6BlindActualPrimalV1",
+      "LeanD6PhaseThreePrimalV1"
+    ],
+    "costs": [
+      "LeanFunctionalExtremaSeparationV1",
+      "LeanFunctionalFlatOutsiderMinimaxV1",
+      "LeanFunctionalOneCellInformationV1"
+    ],
+    "seen": [
+      "LeanSupportBayesMinimaxV1",
+      "LeanSupportPassiveSamplingMassV1"
+    ],
+    "worlds": [
+      "LeanD6ThresholdConstructionV1",
+      "LeanSupportBayesMinimaxV1"
+    ],
+    "mass": [
+      "LeanD6AllocationPhaseThreeParametersV1",
+      "LeanSupportBayesMinimaxV1"
+    ],
+    "SafeRefresh": [
+      "LeanFunctionalResidualMaintenanceV2",
+      "LeanFunctionalSelectiveMaintenanceV1"
+    ],
+    "rawWorld": [
+      "LeanD6BinaryIntegerCounterexampleV1",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2"
+    ],
+    "midpoint": [
+      "LeanQueryFiberRepairV1",
+      "LeanQueryResolutionMinimaxV1"
+    ],
+    "shift": [
+      "LeanD6AllocationPhaseThreeParametersV1",
+      "LeanD6ReferenceCenteredCompensatedV1",
+      "LeanFunctionalOneCellInformationV1",
+      "LeanMasterAnchorThresholdV1"
+    ],
+    "a": [
+      "LeanD6ReferenceEndpointWorldsV1",
+      "LeanD6ScaledReferenceCoefficientsV1"
+    ],
+    "b": [
+      "LeanD6ReferenceEndpointWorldsV1",
+      "LeanD6ScaledReferenceCoefficientsV1"
+    ],
+    "c": [
+      "LeanD6ReferenceEndpointWorldsV1",
+      "LeanD6ScaledReferenceCoefficientsV1"
+    ],
+    "e": [
+      "LeanD6ReferenceEndpointWorldsV1",
+      "LeanD6ScaledReferenceCoefficientsV1"
+    ],
+    "radius": [
+      "LeanD6AllocationMarginRegionV1",
+      "LeanD6CyclicConfidenceSequenceV1",
+      "LeanQueryResolutionMinimaxV1",
+      "LeanQueryScalarMinimaxV1"
+    ],
+    "Compatible": [
+      "LeanQueryResolutionMinimaxV1",
+      "LeanTypedCertificateCompletionV1"
+    ],
+    "Db": [
+      "LeanD6ScaledValueErrorV1",
+      "LeanD6SharpnessM6V1"
+    ],
+    "base": [
+      "LeanD6ReferencePhaseValueV1",
+      "LeanGaussianSampleProductV1"
+    ],
+    "D": [
+      "LeanD6AllocationPhaseThreeParametersV1",
+      "LeanD6ScaledValueErrorV1"
+    ],
+    "cornerQ6": [
+      "LeanD6StrictRankOneM6WitnessV1",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2"
+    ],
+    "eta": [
+      "LeanD6DiscoveryStoppingV1",
+      "LeanD6StrictTwoProfileRankOneM6CounterexampleV2"
+    ],
+    "cardinalityFamily": [
+      "LeanProductMixedDifferenceV4",
+      "LeanSupportGeometryV4"
+    ],
+    "tip": [
+      "LeanSupportKernelGeometryV1",
+      "LeanSupportThreeWorldWitnessV1",
+      "LeanSupportUnboundedObstructionV1"
+    ],
+    "supportPoint": [
+      "LeanD6ThresholdConstructionV1",
+      "LeanSupportUnboundedObstructionV1"
+    ],
+    "worldF": [
+      "LeanSupportThreeWorldWitnessV1",
+      "LeanSupportUnboundedObstructionV1"
+    ],
+    "embed": [
+      "LeanD6GeometricRealizationV1",
+      "LeanSupportGeometryReductionV1"
+    ],
+    "raw": [
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanMasterUnknownCalibrationV1"
+    ],
+    "world": [
+      "LeanD6M6SharpnessBridgeV1",
+      "LeanD6ThresholdConstructionV1"
+    ],
+    "hit": [
+      "LeanD6AllocationFiniteBridgeV1",
+      "LeanUniformSubsetMomentsV1"
+    ],
+    "query": [
+      "LeanD6AllocationFiniteBridgeV1",
+      "LeanFiniteAllocationTrackerV1",
+      "LeanSupportPhysicalQueryContractV1"
+    ],
+    "pairDistances": [
+      "LeanQueryResolutionMinimaxV1",
+      "LeanQueryScalarMinimaxV1"
+    ],
+    "feasibleErrors": [
+      "LeanQueryResolutionMinimaxV1",
+      "LeanQueryScalarMinimaxV1"
+    ],
+    "next": [
+      "LeanStructuralApproximateAnchorV1",
+      "LeanStructuralOrderedRadiusChainV1"
+    ],
+    "evolution": [
+      "LeanStructuralApproximateAnchorV1",
+      "LeanStructuralOrderedRadiusChainV1"
+    ],
+    "accumulated": [
+      "LeanStructuralApproximateAnchorV1",
+      "LeanStructuralOrderedRadiusChainV1"
+    ],
+    "residual": [
+      "LeanD6RecordGapDecompositionV1",
+      "LeanD6ThresholdConstructionV1"
+    ],
+    "profile": [
+      "LeanD6StoppingGeometryBridgeV1",
+      "LeanMasterAnchorThresholdV1"
+    ]
+  },
+  "G13_venue": {
+    "status": "OPEN -- supervisor decision",
+    "settled": [
+      "pinned build and artifact paths exist for every headline",
+      "no MARL/crossroad adapter claim is made, so no Tier B/C adapter is required"
+    ]
+  }
+}

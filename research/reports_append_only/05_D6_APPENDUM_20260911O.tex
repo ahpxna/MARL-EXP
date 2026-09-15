@@ -1,0 +1,78 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product Compression}\\[2pt]
+{\large\itshape Append-only update O: three retractions of my own, the same-response minimax value with exact rational certificates, and a compile defect}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 11 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--179 are an immutable prefix. This addendum begins at Section 180.
+
+\section*{180. Three retractions}
+
+\textbf{(a) The mechanism I gave for the reference flip was wrong.} I reported that under a full-support uniform product reference the gadget's asymmetry dies because $C(B)=C(z)$. Recomputation gives $C(B)=33/32$ and $C(z)=61/32$. These are not equal. The \emph{conclusion} that Top-C flips at $\mu=0$ survives; the stated cause does not. \eclass{retracted}
+
+\textbf{(b) ``Reference robustness: NO'' was wrong.} I reported that moving off the corner reference destroys the construction. It does not. With per-world modular compensation the family keeps a common response under a full-support reference, and the floor stays strictly positive: at $k=3$, $\rho=3/2$ the exact floor is $9/16$ at the corner and remains $\approx 0.09755$ at $t=1/16$, and $\approx 0.01783$ at $\rho=15/8$, $t=1/64$. Indistinguishability is not a point-mass artifact. \eclass{retracted}
+
+\textbf{(c) My LP numbers for $W(\rho)$ were local maxima, not maxima.} An alternating-ascent LP reported $W(1)=2$ and $W(3/2)=1/2$. Full enumeration over all $64\times 64$ extremal pairs gives $W(1)=3$ and $W(3/2)=3/2$, both equal to $k(2\delta_\square-\rho)$. The ascent understated the value by a third. Separately, the closed form I read off the reduced regret matrix was correct only at $k=3$; the machine check rejected it at $k=4,5$ and the corrected form is in Section 182. \eclass{retracted}
+
+\section*{181. The same-response family, independently reproduced}
+
+\texttt{LeanD6SameResponseMarginLossV1} is compiled, with a clean audit, and proves
+\[ L_A(S)=\tfrac{1}{2}\bigl(1+|A|+\rho\,|T\setminus S|-2\,|A\cap(T\setminus S)|\bigr). \]
+Written in the coordinates of the construction --- $u=|T\setminus S|$ the number of Top-C elements the decision drops, $v=|A\cap(T\setminus S)|$, $w=|A\cap T|$ --- this is
+\[ 2L_A(S)=\rho u+k+1-2v,\qquad 2L^\ast_A=k+1+(\rho-2)w, \]
+\[ 2\,\mathrm{reg}_A(S)=\rho u-2v-(\rho-2)w. \]
+I verified the first identity exhaustively and exactly over $\mathbb{Q}$ for every hidden world $A$ and every decision $S$ at $k=3,4,5$ and $\rho\in\{1,\tfrac54,\tfrac32,\tfrac74,\tfrac{19}{10},2\}$: zero discrepancies. This is an independent reproduction of a compiled theorem, not additional support for it. \eclass{numerical evidence}
+
+The hypothesis $2\le|\mathrm{others}(A,j)|$ in the Lean statement is not cosmetic: it is exactly what lets the maximiser switch the gate on for free, and it is the reason the formula needs $k\ge3$.
+
+\section*{182. The minimax value, with exact rational certificates}
+
+For the full game --- every same-response world, every decision of the right size --- the value is
+\[ V(\rho)=\frac{k\,\rho\,(2-\rho)}{4},\qquad 1\le\rho\le2 . \]
+I certified this at $k=3,4$ and $\rho\in\{1,\tfrac54,\tfrac32,\tfrac74,\tfrac{19}{10},2\}$ by rationalising both the primal mixture and the dual prior and evaluating both in exact \texttt{Fraction} arithmetic. At all twelve points the certified lower and upper bounds coincide, and coincide with the formula: $3/4$, $45/64$, $9/16$, $21/64$, $57/400$, $0$ at $k=3$ and $1$, $15/16$, $3/4$, $7/16$, $19/100$, $0$ at $k=4$. \eclass{numerical evidence, exact rational}
+
+The corrected reduced regret matrix on $\{T\}\cup\{A_i=\{i\}\cup B\}$, with $c=(2-\rho)/2$, is
+\[ R_{00}=kc,\quad R_{0j}=R_{i0}=c,\quad R_{ij}=(k-2)(1-c),\quad R_{ii}=R_{ij}+1 . \]
+My earlier reading $R_{ii}=2-c$, $R_{ij}=1-c$ is the $k=3$ specialisation and is withdrawn.
+
+\section*{183. Why no LP is needed: the prior is an exact equaliser}
+
+Let $p^\ast=\dfrac{k\rho-2}{2(k-1)}$ and mix the full-intersection world with weight $p^\ast$ against the $k$ singleton-intersection worlds uniformly. Writing the expected regret against an arbitrary decision and using $\sum_i \mathbf{1}[i\in T\setminus S]=u$, the coefficient of $u$ is
+\[ -2p^\ast c+(1-p^\ast)\Bigl(1-c-\tfrac1k\Bigr)\cdot 2 \;=\; 2c\Bigl(-1+\tfrac{k}{k-1}-\tfrac{1}{k-1}\Bigr)=0 . \]
+The expected regret is therefore \emph{constant in the decision}, with value $k\rho(2-\rho)/4$. I confirmed this symbolically for general $k,\rho,u$ and exhaustively over all $\binom{2k}{k}$ decisions at $k=3,4,5,6$: one distinct value in every case. \eclass{proved, elementary algebra}
+
+This removes the LP from the lower-bound argument entirely. The dual is not merely optimal, it is an equaliser, so no case analysis over decisions is required --- which is what makes the Lean statement \texttt{randomized\_dual\_equalizer} a one-line consequence of $\sum_U p_U=1$.
+
+Feasibility of the mixture needs $p^\ast\in[0,1]$, i.e.\ $\rho\ge 2/k$, which is implied by $\rho\ge1$ for every $k\ge2$.
+
+\section*{184. A compile defect, and what its axiom line does and does not license}
+
+\texttt{LeanD6SameResponseMarginGameV1} produced no \texttt{.olean}. The cause is a single tactic: \texttt{sdiff\_self} resolves to the lattice lemma $s\setminus s=\bot$, not to the \texttt{Finset} lemma $s\setminus s=\emptyset$, so \texttt{inter\_empty}, \texttt{card\_empty} and \texttt{Nat.cast\_zero} never matched --- the linter reported all six \texttt{simp} arguments as unused, which is the visible symptom --- and the residual goal retained $|A\cap\bot|$ and $|\bot|$. Consequently \texttt{actual\_two\_action\_risk} carries \texttt{sorryAx}. The statement itself is correct; only the proof failed.
+
+This is worth recording as an evidence class in its own right. The log prints a clean axiom line for \texttt{actual\_regret\_formula}, \texttt{complement\_optimal}, \texttt{adversary\_equalizer} and \texttt{mixture\_weights\_valid}. Those declarations did elaborate, and their audits are genuine. But the module wrote no artifact, so nothing can import them: \textbf{clean axiom print with absent \texttt{.olean} is not a compiled artifact}. \texttt{LeanD6SameResponseMarginCertificateV1} has never been compiled at all, for exactly this reason --- it imports the failed module.
+
+\section*{185. What the threshold statement says, and what it does not}
+
+Two distinct thresholds are now in play and should not be merged.
+
+\emph{Top-C optimality.} Margin $\ge2\delta_\square$ forces Top-C optimal; below it there is a genuine construction on which Top-C loses. That pair is the sharp threshold \emph{for Top-C as a decision rule}.
+
+\emph{Information.} $V(\rho)=k\rho(2-\rho)/4$ vanishes only at $\rho=2$ and is strictly positive on $[1,2)$. So the same constant $2\delta_\square$ is also where the same-response family stops hiding the optimum --- but this is a statement about \emph{this} family, and $V$ is its value, not a lower bound on every family at that margin. The two agreeing at $2\delta_\square$ is a result; treating either as implying the other is not licensed.
+
+Once Section 184's defect clears, the upper bound (\texttt{actual\_two\_action\_risk}, a two-action rule whose expected regret equals $k\rho(2-\rho)/4$ in \emph{every} hidden world) and the lower bound (\texttt{randomized\_dual\_equalizer}, against every finite randomized rule) close the value for all $q\ge2$ and all $\rho\in[1,2]$, at which point Section 182's twelve certified points become redundant. Until then the general statement is \eclass{conjecture with exact certificates at twelve points}.
+\end{document}

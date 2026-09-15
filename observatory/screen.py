@@ -163,7 +163,10 @@ def screen_half_factor(n_worlds: int, m: int, arity: int, *, seed: int = 0,
     k = int(k if k is not None else max(1, m // 2))
 
     spans = prim.max(axis=2) - prim.min(axis=2)           # (B, m)
-    order = np.argsort(-spans, axis=1)
+    # stable sort so ties break by index, exactly as exact.topk does; the
+    # portfolio's counterexamples live on ties, so an unstable sort here would
+    # make the screen disagree with the certifier precisely where it matters
+    order = np.argsort(-spans, axis=1, kind="stable")
     best_loss = None
     for S in itertools.combinations(range(m), k):
         L = compression_loss_batch(values, actions, prim, S)

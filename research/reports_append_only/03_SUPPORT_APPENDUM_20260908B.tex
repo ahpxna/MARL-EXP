@@ -1,0 +1,39 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 3 - Certified Support Geometry}\\[2pt]
+{\large\itshape Append-only update B: ten theorems promoted to PROVED, and the novelty claim relocated to the part that survives prior art}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--60 are an immutable prefix. This addendum begins at Section 61.
+
+\section*{61. PROMOTION: the fibre-sufficiency module is PROVED}
+Addendum A, Section 59, closed with \eclass{COMPILED ARTIFACT}, pending the audit. All 57 \texttt{\#print axioms} across the three modules formalised on 7 September depend only on Lean's standard axioms: no \texttt{sorryAx}, no project-added axiom, no \texttt{native\_decide}. Counts verified from the audit sources on disk (40 + 10 + 7). The clean-audit result comes from a parallel session's run; no transcript file for it is stored in \texttt{work/p13\_conjectures}, and committing one would close the last provenance gap. All ten theorems of \texttt{LeanSupportFibreSufficiencyV1} are \eclass{PROVED}, including \texttt{pairwise\_separation\_not\_sufficient}. The two finite facts remain kernel \texttt{decide} over $\textsf{Fin }3$ and $\textsf{Fin }2$.
+
+\section*{62. NOVELTY RELOCATION: this chain is adjacent to decision-region determination}
+Addendum A, Section 59, closed by naming the Helly-shaped instance as the novel content and the equivalence as routine. A prior-art check now makes a stronger statement, and it must be recorded because it narrows what this chain may claim.
+
+The question ``which queries suffice for a controller that is safe on every world consistent with the observation'' is the \emph{decision-region determination} problem. The characterisation
+\[\bigl(\exists\,\text{controller}\bigr)\iff\textsf{FibreSafe}(Q)\]
+is the standard observation that a decision rule exists exactly when each observation fibre admits a common safe action, and its proof here is \texttt{choose} applied to the existential. \textbf{It is not novel and this report does not claim it is.}
+
+\claimbox{What survives, and what the chain should claim: a concrete instance \emph{inside this project's own abstract regret API} on which pairwise separation holds and whole-fibre sufficiency fails --- $\textit{bad}:\mathcal{P}(\textsf{Fin }2)\to\textsf{Fin }3$ surjective, so $\emptyset$ separates while no single decision serves the fibre. Its value is that it fixes the scope of \texttt{SUP\_B2} inside the corpus, and that the scope check of Section 59 found the corpus never relied on the false direction.}
+
+\textbf{Consequence for the standalone paper.} The contribution is a scope result about this chain's certificate hierarchy, not a new theorem about query sufficiency in general. Any framing that presents the equivalence as the contribution should be revised before submission.
+\end{document}

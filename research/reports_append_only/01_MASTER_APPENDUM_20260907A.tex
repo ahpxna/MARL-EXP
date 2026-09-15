@@ -1,0 +1,177 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 1 - MASTER / Reference $\to$ Support $\to$ Decision}\\[2pt]
+{\large\itshape Append-only update: the $\Gamma$-box tightening confirmed on three seeds, a scope restriction on what that confirms, and the cross-chain ledger delta}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 7 September (evening)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--47 are an immutable prefix. This addendum begins at Section 48.
+
+\section*{48. Three-seed confirmation of the $\Gamma$-box advantage}
+\texttt{master\_certificate\_utility\_v2}, nine families, $m\in\{4,6,8\}$, $4050$ rows per seed, $1350$ instances per tolerance. Certified fraction, $\Gamma$-box versus $\Gamma$-operational, paired on the same instances:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r r r}
+\toprule
+tol & \multicolumn{3}{c}{box $-$ operational (certified frac.)} & sign\\
+ & $s{=}8201$ & $s{=}8202$ & $s{=}8203$ & \\
+\midrule
+$0.00$ & $+0.3844$ & $+0.3689$ & $+0.3844$ & $+$\\
+$0.01$ & $+0.5022$ & $+0.4933$ & $+0.5133$ & $+$\\
+$0.02$ & $+0.4400$ & $+0.4333$ & $+0.4578$ & $+$\\
+$0.05$ & $+0.2556$ & $+0.2644$ & $+0.2778$ & $+$\\
+$0.10$ & $+0.0800$ & $+0.0733$ & $+0.0889$ & $+$\\
+$0.20$ & $+0.0333$ & $+0.0311$ & $+0.0400$ & $+$\\
+$0.30$ & $+0.0289$ & $+0.0244$ & $+0.0378$ & $+$\\
+$0.50$ & $+0.0244$ & $+0.0178$ & $+0.0156$ & $+$\\
+$1.00$ & $+0.0067$ & $+0.0067$ & $+0.0089$ & $+$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The advantage is positive at every tolerance on every seed; it is largest at $\text{tol}=0.01$ and decays monotonically as the tolerance grows, which is the expected shape --- a looser tolerance certifies almost everything under either $\Gamma$, so the gap must close. At $\text{tol}=0$ the operational certificate certifies \emph{nothing} ($0.0$ on all three seeds) while box certifies $0.37$--$0.38$.
+
+\section*{49. Supporting invariants, all three seeds}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.46\columnwidth}X}
+\toprule
+\texttt{gamma\_box\_strict\_tightening\_fraction} & $0.9956$ / $0.9978$ / $0.9956$\\
+\texttt{false\_safe\_rate} (every tol, every $\Gamma$) & $0.0$\\
+\texttt{all\_known\_bounds\_covered} & true\\
+\texttt{all\_known\_box\_bounds\_covered} & true\\
+\texttt{all\_known\_operational\_bounds\_covered} & true\\
+mean certificate, box vs op ($s{=}8201$) & $0.2707$ vs $0.3254$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The box certificate is strictly tighter on $99.6\%$--$99.8\%$ of rows, and its mean value is smaller than the operational one on every seed, which is the same fact measured two ways. No false-safe emission occurs anywhere in $12150$ rows.
+
+\section*{50. SCOPE RESTRICTION on what Sections 48--49 establish}
+\claimbox{The certificate intervals in this experiment are constructed \emph{from the truth}. Therefore these tables are a \textbf{utility and tightening} result --- how often each $\Gamma$ yields a usable certificate, and how tight it is --- and are \textbf{not} statistical coverage evidence. \texttt{false\_safe\_rate} $=0$ here means the construction never emitted an unsafe certificate \emph{given the truth}, not that a deployed estimator would achieve nominal coverage. \eclass{DEVELOPMENT\_EMPIRICAL}}
+This restriction is stated because the sign-stability across three seeds makes the table look stronger than it is; three seeds establish reproducibility of a construction, not calibration of an estimator. \texttt{milp\_status} remains \textsf{NOT\_IMPLEMENTED}; exact enumeration and LP are reported separately and no non-optimal solver status is ever read as a lower bound.
+
+\section*{51. Cross-chain ledger delta for 7 September (evening)}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{>{\raggedright\arraybackslash}p{0.20\columnwidth}>{\raggedright\arraybackslash}p{0.24\columnwidth}X}
+\toprule
+Chain & Movement & Evidence class after\\
+\midrule
+D6 & $c^\ast(6)=6$ closed as a \emph{supremum}; two addendum-D statements demoted to vacuous & COMPILED ARTIFACT (audit transcript pending)\\
+Support & separation shown \emph{not} sufficient; whole-fibre characterisation added; scope check clean & COMPILED ARTIFACT\\
+Functional & two allocator defects repaired; censoring \emph{unchanged}; no winner & NUMERICAL EVIDENCE, negative\\
+Query & estimand fixed; fix measured \emph{insufficient}; direction demoted & NUMERICAL EVIDENCE, negative\\
+Structural & confirmation family demoted as too easy; staircase $\chi=r$ discovered exactly & EXACT FINITE DISCOVERY\\
+MASTER & $\Gamma$-box advantage confirmed on three seeds, scope restricted & DEVELOPMENT\_EMPIRICAL\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Four of the six movements this evening are \textbf{demotions or negatives}. That ratio is recorded deliberately: two of them (D6 Section 126, Query Section 73) retract statements this project wrote within the previous twenty-four hours, and one (Functional Section 54) shows that a published ablation row compared a policy against itself.
+
+\section*{52. A ledger-reading defect, and the rule it produces}
+Two sections of tonight's addenda were written wrong and corrected before compile, both from the same cause: \textbf{a result artifact was read without its companion status records.} Report 4 quoted a \texttt{next\_formal\_target} field that a \texttt{*.FORMAL\_TARGET\_MET.json} companion had already marked \textsf{MET}, understating the Structural chain by a full evidence class; Report 5 declared the $m$-generalisation unprobed when \texttt{TangentSeed\_m\{4,5,6,7\}} had run on 6 September. The companions exist precisely because result artifacts are hash-pinned and must never be edited in place, so a stale field inside one is expected and is \emph{not} a defect of the artifact --- it is a defect of the reader.
+
+\claimbox{\textbf{Rule.} Before quoting any \texttt{next\_formal\_target}, \texttt{status} or ``open'' field from a result artifact, enumerate the companion status records that annotate it. Before reporting that a direction was never tried, enumerate the artifacts for that direction by name pattern, not by memory of the session.}
+
+\section*{53. Outstanding evidence items, all chains}
+\begin{enumerate}
+\item \texttt{\#print axioms} transcripts for \texttt{AxiomAuditD6M6SharpnessBridgeV1} (41 names), \texttt{AxiomAuditSupportFibreSufficiencyV1} (10), \texttt{AxiomAuditFunctionalResidualMaintenanceV2} (7). Until pasted, all three modules are COMPILED ARTIFACT and none is PROVED.
+\item D6 tie-locus LP at $m=4$ and $m=8$: pre-registered and \textbf{not run}.
+\item Functional: a controlled ablation isolating the exploration floor from the Neyman rule.
+\item Query: a task-competent frozen $\rho$, tested in the external runtime before it enters the ledger.
+\item Structural: \emph{not} the parametric bound --- that was proved on 5 September and the first draft of tonight's Report 4 wrongly listed it as open. What is open is whether the staircase is extremal over arbitrary relation families.
+\end{enumerate}
+
+\section*{54. Formal inventory for this chain, complete}
+The corpus holds \textbf{3} Lean modules attributable to this chain, carrying \textbf{25} theorems; 3 produce a \texttt{.olean}; \textbf{0} carry an \texttt{AxiomAudit} file. Ranked by theorem count:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r c c}
+\toprule
+Module & thm & \texttt{.olean} & audit\\
+\midrule
+\texttt{Lean\allowbreak Pairwise\allowbreak Master\allowbreak V4} & 10 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Master\allowbreak Reference\allowbreak Uncertainty\allowbreak V1} & 9 & yes & \textbf{no}\\
+\texttt{Lean\allowbreak Typed\allowbreak Certificate\allowbreak Completion\allowbreak V1} & 6 & yes & \textbf{no}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{3} of this chain's 3 compiled modules have no \texttt{\#print axioms} file. By this project's own standard --- an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED} --- every one of them is \eclass{COMPILED ARTIFACT} and must not be cited as proved.}
+
+\section*{56. Corpus-wide formal inventory, and the audit deficit}
+Counted across \texttt{work/p13\_conjectures} in full, not by recollection:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r r r}
+\toprule
+Chain & modules & theorems & \texttt{.olean} & audited\\
+\midrule
+D6 & 88 & 626 & 85 & 2\\
+STRUCTURAL & 19 & 138 & 19 & 0\\
+SUPPORT & 7 & 89 & 7 & 1\\
+FUNCTIONAL & 7 & 60 & 7 & 1\\
+QUERY & 6 & 33 & 6 & 0\\
+MASTER & 3 & 25 & 3 & 0\\
+OTHER & 12 & 45 & 12 & 0\\
+\midrule
+\textbf{total} & \textbf{142} & \textbf{1016} & \textbf{139} & \textbf{4}\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\claimbox{\textbf{135 of the 139 compiled modules --- 97\% of the corpus, 1016 theorems in total --- have never had \texttt{\#print axioms} run against them.} This project's stated rule is that an axiom audit, not the absence of \texttt{sorry}, is what licenses \eclass{PROVED}. Applied honestly, the corpus is overwhelmingly \eclass{COMPILED ARTIFACT}. This deficit has never appeared in any report and is recorded here as the single largest gap between what the ledger holds and what it may claim.}
+Three modules carry no \texttt{.olean} and are therefore not even compiled artifacts:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r}
+\toprule
+Module & thm\\
+\midrule
+\texttt{Lean\allowbreak D6\allowbreak Active\allowbreak Cell\allowbreak Cone\allowbreak Construction\allowbreak Scratch\allowbreak V1} & 7\\
+\texttt{Lean\allowbreak D6\allowbreak Canonical\allowbreak Abel\allowbreak Route\allowbreak Counterexample\allowbreak V1} & 8\\
+\texttt{Lean\allowbreak D6\allowbreak Decision\allowbreak Half\allowbreak Factor\allowbreak Conjecture} & 1\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Their names (\texttt{Scratch}, \texttt{Conjecture}) declare their status; they are retained, not deleted, and must never be cited.
+
+\section*{57. Artifact inventory}
+\texttt{research/} holds \textbf{1191} result artifacts (manifests excluded). Largest directories:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r}
+\toprule
+Directory & artifacts\\
+\midrule
+\texttt{high\_value\_extensions} & 194\\
+\texttt{d6\_contrast\_rank\_falsification} & 155\\
+\texttt{confirmatory\_functional\_v2\_fresh} & 148\\
+\texttt{confirmatory\_functional} & 123\\
+\texttt{chain\_verify\_dev\_20260829\_023640} & 110\\
+\texttt{v4\_development\_20260829\_043055} & 86\\
+\texttt{p13\_redesign} & 68\\
+\texttt{v6\_boundary} & 39\\
+\texttt{observatory} & 36\\
+\texttt{v7\_fixed\_panel} & 36\\
+\texttt{v4\_development\_20260829\_045942} & 33\\
+\texttt{new\_chains\_v2} & 23\\
+\texttt{v4\_development\_20260829\_045335} & 20\\
+\texttt{v5\_dev} & 20\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Two external working trees were swept and folded in on 7 September}, because work on these chains had been proceeding in checkouts outside the repository and was not visible to any report:
+\begin{itemize}
+\item \texttt{Documents/ChatGPT/CIG-AMF} --- 21 files, git history empty. Yielded \texttt{LeanD6M6SharpnessBridgeV1} and its audit, the v3 functional lab, the query signal probe, the allocation tests, and four smoke artifacts. Now under \texttt{research/imported\_chatgpt\_tree\_20260907/}.
+\item \texttt{Documents/Codex/2026-09-07/...} --- a larger tree, never previously granted. Yielded \texttt{LeanSupportFibreSufficiencyV1} (never compiled until tonight), \texttt{LeanFunctionalResidualMaintenanceV2} (compiled, unreported), the failed \texttt{LeanD6M6SharpnessV1}, the endpoint generator \texttt{generate\_d6.py} that produced the \texttt{decide} tables of Report 5, \texttt{capability\_audit.py}, and the corrected functional/query result sets. Now under \texttt{research/imported\_codex\_tree\_20260907/}, failures under \texttt{failed\_attempts/}.
+\end{itemize}
+\claimbox{\textbf{Process finding.} Formal work on three chains lived for two days in checkouts no report could see, and one module (\texttt{LeanSupportFibreSufficiencyV1}) had never been compiled by anyone. A chain's evidence is only as good as the ledger's ability to enumerate it; ``it exists somewhere'' is not a ledger state.}
+\end{document}

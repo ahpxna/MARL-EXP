@@ -376,7 +376,7 @@ D6_KAPPA_DI = declare(Equation(
     ("l_C", "kappa_observed", "m_minus_1", "exceeds_m_minus_1", "slack",
      "ratio", "normalized", "balanced", "strict_topc", "arity",
      "reference_is_point_mass", "reference_mass_check"),
-    status_note="universal m-1 law FALSIFIED 4-Sep; conditional version OPEN",
+    status_note="universal m-1 law FALSIFIED 4-Sep; the centred-rank-one conditional version FALSIFIED 5-Sep. Open conditional is now the RAW rank-one version (D6-prime), untested.",
 ))
 
 D6_NEW1 = declare(Equation(
@@ -401,7 +401,23 @@ D6_RANKONE = declare(Equation(
     ("coordinate", "max_abs_minor", "is_rank_one", "n_profile_levels",
      "contrast_spectrum_size", "all_coordinates_rank_one", "two_profile",
      "binary_alphabet", "witness_minor_u", "witness_minor_v"),
-    kind="predicate", status_note="NEW; rank-one sufficiency conjecture OPEN",
+    kind="predicate", status_note="REFUTED 5-Sep: centred rank one does NOT imply the m-1 decision bound. Exact rational counterexample at m=6,K=3 under StrictTopC and two-profile, independently recomputed (131/130). Centring is a projection that discards the additive layer and the counterexample lives there. The invariant that survives is RAW local contrast rank one; see LeanD6RawLocalContrastRankOneV1.",
+))
+
+D6_RAW_RANKONE = declare(Equation(
+    "D6.raw_contrast_rank_one", "D6",
+    "coordinate i is RAW rank one iff every 2x2 minor rho_{i,u}(x)rho_{i,v}(y) - rho_{i,u}(y)rho_{i,v}(x) vanishes, where rho_{i,u}(z) = F(z_{i<-u}) - F(z_{i<-u0})",
+    ("coordinate", "raw_max_abs_minor", "raw_is_rank_one", "raw_rank_exceeds_one",
+     "centred_is_rank_one", "misaligned", "n_raw_profile_levels",
+     "all_coordinates_raw_rank_one", "n_misaligned_coordinates",
+     "binary_alphabet", "raw_witness_minor_u", "raw_witness_minor_v"),
+    kind="predicate",
+    status_note=("NEW 5-Sep. The RAW contrast keeps the additive layer that "
+                 "centring projects away. Every recorded D6 counterexample is "
+                 "centred rank one but NOT raw rank one at at least one "
+                 "coordinate (14/14), and the sole raw-rank-one witness is the "
+                 "binary one. `misaligned` = centred rank one AND raw rank > 1: "
+                 "that is exactly what D6's hypothesis could not see."),
 ))
 
 D6_APPLICABILITY = declare(Equation(

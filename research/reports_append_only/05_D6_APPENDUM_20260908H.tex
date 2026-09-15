@@ -1,0 +1,96 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.55in,top=0.48in,bottom=0.52in]{geometry}
+\usepackage[T1]{fontenc}\usepackage{newtxtext,newtxmath}\usepackage{microtype}
+\usepackage{amsmath,mathtools}\usepackage{booktabs,tabularx,array}\usepackage[normalem]{ulem}\usepackage{cancel}\usepackage{enumitem,xcolor,ragged2e}
+\usepackage{graphicx}
+\setlength{\columnsep}{0.24in}\setlength{\parindent}{0pt}\setlength{\parskip}{2.2pt}
+\setlist{nosep,leftmargin=*}\renewcommand{\arraystretch}{1.10}
+\newcommand{\oldclaim}[1]{\sout{#1}}
+\newcommand{\claimbox}[1]{\begin{center}\fbox{\parbox{0.94\columnwidth}{\centering\scriptsize #1}}\end{center}}
+\newcommand{\eclass}[1]{\textsf{[#1]}}
+\DeclareFontFamilySubstitution{TS1}{ntxtlf}{cmr}
+% \let binds the CURRENT meaning of \_ ; \newcommand would create a macro that
+% re-expands to \_ and loops until TeX runs out of input stack.
+\let\CIGunderscore\_
+\renewcommand{\_}{\CIGunderscore\allowbreak}
+\begin{document}
+\sloppy
+\twocolumn[{\begin{center}
+{\LARGE\bfseries Report 5 - D6 Product-Reference / Decision Interaction}\\[2pt]
+{\large\itshape Append-only update H: the block-composition identities verified, the information-limit lower bound given a closed form, and one proposed target shown to be weaker than the evidence already in hand}\\[2pt]
+{\small CIG-AMF Scientific Evolution Report -- 8 September (third update)}
+\end{center}\vspace{2mm}}]
+
+\textbf{Append-only rule.} Sections 1--146, including addenda A--G, are an immutable prefix. This addendum begins at Section 147.
+
+\section*{147. The block-composition identities hold}
+For independent blocks $F(x)=\sum_b F_b(x_b)$ with the corresponding product reference, the proposed identities are
+\[\delta_\square(F)=\max_b \delta_\square(F_b),\qquad 2D(F)=\sum_b 2D(F_b),\]
+the second because the retained residual splits across blocks and oscillation is additive on a Cartesian product. Checked mechanically by composing two copies of the exact $m=4$ witness of Section 134 into an $m=8$ world, with $S$ the union of the blocks' selected sets:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X r r}
+\toprule
+ & predicted & measured\\
+\midrule
+$\delta_\square$ & $\max(1,1)=1$ & $1$\\
+$2D$ & $3+3=6$ & $6$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Both exact over $\mathbb{Q}$. \eclass{VERIFIED NUMERICALLY, not yet formalised}
+
+\textbf{Consequence for the frontier programme.} Composing a $6$-block and an $8$-block at common margin $\mu$ gives $(6-3\mu)+(8-4\mu)=14-7\mu=m-\tfrac m2\mu$ at $m=14$, and two $6$-blocks give $12-6\mu$ at $m=12$. Since $\langle 6,8\rangle=\{6,8,12,14,16,\dots\}$, \textbf{$m=10$ is the one missing size} for every even $m\ge6$. The composition also confirms it is a lower-bound device only: two $m=4$ blocks give $6$, while $c^\ast(8)=8$, because the $m=4$ block value $3=m-1$ is itself suboptimal.
+
+\section*{148. The information limit has a closed form}
+Define, for an algorithm knowing the entire response profile $\mathcal I(F)=(Q_1,\dots,Q_m)$ and allowed to randomise,
+\[V(\theta)=\inf_{\pi}\ \sup_{\substack{\mathcal I(F)=\theta\\ \delta_\square(F)\le1}}\ \mathbb E_{S\sim\pi}\,r_F(S),\qquad r_F(S)=L_F(S)-\min_{|T|=k}L_F(T).\]
+$V>0$ says that no ranking rule, however good, removes the error: more information must be measured.
+
+Permuting the $m-1$ coordinates of positive response slope while fixing the negative one produces worlds with \emph{identical} $Q$ and different optimal sets, with $r_F(S)=|S\setminus T_F^\star|$. On that family the game is symmetric under $S_{m-1}$, so the uniform strategy is optimal on both sides and
+\[\mathbb E\,|S\setminus T^\star| = k-\frac{k^2}{m-1},\]
+giving, with $m=2k$,
+\[\boxed{\ V\ \ge\ \frac{k(k-1)}{2k-1}.\ }\]
+Confirmed as the exact game value by linear programming over all $\binom{m-1}{k}$ strategies:
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{r r r X}
+\toprule
+$m$ & $\binom{m-1}{k}$ & LP value & $k(k-1)/(2k-1)$\\
+\midrule
+$6$ & $10$ & $1.200000000$ & $6/5$\\
+$8$ & $35$ & $1.714285714$ & $12/7$\\
+$10$ & $126$ & $2.222222222$ & $20/9$\\
+$12$ & $462$ & $2.727272727$ & $30/11$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The values $6/5$ and $12/7$ reported for $m=6,8$ are the $k=3,4$ cases of this formula.
+
+\section*{149. NARROWING a proposed target: $m/5$ is weaker than the family already gives}
+The programme proposed for this direction set as its nearest target
+\begin{center}\scriptsize\oldclaim{$V\ge m/5$ at $\mu=0$, $m=6r$, using six-dimensional blocks and a global budget argument}\end{center}
+Three observations, all from the table above.
+\begin{itemize}
+\item $k(k-1)/(2k-1)=m/5$ \emph{only} at $m=6$; it is a coincidence at that width. At $m=8$ the family gives $12/7\approx1.714$ against $m/5=1.6$, and the gap widens: the closed form is asymptotically $k/2=m/4$, not $m/5$.
+\item The permutation family is defined \textbf{directly at every even $m$} --- take the $m-1$ positive-slope coordinates and let $T^\star$ range over their $k$-subsets. It needs \textbf{no block composition}, so the $m=10$ gap of Section 147 \textbf{does not apply} to this bound.
+\item Consequently a composition argument for $V$ would not only be unnecessary, it would \emph{lose} the constant, since composing blocks of size $6$ recovers $m/5$ rather than $m/4$.
+\end{itemize}
+\claimbox{\textbf{Two programmes, not one.} (i) The Top-C frontier $R_m(\mu)=m-\tfrac m2\mu$ does need block composition and does need an $m=10$ witness. (ii) The information limit $V\ge k(k-1)/(2k-1)$ needs neither, and is already available at every even $m$. Conflating them costs the second its constant.}
+
+\section*{150. Status of everything in this addendum}
+\begin{center}\scriptsize
+\begin{tabularx}{0.98\columnwidth}{X X}
+\toprule
+Statement & Evidence class\\
+\midrule
+$2[L_F(S)-L_F(T)]\le d(2\delta_\square-\mu)$ & \eclass{PROVED} (Lean, §141)\\
+$R_6(\mu)=6-3\mu$ at five $\mu$; $R_8(0)=8$ & \eclass{PROVED upper + EXACT lower} (§142)\\
+Block-composition identities & \eclass{VERIFIED NUMERICALLY}, not formalised\\
+$V\ge k(k-1)/(2k-1)$ & \eclass{EXACT LP on a constructed family}; a lower bound for the full class, not a minimax solution\\
+$R_m(\mu)=m-\tfrac m2\mu$ for all even $m\ge6$ & \eclass{TARGET}; needs composition formalised and an $m=10$ witness\\
+$\mu\ge2\delta_\square \Rightarrow V=0$ & follows from the proved bound; the \emph{sharp} threshold is open\\
+Robustness to a full-support product reference & \eclass{UNTESTED}; every construction here uses the corner reference\\
+\bottomrule
+\end{tabularx}
+\end{center}
+\textbf{Novelty caution carried forward.} Mixed differences and additive decomposition have a long history, and ANOVA for categorical inputs with dependence and non-rectangular support has recent treatments. The defensible content is the \emph{witnesses attaining the boundary} and the \emph{information limit}, not the decomposition machinery.
+\end{document}
