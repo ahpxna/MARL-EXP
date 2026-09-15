@@ -1,0 +1,80 @@
+{
+ "script": "P33_query_actual_regret.py",
+ "contract": "E-Q",
+ "loss_geometry_source": "research/worker_P16_query_20260915/P16_query_regret_chain.json, budget 1",
+ "gamma": 0.426727294921875,
+ "L_max": 0.586181640625,
+ "decision_rule": "likelihood-ratio test on the true mixture densities, then play the SELECTED world's own optimal action; loss 0 when the label is right, L_max when it is wrong",
+ "rows": [
+  {
+   "measurement": "g0_normalised_order2",
+   "h": 0.6,
+   "H2": 0.0004921788077915196,
+   "L": 0.0004922999675374096,
+   "N": 4678,
+   "reps_per_world": 4000,
+   "gamma": 0.426727294921875,
+   "L_max": 0.586181640625,
+   "per_world": {
+    "world_0": {
+     "error_rate": 0.015,
+     "mean_regret": 0.008792724609375,
+     "se": 0.0011267310297764508
+    },
+    "world_1": {
+     "error_rate": 0.0135,
+     "mean_regret": 0.0079134521484375,
+     "se": 0.001069724491278029
+    }
+   },
+   "equal_prior_mean_regret": 0.00835308837890625,
+   "bootstrap_ci95": [
+    0.00688763427734375,
+    0.009891815185546875
+   ],
+   "bootstrap_resamples": 2000,
+   "theory_lower_gamma_rho2N_over_4": 0.0010659775848997197,
+   "theory_upper_Lmax_rhoN_over_2": 0.029297531982150595,
+   "inside_window": true
+  },
+  {
+   "measurement": "u_normalised_order1",
+   "h": 0.6,
+   "H2": 5.615201237450183e-05,
+   "L": 5.615358895776784e-05,
+   "N": 41006,
+   "reps_per_world": 4000,
+   "gamma": 0.426727294921875,
+   "L_max": 0.586181640625,
+   "per_world": {
+    "world_0": {
+     "error_rate": 0.0155,
+     "mean_regret": 0.0090858154296875,
+     "se": 0.0011450652085470542
+    },
+    "world_1": {
+     "error_rate": 0.01575,
+     "mean_regret": 0.00923236083984375,
+     "se": 0.0011541161034797193
+    }
+   },
+   "equal_prior_mean_regret": 0.009159088134765625,
+   "bootstrap_ci95": [
+    0.007620361328125,
+    0.0108443603515625
+   ],
+   "bootstrap_resamples": 2000,
+   "theory_lower_gamma_rho2N_over_4": 0.0010667137458498632,
+   "theory_upper_Lmax_rhoN_over_2": 0.02930764663039664,
+   "inside_window": true
+  }
+ ],
+ "wall_seconds": 251.9,
+ "not_established": [
+  "MONTE CARLO with a bootstrap CI.  The window it is checked against is a THEOREM (QueryRegretBridge + AffinityTesting); the measurement is not.",
+  "The prior is equal: this is Bayes regret, not worst-case minimax.",
+  "h = 0.6 sits ABOVE the crossover h* = 0.1133 found in P21, so these sample counts must not be read as evidence about the leakage ORDER.",
+  "The loss table is the corpus's own at budget 1; a different budget gives different gamma and L_max."
+ ],
+ "lean": "LeanQueryRegretBridgeV1 (regret_ge_gamma_error, lrt_regret_le, bayes_regret_window); LeanQueryAffinityTestingV1 (the bracket)"
+}

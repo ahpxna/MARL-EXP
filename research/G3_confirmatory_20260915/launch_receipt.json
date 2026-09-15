@@ -1,0 +1,21 @@
+{
+ "gate": "G3",
+ "kind": "launch_receipt",
+ "launched_utc": "2026-09-15T20:21:41Z",
+ "registration_utc": "2026-09-15T20:00:17Z",
+ "registration_precedes_launch": true,
+ "protocol_file": "research/G3_prereg_20260915/preregistration.json",
+ "snapshot_digest": "fdf94eda95fb33927b991d99d3c383413206f1ec98281fcf6d63904d04507a51",
+ "config": {"instances": 1000, "seeds": [811,821,823,827,829,839,853,857,859,863],
+            "relations": 5, "actions": 6, "topk": 2, "alpha": 0.05,
+            "max_n": 131072, "batch": 16, "pilot_fraction": 0.15,
+            "rng_protocol": "instance_cell_v1"},
+ "deviations": [
+  {"deviation": "The run is SPLIT into one process per seed and merged, instead of one process over all ten seeds.",
+   "reason": "Wall-clock only. Under rng_protocol=instance_cell_v1 every draw is keyed by SeedSequence([seed, instance_id, ...]) and legacy_rng is never consumed (scripts/run_functional_variance_stopping_lab_v4.py:390-399), so the per-seed split is bit-identical to the combined run, not an approximation.",
+   "timestamp": "2026-09-15T20:21:41Z"},
+  {"deviation": "Each per-seed artifact will carry admissibility.class = DEVELOPMENT and development_only = true.",
+   "reason": "The runner's FROZEN_CONFIRMATORY_SEEDS is (701,709,719,727,733,743,751,757,761,769), taken from config/ieee_benchmark_protocol_v1.json -- a DIFFERENT protocol. The G3 seeds 811..863 were chosen fresh precisely so they carry no tuning history. The runner's label is therefore wrong for this run and MUST NOT be quoted; the governing record of confirmatory status is this receipt plus the sealed preregistration. The runner was not edited to say otherwise.",
+   "timestamp": "2026-09-15T20:21:41Z"}],
+ "status": "LAUNCHED"
+}
