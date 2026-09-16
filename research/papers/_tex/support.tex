@@ -242,6 +242,114 @@ the sum over draws; the exchange is between two finite sums and is exact.
 \leanbox{\lean{avoid\_prob}, \lean{prod\_unseen\_card}, \lean{expected\_prod\_unseen} in
 \lean{LeanSupportSamplingLawV1}}
 
+\noindent\emph{Supporting results in \lean{LeanSupportSamplingLawV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{avoid\_prob}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} : \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N}\\
+&\quad \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{k}, \mathit{h} \mathit{k} \in \mathit{A} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0) = (\textstyle\sum \mathit{x} \in \mathit{A}, \mathit{p}\\
+&\quad \mathit{x}) ^{\mathit{N}}
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{expected\_prod\_unseen}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\mathit{N} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h} \mathit{k})) * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+&\quad ))) = (\textstyle\prod \mathit{i}, (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i}) : \mathbb{R}\\
+&\quad )) * (1 - \textstyle\sum \mathit{i}, \mathit{pc}\\
+&\quad \mathit{i}) ^{\mathit{N}}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{fixed\_tip\_unsafe\_fraction}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L'} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} : \mathbb{N} ) : \mathbb{R}\\
+&\quad ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose} (\mathit{L'} + 1) : \mathbb{N} ) : \mathbb{R}\\
+&\quad ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} : \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) +\\
+&\quad 1)
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{good\_event\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\mathit{hpnn} : \forall \mathit{x}, 0 \leq \mathit{p}\\
+&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i})\\
+&\quad ^{\mathit{N}} \leq \textstyle\sum \mathit{h} :\\
+&\quad \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{i}, 1 \leq (\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0)
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{minimax\_eq\_of\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{World}],\; [\mathit{Nonempty}\\
+&\quad \mathit{World}],\; (\mathit{R} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{w}, \mathit{R} \mathit{w} =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
+&\quad \mathit{R} = \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{prod\_unseen\_as\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+&\quad )) = \textstyle\sum \tau : (\mathit{i} : \iota )\\
+&\quad \to \kappa \mathit{i}, (\mathbf{if} \forall \mathit{i}, \tau \mathit{i} \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0)
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{prod\_unseen\_card}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u} \mathit{h}\\
+&\quad \mathit{i}).\mathit{card} = (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h})).\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,8}\quad\lean{transversal\_mass}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \ (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} => \mathit{u} \mathit{i} (\tau \mathit{i}))),\\
+&\quad \mathit{p} \mathit{x} = 1 - \textstyle\sum \mathit{i},\\
+&\quad \mathit{pc} \mathit{i}
+\end{aligned} \]}
+
+
 No independence between classes is assumed anywhere. Linearity of expectation suffices because
 the quantity needed is a sum, which is why the result is an identity rather than an
 approximation; an earlier version did assume independence, and removing it also removed a
@@ -281,6 +389,66 @@ ratio. Both numerator and denominator are functions of $|R|$.
 
 \leanbox{\lean{decoder\_risk\_world\_free}, \lean{decoder\_risk\_eq\_L\_over\_aL} in
 \lean{LeanSupportEquivariantDecoderV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportEquivariantDecoderV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,9}\quad\lean{bayes\_is\_minimax}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{World}],\; [\mathit{Nonempty}\\
+&\quad \mathit{World}],\; (\mathit{pri} \mathit{R} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{hconst} : \forall \mathit{w}, \mathit{R} \mathit{w} =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} * \mathit{R}\\
+&\quad \mathit{w}) = \mathit{r} \wedge (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
+&\quad \mathit{R} = \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{decoder\_risk\_eq\_L\_over\_aL}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
+&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W}),\; (\mathit{hT} : \mathit{Fintype}.\mathit{card} \mathit{T} = \mathit{a} +\\
+&\quad \mathit{b}),\; (\mathit{hle} : \mathit{R}.\mathit{card} \leq \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(((\mathit{W} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad )) / ((\mathit{univ} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) = ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
+&\quad ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
+&\quad ))
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{decoder\_risk\_world\_free}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W₁} \mathit{W₂} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\; (\mathit{hW₁} : \mathit{W₁}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{hW₂} : \mathit{W₂}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{h₁} : \mathit{R} \subseteq \mathit{W₁}),\; (\mathit{h₂} : \mathit{R} \subseteq \mathit{W₂}),\; (\mathit{U} : \mathit{Finset}\\
+&\quad \mathit{T})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((\mathit{W₁} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) / \mathit{U}.\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,12}\quad\lean{hidden\_count\_world\_free}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{b} : \mathbb{N}\\
+&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{W} \ \mathit{R}).\mathit{card} = \mathit{b} -\\
+&\quad \mathit{R}.\mathit{card}
+\end{aligned} \]}
+
 
 Equivariance is therefore a cardinality computation, not an assumption, and it uses very
 little: only that compatibility forces $R\subseteq W$ with $|W|=b$. Any observation process
@@ -375,6 +543,94 @@ invariance equates their risks.
 \end{proof}
 
 \leanbox{\lean{constant\_risk\_of\_symmetry} in \lean{LeanSupportMinimaxLowerV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportMinimaxLowerV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,13}\quad\lean{bayesRisk\_eq\_sum\_postLoss}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{d} = \textstyle\sum \mathit{x},\\
+&\quad \mathit{postLoss} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{x} (\mathit{d} \mathit{x})
+\end{aligned} \]}
+
+\noindent\textbf{S\,14}\quad\lean{bayes\_optimal\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{d} : \mathit{Obs} \to \mathit{Act},\\
+&\quad \mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{d} = \mathit{bayesOptValue} \mathit{pri}\\
+&\quad \mathit{P} \mathit{L}
+\end{aligned} \]}
+
+\noindent\textbf{S\,15}\quad\lean{bayes\_optimal\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} \leq \mathit{bayesRisk} \mathit{pri}\\
+&\quad \mathit{P} \mathit{L} \mathit{d}
+\end{aligned} \]}
+
+\noindent\textbf{S\,16}\quad\lean{constant\_risk\_of\_symmetry}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G} \to \mathit{World} \to \mathit{World}),\; (\mathit{R} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hinv} : \forall \mathit{g} \mathit{w}, \mathit{R} (\mathit{act} \mathit{g} \mathit{w}) = \mathit{R}\\
+&\quad \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w} \mathit{w'} : \mathit{World}, \exists \mathit{g}, \mathit{act} \mathit{g} \mathit{w} =\\
+&\quad \mathit{w'})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{w} \mathit{w'} : \mathit{World},\\
+&\quad \mathit{R} \mathit{w} = \mathit{R} \mathit{w'}
+\end{aligned} \]}
+
+\noindent\textbf{S\,17}\quad\lean{equivariant\_is\_minimax}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\; (\mathit{r} : \mathbb{R}\\
+&\quad ),\; (\mathit{hconst} : \forall \mathit{w}, \mathit{risk} \mathit{P} \mathit{L} \mathit{d₀} \mathit{w} =\\
+&\quad \mathit{r}),\; (\mathit{hopt} : \mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L} =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} | \exists \mathit{d}\\
+&\quad : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathit{risk} \mathit{P} \mathit{L}\\
+&\quad \mathit{d}) = \mathit{v}\} \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,18}\quad\lean{minimax\_ge\_bayes\_optimal}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} \leq (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathit{risk} \mathit{P} \mathit{L}\\
+&\quad \mathit{d})
+\end{aligned} \]}
+
 
 Proposition~\ref{prop:symmetry} is how the constant-risk hypothesis is discharged rather than
 imposed. Combined with Theorem~\ref{thm:equivariant}---a risk depending only on $|R|$ is
@@ -534,6 +790,69 @@ argument.
 \leanbox{\lean{binary\_decide\_value}, \lean{decide\_upper\_expect},
 \lean{growing\_K\_recover} in \lean{LeanSupportDecideRecoverV1}}
 
+\noindent\emph{Supporting results in \lean{LeanSupportDecideRecoverV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $5$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,19}\quad\lean{binary\_decide\_value}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R} ) / (1 + \mathit{L}\\
+&\quad \mathit{i}))) = \mathbf{if} (\forall \mathit{i}, \mathit{L} \mathit{i} =\\
+&\quad 1) \mathbf{then} (1 : \mathbb{R} ) / 2 \mathbf{else} 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,20}\quad\lean{cfac\_le\_one}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{i} : \iota )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{cfac} \mathit{a} \mathit{L} \mathit{i}\\
+&\quad \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,21}\quad\lean{growing\_K\_recover}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L} \mathit{i}).\mathit{choose} (\mathit{L} \mathit{i}) : \mathbb{N} ) : \mathbb{R}\\
+&\quad )) = (1 / 2 : \mathbb{R} ) ^{} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} => \mathit{L} \mathit{i} =\\
+&\quad 1)).\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,22}\quad\lean{recover\_lower\_pointwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{ha} : \forall \mathit{i}, 1 \leq \mathit{a}\\
+&\quad \mathit{i}),\; (\mathit{i₀} : \iota ),\; (\mathit{h} : 1 \leq \mathit{L}\\
+&\quad \mathit{i₀})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1:\mathbb{R} ) / 2 \leq 1 - \textstyle\prod \mathit{i},\\
+&\quad \mathit{cfac} \mathit{a} \mathit{L} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{S\,23}\quad\lean{recover\_upper\_pointwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&1 - \textstyle\prod \mathit{i}, \mathit{cfac}\\
+&\quad \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i}, (\mathit{L} \mathit{i} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,24}\quad\lean{two\_le\_choose}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\; (\mathit{hL} : 1 \leq \mathit{L})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 \leq (\mathit{a} + \mathit{L}).\mathit{choose}\\
+&\quad \mathit{L}
+\end{aligned} \]}
+
+
 The recovery side is computed as an identity rather than a bound, and this matters because an
 independence assumption would weaken the comparison. The probability that recovery is
 incomplete is
@@ -599,7 +918,7 @@ formally, the gap was unmissable, since the conclusion mentions one rule and one
 there is no second rule to compare against. And the sampling law initially assumed independence
 between classes in order to factor an expectation, which is unnecessary---linearity suffices
 for the sum actually needed---and removing it also removed a hypothesis from the recovery law.
-Appendix~\ref{app:inventory} reproduces every audited statement.
+Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $17$ accepted modules carrying $153$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $183$ audited statements of the strand across its $21$ accepted modules, grouped by module.
 
 \section{Experiments}
 

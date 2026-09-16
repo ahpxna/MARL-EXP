@@ -318,6 +318,106 @@ intersection of half-spaces.
 \leanbox{\lean{alternative\_union\_polyhedra}, \lean{pairRegion\_convex} in
 \lean{LeanFunctionalRangeAlternativeUnionV1}}
 
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeAlternativeUnionV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{alternative\_union\_polyhedra}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
+&\quad \leftrightarrow \exists \mathit{i} \in \mathit{T},\\
+&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j}\\
+&\quad \mathit{a} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{energy\_inf\_rewrite}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{Q},\\
+&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
+&\quad = \mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{i}\\
+&\quad \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
+&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{energy\_sets\_equal}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q},\\
+&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
+&\quad = \{ \mathit{z} : \mathbb{R} | \exists \mathit{i} \in \mathit{T},\\
+&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
+&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{not\_strictTopK\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} : \mathbb{N}\\
+&\quad ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} =\\
+&\quad \mathit{k}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\neg \mathit{StrictTopK} (\mathbf{fun} \mathit{r} => \mathit{capacity} (\mathit{Q}\\
+&\quad \mathit{r})) \mathit{T} \mathit{k}\\
+&\quad \leftrightarrow \mathit{ClosedAlternative} \mathit{T}\\
+&\quad \mathit{Q}
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{pairRegion\_convex}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{A})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R}\\
+&\quad \to \mathit{A} \to \mathbb{R} | \mathit{PairRegion}\\
+&\quad \mathit{Q} \mathit{i} \mathit{j} \mathit{a}\\
+&\quad \mathit{b}\}
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{pair\_le\_capacity}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{A})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{f} \mathit{a} - \mathit{f} \mathit{b}\\
+&\quad \leq \mathit{capacity} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{range\_ge\_iff\_exists\_pair}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity}\\
+&\quad \mathit{g} \leftrightarrow \exists \mathit{a}\\
+&\quad \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v}\\
+&\quad : \mathit{A}, \mathit{f} \mathit{u} - \mathit{f}\\
+&\quad \mathit{v} \leq \mathit{g} \mathit{a} - \mathit{g}\\
+&\quad \mathit{b}
+\end{aligned} \]}
+
+
 By Theorem~\ref{thm:union} the relevant alternative set is the finite union
 $\bigcup_{i,j,a,b}\mathcal{P}_{ijab}$, so the oracle is
 \begin{equation}
@@ -401,6 +501,34 @@ rather than bounded.
 \leanbox{\lean{range\_ge\_iff\_exists\_pair\_ge}, \lean{expand\_lower} in
 \lean{LeanFunctionalShrinkExpandV1}}
 
+\noindent\emph{Supporting results in \lean{LeanFunctionalShrinkExpandV1}.}~The statements below produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $7$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,12}\quad\lean{range\_ge\_iff\_exists\_pair\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam}\\
+&\quad \leftrightarrow \exists \mathit{a} \mathit{b} :\\
+&\quad \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} -\\
+&\quad \mathit{lam} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{S\,13}\quad\lean{range\_le\_iff\_exists\_interval}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z}\\
+&\quad \leftrightarrow \exists \mathit{l} : \mathbb{R}\\
+&\quad , \forall \mathit{a} : \mathit{A}, \mathit{l}\\
+&\quad \leq \mathit{lam} \mathit{a} \wedge \mathit{lam}\\
+&\quad \mathit{a} \leq \mathit{l} + \mathit{z}
+\end{aligned} \]}
+
+
 The word \emph{ordered} in Theorem~\ref{thm:expand} is load-bearing and was not in an earlier
 version. Requiring an ordered pair means only two cells move; an unordered formulation forces
 a third cell to accommodate the separation and overstates the cost, which would make the
@@ -430,6 +558,63 @@ substitution and the inequality by the square-completion residual.
 
 \leanbox{\lean{inner\_qp\_lower}, \lean{inner\_qp\_attained}, \lean{harm\_pos} in
 \lean{LeanFunctionalRangeEnergyOracleV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeEnergyOracleV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,8}\quad\lean{energy\_ge\_of\_pairwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{hpair} : \forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E}\\
+&\quad \mathit{Q})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A}\\
+&\quad \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T}\\
+&\quad \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{energy\_lower\_bound\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad ),\; (\mathit{c} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c} \leq \mathit{E}\\
+&\quad \mathit{Q}) \leftrightarrow (\forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E}\\
+&\quad \mathit{Q})
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{inner\_qp\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
+&\quad \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 <\\
+&\quad \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
+&\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4}\\
+&\quad : \mathbb{R} , \mathit{g} \leq \mathit{x1} -\\
+&\quad \mathit{x2} - \mathit{x3} + \mathit{x4}\\
+&\quad \wedge (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
+&\quad \mathit{w4}*\mathit{x4}^{2}) / 2 = \mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3}\\
+&\quad \mathit{w4})
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{inner\_qp\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
+&\quad \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 <\\
+&\quad \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
+&\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R}\\
+&\quad ),\; (\mathit{hfeas} : \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} +\\
+&\quad \mathit{x4})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3}\\
+&\quad \mathit{w4}) \leq (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
+&\quad \mathit{w4}*\mathit{x4}^{2}) / 2
+\end{aligned} \]}
+
 
 The harmonic denominator is the same shape that appears in the fixed-confidence literature,
 but it is derived here for the range target rather than transported from a mean surrogate,
@@ -554,6 +739,89 @@ second is; and in between both are positive and sum to exactly $\tfrac14$.
 
 \leanbox{\lean{positive\_parts\_sum} in \lean{LeanFunctionalScalarProxyFailsV1}}
 
+\noindent\emph{Supporting results in \lean{LeanFunctionalScalarProxyFailsV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $4$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,22}\quad\lean{cap\_i1}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{cap3} 0 1 (1/2) = 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,23}\quad\lean{cap\_j1}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{cap3} 0 (1/2) (1/4) = 1/2
+\end{aligned} \]}
+
+\noindent\textbf{S\,24}\quad\lean{family1\_alt\_cost}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eta} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 *\\
+&\quad \mathit{eta} / 32
+\end{aligned} \]}
+
+\noindent\textbf{S\,25}\quad\lean{family1\_alt\_ties}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{cap3} 0 (1/2) 1 = \mathit{cap3} 0 1 (1/2)
+\end{aligned} \]}
+
+\noindent\textbf{S\,26}\quad\lean{family1\_full\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{halt} : \mathit{Jfull} \leq (1/2) * \mathit{eta} * (1 - 1/4)\\
+&\quad ^{2})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Jfull} \leq 9 * \mathit{eta} / 32
+\end{aligned} \]}
+
+\noindent\textbf{S\,27}\quad\lean{family1\_scalar\_value}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1))\\
+&\quad = 1 / 32
+\end{aligned} \]}
+
+\noindent\textbf{S\,28}\quad\lean{family2\_full\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{z} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z})\\
+&\quad 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2) 0) ^{2}\\
+&\quad / 4
+\end{aligned} \]}
+
+\noindent\textbf{S\,29}\quad\lean{positive\_parts\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{z} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 -\\
+&\quad \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2) 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,30}\quad\lean{scalar\_not\_lower\_to\_any\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
+&\quad \mathit{C})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
+&\quad \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} / (8 * (1 + 3 *\\
+&\quad \mathit{eta}))) < (1 / 128 : \mathbb{R} )
+\end{aligned} \]}
+
+\noindent\textbf{S\,31}\quad\lean{scalar\_not\_upper\_to\_any\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
+&\quad \mathit{C})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
+&\quad \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32\\
+&\quad < (1 / 32 : \mathbb{R} ) / \mathit{C}
+\end{aligned} \]}
+
+
 Lemma~\ref{lem:posparts} is what closes the quantifier. Without it one could only say that
 \emph{some} alternatives are expensive; with it, \emph{every} capacity-inverting alternative
 is, whatever $z$ it chooses, so the bound is a property of the instance rather than of a
@@ -618,6 +886,117 @@ undetermined and no crossing may be reported.
 \leanbox{\lean{crossing\_sign\_undetermined} in
 \lean{LeanFunctionalRangeDesignCertificateV1}}
 
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeDesignCertificateV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,14}\quad\lean{bil\_symm}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y}\\
+&\quad = \mathit{bil} \mathit{M} \mathit{y} \mathit{x}
+\end{aligned} \]}
+
+\noindent\textbf{S\,15}\quad\lean{certificate\_gives\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{V} : \mathbb{R}\\
+&\quad ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M}\\
+&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y}\\
+&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
+&\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} =\\
+&\quad 0),\; (\mathit{hval} : \mathit{V} = (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu}\\
+&\quad \mathit{p}))
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R}\\
+&\quad , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)\\
+&\quad \to \mathit{V} \leq (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu}\\
+&\quad \mathit{p})
+\end{aligned} \]}
+
+\noindent\textbf{S\,16}\quad\lean{crossing\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R}\\
+&\quad ),\; (\mathit{n1} \mathit{n2} : \mathbb{N} ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} -\\
+&\quad \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1}\\
+&\quad = \mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} -\\
+&\quad \mathit{G1})) \mathit{kappa} \mathit{n2} \mathit{G2}
+\end{aligned} \]}
+
+\noindent\textbf{S\,17}\quad\lean{crossing\_sign\_undetermined}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} : \mathbb{R}\\
+&\quad ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\; (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\; (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\; (\mathit{hov2} : \mathit{G1lo} \leq \mathit{G2hi})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi} \wedge \mathit{g2} \leq \mathit{g1})\\
+&\quad \wedge (\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi} \wedge \mathit{g1} \leq \mathit{g2})
+\end{aligned} \]}
+
+\noindent\textbf{S\,18}\quad\lean{kkt\_certificate}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M}\\
+&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y}\\
+&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
+&\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} =\\
+&\quad 0),\; (\mathit{lam'} : \iota \to \mathbb{R} ),\; (\mathit{hfeas'} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu}\\
+&\quad \mathit{p}) \leq (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu}\\
+&\quad \mathit{p})
+\end{aligned} \]}
+
+\noindent\textbf{S\,19}\quad\lean{quad\_add}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d})\\
+&\quad = \mathit{quad} \mathit{M} \mathit{a} + 2 *\\
+&\quad \mathit{bil} \mathit{M} \mathit{d} \mathit{a} +\\
+&\quad \mathit{quad} \mathit{M} \mathit{d}
+\end{aligned} \]}
+
+\noindent\textbf{S\,20}\quad\lean{region\_min\_lower\_bounds\_J}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
+&\quad \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
+&\quad ),\; (\mathit{J} : \mathbb{R} ),\; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR}\\
+&\quad \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R}\\
+&\quad ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R}, \mathit{b} \mathit{r} \leq \mathit{cost}\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b}\\
+&\quad \leq \mathit{J}
+\end{aligned} \]}
+
+\noindent\textbf{S\,21}\quad\lean{single\_alt\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
+&\quad \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
+&\quad ),\; (\mathit{J} : \mathbb{R} ),\; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR}\\
+&\quad \mathit{cost}),\; \{ \mathit{r} : \rho \},\; (\mathit{hr} : \mathit{r} \in \mathit{R})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{J} \leq \mathit{cost} \mathit{r}
+\end{aligned} \]}
+
+
 This negative result is stated deliberately. A procedure that substitutes bracket midpoints
 into \eqref{eq:crossing} will report not merely an imprecise crossing but one pointing the
 wrong way; the failure is qualitative. The same discipline governs infeasibility: a
@@ -634,6 +1013,84 @@ break-even occurs at $c_{c}\nu_{c}=(\sigma_{a}+\sigma_{b})^{2}$.
 
 \leanbox{\lean{scalar\_split\_optimal}, \lean{breakeven\_iff}, \lean{breakeven\_not\_four}
 in \lean{LeanFunctionalDesignDualityV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalDesignDualityV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $6$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,32}\quad\lean{design\_value\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{W}),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q}, \mathit{c} \leq \mathit{f} \mathit{q}\\
+&\quad \mathit{w})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q}\\
+&\quad \mathit{hQ} \mathit{f} \mathit{w}
+\end{aligned} \]}
+
+\noindent\textbf{S\,33}\quad\lean{design\_value\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{W}),\; \{ \mathit{q} : \iota \},\; (\mathit{hq} : \mathit{q} \in \mathit{Q})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f}\\
+&\quad \mathit{w} \leq \mathit{f} \mathit{q} \mathit{w}
+\end{aligned} \]}
+
+\noindent\textbf{S\,34}\quad\lean{dual\_gap\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&\quad ),\; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam}\\
+&\quad \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} =\\
+&\quad 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} :\\
+&\quad \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U}),\; (\mathit{hattain} : \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀} =\\
+&\quad \mathit{U})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w}\\
+&\quad : \mathit{W}, \mathit{designValue} \mathit{Q}\\
+&\quad \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\}\\
+&\quad \mathit{U}
+\end{aligned} \]}
+
+\noindent\textbf{S\,35}\quad\lean{infeasible\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
+&\quad \mathit{channels} = \mathit{none}\\
+&\quad \leftrightarrow \mathit{total} < \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,36}\quad\lean{information\_of\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R}\\
+&\quad ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total}),\; (\mathit{hsetup} : 0 \leq \mathit{setup}),\; (\mathit{hunit} : 0 \leq \mathit{unit})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad )) * \mathit{unit} \wedge (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad )) * \mathit{unit} \leq \mathit{total} * \mathit{unit}
+\end{aligned} \]}
+
+\noindent\textbf{S\,37}\quad\lean{value\_of\_feasible}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N}\\
+&\quad ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
+&\quad \mathit{channels} = \mathit{some} (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad ))
+\end{aligned} \]}
+
 
 The number $4$ that circulates as a break-even threshold is the value of
 $(\sigma_{a}+\sigma_{b})^{2}$ at unit variances and nothing more. With several alternatives
@@ -720,8 +1177,8 @@ froze the extrema at the truth, so the forward direction of Theorem~\ref{thm:uni
 precisely the phenomenon family~1 exploits. The expand cost initially minimised over unordered
 pairs, which overstates $E_{j}$ by forcing a third cell to move. And the certificate initially
 followed the textbook route through $M^{-1}$, which would have propagated an invertibility
-hypothesis into every downstream statement. Appendix~\ref{app:inventory} reproduces every
-audited statement.
+hypothesis into every downstream statement. Every audited statement of every module this paper cites is displayed in Section~
+ef{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $15$ accepted modules carrying $106$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $162$ audited statements of the strand across its $21$ accepted modules, grouped by module.
 
 \section{Experiments}
 

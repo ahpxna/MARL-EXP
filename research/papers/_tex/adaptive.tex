@@ -252,6 +252,24 @@ $u=\sqrt{2c\log(1/\beta)}$ makes the exponent $-\log(1/\beta)$.
 
 \leanbox{\lean{subgaussian\_threshold} in \lean{LeanAdaptiveExpectedStoppingV1}}
 
+\noindent\emph{Supporting results in \lean{LeanAdaptiveExpectedStoppingV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $2$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{subgaussian\_threshold}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mu : \mathit{Measure} \Omega \},\; [\mathit{IsProbabilityMeasure} \mu ],\;\\
+&\quad \{ \mathit{X} : \Omega \to \mathbb{R} \},\; \{\\
+&\quad \mathit{c} : \mathbb{R}_{\geq0} \},\; (\mathit{hc} : (0:\mathbb{R} ) < (\mathit{c} : \mathbb{R}\\
+&\quad )),\; (\mathit{h} : \mathit{HasSubgaussianMGF} \mathit{X} \mathit{c} \mu ),\; (\mathit{beta} : \mathbb{R}\\
+&\quad ),\; (\mathit{hb0} : 0 < \mathit{beta}),\; (\mathit{hb1} : \mathit{beta} \leq 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mu .\mathit{real} \{ \omega |\\
+&\quad \mathit{Real}.\mathit{sqrt} (2 * (\mathit{c} : \mathbb{R} ) * \mathit{Real}.\mathit{log} (1 /\\
+&\quad \mathit{beta})) \leq \mathit{X} \omega \}\\
+&\quad \leq \mathit{beta}
+\end{aligned} \]}
+
+
 The threshold is stated in terms of an arbitrary budget $\beta$ rather than a fixed
 $\delta$ because that is the form the peeling argument consumes: it allocates
 $\delta/(K\,n(n+1))$ to arm $i$ at count $n$---the factor chosen so that
@@ -333,6 +351,40 @@ Continuing to horizon fourteen the deficit reaches $\frac{31}{23}$.
 \leanbox{\lean{weights\_sum\_one}, \lean{counts\_sum}, \lean{deficit\_exceeds\_one},
 \lean{online\_quota\_fails} in \lean{LeanAdaptiveOnlineQuotaFailsV1}}
 
+\noindent\emph{Supporting results in \lean{LeanAdaptiveOnlineQuotaFailsV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,7}\quad\lean{counts\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{i}, \mathit{N} \mathit{i}\\
+&\quad = 11
+\end{aligned} \]}
+
+\noindent\textbf{S\,8}\quad\lean{deficit\_exceeds\_one}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) * \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{greedy\_steps}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{True}
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{online\_quota\_fails}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1)\\
+&\quad \wedge (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
+&\quad 11) \wedge (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) *\\
+&\quad \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q} )
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{weights\_sum\_one}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{i}, \mathit{w} \mathit{i}\\
+&\quad = 1
+\end{aligned} \]}
+
+
 \input{adaptive_trace}
 
 A counterexample to a rule's behaviour is only as good as the claim that the trace is what the
@@ -385,6 +437,72 @@ $\mathrm{greedyCount}(w,11)=N$, which is not done.
 
 \leanbox{\lean{frequency\_converges}, \lean{pull\_count\_lower} in
 \lean{LeanAdaptiveTrackingV1}}
+
+\noindent\emph{Supporting results in \lean{LeanAdaptiveTrackingV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,2}\quad\lean{deficit\_sum\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} =\\
+&\quad 1),\; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
+&\quad \mathit{t})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{i}, \mathit{deficit} \mathit{w}\\
+&\quad \mathit{N} \mathit{t} \mathit{i} = 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{exists\_deficient}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N}\\
+&\quad ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} =\\
+&\quad 1),\; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
+&\quad \mathit{t})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{i}, 0 \leq \mathit{deficit} \mathit{w}\\
+&\quad \mathit{N} \mathit{t} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{pull\_count\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{s} \mathit{t} : \mathbb{N}\\
+&\quad ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{i} : \iota ),\; (\mathit{Ns} \mathit{Nt} : \mathbb{R}\\
+&\quad ),\; (\mathit{hNs} : |\mathit{Ns} - (\mathit{s} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq \mathit{c}),\; (\mathit{hNt} : |\mathit{Nt} - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq \mathit{c})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((\mathit{t} : \mathbb{R} ) - (\mathit{s} : \mathbb{R}\\
+&\quad )) * \mathit{w} \mathit{i} - 2 * \mathit{c}\\
+&\quad \leq \mathit{Nt} - \mathit{Ns}
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{tracking\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hlo} : \forall \mathit{i}, ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) \leq (\mathit{N} \mathit{i} : \mathbb{R}\\
+&\quad )),\; (\mathit{hhi} : \forall \mathit{i}, (\mathit{N} \mathit{i} : \mathbb{R} ) \leq ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) +\\
+&\quad 1),\; (\mathit{i} : \iota )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&|(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R}\\
+&\quad ) * \mathit{w} \mathit{i}| \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{tracking\_exists}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} =\\
+&\quad 1),\; (\mathit{hw0} : \forall \mathit{i}, 0 \leq \mathit{w}\\
+&\quad \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{N} : \iota \to \mathbb{N} , (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
+&\quad \mathit{t}) \wedge \forall \mathit{i}, |(\mathit{N} \mathit{i} : \mathbb{R}\\
+&\quad ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}|\\
+&\quad \leq 1
+\end{aligned} \]}
+
 
 Theorem~\ref{thm:freq} is stated with $c$ free for a reason. Whatever bound a specific rule can
 prove---not the $c=1$ that Section~\ref{sec:fails} refutes---converts into a statement about
@@ -443,8 +561,7 @@ threshold ill-defined. And an early attempt asserted the invariant $D_{i}(t)\le1
 greedy rule---a natural-looking strengthening which is false, since on
 $w=(\tfrac{9}{10},\tfrac{1}{10})$ the first arm's deficit reaches $\tfrac45$ while
 $1-w_{1}=\tfrac{1}{10}$. Attempting to prove it is what led to the search that produced
-Theorem~\ref{thm:quotafails}. Appendix~\ref{app:inventory} reproduces every audited
-statement.
+Theorem~\ref{thm:quotafails}. Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $3$ accepted modules carrying $12$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $26$ audited statements of the strand across its $6$ accepted modules, grouped by module.
 
 \section{Experiments}
 

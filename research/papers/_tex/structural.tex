@@ -412,6 +412,138 @@ $m\ge5$ is used.
 \leanbox{\lean{exists\_one\_defect}, \lean{altFrom\_defects} in
 \lean{LeanStructuralFamilyUpperV1}}
 
+\noindent\emph{Supporting results in \lean{LeanStructuralFamilyUpperV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,12}\quad\lean{altFrom\_defects}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z}\\
+&\quad ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n}\\
+&\quad = \mathit{a} + \mathit{b} \to |\mathit{s}|\\
+&\quad \leq 1 \to |\mathit{s} - (\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z}\\
+&\quad )| \leq 1 \to \mathit{defects} \mathit{s} (\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
+&\quad \mathit{b}) = \mathit{List}.\mathit{replicate}\\
+&\quad \mathit{n} 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,13}\quad\lean{altFrom\_length}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
+&\quad \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
+&\quad \mathit{b}).\mathit{length} = \mathit{n}
+\end{aligned} \]}
+
+\noindent\textbf{S\,14}\quad\lean{altFrom\_multiset}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z}\\
+&\quad ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n}\\
+&\quad = \mathit{a} + \mathit{b} \to ((\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad ) = \mathit{Multiset}.\mathit{replicate} \mathit{a}\\
+&\quad (-1) + \mathit{Multiset}.\mathit{replicate} \mathit{b}\\
+&\quad 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,15}\quad\lean{altFrom\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
+&\quad \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
+&\quad \mathit{b}).\mathit{sum} = -(\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,16}\quad\lean{exists\_one\_defect}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} \mathit{q} \mathit{j} : \mathbb{N} ),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1),\; (\mathit{hj1} : 1 \leq \mathit{j}),\; (\mathit{hjm} : \mathit{j} \leq \mathit{p} + \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{l} : \mathit{List} \mathbb{Z}\\
+&\quad , ((\mathit{l} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad ) \wedge \mathit{defects} 0 \mathit{l} =\\
+&\quad \mathit{List}.\mathit{replicate} (\mathit{j} - 1) 0 ++ (2 : \mathbb{Z}\\
+&\quad ) :: \mathit{List}.\mathit{replicate} (\mathit{p} + \mathit{q} + 2 -\\
+&\quad \mathit{j}) 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,17}\quad\lean{orderEven\_defects}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
+&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{defects} 0 (\mathit{orderEven} \mathit{t} \mathit{p}\\
+&\quad \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} + (\mathit{t} -\\
+&\quad 1)) 0 ++ (2 : \mathbb{Z} ) ::\\
+&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} + 1 - \mathit{t}) +\\
+&\quad 1) 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,18}\quad\lean{orderEven\_multiset}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,19}\quad\lean{orderOdd\_defects}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{defects} 0 (\mathit{orderOdd} \mathit{t} \mathit{p}\\
+&\quad \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} +\\
+&\quad \mathit{t}) 0 ++ (2 : \mathbb{Z} ) ::\\
+&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} - \mathit{t}) +\\
+&\quad 1) 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,20}\quad\lean{orderOdd\_multiset}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,21}\quad\lean{totalDefect\_orderEven}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
+&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{totalDefect} 0 (\mathit{orderEven} \mathit{t} \mathit{p}\\
+&\quad \mathit{q}) = 2
+\end{aligned} \]}
+
+\noindent\textbf{S\,22}\quad\lean{totalDefect\_orderOdd}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{totalDefect} 0 (\mathit{orderOdd} \mathit{t} \mathit{p}\\
+&\quad \mathit{q}) = 2
+\end{aligned} \]}
+
+
 For this family the alternation admits a closed description, which is worth recording because
 it makes \eqref{eq:invariant} concrete. Write $A=(-1,+1,-1,+1,\dots)$, whose prefix sums are
 $(-1,0,-1,0,\dots)$ and therefore inside the band throughout. To pay at budget $j$ and
@@ -487,6 +619,137 @@ both are achieved.
 \leanbox{\lean{ratio\_card\_concentrated\_on\_support} in
 \lean{LeanStructuralFamilyLowerV1}}
 
+\noindent\emph{Supporting results in \lean{LeanStructuralFamilyLowerV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $4$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{avg\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi}\\
+&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
+&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi}, \mathit{c} \leq \textstyle\sum \mathit{k}, \mathit{r} \mathit{pi}\\
+&\quad \mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R}\\
+&\quad ) \leq (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
+&\quad \mathit{k})
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{defects\_append}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l₁} \mathit{l₂} : \mathit{List} \mathbb{Z}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{defects} \mathit{s} (\mathit{l₁} ++\\
+&\quad \mathit{l₂}) = \mathit{defects} \mathit{s} \mathit{l₁}\\
+&\quad ++ \mathit{defects} (\mathit{s} +\\
+&\quad \mathit{l₁}.\mathit{sum}) \mathit{l₂}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{dfc\_eq\_zero\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{dfc} \mathit{s} = 0 \leftrightarrow |\mathit{s}|\\
+&\quad \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{dfc\_even}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{dfc} \mathit{s} \% 2 = 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{no\_big\_step}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
+&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h0} : \mathit{totalDefect} \mathit{s} \mathit{l} =\\
+&\quad 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{x} \in \mathit{l}, |\mathit{x}|\\
+&\quad \leq 2
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{parity\_bridge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{k} : \mathbb{N}\\
+&\quad ),\; (\mathit{h} : \mathit{s} \% 2 = (\mathit{k} : \mathbb{Z} ) \%\\
+&\quad 2)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{dfc} \mathit{s} = |\mathit{s}| - (\mathit{k} : \mathbb{Z}\\
+&\quad ) \% 2
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{path\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
+&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi}, \exists \mathit{k}, \mathit{c} \leq \mathit{r} \mathit{pi}\\
+&\quad \mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{c} \leq \textstyle\sum \mathit{pi}, \mathit{P}\\
+&\quad \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
+&\quad \mathit{k}))
+\end{aligned} \]}
+
+\noindent\textbf{S\,8}\quad\lean{ratio\_card\_concentrated\_on\_support}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{e} : \mathbb{R}\\
+&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hbal} : \forall \mathit{k}, (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}) =\\
+&\quad \mathit{e}),\; (\mathit{hconc} : \forall \mathit{pi}, \mathit{P} \mathit{pi} \neq 0 \to (\textstyle\sum \mathit{k}, \mathit{r} \mathit{pi} \mathit{k}) = (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
+&\quad \mathit{k}))
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
+&\quad \mathit{k}))) = (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R}\\
+&\quad ) * (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
+&\quad \mathit{k})
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{totalDefect\_even}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{totalDefect} \mathit{s} \mathit{l} \% 2\\
+&\quad = 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{two\_le\_dfc}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{h} : 2 \leq |\mathit{s}|)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 \leq \mathit{dfc} \mathit{s}
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{two\_le\_totalDefect}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
+&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h3} : \exists \mathit{x} \in \mathit{l}, 2 <\\
+&\quad |\mathit{x}|)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 \leq \mathit{totalDefect} \mathit{s} \mathit{l}
+\end{aligned} \]}
+
+
 The assembly carries two hypotheses, balance and concentration, which say that the
 expectation of the maximum equals $|\mathrm{Bud}|$ times the maximum of the expectation. Both
 are satisfied by the witness and are required only on the \emph{support} of the mixture; the
@@ -558,6 +821,42 @@ rankings, which the exact lower bound for this witness forbids.
 \leanbox{\lean{normalized\_chi\_at\_least\_five} in
 \lean{LeanStructuralIntegerToleranceV1}}
 
+\noindent\emph{Supporting results in \lean{LeanStructuralIntegerToleranceV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,23}\quad\lean{epsilonOptimal\_on\_grid}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{cost} : \mathit{Finset} \mathit{I} \to \mathbb{N}\\
+&\quad ),\; (\mathit{scale} \mathit{eps} : \mathbb{R} ),\; (\mathit{hscale} : 0 <\\
+&\quad \mathit{scale}),\; (\mathit{heps} : \mathit{scale} * \mathit{eps} <\\
+&\quad 1),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset}\\
+&\quad \mathit{I}),\; (\mathit{h} : \mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R} )/\mathit{scale}) \mathit{eps} \mathit{k}\\
+&\quad \mathit{S})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R}\\
+&\quad )/\mathit{scale}) 0 \mathit{k} \mathit{S}
+\end{aligned} \]}
+
+\noindent\textbf{S\,24}\quad\lean{normalized\_chi\_at\_least\_five}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : \mathit{eps} <\\
+&\quad 1/114)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\neg \mathit{PrefixCoverDimensionAtMost}\\
+&\quad \mathit{normalizedScalarObjective} \mathit{eps} 4
+\end{aligned} \]}
+
+\noindent\textbf{S\,25}\quad\lean{normalized\_formula}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} (\mathit{Fin} 7))
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{normalizedScalarObjective} \mathit{S}\\
+&\quad = (\mathit{complementAbs7} \mathit{S}:\mathbb{R} )/114
+\end{aligned} \]}
+
+
 The normalisation objection is met outright, since \eqref{eq:normform} is stated after
 dividing by the total radius. The slack objection is met on a band rather than on all
 $\varepsilon$: five rankings are necessary up to $1/114$ and no further. The honest statement
@@ -606,6 +905,96 @@ On the cyclic menu, $x^{*}_{i,k}=\min(k,m)/m$ for every item $i$.
 
 \leanbox{\lean{cyclic\_retained}, \lean{retained\_transfer} in
 \lean{LeanStructuralRetainedMarginalV1}}
+
+\noindent\emph{Supporting results in \lean{LeanStructuralRetainedMarginalV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,26}\quad\lean{card\_prefixSet}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pos} : \alpha \to \mathbb{N} ),\; (\mathit{h} : \mathit{IsRanking}\\
+&\quad \mathit{pos}),\; (\mathit{k} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{prefixSet} \mathit{pos}\\
+&\quad \mathit{k}).\mathit{card} = \mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha )
+\end{aligned} \]}
+
+\noindent\textbf{S\,27}\quad\lean{cyclic\_retained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{i} : \mathit{ZMod} \mathit{m}),\; (\mathit{k} : \mathbb{N}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{retained} (\alpha
+\end{aligned} \]}
+
+\noindent\textbf{S\,28}\quad\lean{retained\_col\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
+&\quad ),\; (\mathit{hpos} : \forall \mathit{j}, \mathit{IsRanking} (\mathit{pos}\\
+&\quad \mathit{j})),\; (\mathit{k} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{i} : \alpha , \mathit{retained}\\
+&\quad \mathit{pos} \mathit{i} \mathit{k} = ((\mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha ) : \mathbb{N} ) : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,29}\quad\lean{retained\_constrained\_eq\_free}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{P₀} : \mathit{Ord} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val}\\
+&\quad \mathit{P}),\; (\mathit{hF₀} : \mathit{Feasible}\\
+&\quad \mathit{P₀}),\; (\mathit{hT₀} : \forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P₀} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
+&\quad \mathit{k}),\; (\mathit{hval} : \mathit{val} \mathit{P₀} =\\
+&\quad \mathit{V})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{P},\\
+&\quad \mathit{Feasible} \mathit{P} \wedge (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
+&\quad \mathit{k}) \wedge \mathit{val} \mathit{P} =\\
+&\quad \mathit{v}\} \mathit{V}
+\end{aligned} \]}
+
+\noindent\textbf{S\,30}\quad\lean{retained\_le\_one}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
+&\quad ),\; (\mathit{i} : \alpha ),\; (\mathit{k} : \mathbb{N}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{retained} \mathit{pos} \mathit{i} \mathit{k}\\
+&\quad \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,31}\quad\lean{retained\_mono}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
+&\quad ),\; (\mathit{i} : \alpha ),\; \{ \mathit{k} \mathit{l}\\
+&\quad : \mathbb{N} \},\; (\mathit{hkl} : \mathit{k} \leq \mathit{l})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{retained} \mathit{pos} \mathit{i} \mathit{k}\\
+&\quad \leq \mathit{retained} \mathit{pos} \mathit{i}\\
+&\quad \mathit{l}
+\end{aligned} \]}
+
+\noindent\textbf{S\,32}\quad\lean{retained\_transfer}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val}\\
+&\quad \mathit{P})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{P}, \mathit{Feasible} \mathit{P}\\
+&\quad \to (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
+&\quad \mathit{k}) \to \mathit{V} \leq \mathit{val} \mathit{P}
+\end{aligned} \]}
+
 
 Theorem~\ref{thm:colsum} cuts both ways. It confirms that the uniform trajectory is
 realisable rather than merely feasible on paper. But because it holds for \emph{every} menu
@@ -664,8 +1053,8 @@ One join is supplied by the paper rather than by a Lean name, and it is flagged 
 ordering of $g_{m}$ is such a list---that permuting a multiset does not remove the element
 $3$---is immediate and is carried out in the proof of Theorem~\ref{thm:everyorderpays}.
 Quoting \lean{two\_le\_totalDefect} as though its conclusion were already about the family
-would misdescribe what the prover checked. Appendix~\ref{app:inventory} reproduces every
-audited statement.
+would misdescribe what the prover checked. Every audited statement of every module this paper cites is displayed in Section~
+ef{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $9$ accepted modules carrying $118$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $155$ audited statements of the strand across its $13$ accepted modules, grouped by module.
 
 \section{Experiments}
 

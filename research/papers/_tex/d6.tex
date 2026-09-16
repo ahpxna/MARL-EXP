@@ -411,6 +411,53 @@ on $[0,1]$ attains its maximum at an endpoint unless it is constant.
 \leanbox{\lean{info\_linear}, \lean{optimum\_at\_endpoint},
 \lean{transition\_at\_equal\_price} in \lean{LeanD6DesignDerivationV1}}
 
+\noindent\emph{Supporting results in \lean{LeanD6DesignDerivationV1}.}~The statements below supply the rewrites the step performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $3$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{budget\_exact}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{wB} \mathit{eta} + \mathit{c} * \mathit{wPair}\\
+&\quad \mathit{eta} \mathit{c} = 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{flat\_when\_equal\_price}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{IB} \mathit{Ipair} \mathit{c} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{heq} : \mathit{Ipair} / \mathit{c} - \mathit{IB} =\\
+&\quad 0),\; (\mathit{eta} \mathit{eta'} : \mathbb{Q} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
+&\quad \mathit{c} = \mathit{info} \mathit{IB} \mathit{Ipair}\\
+&\quad \mathit{eta'} \mathit{c}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{info\_linear}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
+&\quad \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} / \mathit{c} -\\
+&\quad \mathit{IB})
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{weights\_unique}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eta} \mathit{c} \mathit{a} \mathit{b} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{hbudget} : \mathit{a} + \mathit{c} * \mathit{b} =\\
+&\quad 1),\; (\mathit{hshare} : \mathit{c} * \mathit{b} =\\
+&\quad \mathit{eta})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{a} = \mathit{wB} \mathit{eta} \wedge \mathit{b}\\
+&\quad = \mathit{wPair} \mathit{eta} \mathit{c}
+\end{aligned} \]}
+
+
 Condition \eqref{eq:transitioncond} is written with the factor $c$ on the left rather than
 divided out because that form has a reading: dividing through gives
 $I_{B}/1=I_{\mathrm{pair}}/c$, so the two queries deliver equal information per unit of budget
@@ -500,6 +547,62 @@ because $|T|=|S|$.
 \leanbox{\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin} in
 \lean{LeanD6MarginSensitiveExchangeV1}}
 
+\noindent\emph{Supporting results in \lean{LeanD6MarginSensitiveExchangeV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,5}\quad\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U}) \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{mu} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}), |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{selected} \mathit{competitor} : \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} : \mathit{competitor}.\mathit{card} =\\
+&\quad \mathit{k}),\; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{selected}, \forall \mathit{j} \notin \mathit{selected}, \mathit{mu} + \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{i}))
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{selected} - \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F})\\
+&\quad \mathit{competitor}) \leq ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R}\\
+&\quad ) * (2 * \mathit{delta} - \mathit{mu})
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U}) \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}), |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{selected} \mathit{competitor} : \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} : \mathit{competitor}.\mathit{card} =\\
+&\quad \mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{selected} -\\
+&\quad \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{competitor} \leq ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R}\\
+&\quad ) * \mathit{delta} - ((\mathit{selected} \ \mathit{competitor}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) - (\mathit{competitor} \ \mathit{selected}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}))) / 2
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{score\_surplus\_ge\_card\_mul\_margin}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{DecidableEq}\\
+&\quad \mathit{I}],\; (\mathit{A} \mathit{B} : \mathit{Finset}\\
+&\quad \mathit{I}),\; (\mathit{score} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{mu} : \mathbb{R} ),\; (\mathit{hCard} : \mathit{A}.\mathit{card} =\\
+&\quad \mathit{B}.\mathit{card}),\; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j} \in \mathit{B}, \mathit{mu} + \mathit{score} \mathit{j} \leq \mathit{score}\\
+&\quad \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{A}.\mathit{card} : \mathbb{R} ) * \mathit{mu}\\
+&\quad \leq \mathit{A}.\mathit{sum} \mathit{score} -\\
+&\quad \mathit{B}.\mathit{sum} \mathit{score}
+\end{aligned} \]}
+
+
 No symmetry is assumed, no active cell is fixed, and the reference is an arbitrary product
 reference. The improvement over the $\delta$-only form is exactly $|T\setminus S|\mu$, which
 is what makes the next subsection possible.
@@ -552,6 +655,66 @@ $|A|(2-\rho)>0$.
 \leanbox{\lean{every\_subthreshold\_margin\_fails} in
 \lean{LeanD6SharpMarginThresholdV1}}
 
+\noindent\emph{Supporting results in \lean{LeanD6SharpMarginThresholdV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,8}\quad\lean{every\_subthreshold\_margin\_fails}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\; (\mathit{hne} :\\
+&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho} : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\; (\mathit{hr2} : \mathit{rho} <\\
+&\quad 2),\; (\mathit{hbal} :\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\quad \mathit{j}).\mathit{card})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})\\
+&\quad \mathit{i})) \mathit{A} \mathit{A}.\mathit{card}\\
+&\quad \wedge \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{Aᶜ} <\\
+&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{A}
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{margin\_two\_sufficient}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{U} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{U}],\; [\mathit{Nonempty} \mathit{U}],\; \{\\
+&\quad \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I} \mathit{n} \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U}) \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{rho} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c},0 \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c},\mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall \mathit{i} \mathit{x} \mathit{c},|\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{T} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{htop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{i})) \mathit{T}\\
+&\quad \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i} \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\mathit{rho}+\mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{i})),\; (\mathit{hrho} : 2*\mathit{delta} \leq \mathit{rho}),\; (\mathit{S} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{hS} :\\
+&\quad \mathit{S}.\mathit{card}=\mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{T} \leq \mathit{productCompressionLoss}\\
+&\quad \mathit{F} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{S}
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{steered\_exchange\_equality}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\; (\mathit{rho} : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\; (\mathit{hbal} :\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\quad \mathit{j}).\mathit{card})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{A}- \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}))\\
+&\quad \mathit{Aᶜ})= (\mathit{A}.\mathit{card}:\mathbb{R}\\
+&\quad )*(2-\mathit{rho})
+\end{aligned} \]}
+
+
 Together these make the condition $\rho\ge2\delta$ sharp at $\delta=1$: sufficient for
 Top-$C$ optimality, and violated for every $\rho$ in $[1,2)$.
 
@@ -593,6 +756,48 @@ then the strict separation holds throughout the cell.
 
 \leanbox{\lean{no\_crossing\_of\_modulus}, \lean{crossing\_bracket} in
 \lean{LeanD6AlternativeReductionV1}}
+
+\noindent\emph{Supporting results in \lean{LeanD6AlternativeReductionV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $4$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+
+\noindent\textbf{S\,11}\quad\lean{crossing\_bracket}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\; (\mathit{hc} : \mathit{ContinuousOn} \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0}\\
+&\quad \mathit{t1})),\; (\mathit{h0} : \mathit{f} \mathit{t0} \leq 0),\; (\mathit{h1} : 0 \leq \mathit{f}\\
+&\quad \mathit{t1})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, \mathit{f} \mathit{t}\\
+&\quad = 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,12}\quad\lean{no\_crossing\_of\_modulus}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\; (\mathit{hLip} : 0 \leq \mathit{Lip}),\; (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1}, |\mathit{f} \mathit{s} - \mathit{f} \mathit{t0}| \leq \mathit{Lip} * (\mathit{s} -\\
+&\quad \mathit{t0})),\; (\mathit{hm} : \mathit{m} \leq \mathit{f}\\
+&\quad \mathit{t0}),\; (\mathit{hpos} : 0 < \mathit{m}),\; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} - \mathit{t0}) <\\
+&\quad \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, 0 < \mathit{f} \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{S\,13}\quad\lean{quadratic\_inf\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} : \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 *\\
+&\quad \mathit{a})),\; (\mathit{hv2} : -\mathit{b} / (2 * \mathit{a}) \leq \mathit{hi})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x} \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 * \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (2 * \mathit{a})) + \mathit{c} \leq \mathit{a} * \mathit{x} ^{2} + \mathit{b} * \mathit{x} +\\
+&\quad \mathit{c}) \wedge \mathit{lo} \leq -\mathit{b} / (2 *\\
+&\quad \mathit{a}) \wedge -\mathit{b} / (2 * \mathit{a})\\
+&\quad \leq \mathit{hi}
+\end{aligned} \]}
+
 
 The information \eqref{eq:ib} is quadratic in $x$ with non-negative leading coefficient, so
 Lemma~\ref{lem:quadinf} reduces a continuous $x$-range to three evaluations. Both verdicts use
@@ -650,7 +855,7 @@ that the $(d,x)$ family is the right one required first establishing that severa
 candidate families were not, and each withdrawn formulation leaves behind the statements that
 ruled it out. The separation certificates are issued per cell, so the file count scales with
 the parameter grid rather than with mathematical content.
-Appendix~\ref{app:inventory} reproduces every audited statement.
+Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $26$ accepted modules carrying $167$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $187$ audited statements of the strand across its $30$ accepted modules, grouped by module.
 
 \section{Experiments}
 
