@@ -133,6 +133,52 @@ EQUATIONS = {
    r'\qquad\Longrightarrow\qquad \mathrm{break\,even\;at}\;\; c_c\,\nu_c=(\sigma_a+\sigma_b)^{2}',
  'func_crossing':
    r'B_{*}\;=\;\kappa\,\frac{|S_2|\,\Gamma_2-|S_1|\,\Gamma_1}{\Gamma_2-\Gamma_1}',
+ # ---------------- D6 ----------------
+ 'd6_igen':
+   r'I(v)\;=\;\frac{1}{2q}\sum_{i=1}^{q} v_i^{2}'
+   r'\qquad\qquad I_B(d,x)\;=\;\frac{1}{2}\left(\frac{d\,\mu^{2}}{q}+\frac{(q-d)\,x^{2}}{q}\right)',
+ 'd6_reduction':
+   r'|v_i|\geq\mu\;\;(i\in S),\quad |v_i|\geq x\;\;(i\notin S),\quad |S|=d'
+   r'\qquad\Longrightarrow\qquad I_B(d,x)\;\leq\;I(v)',
+ 'd6_design':
+   r'w_B=1-\eta,\qquad w_{\mathrm{pair}}=\frac{\eta}{c},\qquad w_B+c\,w_{\mathrm{pair}}=1',
+ 'd6_info_linear':
+   r'I(\eta)\;=\;I_B+\eta\left(\frac{I_{\mathrm{pair}}}{c}-I_B\right)'
+   r'\qquad\Longrightarrow\qquad \mathrm{endpoint\;optimum\;unless}\;\;c\,I_B=I_{\mathrm{pair}}',
+ 'd6_modulus':
+   r'L_{\mathrm{full}}(t_0)\;>\;\rho_{\mathrm{two}}\;U_{\mathrm{two}}(t_0),'
+   r'\qquad \rho\;=\;r^{(t_1-t_0)/q}',
+ # ---------------- SUPPORT ----------------
+ 'sup_bayes':
+   r'B(d)\;=\;\sum_{x} g\left(x,\,d(x)\right),'
+   r'\qquad g(x,a)\;=\;\sum_{w}\pi(w)\,P(w,x)\,L(w,a)',
+ 'sup_optimal':
+   r'\sum_{x}\;\min_{a}\;g(x,a)\;\;\leq\;\;B(d)\qquad\mathrm{for\;every\;rule}\;d',
+ 'sup_minimax':
+   r'\sum_{x}\min_{a}g(x,a)\;\;\leq\;\;\sup_{w}R(w,d)'
+   r'\qquad\mathrm{for\;every\;rule}\;d\;\mathrm{and\;every\;prior}\;\pi',
+ 'sup_decoder':
+   r'r\;=\;\frac{b-|R|}{a+b-|R|}\;=\;\frac{L}{a+L},\qquad L=b-|R|',
+ 'sup_decide':
+   r'R_{\mathrm{dec}}\;=\;\frac{1}{2}(1-P)^{N}\;\;\mathrm{exactly,\;flat\;in}\;K'
+   r'\qquad\mathrm{recovery\;grows\;like}\;K\log K',
+ # ---------------- ADAPTIVE ----------------
+ 'adp_deficit':
+   r'D_i(t)\;=\;t\,w_i-N_i(t),\qquad \sum_i D_i(t)\;=\;0'
+   r'\qquad\Longrightarrow\qquad \max_i D_i(t)\;\geq\;0',
+ 'adp_exists':
+   r'\forall\,w,\;\forall\,t:\;\;\exists\,N\;\;\mathrm{with}\;\;\sum_i N_i=t'
+   r'\;\;\mathrm{and}\;\;\left|N_i-t\,w_i\right|\leq 1',
+ 'adp_quota_fail':
+   r'w=\frac{1}{23}(17,1,1,3,1):\qquad D_0(11)\;=\;11\cdot\frac{17}{23}-7\;=\;\frac{26}{23}\;>\;1',
+ 'adp_layercake':
+   r'\int \tau \,d\mu\;=\;\sum_{n\geq 0}\mu\{\tau>n\}'
+   r'\qquad\Longrightarrow\qquad \mathbb{E}[\tau]\;\leq\;\frac{C}{1-\rho}',
+ 'adp_subgauss':
+   r'\mu\left\{\sqrt{2c\log(1/\beta)}\leq X\right\}\;\leq\;\beta',
+ 'adp_freq':
+   r'\left|N_i-t\,w_i\right|\leq c\qquad\Longrightarrow\qquad'
+   r'\left|\frac{N_i}{t}-w_i\right|\;\leq\;\frac{c}{t}',
 }
 
 

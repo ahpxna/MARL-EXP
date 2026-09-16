@@ -29,6 +29,15 @@ plt.rcParams.update({
 })
 
 
+def note(fig, text, fs=20):
+    """Footnote anchored to the figure, wrapped, always inside the canvas."""
+    fig.text(0.012, 0.012, text, fontsize=fs, color=GREY, style='italic',
+             wrap=True, ha='left', va='bottom')
+    eng = fig.get_layout_engine()
+    if eng is not None:
+        eng.set(rect=(0.012, 0.075, 0.976, 0.913))
+
+
 def save(fig, name):
     p = OUT / name
     fig.savefig(p, dpi=200, facecolor='white')
@@ -39,7 +48,7 @@ def save(fig, name):
 
 def master_rate():
     d = DATA['MASTER_rate_vs_kappa']
-    fig, ax = plt.subplots(figsize=(12.4, 10.2), layout='constrained')
+    fig, ax = plt.subplots(figsize=(15.8, 9.0), layout='constrained')
     D, K = 0.5, 1
     ks = [0.25 + i * 0.01 for i in range(int((4 - 0.25) / 0.01) + 1)]
     for m, col, ls in ((2, CRAN, '-'), (4, CRAN2, '--')):
@@ -90,9 +99,8 @@ def master_baselines():
     ax.text(hi + 2, y[2], f'{vals[2]:.1f} – {hi:.1f}%', va='center',
             fontsize=22, color=INK)
     ax.text(102, y[3], '100%', va='center', fontsize=22, color=CRAN, fontweight='bold')
-    ax.text(0.0, -0.30, f"{d['cells']} cells · removing the control query gives exactly zero, "
-                        "by the hidden-shift witness verified before the solver runs",
-            transform=ax.transAxes, fontsize=19, color=GREY, style='italic')
+    note(fig, f"{d['cells']} cells · removing the control query gives exactly zero, "
+                        "by the hidden-shift witness verified before the solver runs", fs=19)
     return save(fig, 'master_fig2_baselines.png')
 
 
@@ -115,8 +123,7 @@ def master_anchor():
                 arrowprops=dict(arrowstyle='-|>', color=GREEN, lw=2.2))
     ax.text(.5, .200, f"+{d['gap_percent']:.1f}%", ha='center', fontsize=25,
             color=GREEN, fontweight='bold')
-    ax.text(0.0, -0.30, 'exact rationals throughout; no floating point enters this comparison',
-            transform=ax.transAxes, fontsize=19, color=GREY, style='italic')
+    note(fig, 'exact rationals throughout; no floating point enters this comparison', fs=19)
     return save(fig, 'master_fig3_anchor.png')
 
 
@@ -125,33 +132,34 @@ def master_witness():
     th0 = [1, 0, 0, 1]; b0 = [0, 0]
     lam = [0.25, -0.75, 0, 1]; b1 = [0.75, 0]
     grp = [0, 0, 1, 1]
-    obs0 = [th0[i] + b0[grp[i]] for i in range(4)]
-    obs1 = [lam[i] + b1[grp[i]] for i in range(4)]
-    assert obs0 == obs1
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(16.1, 9.4), layout='constrained')
+    obs = [th0[i] + b0[grp[i]] for i in range(4)]
+    assert obs == [lam[i] + b1[grp[i]] for i in range(4)]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(12.4, 7.2), layout='constrained',
+                                 sharey=True)
     x = list(range(4))
     for ax, th, b, name, col in ((a1, th0, b0, 'world A', CRAN),
                                  (a2, lam, b1, 'world B', CRAN2)):
         ax.axhline(0.5, color=GREEN, lw=3, ls='--', zorder=1)
-        ax.bar(x, th, width=.5, color=col, zorder=2)
-        ax.bar(x, [b[grp[i]] for i in range(4)], width=.5,
-               bottom=th, color=col, alpha=.28, zorder=2, hatch='///')
-        ax.plot(x, obs0, 'k_', ms=42, mew=5, zorder=4)
-        ax.set_title(name, fontsize=30, color=col, fontweight='bold', pad=14)
-        ax.set_xticks(x); ax.set_xticklabels([f'item {i}' for i in x], fontsize=22)
-        ax.set_ylim(-1.35, 1.55); ax.tick_params(labelsize=22)
+        ax.bar(x, th, width=.74, color=col, zorder=2, label='item value θ')
+        ax.bar(x, [b[grp[i]] for i in range(4)], width=.74, bottom=th,
+               color=col, alpha=.26, hatch='///', zorder=2,
+               label='group offset b')
+        ax.plot(x, obs, 'k_', ms=46, mew=6, zorder=4, label='what a query sees')
+        ax.set_title(name, fontsize=27, color=col, fontweight='bold', pad=10)
+        ax.set_xticks(x); ax.set_xticklabels([str(i) for i in x], fontsize=23)
+        ax.set_xlabel('item', fontsize=22, labelpad=6)
+        ax.set_xlim(-.62, 3.62); ax.set_ylim(-1.35, 1.72)
+        ax.tick_params(labelsize=22)
         ax.grid(axis='y', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
         above = [i for i in x if th[i] > 0.5]
-        ax.text(-.45, -1.20, 'answer:  {' + ', '.join(str(i) for i in above) + '}',
-                fontsize=26, color=col, fontweight='bold', family='monospace')
-    a1.set_ylabel('value', fontsize=25, labelpad=10)
-    a1.text(0.0, 1.10, 'solid = item value θ   ·   hatched = group offset b   ·   '
-                       'black dash = what an ordinary query sees',
-            transform=a1.transAxes, fontsize=21, color=GREY)
-    a2.text(1.0, 1.10, 'every ordinary query mean is identical — the answers are not',
-            transform=a2.transAxes, fontsize=21, color=GREEN, ha='right',
-            fontweight='bold')
-    a2.text(.5, 1.28, 'threshold 1/2', fontsize=22, color=GREEN)
+        ax.text(1.5, -1.22, 'answer  {' + ', '.join(str(i) for i in above) + '}',
+                fontsize=25, color=col, fontweight='bold', family='monospace',
+                ha='center')
+    a1.set_ylabel('value', fontsize=24, labelpad=8)
+    a2.text(1.5, 1.50, 'threshold 1/2', fontsize=21, color=GREEN, ha='center')
+    a1.legend(fontsize=18, frameon=False, loc='upper center', ncol=1,
+              bbox_to_anchor=(0.5, 1.02))
+    note(fig, 'every ordinary query mean is identical; the answers are not', fs=19)
     return save(fig, 'master_fig4_witness.png')
 
 
@@ -199,14 +207,13 @@ def query_regret():
     ax.tick_params(labelsize=22)
     ax.set_ylim(-.75, len(rows) - .25)
     ax.grid(axis='x', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
-    ax.text(0.0, -0.15, 'shaded band = the proved window; black bar = bootstrap 95% CI; '
-                        'both measured values land inside',
-            transform=ax.transAxes, fontsize=21, color=GREY, style='italic')
+    note(fig, 'shaded band = the proved window; black bar = bootstrap 95% CI; '
+                        'both measured values land inside', fs=21)
     return save(fig, 'query_fig1_regret.png')
 
 
 def query_sandwich():
-    fig, ax = plt.subplots(figsize=(12.4, 10.2), layout='constrained')
+    fig, ax = plt.subplots(figsize=(15.8, 9.0), layout='constrained')
     hs = [0.02 * i for i in range(1, 61)]
     r, aE, J = 2, 1.0, 1.0
     ax.plot(hs, [aE**2 * h**(2*r) / 32 for h in hs], color=CRAN, lw=4,
@@ -221,9 +228,8 @@ def query_sandwich():
     ax.tick_params(labelsize=22)
     ax.legend(fontsize=22, frameon=False, loc='upper left')
     ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
-    ax.text(.03, .06, 'both sides have slope 2r on this plot:\nthe order is pinned, '
-                      'not merely bounded above',
-            transform=ax.transAxes, fontsize=21, color=GREY, style='italic')
+    note(fig, 'both sides have slope 2r on this plot:\nthe order is pinned, '
+                      'not merely bounded above', fs=21)
     return save(fig, 'query_fig2_sandwich.png')
 
 
@@ -246,14 +252,13 @@ def struct_law():
     a2.grid(color='#E3DCDD', lw=1); a2.set_axisbelow(True)
     a2.text(.05, .88, 'exactly  m − 1,\nproved for every m ≥ 5', transform=a2.transAxes,
             fontsize=25, color=CRAN, fontweight='bold')
-    a1.text(0.0, -0.13, 'the ratio grows while the level falls: a fixed-ε unbounded '
-                        'separation is NOT claimed',
-            transform=a1.transAxes, fontsize=21, color=GREY, style='italic')
+    note(fig, 'the ratio grows while the level falls: a fixed-ε unbounded '
+                        'separation is NOT claimed', fs=21)
     return save(fig, 'struct_fig1_law.png')
 
 
 def struct_defect():
-    fig, ax = plt.subplots(figsize=(12.4, 10.2), layout='constrained')
+    fig, ax = plt.subplots(figsize=(15.8, 9.0), layout='constrained')
     m = 9; p, q = 4, 3
     budgets = list(range(1, p + q + 3))
     for j in (1, 4, 8):
@@ -267,9 +272,8 @@ def struct_defect():
     ax.set_xticks(budgets)
     ax.legend(fontsize=20, frameon=False, loc='upper right')
     ax.grid(axis='y', color='#E3DCDD', lw=1); ax.set_axisbelow(True)
-    ax.text(0.0, -0.13, 'exists_one_defect: for every m ≥ 5 and every budget j there is an '
-                        'ordering paying exactly 2, exactly at j',
-            transform=ax.transAxes, fontsize=21, color=GREY, style='italic')
+    note(fig, 'exists_one_defect: for every m ≥ 5 and every budget j there is an '
+                        'ordering paying exactly 2, exactly at j', fs=21)
     return save(fig, 'struct_fig2_defect.png')
 
 
@@ -294,13 +298,12 @@ def func_panel():
         a2.text(i, v[n]['median_N'] * 1.03, f"{v[n]['median_N']:,.0f}", ha='center',
                 fontsize=26, fontweight='bold', color=cols[i])
     a2.grid(axis='y', color='#E3DCDD', lw=1, zorder=0); a2.set_axisbelow(True)
-    a1.text(0.0, -0.13,
+    note(fig,
             f"paired: both certify in {d['paired_both_certify']} worlds — "
             f"C_lucb faster in {d['C_lucb_strictly_faster']}, tie {d['ties']}, "
             f"loses {d['C_anytime_strictly_faster']}; "
             f"{d['only_C_lucb']} more where only C_lucb certifies. "
-            "A result on THIS panel, not a domination theorem.",
-            transform=a1.transAxes, fontsize=20, color=GREY, style='italic')
+            "A result on THIS panel, not a domination theorem.", fs=20)
     return save(fig, 'func_fig1_panel.png')
 
 
@@ -321,7 +324,143 @@ def func_families():
     ax.tick_params(labelsize=22)
     ax.legend(fontsize=21, frameon=False, loc='center left')
     ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
-    ax.text(0.0, -0.13, 'both curves are PROVED bounds in exact arithmetic, not sampled: '
-                        'the scalar proxy is wrong in both directions, by no constant',
-            transform=ax.transAxes, fontsize=21, color=GREY, style='italic')
+    note(fig, 'both curves are PROVED bounds in exact arithmetic, not sampled: '
+                        'the scalar proxy is wrong in both directions, by no constant', fs=21)
     return save(fig, 'func_fig2_families.png')
+
+
+# ============================ SUPPORT ============================
+def support_separation():
+    d = json.loads(Path('research/worker_P20_support_20260915/'
+                        'P20_support_growing_k.json').read_text())
+    rows = [r for r in d['rows'] if r['P'] == d['rows'][0]['P']]
+    Ks = [int(r['K']) for r in rows]
+    dec = [int(r['N_decide_exact']) for r in rows]
+    rec = [int(r['N_recover_exact']) for r in rows]
+    fig, ax = plt.subplots(figsize=(15.8, 9.2), layout='constrained')
+    ax.plot(Ks, dec, 'o-', color=CRAN, lw=4, ms=18, label='decide  —  exact sample count')
+    ax.plot(Ks, rec, 's--', color=CRAN2, lw=4, ms=18, label='recover  —  exact sample count')
+    ax.set_xscale('log'); ax.set_yscale('log')
+    ax.set_xlabel('number of classes  K', fontsize=25, labelpad=12)
+    ax.set_ylabel('samples to reach error ε', fontsize=25, labelpad=12)
+    ax.tick_params(labelsize=22)
+    ax.legend(fontsize=22, frameon=False, loc='upper left')
+    ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
+    note(fig, 'deciding is FLAT in K; recovering grows like K log K.\n'
+                      'The gap is the whole point: you need not identify the world '
+                      'to decide.', fs=21)
+    return save(fig, 'support_fig1_separation.png')
+
+
+def support_minimax():
+    fig, ax = plt.subplots(figsize=(15.8, 9.0), layout='constrained')
+    ax.axis('off')
+    steps = [
+        ('any rule  d', 'sup_w  R(w, d)', CRAN2, 0.86),
+        ('≥  Bayes risk, any prior π', 'Σ_w π(w) R(w, d)', CRAN2, 0.66),
+        ('≥  Bayes-OPTIMAL value', 'Σ_x  min_a  g(x, a)', CRAN, 0.46),
+        ('=  the equivariant decoder', 'r  =  L / (a + L)', GREEN, 0.26),
+    ]
+    for label, expr, col, y in steps:
+        ax.text(.06, y + .055, label, fontsize=25, color=col, fontweight='bold',
+                transform=ax.transAxes)
+        ax.text(.10, y, expr, fontsize=28, color=INK, family='monospace',
+                transform=ax.transAxes)
+    for y in (.80, .60, .40):
+        ax.annotate('', xy=(.045, y - .10), xytext=(.045, y),
+                    xycoords='axes fraction', textcoords='axes fraction',
+                    arrowprops=dict(arrowstyle='-|>', color=CRAN, lw=3))
+    ax.text(.06, .12, 'so the decoder is a LEAST element of the achievable\n'
+                      'worst-case risks: an infimum over ALL rules, attained.',
+            fontsize=23, color=GREEN, fontweight='bold', transform=ax.transAxes)
+    ax.text(.06, .02, 'the third step is the one that was missing: bayes_optimal_lower',
+            fontsize=20, color=GREY, style='italic', transform=ax.transAxes)
+    return save(fig, 'support_fig2_minimax.png')
+
+
+# ============================== D6 ==============================
+def d6_design():
+    fig, ax = plt.subplots(figsize=(15.8, 9.2), layout='constrained')
+    etas = [i / 200 for i in range(201)]
+    for c, col, ls in ((1.5, CRAN, '-'), (2.0, CRAN2, '--')):
+        ax.plot(etas, [e / c for e in etas], color=col, lw=4, ls=ls,
+                label=f'w_pair = η/c   (c = {c})')
+    ax.plot(etas, [1 - e for e in etas], color=AMBER, lw=4, ls=':',
+            label='w_B = 1 − η   (price 1)')
+    obs = [(1/3, 1.5, 2/9), (13/20, 1.5, 13/30), (4/5, 1.5, 8/15),
+           (1/3, 2.0, 1/6), (13/20, 2.0, 13/40), (4/5, 2.0, 2/5)]
+    for e, c, wp in obs:
+        ax.plot([e], [wp], 'o', ms=20, mfc='white',
+                mec=CRAN if c == 1.5 else CRAN2, mew=4, zorder=5)
+        ax.plot([e], [1 - e], 's', ms=18, mfc='white', mec=AMBER, mew=4, zorder=5)
+    ax.set_xlabel('budget share committed to the pair query,  η', fontsize=25, labelpad=12)
+    ax.set_ylabel('design weight', fontsize=25, labelpad=12)
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1.05); ax.tick_params(labelsize=22)
+    ax.legend(fontsize=21, frameon=False, loc='upper center')
+    ax.grid(color='#E3DCDD', lw=1); ax.set_axisbelow(True)
+    note(fig, 'markers are the artifact\'s own fitted weights in all 24 cells;\n'
+                      'the lines are the derived formula. They coincide exactly, and the\n'
+                      'weights do not depend on (q, μ) at all.', fs=21)
+    return save(fig, 'd6_fig1_design.png')
+
+
+def d6_certificates():
+    p32 = json.loads(Path('research/worker_P32_d6_apair_20260915/'
+                          'P32_d6_apair_necessity.json').read_text())
+    p24 = json.loads(Path('research/worker_P24_d6_corrected_20260915/'
+                          'P24_d6_boundary_modulus_v2.json').read_text())
+    fig, ax = plt.subplots(figsize=(16.1, 9.4), layout='constrained')
+    labels = ['A-pair NECESSARY\n(L_full > U_noA)', 'A-pair present\nin the support',
+              'separation certified\non the whole cell']
+    got = [p32['cells_apair_necessary'], p32['cells_apair_present'], p24['cells_certified']]
+    tot = [p32['cells_total'], p32['cells_total'], p24['cells_total']]
+    y = [2, 1, 0]
+    ax.barh(y, tot, height=.5, color='#E3DCDD', zorder=2)
+    ax.barh(y, got, height=.5, color=[CRAN, CRAN2, GREEN], zorder=3)
+    ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=23)
+    ax.set_xlabel('cells', fontsize=25, labelpad=12)
+    ax.tick_params(labelsize=22); ax.set_xlim(0, max(tot) * 1.18)
+    for yy, g, t in zip(y, got, tot):
+        ax.text(g + .3, yy, f'{g} / {t}', va='center', fontsize=26,
+                fontweight='bold', color=INK)
+    ax.grid(axis='x', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
+    note(fig, 'the 3 cells without a necessity certificate are exactly those where '
+                        'the A-pair weight is 0 — so nothing is missing, the query is simply '
+                        'not used there', fs=21)
+    return save(fig, 'd6_fig2_certificates.png')
+
+
+# =========================== ADAPTIVE ===========================
+def adaptive_quota():
+    from fractions import Fraction as Fr
+    w = [Fr(17, 23), Fr(1, 23), Fr(1, 23), Fr(3, 23), Fr(1, 23)]
+    K = len(w); N = [0] * K
+    ts, d0 = [0], [0.0]
+    for t in range(16):
+        D = [Fr(t) * w[i] - N[i] for i in range(K)]
+        j = max(range(K), key=lambda i: (D[i], -i))
+        N[j] += 1
+        ts.append(t + 1); d0.append(float(Fr(t + 1) * w[0] - N[0]))
+    fig, ax = plt.subplots(figsize=(15.8, 9.2), layout='constrained')
+    ax.plot(ts, d0, 'o-', color=CRAN, lw=4, ms=16, zorder=3,
+            label='deficit of arm 0 under largest-deficit-first')
+    ax.axhline(1, color=AMBER, lw=4, ls='--', zorder=2)
+    ax.text(0.3, 1.04, 'the quota bound of tracking_exists', fontsize=22, color=AMBER,
+            fontweight='bold')
+    bad = [i for i, v in zip(ts, d0) if v > 1]
+    if bad:
+        first = bad[0]
+        ax.plot([first], [d0[ts.index(first)]], 'o', ms=28, mfc='none',
+                mec=GREEN, mew=5, zorder=4)
+        ax.annotate(f'first violation\nt = {first},  D₀ = 26/23',
+                    xy=(first, d0[ts.index(first)]), xytext=(first + 1.4, 1.30),
+                    fontsize=23, color=GREEN, fontweight='bold',
+                    arrowprops=dict(arrowstyle='-|>', color=GREEN, lw=3))
+    ax.set_xlabel('t', fontsize=27, labelpad=10)
+    ax.set_ylabel('deficit   t·w₀ − N₀(t)', fontsize=25, labelpad=12)
+    ax.tick_params(labelsize=22); ax.set_xticks(range(0, 17, 2))
+    ax.legend(fontsize=21, frameon=False, loc='lower right')
+    ax.grid(color='#E3DCDD', lw=1); ax.set_axisbelow(True)
+    note(fig, 'w = (17, 1, 1, 3, 1)/23 · every step verified to be a genuine '
+                        'largest-deficit choice · exact rationals throughout', fs=21)
+    return save(fig, 'adaptive_fig1_quota.png')

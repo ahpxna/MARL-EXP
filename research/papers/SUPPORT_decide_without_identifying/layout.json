@@ -1,0 +1,362 @@
+{
+ "boxes": {
+  "1": [
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 4.1,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "I.  Introduction"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 5.12,
+    "width": 12.9,
+    "height": 2.26,
+    "shape": null,
+    "lines": [
+     "A class contains a safe tips and b unsafe tips in a finite set T. A world is the unsafe set W \u2286 T with |W| = b. Observations reveal only unsafe tips, so a transcript is a revealed subset R \u2286 W. The task is to name a safe tip, not to identify W.",
+     "That distinction is the point. Identifying the world is a coupon-collector problem whose cost grows with the number of classes; naming a safe tip need not be. The question is how much cheaper deciding is than recovering, and whether the natural decoder \u2014 name a tip drawn uniformly from the unexplored set \u2014 is actually optimal or merely convenient."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 7.54,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "II.  Contributions"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 8.56,
+    "width": 12.9,
+    "height": 7.42,
+    "shape": null,
+    "lines": [
+     "C1.  A DECODER WHOSE RISK IS A FUNCTION OF THE TRANSCRIPT ALONE. The number of unsafe tips still hidden is the same for EVERY world compatible with the transcript, so the decoder's conditional risk depends on the transcript and not on the world. Equivariance is proved, not assumed.",
+     "C2.  MINIMAXITY OVER ALL DECISION RULES. The earlier statement lifted a Bayes bound to a worst case for THIS decoder, but took constant risk as a hypothesis and contained no infimum over rules \u2014 so it said the decoder was flat, not that it was optimal. We close that gap: we prove Bayes risk factors through a posterior loss, that the pointwise argmin rule is optimal over ALL rules, that such a rule EXISTS, and hence that the equivariant decoder is a LEAST element of the achievable worst-case risks.",
+     "C3.  FLATNESS FROM SYMMETRY RATHER THAN ASSUMPTION. A risk invariant under a transitive relabelling of worlds is constant; this is how the constant-risk hypothesis is discharged instead of being imposed.",
+     "C4.  AN EXACT DECIDE\u2013RECOVER SEPARATION, FLAT IN K. The decide risk is exactly \u00bd(1\u2212P)^N, independent of the number of classes, while recovery grows like K log K. The separation is an identity, not an asymptotic comparison.",
+     "C5.  THE SAMPLING LAW, EXACTLY. The probability that a tuple goes unseen is (1\u2212s)^N by a product law, and the expectation of a product of indicators factors as B(1\u2212s)^N by exchanging two finite sums."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 16.14,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "III.  Methodology"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 17.16,
+    "width": 12.9,
+    "height": 3.98,
+    "shape": null,
+    "lines": [
+     "STEP 1 \u2014 THE SAMPLING LAW  (C5).   avoid_prob, prod_unseen_card, expected_prod_unseen",
+     "HOW IT IS CLOSED. The per-draw avoidance probability is computed by a product over the finite index set; the expectation of the product of unseen indicators is obtained by exchanging two finite sums, which is exact and needs no independence assumption between classes.",
+     "STEP 2 \u2014 THE DECODER AND ITS RISK  (C1).   hidden_count_world_free, decoder_risk_world_free, decoder_risk_eq_L_over_aL",
+     "WHY THIS FOLLOWS FROM STEP 1. Step 1 gives what a transcript reveals; Step 2 asks what a decoder can do with it. The key counting fact is that every world compatible with a transcript has exactly b unsafe tips and contains all revealed ones, so the number still hidden is the same in all of them:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 2.05,
+    "top": 21.3,
+    "width": 11.4,
+    "height": 1.29,
+    "ref": "sup_decoder"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 22.75,
+    "width": 12.9,
+    "height": 1.83,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED. A cardinality computation on the compatible worlds, then division by the size of the unexplored set. The risk is therefore a function of the transcript alone \u2014 which is exactly equivariance.",
+     "STEP 3 \u2014 BAYES RISK FACTORS THROUGH THE POSTERIOR LOSS  (C2).   bayesRisk_eq_sum_postLoss",
+     "WHY THIS IS NEEDED. Optimality over all rules cannot be argued rule by rule; it needs a form in which a rule's contribution is separated observation by observation."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 0.53,
+    "top": 24.73,
+    "width": 14.44,
+    "height": 1.18,
+    "ref": "sup_bayes"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 26.08,
+    "width": 12.9,
+    "height": 1.4,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED. Exchanging the sum over worlds with the sum over observations, then collecting the rule's action at each observation. After this the rule appears only inside g, once per observation.",
+     "STEP 4 \u2014 OPTIMALITY OVER ALL RULES  (C2).   bayes_optimal_lower, bayes_optimal_attained",
+     "WHY THIS FOLLOWS FROM STEP 3. With Step 3's form, minimising the Bayes risk is minimising each summand independently."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 1.29,
+    "top": 27.63,
+    "width": 12.92,
+    "height": 1.44,
+    "ref": "sup_optimal"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 29.23,
+    "width": 12.9,
+    "height": 2.69,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED. Each summand is at least the pointwise minimum over actions, and the bound is ATTAINED by choosing an argmin at every observation \u2014 a rule that exists because the action set is finite and non-empty. The infimum over rules is therefore a minimum, and no limiting argument is required.",
+     "STEP 5 \u2014 THE MINIMAX STATEMENT  (C2, C3).   minimax_ge_bayes_optimal, equivariant_is_minimax, constant_risk_of_symmetry",
+     "WHY THIS FOLLOWS FROM STEP 4. The worst case dominates the Bayes risk for every prior; chaining that with Step 4 lower-bounds the worst-case risk of EVERY rule by a single number:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 0.53,
+    "top": 32.08,
+    "width": 14.44,
+    "height": 1.07,
+    "ref": "sup_minimax"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 33.31,
+    "width": 12.9,
+    "height": 1.4,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED. Two inequalities composed. A rule whose risk is constant and equal to that number is then a LEAST element of the achievable worst-case risks \u2014 an infimum over all rules, attained. The constant-risk hypothesis is discharged by symmetry: a risk invariant under a transitive relabelling of worlds is constant.",
+     "STEP 6 \u2014 THE DECIDE\u2013RECOVER SEPARATION  (C4).   binary_decide_value, decide_upper_expect, growing_K_recover"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 0.53,
+    "top": 34.86,
+    "width": 14.44,
+    "height": 0.72,
+    "ref": "sup_decide"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 35.75,
+    "width": 12.9,
+    "height": 0.3,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED. In the symmetric model the decide risk collapses to an exact closed form that does not mention K at all, while the recovery count is bounded below by a coupon-collector argument. The comparison is therefore between an identity and a growth rate, not between two estimates."
+    ],
+    "text": null
+   }
+  ],
+  "2": [
+   {
+    "kind": "header",
+    "left": 15.4,
+    "top": 4.1,
+    "width": 15.2,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "IV.  Results"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 5.12,
+    "width": 15.2,
+    "height": 5.99,
+    "shape": null,
+    "lines": [
+     "DECIDING IS FLAT IN K; RECOVERING IS NOT. Across the parameter grid the exact decide count is independent of the number of classes while the exact recovery count grows, and the ratio between them grows without bound as K increases. Both counts are exact integers computed from the closed forms, not simulated.",
+     "THE DECODER IS OPTIMAL, NOT MERELY FLAT. With Step 5 the equivariant decoder is a least element of the achievable worst-case risks, so no decision rule whatsoever \u2014 randomised or not, adaptive or not \u2014 achieves a smaller worst case on this problem."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 11.27,
+    "width": 14.44,
+    "height": 8.41,
+    "ref": "research/papers/_figures/support_fig1_separation.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 19.84,
+    "width": 15.2,
+    "height": 3.73,
+    "shape": null,
+    "lines": [
+     "Fig. 1.  Exact sample counts. Deciding is flat in the number of classes; recovering grows like K log K. Both are exact counts from the closed forms."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 23.73,
+    "width": 14.44,
+    "height": 8.23,
+    "ref": "research/papers/_figures/support_fig2_minimax.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 32.12,
+    "width": 15.2,
+    "height": 3.73,
+    "shape": null,
+    "lines": [
+     "Fig. 2.  The minimax chain. The third step \u2014 optimality over all rules \u2014 is the one that was missing, and it is what turns flatness into optimality."
+    ],
+    "text": null
+   }
+  ],
+  "3": [
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 4.1,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "V.  Discussion"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 5.12,
+    "width": 15.6,
+    "height": 11.39,
+    "shape": null,
+    "lines": [
+     "The gap closed here is small to state and large in consequence. A constant-risk decoder is not automatically a good one: constancy is a property of the decoder, optimality is a property of the problem. Without an infimum over rules, the earlier statement was compatible with every rule being bad. Step 4 supplies that infimum, and because the action set is finite the infimum is attained, so the argument needs no compactness and no limit.",
+     "The practical reading of C4 is that an experimenter facing many classes should not pay for identification. The cost of naming a safe tip does not grow with the number of classes; the cost of learning which world one is in does.",
+     "SCOPE \u2014 WHAT IS NOT ESTABLISHED. The prior is arbitrary but FIXED: this is minimaxity through one Bayes prior, not a general minimax theorem, and no saddle point is claimed in the abstract. Worlds, transcripts and actions are finite throughout, and nothing extends to infinite action sets where the pointwise minimum may fail to be attained. The transitivity of the relabelling group is a hypothesis supplied where it is used, and is a fact about this problem rather than a theorem proved in general."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 16.67,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "VI.  Conclusions"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 17.69,
+    "width": 15.6,
+    "height": 10.1,
+    "shape": null,
+    "lines": [
+     "The natural decoder \u2014 name a tip uniformly from the unexplored set \u2014 is not merely convenient. Its risk is a function of the transcript alone, and it is a least element of the worst-case risks achievable by ANY decision rule. Deciding costs a number that does not grow with the number of classes, while identifying the world does, so the two problems are separated exactly and not merely asymptotically.",
+     "VERIFICATION. Lean 4, toolchain leanprover/lean4:v4.34.0-rc2, mathlib 1f495c61. A module is accepted only when lean_exit = 0 with zero errors, the source hash is unchanged across the compile, the .olean is newer than its source, at least one #print axioms is present, the axiom set lies within {propext, Classical.choice, Quot.sound}, and no sorry appears anywhere. Numerical sweeps are reported separately from theorems and never substitute for one."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 27.95,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "References"
+    ],
+    "text": null
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 28.97,
+    "width": 15.6,
+    "height": 6.88,
+    "shape": null,
+    "lines": [
+     "[1] S. Javdani, Y. Chen, A. Karbasi, A. Krause, J. A. Bagnell and S. Srinivasa, \u201cNear-optimal Bayesian active learning for decision making,\u201d in Proc. AISTATS, 2014.",
+     "[2] E. L. Lehmann and G. Casella, Theory of Point Estimation, 2nd ed. New York, NY: Springer, 1998.",
+     "[3] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. CPP, 2020."
+    ],
+    "text": null
+   }
+  ]
+ },
+ "report": {
+  "1": {
+   "natural_in": 44.7,
+   "available_in": 31.75,
+   "fill": 1.408,
+   "blocks": 16,
+   "verdict": "OVERFULL \u2014 trim"
+  },
+  "2": {
+   "natural_in": 22.82,
+   "available_in": 31.75,
+   "fill": 0.719,
+   "blocks": 6,
+   "verdict": "thin \u2014 add content"
+  },
+  "3": {
+   "natural_in": 15.66,
+   "available_in": 31.75,
+   "fill": 0.493,
+   "blocks": 6,
+   "verdict": "thin \u2014 add content"
+  }
+ }
+}
