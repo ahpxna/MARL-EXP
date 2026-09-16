@@ -27,9 +27,7 @@ $\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$, established 
 bound, as an upper bound over \emph{every} unit-budget design, and as attained by an
 explicit symmetric design---so the constant is an identity rather than an order of
 magnitude. A third result certifies, on one explicit instance in exact rational
-arithmetic, that no anchor-free design matches an anchored one. Every mathematical claim
-is machine-checked in Lean~4 with no \texttt{sorry} and with axioms confined to
-$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$. Numerical sweeps
+arithmetic, that no anchor-free design matches an anchored one. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry} and with axioms confined to $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; the corollaries, limits and worked derivations the paper carries out itself are marked as such in Section~\ref{sec:verification}. Numerical sweeps
 over $32$ parameter cells reproduce the closed form to a worst relative gap of
 $2.5\times10^{-16}$, and the same sweeps show that removing the calibration query returns
 exactly zero while a merely uniform allocation still reaches $73.5$--$100\%$ of the
@@ -744,40 +742,55 @@ Total                                & 29 & \\
 \subsection{The statements as they are checked}
 
 Formal-methods claims are only as strong as the statements actually proved, so the two
-load-bearing ones are reproduced here in the form the prover sees.
+load-bearing ones are reproduced exactly as the prover has them.
 
 \begin{figure}[htbp]
 \footnotesize
 \hrule\vspace{4pt}
 \begin{tabbing}
 \quad\=\quad\=\kill
-\lean{theorem group\_cost\_lower} \\
-\> \lean{(h x z sm sk : $\mathbb{R}$)} \\
-\> \lean{(hh : 0 < h) (hx : 0 < x) (hz : 0 < z)} \\
-\> \lean{(hsm : 0 < sm) (hsk : 0 < sk)} \\
-\> \lean{(hcon : h * (x + z) $\le$ x * z) :} \\
+\lean{theorem group\_cost\_lower (h x z sm sk : $\mathbb{R}$)} \\
+\> \lean{(hsm : 0 < sm) (hsk : 0 < sk) (hh : 0 < h)} \\
+\> \lean{(hx : 0 < x) (hz : 0 < z)} \\
+\> \lean{(hinfo : h * (x + z) $\le$ x * z) :} \\
 \> \lean{h * (sm + sk)\^{}2 $\le$ sm\^{}2 * x + sk\^{}2 * z} \\[6pt]
 \lean{theorem calibration\_rate\_upper} \\
-\> \lean{(K : $\mathbb{N}$) (hK : 0 < K) (x z : Fin K $\to$ $\mathbb{R}$)} \\
-\> \lean{(sm sk $\Delta$ V : $\mathbb{R}$) ($\ldots$ positivity $\ldots$)} \\
-\> \lean{(hinfo : $\forall$ g, (2*V/$\Delta$\^{}2) * (x g + z g) $\le$ x g * z g)} \\
-\> \lean{(hbud : $\sum$ g, (sm\^{}2 * x g + sk\^{}2 * z g) $\le$ 1) :} \\
-\> \lean{V $\le$ $\Delta$\^{}2 / (2 * K * (sm + sk)\^{}2)}
+\> \lean{(sm sk D V : $\mathbb{R}$) (x z : Fin K $\to$ $\mathbb{R}$)} \\
+\> \lean{(hsm : 0 < sm) (hsk : 0 < sk) (hD : 0 < D)} \\
+\> \lean{(hV : 0 < V) (hK : 0 < K)} \\
+\> \lean{(hx : $\forall$ g, 0 < x g) (hz : $\forall$ g, 0 < z g)} \\
+\> \lean{(hbudget : $\sum$ g, (sm\^{}2 * x g + sk\^{}2 * z g) $\le$ 1)} \\
+\> \lean{(hinfo : $\forall$ g, 2*V/D\^{}2 * (x g + z g) $\le$ x g * z g) :} \\
+\> \lean{V $\le$ D\^{}2 / (2 * (K : $\mathbb{R}$) * (sm + sk)\^{}2)}
 \end{tabbing}
 \vspace{-4pt}\hrule
-\caption{The two statements carrying the price law, as checked. The upper bound quantifies
-over arbitrary allocation functions \lean{x z : Fin K $\to$ $\mathbb{R}$} constrained only by the
-budget and the information requirement; no structure on the design is assumed and no
-parametric family is fixed.}
+\caption{The two statements carrying the price law, as checked ($D$ is the paper's
+$\Delta$; $K$ is a section variable). The upper bound quantifies over arbitrary allocation
+functions \lean{x z : Fin K $\to$ $\mathbb{R}$} constrained only by the budget and the
+information requirement; no structure on the design is assumed and no parametric family is
+fixed.}
 \label{fig:statements}
 \end{figure}
 
-Three details of Fig.~\ref{fig:statements} are worth naming. The hypothesis \lean{hcon} is
+Three details of Fig.~\ref{fig:statements} are worth naming. The hypothesis \lean{hinfo} is
 an inequality, not an equality, so the lower bound covers designs that over-deliver
-information as well as those that meet the requirement exactly. The budget \lean{hbud} is
-likewise an inequality, so designs that underspend are included. And $V$ is universally
-quantified rather than defined as a supremum, which is what makes the conclusion a bound on
-every achievable value rather than a statement about a particular optimum.
+information as well as those that meet the requirement exactly. The budget
+\lean{hbudget} is likewise an inequality, so designs that underspend are included. And $V$
+is universally quantified rather than defined as a supremum, which is what makes the
+conclusion a bound on every achievable value rather than a statement about a particular
+optimum.
+
+\subsection{What the paper derives rather than cites}
+
+Four displayed results carry no \lean{leanbox} because the paper obtains them itself from
+the checked ones, and they are listed here rather than left to inference:
+Corollary~\ref{cor:groupprice} (substituting $s_{m}=\sqrt{m}$, $s_{\kappa}=\sqrt{\kappa}$
+into Theorem~\ref{thm:groupattained}), the two limits $\kappa\to0$ and $\kappa\to\infty$,
+and Corollary~\ref{cor:crossover} (setting $\kappa=m$). Each is one line of algebra from a
+machine-checked statement. The likelihood derivation \eqref{eq:llr} and the
+Cauchy--Schwarz step \eqref{eq:cs} are likewise worked out in the paper; the identity they
+lead to is \lean{profiled\_information} and \lean{group\_cost\_lower} respectively, both
+checked.
 
 \subsection{Evidence per step of the argument}
 
@@ -831,9 +844,9 @@ Slack, Lem~\ref{lem:slack}
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the whole development. The MASTER
-strand contains $11$ Lean source files with $88$ theorem and lemma statements, of which the
+strand contains $15$ Lean source files with $122$ theorem and lemma statements, of which the
 modules in Table~\ref{tab:modules} carry acceptance receipts covering $57$ audited
-declarations. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+declarations. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations. The statements not
 displayed are the arithmetic identities, positivity checks and finite-sum exchanges that
 each displayed result rests on.

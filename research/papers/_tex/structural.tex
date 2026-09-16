@@ -31,8 +31,7 @@ every budget $j$ we \emph{build} an ordering whose defect is zero everywhere exc
 $2$ at position $j$, by a greedy alternation maintaining an explicit invariant. We
 additionally carry the constrained problem with its actual marginal, a matrix indexed by
 (item, budget) rather than a scalar stand-in, prove its column sums equal $\min(k,n)$ for
-\emph{every} menu, and compute it in closed form on the cyclic menu. Everything is
-machine-checked in Lean~4 with no \texttt{sorry}.
+\emph{every} menu, and compute it in closed form on the cyclic menu. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}, with one instantiation step carried out in the paper and named in Section~\ref{sec:verification}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -822,40 +821,66 @@ present; the axiom set of every audited declaration lies within
 $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no \texttt{sorry}
 appears anywhere in the file.
 
-\subsection{The two crux statements as they are checked}
+\subsection{The crux statements as they are checked}
 
 \begin{figure}[htbp]
 \footnotesize
 \hrule\vspace{4pt}
 \begin{tabbing}
 \quad\=\quad\=\kill
-\lean{theorem no\_big\_step} \\
-\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) ($\pi$ : Equiv.Perm (Fin m))} \\
-\> \lean{(hfree : $\forall$ k, defect m $\pi$ k = 0) (i : Fin m) :} \\
-\> \lean{|g m ($\pi$ i)| $\le$ 2} \\[6pt]
-\lean{theorem two\_le\_totalDefect} \\
-\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) ($\pi$ : Equiv.Perm (Fin m)) :} \\
-\> \lean{2 $\le$ $\sum$ k, defect m $\pi$ k} \\[6pt]
-\lean{theorem exists\_one\_defect} \\
-\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) (j : Fin (m-1)) :} \\
-\> \lean{$\exists$ $\pi$, ($\forall$ k, k $\ne$ j $\to$ defect m $\pi$ k = 0)} \\
-\> \qquad\lean{$\wedge$ defect m $\pi$ j = 2}
+\lean{theorem no\_big\_step (s : $\mathbb{Z}$) (l : List $\mathbb{Z}$)} \\
+\> \lean{(hs : |s| $\le$ 1) (he : |s + l.sum| $\le$ 1)} \\
+\> \lean{(hz : totalDefect s l = 0) :} \\
+\> \lean{$\forall$ x $\in$ l, |x| $\le$ 2} \\[6pt]
+\lean{theorem two\_le\_totalDefect (s : $\mathbb{Z}$) (l : List $\mathbb{Z}$)} \\
+\> \lean{(hs : |s| $\le$ 1) (he : |s + l.sum| $\le$ 1)} \\
+\> \lean{(hbig : $\exists$ x $\in$ l, 2 < |x|) :} \\
+\> \lean{2 $\le$ totalDefect s l} \\[6pt]
+\lean{theorem exists\_one\_defect (p q j : $\mathbb{N}$)} \\
+\> \lean{(hpq : q $\le$ p) (hqp : p $\le$ q + 1)} \\
+\> \lean{(hj1 : 1 $\le$ j) (hjm : j $\le$ p + q + 1) :} \\
+\> \lean{$\exists$ l : List $\mathbb{Z}$, (l : Multiset $\mathbb{Z}$) = (gList p q : Multiset $\mathbb{Z}$)} \\
+\> \qquad\lean{$\wedge$ defects 0 l = List.replicate (j-1) 0} \\
+\> \qquad\qquad\lean{++ (2 : $\mathbb{Z}$) :: List.replicate (p+q+2-j) 0}
 \end{tabbing}
 \vspace{-4pt}\hrule
-\caption{The mechanism and the construction as checked. Both are universally quantified
-over $m$ with the single hypothesis $5\le m$, so neither is a finite computation: the
-statements hold for every population size at once. \lean{exists\_one\_defect} is
-existential in its conclusion but its witness is produced by the explicit alternation of
-Theorem~\ref{thm:construction}, and \lean{altFrom\_defects} computes that witness's defect
-vector rather than merely asserting the existential.}
+\caption{The mechanism and the construction, reproduced as the prover has them. The
+construction is fully general: quantified over the family parameters $p,q$ and over the
+budget $j$, concluding a multiset equality with $g_{m}$ and the \emph{exact} defect vector,
+so Theorem~\ref{thm:construction} is machine-checked as stated.
+The mechanism is stated for an arbitrary integer list rather than for a permutation of
+$g_{m}$, and \lean{two\_le\_totalDefect} takes ``some element exceeds $2$'' as the
+hypothesis \lean{hbig}. Section~\ref{sec:instantiation} supplies that hypothesis for
+$g_{m}$ and says where the step is carried out.}
 \label{fig:statements}
 \end{figure}
 
-The hypothesis \lean{5 $\le$ m} is the only assumption in Fig.~\ref{fig:statements}. In
-particular there is no upper bound on $m$, no hypothesis about the schedule distribution,
-and no numeric side condition---which is what distinguishes a proved law from a sweep over
-checked values. A sweep to $m=20$, of the kind Table~\ref{tab:law} displays, would leave
-open whether some larger $m$ behaves differently; the quantifier closes that.
+\subsection{The one step the paper supplies}
+\label{sec:instantiation}
+
+Theorem~\ref{thm:everyorderpays} is stated here as ``for every $m\ge5$ and every ordering
+$\pi$ of $g_{m}$, the total defect is at least $2$''. The Lean chain delivers it in two
+pieces, and the join is worth naming rather than eliding.
+
+\lean{no\_big\_step} and \lean{two\_le\_totalDefect} are about an arbitrary
+\lean{List $\mathbb{Z}$}. They say: a list whose running sums stay in the band has no
+element of absolute value above $2$, and a list containing an element above $2$ has total
+defect at least $2$. Both are machine-checked in that generality, which is stronger than the
+family needs.
+
+What is \emph{not} in Lean is the instantiation: that every ordering of $g_{m}$ is such a
+list, i.e.\ that every permutation of the multiset contains the element $3$. That is
+immediate---permuting a multiset does not remove a member, and $3\in g_{m}$ by
+\eqref{eq:family} for every $m\ge5$---and the paper carries it out in the proof of
+Theorem~\ref{thm:everyorderpays} rather than citing a Lean name for it. It is one line of
+ordinary mathematics, and it is flagged because the alternative---quoting
+\lean{two\_le\_totalDefect} as though its conclusion were already about the family---would
+misdescribe what the prover checked.
+
+Formalising the join means defining orderings of $g_{m}$ as permutations of
+\lean{gList p q} and discharging \lean{hbig} from membership, which the upper-bound module
+already does for its own purposes when it proves the multiset equalities in
+\lean{exists\_one\_defect}. It is not done for the lower bound.
 
 \subsection{Evidence per step}
 
@@ -898,9 +923,9 @@ well as a large one.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Structural strand
-contains $49$ Lean source files with $388$ theorem and lemma statements, of which $12$
+contains $77$ Lean source files with $959$ theorem and lemma statements, of which $12$
 modules carry an acceptance receipt covering $168$ declarations whose axiom set was printed
-and checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+and checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the

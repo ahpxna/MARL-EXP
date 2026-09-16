@@ -29,8 +29,7 @@ into matching sufficiency and necessity sample counts differing only by explicit
 and then into a proved two-sided window on Bayes regret. We further prove that the
 normalised ratio $H^{2}/h^{2r}$ \emph{converges}, with a strictly positive limit, so the
 leading constant is genuine rather than an artefact of the sandwich. Along the way we
-supply a scalar-variable iterated-derivative sum rule absent from mathlib. Everything is
-machine-checked in Lean~4 with no \texttt{sorry}. Simulation of two admissible measurements
+supply a scalar-variable iterated-derivative sum rule absent from mathlib. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; Section~\ref{sec:verification} states exactly which steps the paper works out itself instead. Simulation of two admissible measurements
 of the same pair of worlds, $4000$ repetitions per world, gives sample requirements of
 $4{,}678$ and $41{,}006$---a factor of $8.8$ attributable entirely to which measurement was
 legal---with measured regret inside the proved window in both cases.
@@ -806,40 +805,50 @@ checked is the file on disk; the compiled artifact is newer than its source; at 
 lies within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-\subsection{The crux statement as it is checked}
+\subsection{The crux statements as they are checked}
 
 \begin{figure}[htbp]
 \footnotesize
 \hrule\vspace{4pt}
 \begin{tabbing}
 \quad\=\quad\=\kill
-\lean{theorem levelSum\_ne\_zero} \\
-\> \lean{(r : $\mathbb{N}$) ($\sigma$ : $\mathbb{R}$) (h$\sigma$ : 0 < $\sigma$)} \\
-\> \lean{(L : Finset $\mathbb{R}$) (c : $\mathbb{R}$ $\to$ $\mathbb{R}$) (vstar : $\mathbb{R}$)} \\
-\> \lean{(hmem : vstar $\in$ L) (hc : c vstar $\ne$ 0)} \\
-\> \lean{(htop : $\forall$ v $\in$ L, v $\ne$ vstar $\to$ v < vstar) :} \\
-\> \lean{($\lambda$ y $\Rightarrow$ $\sum$ v $\in$ L, c v * hpoly r $\sigma$ (y - v)} \\
-\> \qquad\lean{* gauss $\sigma$ (y - v)) $\ne$ 0} \\[6pt]
-\lean{theorem mixture\_coeff\_ne\_zero} \\
-\> \lean{($\ldots$ mixture data $\ldots$) :} \\
-\> \lean{$\Delta$ r $\ne$ 0}
+\lean{theorem levelSum\_ne\_zero ($\sigma$ : $\mathbb{R}$) (h$\sigma$ : $\sigma$ $\ne$ 0)} \\
+\> \lean{(r : $\mathbb{N}$) (S : Finset $\mathbb{R}$) (c : $\mathbb{R}$ $\to$ $\mathbb{R}$) (vstar : $\mathbb{R}$)} \\
+\> \lean{(hvs : vstar $\in$ S)} \\
+\> \lean{(htop : $\forall$ v $\in$ S, v $\ne$ vstar $\to$ v < vstar)} \\
+\> \lean{(hc : c vstar $\ne$ 0) :} \\
+\> \lean{$\exists$ y, levelSum $\sigma$ r S c y $\ne$ 0} \\[6pt]
+\lean{theorem mixture\_coeff\_ne\_zero ($\sigma$ : $\mathbb{R}$) (h$\sigma$ : $\sigma$ $\ne$ 0)} \\
+\> \lean{(pi f g : X $\to$ $\mathbb{R}$) (r : $\mathbb{N}$) (vstar : $\mathbb{R}$)} \\
+\> \lean{(hvs : vstar $\in$ Finset.image f univ)} \\
+\> \lean{(htop : $\forall$ v $\in$ Finset.image f univ,} \\
+\> \qquad\lean{v $\ne$ vstar $\to$ v < vstar)} \\
+\> \lean{(hc : levelMoment pi f g r vstar $\ne$ 0) :} \\
+\> \lean{$\exists$ y, iteratedDeriv r} \\
+\> \qquad\lean{(fun h $\Rightarrow$ $\sum$ x, pi x * gauss $\sigma$ (y - f x - h * g x)) 0 $\ne$ 0}
 \end{tabbing}
 \vspace{-4pt}\hrule
-\caption{The non-vanishing theorem as checked. The hypothesis \lean{htop} is the strict
-top level of Remark~2; \lean{hc} is the non-zero coefficient there. The conclusion is a
-disequality of \emph{functions}, not of values at a point, which is the form the leakage
-order \eqref{eq:order} needs: a coefficient that is non-zero somewhere is not enough if it
-could vanish identically after the shifted terms are summed.}
+\caption{The non-vanishing theorem and its mixture form, reproduced as the prover has them.
+The hypothesis \lean{htop} is the strict top level of Remark~2; \lean{hc} is the non-zero
+coefficient there. Both are quantified over an arbitrary finite level set, an arbitrary
+coefficient function, and---in the mixture form---arbitrary weights \lean{pi}, response
+\lean{f} and perturbation \lean{g}, so nothing is assumed about how the configuration
+arose.}
 \label{fig:statements}
 \end{figure}
 
-The shape of Fig.~\ref{fig:statements} carries the argument's content. The finite set
-\lean{L} of levels is arbitrary, the coefficient function \lean{c} is arbitrary subject to
-\lean{hc}, and the conclusion holds for every such configuration; nothing is assumed about
-how the coefficients arose. The companion statement
-\lean{mixture\_coeff\_diff\_eq\_zero} supplies the other half---that the coefficients below
-order $r$ cancel---so the two together justify \eqref{eq:order} rather than only its
-non-degeneracy.
+The conclusion is \lean{$\exists$ y, $\ldots$ $\ne$ 0}, which is exactly
+$\Delta_{r}\not\equiv0$: a function is not identically zero precisely when it is non-zero
+somewhere. That is the form the leakage order \eqref{eq:order} needs, and it is weaker than
+it may look in one respect worth stating---it produces \emph{a} point where the coefficient
+survives, not a set of positive measure. The lower side of
+Theorem~\ref{thm:sandwich} needs an interval, and it obtains one from this point by
+continuity, which is a step the paper carries out rather than a Lean statement.
+
+The companion \lean{mixture\_coeff\_diff\_eq\_zero} supplies the other half of
+\eqref{eq:order}---that the coefficients below order $r$ cancel---with the shared level set
+appearing as an explicit hypothesis \lean{hS} and the agreeing moments as \lean{hagree}.
+The two together justify the definition rather than only its non-degeneracy.
 
 \subsection{Evidence per step}
 
@@ -894,9 +903,9 @@ the tie case is now reported as out of scope in Remark~2 rather than silently as
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Query strand contains
-$21$ Lean source files with $135$ theorem and lemma statements, of which $13$ modules carry
+$27$ Lean source files with $167$ theorem and lemma statements, of which $13$ modules carry
 an acceptance receipt covering $87$ declarations whose axiom set was printed and checked.
-Across the programme of which this paper is one part: $427$ files, $3{,}115$ statements,
+Across the programme of which this paper is one part: $762$ files, $7{,}199$ statements,
 $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the

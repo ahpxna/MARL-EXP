@@ -30,9 +30,10 @@ for every target on the simplex and every horizon there \emph{exists} an integer
 spending exactly the horizon with per-arm deficit at most one, by construction rather than
 by an existence argument. And we prove that the natural online rule---serve the arm of
 largest deficit, which is house-monotone by construction---does \emph{not} satisfy quota, by
-an exact five-arm witness on targets $\frac{1}{23}(17,1,1,3,1)$ whose every step is verified
-to be a genuine largest-deficit choice and whose deficit reaches $\frac{26}{23}$ at horizon
-eleven. Everything is machine-checked in Lean~4 with no \texttt{sorry}.
+an exact five-arm witness on targets $\frac{1}{23}(17,1,1,3,1)$ whose deficit reaches
+$\frac{26}{23}$ at horizon eleven. The arithmetic of that violation is machine-checked; the
+identification of the counts as the rule's own trajectory is an exact computation reported
+here, and Section~\ref{sec:gap} draws the line precisely. The first three results are machine-checked in Lean~4 with no \texttt{sorry}; for the fourth, Section~\ref{sec:verification} states precisely which part is machine-checked and which part rests on an exact computation reported here.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -114,7 +115,8 @@ deficit at most one (Theorem~\ref{thm:exists}), proved by construction.
 
 \item[C4.] \textbf{But no online monotone rule achieves it.} The largest-deficit rule is
 house-monotone by construction and does not satisfy quota
-(Theorem~\ref{thm:quotafails}), by an exact five-arm witness whose every step is verified.
+(Theorem~\ref{thm:quotafails}), by an exact five-arm witness whose eleven steps are each a
+genuine largest-deficit choice.
 
 \item[C5.] \textbf{The consequences the analysis consumes.} Deficits sum to zero, so some arm
 is always behind and a greedy rule never idles (Lemma~\ref{lem:sumzero},
@@ -418,7 +420,8 @@ Section~\ref{sec:fails} shows the natural candidate does not provide it.
 \begin{theorem}[Largest-deficit-first violates quota]
 \label{thm:quotafails}
 On five arms with targets $w=\frac{1}{23}(17,1,1,3,1)$, the rule that serves the arm of
-largest deficit reaches counts $(7,1,1,1,1)$ after eleven steps, at which point
+largest deficit reaches counts $(7,1,1,1,1)$ after eleven steps
+(\NUM{}, Section~\ref{sec:gap}), at which point (\PROVED{})
 \begin{equation}
 D_{0}(11)\;=\;11\cdot\frac{17}{23}-7\;=\;\frac{26}{23}\;>\;1 .
 \label{eq:quotafail}
@@ -431,20 +434,23 @@ Continuing to horizon fourteen the deficit reaches $\frac{31}{23}$.
 
 \input{adaptive_trace}
 
-\subsection{Why every step is verified}
+\subsection{Why every step must be checked}
 
 A counterexample to a rule's behaviour is only as good as the claim that the trace is what
 the rule produces. Table~\ref{tab:trace} therefore records, at every step, the deficit of
-\emph{every} arm, and the formal development checks the served arm's deficit against each
-alternative rather than asserting the argmax. This matters because ties occur---at $t=2$ and
-$t=3$ the maximum is attained uniquely, but a rule with a different tie-breaking convention
-could in principle diverge---and a trace produced by a tie-breaking accident would establish
-nothing about the rule.
+\emph{every} arm, and the served arm is compared against each alternative rather than
+asserted to be the argmax. This matters because a trace produced by a tie-breaking accident
+would establish nothing about the rule: at every step in the table the maximum is attained
+uniquely, so any implementation of largest-deficit-first produces these counts whatever it
+does about ties.
 
-The counts are also checked to sum to the horizon at every step
-(\lean{counts\_sum}) and the targets to sum to one (\lean{weights\_sum\_one}), so the
-deficits in Table~\ref{tab:trace} sum to zero row by row, which is
-Lemma~\ref{lem:sumzero} evaluated on the witness.
+Where that check lives is worth stating exactly, and Section~\ref{sec:gap} does so. The
+arithmetic of the violation---the target on the simplex, the counts summing to eleven, and
+$D_{0}(11)>1$---is machine-checked. The eleven step comparisons are kernel-checked as
+rational facts inside a proof whose conclusion is \lean{True}, so they do not escape it, and
+no Lean statement ties them to the target and counts. The trace in
+Table~\ref{tab:trace} is therefore reproduced from an independent exact-rational simulation,
+reported as a \NUM{} result.
 
 \begin{figure}[htbp]
 \centering
@@ -452,8 +458,8 @@ Lemma~\ref{lem:sumzero} evaluated on the witness.
 \caption{The deficit of the first arm under largest-deficit-first on
 $w=\frac{1}{23}(17,1,1,3,1)$. The per-horizon bound of one---achievable offline by
 Theorem~\ref{thm:exists}---is crossed at $t=11$ and exceeded thereafter. Exact rationals
-throughout; every step is verified to be a genuine largest-deficit choice rather than a
-tie-breaking artefact.}
+throughout; each step is a genuine largest-deficit choice rather than a tie-breaking
+artefact, by the recomputation of Section~\ref{sec:gap}.}
 \label{fig:quota}
 \end{figure}
 
@@ -615,8 +621,9 @@ targets.
 
 Table~\ref{tab:search} contains worse targets than $\frac{1}{23}(17,1,1,3,1)$, so it is
 worth saying why that one carries Theorem~\ref{thm:quotafails}. It is the witness whose
-every step is verified in the formal development: each of the eleven choices is checked
-against every alternative arm, so the trace is provably what the rule produces. The search
+its eleven steps are the ones the formal development records, and we have recomputed each
+choice against every alternative arm in exact rational arithmetic
+(Section~\ref{sec:gap}). The search
 results are exact rational arithmetic but are computed rather than proved, and they are
 reported as a \NUM{} result accordingly.
 
@@ -691,38 +698,60 @@ appears anywhere in the file.
 \begin{tabbing}
 \quad\=\quad\=\kill
 \lean{theorem lintegral\_nat\_eq\_tsum\_meas\_gt} \\
-\> \lean{\{$\Omega$ : Type*\} [MeasurableSpace $\Omega$] ($\mu$ : Measure $\Omega$)} \\
-\> \lean{($\tau$ : $\Omega$ $\to$ $\mathbb{N}$) (h : Measurable $\tau$) :} \\
-\> \lean{$\int^-$ $\omega$, ($\tau$ $\omega$ : $\mathbb{R}\geq0\infty$) $\partial\mu$} \\
-\> \qquad\lean{= $\sum'$ n, $\mu$ \{$\omega$ | n < $\tau$ $\omega$\}} \\[6pt]
+\> \lean{($\mu$ : Measure $\Omega$) (tau : $\Omega$ $\to$ $\mathbb{N}$)} \\
+\> \lean{(htau : Measurable tau) :} \\
+\> \lean{$\int^-$ $\omega$, (tau $\omega$ : $\mathbb{R}\geq0\infty$) $\partial\mu$} \\
+\> \qquad\lean{= $\sum'$ n : $\mathbb{N}$, $\mu$ \{$\omega$ | n < tau $\omega$\}} \\[6pt]
+\lean{def w : Fin 5 $\to$ $\mathbb{Q}$ := !\lbrack 17/23,1/23,1/23,3/23,1/23\rbrack} \\
+\lean{def N : Fin 5 $\to$ $\mathbb{N}$ := !\lbrack 7,1,1,1,1\rbrack} \\[6pt]
+\lean{theorem greedy\_steps : True} \\[6pt]
 \lean{theorem online\_quota\_fails :} \\
-\> \lean{$\exists$ (K : $\mathbb{N}$) (w : Fin K $\to$ $\mathbb{Q}$) (t : $\mathbb{N}$),} \\
-\> \lean{($\sum$ i, w i = 1) $\wedge$ (0 < t) $\wedge$} \\
-\> \lean{1 < t * w 0 - (greedyCount w t 0)} \\[6pt]
-\lean{theorem greedy\_steps :} \\
-\> \lean{$\forall$ s < 11, $\forall$ j, deficit w s j} \\
-\> \qquad\lean{$\le$ deficit w s (served w s)}
+\> \lean{($\sum$ i, w i = 1) $\wedge$ ($\sum$ i, N i = 11)} \\
+\> \lean{$\wedge$ (1 : $\mathbb{Q}$) < (11 : $\mathbb{Q}$) * w 0 - (N 0 : $\mathbb{Q}$)}
 \end{tabbing}
 \vspace{-4pt}\hrule
-\caption{The layer-cake identity and the quota failure, as checked. The first is stated for
-an arbitrary measurable $\mathbb{N}$-valued $\tau$ on an arbitrary measure space, so
-Corollary~\ref{cor:expstop} applies to any stopping time with a geometric tail.
-\lean{greedy\_steps} is what makes the witness a statement about the \emph{rule}: it checks,
-at each of the eleven steps, that the served arm's deficit dominates every other arm's, so
-the counts are produced by largest-deficit-first and not by a convenient tie-break.}
+\caption{The two statements behind Theorem~\ref{thm:layercake} and
+Theorem~\ref{thm:quotafails}, reproduced as the prover has them. The layer-cake identity is
+general: an arbitrary measurable $\mathbb{N}$-valued \lean{tau} on an arbitrary measure
+space. \lean{online\_quota\_fails} is \emph{not} quantified: \lean{w} and \lean{N} are the
+fixed definitions above and the horizon is the literal $11$.
+\lean{greedy\_steps} concludes \lean{True}; its proof body checks eleven rational
+comparisons, but they are written as literals and nothing in the statement ties them to
+\lean{w} and \lean{N}. Section~\ref{sec:gap} says what follows and what does not.}
 \label{fig:statements}
 \end{figure}
 
-The shape of \lean{online\_quota\_fails} is worth noting. It is existential---it exhibits a
-$(K,w,t)$ at which the bound fails---which is the correct form for refuting a universal
-assumption. An analysis assuming ``for every target and horizon, the online rule keeps the
-deficit below one'' is contradicted by exactly this statement, and by nothing weaker.
+\subsection{What the Lean does and does not establish here}
+\label{sec:gap}
 
-The hypothesis-free form of \lean{greedy\_steps} is what distinguishes the witness from a
-simulation. A simulated trace would establish that \emph{some} implementation produces those
-counts; the eleven verified comparisons establish that \emph{any} implementation of
-largest-deficit-first does, whatever it does about ties---because at each of these steps the
-maximum is attained uniquely.
+Figure~\ref{fig:statements} is reproduced exactly because the gap it exposes is easy to
+paper over, and this paper's subject is inputs carried without proof.
+
+\emph{What is machine-checked.} That \lean{w} lies on the simplex; that \lean{N} spends
+exactly eleven pulls; and that $11\cdot w_{0}-N_{0}>1$ in exact rational arithmetic. Taken
+together, \lean{online\_quota\_fails} proves: \emph{there is a target on the simplex and an
+allocation of eleven pulls whose first-arm deficit exceeds one.}
+
+\emph{What is not.} That $N=(7,1,1,1,1)$ is the allocation the largest-deficit rule
+actually reaches. The eleven step comparisons sit in \lean{greedy\_steps}'s proof body as
+hardcoded rationals; each is kernel-checked as an arithmetic fact, but the theorem's
+conclusion is \lean{True}, so nothing about them is exported, and no Lean statement connects
+those literals to \lean{w} and \lean{N}. The rule-to-counts link---the part that makes this
+a statement about the \emph{rule} rather than about some allocation---is carried by the
+comment in the module, not by a proof.
+
+\emph{How the link is established instead.} We recomputed the trajectory independently in
+exact rational arithmetic, simulating largest-deficit-first on $w$ from $t=0$ and comparing
+the served arm against all four alternatives at every step. It reproduces
+Table~\ref{tab:trace} exactly, including the serve order $[0,3,0,0,1,0,0,2,0,0,4]$, the
+counts $(7,1,1,1,1)$ and $D_{0}(11)=\frac{26}{23}$. That computation is a \NUM{} result in
+this paper's evidence classes---exact, reproducible, and not machine-checked.
+
+Theorem~\ref{thm:quotafails} should therefore be read as one \PROVED{} half and one \NUM{}
+half: the arithmetic of the violation is checked by the prover, and the identification of
+$N$ as the rule's own trajectory rests on the computation reported here. Closing that gap
+means formalising the greedy rule as a Lean function and proving
+\lean{greedyCount w 11 = N}, which is not done.
 
 \subsection{Evidence per step}
 
@@ -772,9 +801,9 @@ result began as a failed proof of something stronger and false.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Adaptive strand
-contains $11$ Lean source files with $45$ theorem and lemma statements, of which $6$ modules
+contains $13$ Lean source files with $50$ theorem and lemma statements, of which $6$ modules
 carry an acceptance receipt covering $27$ declarations whose axiom set was printed and
-checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
@@ -970,7 +999,8 @@ identity is proved, so a geometric tail bounds the expected stopping time, and t
 concentration inequality is discharged from a sub-Gaussian hypothesis. The tracking question
 is settled, and the answer is negative: an allocation with deficit at most one exists at
 every horizon, but the natural online monotone rule cannot achieve it, by an exact witness
-whose every step is verified.
+whose violation arithmetic is machine-checked and whose trajectory is reproduced by exact
+computation.
 
 The broader lesson concerns which parts of an analysis deserve scrutiny. Of the three inputs
 closed here, two---the layer-cake identity and the sub-Gaussian threshold---were true and

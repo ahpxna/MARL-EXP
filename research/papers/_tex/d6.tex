@@ -30,8 +30,7 @@ prove that the budget constraint together with the split \emph{forces} the two w
 which therefore depend on the split $\eta$ and the price $c$ alone and not on the model
 parameters $(q,\mu)$; the delivered information is consequently affine in the split, so the
 optimum sits at an endpoint unless the two queries buy information at exactly the same rate
-per unit price---a condition we derive and on which every split is optimal. Everything is
-machine-checked in Lean~4 with no \texttt{sorry}.
+per unit price---a condition we derive and on which every split is optimal. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; the corollaries the paper derives from them are marked in Section~\ref{sec:verification}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -768,25 +767,26 @@ appears anywhere in the file.
 \hrule\vspace{4pt}
 \begin{tabbing}
 \quad\=\quad\=\kill
-\lean{theorem IB\_le\_general} \\
-\> \lean{(q d : $\mathbb{N}$) ($\mu$ x : $\mathbb{R}$) (S : Finset (Fin q))} \\
-\> \lean{(v : Fin q $\to$ $\mathbb{R}$) (hq : 0 < q) (hcard : S.card = d)} \\
-\> \lean{(h$\mu$ : 0 $\le$ $\mu$) (hx : 0 $\le$ x)} \\
-\> \lean{(hS : $\forall$ i $\in$ S, $\mu$ $\le$ |v i|)} \\
-\> \lean{(hSc : $\forall$ i $\notin$ S, x $\le$ |v i|) :} \\
-\> \lean{IB q d $\mu$ x $\le$ Igen q v} \\[6pt]
-\lean{theorem weights\_unique} \\
-\> \lean{($\eta$ c wB wp : $\mathbb{R}$) (hc : 0 < c)} \\
-\> \lean{(hbud : wB + c * wp = 1) (hsplit : c * wp = $\eta$) :} \\
-\> \lean{wB = 1 - $\eta$ $\wedge$ wp = $\eta$ / c}
+\lean{theorem IB\_le\_general (q : $\mathbb{N}$) (hq : 0 < q)} \\
+\> \lean{(mu x : $\mathbb{Q}$) (hmu : 0 $\le$ mu) (hx : 0 $\le$ x)} \\
+\> \lean{(v : Fin q $\to$ $\mathbb{Q}$) (S : Finset (Fin q))} \\
+\> \lean{(hS : $\forall$ i $\in$ S, mu $\le$ |v i|)} \\
+\> \lean{(hSc : $\forall$ i, i $\notin$ S $\to$ x $\le$ |v i|) :} \\
+\> \lean{IB (q : $\mathbb{Q}$) (S.card : $\mathbb{Q}$) mu x $\le$ Igen q v} \\[6pt]
+\lean{theorem weights\_unique (eta c a b : $\mathbb{Q}$) (hc : c $\ne$ 0)} \\
+\> \lean{(hbudget : a + c * b = 1) (hshare : c * b = eta) :} \\
+\> \lean{a = wB eta $\wedge$ b = wPair eta c}
 \end{tabbing}
 \vspace{-4pt}\hrule
-\caption{The reduction and the uniqueness, as checked. In \lean{IB\_le\_general} the shift
-\lean{v} is an arbitrary function \lean{Fin q $\to$ $\mathbb{R}$} and the block \lean{S} an
-arbitrary \lean{Finset}; the hypotheses are the per-coordinate magnitude bounds and nothing
-else, so the conclusion holds for every alternative in the class rather than for a
-parameterised family. In \lean{weights\_unique} the conclusion is an equality, not an
-existence, which is what distinguishes a derivation from a fit.}
+\caption{The reduction and the uniqueness, as checked. Both are over $\mathbb{Q}$, so every
+arithmetic step is exact. In \lean{IB\_le\_general} the shift \lean{v} is an arbitrary
+function \lean{Fin q $\to$ $\mathbb{Q}$} and the block \lean{S} an arbitrary \lean{Finset};
+the hypotheses are the per-coordinate magnitude bounds and nothing else, so the conclusion
+holds for every alternative in the class rather than for a parameterised family. In
+\lean{weights\_unique} the conclusion is an equality, not an existence, which is what
+distinguishes a derivation from a fit---and the hypothesis is \lean{c $\ne$ 0}, with
+positivity of the price entering separately through
+\lean{weights\_nonneg\_iff}.}
 \label{fig:statements}
 \end{figure}
 
@@ -800,6 +800,15 @@ not an upgrade of it.
 Likewise \lean{weights\_unique} concludes an \emph{equality} from the budget and the split.
 An existential---``there exist non-negative weights satisfying the budget''---would be
 consistent with the weights having been fitted; the equality is what rules that out.
+
+\subsection{What the paper derives rather than cites}
+
+Two displayed corollaries carry no \lean{leanbox} because the paper obtains them from the
+checked statements: Corollary~\ref{cor:upgrade}, which chains
+Theorem~\ref{thm:reduction} with a hypothesis on $I_{B}$, and
+Corollary~\ref{cor:indep}, which reads off \eqref{eq:design} that $q$ and $\mu$ do not
+occur. Both are immediate, and both are named here so that the reader is not left to infer
+which results are checked and which are consequences drawn in the text.
 
 \subsection{Evidence per step}
 
@@ -827,7 +836,7 @@ Separation, Thm~\ref{thm:modulus}      & \lean{LeanD6AlternativeReductionV1}& 7 
 
 \subsection{Why a large strand yields few displayed equations}
 
-The D6 strand is by far the largest in the programme---$261$ files and $1{,}750$ statements
+The D6 strand is by far the largest in the programme---$444$ files and $4{,}087$ statements
 against, for instance, the Query strand's $21$ and $135$---and it contributes five displayed
 equations to this paper. The ratio invites the question of what the rest is doing, and the
 answer is worth giving because it is characteristic of formal developments and misleading if
@@ -849,9 +858,9 @@ what did not work.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The D6 strand contains
-$261$ Lean source files with $1{,}750$ theorem and lemma statements, of which $28$ modules
+$444$ Lean source files with $4{,}087$ theorem and lemma statements, of which $28$ modules
 carry an acceptance receipt covering $175$ declarations whose axiom set was printed and
-checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the

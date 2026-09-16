@@ -30,8 +30,7 @@ worst-case risks, which closes a real gap: the earlier statement took constant r
 hypothesis and contained no infimum over rules, so it said the decoder was flat, not that it
 was optimal. Flatness is itself discharged from symmetry rather than imposed. Finally the
 decide risk is exactly $\tfrac12(1-P)^{N}$, independent of $K$, while recovery grows like
-$K\log K$: the separation is an identity, not an asymptotic comparison. Everything is
-machine-checked in Lean~4 with no \texttt{sorry}.
+$K\log K$: the separation is an identity, not an asymptotic comparison. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; Section~\ref{sec:verification} names the steps the paper works out itself.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -692,38 +691,41 @@ appears anywhere in the file.
 \begin{tabbing}
 \quad\=\quad\=\kill
 \lean{theorem bayes\_optimal\_lower} \\
-\> \lean{(W X A : Type) [Fintype W] [Fintype X]} \\
-\> \lean{[Fintype A] [Nonempty A]} \\
-\> \lean{($\pi$ : W $\to$ $\mathbb{R}$) (P : W $\to$ X $\to$ $\mathbb{R}$)} \\
-\> \lean{(L : W $\to$ A $\to$ $\mathbb{R}$) (d : X $\to$ A) :} \\
-\> \lean{$\sum$ x, ($\inf$ over a of postLoss $\pi$ P L x a)} \\
-\> \qquad\lean{$\le$ bayesRisk $\pi$ P L d} \\[6pt]
-\lean{theorem equivariant\_is\_minimax} \\
-\> \lean{($\ldots$) (hconst : $\forall$ w, risk w d0 = v)} \\
-\> \lean{(hmeets : $\sum$ x, ($\inf$ over a of postLoss $\ldots$) = v) :} \\
-\> \lean{IsLeast \{ r | $\exists$ d, r = $\sup$ w, risk w d \} v}
+\> \lean{(pri : World $\to$ $\mathbb{R}$) (P : World $\to$ Obs $\to$ $\mathbb{R}$)} \\
+\> \lean{(L : World $\to$ Act $\to$ $\mathbb{R}$) (d : Obs $\to$ Act) :} \\
+\> \lean{bayesOptValue pri P L $\le$ bayesRisk pri P L d} \\[6pt]
+\lean{theorem equivariant\_is\_minimax [Nonempty World]} \\
+\> \lean{(pri : World $\to$ $\mathbb{R}$) (P : World $\to$ Obs $\to$ $\mathbb{R}$)} \\
+\> \lean{(L : World $\to$ Act $\to$ $\mathbb{R}$)} \\
+\> \lean{(hpi : $\forall$ w, 0 $\le$ pri w) (hsum : $\sum$ w, pri w = 1)} \\
+\> \lean{(d$_0$ : Obs $\to$ Act) (r : $\mathbb{R}$)} \\
+\> \lean{(hconst : $\forall$ w, risk P L d$_0$ w = r)} \\
+\> \lean{(hopt : bayesOptValue pri P L = r) :} \\
+\> \lean{IsLeast \{v | $\exists$ d : Obs $\to$ Act,} \\
+\> \qquad\lean{univ.sup' univ\_nonempty (risk P L d) = v\} r}
 \end{tabbing}
 \vspace{-4pt}\hrule
 \caption{The optimality step and the conclusion, as checked. In
 \lean{bayes\_optimal\_lower} the rule \lean{d} is an \emph{arbitrary} function
-\lean{X $\to$ A}: nothing restricts it to be deterministic in any meaningful sense, since in
-a finite setting every rule is such a function. The conclusion of
-\lean{equivariant\_is\_minimax} is \lean{IsLeast}, not merely a lower bound---the value is
+\lean{Obs $\to$ Act}: nothing restricts it, since in a finite setting every rule is such a
+function. The conclusion of \lean{equivariant\_is\_minimax} is \lean{IsLeast}---the value is
 both a lower bound on the achievable worst-case risks and a member of that set, which is the
-difference between ``no rule is known to do better'' and ``no rule does better''.}
+difference between ``no rule is known to do better'' and ``no rule does better''. Its two
+hypotheses \lean{hconst} and \lean{hopt} are what the surrounding sections supply:
+Theorem~\ref{thm:equivariant} with Proposition~\ref{prop:symmetry} gives the first, and the
+posterior computation of Section~\ref{sec:natural} gives the second.}
 \label{fig:statements}
 \end{figure}
 
-The choice of \lean{IsLeast} in Fig.~\ref{fig:statements} is deliberate and is the formal
-expression of what was missing before. A lower-bound statement alone would say the worst-case
-risk of every rule is at least $v$; membership says $v$ is achieved, and by the equivariant
-decoder specifically. Together they say the decoder is optimal rather than merely
-unimprovable-as-far-as-we-know.
+The choice of \lean{IsLeast} is deliberate and is the formal expression of what was missing
+before. A lower-bound statement alone would say the worst-case risk of every rule is at
+least $r$; membership says $r$ is achieved, and by a rule with constant risk. Together they
+say the decoder is optimal rather than merely unimprovable-as-far-as-we-know.
 
-The hypothesis \lean{[Nonempty A]} is where Theorem~\ref{thm:optimal}'s existence clause
-enters. Without it the pointwise minimum is over an empty set and the statement is vacuous
-or ill-formed depending on convention; with it, the argmin rule exists and the infimum is
-attained.
+The hypothesis \lean{[Nonempty World]}, together with the finiteness of the action set that
+Theorem~\ref{thm:optimal}'s existence clause needs, is where that theorem enters. Without a
+non-empty action set the pointwise minimum is over an empty family and the statement is
+vacuous; with it, the argmin rule exists and the infimum is attained.
 
 \subsection{Evidence per step}
 
@@ -772,9 +774,9 @@ the recover column moving against it.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Support strand
-contains $38$ Lean source files with $390$ theorem and lemma statements, of which $21$
+contains $50$ Lean source files with $870$ theorem and lemma statements, of which $21$
 modules carry an acceptance receipt covering $184$ declarations whose axiom set was printed
-and checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+and checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the

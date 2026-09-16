@@ -30,8 +30,7 @@ of convex problems; the range constraints admit exact shrink and expand equivale
 inner quadratic programme has a closed form with a harmonic denominator; and the optimality
 certificate is proved from primal feasibility, dual non-negativity, stationarity and
 complementary slackness using only symmetry and positive \emph{semi}definiteness, so a
-singular information matrix costs no extra hypothesis and no pseudoinverse. Everything is
-machine-checked in Lean~4 with no \texttt{sorry}. On a confirmatory panel of $1000$ paired
+singular information matrix costs no extra hypothesis and no pseudoinverse. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; Section~\ref{sec:verification} records which of them are conditional on a stated hypothesis rather than on a formalised definition of the oracle value. On a confirmatory panel of $1000$ paired
 instances, $\mathrm{C\_lucb}$ certifies $797$ worlds at median $20{,}996$ queries against
 $605$ at $74{,}252$ for uniform.
 \end{abstract}
@@ -984,36 +983,60 @@ appears anywhere in the file.
 \begin{tabbing}
 \quad\=\quad\=\kill
 \lean{theorem scalar\_not\_upper\_to\_any\_constant} \\
-\> \lean{(c : $\mathbb{R}$) (hc : 0 < c) :} \\
-\> \lean{$\exists$ inst, Jfull inst < c * Jscalar inst} \\[6pt]
+\> \lean{(C : $\mathbb{R}$) (hC : 0 < C) :} \\
+\> \lean{$\exists$ eta : $\mathbb{R}$, 0 < eta $\wedge$ eta $\le$ 1} \\
+\> \qquad\lean{$\wedge$ 9 * eta / 32 < (1 / 32 : $\mathbb{R}$) / C} \\[6pt]
 \lean{theorem scalar\_not\_lower\_to\_any\_constant} \\
-\> \lean{(c : $\mathbb{R}$) (hc : 0 < c) :} \\
-\> \lean{$\exists$ inst, c * Jscalar inst < Jfull inst} \\[6pt]
-\lean{theorem kkt\_certificate} \\
-\> \lean{(M : Matrix n n $\mathbb{R}$) (hsymm : M.IsSymm)} \\
-\> \lean{(hpsd : $\forall$ v, 0 $\le$ v $\cdot$ (M.mulVec v))} \\
-\> \lean{(hstat : M.mulVec (l - $\mu$) + A$^{\top}$.mulVec y = 0)} \\
-\> \lean{(hdual : 0 $\le$ y) (hfeas : A.mulVec l $\le$ 0)} \\
-\> \lean{(hcs : y $\cdot$ (A.mulVec l) = 0)} \\
-\> \lean{($\lambda$' : n $\to$ $\mathbb{R}$) (hf : A.mulVec $\lambda$' $\le$ 0) :} \\
-\> \lean{energy M $\mu$ l $\le$ energy M $\mu$ $\lambda$'}
+\> \lean{(C : $\mathbb{R}$) (hC : 0 < C) :} \\
+\> \lean{$\exists$ eta : $\mathbb{R}$, 0 < eta $\wedge$ eta $\le$ 1} \\
+\> \qquad\lean{$\wedge$ C * (eta / (8*(1+3*eta))) < (1 / 128 : $\mathbb{R}$)} \\[6pt]
+\lean{theorem kkt\_certificate (M : $\iota\to\iota\to\mathbb{R}$) (A : $\kappa\to\iota\to\mathbb{R}$)} \\
+\> \lean{(mu lam : $\iota\to\mathbb{R}$) (y : $\kappa\to\mathbb{R}$)} \\
+\> \lean{(hsymm : $\forall$ p q, M p q = M q p)} \\
+\> \lean{(hpsd : $\forall$ d, 0 $\le$ quad M d)} \\
+\> \lean{(hy : $\forall$ c, 0 $\le$ y c)} \\
+\> \lean{(hfeas : $\forall$ c, rowAp A lam c $\le$ 0)} \\
+\> \lean{(hstat : $\forall$ p, ($\sum$ q, M p q * (lam q - mu q))} \\
+\> \qquad\lean{+ ($\sum$ c, y c * A c p) = 0)} \\
+\> \lean{(hcs : $\sum$ c, y c * rowAp A lam c = 0)} \\
+\> \lean{(lam' : $\iota\to\mathbb{R}$) (hfeas' : $\forall$ c, rowAp A lam' c $\le$ 0) :} \\
+\> \lean{(1/2)*quad M (lam - mu) $\le$ (1/2)*quad M (lam' - mu)}
 \end{tabbing}
 \vspace{-4pt}\hrule
 \caption{The two-directional failure and the inverse-free certificate, as checked. The
-first two statements are quantified over \emph{every} positive $c$, so they rule out any
-constant correction rather than exhibiting one bad case;
-Corollary~\ref{cor:noconstant} is their conjunction. In
-\lean{kkt\_certificate} the hypothesis on $M$ is \lean{hpsd}, positive
+first two are quantified over \emph{every} positive $C$, so they rule out any constant
+correction rather than exhibiting one bad case; Corollary~\ref{cor:noconstant} is their
+conjunction. In \lean{kkt\_certificate} the hypothesis on $M$ is \lean{hpsd}, positive
 \emph{semi}definiteness, and no invertibility or pseudoinverse appears in the statement or
-in the proof.}
+the proof.}
 \label{fig:statements}
 \end{figure}
 
+\subsection{What the two family statements are, exactly}
+
 The quantifier structure of the first two statements in Fig.~\ref{fig:statements} is the
-whole content of C1. A theorem exhibiting one instance on which the proxy is bad would leave
-open that a constant correction repairs it; these are stated with $c$ universally quantified
-and the instance existential inside, so no constant survives. The instance produced is the
-corresponding family with $\eta$ chosen from $c$.
+content of C1: a theorem exhibiting one bad instance would leave open that a constant
+correction repairs it, and these are stated with $C$ universally quantified and the instance
+existential inside, so no constant survives.
+
+Their \emph{terms} deserve equal precision. They compare the closed-form envelopes
+$9\eta/32$ and $1/32$ for family~1, and $\eta/(8(1+3\eta))$ and $1/128$ for family~2---not
+symbols $J_{\mathrm{full}}$ and $J_{\mathrm{scalar}}$, which the development never defines
+as an infimum over the alternative set. That the envelopes are the right numbers is carried
+by separate checked statements: \lean{family1\_alt\_ties} and \lean{family1\_alt\_cost} show
+the exhibited alternative is capacity-inverting and costs $\frac{9\eta}{32}$;
+\lean{family1\_scalar\_value} and \lean{family2\_scalar\_value} evaluate \eqref{eq:scalar};
+\lean{positive\_parts\_sum} and \lean{family2\_full\_ge} give the $\frac{1}{128}$ floor. The
+two \lean{\_ratio} theorems then take $J_{\mathrm{full}}$ as a \emph{variable with a
+hypothesis}---\lean{family1\_ratio (Jfull eta) (hJ : Jfull $\le$ 9*eta/32)}---and conclude
+the ratio bound.
+
+So the development proves: any quantity satisfying the envelope bounds has the stated ratio
+behaviour, and the envelopes are correct for these instances. What it does not do is define
+$J_{\mathrm{full}}$ as the infimum in \eqref{eq:J} and prove the exhibited alternative
+attains it---which is the same missing separability step
+Section~\ref{sec:discussion} records, and which family~1 does not need, since an exhibited
+feasible alternative bounds an infimum from above by construction.
 
 \subsection{Evidence per step}
 
@@ -1047,9 +1070,9 @@ All module names are prefixed \lean{LeanFunctional}, elided in the table for wid
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Functional strand
-contains $36$ Lean source files with $319$ theorem and lemma statements, of which $21$
+contains $49$ Lean source files with $430$ theorem and lemma statements, of which $21$
 modules carry an acceptance receipt covering $162$ declarations whose axiom set was printed
-and checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+and checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
 statements, $108$ accepted modules, $860$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
