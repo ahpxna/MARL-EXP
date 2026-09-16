@@ -106,7 +106,8 @@ def build(layout_path, meta_path, out_path):
     eq_index = json.loads(Path('research/papers/_figures/eq/index.json').read_text())
     for col in ('1', '2', '3'):
         # a column carrying more than its natural share renders smaller, never clipped
-        fontscale = 100.0 if fills[col] <= 1.0 else 100.0 / fills[col]
+        # the layout already sized every box to the text AT THIS SCALE, so the two agree
+        fontscale = layout['report'][col].get('text_scale', 1.0) * 100.0
         for box in layout['boxes'][col]:
             k = box['kind']
             if k in ('header', 'prose', 'caption'):

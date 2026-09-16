@@ -94,17 +94,37 @@ def layout_column(col, blocks, eq_index, top=TOP, bottom=BOTTOM):
 
     # distribute the difference over the PROSE blocks only: equations and figures keep
     # their aspect, headers keep the template's height.
+    # Fit the stack by SCALING the text, never by squeezing a box below the text it holds.
+    # Headers, equations and figures keep their size; the prose absorbs the difference, and
+    # the same factor is handed to the builder as the font scale, so the box a paragraph
+    # gets and the size that paragraph is drawn at always agree.  Squeezing boxes instead
+    # is what made text overflow into the equation below it.
     prose_idx = [i for i, b in enumerate(blocks) if b['kind'] in ('prose', 'caption')]
-    slack = avail - natural
-    if prose_idx:
-        # Distribute the difference in PROPORTION to each block's natural height, not
-        # equally.  Equal shares give a one-line block the same absolute slack as a
-        # six-line one, so the short blocks end up loose and the long ones tight -- and a
-        # renderer that auto-fits per box then draws them at visibly different sizes.
-        base = sum(nat[i] for i in prose_idx)
+    fixed = sum(h for i, h in enumerate(nat) if i not in prose_idx) + sum(gaps)
+    prose_nat = sum(nat[i] for i in prose_idx)
+    room = avail - fixed
+    if prose_idx and prose_nat > 0:
+        factor = room / prose_nat
+        factor = max(0.55, min(1.0, factor))   # below 0.55 the column is genuinely overfull
         for i in prose_idx:
-            share = (nat[i] / base) if base > 0 else (1.0 / len(prose_idx))
-            nat[i] = max(0.24, nat[i] + slack * share)
+            nat[i] = nat[i] * factor
+    else:
+        factor = 1.0
+
+    # If the text has already been scaled to its floor and the stack still exceeds the
+    # column, the remaining lever is the figures: a figure at 70% width is still perfectly
+    # legible on a 48-inch sheet, whereas text below 55% is not.  Shrinking the figures is
+    # therefore the right thing to give up, and it is done only when needed.
+    fig_idx = [i for i, b in enumerate(blocks) if b['kind'] == 'fig']
+    over = (sum(nat) + sum(gaps)) - avail
+    fig_scale = 1.0
+    if over > 0.01 and fig_idx:
+        fig_total = sum(nat[i] for i in fig_idx)
+        if fig_total > 0:
+            fig_scale = max(0.55, 1.0 - over / fig_total)
+            for i in fig_idx:
+                nat[i] *= fig_scale
+                blocks[i]['_w'] = blocks[i].get('_w', 0) * fig_scale
 
     boxes, y = [], top
     for i, b in enumerate(blocks):
@@ -120,8 +140,10 @@ def layout_column(col, blocks, eq_index, top=TOP, bottom=BOTTOM):
                           'text': b.get('text')})
         y += nat[i] + (gaps[i] if i < len(gaps) else 0)
 
-    return boxes, {'natural_in': round(natural, 2), 'available_in': round(avail, 2),
+    return boxes, {'text_scale': round(factor, 3), 'figure_scale': round(fig_scale, 3),
+                   'natural_in': round(natural, 2), 'available_in': round(avail, 2),
                    'fill': round(fill, 3), 'blocks': len(blocks),
+                   'stack_in': round(sum(nat) + sum(gaps), 2),
                    'verdict': ('OVERFULL — trim' if fill > 1.02 else
                                'thin — add content' if fill < 0.80 else 'good')}
 
