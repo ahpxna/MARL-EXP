@@ -118,6 +118,25 @@ def block_height(col, b, eq_index):
     return w / _aspect(b['key'] if k == 'eq' else b['path'], eq_index)
 
 
+def atomise(blocks):
+    """Split multi-paragraph prose into one block per paragraph.
+
+    A column break between two paragraphs is ordinary typography; one inside a paragraph is
+    a defect.  Splitting here gives the balancer paragraph-level granularity without ever
+    letting it cut mid-argument, and keeps equations welded to the paragraph that
+    introduces them.
+    """
+    out = []
+    for b in blocks:
+        if b['kind'] == 'prose' and len(b['lines']) > 1:
+            for ln in b['lines']:
+                if ln.strip():
+                    out.append({'kind': 'prose', 'lines': [ln]})
+        else:
+            out.append(b)
+    return out
+
+
 def balance(blocks, eq_index, top=TOP, bottom=BOTTOM):
     """Split ONE ordered block list into three contiguous columns.
 
@@ -126,10 +145,25 @@ def balance(blocks, eq_index, top=TOP, bottom=BOTTOM):
     points, which is cheap for the block counts a poster has.  A column may not start on
     anything but a header, so sections are never orphaned from their titles.
     """
+    blocks = atomise(blocks)
     n = len(blocks)
     avail = bottom - top
     heights = [[block_height(c, b, eq_index) for b in blocks] for c in (1, 2, 3)]
-    cuts = [i for i in range(1, n) if blocks[i]['kind'] == 'header']
+    # A cut may fall anywhere EXCEPT immediately after a header, which would leave that
+    # header alone at the foot of a column; and never between an equation or figure and the
+    # prose that introduces it.
+    def opens_a_unit(b):
+        # after atomising, any paragraph is a legitimate column opening -- what must never
+        # happen is opening on an equation, a figure or a caption orphaned from its text.
+        '''A column may open on a section header or on a numbered step, never mid-argument.'''
+        if b['kind'] == 'header':
+            return True
+        if b['kind'] == 'prose':
+            return True
+        return False
+
+    cuts = [i for i in range(1, n)
+            if blocks[i - 1]['kind'] != 'header' and opens_a_unit(blocks[i])]
     best, best_score = None, None
     for i in cuts:
         for j in cuts:
@@ -143,7 +177,21 @@ def balance(blocks, eq_index, top=TOP, bottom=BOTTOM):
                 gaps = [GAP_AFTER_HEADER if b['kind'] == 'header' else GAP
                         for b in bs[:-1]]
                 fills.append((sum(hs) + sum(gaps)) / avail)
-            score = max(abs(f - 0.99) for f in fills)
+            # readability first: a column should open on a section, not mid-argument.
+            # A non-header cut is allowed but must buy a real gain in balance to win.
+            # prefer opening on a section, then on a step, then on any paragraph
+            def cost(k):
+                b = blocks[k]
+                if b['kind'] == 'header':
+                    return 0.0
+                if b['lines'] and b['lines'][0].lstrip().startswith(('STEP ', 'C1.', 'C2.', 'C3.',
+                                                                    'C4.', 'C5.', 'C6.')):
+                    return 0.04
+                return 0.12
+            penalty = cost(i) + cost(j)
+            score = (max(fills) - min(fills)
+                     + 2 * max(0.0, max(fills) - 1.02)
+                     + penalty)
             if best_score is None or score < best_score:
                 best_score, best = score, (i, j, fills)
     if best is None:

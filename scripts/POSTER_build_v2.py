@@ -11,6 +11,14 @@ from pathlib import Path
 from pptx import Presentation
 from pptx.oxml.ns import qn
 from pptx.util import Emu
+from pptx.oxml.ns import qn as _qn
+from lxml.etree import SubElement
+from pptx.oxml import parse_xml
+
+
+def OxmlElement(tag):
+    ns = 'http://schemas.openxmlformats.org/drawingml/2006/main'
+    return parse_xml(f'<a:{tag.split(":")[1]} xmlns:a="{ns}"/>')
 
 TEMPLATE = 'Poster Template (1) (2) (1).pptx'
 # template shapes to borrow typography from, by role
@@ -38,6 +46,26 @@ def set_text(shape, lines):
         for r in runs[1:]:
             q.remove(r)
         body.append(q)
+
+
+def set_autofit(shape, scale):
+    """Let PowerPoint shrink the text to the box instead of clipping it.
+
+    The box geometry is computed, so a column that carries more than its natural share
+    should render smaller rather than overflow; `normAutofit` is exactly that behaviour and
+    it is what the template's own boxes would do if the content grew.
+    """
+    bodyPr = shape.text_frame._txBody.find(qn('a:bodyPr'))
+    if bodyPr is None:
+        return
+    for tag in ('a:normAutofit', 'a:spAutoFit', 'a:noAutofit'):
+        el = bodyPr.find(qn(tag))
+        if el is not None:
+            bodyPr.remove(el)
+    af = OxmlElement('a:normAutofit')
+    af.set('fontScale', str(int(max(25, min(100, scale)) * 1000)))
+    af.set('lnSpcReduction', str(int(max(0, min(20, (100 - scale) * 0.4)) * 1000)))
+    bodyPr.append(af)
 
 
 def place(shape, box):
@@ -71,8 +99,11 @@ def build(layout_path, meta_path, out_path):
         sh._element.getparent().remove(sh._element)
 
     counts = {'header': 0, 'prose': 0, 'caption': 0, 'eq': 0, 'fig': 0}
+    fills = {c: layout['report'][c]['fill'] for c in ('1', '2', '3')}
     eq_index = json.loads(Path('research/papers/_figures/eq/index.json').read_text())
     for col in ('1', '2', '3'):
+        # a column carrying more than its natural share renders smaller, never clipped
+        fontscale = 100.0 if fills[col] <= 1.0 else 100.0 / fills[col]
         for box in layout['boxes'][col]:
             k = box['kind']
             if k in ('header', 'prose', 'caption'):
@@ -81,6 +112,7 @@ def build(layout_path, meta_path, out_path):
                 sh = slide.shapes[-1]
                 set_text(sh, box['lines'] if box['lines'] else [box.get('text') or ''])
                 place(sh, box)
+                set_autofit(sh, fontscale)
             elif k == 'eq':
                 slide.shapes.add_picture(
                     eq_index[box['ref']]['path'],
