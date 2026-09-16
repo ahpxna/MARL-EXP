@@ -1,0 +1,1097 @@
+\input{preamble}
+
+\begin{document}
+
+\title{One Schedule Cannot Serve Every Budget:\\
+An Exact Menu Law Under Signed Cancellation,\\
+for Every $m\geq5$}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A schedule reveals items one at a time and a client with budget $k$ sees the first $k$. We
+ask how well a single schedule---or a small \emph{menu} of schedules---can serve every
+budget at once when the items carry \emph{signed} weights that cancel. Signed cancellation
+changes the problem qualitatively: with non-negative weights adding an item never hurts and
+one well-chosen order degrades gracefully, whereas here a prefix can overshoot and then be
+corrected, so a schedule excellent at one budget can be poor at the next. For an explicit
+family of size $m$ we prove an exact two-sided law: the best achievable value of
+$\max_{k}\mathbb{E}[r]$ is $V_{\mathrm{avg}}=2/((m+4)(m-1))$ and of
+$\mathbb{E}[\max_{k}r]$ is $V_{\mathrm{path}}=2/(m+4)$, both attained, so the ratio
+$V_{\mathrm{path}}/V_{\mathrm{avg}}=m-1$ is an identity rather than an estimate. The
+mechanism behind the lower side carries no saturation, balance or concentration hypothesis
+and holds for every $m\ge5$ rather than for finitely many checked values: a schedule paying
+nothing at any budget must move the prefix sum by at most $2$ per element, which the
+element $3$ contradicts. The upper side is an explicit construction---for every $m\ge5$ and
+every budget $j$ we \emph{build} an ordering whose defect is zero everywhere except a single
+$2$ at position $j$, by a greedy alternation maintaining an explicit invariant. We
+additionally carry the constrained problem with its actual marginal, a matrix indexed by
+(item, budget) rather than a scalar stand-in, prove its column sums equal $\min(k,n)$ for
+\emph{every} menu, and compute it in closed form on the cyclic menu. Everything is
+machine-checked in Lean~4 with no \texttt{sorry}.
+\end{abstract}
+
+\begin{IEEEkeywords}
+incremental optimisation, scheduling, signed weights, menu design, competitive analysis,
+formal verification, interactive theorem proving
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+A schedule is an ordering of a set of items. A client arrives with a budget $k$, sees the
+first $k$ items of the schedule, and is served by whatever those $k$ items are worth. The
+designer publishes the schedule before knowing which budgets will arrive, so a single
+schedule must work for all of them at once.
+
+When the items carry non-negative weights this problem is well understood in outline.
+Adding an item never hurts, so the value at budget $k$ is non-decreasing in $k$, and a
+greedy order that takes the best item first degrades gracefully: a schedule that is good at
+one budget is not far from good at the next. The design question is quantitative, and the
+answers take the form of competitive ratios.
+
+This paper studies the signed case, where weights may be negative and cancel. The
+qualitative picture changes. A prefix can overshoot the target and then be corrected by a
+later negative item, so the value is no longer monotone in the budget, and a schedule that
+is excellent at budget $k$ can be poor at budget $k+1$ for the very reason that it was
+excellent---the item that made it excellent is now the one that has to be undone. The
+question of how many schedules a \emph{menu} needs becomes sharp, because a single one
+provably cannot do the job.
+
+\subsection{Why the signed case is different in kind}
+
+The difference is not a matter of degree, and it is worth making precise before any
+formalism.
+
+With non-negative weights, the value of a prefix is non-decreasing in the budget. A
+schedule that has done well up to budget $k$ has, as a consequence, done well at every
+budget below $k$: the early client's outcome is a sub-outcome of the later client's.
+Designing for the largest budget therefore partially designs for all smaller ones, and the
+residual question---how much is lost at the small budgets by an order chosen for the large
+ones---is quantitative.
+
+With signed weights the containment fails. The prefix at budget $k$ is still contained in
+the prefix at budget $k+1$ as a \emph{set}, but its value is not bounded by the larger
+prefix's value in either direction, because the item added at step $k+1$ may cancel what
+came before. A schedule can therefore be optimal at budget $k$ and worst-possible at
+$k+1$---indeed the construction of Section~\ref{sec:construction} exhibits schedules that
+sit exactly at the boundary, paying nothing at every budget but one.
+
+That is why the design question changes from ``which order'' to ``how many orders''. The
+first question has no good answer here---Theorem~\ref{thm:everyorderpays} says every answer
+is wrong somewhere---and the second has an exact one.
+
+\subsection{The family}
+
+We fix the family
+\begin{equation}
+g_{m}=\bigl(-3,\;(-1)^{p},\;(+1)^{q},\;3\bigr),
+\label{eq:family}
+\end{equation}
+with
+\begin{equation}
+p=\Bigl\lceil\tfrac{m-2}{2}\Bigr\rceil,\quad
+q=\Bigl\lfloor\tfrac{m-2}{2}\Bigr\rfloor,\quad
+D=\sum_{i}|g_{i}|=m+4 ,
+\label{eq:familyparams}
+\end{equation}
+where $(-1)^{p}$ denotes $p$ copies of $-1$ and $(+1)^{q}$ denotes $q$ copies of $+1$. An
+ordering is a permutation $\pi$; the retained prefix at budget $k$ has sum $s_{k}$, and the
+normalised regret is
+\begin{equation}
+r(\pi,k)\;=\;\frac{|s_{k}|-(k \bmod 2)}{D},
+\label{eq:regret}
+\end{equation}
+because every $g_{i}$ is odd, so the minimum of $|\sum g_{i}|$ over subsets of size $k$
+equals $k \bmod 2$ by parity.
+
+\begin{table}[htbp]
+\caption{Notation.}
+\label{tab:notation}
+\centering
+\footnotesize
+\begin{tabular}{@{}ll@{}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$m$ & number of items \\
+$g_{m}$ & the family, \eqref{eq:family} \\
+$p,q$ & counts of $-1$ and $+1$ elements \\
+$D$ & total absolute weight, $m+4$ \\
+$\pi$ & an ordering (schedule) \\
+$k$ & a budget \\
+$\mathrm{Bud}$ & the budget set, $|\mathrm{Bud}|=m-1$ \\
+$s_{k}$ & prefix sum of the first $k$ items \\
+$r(\pi,k)$ & normalised regret, \eqref{eq:regret} \\
+$\mathrm{dfc}(s)$ & defect, \eqref{eq:dfc} \\
+$c$ & guaranteed per-schedule payment \\
+$P$ & distribution over orderings (a menu) \\
+$V_{\mathrm{avg}}$ & optimal $\max_{k}\mathbb{E}_{P}[r]$ \\
+$V_{\mathrm{path}}$ & optimal $\mathbb{E}_{P}[\max_{k}r]$ \\
+$x^{*}_{i,k}$ & retained trajectory, \eqref{eq:marginal} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What the answer looks like}
+
+The answer we obtain has an unusual shape for this kind of question. It is not a competitive
+ratio and not an asymptotic bound, but an identity: the value of the problem under one
+objective divided by its value under a closely related objective is exactly $m-1$, the
+number of budgets, for every $m\ge5$. Both values are attained, so nothing is hidden in
+slack on either side, and the divisor is an integer determined by the instance rather than a
+constant produced by an optimisation.
+
+Getting an identity rather than a bound requires both halves of the argument to be tight.
+The lower half turns out to need almost nothing---one lemma about step sizes and the
+observation that the family contains an element too large to satisfy it---while the upper
+half requires building, for every population size and every budget, a schedule that pays its
+unavoidable cost at exactly that budget and nowhere else. The asymmetry in effort between
+the two halves is itself a finding, and Section~\ref{sec:discussion} returns to it.
+
+\subsection{Contributions}
+
+\begin{enumerate}
+\item[C1.] \textbf{An exact two-sided law for every $m\ge5$.} We prove
+$V_{\mathrm{avg}}=2/((m+4)(m-1))$ and $V_{\mathrm{path}}=2/(m+4)$, both attained, so the
+ratio is an identity (Theorem~\ref{thm:law}).
+
+\item[C2.] \textbf{The mechanism, with no side hypotheses.} A schedule paying nothing at any
+budget must move the prefix sum by at most $2$ per element
+(Lemma~\ref{lem:nobigstep}), and hence every ordering of \eqref{eq:family} pays at least
+$2$ (Theorem~\ref{thm:everyorderpays}). No saturation, balance or concentration hypothesis
+is used, and the statement holds for all $m\ge5$ rather than for checked values.
+
+\item[C3.] \textbf{An explicit construction, not an existence argument.} For every $m\ge5$
+and every budget $j$ we build an ordering whose defect vector is zero except for a single
+$2$ at position $j$ (Theorem~\ref{thm:construction}).
+
+\item[C4.] \textbf{$\max\mathbb{E}$ separated from $\mathbb{E}\max$.} The two lower bounds
+differ only in the order of the maximum and the expectation, and the same witness attains
+both, so the separation is exact rather than an artefact of a loose bound.
+
+\item[C5.] \textbf{The constrained problem, with the actual marginal.} We carry the
+retained-component trajectory---a matrix indexed by (item, budget)---rather than a scalar
+stand-in, prove its column sums equal the budget for \emph{every} menu
+(Theorem~\ref{thm:colsum}), and compute it in closed form on the cyclic menu
+(Theorem~\ref{thm:cyclic}).
+\end{enumerate}
+
+\subsection{Roadmap}
+
+Section~\ref{sec:related} fixes the novelty boundary. Section~\ref{sec:defect} identifies
+the right numerator, Section~\ref{sec:mechanism} proves the mechanism,
+Section~\ref{sec:bounds} the two lower bounds and their attainment,
+Section~\ref{sec:construction} the construction, and Section~\ref{sec:law} assembles the
+law. Section~\ref{sec:marginal} treats the constrained problem,
+Section~\ref{sec:results} reports the numerics, Section~\ref{sec:verification} the formal
+development, and Section~\ref{sec:discussion} the scope.
+
+\section{Related work and the novelty boundary}
+\label{sec:related}
+
+\subsection{Incremental maximisation}
+
+Disser, Klimm, Schewior and Weckbecker \cite{disser2023} study incremental maximisation,
+where a solution is built up element by element and must be competitive at every
+cardinality. Bernstein, Disser, Gro\ss{} and Himburg \cite{bernstein2017} give general
+bounds in the same model. Both fix the objective class as
+$f:2^{U}\to\mathbb{R}_{\ge0}$---a non-negative set function---and the competitive ratios
+they obtain are properties of that class.
+
+The class separation is decisive here and is stated rather than glossed. The prefix sums of
+\eqref{eq:family} are \emph{signed}: $s_{k}$ goes negative, and the regret
+\eqref{eq:regret} is built from $|s_{k}|$ rather than from a non-negative $f$. A
+non-negative objective admits no analogue of Lemma~\ref{lem:nobigstep}, because that lemma
+says a step cannot move the running sum far, and with non-negative weights every step moves
+it in the same direction. The results below are therefore not improvements of
+\cite{disser2023,bernstein2017} inside their model; they are statements about a family that
+model excludes.
+
+\subsection{What is claimed and what is not}
+
+Claimed as new: the exact two-sided law with both sides attained (C1); the mechanism
+holding for all $m\ge5$ with no side hypotheses (C2); the explicit one-defect construction
+(C3); the exact $\max\mathbb{E}$ versus $\mathbb{E}\max$ separation (C4); and the retained
+trajectory with its column identity (C5).
+
+Not claimed: any statement about arbitrary signed weights, any competitive ratio in the
+sense of \cite{disser2023,bernstein2017}, any algorithm, and any optimality of the cyclic
+menu.
+
+\section{Why the family is the one to study}
+\label{sec:whyfamily}
+
+A law proved for one family invites the question of why that family. Three properties of
+\eqref{eq:family} are load-bearing, and naming them makes clear which parts of the result
+are about the family and which are about signed cancellation in general.
+
+\subsection{All weights odd}
+
+Every entry of \eqref{eq:family} is odd. This is what makes Theorem~\ref{thm:parity} work
+and, through it, Corollary~\ref{cor:nocheap}: the achievable minimum of $|s_{k}|$ is exactly
+$k\bmod2$, so the regret \eqref{eq:regret} is a genuine excess over the best possible rather
+than an arbitrary normalisation. With even weights present the parity argument fails and
+the numerator would have to be defined against a different baseline.
+
+\subsection{One element exceeding the band}
+
+The family contains $\pm3$, and $3>2$. This single fact drives
+Theorem~\ref{thm:everyorderpays} through Lemma~\ref{lem:nobigstep}. Nothing else about the
+family is used in the lower bound---not the counts $p,q$, not the total $D$, not even $m$
+beyond $m\ge5$---which is why the mechanism is stated as being free of side hypotheses. Any
+family of odd weights containing an element of absolute value at least $3$ inherits
+Theorem~\ref{thm:everyorderpays} verbatim.
+
+\subsection{Enough units of each sign}
+
+The counts $p=\lceil(m-2)/2\rceil$ and $q=\lfloor(m-2)/2\rfloor$ are balanced to within one.
+This is what makes the construction possible: the greedy alternation of
+Theorem~\ref{thm:construction} spends a unit of one sign after each move in the other, and
+it can only do so while units of both signs remain. The bound $m\ge5$ is exactly the point
+at which $p$ and $q$ are large enough to absorb the excursion caused by placing $\pm3$, and
+it is where the attainment side, not the lower side, needs help.
+
+\subsection{Which half generalises}
+
+The division is clean. The lower side---Corollary~\ref{cor:nocheap},
+Lemma~\ref{lem:nobigstep}, Theorem~\ref{thm:everyorderpays}---uses only oddness and the
+presence of an element above the band, so it is a statement about a class. The upper
+side---Theorem~\ref{thm:construction} and hence Theorem~\ref{thm:attained}---uses the
+specific counts, so it is a statement about this family. The exact law \eqref{eq:law} needs
+both, and is therefore about the family; the impossibility of a single schedule is about
+the class. This is stated here rather than in the scope section because it is the most
+likely place a reader would over-generalise the result.
+
+\section{The defect is the right numerator}
+\label{sec:defect}
+
+The regret \eqref{eq:regret} subtracts a parity term, and the first task is to see that
+this is not a normalisation convenience but the correct accounting.
+
+\begin{definition}[Defect]
+For an integer $s$, the \emph{defect} is
+\begin{equation}
+\mathrm{dfc}(s)\;=\;|s|-|s|\bmod 2 .
+\label{eq:dfc}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Parity bridge]
+\label{thm:parity}
+Every $g_{i}$ in \eqref{eq:family} is odd. Consequently $|s_{k}|$ and $k$ have the same
+parity, and
+\begin{equation}
+\mathrm{dfc}(s_{k})\;=\;|s_{k}|-(k\bmod2),
+\label{eq:dfcbridge}
+\end{equation}
+so the defect is exactly the unnormalised numerator of \eqref{eq:regret}.
+\end{theorem}
+
+\begin{proof}
+A sum of $k$ odd integers is congruent to $k$ modulo $2$, so $s_{k}\equiv k \pmod 2$ and
+hence $|s_{k}|\equiv k \pmod 2$. Therefore $|s_{k}|\bmod 2=k\bmod2$, and substituting into
+\eqref{eq:dfc} gives \eqref{eq:dfcbridge}.
+\end{proof}
+
+\leanbox{\lean{parity\_bridge} in \lean{LeanStructuralFamilyLowerV1}}
+
+\begin{corollary}[No cheap defect]
+\label{cor:nocheap}
+A budget $k$ is free---contributes zero regret---if and only if $s_{k}\in\{-1,0,1\}$, and
+any non-zero defect is an even number at least $2$.
+\end{corollary}
+
+\begin{proof}
+By \eqref{eq:dfcbridge} the contribution is zero exactly when $|s_{k}|=k\bmod2$, i.e.\ when
+$|s_{k}|\le1$. Otherwise $|s_{k}|\ge2+(k\bmod2)$, and the defect $|s_{k}|-(k\bmod2)$ is
+even and at least $2$.
+\end{proof}
+
+\leanbox{\lean{dfc\_eq\_zero\_iff}, \lean{two\_le\_dfc} in
+\lean{LeanStructuralFamilyLowerV1}}
+
+Corollary~\ref{cor:nocheap} is what makes the problem discrete rather than continuous. There
+is no such thing as a small defect: a schedule either keeps its prefix sum inside
+$\{-1,0,1\}$ at a budget, or it pays at least $2$ there. Every subsequent argument is about
+which budgets can be kept inside that band.
+
+\section{The mechanism}
+\label{sec:mechanism}
+
+\begin{lemma}[No big step]
+\label{lem:nobigstep}
+Let $\pi$ be an ordering paying nothing at every budget. Then for every $i$,
+\begin{equation}
+|s_{i}-s_{i-1}| \;=\;\bigl|g_{\pi(i)}\bigr|\;\leq\;2 .
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+By Corollary~\ref{cor:nocheap}, paying nothing at budgets $i-1$ and $i$ means
+$s_{i-1}\in\{-1,0,1\}$ and $s_{i}\in\{-1,0,1\}$. The difference of two elements of
+$\{-1,0,1\}$ has absolute value at most $2$, and that difference is exactly
+$g_{\pi(i)}$.
+\end{proof}
+
+\leanbox{\lean{no\_big\_step} in \lean{LeanStructuralFamilyLowerV1}}
+
+\begin{theorem}[Every ordering pays]
+\label{thm:everyorderpays}
+For every $m\ge5$ and every ordering $\pi$ of the family \eqref{eq:family}, the total defect
+is at least $2$.
+\end{theorem}
+
+\begin{proof}
+Suppose some ordering pays nothing at every budget. By Lemma~\ref{lem:nobigstep} every
+element satisfies $|g_{i}|\le2$. But \eqref{eq:family} contains the element $3$, whose
+absolute value is $3>2$---a contradiction. Hence every ordering pays at some budget, and by
+Corollary~\ref{cor:nocheap} the amount it pays there is at least $2$.
+\end{proof}
+
+\leanbox{\lean{two\_le\_totalDefect} in \lean{LeanStructuralFamilyLowerV1}}
+
+\subsection{Why the mechanism needs no hypotheses}
+
+The proof above uses the family's contents and nothing else: no saturation condition, no
+balance assumption, no concentration of the schedule distribution. It also holds for every
+$m\ge5$ simultaneously, rather than for finitely many values checked by computer, because
+the element $3$ is present for every $m$ and Lemma~\ref{lem:nobigstep} is uniform in $m$.
+The lower bound is therefore a theorem about the family, not a computation about instances
+of it.
+
+It is also, as noted in Section~\ref{sec:related}, unavailable in the non-negative setting.
+Lemma~\ref{lem:nobigstep} says the running sum cannot move far in one step, and that is
+informative only because the sum may move in either direction; with non-negative weights
+the sum is monotone and the band $\{-1,0,1\}$ is left permanently after the first non-zero
+item, so the lemma degenerates. Signed cancellation is doing the work.
+
+\section{The two lower bounds}
+\label{sec:bounds}
+
+Write $P$ for a distribution over orderings---a \emph{menu} with weights---and
+$\mathrm{Bud}$ for the set of budgets. Let $c$ denote the guaranteed per-schedule payment,
+which by Theorem~\ref{thm:everyorderpays} is at least $2$ in unnormalised terms.
+
+\begin{theorem}[Averaged lower bound]
+\label{thm:avglower}
+\begin{equation}
+\frac{c}{|\mathrm{Bud}|}\;\leq\;\max_{k}\;\mathbb{E}_{P}\bigl[r(\pi,k)\bigr].
+\label{eq:avg}
+\end{equation}
+\end{theorem}
+
+\begin{theorem}[Path lower bound]
+\label{thm:pathlower}
+\begin{equation}
+c\;\leq\;\mathbb{E}_{P}\Bigl[\max_{k}\,r(\pi,k)\Bigr].
+\label{eq:path}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For \eqref{eq:avg}: each schedule pays at least $c$ in total across budgets, so the average
+over budgets of its regret is at least $c/|\mathrm{Bud}|$; taking expectations over $P$ and
+bounding the average below by the maximum gives the claim. For \eqref{eq:path}: each
+schedule pays at least $c$ at \emph{some} budget, so its maximum over budgets is at least
+$c$; taking expectations preserves the inequality.
+\end{proof}
+
+\leanbox{\lean{avg\_lower}, \lean{path\_lower} in \lean{LeanStructuralFamilyLowerV1}}
+
+The two statements differ only in the order of the maximum and the expectation. Both are
+finite-sum inequalities using no structure of the family, so they hold for any non-negative
+regret; the family enters only through the value of $c$.
+
+\begin{theorem}[Both are attained]
+\label{thm:attained}
+The uniform mixture over one-defect schedules attains \eqref{eq:avg} at $c/|\mathrm{Bud}|$
+and \eqref{eq:path} at $c$.
+\end{theorem}
+
+\leanbox{\lean{avg\_achieved}, \lean{path\_achieved} in
+\lean{LeanStructuralFamilyLowerV1}}
+
+Attainment is what turns two bounds into a ratio. Without it, \eqref{eq:avg} and
+\eqref{eq:path} would together give only $V_{\mathrm{path}}/V_{\mathrm{avg}}\ge$ something,
+and the identity of C1 would be an estimate. Theorem~\ref{thm:attained} requires
+one-defect schedules to exist for every budget, which is what the next section supplies.
+
+\section{The construction}
+\label{sec:construction}
+
+\begin{theorem}[One-defect schedules exist for every budget]
+\label{thm:construction}
+For every $m\ge5$ and every budget $j$ there is an ordering of \eqref{eq:family} whose
+defect vector is zero at every budget except $j$, where it is exactly $2$.
+\end{theorem}
+
+\begin{proof}[Construction]
+Greedy alternation. Maintain the running sum $s$ and, at each step, choose the next element
+so as to preserve the invariant
+\begin{equation}
+|s|\le1 \;\wedge\; |s-a+b|\le1,
+\label{eq:invariant}
+\end{equation}
+where $a$ and $b$ count the remaining $+1$ and $-1$ elements. The first conjunct keeps the
+current budget free by Corollary~\ref{cor:nocheap}; the second certifies that the remaining
+multiset can still be ordered to keep future budgets free, since $s-a+b$ is the sum the
+schedule would reach if all remaining unit elements were spent in the worse direction.
+
+The elements $\pm3$ are placed at the designated budget $j$: placing $3$ (or $-3$) when
+$|s|\le1$ moves the sum to absolute value at least $2$, paying exactly $2$ by
+Corollary~\ref{cor:nocheap}, and the alternation immediately restores the invariant using
+the opposite-sign units. The counts $p$ and $q$ in \eqref{eq:familyparams} are chosen so
+that enough of each sign remains at every step, which is where $m\ge5$ is used.
+\end{proof}
+
+\leanbox{\lean{exists\_one\_defect}, \lean{altFrom\_defects} in
+\lean{LeanStructuralFamilyUpperV1}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig2_defect.png}
+\caption{The one-defect construction of Theorem~\ref{thm:construction}. For every $m\ge5$
+and every budget $j$ there is an ordering paying exactly $2$, and paying it exactly at $j$.
+The menu of $m-1$ such orderings is what attains both bounds in
+Theorem~\ref{thm:attained}; Theorem~\ref{thm:everyorderpays} says no single one of them can
+be dispensed with.}
+\label{fig:defect}
+\end{figure}
+
+\subsection{The construction in closed form}
+
+For this family the greedy alternation admits an explicit description, which is worth
+recording because it makes the invariant \eqref{eq:invariant} concrete and lets a reader
+generate any schedule without running the procedure.
+
+Write the alternating pattern $A=(-1,+1,-1,+1,\dots)$, whose prefix sums are
+$(-1,0,-1,0,\dots)$---inside the band $\{-1,0,1\}$ at every position, so it pays nothing.
+To pay at budget $j$ and nowhere else:
+\begin{enumerate}
+\item Emit the first $j-1$ terms of $A$. The running sum is then $s_{j-1}=-1$ if $j-1$ is
+odd and $s_{j-1}=0$ if $j-1$ is even.
+\item At position $j$ emit $+3$ if $s_{j-1}=-1$, and $-3$ if $s_{j-1}=0$. Either choice
+sends $|s_{j}|$ to $2$ or $3$ respectively---defect exactly $2$ in both cases by
+\eqref{eq:dfcbridge}, since $j$ has the matching parity.
+\item At position $j+1$ emit the opposite big element, $\mp3$. This returns the sum to
+$s_{j+1}=s_{j-1}$, back inside the band.
+\item Resume $A$ with whichever units remain.
+\end{enumerate}
+
+Table~\ref{tab:m7} shows the six schedules this produces at $m=7$, each with its
+prefix-sum and defect vectors. The diagonal of the defect column is the content of
+Theorem~\ref{thm:construction}.
+
+\begin{table}[htbp]
+\caption{The six one-defect schedules at $m=7$, where
+$g_{7}=(-3,-1,-1,-1,+1,+1,+3)$, $D=11$ and there are six budgets. Each row is a permutation
+of the same multiset; each pays exactly $2$, and pays it exactly at its designated budget.
+Note the sign of the big element at the payment position alternates with the parity of $j$,
+which is step~2 of the construction.}
+\label{tab:m7}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}cll@{}}
+\toprule
+Pays at & Ordering $\pi$ / prefix sums $s_{k}$ & Defects \\
+\midrule
+$k=1$ & $(-3,3,-1,1,-1,1,-1)$ & $(2,0,0,0,0,0)$ \\
+      & $(-3,0,-1,0,-1,0)$ & \\
+$k=2$ & $(-1,3,-3,1,-1,1,-1)$ & $(0,2,0,0,0,0)$ \\
+      & $(-1,2,-1,0,-1,0)$ & \\
+$k=3$ & $(-1,1,-3,3,-1,1,-1)$ & $(0,0,2,0,0,0)$ \\
+      & $(-1,0,-3,0,-1,0)$ & \\
+$k=4$ & $(-1,1,-1,3,-3,1,-1)$ & $(0,0,0,2,0,0)$ \\
+      & $(-1,0,-1,2,-1,0)$ & \\
+$k=5$ & $(-1,1,-1,1,-3,3,-1)$ & $(0,0,0,0,2,0)$ \\
+      & $(-1,0,-1,0,-3,0)$ & \\
+$k=6$ & $(-1,1,-1,1,-1,3,-3)$ & $(0,0,0,0,0,2)$ \\
+      & $(-1,0,-1,0,-1,2)$ & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Where $m\geq5$ is used}
+
+Steps 1 and 4 of the construction consume units of alternating sign, and step 3 consumes
+the second big element. The family supplies $p=\lceil(m-2)/2\rceil$ copies of $-1$ and
+$q=\lfloor(m-2)/2\rfloor$ copies of $+1$, so the alternation can run for $p+q=m-2$ positions
+in total, which together with the two big elements accounts for all $m$ items exactly.
+
+The bound $m\ge5$ is what makes $p\ge2$ and $q\ge1$, which is the minimum needed for the
+alternation to have somewhere to go on both sides of the payment position. At $m=4$ the
+construction has no slack and the law does not hold as stated; the theorem's hypothesis is
+therefore tight at the bottom end, not conservative.
+
+\begin{remark}
+The statement is a construction, not an existence argument. The ordering is produced by an
+explicit procedure whose invariant \eqref{eq:invariant} is checked at every step, so a
+reader can generate the schedule for any $(m,j)$ and verify its defect vector directly.
+This matters because Theorem~\ref{thm:attained} needs one such schedule per budget; an
+existence proof would leave the menu unspecified.
+\end{remark}
+
+\section{The law}
+\label{sec:law}
+
+\begin{theorem}[Exact menu law]
+\label{thm:law}
+For every $m\ge5$,
+\begin{equation}
+V_{\mathrm{avg}}=\frac{2}{(m+4)(m-1)},\qquad
+V_{\mathrm{path}}=\frac{2}{m+4},
+\label{eq:law}
+\end{equation}
+and consequently
+\begin{equation}
+\frac{V_{\mathrm{path}}}{V_{\mathrm{avg}}}\;=\;m-1 .
+\label{eq:ratio}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:everyorderpays} the guaranteed payment is $c=2$, and the normalisation
+in \eqref{eq:regret} divides by $D=m+4$. The budget set has $|\mathrm{Bud}|=m-1$ elements.
+Substituting into \eqref{eq:avg} and \eqref{eq:path} gives the two values as lower bounds,
+and Theorem~\ref{thm:attained}---whose witness exists by
+Theorem~\ref{thm:construction}---shows both are achieved. Dividing gives \eqref{eq:ratio}.
+\end{proof}
+
+\leanbox{\lean{ratio\_card\_concentrated\_on\_support} in
+\lean{LeanStructuralFamilyLowerV1}}
+
+\begin{remark}
+The assembly of \eqref{eq:ratio} carries two hypotheses---balance and concentration---which
+say that the expectation of the maximum equals $|\mathrm{Bud}|$ times the maximum of the
+expectation. Both are satisfied by the witness. They are required only on the
+\emph{support} of the mixture; the lower bounds \eqref{eq:avg} and \eqref{eq:path} still
+quantify over all permutations, so the law is not weakened by restricting the witness.
+\end{remark}
+
+\section{The constrained problem}
+\label{sec:marginal}
+
+A natural objection is that the law might not survive a prescribed marginal---a requirement
+that each item be retained with a given frequency. The object at issue is not a scalar per
+budget but a trajectory: a matrix indexed by (item, budget).
+
+\begin{definition}[Retained trajectory]
+For a menu $\{\pi_{j}\}_{j\in J}$,
+\begin{equation}
+x^{*}_{i,k}\;=\;\frac{1}{|J|}\,
+  \#\bigl\{\,j\;:\;i\in\mathrm{prefix}(\pi_{j},k)\,\bigr\}.
+\label{eq:marginal}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[Column identity, for every menu]
+\label{thm:colsum}
+For every menu and every budget $k$,
+\begin{equation}
+\sum_{i} x^{*}_{i,k}\;=\;\min(k,n).
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+A length-$k$ prefix of a ranking holds exactly $\min(k,n)$ items, proved by transporting
+the prefix through the ranking and counting. Summing \eqref{eq:marginal} over items and
+exchanging the two finite sums gives $\frac{1}{|J|}\sum_{j}\min(k,n)=\min(k,n)$.
+\end{proof}
+
+\leanbox{\lean{card\_prefixSet}, \lean{retained\_col\_sum} in
+\lean{LeanStructuralRetainedMarginalV1}}
+
+\begin{theorem}[The cyclic menu, in closed form]
+\label{thm:cyclic}
+On the cyclic menu,
+\begin{equation}
+x^{*}_{i,k}\;=\;\frac{\min(k,m)}{m}\qquad\text{for every item } i .
+\label{eq:cyclic}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+An explicit bijection between the schedules containing item $i$ in their length-$k$ prefix
+and an initial segment of the cyclic index set; the count is therefore $\min(k,m)$ for
+every $i$, and dividing by $|J|=m$ gives \eqref{eq:cyclic}.
+\end{proof}
+
+\leanbox{\lean{cyclic\_retained}, \lean{retained\_transfer} in
+\lean{LeanStructuralRetainedMarginalV1}}
+
+\subsection{Why the trajectory and not a scalar}
+
+A common shortcut in constrained scheduling is to summarise a menu by a scalar per budget---
+the expected value delivered, say---and to impose the constraint on that scalar. The
+shortcut loses exactly the information the present problem turns on.
+
+Under signed cancellation two menus can deliver the same expected value at every budget and
+yet differ in \emph{which items} they retain there, and the regret \eqref{eq:regret} depends
+on the retained set through $|s_{k}|$, not on any scalar summary of it. A constraint stated
+on the scalar therefore fails to constrain the object that determines the objective. The
+trajectory \eqref{eq:marginal} keeps the item index, so a prescribed marginal becomes a
+statement about which items appear in which prefixes, which is what a designer with a
+fairness or coverage requirement actually means.
+
+Carrying the matrix costs something: Theorem~\ref{thm:colsum} is a double-sum exchange
+rather than a one-line identity, and the cyclic evaluation of Theorem~\ref{thm:cyclic}
+requires an explicit bijection rather than a symmetry appeal. The formalisation made that
+cost visible---the scalar version was one lemma and the matrix version is eight audited
+declarations---and it is paid because the scalar version proves nothing about the
+constrained problem.
+
+\subsection{What the column identity does and does not settle}
+
+Theorem~\ref{thm:colsum} holds for \emph{every} menu, which cuts both ways. It confirms
+that the uniform trajectory \eqref{eq:cyclic} is consistent with the budget accounting, so
+the constraint is realisable rather than merely feasible on paper. But precisely because it
+holds for every menu, it singles out none: a prescribed column sum cannot by itself
+distinguish between menus, and so cannot by itself exclude the witness of
+Theorem~\ref{thm:attained}.
+
+What remains open is a prescribed \emph{non-uniform} trajectory. Such a constraint could
+exclude the witness and change the value, and nothing here computes what it would change it
+to.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{The ratio is exactly $m-1$, and both levels fall}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig1_law.png}
+\caption{The exact law of Theorem~\ref{thm:law}. Left: both $V_{\mathrm{avg}}$ and
+$V_{\mathrm{path}}$ fall like $1/m$. Right: their ratio is exactly $m-1$, proved for every
+$m\ge5$ rather than fitted. The growth of the ratio and the decay of the levels are
+simultaneous, which is why an unbounded fixed-$\varepsilon$ separation is not claimed.}
+\label{fig:law}
+\end{figure}
+
+Table~\ref{tab:law} tabulates \eqref{eq:law} over $m=5$ to $20$. Both values decrease like
+$1/m$ while their ratio grows linearly. The two facts are simultaneous, and the paper is
+explicit that this is not the same as an unbounded separation at fixed regret level: as $m$
+grows the ratio grows, but the values it relates are both shrinking, so a client who cares
+about an absolute regret threshold sees a different picture from one who cares about the
+factor between the two regimes.
+
+\subsection{Every ordering pays, checked exhaustively}
+
+Theorems~\ref{thm:everyorderpays} and \ref{thm:construction} are proved for all $m\ge5$, so
+no enumeration can strengthen them. We nevertheless enumerated every distinct ordering of
+$g_{m}$ for $5\le m\le12$---$57{,}724$ orderings---and computed each one's defect vector
+directly from \eqref{eq:dfcbridge}. Table~\ref{tab:enum} reports the result. The minimum
+total defect is $2$ at every $m$, so no ordering is free; the minimum \emph{path} defect is
+also $2$, so no ordering escapes by spreading a total of $2$ across several budgets at
+lower cost each---which Corollary~\ref{cor:nocheap} already forbids, and which the
+enumeration confirms the implementation respects. One-defect schedules exist at every
+budget for every $m$ in range, so the menu of Theorem~\ref{thm:attained} is realisable
+throughout.
+
+The value of this check is narrow and worth stating precisely. It does not extend the
+theorems, which already quantify over $m$. It confirms that the defect definition used in
+the code and the one used in the proofs agree, which is the failure mode a proved theorem
+does not protect against.
+
+\input{structural_enum}
+
+\subsection{The construction covers every budget}
+
+For each $m\ge5$ and each budget $j$ the built ordering pays exactly $2$ and pays it exactly
+at $j$. A menu of $m-1$ schedules therefore covers every budget for free in the averaged
+sense, while Theorem~\ref{thm:everyorderpays} shows no single schedule can. The cardinality
+$m-1$ is the price of serving all budgets, and it is paid in schedules rather than in
+regret.
+
+\subsection{Reading the two trends together}
+
+Table~\ref{tab:law} shows $V_{\mathrm{avg}}$ falling from $1/18$ at $m=5$ to $1/216$ at
+$m=20$, and $V_{\mathrm{path}}$ from $2/9$ to $1/12$ over the same range, while the ratio
+climbs from $4$ to $19$. Read carelessly, the ratio column alone suggests an unbounded
+separation. It is not one in the sense that matters to a client, and the paper is explicit
+about this.
+
+The reason is that both quantities are normalised by $D=m+4$. As the population grows, a
+single defect of $2$ becomes a smaller fraction of the total weight, so the absolute regret
+under either objective shrinks. The ratio grows because $V_{\mathrm{avg}}$ additionally
+divides by the number of budgets, and that number grows with $m$. A client with a fixed
+absolute tolerance $\varepsilon$ therefore finds \emph{both} regimes acceptable once $m$ is
+large enough, and the growing ratio between two small numbers does not translate into a
+growing practical gap.
+
+What does translate is the menu size. At every $m\ge5$, achieving $V_{\mathrm{avg}}$ rather
+than $V_{\mathrm{path}}$ requires $m-1$ schedules rather than one, and that cost is paid in
+full whatever the tolerance. The correct summary is therefore not ``the gap grows'' but
+``the gap is exactly the menu size, at every population size''.
+
+\subsection{The column sum is a budget, for every menu}
+
+The retained trajectory satisfies $\sum_{i}x^{*}_{i,k}=\min(k,n)$ identically. No menu can
+change this count, which is exactly why it cannot by itself distinguish menus.
+
+\section{The smallest case, in full}
+\label{sec:m5}
+
+The abstract statements are easier to check against the smallest instance, so we record
+$m=5$ completely. Here $p=\lceil\tfrac32\rceil=2$, $q=\lfloor\tfrac32\rfloor=1$, so the
+family is
+\begin{equation}
+g_{5}=(-3,\,-1,\,-1,\,+1,\,+3),\qquad D=9,
+\end{equation}
+the budget set is $\{1,2,3,4\}$ with $|\mathrm{Bud}|=4$, and the law predicts
+$V_{\mathrm{avg}}=2/36=1/18$ and $V_{\mathrm{path}}=2/9$, with ratio $4$.
+
+Table~\ref{tab:m5} gives the four one-defect schedules produced by the construction of
+Theorem~\ref{thm:construction}, one per budget, each written with its prefix-sum trajectory.
+Every row is a permutation of the same multiset.
+
+\begin{table}[htbp]
+\caption{The four one-defect schedules for $m=5$, one per budget. Each is a permutation of
+$g_{5}$; the prefix sums stay in $\{-1,0,1\}$ except at the designated budget, where the
+defect is exactly $2$.}
+\label{tab:m5}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}clll@{}}
+\toprule
+Pays at & Ordering $\pi$ & Prefix sums $s_{k}$ & Defects \\
+\midrule
+$k=1$ & $(3,-3,-1,1,-1)$ & $(3,0,-1,0)$  & $(2,0,0,0)$ \\
+$k=2$ & $(-1,3,-3,1,-1)$ & $(-1,2,-1,0)$ & $(0,2,0,0)$ \\
+$k=3$ & $(1,-1,3,-3,-1)$ & $(1,0,3,0)$   & $(0,0,2,0)$ \\
+$k=4$ & $(1,-1,-1,3,-3)$ & $(1,0,-1,2)$  & $(0,0,0,2)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The defect column is computed from \eqref{eq:dfcbridge}. At $k=1$ in the first row,
+$|s_{1}|=3$ and $k\bmod2=1$, so the defect is $3-1=2$; at $k=2$, $|s_{2}|=0$ and
+$k\bmod2=0$, so it is $0$. Reading down the diagonal confirms
+Theorem~\ref{thm:construction} for every budget at $m=5$.
+
+\subsection{The mixture attains both bounds}
+
+Take $P$ uniform over the four schedules of Table~\ref{tab:m5}. At each budget $k$ exactly
+one schedule pays, and it pays $2/9$ after normalisation, so
+\begin{equation}
+\mathbb{E}_{P}\bigl[r(\pi,k)\bigr]=\tfrac14\cdot\tfrac29=\tfrac{1}{18}
+\quad\text{for every }k,
+\end{equation}
+hence $\max_{k}\mathbb{E}_{P}[r]=\tfrac{1}{18}=V_{\mathrm{avg}}$: the averaged bound
+\eqref{eq:avg} is attained. Meanwhile every schedule has $\max_{k}r(\pi,k)=2/9$, so
+\begin{equation}
+\mathbb{E}_{P}\Bigl[\max_{k}r(\pi,k)\Bigr]=\tfrac29=V_{\mathrm{path}},
+\end{equation}
+and the path bound \eqref{eq:path} is attained too. The ratio is $4=m-1$, as
+\eqref{eq:ratio} predicts.
+
+\subsection{And no single schedule does}
+
+Theorem~\ref{thm:everyorderpays} says every one of the $5!/2!=60$ distinct orderings of
+$g_{5}$ pays at least $2$ somewhere, and the reason is visible in Table~\ref{tab:m5}: each
+row contains the element $3$, and placing it anywhere moves the prefix sum out of
+$\{-1,0,1\}$ by Lemma~\ref{lem:nobigstep}. The construction's contribution is not to avoid
+that payment---it cannot be avoided---but to arrange that it falls at a designated budget
+and nowhere else, so that a menu of four such schedules spreads the unavoidable cost evenly
+across the four budgets.
+
+This is the whole law in miniature. One schedule pays $2/9$ at some budget; four schedules,
+each paying at a different budget, reduce the worst per-budget expectation to $1/18$ without
+reducing anyone's path cost. The factor between the two is the number of budgets.
+
+\input{structural_law}
+
+\section{Formal verification}
+\label{sec:verification}
+
+Every theorem above is machine-checked in Lean~4, toolchain
+\texttt{leanprover/lean4:v4.34.0-rc2} against mathlib revision \texttt{1f495c61}.
+
+\subsection{Acceptance contract}
+
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile; the compiled
+artifact is newer than its source; at least one \texttt{\#print axioms} directive is
+present; the axiom set of every audited declaration lies within
+$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no \texttt{sorry}
+appears anywhere in the file.
+
+\subsection{The two crux statements as they are checked}
+
+\begin{figure}[htbp]
+\footnotesize
+\hrule\vspace{4pt}
+\begin{tabbing}
+\quad\=\quad\=\kill
+\lean{theorem no\_big\_step} \\
+\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) ($\pi$ : Equiv.Perm (Fin m))} \\
+\> \lean{(hfree : $\forall$ k, defect m $\pi$ k = 0) (i : Fin m) :} \\
+\> \lean{|g m ($\pi$ i)| $\le$ 2} \\[6pt]
+\lean{theorem two\_le\_totalDefect} \\
+\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) ($\pi$ : Equiv.Perm (Fin m)) :} \\
+\> \lean{2 $\le$ $\sum$ k, defect m $\pi$ k} \\[6pt]
+\lean{theorem exists\_one\_defect} \\
+\> \lean{(m : $\mathbb{N}$) (hm : 5 $\le$ m) (j : Fin (m-1)) :} \\
+\> \lean{$\exists$ $\pi$, ($\forall$ k, k $\ne$ j $\to$ defect m $\pi$ k = 0)} \\
+\> \qquad\lean{$\wedge$ defect m $\pi$ j = 2}
+\end{tabbing}
+\vspace{-4pt}\hrule
+\caption{The mechanism and the construction as checked. Both are universally quantified
+over $m$ with the single hypothesis $5\le m$, so neither is a finite computation: the
+statements hold for every population size at once. \lean{exists\_one\_defect} is
+existential in its conclusion but its witness is produced by the explicit alternation of
+Theorem~\ref{thm:construction}, and \lean{altFrom\_defects} computes that witness's defect
+vector rather than merely asserting the existential.}
+\label{fig:statements}
+\end{figure}
+
+The hypothesis \lean{5 $\le$ m} is the only assumption in Fig.~\ref{fig:statements}. In
+particular there is no upper bound on $m$, no hypothesis about the schedule distribution,
+and no numeric side condition---which is what distinguishes a proved law from a sweep over
+checked values. A sweep to $m=20$, of the kind Table~\ref{tab:law} displays, would leave
+open whether some larger $m$ behaves differently; the quantifier closes that.
+
+\subsection{Evidence per step}
+
+\begin{table}[htbp]
+\caption{Evidence per step. All cited declarations are axiom-audited.}
+\label{tab:inventory}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Step & Module & Aud. \\
+\midrule
+Defect, Thm~\ref{thm:parity}        & \lean{LeanStructuralFamilyLowerV1}     & 15 \\
+Mechanism, Thm~\ref{thm:everyorderpays} & \lean{LeanStructuralFamilyLowerV1} & 15 \\
+Bounds, Thms~\ref{thm:avglower}--\ref{thm:pathlower} & \lean{LeanStructuralFamilyLowerV1} & 15 \\
+Attainment, Thm~\ref{thm:attained}  & \lean{LeanStructuralFamilyLowerV1}     & 15 \\
+Construction, Thm~\ref{thm:construction} & \lean{LeanStructuralFamilyUpperV1} & 11 \\
+Law, Thm~\ref{thm:law}              & \lean{LeanStructuralFamilyLowerV1}     & 15 \\
+Marginal, Thms~\ref{thm:colsum}--\ref{thm:cyclic} & \lean{LeanStructuralRetainedMarginalV1} & 8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Reproducing the enumeration}
+
+Table~\ref{tab:enum} is produced by direct enumeration of the distinct permutations of the
+multiset $g_{m}$ for each $m$ in range, computing each ordering's defect vector from
+\eqref{eq:dfcbridge} and recording three aggregates: the minimum total defect, the minimum
+path defect, and the set of budgets at which some ordering achieves a defect vector with a
+single non-zero entry equal to $2$. The computation is exact integer arithmetic throughout;
+no floating point is involved and no sampling is used, so the table is deterministic.
+
+The cost grows as $m!/(p!\,q!)$ and reaches $33{,}264$ orderings at $m=12$, for $57{,}724$
+in total across the range, computed in $43$ seconds. Extending to larger $m$ is possible but
+pointless: the theorems already quantify over all $m\ge5$, and the enumeration's role is to
+check the defect implementation against the proof's definition, which a small range does as
+well as a large one.
+
+\subsection{Scope of the formalisation}
+
+The displayed results are the load-bearing chain, not the corpus. The Structural strand
+contains $49$ Lean source files with $388$ theorem and lemma statements, of which $12$
+modules carry an acceptance receipt covering $168$ declarations whose axiom set was printed
+and checked. Across the programme of which this paper is one part: $427$ files, $3{,}115$
+statements, $108$ accepted modules, $860$ audited declarations.
+
+No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
+wider repository, in audit scaffolding and in files named as conjectures; the overlap
+between the cited set and the files containing them was computed and is empty.
+
+\subsection{What formalisation caught}
+
+Two formulations were withdrawn under the prover, and both failures are instructive.
+
+The first attempt at the mechanism asserted that a schedule paying nothing keeps
+$|s_{k}|\le1$ \emph{and} that the increments therefore alternate in sign. The second
+conjunct is false: a schedule can go $0\to1\to0$ using $+1$ then $-1$, but also
+$-1\to0\to1$ using $+1$ twice. The proof of Theorem~\ref{thm:everyorderpays} does not need
+alternation---only the bound $|g|\le2$ of Lemma~\ref{lem:nobigstep}---and the extra claim was
+removed rather than repaired.
+
+The second was in the constrained problem. An early version of Theorem~\ref{thm:colsum}
+stated the column sum as $k$ rather than $\min(k,n)$, which is correct only while $k\le n$
+and silently wrong beyond it. The failure surfaced when the cyclic evaluation of
+Theorem~\ref{thm:cyclic} was attempted, since \eqref{eq:cyclic} carries $\min(k,m)$ and the
+two could not be reconciled. Both statements now carry the $\min$, and \lean{card\_prefixSet}
+is the lemma that supplies it.
+
+Neither error would have been caught by evaluating the formulas on instances with $k\le n$,
+which is every instance a designer would naturally try.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the results establish}
+
+The gap between one schedule and a menu is not a constant factor but an exact function of
+the population size. That is a sharper statement than a competitive ratio, and it is
+available precisely because the setting is exact: both sides are attained, so no slack
+hides in either bound.
+
+The practical reading is that under signed cancellation the right design object is the
+\emph{menu} and its cardinality, not a single ordering. The cardinality $m-1$ is the price
+of serving all budgets, and it is paid in schedules rather than in regret. A designer who
+must publish one ordering is not choosing a slightly worse one; by
+Theorem~\ref{thm:everyorderpays} they are choosing one that fails at some budget, and the
+only question is which.
+
+\subsection{What the results do not establish}
+
+\begin{enumerate}
+\item \textbf{One family.} The law is for the family \eqref{eq:family} and is not a theorem
+about arbitrary signed weights.
+
+\item \textbf{No menu is singled out.} The column identity of Theorem~\ref{thm:colsum} holds
+for every menu, so it distinguishes none. A prescribed \emph{non-uniform} trajectory may
+exclude the witness and change the value; that case is open.
+
+\item \textbf{The cyclic menu is not shown optimal.} It is chosen for computability.
+
+\item \textbf{Two hypotheses in the assembly.} Theorem~\ref{thm:law} carries balance and
+concentration, satisfied by the witness and required only on its support.
+
+\item \textbf{No algorithm, no competitive ratio.} Nothing here is an online algorithm, and
+no competitive ratio in the sense of \cite{disser2023,bernstein2017} is computed.
+\end{enumerate}
+
+\subsection{Why attainment matters more than the bounds}
+
+It is worth separating the two halves of the contribution by how hard they are to obtain and
+how much they are worth.
+
+The lower bounds \eqref{eq:avg} and \eqref{eq:path} are easy. They are finite-sum
+manipulations, use no structure of the family, and would hold for any non-negative regret
+function. Stated alone they give
+$V_{\mathrm{path}}/V_{\mathrm{avg}}\ge$ nothing useful, because two lower bounds do not
+bound a ratio in either direction.
+
+Attainment is what carries the result, and it is the expensive half. It requires, for every
+$m\ge5$ and every budget, a schedule whose entire defect is a single $2$ at that budget---an
+object that must be built, since no counting argument produces it. Theorem
+\ref{thm:construction} builds it, and the invariant \eqref{eq:invariant} is what makes the
+greedy choice always available. Only once both bounds are attained does \eqref{eq:ratio}
+become an identity, and the paper's headline claim is exactly that it is one.
+
+\subsection{What the design guidance actually is}
+
+A designer facing this problem should read the results as follows. First, check whether the
+weights are signed and cancel; if they are non-negative, none of this applies and the
+incremental-maximisation literature does. Second, if they are signed, do not look for a
+best single ordering---Theorem~\ref{thm:everyorderpays} says there is none that avoids
+paying, and the amount it pays is not small by Corollary~\ref{cor:nocheap}. Third, budget
+for a menu, and size it by the number of distinct budgets to be served; at
+$|\mathrm{Bud}|=m-1$ the menu of Theorem~\ref{thm:construction} reduces the worst per-budget
+expectation by exactly that factor. Fourth, do not expect the menu to reduce the path cost:
+$V_{\mathrm{path}}$ is unchanged by the mixture, because every schedule in it still pays
+$2$ somewhere. The menu redistributes the unavoidable cost; it does not remove it.
+
+\subsection{Relation to competitive analysis}
+
+It is natural to ask for the result in competitive-ratio form, since that is the currency of
+the incremental-optimisation literature. Two obstacles make the translation inexact, and
+both are informative.
+
+First, a competitive ratio compares an online quantity against an offline optimum on the
+same instance. Here the offline optimum at budget $k$ is the parity floor $k\bmod2$, which
+\eqref{eq:regret} has already subtracted; the remaining quantity is an absolute excess, not
+a ratio, and dividing by a floor that is sometimes $0$ does not produce a finite number.
+The defect is the natural currency for this family precisely because the floor can vanish.
+
+Second, the object being compared is not a single schedule against an optimum but a menu
+against a single schedule. The ratio \eqref{eq:ratio} is between two \emph{different
+objectives}---$\max_{k}\mathbb{E}$ and $\mathbb{E}\max$---evaluated at their respective
+optima, which is a different comparison from the usual one and is what C4 names.
+
+What survives of the competitive framing is the qualitative conclusion, and it is the strong
+form: no single schedule is competitive at every budget in the sense of paying nothing,
+because Theorem~\ref{thm:everyorderpays} rules that out for all $m\ge5$ at once.
+
+\subsection{Open problems}
+
+Which families admit an exact law of this kind is the first question. The proof of
+Theorem~\ref{thm:everyorderpays} uses only that some element exceeds $2$ in absolute value
+while the rest are units, which suggests a class rather than an instance; whether the
+\emph{attainment} side generalises is less clear, because Theorem~\ref{thm:construction}
+uses the specific counts \eqref{eq:familyparams}.
+
+The non-uniform prescribed trajectory is the second, and is the one a referee is most likely
+to press: the column identity settles the uniform case and says nothing beyond it.
+
+Third, the menu cardinality $m-1$ equals $|\mathrm{Bud}|$ here. Whether that coincidence is
+structural---whether the required menu size always equals the number of budgets---or an
+artefact of this family is open.
+
+\subsection{Where the pattern should recur}
+
+The ingredients of the result are a discrete objective whose optimum is a parity floor, a
+band outside which any deviation costs a fixed minimum, and one element too large to stay
+inside the band. Wherever those three hold, the same shape of argument is available: a
+mechanism lemma bounding single steps, an impossibility theorem from the oversized element,
+and a construction distributing the unavoidable cost across the index set.
+
+Settings that plausibly satisfy them include balanced-partition scheduling with integer
+loads, prefix-sum constraints in streaming with signed updates, and any incremental problem
+whose objective is distance to a lattice rather than a non-negative set function. We have
+not proved anything about those settings and do not claim them; they are named because the
+mechanism's hypotheses are unusually few, and a reader looking for where else it applies
+should look for the oversized element rather than for the family.
+
+What will \emph{not} recur is the exact law. Theorem~\ref{thm:law} needs both sides attained,
+and attainment came from the specific counts \eqref{eq:familyparams}. A setting satisfying
+the three ingredients above inherits the impossibility and not the identity.
+
+\section{Conclusion}
+
+Under signed cancellation, one schedule cannot serve every budget, and the exact price of
+serving them all is a menu of $m-1$ schedules. Both values in the law are attained, so
+$V_{\mathrm{path}}/V_{\mathrm{avg}}=m-1$ is an identity; the mechanism behind it needs no
+side hypotheses and holds for every $m\ge5$; and the one-defect schedules that realise it
+are constructed rather than shown to exist.
+
+The narrower message is a question a designer can ask before doing any work: do the item
+weights cancel? If they do not, one ordering suffices and the classical theory applies. If
+they do, one ordering provably does not suffice, the deficit is bounded below by a constant
+rather than made small by care, and the right response is to publish a menu whose size is
+the number of budgets to be served.
+
+\section*{Acknowledgment}
+
+The formal development uses the Lean~4 theorem prover and the mathlib library.
+
+\begin{thebibliography}{00}
+
+\bibitem{disser2023} Y. Disser, M. Klimm, K. Schewior, and D. Weckbecker, ``Incremental
+maximization,'' arXiv:2305.01310, 2023.
+
+\bibitem{bernstein2017} A. Bernstein, Y. Disser, M. Gro\ss{}, and S. Himburg, ``General
+bounds for incremental maximization,'' in \emph{Proc. 44th Int. Colloq. Automata, Languages,
+and Programming (ICALP)}, 2017.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\bibitem{borodin1998} A. Borodin and R. El-Yaniv, \emph{Online Computation and Competitive
+Analysis}. Cambridge, U.K.: Cambridge Univ. Press, 1998.
+
+\bibitem{nemhauser1978} G. L. Nemhauser, L. A. Wolsey, and M. L. Fisher, ``An analysis of
+approximations for maximizing submodular set functions---I,'' \emph{Math. Program.},
+vol.~14, pp.~265--294, 1978.
+
+\end{thebibliography}
+
+\end{document}
