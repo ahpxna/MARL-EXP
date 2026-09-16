@@ -1,0 +1,322 @@
+{
+ "paper": "FUNCTIONAL — the scalar proxy is wrong in both directions",
+ "text": {
+  "0": [
+   "When the Extrema Move, the Scalar Proxy Fails in Both Directions",
+   "Solving the group-range alternative exactly, and what it costs not to",
+   "Vu Phan An Nguyen",
+   "Rider University  ·  CIG-AMF formal research programme  ·  6 Lean 4 modules, 58 audited declarations, 0 sorry, axioms only {propext, Classical.choice, Quot.sound}"
+  ],
+  "22": [
+   "The question"
+  ],
+  "20": [
+   "A design buys observations to certify the Top-k of a set of relations, ranked by CAPACITY — the range max_a θ_ra − min_a θ_ra. Certifying means excluding every alternative that would change the answer.",
+   "",
+   "THREE QUANTITIES, KEPT DISTINCT",
+   "J_scalar :  pair-flip at the CURRENT extrema, ordering constraints dropped",
+   "J_old    :  the QP inside the CURRENT extrema region",
+   "J_full   :  the whole alternative set, extrema free in either relation",
+   "",
+   "By inclusion of feasible sets:",
+   "",
+   "",
+   "",
+   "A RETRACTION.  An earlier probe of ours reported ratios J_true/J_pairflip of 1.000, 0.349, 1.091, 0.113. Those numbers are WITHDRAWN: the probe wrote its own world generator instead of calling the real one; it examined only the weakest Top-k relation against the strongest outsider, though with unequal precisions the cheapest crossing pair need not be the boundary pair; it read 'extrema changed' off an argmax index that moves under exact ties; and it compared a scalar formula against a fixed-extrema QP as if they were the same problem.",
+   "",
+   "So the question is not which allocator wins. It is whether solving the alternative CORRECTLY, when the extrema move, buys anything at all."
+  ],
+  "9": [
+   "Objectives"
+  ],
+  "8": [
+   "1.  Prove the scalar proxy is a bound in NEITHER direction, and that the gap is not a constant — in exact arithmetic, with no optimiser and no sampled world.",
+   "2.  Reduce the true alternative set to a finite union of convex pair regions, on the real RANGE target rather than a Top-1 surrogate.",
+   "3.  Solve the inner problem in closed form, and certify it without inverting the information matrix — so a singular M needs no pseudoinverse.",
+   "4.  Restore the setup-cost law, with infeasible supports reported as infeasible rather than clamped."
+  ],
+  "4": [
+   "The chain — the union identity"
+  ],
+  "1": [
+   "STEP 1.   THE FINITE MAX/MIN SET IDENTITY.        range_ge_iff_exists_pair",
+   "",
+   "",
+   "",
+   "Forward: choose a maximiser and a minimiser of relation j. Backward: its range is at least that chosen difference, which dominates every pair difference in i. This is the MODEL BRIDGE, and it is the main step — not an optimiser interface.",
+   "",
+   "STEP 2.   THE ALTERNATIVE IS A UNION OF POLYHEDRA.        alternative_union_polyhedra,  pairRegion_convex",
+   "",
+   "",
+   "",
+   "Each region is convex, with NO definiteness assumption on an observation matrix, and the extrema are chosen from the ALTERNATIVE, never frozen at truth."
+  ],
+  "14": [
+   "STEP 3.   THE ENERGY ORACLE IS A FINITE CHECK.        energy_lower_bound_iff,  energy_ge_of_pairwise",
+   "",
+   "",
+   "",
+   "A number c lower-bounds the energy over the WHOLE alternative set if and only if it lower-bounds it on every pair region. Since T, its complement and the action set are finite, certifying the oracle is a finite conjunction of convex problems — no infimum over an infinite-dimensional set is ever taken."
+  ],
+  "18": [
+   "STEP 4.   SHRINK AND EXPAND, AS EQUIVALENCES.        range_le_iff_exists_interval,  range_ge_iff_exists_pair_ge",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "range ≤ z iff all cells lie in a common interval of length z — minimised coordinate-wise by the CLAMP (clamp_dist_le, shrink_lower, shrink_attained). range ≥ z iff some ORDERED pair is separated by at least z — so no third cell has to move (expand_lower, expand_attained)."
+  ],
+  "3": [
+   "The chain — certificates and the two counterexample families"
+  ],
+  "16": [
+   "STEP 5.   THE INNER QP, IN CLOSED FORM.        inner_qp_lower,  inner_qp_attained",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "Proved by completing the square against the explicit minimiser. No optimiser, no multiplier theorem. This is the pairV shape, DERIVED for the range target rather than transported from the Top-1 surrogate.",
+   "",
+   "STEP 6.   THE CERTIFICATE, WITHOUT AN INVERSE.        kkt_certificate,  certificate_gives_lower_bound",
+   "The textbook dual d(y) = yᵀAμ − ½yᵀAM⁻¹Aᵀy needs M invertible. A singular information matrix must not be pushed through a pseudoinverse formula unconditionally — so this file avoids the inverse entirely:",
+   "",
+   "",
+   "",
+   "",
+   "Given these four conditions, λ* minimises ½(λ−μ)ᵀM(λ−μ) over {λ : Aλ ≤ 0}. Only symmetry and positive SEMIdefiniteness of M are used, so a singular M is covered with no extra hypothesis.",
+   "DIRECTIONS.  A lower bound for EVERY region, then their minimum, lower-bounds J (region_min_lower_bounds_J). A single feasible alternative only UPPER-bounds it (single_alt_upper). The two are never conflated.",
+   "",
+   "STEP 7.   FAMILY 1 — THE PROXY OVERSTATES, WITHOUT LIMIT.        scalar_not_upper_to_any_constant",
+   "Two relations, three actions, Top-1 is relation i, 0 < η ≤ 1:   θ_i = (0, 1, ½), α_i = (1, 1, 1);   θ_j = (0, ½, ¼), α_j = (1, 1, η).",
+   "Raising ONLY the third cell of j from ¼ to 1 makes the two capacities equal, at cost 9η/32:",
+   "",
+   "",
+   "",
+   "STEP 8.   FAMILY 2 — THE PROXY UNDERSTATES, WITHOUT LIMIT.        scalar_not_lower_to_any_constant",
+   "θ_i = (0, 1, ¾), α_i = (1, η, 1);   θ_j = (0, ½, ¼), α_j = (1, 1, 1).   For any capacity-inverting alternative pick z between the two new capacities: shrinking i below z costs at least [¾−z]₊²/4, opening j above z at least [z−½]₊²/4, and the two positive parts always sum to at least ¼.",
+   "",
+   "",
+   "",
+   "Both are EXPLICIT feasible alternatives and elementary lower bounds. No optimiser, no sampled world, no seed.",
+   "",
+   "STEP 9.   THE SETUP-COST LAW, AND ITS CROSSING.        infeasible_iff,  value_of_feasible,  crossing_budget,  crossing_sign_undetermined",
+   "An infeasible configuration has NO value; it is never clamped to a small positive one. Two supports of sizes |S₁|, |S₂| at equal setup κ give equal information exactly at",
+   "",
+   "",
+   "",
+   "and if the two Γ are only BRACKETED and the brackets overlap, both orders are consistent, so no crossing may be reported and the honest output is UNDECIDED.",
+   "",
+   "STEP 10.   THE BREAK-EVEN, WITHOUT THE FOLKLORE 4.        scalar_split_optimal,  breakeven_iff,  breakeven_not_four",
+   "",
+   "",
+   "",
+   "The number 4 is the value of (σ_a+σ_b)² at unit variances and nothing more; breakeven_not_four keeps it inside its hypotheses. With several alternatives the scalar design shares cells and the pairwise threshold does NOT transfer."
+  ],
+  "15": [
+   "Figure 1.  The two families, in exact arithmetic. Family 1 forces the ratio below 9η; family 2 forces it above (1+3η)/(16η). Both are PROVED bounds, not sampled points: the scalar proxy is wrong in both directions, and by no constant."
+  ],
+  "5": [
+   "Results and Discussion"
+  ],
+  "12": [
+   "Figure 2.  The main panel, 1000 paired instances. C_lucb certifies 797 worlds at median 20,996 queries; C_anytime 749 at 29,884; uniform 605 at 74,252. Paired where both certify: C_lucb faster in 748, tie 1, loses 0, plus 48 worlds only C_lucb certifies. This is a result ON THIS PANEL, not a domination theorem. Source: functional_v4_lucb_ieee10seed_cellv1.json."
+  ],
+  "7": [
+   "Conclusions"
+  ],
+  "13": [
+   "The scalar pair-flip proxy at the current extrema is a bound in NEITHER direction. Family 1 drives J_full/J_scalar to 0 and family 2 drives it to infinity, both in exact arithmetic with explicit witnesses — so no constant correction can repair it, and any allocator built on that proxy is building on sand when the extrema can move.",
+   "",
+   "The true alternative set is a finite union of convex pair regions on the real range target. Its energy oracle is therefore a finite conjunction of convex problems; the inner problem has a closed form, and its optimality certificate needs no matrix inverse, so a singular information matrix costs nothing extra.",
+   "",
+   "ON ALLOCATORS.  Defending 'C_anytime is the best allocator' is not supportable: on the main panel C_lucb certifies more worlds, at a lower median, and never loses a paired comparison. C_lucb — the same-information, same-guarantee baseline — is what any oracle-based allocator must beat, and uniform is too weak a comparator to defend a claim against the unknown-variance literature.",
+   "",
+   "SCOPE — NOT ESTABLISHED.  (1) The DECOMPOSITION step is not formalised: that relations i and j occupy disjoint blocks while every other relation stays at zero cost is a model statement, and the full oracle equality is not assembled. (2) Free response table, known variance, positive precision; under realizability coupling the cost does not separate. (3) kkt_certificate is SUFFICIENCY — it does not say every optimal point has a certificate. (4) Weak duality only: a dual mixture certifies an upper bound, but a gap is not excluded. (5) No allocator built on this oracle has yet been compared against C_lucb."
+  ],
+  "6": [
+   "References"
+  ],
+  "2": [
+   "[1] Jourdan, Degenne & Kaufmann. Dealing with unknown variances in best-arm identification. COLT 2023. arXiv:2210.00974.",
+   "[2] Garivier, A. & Kaufmann, E. Optimal best arm identification with fixed confidence. COLT 2016.",
+   "[3] Boyd, S. & Vandenberghe, L. Convex Optimization. CUP, 2004.   [4] The mathlib Community. CPP, 2020."
+  ]
+ },
+ "pictures": {
+  "21": "research/papers/_figures/func_fig2_families.png",
+  "23": "research/papers/_figures/func_fig1_panel.png"
+ },
+ "geometry": {
+  "20": {
+   "left": 1.3,
+   "top": 5.1,
+   "width": 12.9,
+   "height": 10.6
+  },
+  "9": {
+   "left": 1.5,
+   "top": 15.9,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "8": {
+   "left": 1.3,
+   "top": 16.9,
+   "width": 12.9,
+   "height": 3.8
+  },
+  "4": {
+   "left": 1.5,
+   "top": 20.9,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "1": {
+   "left": 1.4,
+   "top": 21.9,
+   "width": 12.8,
+   "height": 5.6
+  },
+  "14": {
+   "left": 1.4,
+   "top": 27.7,
+   "width": 12.8,
+   "height": 3.6
+  },
+  "18": {
+   "left": 1.4,
+   "top": 31.5,
+   "width": 12.8,
+   "height": 4.1
+  },
+  "16": {
+   "left": 15.4,
+   "top": 5.1,
+   "width": 15.2,
+   "height": 21.6
+  },
+  "21": {
+   "left": 18.4,
+   "top": 26.9,
+   "width": 9.2,
+   "height": 7.6
+  },
+  "15": {
+   "left": 15.4,
+   "top": 34.6,
+   "width": 15.2,
+   "height": 1.2
+  },
+  "23": {
+   "left": 31.0,
+   "top": 5.1,
+   "width": 15.6,
+   "height": 9.1
+  },
+  "12": {
+   "left": 31.0,
+   "top": 14.3,
+   "width": 15.6,
+   "height": 2.6
+  },
+  "7": {
+   "left": 31.0,
+   "top": 17.2,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "13": {
+   "left": 31.0,
+   "top": 18.2,
+   "width": 15.6,
+   "height": 14.8
+  },
+  "6": {
+   "left": 31.0,
+   "top": 33.3,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "2": {
+   "left": 30.9,
+   "top": 34.3,
+   "width": 15.8,
+   "height": 1.3
+  }
+ },
+ "equations": {
+  "func_order": {
+   "left": 1.6,
+   "top": 11.6,
+   "width": 12.4
+  },
+  "func_union": {
+   "left": 1.6,
+   "top": 22.9,
+   "width": 12.4
+  },
+  "func_polyhedron": {
+   "left": 2.4,
+   "top": 25.7,
+   "width": 10.8
+  },
+  "func_J": {
+   "left": 1.9,
+   "top": 28.7,
+   "width": 11.8
+  },
+  "func_shrink": {
+   "left": 2.4,
+   "top": 32.7,
+   "width": 6.0
+  },
+  "func_expand": {
+   "left": 8.8,
+   "top": 32.7,
+   "width": 4.6
+  },
+  "func_innerqp": {
+   "left": 16.4,
+   "top": 6.1,
+   "width": 13.2
+  },
+  "func_kkt": {
+   "left": 15.8,
+   "top": 11.6,
+   "width": 14.4
+  },
+  "func_family1": {
+   "left": 17.9,
+   "top": 17.4,
+   "width": 10.2
+  },
+  "func_family2": {
+   "left": 17.9,
+   "top": 21.2,
+   "width": 10.2
+  },
+  "func_crossing": {
+   "left": 20.4,
+   "top": 24.1,
+   "width": 5.2
+  },
+  "func_breakeven": {
+   "left": 15.8,
+   "top": 25.5,
+   "width": 14.4
+  }
+ },
+ "delete": [
+  "19",
+  "24",
+  "28",
+  "17",
+  "27",
+  "11",
+  "25",
+  "26"
+ ]
+}

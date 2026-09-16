@@ -9,9 +9,47 @@ import argparse, json
 from pathlib import Path
 
 SRC = Path('research/worker_G03_prior_20260915/G03_prior_comparison.json')
-OUT = 'research/worker_G03s_theorem_20260915/G03s_prior_theorem_level.json'
+OUT = 'research/worker_G03s_theorem_20260915/G03s_prior_theorem_level_v2.json'
 
 VERIFIED = {
+ 'Structural': {
+  'source_read': 'arXiv:2305.01310, ar5iv full text (Disser, Klimm, Schewior, Weckbecker).',
+  'theorems_read': [
+   {'id': 'Definition (objective class)',
+    'statement': 'The objective is a monotone function f : 2^U -> R_{>=0}.  The codomain is '
+                 'the NON-NEGATIVE reals.'},
+   {'id': 'Definition (accountable)',
+    'statement': 'f is accountable if for every X subset of U there exists e in X with '
+                 'f(X \\ {e}) >= f(X) - f(X)/|X|.'},
+   {'id': 'Theorem 1',
+    'statement': 'For every instance of IncMaxCont there is a starting value c1 such that '
+                 'GreedyScaling(c1, rho*) achieves the best-possible competitive ratio '
+                 'rho* >= 1.'},
+   {'id': 'Theorem 2',
+    'statement': 'GreedyScaling(c1, phi+1) is (phi+1)-competitive if and only if '
+                 'd(c1) >= 1/(phi+1).'},
+   {'id': 'Theorem 4', 'statement': 'IncMax has competitive ratio at least 2.246.'},
+   {'id': 'Theorem 5', 'statement': 'IncMax admits a 1.772-competitive randomised algorithm.'}],
+  'what_is_therefore_prior': [
+   'The whole incremental-maximisation programme for monotone accountable objectives: the '
+   'upper bound phi+1 ~ 2.618, the lower bound 2.246, and the randomised 1.772.',
+   'The idea of one schedule serving every budget.  Structural must credit this.'],
+  'what_is_NOT_in_the_prior': [
+   'DECISIVE: the objective class is f : 2^U -> R_{>=0}.  The structural family '
+   'g_m = (-3, (-1)^p, (+1)^q, 3) has prefix values that go NEGATIVE, so it fails the '
+   'codomain restriction before accountability is even tested.  Our objective is not in '
+   'the prior class at all -- this is a class separation, not a constant improvement.',
+   'The prior guarantee is MULTIPLICATIVE (a competitive ratio).  Ours is ADDITIVE and '
+   'normalised by D = sum |g_i| = m+4.  The two are not comparable numbers.',
+   'The prior asks for ONE ordering serving all cardinalities.  Ours asks for the MINIMUM '
+   'MENU of orderings, and proves the menu size is exactly m-1.'],
+  'boundary_Structural_may_claim':
+   'The signed-cancellation regime, which the prior class excludes by its codomain; the '
+   'ADDITIVE normalised two-sided law V_path/V_avg = m-1 for every m >= 5; and the MENU '
+   'formulation.  The incremental-maximisation idea and every multiplicative constant are '
+   'cited to the prior.',
+  'verified_level': 'theorem', 'theorem_level_verified': True},
+
  'MASTER (design/duality)': {
   'source_read': 'arXiv:0908.1912v1 (Ann. Statist. 37 (2009) 2056-2082), full PDF, Sections 1-2.',
   'theorems_read': [

@@ -1,0 +1,305 @@
+{
+ "paper": "QUERY — which query you are allowed to ask sets the leakage order",
+ "text": {
+  "0": [
+   "Which Query You Are Allowed to Ask Sets the Leakage Order",
+   "Holding the two worlds fixed and varying the admissible measurement instead",
+   "Vu Phan An Nguyen",
+   "Rider University  ·  CIG-AMF formal research programme  ·  7 Lean 4 modules, 54 audited declarations, 0 sorry, axioms only {propext, Classical.choice, Quot.sound}"
+  ],
+  "22": [
+   "The question"
+  ],
+  "20": [
+   "Two fixed worlds are to be told apart from observations. We hold the WORLDS fixed and vary instead the ADMISSIBLE MEASUREMENT.",
+   "",
+   "The observation density of world W at perturbation h is a finite Gaussian mixture:",
+   "",
+   "",
+   "",
+   "Expanding in h produces coefficients Δ_j. The LEAKAGE ORDER is the least j with Δ_j ≢ 0.",
+   "",
+   "Two things must be established separately, and the second is the one usually skipped:",
+   "·  the coefficients below order r cancel;",
+   "·  Δ_r ≢ 0.  'Some coefficient is nonzero' is NOT enough — the shifted Gaussian derivatives could in principle cancel one another.",
+   "",
+   "WHAT IS NOT NEW  (read at theorem level)",
+   "Ho & Nguyen, arXiv:1609.02655.  Thm 3.1: singularity level r gives inf ‖p_G − p_G₀‖∞ / W_s^s(G,G₀) > 0 for s ≥ r+1.  Thm 3.3(a): minimax lower bound n^(−1/2s) for s ∈ [1, r+1), over a COMPACT parameter space.",
+   "So the phenomenon that singularity degrades the rate is PRIOR, with minimax lower bounds already proved. We credit it and do not restate it as new.",
+   "What the prior does NOT contain: the observation model is FIXED throughout — no theorem varies which measurements are legal — and no separation parameter h appears anywhere; rates are powers of the sample size n."
+  ],
+  "9": [
+   "Objectives"
+  ],
+  "8": [
+   "1.  Show the same two worlds acquire DIFFERENT leakage orders under different admissible queries.",
+   "2.  Prove Δ_r ≢ 0, so the order is well defined and not an artefact of cancellation.",
+   "3.  Sandwich H² between two explicit constant multiples of h^{2r}, then convert to matching sample-complexity bounds and a two-sided regret window.",
+   "4.  Correct our own earlier note: the prior contains no h at all, so 'claiming the h-rate puts us inside the prior' was too strong."
+  ],
+  "4": [
+   "The chain — the coefficient analysis"
+  ],
+  "1": [
+   "STEP 1.   THE GAUSSIAN DERIVATIVES, BUILT.        iteratedDeriv_gauss,  hpoly_coeff,  hpoly_ne_zero",
+   "",
+   "",
+   "",
+   "",
+   "The degree-n coefficient of H_n is (−1/σ²)ⁿ ≠ 0, hence H_n ≠ 0 — the fact the non-vanishing argument needs.",
+   "",
+   "STEP 2.   PUSH THE DERIVATIVE THROUGH THE SUM.        iteratedDeriv_fun_sum,  contDiff_component",
+   "",
+   "",
+   "",
+   "",
+   "Mathlib has the multilinear iteratedFDeriv_fun_sum_apply but no scalar-variable counterpart; this file supplies it. Smoothness of each component is DISCHARGED, not assumed."
+  ],
+  "14": [
+   "STEP 3.   THE ASSEMBLY.        iteratedDeriv_mixture",
+   "",
+   "",
+   "",
+   "",
+   "The j-th derivative in h at h = 0 of the whole mixture IS the order-j level sum. This is the step the audit recorded as the one remaining piece of Q3."
+  ],
+  "18": [
+   "STEP 4.   NON-VANISHING — THE HARD HALF.        levelSum_ne_zero,  mixture_coeff_ne_zero",
+   "",
+   "",
+   "",
+   "",
+   "Every term of the second sum is a polynomial against a DECAYING exponential, so it tends to 0. If T ≡ 0 then c_v* H_r(·−v*) would tend to 0 at +∞, forcing its leading coefficient to vanish — contradicting c_v* ≠ 0 and H_r ≠ 0. So the shifted Gaussian derivatives cannot conspire to cancel."
+  ],
+  "3": [
+   "The chain — rate, sample complexity, regret"
+  ],
+  "16": [
+   "STEP 5.   THE HELLINGER SANDWICH.        hellinger_lower_from_interval,  hellinger_upper_const",
+   "",
+   "",
+   "",
+   "",
+   "The lower constant is 32, not 16 — it comes from the Cauchy–Schwarz interval bound, and the looser constant is easy to write by accident. The upper side uses an integrable Gaussian envelope and a uniform Taylor remainder, both proved: chi2_pointwise, bound_of_vanishing_derivs, envelope_integrable, gaussComp_contDiff.",
+   "",
+   "STEP 6.   FROM HELLINGER TO PER-SAMPLE INFORMATION.        log_sandwich",
+   "",
+   "",
+   "",
+   "",
+   "This converts the sandwich on H² into a sandwich on the per-sample log-affinity L = −log(1−H²).",
+   "",
+   "STEP 7.   MATCHING SAMPLE COMPLEXITY.        sufficient_count,  necessary_count,  ceil_suffices,  matching_rate",
+   "",
+   "",
+   "",
+   "",
+   "The two sides differ by the factor 2 of step 6 and the ratio c₊/c₋ of step 5 — both explicit, neither hidden in an asymptotic. ceil_suffices states that the integer ceiling suffices.",
+   "",
+   "STEP 8.   THE REGRET WINDOW.        regret_ge_gamma_error,  lrt_regret_le,  bayes_regret_window",
+   "",
+   "",
+   "",
+   "",
+   "with γ = 13983/32768 and L_max = 2401/4096. Regret is bounded below by γ times the error probability and above by L_max times it; the window follows.",
+   "",
+   "STEP 9.   THE ANALYTIC LIMIT.        ratio_tendsto_of_dominated,  hellinger_ratio_tendsto,  limit_pos_of_ae_ne_zero",
+   "",
+   "",
+   "",
+   "",
+   "A sandwich localises the ratio in [c₋, c₊]; it does not say the ratio CONVERGES. Dominated convergence along h ↓ 0 supplies the limit, and limit_pos_of_ae_ne_zero turns the pointwise non-vanishing of step 4 into a strictly positive leading constant."
+  ],
+  "15": [
+   "Figure 1.  The Hellinger sandwich. Both sides have slope 2r on this log-log plot, so the ORDER is pinned, not merely bounded above. The lower constant 1/32 comes from the Cauchy–Schwarz interval bound; the upper constant J/2 from the integrable Gaussian envelope."
+  ],
+  "5": [
+   "Results and Discussion"
+  ],
+  "12": [
+   "Figure 2.  Measured Bayes regret against the proved window, for two admissible measurements of the SAME pair of worlds. The shaded band is [γρ^2N/4, L_max ρ^N/2]; the black bar is a bootstrap 95% interval over 4000 repetitions per world. Both measured values land inside. The order-1 measurement needs N = 41,006 samples where the order-2 measurement needs 4,678 — the same worlds, a different legal query. Source: P33_query_actual_regret.json."
+  ],
+  "7": [
+   "Conclusions"
+  ],
+  "13": [
+   "The leakage order is a property of the QUERY, not of the parameter space. The same two worlds, measured differently, separate at different orders, and the sample cost of restoring distinguishability follows the order through H² ≍ h^{2r}.",
+   "",
+   "The chain is closed end to end and machine-checked: Gaussian derivatives built explicitly, the derivative pushed through the finite sum, the order-r coefficient shown not to vanish, H² sandwiched, converted to matching sample counts, and bracketed as regret. Step 4 is the one usually skipped and is the reason the order is well defined at all.",
+   "",
+   "SCOPE — NOT ESTABLISHED.  (1) Normalising constants 1/(σ√2π) and 1/j! are dropped throughout; the dropped expressions must not be quoted as densities. (2) The cancellation statement assumes the two worlds share a level set. (3) Non-vanishing needs a strict top level; ties at the top are outside it. (4) The regret window's ends separate as N grows: it localises regret, it does not determine it. (5) No minimax statement is made — the comparison with Ho–Nguyen is a comparison of DIFFERENT objects."
+  ],
+  "6": [
+   "References"
+  ],
+  "2": [
+   "[1] Ho, N. & Nguyen, X. Singularity structures and impacts on parameter estimation in finite mixtures. arXiv:1609.02655.",
+   "[2] Chen, J. Optimal rate of convergence for finite mixture models. Ann. Statist. 23(1), 221–233, 1995.",
+   "[3] Tsybakov, A. Introduction to Nonparametric Estimation. Springer, 2009.   [4] The mathlib Community. CPP, 2020."
+  ]
+ },
+ "pictures": {
+  "21": "research/papers/_figures/query_fig2_sandwich.png",
+  "23": "research/papers/_figures/query_fig1_regret.png"
+ },
+ "geometry": {
+  "20": {
+   "left": 1.3,
+   "top": 5.1,
+   "width": 12.9,
+   "height": 9.5
+  },
+  "9": {
+   "left": 1.5,
+   "top": 15.0,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "8": {
+   "left": 1.3,
+   "top": 16.0,
+   "width": 12.9,
+   "height": 3.6
+  },
+  "4": {
+   "left": 1.5,
+   "top": 19.9,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "1": {
+   "left": 1.4,
+   "top": 20.9,
+   "width": 12.8,
+   "height": 6.1
+  },
+  "14": {
+   "left": 1.4,
+   "top": 27.3,
+   "width": 12.8,
+   "height": 4.1
+  },
+  "18": {
+   "left": 1.4,
+   "top": 31.6,
+   "width": 12.8,
+   "height": 4.0
+  },
+  "16": {
+   "left": 15.4,
+   "top": 5.1,
+   "width": 15.2,
+   "height": 21.6
+  },
+  "21": {
+   "left": 18.4,
+   "top": 26.9,
+   "width": 9.2,
+   "height": 7.6
+  },
+  "15": {
+   "left": 15.4,
+   "top": 34.6,
+   "width": 15.2,
+   "height": 1.2
+  },
+  "23": {
+   "left": 31.0,
+   "top": 5.1,
+   "width": 15.6,
+   "height": 9.1
+  },
+  "12": {
+   "left": 31.0,
+   "top": 14.3,
+   "width": 15.6,
+   "height": 2.6
+  },
+  "7": {
+   "left": 31.0,
+   "top": 17.2,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "13": {
+   "left": 31.0,
+   "top": 18.2,
+   "width": 15.6,
+   "height": 14.8
+  },
+  "6": {
+   "left": 31.0,
+   "top": 33.3,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "2": {
+   "left": 30.9,
+   "top": 34.3,
+   "width": 15.8,
+   "height": 1.3
+  }
+ },
+ "equations": {
+  "query_mixture": {
+   "left": 2.6,
+   "top": 7.5,
+   "width": 10.4
+  },
+  "query_hermite": {
+   "left": 1.6,
+   "top": 21.9,
+   "width": 12.4
+  },
+  "query_sumswap": {
+   "left": 1.6,
+   "top": 24.4,
+   "width": 12.4
+  },
+  "query_assembly": {
+   "left": 1.9,
+   "top": 28.3,
+   "width": 11.8
+  },
+  "query_nonvanish": {
+   "left": 1.9,
+   "top": 32.6,
+   "width": 11.8
+  },
+  "query_hellinger": {
+   "left": 19.4,
+   "top": 6.1,
+   "width": 7.2
+  },
+  "query_logsandwich": {
+   "left": 17.4,
+   "top": 10.5,
+   "width": 11.2
+  },
+  "query_samplecount": {
+   "left": 19.4,
+   "top": 15.1,
+   "width": 7.2
+  },
+  "query_regret": {
+   "left": 19.4,
+   "top": 19.3,
+   "width": 7.2
+  },
+  "query_limit": {
+   "left": 20.9,
+   "top": 23.2,
+   "width": 4.2
+  }
+ },
+ "delete": [
+  "19",
+  "24",
+  "28",
+  "17",
+  "27",
+  "11",
+  "25",
+  "26"
+ ]
+}

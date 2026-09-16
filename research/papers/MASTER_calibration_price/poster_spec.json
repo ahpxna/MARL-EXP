@@ -1,0 +1,352 @@
+{
+ "paper": "MASTER — the price of a calibration query",
+ "template_shape_map": "0 title | 22,9,4,3,17,5,7,6 headers | 20,8,1,14,18,16,27,13,2 bodies | 15,12,26,11,28 captions | 19,21,23,25 pictures | 24 table | 10 logo (kept)",
+ "text": {
+  "0": [
+   "The Price of a Calibration Query",
+   "When an extra kind of measurement stops being an optimisation and becomes a precondition",
+   "Vu Phan An Nguyen",
+   "Rider University  ·  CIG-AMF formal research programme  ·  every theorem below is machine-checked in Lean 4 (leanprover/lean4:v4.34.0-rc2, mathlib 1f495c61) with no sorry and axioms only {propext, Classical.choice, Quot.sound}"
+  ],
+  "22": [
+   "The question"
+  ],
+  "20": [
+   "A population of K·m items carries unknown values θᵢ, split into K groups; group g carries an unknown common offset b_g. The answer wanted is a threshold set: which items lie above a fixed level.",
+   "",
+   "ORDINARY query on item i:  observes θᵢ + b_g(i), variance v, unit price. It sees the value and the offset only IN COMBINATION.",
+   "CALIBRATION query on group g:  observes b_g directly, variance ν, price κ.",
+   "",
+   "Write a = x/v for ordinary precision on an item, b = z/ν for control precision on its group, Δ for the separation of the two worlds, s_m = √m, s_κ = √κ.",
+   "",
+   "TWO QUESTIONS, AND ONLY THESE TWO",
+   "·  WHEN does the calibration query stop being an efficiency gain and become mandatory?",
+   "·  WHAT does it cost — the exact optimal value under a unit budget, not an order of magnitude?",
+   "",
+   "WHAT IS NOT NEW  (read at theorem level, not from abstracts)",
+   "Dette & Titoff 2009, Thm 2.1: the T-optimal value IS the squared Chebyshev approximation error; Thm 2.2 characterises ALL T-optimal designs. Their criterion is already profiled, and the noncentrality δ² = θ₀ᵀM₁₁.₂θ₀ is a SCHUR COMPLEMENT — our I_u = D_u − M_u²/(2K) has that same shape.",
+   "Bennouna et al. 2025, Thm 1: a dataset is sufficient iff Δ(X,C) ⊆ span D — existential, over a PREDEFINED query set.",
+   "So profiling, the Schur shape, closed-form criterion values and identifiability are CITED, not claimed. Neither prior prices a query TYPE, states a necessity dichotomy, or gives a rate in (K, m, κ)."
+  ],
+  "9": [
+   "Objectives"
+  ],
+  "8": [
+   "1.  Exhibit a configuration on which every ordinary query is blind, so the attainable value is exactly zero — a dichotomy, not a slow rate.",
+   "2.  Prove the exact optimal value once a calibration query is bought, matched on both sides and attained.",
+   "3.  Certify on one explicit instance that no anchor-free design can match an anchored one, in exact rationals.",
+   "4.  State the novelty boundary on the front of the poster, not in an appendix."
+  ],
+  "4": [
+   "The chain — steps 1 to 4"
+  ],
+  "1": [
+   "STEP 1.   THE DICHOTOMY.        hidden_shift_means,  hidden_shift_answers_differ",
+   "Four items, two per group, exhibited in exact rationals:",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "Every ordinary query has the SAME mean in both worlds, and the answers differ. So the calibration query is not an improvement — it is a precondition."
+  ],
+  "14": [
+   "STEP 2.   PROFILE THE GROUP OFFSET.        profiled_information,  profiled_information_form",
+   "",
+   "",
+   "",
+   "",
+   "Both halves are proved: the inequality for every shift t, and the value at the minimiser t = aΔ/(a+b). This is where the Schur-complement shape enters — and that shape is prior."
+  ],
+  "18": [
+   "STEP 3.   PRICE ONE GROUP — LOWER.        group_cost_lower",
+   "",
+   "",
+   "",
+   "Pure Cauchy–Schwarz on (s_m x − s_κ z)². No optimiser and no multiplier theorem is consulted.",
+   "",
+   "STEP 4.   PRICE ONE GROUP — ATTAINED.        group_cost_attained",
+   "",
+   "",
+   "",
+   "So (√m + √κ)² is the EXACT price of one unit of profiled information in a group."
+  ],
+  "3": [
+   "The chain — steps 5 to 8"
+  ],
+  "16": [
+   "STEP 5.   THE K-GROUP UPPER BOUND.        calibration_rate_upper",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "The statement quantifies over EVERY unit-budget design, not over a parametric family.",
+   "",
+   "STEP 6.   IT IS ATTAINED.        calibration_rate_attained",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "An identity, not an order of magnitude. Both readings follow at once:",
+   "",
+   "",
+   "",
+   "",
+   "STEP 7.   THE ANCHOR IS MANDATORY.        anchorFree_le,  anchorFree_attained,  anchor_mandatory",
+   "",
+   "",
+   "",
+   "A gap of 37.4%, in exact rationals. The anchored design spends 9/20 + 9/20 + (1/10)·1 = 1. anchor_mandatory is stated for an ABSTRACT design type: no optimality of the anchored design is assumed, and the upper certificate covers designs placing mass anywhere.",
+   "",
+   "STEP 8.   GAIN FACTORISATION.        hadamard_square_factor,  min_attained_on_active",
+   "",
+   "",
+   "",
+   "and the minimum after a perturbation is attained on the active set, so inactive constraints may be dropped. These let the K-group sum of step 5 be assembled from per-group statements without a separate convexity argument."
+  ],
+  "15": [
+   "Figure 1.  The price law against control price. The line is the closed form Δ²/(2K(√m+√κ)²); the markers are two independent numerical optima (bisection and Nelder–Mead) over the same feasible set. Across all 32 cells the largest relative gap is 2.5 × 10⁻¹⁶ — machine precision — and Nelder–Mead never exceeds the closed form in any cell. Source: P17_master_full_class.json."
+  ],
+  "17": [
+   "Results and Discussion"
+  ],
+  "27": [
+   "THE LAW IS EXACT, AND THE NUMERICS AGREE TO MACHINE PRECISION.  Two independent optimisers over the same feasible set reproduce the closed form in all 32 cells, worst relative gap 2.5 × 10⁻¹⁶. Nelder–Mead never exceeds it, which is the direction that would falsify an upper bound.",
+   "",
+   "THE COST OF A MISSING QUERY TYPE IS TOTAL; THE COST OF BAD ALLOCATION IS BOUNDED.  Over the same 32 cells, removing the controls gives EXACTLY zero — not a numerical shortfall but the hidden-shift witness of step 1, verified before the solver is called. A uniform design that keeps all controls still reaches 73.5–100% of the optimum (median 91.7%).",
+   "",
+   "That asymmetry is the practical message. An experimenter who allocates badly loses a bounded fraction. An experimenter who omits the query type loses everything, and no amount of sampling recovers it."
+  ],
+  "11": [
+   "4 modules · 29 audited declarations · 0 sorry · axioms only {propext, Classical.choice, Quot.sound}"
+  ],
+  "28": [
+   "Receipts record lean_exit, the source hash before and after the compile, whether the .olean is newer than its source, and the full axiom audit per declaration."
+  ],
+  "5": [
+   "Results and Discussion cont."
+  ],
+  "12": [
+   "Figure 2.  Control baselines over the same 32 cells. Removing the control query gives exactly zero, by the hidden-shift witness rather than by numerical failure. Source: P31_master_control_baselines.json."
+  ],
+  "26": [
+   "Figure 3.  The dichotomy, drawn. Solid bars are item values θ, hatched bars the group offset b, and the black dashes mark what an ordinary query actually observes — identical in both worlds. The answers, read at threshold ½, are not identical. This is hidden_shift_means and hidden_shift_answers_differ, in exact rationals."
+  ],
+  "7": [
+   "Conclusions"
+  ],
+  "13": [
+   "A calibration query is not an efficiency improvement a good allocator could do without. There are configurations on which every ordinary query has identical means in two worlds with different answers, so the value is exactly zero until a query of the new type is bought.",
+   "",
+   "Once bought, its price is EXACT: the constant 1/(2K(√m+√κ)²) is matched by a lower bound, an upper bound over all unit-budget designs, and an attaining design.",
+   "",
+   "SCOPE — NOT ESTABLISHED.  (1) Common v, ν, κ and equal gaps; heterogeneous cases are not covered. (2) Step 7 certifies ONE instance. (3) Step 1 exhibits two indistinguishable worlds, it does not characterise all of them. (4) No estimator and no finite-sample guarantee is claimed."
+  ],
+  "6": [
+   "References"
+  ],
+  "2": [
+   "[1] Dette & Titoff. Optimal discrimination designs. Ann. Statist. 37(4), 2056–2082, 2009.",
+   "[2] Bennouna et al. What data enables optimal decisions? arXiv:2505.21692, 2025.",
+   "[3] Atkinson & Fedorov. Biometrika 62, 57–70, 1975.   [4] Pukelsheim. Optimal Design of Experiments. SIAM, 2006.",
+   "[5] The mathlib Community. The Lean mathematical library. CPP, 2020."
+  ]
+ },
+ "pictures": {
+  "21": "research/papers/_figures/master_fig1_rate.png",
+  "23": "research/papers/_figures/master_fig2_baselines.png",
+  "25": "research/papers/_figures/master_fig4_witness.png"
+ },
+ "geometry": {
+  "20": {
+   "left": 1.3,
+   "top": 5.1,
+   "width": 12.9,
+   "height": 9.5
+  },
+  "9": {
+   "left": 1.5,
+   "top": 15.0,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "8": {
+   "left": 1.3,
+   "top": 16.0,
+   "width": 12.9,
+   "height": 3.6
+  },
+  "4": {
+   "left": 1.5,
+   "top": 19.9,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "1": {
+   "left": 1.4,
+   "top": 20.9,
+   "width": 12.8,
+   "height": 5.9
+  },
+  "14": {
+   "left": 1.4,
+   "top": 27.3,
+   "width": 12.8,
+   "height": 3.9
+  },
+  "18": {
+   "left": 1.4,
+   "top": 31.4,
+   "width": 12.8,
+   "height": 4.2
+  },
+  "16": {
+   "left": 15.4,
+   "top": 5.1,
+   "width": 15.2,
+   "height": 21.4
+  },
+  "21": {
+   "left": 18.4,
+   "top": 26.4,
+   "width": 9.2,
+   "height": 7.6
+  },
+  "15": {
+   "left": 15.4,
+   "top": 34.1,
+   "width": 15.2,
+   "height": 1.5
+  },
+  "17": {
+   "left": 15.6,
+   "top": 28.8,
+   "width": 14.5,
+   "height": 0.9
+  },
+  "27": {
+   "left": 15.4,
+   "top": 29.8,
+   "width": 15.2,
+   "height": 5.0
+  },
+  "11": {
+   "left": 15.4,
+   "top": 34.9,
+   "width": 15.2,
+   "height": 0.7
+  },
+  "23": {
+   "left": 31.0,
+   "top": 5.1,
+   "width": 15.6,
+   "height": 9.1
+  },
+  "12": {
+   "left": 31.0,
+   "top": 14.3,
+   "width": 15.6,
+   "height": 1.7
+  },
+  "25": {
+   "left": 31.0,
+   "top": 16.1,
+   "width": 15.6,
+   "height": 9.1
+  },
+  "26": {
+   "left": 31.0,
+   "top": 25.3,
+   "width": 15.6,
+   "height": 1.8
+  },
+  "7": {
+   "left": 31.0,
+   "top": 27.2,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "13": {
+   "left": 31.0,
+   "top": 28.2,
+   "width": 15.6,
+   "height": 5.0
+  },
+  "6": {
+   "left": 31.0,
+   "top": 33.3,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "2": {
+   "left": 30.9,
+   "top": 34.3,
+   "width": 15.8,
+   "height": 1.5
+  }
+ },
+ "delete": [
+  "19",
+  "24",
+  "28",
+  "17",
+  "27",
+  "11"
+ ],
+ "equations": {
+  "master_witness": {
+   "left": 1.9,
+   "top": 22.5,
+   "width": 11.8
+  },
+  "master_dichotomy": {
+   "left": 1.9,
+   "top": 23.3,
+   "width": 11.8
+  },
+  "master_profile": {
+   "left": 2.6,
+   "top": 28.1,
+   "width": 10.4
+  },
+  "master_group_lower": {
+   "left": 1.9,
+   "top": 32.3,
+   "width": 11.8
+  },
+  "master_group_attained": {
+   "left": 1.9,
+   "top": 34.9,
+   "width": 11.8
+  },
+  "master_upper": {
+   "left": 15.8,
+   "top": 6.1,
+   "width": 14.4
+  },
+  "master_rate": {
+   "left": 19.8,
+   "top": 9.3,
+   "width": 6.4
+  },
+  "master_limits": {
+   "left": 15.6,
+   "top": 12.0,
+   "width": 14.8
+  },
+  "master_anchor": {
+   "left": 15.8,
+   "top": 14.5,
+   "width": 14.4
+  },
+  "master_hadamard": {
+   "left": 16.8,
+   "top": 18.1,
+   "width": 12.4
+  }
+ }
+}
