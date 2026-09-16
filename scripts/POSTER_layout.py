@@ -25,6 +25,10 @@ GAP_AFTER_HEADER = 0.10
 FS = {"header": 50, "prose": 25, "caption": 22, "eq_pad": 0}
 H_HEADER = 0.92
 
+# inches of poster per pixel of the 30 pt / 300 dpi equation render: a single-line
+# formula lands at about 0.62 in, roughly one and a half body lines.
+EQ_SCALE = 0.0031
+
 EQ_INDEX = Path('research/papers/_figures/eq/index.json')
 
 
@@ -63,9 +67,20 @@ def layout_column(col, blocks, eq_index, top=TOP, bottom=BOTTOM):
         elif k in ('prose', 'caption'):
             fs = FS['prose'] if k == 'prose' else FS['caption']
             h = prose_height(b['lines'], width - 0.2, b.get('fs', fs))
-        elif k in ('eq', 'fig'):
+        elif k == 'eq':
+            # Equations are placed by HEIGHT, not width, so every formula on the sheet is
+            # typeset at the same glyph size.  Placing by width magnifies a short formula
+            # and shrinks a long one, which is what made them look inconsistent.
+            meta = eq_index[b['key']]
+            h = meta['px_h'] * EQ_SCALE
+            w = h * meta['aspect']
+            if w > width * 0.98:      # too long for the column, and only then
+                w = width * 0.98      # does it render smaller -- legitimately
+                h = w / meta['aspect']
+            b['_w'] = w
+        elif k == 'fig':
             w = b.get('width', width * b.get('wfrac', 0.92))
-            h = w / _aspect(b['key'] if k == 'eq' else b['path'], eq_index)
+            h = w / _aspect(b['path'], eq_index)
             b['_w'] = w
         else:
             raise SystemExit(f'unknown block kind {k!r}')
@@ -82,9 +97,14 @@ def layout_column(col, blocks, eq_index, top=TOP, bottom=BOTTOM):
     prose_idx = [i for i, b in enumerate(blocks) if b['kind'] in ('prose', 'caption')]
     slack = avail - natural
     if prose_idx:
-        per = slack / len(prose_idx)
+        # Distribute the difference in PROPORTION to each block's natural height, not
+        # equally.  Equal shares give a one-line block the same absolute slack as a
+        # six-line one, so the short blocks end up loose and the long ones tight -- and a
+        # renderer that auto-fits per box then draws them at visibly different sizes.
+        base = sum(nat[i] for i in prose_idx)
         for i in prose_idx:
-            nat[i] = max(0.30, nat[i] + per)
+            share = (nat[i] / base) if base > 0 else (1.0 / len(prose_idx))
+            nat[i] = max(0.24, nat[i] + slack * share)
 
     boxes, y = [], top
     for i, b in enumerate(blocks):
@@ -114,8 +134,14 @@ def block_height(col, b, eq_index):
     if k in ('prose', 'caption'):
         fs = FS['prose'] if k == 'prose' else FS['caption']
         return prose_height(b['lines'], width - 0.2, b.get('fs', fs))
+    if k == 'eq':
+        meta = eq_index[b['key']]
+        h = meta['px_h'] * EQ_SCALE
+        if h * meta['aspect'] > width * 0.98:
+            h = (width * 0.98) / meta['aspect']
+        return h
     w = b.get('width', width * b.get('wfrac', 0.92))
-    return w / _aspect(b['key'] if k == 'eq' else b['path'], eq_index)
+    return w / _aspect(b['path'], eq_index)
 
 
 def atomise(blocks):

@@ -87,8 +87,11 @@ def build(layout_path, meta_path, out_path):
     shapes = list(slide.shapes)
     spTree = slide.shapes._spTree
 
-    # title first, from the template's own title box
+    # title first, from the template's own title box.  The template starts it at x = 1.1in,
+    # which runs under the logo at x = 1.7; shift it clear and narrow it to match.
     set_text(shapes[TITLE_SHAPE], meta['title'])
+    shapes[TITLE_SHAPE].left = Emu(int(9.3 * 914400))
+    shapes[TITLE_SHAPE].width = Emu(int(37.6 * 914400))
 
     # everything except the title and the logo is replaced by computed blocks
     keep = {TITLE_SHAPE, LOGO_SHAPE}

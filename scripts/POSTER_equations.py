@@ -205,7 +205,9 @@ def main():
         if a.prefix and not k.startswith(a.prefix):
             continue
         col = CRAN if k in ('master_rate', 'query_regret', 'struct_law', 'func_J') else INK
-        size = 38 if k in ('master_rate', 'query_regret', 'struct_law', 'func_J') else 30
+        # ONE render size for every equation.  Glyph height on the poster is then set by
+        # the placement, not by the render, so no formula is silently magnified.
+        size = 30
         try:
             p, w, h = render(k, tex, fontsize=size, color=col)
         except Exception as e:
