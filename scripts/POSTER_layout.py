@@ -46,14 +46,14 @@ def prose_height(lines, width_in, fs):
     chars-per-line uses an average glyph advance of 0.50 em, which is right for the
     template's body face; line advance is 1.24 em.  Blank strings are half-lines.
     """
-    cpl = max(1.0, width_in * 72.0 / (0.50 * fs))
+    cpl = max(1.0, width_in * 72.0 / (0.55 * fs))
     n = 0.0
     for ln in lines:
         if not ln.strip():
             n += 0.45
         else:
             n += math.ceil(len(ln) / cpl)
-    return n * 1.24 * fs / 72.0
+    return n * 1.30 * fs / 72.0
 
 
 def layout_column(col, blocks, eq_index, top=TOP, bottom=BOTTOM):

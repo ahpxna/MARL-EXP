@@ -27,7 +27,7 @@ TITLE_SHAPE = 0
 LOGO_SHAPE = 10
 
 
-def set_text(shape, lines):
+def set_text(shape, lines, uniform=True):
     body = shape.text_frame._txBody
     paras = body.findall(qn('a:p'))
     formatted = [q for q in paras if q.findall(qn('a:r'))]
@@ -36,9 +36,18 @@ def set_text(shape, lines):
         raise SystemExit('text box has no paragraph to clone')
     for q in paras:
         body.remove(q)
+    # Body boxes take ONE template paragraph for every line: using paragraph i for line i
+    # inherits whatever the template put first, and on the body shape that is a small
+    # caption-weight paragraph -- which is why a single-line STEP heading rendered much
+    # smaller than the prose beside it.  The title block is the exception: its three lines
+    # are deliberately different sizes, so there it keeps the template's own per-line
+    # formatting.
     for i, line in enumerate(lines):
-        src = paras[i] if i < len(paras) and paras[i].findall(qn('a:r')) else filler
-        q = copy.deepcopy(src)
+        if uniform:
+            q = copy.deepcopy(filler)
+        else:
+            src = paras[i] if i < len(paras) and paras[i].findall(qn('a:r')) else filler
+            q = copy.deepcopy(src)
         for br in q.findall(qn('a:br')):
             q.remove(br)
         runs = q.findall(qn('a:r'))
@@ -68,6 +77,23 @@ def set_autofit(shape, scale):
     bodyPr.append(af)
 
 
+def emphasise_steps(shape):
+    """A step heading is a heading: bold, never italic.
+
+    The template's body paragraphs carry their own emphasis, and a STEP line inheriting
+    italic reads as an aside rather than as the start of an argument.
+    """
+    for para in shape.text_frame.paragraphs:
+        if not para.runs:
+            continue
+        head = para.runs[0].text.lstrip()
+        if head.startswith('STEP ') or head.startswith(('C1.', 'C2.', 'C3.', 'C4.',
+                                                        'C5.', 'C6.')):
+            for r in para.runs:
+                r.font.bold = True
+                r.font.italic = False
+
+
 def place(shape, box):
     shape.left = Emu(int(box['left'] * 914400))
     shape.top = Emu(int(box['top'] * 914400))
@@ -89,7 +115,7 @@ def build(layout_path, meta_path, out_path):
 
     # title first, from the template's own title box.  The template starts it at x = 1.1in,
     # which runs under the logo at x = 1.7; shift it clear and narrow it to match.
-    set_text(shapes[TITLE_SHAPE], meta['title'])
+    set_text(shapes[TITLE_SHAPE], meta['title'], uniform=False)
     shapes[TITLE_SHAPE].left = Emu(int(9.3 * 914400))
     shapes[TITLE_SHAPE].width = Emu(int(37.6 * 914400))
 
@@ -116,6 +142,7 @@ def build(layout_path, meta_path, out_path):
                 sh = slide.shapes[-1]
                 set_text(sh, box['lines'] if box['lines'] else [box.get('text') or ''])
                 place(sh, box)
+                emphasise_steps(sh)
                 set_autofit(sh, fontscale)
             elif k == 'eq':
                 slide.shapes.add_picture(
