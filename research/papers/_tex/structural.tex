@@ -31,7 +31,12 @@ every budget $j$ we \emph{build} an ordering whose defect is zero everywhere exc
 $2$ at position $j$, by a greedy alternation maintaining an explicit invariant. We
 additionally carry the constrained problem with its actual marginal, a matrix indexed by
 (item, budget) rather than a scalar stand-in, prove its column sums equal $\min(k,n)$ for
-\emph{every} menu, and compute it in closed form on the cyclic menu. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}, with one instantiation step carried out in the paper and named in Section~\ref{sec:verification}.
+\emph{every} menu, and compute it in closed form on the cyclic menu. We additionally show the difficulty is not an artefact of scale or of exact optimality: after
+normalising the total radius, five rankings remain necessary for every tolerance
+$\varepsilon<1/114$, because a quantised objective admits no $\varepsilon$-optimal set that
+is not optimal below one grid unit. Each displayed theorem is machine-checked in Lean~4 with
+no \texttt{sorry}, with one instantiation step carried out in the paper and named in
+Section~\ref{sec:verification}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -806,6 +811,108 @@ reducing anyone's path cost. The factor between the two is the number of budgets
 
 \input{structural_law}
 
+\section{Does the difficulty survive normalisation and slack?}
+\label{sec:tolerance}
+
+Two objections meet any lower bound of the form ``this instance needs $K$ rankings''. The
+first is that the instance might win by inflating its coefficients, so that the difficulty
+is an artefact of scale rather than of structure. The second is that exact optimality is a
+brittle requirement, and that allowing a small regret $\varepsilon$ might collapse $K$ to
+one. A separate strand of the development answers both on an explicit scalar witness, and
+the answer is that the difficulty survives.
+
+\subsection{Quantised objectives keep their exact optima}
+
+\begin{theorem}[Grid tolerance]
+\label{thm:grid}
+Let $\mathrm{cost}:2^{I}\to\mathbb{N}$ be integer-valued, let $\sigma>0$ be a scale, and
+suppose $\sigma\varepsilon<1$. If $S$ is $\varepsilon$-optimal at budget $k$ for the scaled
+objective $T\mapsto\mathrm{cost}(T)/\sigma$, then $S$ is \emph{exactly} optimal at $k$:
+\begin{equation}
+\sigma\varepsilon<1
+\quad\Longrightarrow\quad
+\bigl[\,\varepsilon\text{-optimal}\,\bigr]\;=\;\bigl[\,0\text{-optimal}\,\bigr].
+\label{eq:grid}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{epsilonOptimal\_on\_grid} in \lean{LeanStructuralIntegerToleranceV1}}
+
+\begin{proof}
+$\varepsilon$-optimality gives $\mathrm{cost}(S)/\sigma\le\mathrm{cost}(T)/\sigma+\varepsilon$
+for every competitor $T$, hence $\mathrm{cost}(S)\le\mathrm{cost}(T)+\sigma\varepsilon
+<\mathrm{cost}(T)+1$. Both sides are integers, so $\mathrm{cost}(S)\le\mathrm{cost}(T)$,
+which is exact optimality.
+\end{proof}
+
+The content is that below one grid unit, slack buys nothing. An objective whose values live
+on a lattice of spacing $1/\sigma$ has no $\varepsilon$-optimal set that is not optimal,
+for any $\varepsilon<1/\sigma$. This is the mechanism by which an exact lower bound extends
+to a band of tolerances.
+
+\subsection{The scalar witness after normalisation}
+
+The witness is a seven-relation scalar family $F_{7}$. Normalising by the total radius---
+dividing the component functions by $57$, so that $\sum_{j}\mathrm{osc}(f_{j})/2=1$---gives
+an objective with an exact closed form.
+
+\begin{proposition}[Normalised form]
+\label{prop:normform}
+\begin{equation}
+\widetilde{L}(S)\;=\;\frac{\mathrm{selectedRadius}(F_{7},S)}{57}
+\;=\;\frac{\bigl|\,\mathrm{complementAbs}_{7}(S)\,\bigr|}{114}.
+\label{eq:normform}
+\end{equation}
+\end{proposition}
+
+\leanbox{\lean{normalized\_formula} in \lean{LeanStructuralIntegerToleranceV1}}
+
+The right-hand side is an integer divided by $114$, so the normalised objective is
+quantised at $\sigma=114$, and Theorem~\ref{thm:grid} applies for every
+$\varepsilon<1/114$.
+
+\begin{theorem}[Five rankings remain necessary on a band of tolerances]
+\label{thm:fiveband}
+For every $\varepsilon$ with $0\le\varepsilon<\tfrac{1}{114}$, four rankings do not suffice
+for the normalised witness:
+\begin{equation}
+\chi_{\varepsilon}\bigl(\widetilde{L}\bigr)\;\geq\;5,
+\qquad 0\le\varepsilon<\tfrac{1}{114}.
+\label{eq:fiveband}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{normalized\_chi\_at\_least\_five} in
+\lean{LeanStructuralIntegerToleranceV1}}
+
+\begin{proof}
+Suppose a menu of four rankings covers every budget to within $\varepsilon$. By
+Proposition~\ref{prop:normform} the objective is $\mathrm{complementAbs}_{7}/114$, so
+Theorem~\ref{thm:grid} with $\sigma=114$ and $\sigma\varepsilon<1$ upgrades every
+$\varepsilon$-optimal prefix in that menu to an exactly optimal one. The menu therefore
+covers every budget \emph{exactly} with four rankings, which the exact lower bound for this
+witness forbids.
+\end{proof}
+
+\subsection{What this settles}
+
+Both objections are met, and it is worth separating what each costs.
+
+The normalisation objection is met outright: \eqref{eq:normform} is stated for the objective
+after dividing by the total radius, so the lower bound is not bought with large
+coefficients. Any family that tried to win by scaling would have its scale divided out here.
+
+The slack objection is met on a band, not on all of $\varepsilon$. Five rankings are
+necessary up to $\varepsilon=1/114$ and no further; above that the requirement does drop,
+and the exact tolerance curve for the staircase family---$\chi_{\varepsilon}=r$ when
+$\varepsilon<1/(2r)$ and $1$ otherwise---shows the same shape. So the honest statement is
+that exact-optimality difficulty is robust to a quantified amount of slack, determined by
+the grid, rather than robust to slack in general.
+
+That quantification is the useful part for a designer. It says how much regret may be
+conceded before a menu can shrink, and it computes that number from the objective's lattice
+rather than leaving it to a sweep.
+
 \section{Formal verification}
 \label{sec:verification}
 
@@ -901,6 +1008,9 @@ Attainment, Thm~\ref{thm:attained}  & \lean{LeanStructuralFamilyLowerV1}     & 1
 Construction, Thm~\ref{thm:construction} & \lean{LeanStructuralFamilyUpperV1} & 11 \\
 Law, Thm~\ref{thm:law}              & \lean{LeanStructuralFamilyLowerV1}     & 15 \\
 Marginal, Thms~\ref{thm:colsum}--\ref{thm:cyclic} & \lean{LeanStructuralRetainedMarginalV1} & 8 \\
+Grid, Thm~\ref{thm:grid}               & \lean{LeanStructuralIntegerToleranceV1} & 3 \\
+Normal form, Prop~\ref{prop:normform}  & \lean{LeanStructuralIntegerToleranceV1} & 3 \\
+Band, Thm~\ref{thm:fiveband}           & \lean{LeanStructuralIntegerToleranceV1} & 3 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -923,10 +1033,10 @@ well as a large one.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The Structural strand
-contains $77$ Lean source files with $959$ theorem and lemma statements, of which $12$
-modules carry an acceptance receipt covering $168$ declarations whose axiom set was printed
+contains $77$ Lean source files with $959$ theorem and lemma statements, of which $13$
+modules carry an acceptance receipt covering $171$ declarations whose axiom set was printed
 and checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
-statements, $108$ accepted modules, $860$ audited declarations.
+statements, $111$ accepted modules, $875$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
 wider repository, in audit scaffolding and in files named as conjectures; the overlap
@@ -1088,6 +1198,8 @@ weights cancel? If they do not, one ordering suffices and the classical theory a
 they do, one ordering provably does not suffice, the deficit is bounded below by a constant
 rather than made small by care, and the right response is to publish a menu whose size is
 the number of budgets to be served.
+
+\input{structural_appendix}
 
 \section*{Acknowledgment}
 

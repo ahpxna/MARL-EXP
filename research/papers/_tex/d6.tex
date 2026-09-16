@@ -30,7 +30,13 @@ prove that the budget constraint together with the split \emph{forces} the two w
 which therefore depend on the split $\eta$ and the price $c$ alone and not on the model
 parameters $(q,\mu)$; the delivered information is consequently affine in the split, so the
 optimum sits at an endpoint unless the two queries buy information at exactly the same rate
-per unit price---a condition we derive and on which every split is optimal. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; the corollaries the paper derives from them are marked in Section~\ref{sec:verification}.
+per unit price---a condition we derive and on which every split is optimal. We further prove a margin-sensitive exchange bound
+$2(L_{F}(T)-L_{F}(S))\le|T\setminus S|(2\delta-\mu)$ with no symmetry or fixed-cell
+assumption, and from it a \emph{sharp threshold}: a margin of $2\delta$ is sufficient for
+Top-$C$ optimality under every product reference, and for every margin below it an explicit
+steering construction makes Top-$C$ strictly suboptimal. Each displayed theorem is
+machine-checked in Lean~4 with no \texttt{sorry}; the corollaries the paper derives from
+them are marked in Section~\ref{sec:verification}.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -535,6 +541,200 @@ Theorems~\ref{thm:slice} and \ref{thm:reduction} together supply the missing des
 it is the extreme point, and the enclosing class is the one cut out by the magnitude
 bounds.
 
+\section{The margin--regret exchange law}
+\label{sec:margin}
+
+The results so far concern the alternative family and the design. A separate strand of the
+same development produces a sharper object: an exchange bound in which the \emph{margin}
+between selected and unselected coordinates appears explicitly, and a threshold at which
+Top-$C$ selection stops being optimal. Both are machine-checked, and they are stated here
+because they are the strongest statements the strand supports.
+
+\subsection{Setting for this section}
+
+Write $\mathrm{osc}(f)=\max f-\min f$ for the oscillation of a coordinate response,
+$Q_{j}$ for the product response of coordinate $j$ under a product reference $q$, and
+$L_{F}(S)$ for the compression loss of retaining the coordinate set $S$. Let $\delta$ bound
+every mixed difference of $F$,
+\begin{equation}
+\bigl|\,\mathrm{mixedDiff}_{F}(i,x,c)\,\bigr|\;\leq\;\delta
+\qquad\text{for all } i,x,c ,
+\label{eq:deltabox}
+\end{equation}
+and let $T$ be Top-$k$ by the score $j\mapsto\mathrm{osc}(Q_{j})$.
+
+\subsection{The surplus that the old bound discarded}
+
+\begin{lemma}[Score surplus from a common margin]
+\label{lem:surplus}
+Let $A,B$ be finite sets with $|A|=|B|$, let $\mathrm{score}$ be any real function, and
+suppose every element of $A$ beats every element of $B$ by at least $\mu$:
+\begin{equation}
+\mu+\mathrm{score}(j)\;\leq\;\mathrm{score}(i)
+\qquad \forall\, i\in A,\ \forall\, j\in B .
+\end{equation}
+Then
+\begin{equation}
+|A|\,\mu\;\leq\;\sum_{i\in A}\mathrm{score}(i)\;-\;\sum_{j\in B}\mathrm{score}(j).
+\label{eq:surplus}
+\end{equation}
+\end{lemma}
+
+\leanbox{\lean{score\_surplus\_ge\_card\_mul\_margin} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+\begin{proof}
+If $B$ is empty then $|A|=|B|=0$ and both sides vanish. Otherwise take $b\in B$ maximising
+$\mathrm{score}$ on $B$. Every $i\in A$ satisfies $\mu+\mathrm{score}(b)\le\mathrm{score}(i)$,
+so summing over $A$ gives $|A|(\mu+\mathrm{score}(b))\le\sum_{A}\mathrm{score}$. Every
+$j\in B$ satisfies $\mathrm{score}(j)\le\mathrm{score}(b)$, so
+$\sum_{B}\mathrm{score}\le|B|\,\mathrm{score}(b)=|A|\,\mathrm{score}(b)$. Subtracting gives
+\eqref{eq:surplus}.
+\end{proof}
+
+The lemma is pure finite combinatorics---no geometry, no design---and it is what converts a
+margin hypothesis into a quantity the exchange bound can consume.
+
+\begin{theorem}[Exchange bound retaining the surplus]
+\label{thm:exchange}
+Under \eqref{eq:deltabox}, with $T$ Top-$k$ and $|S|=k$, write $A=T\setminus S$ and
+$B=S\setminus T$. Then
+\begin{equation}
+L_{F}(T)-L_{F}(S)\;\leq\;|A|\,\delta
+ \;-\;\frac{1}{2}\Bigl(\sum_{j\in A}\mathrm{osc}(Q_{j})-\sum_{j\in B}\mathrm{osc}(Q_{j})\Bigr).
+\label{eq:exchangesurplus}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+The bracketed term is the surplus. An earlier endpoint-patch argument dropped it and
+retained only $|A|\delta$; \eqref{eq:exchangesurplus} keeps it, and because $T$ is Top-$k$
+the surplus is non-negative, so the new bound is never weaker.
+
+\begin{theorem}[Margin-sensitive exchange]
+\label{thm:marginexchange}
+If in addition every selected coordinate beats every unselected one by at least $\mu$,
+\begin{equation}
+\mu+\mathrm{osc}(Q_{j})\;\leq\;\mathrm{osc}(Q_{i})
+\qquad \forall\, i\in T,\ \forall\, j\notin T,
+\label{eq:marginhyp}
+\end{equation}
+then
+\begin{equation}
+2\bigl(L_{F}(T)-L_{F}(S)\bigr)\;\leq\;|T\setminus S|\;\bigl(2\delta-\mu\bigr).
+\label{eq:marginexchange}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+\begin{proof}
+Apply Theorem~\ref{thm:exchange}, then bound the surplus below by
+Lemma~\ref{lem:surplus} with $\mathrm{score}=\mathrm{osc}\circ Q$, using
+$|T\setminus S|=|S\setminus T|$ which holds because $|T|=|S|$.
+\end{proof}
+
+No symmetry is assumed, no active cell is fixed, and the reference $q$ is an arbitrary
+product reference with non-negative weights summing to one. The bound replaces the
+$\delta$-only form $2(L_{F}(T)-L_{F}(S))\le 2|T\setminus S|\delta$ wherever a margin is
+available, and the improvement is exactly $|T\setminus S|\mu$.
+
+\section{The sharp threshold at margin $2\delta$}
+\label{sec:threshold}
+
+Equation \eqref{eq:marginexchange} has an immediate consequence that is the sharpest result
+in this strand: at margin $2\delta$ the right-hand side turns non-positive, and Top-$C$
+selection becomes optimal.
+
+\begin{theorem}[Sufficiency: $\rho\geq2\delta$ makes Top-$C$ optimal]
+\label{thm:sufficient}
+Under \eqref{eq:deltabox} and \eqref{eq:marginhyp} with margin $\rho$, if
+$2\delta\leq\rho$ then
+\begin{equation}
+L_{F}(T)\;\leq\;L_{F}(S)
+\qquad\text{for every } S \text{ with } |S|=k .
+\label{eq:sufficient}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{margin\_two\_sufficient} in \lean{LeanD6SharpMarginThresholdV1}}
+
+\begin{proof}
+By Theorem~\ref{thm:marginexchange} the doubled loss difference is at most
+$|T\setminus S|(2\delta-\rho)$, and $2\delta-\rho\le0$ while $|T\setminus S|\ge0$, so the
+product is non-positive.
+\end{proof}
+
+Theorem~\ref{thm:sufficient} holds for \emph{every} product reference, including degenerate
+ones---the proof uses only non-negativity and normalisation of the weights. That matters,
+because the matching necessity result does not.
+
+\subsection{Necessity: the threshold cannot be lowered}
+
+\begin{theorem}[The steering construction attains the bound exactly]
+\label{thm:steered}
+For $A$ a coordinate set, $j\notin A$, $1\le\rho$, with $|A^{\complement}|=|A|$ and at
+least two coordinates outside $A\cup\{j\}$, the steered objective attains
+\eqref{eq:marginexchange} with equality against the complement:
+\begin{equation}
+2\bigl(L(A)-L(A^{\complement})\bigr)\;=\;|A|\,(2-\rho),
+\label{eq:steered}
+\end{equation}
+under the corner reference.
+\end{theorem}
+
+\leanbox{\lean{steered\_exchange\_equality} in \lean{LeanD6SharpMarginThresholdV1}}
+
+\begin{theorem}[Every sub-threshold margin fails]
+\label{thm:subthreshold}
+For $A$ non-empty and every $\rho$ with $1\le\rho<2$, the set $A$ is Top-$k$ by the
+oscillation score and yet
+\begin{equation}
+L(A^{\complement})\;<\;L(A).
+\label{eq:fails}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{every\_subthreshold\_margin\_fails} in
+\lean{LeanD6SharpMarginThresholdV1}}
+
+\begin{proof}
+$A$ is Top-$k$ by the steering construction. By \eqref{eq:steered} the doubled difference
+equals $|A|(2-\rho)$, which is strictly positive because $|A|>0$ and $\rho<2$.
+\end{proof}
+
+\begin{corollary}[Sharp threshold]
+\label{cor:sharp}
+With $\delta=1$, the condition $\rho\ge2\delta$ of Theorem~\ref{thm:sufficient} is sharp:
+it is sufficient for Top-$C$ optimality, and for every $\rho$ in $[1,2)$ there is an
+instance on which Top-$C$ is strictly suboptimal.
+\end{corollary}
+
+\subsection{What the threshold is, and what it is not}
+
+Three scope statements are carried in the module's own documentation and are repeated here
+because the result invites over-reading.
+
+\emph{It is a Top-$C$ optimality threshold, not a minimax value.} Theorems
+\ref{thm:sufficient} and \ref{thm:subthreshold} say when the Top-$C$ rule is optimal among
+same-cardinality sets. They say nothing about the minimax value of the whole same-response
+fibre; those are different quantifiers, and the second is open.
+
+\emph{Sufficiency and necessity do not share a reference class.} The sufficiency direction
+permits degenerate product references---the corner reference included---because its proof
+uses only \eqref{eq:deltabox} and the weight axioms. The necessity direction uses the
+corner reference specifically, through the steering construction.
+
+\emph{Robustness to the reference is absent, and was checked.} An exact rational sweep of
+the product reference $q_{i}(1)=t$ found that at every $t>0$ the Top-$C$ set flips to the
+optimal set, so the regret vanishes and the construction stops witnessing anything. The
+mechanism is that a full-support reference symmetrises two coordinate classes which the
+corner reference separates. The necessity half of Corollary~\ref{cor:sharp} is therefore a
+statement about corner-reference instances, and no claim is made beyond them.
+
 \section{The separation certificate on a cell}
 \label{sec:certificate}
 
@@ -830,6 +1030,10 @@ Budget, Thms~\ref{thm:budget}--\ref{thm:unique} & \lean{LeanD6DesignDerivationV1
 Affine, Thm~\ref{thm:affine}           & \lean{LeanD6DesignDerivationV1}    & 7 \\
 Transition, Thm~\ref{thm:transition}   & \lean{LeanD6DesignDerivationV1}    & 7 \\
 Separation, Thm~\ref{thm:modulus}      & \lean{LeanD6AlternativeReductionV1}& 7 \\
+Surplus, Lem~\ref{lem:surplus}         & \lean{LeanD6MarginSensitiveExchangeV1} & 3 \\
+Exchange, Thms~\ref{thm:exchange}--\ref{thm:marginexchange} & \lean{LeanD6MarginSensitiveExchangeV1} & 3 \\
+Sufficiency, Thm~\ref{thm:sufficient}  & \lean{LeanD6SharpMarginThresholdV1} & 3 \\
+Necessity, Thms~\ref{thm:steered}--\ref{thm:subthreshold} & \lean{LeanD6SharpMarginThresholdV1} & 3 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -858,10 +1062,10 @@ what did not work.
 \subsection{Scope of the formalisation}
 
 The displayed results are the load-bearing chain, not the corpus. The D6 strand contains
-$444$ Lean source files with $4{,}087$ theorem and lemma statements, of which $28$ modules
-carry an acceptance receipt covering $175$ declarations whose axiom set was printed and
+$444$ Lean source files with $4{,}087$ theorem and lemma statements, of which $30$ modules
+carry an acceptance receipt covering $181$ declarations whose axiom set was printed and
 checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
-statements, $108$ accepted modules, $860$ audited declarations.
+statements, $111$ accepted modules, $875$ audited declarations.
 
 No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
 wider repository, in audit scaffolding and in files named as conjectures; the overlap
@@ -1065,6 +1269,8 @@ case was an argument connecting the statement to the claim it was being used to 
 in both cases the missing argument turned out to be short. Finding that a gap is small is
 not the same as finding that it is absent, and the difference is only visible once someone
 tries to write the connecting step down.
+
+\input{d6_appendix}
 
 \section*{Acknowledgment}
 

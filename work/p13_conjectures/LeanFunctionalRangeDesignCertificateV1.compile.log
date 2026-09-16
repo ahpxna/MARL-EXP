@@ -16,39 +16,18 @@ consider restructuring your `variable` declarations so that the variables are no
   omit [DecidableEq ι] in theorem ...
 
 Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
-/Users/phanan/cig-amf-main/work/p13_conjectures/LeanFunctionalRangeDesignCertificateV1.lean:119:29: error: No goals to be solved
-/Users/phanan/cig-amf-main/work/p13_conjectures/LeanFunctionalRangeDesignCertificateV1.lean:144:34: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
-  ∑ p, d p * ∑ c, y c * A c p
-in the target expression
-  ∑ p, -(d p * ∑ c, y c * A c p) = ∑ x, -(y x * rowAp A lam' x)
+/Users/phanan/cig-amf-main/work/p13_conjectures/LeanFunctionalRangeDesignCertificateV1.lean:106:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.FunctionalRangeDesignCertificate.kkt_certificate`:
+  [DecidableEq κ]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq κ] in theorem ...
 
-ι : Type u_1
-κ : Type u_2
-inst✝³ : Fintype ι
-inst✝² : DecidableEq ι
-inst✝¹ : Fintype κ
-inst✝ : DecidableEq κ
-M : ι → ι → ℝ
-A : κ → ι → ℝ
-mu lam : ι → ℝ
-y : κ → ℝ
-hM : ∀ (p q : ι), M p q = M q p
-hpsd : ∀ (d : ι → ℝ), 0 ≤ quad M d
-hy : ∀ (c : κ), 0 ≤ y c
-hfeas : ∀ (c : κ), rowAp A lam c ≤ 0
-hstat : ∀ (p : ι), ∑ q, M p q * (lam q - mu q) + ∑ c, y c * A c p = 0
-hcs : ∑ c, y c * rowAp A lam c = 0
-lam' : ι → ℝ
-hfeas' : ∀ (c : κ), rowAp A lam' c ≤ 0
-a : ι → ℝ := fun p => lam p - mu p
-ha : a = fun p => lam p - mu p
-d : ι → ℝ := fun p => lam' p - lam p
-hd : d = fun p => lam' p - lam p
-hsplit : (fun p => lam' p - mu p) = a + d
-hinner : ∀ (p : ι), ∑ q, M p q * d p * a q = d p * ∑ q, M p q * (lam q - mu q)
-hstep : ∀ (p : ι), d p * ∑ q, M p q * (lam q - mu q) = -(d p * ∑ c, y c * A c p)
-hswap : ∑ p, d p * ∑ c, y c * A c p = ∑ c, y c * rowAp A d c
-⊢ ∑ p, -(d p * ∑ c, y c * A c p) = ∑ x, -(y x * rowAp A lam' x)
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+/Users/phanan/cig-amf-main/work/p13_conjectures/LeanFunctionalRangeDesignCertificateV1.lean:110:5: warning: Variable name `hfeas` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hfeas
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
 /Users/phanan/cig-amf-main/work/p13_conjectures/LeanFunctionalRangeDesignCertificateV1.lean:186:0: warning: automatically included section variable(s) unused in theorem `CIGAMF.P13.FunctionalRangeDesignCertificate.region_min_lower_bounds_J`:
   [DecidableEq ρ]
 consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
@@ -63,12 +42,8 @@ consider restructuring your `variable` declarations so that the variables are no
 Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
 'CIGAMF.P13.FunctionalRangeDesignCertificate.bil_symm' depends on axioms: [propext, Classical.choice, Quot.sound]
 'CIGAMF.P13.FunctionalRangeDesignCertificate.quad_add' depends on axioms: [propext, Classical.choice, Quot.sound]
-'CIGAMF.P13.FunctionalRangeDesignCertificate.kkt_certificate' depends on axioms: [propext,
- sorryAx,
- Classical.choice,
- Quot.sound]
+'CIGAMF.P13.FunctionalRangeDesignCertificate.kkt_certificate' depends on axioms: [propext, Classical.choice, Quot.sound]
 'CIGAMF.P13.FunctionalRangeDesignCertificate.certificate_gives_lower_bound' depends on axioms: [propext,
- sorryAx,
  Classical.choice,
  Quot.sound]
 'CIGAMF.P13.FunctionalRangeDesignCertificate.region_min_lower_bounds_J' depends on axioms: [propext,
