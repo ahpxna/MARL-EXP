@@ -36,7 +36,11 @@ $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$. Numerical 
 $32$ parameter cells reproduce the closed form to a worst relative gap of
 $2.5\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
 calibration query returns exactly zero, while a merely uniform allocation still reaches
-$73.5$--$100\%$ of the optimum.
+$73.5$--$100\%$ of the optimum. A separate simulation asks whether the law predicts a
+decision and not only a design: over $240$ randomly drawn instances the realised error of a
+plug-in profiled test collapses onto $\Phi(-\sqrt{\Gamma^{*}B})$ with a root-mean-square gap of
+$0.006$, the residual positive everywhere and decaying like the reciprocal of the sample
+size.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -471,7 +475,32 @@ The split \eqref{eq:groupsplit} takes this form because the two channels must be
 inverse proportion to the square roots of their prices: substituting anything else into
 \eqref{eq:cs} leaves slack. Writing $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$, the
 exact price of one unit of profiled information in a group is $(\sqrt{m}+\sqrt{\kappa})^{2}$
-and the optimal split satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$. Neither type can be
+and the optimal split satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig7_unitprice.png}
+\caption{The price of one unit of profiled information in a group,
+$(\sqrt{m}+\sqrt{\kappa})^{2}$ from Theorem~\ref{thm:groupattained}, against the additive
+price $m+\kappa$ that treats the two query types as separate purchases (dotted). The two
+differ by exactly the cross term $2\sqrt{m\kappa}$, which is the part of the cost that
+arises because neither type is useful without the other. An additive accounting therefore
+understates the price of information at every price pair, and by the largest factor when
+the two prices are equal. Exact evaluation of \eqref{eq:groupsplit}; nothing is fitted.}
+\label{fig:unitprice}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig5_crossover.png}
+\caption{The optimal split $z^{\star}/x^{\star}=\sqrt{m/\kappa}$ at three group sizes.
+Open circles mark $\kappa=m$, the only price at which the two query types are bought in
+equal numbers. To the left of its circle a group should buy \emph{more} calibration than
+ordinary observations, and to the right fewer; the ratio is a square root, so it moves an
+order of magnitude for every two orders of magnitude in price. Exact evaluation of
+\eqref{eq:groupsplit}.}
+\label{fig:crossover}
+\end{figure} Neither type can be
 dropped: as $x\to\infty$ with $z$ fixed, the constraint forces $h\le z$, so a group with no
 control precision cannot deliver information exceeding what its control alone
 supports---which by Theorem~\ref{thm:dichotomy} may be nothing at all.
@@ -529,49 +558,82 @@ $V=h\Delta^{2}/2$, the right-hand side of \eqref{eq:upper}.
 
 \leanbox{\lean{calibration\_rate\_attained} in \lean{LeanMasterCalibrationLawV1}}
 
-\noindent\emph{Supporting results in \lean{LeanMasterCalibrationLawV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $3$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanMasterCalibrationLawV1}.}~The statements below are the whole arithmetic of the law. The first four name the witness of Theorem~\ref{thm:dichotomy} and check its two halves separately, since the means agreeing and the answers differing are independent facts. The next two give the profiled value in both the product and the harmonic form, because the harmonic form is what the group bound consumes. The last four are the two group bounds and the two halves of the price law, and they are stated for arbitrary allocations rather than for the optimum, which is what lets the summation step in Theorem~\ref{thm:upper} apply to every design. They are reproduced as the prover has them; a further $3$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{calibration\_rate\_upper}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{sm} \mathit{sk} \mathit{D} \mathit{V} : \mathbb{R}\\
-&\quad ),\; (\mathit{x} \mathit{z} : \mathit{Fin} \mathit{K} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hsm} : 0 < \mathit{sm}),\; (\mathit{hsk} : 0 <\\
-&\quad \mathit{sk}),\; (\mathit{hD} : 0 < \mathit{D}),\; (\mathit{hV} : 0 <\\
-&\quad \mathit{V}),\; (\mathit{hK} : 0 < \mathit{K}),\; (\mathit{hx} : \forall \mathit{g}, 0 < \mathit{x}\\
-&\quad \mathit{g}),\; (\mathit{hz} : \forall \mathit{g}, 0 < \mathit{z}\\
-&\quad \mathit{g}),\; (\mathit{hbudget} : \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} * \mathit{x} \mathit{g} + \mathit{sk} ^{2} * \mathit{z} \mathit{g}) \leq 1),\; (\mathit{hinfo} : \forall \mathit{g}, 2 * \mathit{V} / \mathit{D} ^{2} * (\mathit{x} \mathit{g} + \mathit{z} \mathit{g}) \leq \mathit{x} \mathit{g} * \mathit{z}\\
+&\quad ),\; (\mathit{x} \mathit{z} : \mathit{Fin}\\
+&\quad \mathit{K} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hsm} : 0 < \mathit{sm}),\;\\
+&\quad (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hD} : 0 <\\
+&\quad \mathit{D}),\; (\mathit{hV} : 0 <\\
+&\quad \mathit{V}),\; (\mathit{hK} : 0 <\\
+&\quad \mathit{K}),\; (\mathit{hx} : \forall \mathit{g},\\
+&\quad 0 < \mathit{x}\\
+&\quad \mathit{g}),\; (\mathit{hz} : \forall \mathit{g},\\
+&\quad 0 < \mathit{z}\\
+&\quad \mathit{g}),\; (\mathit{hbudget} :\\
+&\quad \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} * \mathit{x}\\
+&\quad \mathit{g} + \mathit{sk} ^{2} * \mathit{z}\\
+&\quad \mathit{g}) \leq 1),\; (\mathit{hinfo} :\\
+&\quad \forall \mathit{g}, 2 * \mathit{V} /\\
+&\quad \mathit{D} ^{2} * (\mathit{x} \mathit{g} + \mathit{z}\\
+&\quad \mathit{g}) \leq \mathit{x} \mathit{g} *\\
+&\quad \mathit{z}\\
 &\quad \mathit{g})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{V} \leq \mathit{D} ^{2} / (2 * (\mathit{K} : \mathbb{R} ) * (\mathit{sm} + \mathit{sk})\\
+\vdash\;&\mathit{V} \leq \mathit{D} ^{2} / (2 * (\mathit{K} : \mathbb{R}\\
+&\quad ) * (\mathit{sm} + \mathit{sk})\\
 &\quad ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{group\_cost\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{h} \mathit{sm} \mathit{sk} : \mathbb{R} ),\; (\mathit{hsm} : 0 <\\
-&\quad \mathit{sm}),\; (\mathit{hsk} : 0 < \mathit{sk}),\; (\mathit{hh} : 0 <\\
+&(\mathit{h} \mathit{sm} \mathit{sk} : \mathbb{R}\\
+&\quad ),\; (\mathit{hsm} : 0 <\\
+&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hh} : 0 <\\
 &\quad \mathit{h})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{sm} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sm}) + \mathit{sk} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sk}) = \mathit{h} * (\mathit{sm} + \mathit{sk})\\
-&\quad ^{2}) \wedge \mathit{h} * ((\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sm}) + (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
-&\quad \mathit{sk})) = (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
-&\quad \mathit{sm}) * (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
+\vdash\;&(\mathit{sm} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
+&\quad \mathit{sm}) + \mathit{sk} ^{2} * (\mathit{h}\\
+&\quad * (\mathit{sm} +\\
+&\quad \mathit{sk}) / \mathit{sk}) = \mathit{h} *\\
+&\quad (\mathit{sm} +\\
+&\quad \mathit{sk})\\
+&\quad ^{2}) \wedge \mathit{h} * ((\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) / \mathit{sm}) + (\mathit{h} *\\
+&\quad (\mathit{sm} +\\
+&\quad \mathit{sk}) /\\
+&\quad \mathit{sk})) = (\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) /\\
+&\quad \mathit{sm}) * (\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) /\\
 &\quad \mathit{sk})
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{hidden\_shift\_answers}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((1:\mathbb{Q} )/2 < \mathit{theta0} 0 \wedge \neg ((1:\mathbb{Q} )/2 < \mathit{lam}\\
-&\quad 0)) \wedge ((1:\mathbb{Q} )/2 < \mathit{theta0} 3 \wedge (1:\mathbb{Q} )/2 < \mathit{lam}\\
+\vdash\;&((1:\mathbb{Q} )/2 < \mathit{theta0} 0 \wedge \neg ((1:\mathbb{Q}\\
+&\quad )/2 < \mathit{lam}\\
+&\quad 0)) \wedge ((1:\mathbb{Q} )/2 <\\
+&\quad \mathit{theta0} 3 \wedge (1:\mathbb{Q} )/2\\
+&\quad < \mathit{lam}\\
 &\quad 3)
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{hidden\_shift\_answers\_differ}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{theta0}\\
-&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{lam}\\
+\vdash\;&(\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
+&\quad \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 <\\
+&\quad \mathit{theta0}\\
+&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
+&\quad )/2 < \mathit{lam}\\
 &\quad \mathit{i}))
 \end{aligned} \]}
 
@@ -585,21 +647,35 @@ $V=h\Delta^{2}/2$, the right-hand side of \eqref{eq:upper}.
 
 \noindent\textbf{S\,6}\quad\lean{hidden\_shift\_witness}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0} \mathit{i} + \mathit{off0} (\mathit{grp} \mathit{i}) = \mathit{lam} \mathit{i} + \mathit{off1} (\mathit{grp}\\
-&\quad \mathit{i})) \wedge (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{theta0}\\
-&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{lam}\\
+\vdash\;&(\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0} \mathit{i}\\
+&\quad + \mathit{off0} (\mathit{grp} \mathit{i}) = \mathit{lam}\\
+&\quad \mathit{i} + \mathit{off1} (\mathit{grp}\\
+&\quad \mathit{i})) \wedge (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
+&\quad )/2 < \mathit{theta0}\\
+&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
+&\quad )/2 < \mathit{lam}\\
 &\quad \mathit{i}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{profiled\_information}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R} ),\; (\mathit{ha} : 0 <\\
+&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 <\\
 &\quad \mathit{a}),\; (\mathit{hb} : 0 < \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{t} : \mathbb{R} , \mathit{a} * \mathit{b} * \mathit{D} ^{2} / (2 * (\mathit{a} + \mathit{b})) \leq \mathit{a} * (\mathit{D} - \mathit{t}) ^{2} / 2 + \mathit{b} * \mathit{t} ^{2} /\\
-&\quad 2) \wedge \mathit{a} * (\mathit{D} - \mathit{a} * \mathit{D} / (\mathit{a} +\\
-&\quad \mathit{b})) ^{2} / 2 + \mathit{b} * (\mathit{a} * \mathit{D} / (\mathit{a} +\\
+\vdash\;&(\forall \mathit{t} : \mathbb{R} , \mathit{a} * \mathit{b} *\\
+&\quad \mathit{D} ^{2} / (2 * (\mathit{a} +\\
+&\quad \mathit{b})) \leq \mathit{a}\\
+&\quad * (\mathit{D} - \mathit{t}) ^{2} / 2 +\\
+&\quad \mathit{b} * \mathit{t}\\
+&\quad ^{2} /\\
+&\quad 2) \wedge \mathit{a} * (\mathit{D} -\\
+&\quad \mathit{a} * \mathit{D} / (\mathit{a} +\\
+&\quad \mathit{b})) ^{2} / 2 + \mathit{b} *\\
+&\quad (\mathit{a} * \mathit{D} / (\mathit{a} +\\
 &\quad \mathit{b})) ^{2} / 2 = \mathit{a} * \mathit{b} *\\
 &\quad \mathit{D} ^{2} / (2 * (\mathit{a} + \mathit{b}))
 \end{aligned} \]}
@@ -624,6 +700,19 @@ decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted
 \label{fig:rate}
 \end{figure}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig6_limits.png}
+\caption{$\Gamma^{*}$ from \eqref{eq:pricelaw} against the calibration price, at $K=4$,
+$m=4$, $\Delta=1$, with the two one-channel readings it is often replaced by: the cheap-%
+calibration limit $\Delta^{2}/(2Km)$ and the expensive-calibration limit
+$\Delta^{2}/(2K\kappa)$. The exact value lies strictly below both at every price, and
+furthest below at $\kappa=m$, where it is a factor of four under either. The regime in
+which a one-channel rule of thumb is least safe is therefore the balanced one, not an
+extreme. Exact evaluation of the proved formula.}
+\label{fig:limits}
+\end{figure}
+
 \subsection{The Anchor Certificate}
 \label{sec:anchor}
 
@@ -643,21 +732,41 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 \lean{gap\_positive}, \lean{anchor\_is\_mandatory} in \lean{LeanMasterAnchorInstanceV1};
 \lean{anchor\_mandatory} in \lean{LeanMasterAnchorCertificateV1}}
 
-\noindent\emph{Supporting results in \lean{LeanMasterAnchorCertificateV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $2$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanMasterAnchorCertificateV1}.}~These carry the abstract half of the anchor argument. \lean{anchor\_mandatory} takes an upper certificate for the anchor-free class and an achieved value for some design, and concludes strict separation from the inequality between them alone; the remaining statements supply the energy algebra it is stated over. Keeping the argument abstract is deliberate, since any weakness in an optimality claim for the anchored side would propagate into the necessity conclusion. They are reproduced as the prover has them; a further $2$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,15}\quad\lean{anchor\_free\_upper}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{v} \mathit{kap} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R} ),\; (\mathit{tj} : \mathit{J} \to \mathbb{R}\\
-&\quad ),\; (\mathit{x} : \mathit{E} \to \mathbb{R} ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R}\\
-&\quad ),\; (\mathit{Jval} \mathit{U0} : \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{j}, 0 \leq \mathit{lam}\\
-&\quad \mathit{j}),\; (\mathit{hlamsum} : \textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} =\\
-&\quad 1),\; (\mathit{hx} : \forall \mathit{e}, 0 \leq \mathit{x}\\
-&\quad \mathit{e}),\; (\mathit{hbudget} : \textstyle\sum \mathit{e}, \mathit{kap} \mathit{e} * \mathit{x} \mathit{e} =\\
-&\quad 1),\; (\mathit{hIe} : \forall \mathit{j}, \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e}, \mathit{x} \mathit{e} / \mathit{v} \mathit{e} * (\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj} \mathit{j}) ^{2}) /\\
-&\quad 2),\; (\mathit{hJval} : \forall \mathit{j}, \mathit{Jval} \leq \mathit{Ival}\\
-&\quad \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e}, (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} * ((\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj} \mathit{j}) ^{2} / (2 * \mathit{v} \mathit{e}))) \leq \mathit{U0} * \mathit{kap}\\
+&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{tj} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{Jval} \mathit{U0} : \mathbb{R}\\
+&\quad ),\; (\mathit{hlam} : \forall \mathit{j}, 0\\
+&\quad \leq \mathit{lam}\\
+&\quad \mathit{j}),\; (\mathit{hlamsum} :\\
+&\quad \textstyle\sum \mathit{j}, \mathit{lam}\\
+&\quad \mathit{j} =\\
+&\quad 1),\; (\mathit{hx} : \forall \mathit{e}, 0\\
+&\quad \leq \mathit{x}\\
+&\quad \mathit{e}),\; (\mathit{hbudget} :\\
+&\quad \textstyle\sum \mathit{e}, \mathit{kap}\\
+&\quad \mathit{e} * \mathit{x} \mathit{e} =\\
+&\quad 1),\; (\mathit{hIe} : \forall \mathit{j},\\
+&\quad \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e},\\
+&\quad \mathit{x} \mathit{e} / \mathit{v} \mathit{e}\\
+&\quad * (\mathit{dd}\\
+&\quad \mathit{j} \mathit{e} - \mathit{tj} \mathit{j})\\
+&\quad ^{2}) /\\
+&\quad 2),\; (\mathit{hJval} : \forall \mathit{j},\\
+&\quad \mathit{Jval} \leq \mathit{Ival}\\
+&\quad \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e},\\
+&\quad (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} *\\
+&\quad ((\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj} \mathit{j})\\
+&\quad ^{2} / (2 * \mathit{v} \mathit{e})))\\
+&\quad \leq \mathit{U0} * \mathit{kap}\\
 &\quad \mathit{e})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -666,11 +775,20 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 
 \noindent\textbf{S\,16}\quad\lean{anchor\_mandatory}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{Design} : \mathit{Type}*\},\; (\mathit{value} : \mathit{Design} \to \mathbb{R}\\
-&\quad ),\; (\mathit{anchorFree} : \mathit{Design} \to \mathit{Prop}),\; (\mathit{U0} \mathit{L1} : \mathbb{R}\\
-&\quad ),\; (\mathit{hgap} : \mathit{U0} < \mathit{L1}),\; (\mathit{hcert} : \forall \mathit{D}, \mathit{anchorFree} \mathit{D} \to \mathit{value} \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} :\\
-&\quad \mathit{Design}),\; (\mathit{hD1} : \mathit{L1} \leq \mathit{value}\\
-&\quad \mathit{D1}),\; (\mathit{Dopt} : \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D}, \mathit{value} \mathit{D} \leq \mathit{value}\\
+&\{ \mathit{Design} : \mathit{Type}*\},\; (\mathit{value} :\\
+&\quad \mathit{Design} \to \mathbb{R}\\
+&\quad ),\; (\mathit{anchorFree} : \mathit{Design}\\
+&\quad \to \mathit{Prop}),\; (\mathit{U0} \mathit{L1}\\
+&\quad : \mathbb{R}\\
+&\quad ),\; (\mathit{hgap} : \mathit{U0} <\\
+&\quad \mathit{L1}),\; (\mathit{hcert} : \forall \mathit{D},\\
+&\quad \mathit{anchorFree} \mathit{D} \to \mathit{value}\\
+&\quad \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} :\\
+&\quad \mathit{Design}),\; (\mathit{hD1} :\\
+&\quad \mathit{L1} \leq \mathit{value}\\
+&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
+&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
+&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
 &\quad \mathit{Dopt})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -681,15 +799,22 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
 &\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\; (\mathit{hK} : \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0} \neq 0)
+&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\;\\
+&\quad (\mathit{hK} : \mathit{Kcap} \mathit{v}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0} \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{energy} \mathit{v} \mathit{d} \mathit{x}\\
 &\quad \mathit{x0} \mathit{v0} \mathit{t} = \mathit{Dval}\\
-&\quad \mathit{v} \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v} \mathit{d}\\
-&\quad \mathit{x}) ^{2} / (2 * \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0}\\
+&\quad \mathit{v} \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v}\\
+&\quad \mathit{d}\\
+&\quad \mathit{x}) ^{2} / (2 * \mathit{Kcap}\\
+&\quad \mathit{v} \mathit{x} \mathit{x0}\\
 &\quad \mathit{v0}) + \mathit{Kcap} \mathit{v} \mathit{x}\\
-&\quad \mathit{x0} \mathit{v0} / 2 * (\mathit{t} - \mathit{Mval} \mathit{v} \mathit{d} \mathit{x} / \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0}\\
+&\quad \mathit{x0} \mathit{v0} / 2 * (\mathit{t} - \mathit{Mval}\\
+&\quad \mathit{v} \mathit{d} \mathit{x} /\\
+&\quad \mathit{Kcap} \mathit{v}\\
+&\quad \mathit{x} \mathit{x0}\\
 &\quad \mathit{v0}) ^{2}
 \end{aligned} \]}
 
@@ -709,7 +834,7 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 \end{aligned} \]}
 
 
-\noindent\emph{Supporting results in \lean{LeanMasterAnchorInstanceV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanMasterAnchorInstanceV1}.}~These instantiate the certificate. The cap on the anchor-free class is proved and then shown attained, so it is tight rather than merely valid; the anchored design's budget and value are computed in exact rationals; and the gap between them is checked positive. Every number in Theorem~\ref{thm:anchor} appears here as a separate checked statement rather than as a step inside one proof. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,8}\quad\lean{anchorFree\_attained}
 {\footnotesize\[ \begin{aligned}[t]
@@ -719,10 +844,18 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 
 \noindent\textbf{S\,9}\quad\lean{anchor\_is\_mandatory}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Design} : \mathit{Type}*),\; (\mathit{value} : \mathit{Design} \to \mathbb{Q}\\
-&\quad ),\; (\mathit{anchorFree} : \mathit{Design} \to \mathit{Prop}),\; (\mathit{hcert} : \forall \mathit{D}, \mathit{anchorFree} \mathit{D} \to \mathit{value} \mathit{D} \leq 1/8),\; (\mathit{D1} :\\
-&\quad \mathit{Design}),\; (\mathit{hD1} : (261 : \mathbb{Q} )/1520 \leq \mathit{value}\\
-&\quad \mathit{D1}),\; (\mathit{Dopt} : \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D}, \mathit{value} \mathit{D} \leq \mathit{value}\\
+&(\mathit{Design} : \mathit{Type}*),\; (\mathit{value} :\\
+&\quad \mathit{Design} \to \mathbb{Q}\\
+&\quad ),\; (\mathit{anchorFree} : \mathit{Design}\\
+&\quad \to \mathit{Prop}),\; (\mathit{hcert} :\\
+&\quad \forall \mathit{D}, \mathit{anchorFree}\\
+&\quad \mathit{D} \to \mathit{value} \mathit{D}\\
+&\quad \leq 1/8),\; (\mathit{D1} :\\
+&\quad \mathit{Design}),\; (\mathit{hD1} : (261 : \mathbb{Q}\\
+&\quad )/1520 \leq \mathit{value}\\
+&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
+&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
+&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
 &\quad \mathit{Dopt})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -806,6 +939,118 @@ ratio $z_{g}/x_{g}=\sqrt{m/\kappa}$ is independent of $K$, of $h$ and of $\Delta
 \emph{shape} of the optimal design within a group depends only on the two prices, and the
 budget and group count determine only its scale.
 
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+The theorems above are proved, so the numerical work cannot strengthen them and is not
+intended to. It has two narrower objectives. The first is to check that the implementation
+used to generate the figures computes the same quantity the theorems describe, which is a
+real risk in any paper pairing formal statements with plots. The second is to quantify the
+practical consequence of Theorem~\ref{thm:dichotomy}, which the theorems alone do not,
+because a theorem about the optimum says nothing about how far a particular heuristic falls
+from it. The third is the one the theorems are furthest from settling. Theorem~\ref{thm:upper}
+bounds an information functional; an experimenter cares about how often a decision comes out
+wrong. Those are the same quantity only in an asymptotic limit in which the noise levels are
+known, observation counts are continuous, and the group offset is removed exactly rather than
+by a finite anchor sample. Experiment~E2 below measures the gap that the three idealisations
+open.
+
+\subsection{Parameter Grid}
+
+The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
+$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$, giving $32$ cells. The $\kappa$ values
+straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
+the law predicts to be qualitatively different.
+
+\subsection{Baselines and Ablations}
+
+Four designs are evaluated on every cell.
+
+\begin{enumerate}
+\item[1)] \textbf{Optimal design.} Algorithm~\ref{alg:design}.
+\item[2)] \textbf{Uniform, all controls.} Every group receives a calibration query, but each
+group's budget is split evenly between the two query types rather than in the ratio
+$\sqrt{m/\kappa}$. This isolates the cost of a poor allocation from the cost of a missing
+query type.
+\item[3)] \textbf{One calibration query missing.} One group is left without a control. This
+tests whether the failure is global or local.
+\item[4)] \textbf{No calibration queries.} The anchor-free class of Theorem~\ref{thm:anchor}.
+\end{enumerate}
+
+An independent bisection optimiser over the same feasible set is run alongside as a
+cross-check. It is given the budget and the information constraint and does not know the
+closed form.
+
+\subsection{E2: The Law Against a Realised Error Rate}
+\label{sec:e2}
+
+The design experiment above compares one formula with another. Experiment~E2 compares the
+formula with an estimator that has to work for its answer.
+
+\emph{Instances.} Two hundred and forty instances are drawn, not chosen, from declared
+ranges: $K\sim\mathrm{Unif}\{1,\dots,8\}$, $m\in\{2,4,8\}$,
+$\kappa\in\{\tfrac14,\tfrac23,1,4,9\}$, noise levels $v,\nu\sim\mathrm{Unif}[0.5,2]$,
+and separation $\Delta$ log-uniform on $[0.05,1.6]$. The prices that enter the law are the
+noise-weighted ones, $s_{m}=\sqrt{vm}$ and $s_{\kappa}=\sqrt{\nu\kappa}$.
+
+\emph{Budget.} The budget is not swept in absolute units, which would make every instance
+a separate curve. It is set from the dimensionless product the law itself identifies,
+\begin{equation}
+\lambda \;=\; \Gamma^{*}B,
+\qquad
+\Gamma^{*}=\frac{\Delta^{2}}{4\,(s_{m}+s_{\kappa})^{2}},
+\label{eq:lambda}
+\end{equation}
+on the grid $\lambda\in\{0.05,0.1,0.2,0.4,0.7,1,1.5,2.25,3,4\}$, so that
+\eqref{eq:upper} predicts one curve, $\Phi(-\sqrt{\lambda})$, for every instance at once.
+A collapse onto a single curve is a strong prediction and an easy one to falsify. Drawing
+$\Delta$ log-uniformly is what makes the two axes independent: at a fixed $\lambda$ a small
+$\Delta$ buys the same information with many more observations per group, so the effect of
+sample size can be measured at constant information.
+
+\emph{Estimator.} The test is a plug-in profiled likelihood ratio. It is not given $v$ or
+$\nu$ and estimates both from the replicate spread; it uses the integer counts the budget
+actually buys, $n_{x}=\lfloor Bx/m\rfloor$ and $n_{z}=\lfloor Bz/\kappa\rfloor$; and it
+weights each group by that group's own estimated information, so a group whose anchors are
+missing costs information rather than miscalibrating the threshold. A group with anchors
+contributes $1/(v/n_{x}+\nu/n_{z})$; a group without them is still analysed, through the
+marginal channel, whose information $1/(v/n_{x}+1)$ is capped at one however large the
+budget. The anchor-free design is therefore predicted to plateau, not to fail outright, and
+the plateau is what the experiment looks for.
+
+\emph{Two predictions, separately.} The finite-count prediction
+$\Phi(-\tfrac{\Delta}{2}\sqrt{\textstyle\sum_{g}I_{g}})$ is tested design by design; the
+price law $\Phi(-\sqrt{\lambda})$ is tested for the optimal design only, and differs from
+the first by integer rounding alone. Keeping them apart is what lets a disagreement be
+attributed.
+
+\emph{Replication and exclusions.} Three seeds of $30{,}000$ replications per cell, giving a
+Monte Carlo standard error of about $0.0016$. A cell whose design buys fewer than four
+observations of a type it needs is excluded and counted, because a variance cannot be
+estimated from fewer: $6{,}675$ cells are simulated and $2{,}925$ excluded.
+
+\subsection{Metrics}
+
+The reported quantities are: the closed-form value \eqref{eq:pricelaw}; the optimiser's
+value; the relative difference between them; the baseline value as a fraction of the
+optimum; and the number of cells in which the optimiser \emph{exceeds} the closed form,
+which is the only outcome that would falsify Theorem~\ref{thm:upper}.
+
+\subsection{Statistical Reporting}
+
+The design experiment is deterministic. The design problem contains no sampling, so no seeds,
+confidence intervals or repetitions are involved, and its tables are exact up to
+floating-point representation. Experiment~E2 is not deterministic, and is reported
+accordingly: every cell is an average over three independent seeds, the seed-to-seed standard
+deviation is retained for every cell, and no difference smaller than twice the Monte Carlo
+standard error is described as an effect. The instance draw is seeded once at the top of the
+run, so the whole experiment reruns bit-for-bit. Evidence classes are kept apart throughout: statements
+labelled \PROVED{} are machine-checked, \CERT{} denotes an exact rational certificate, and
+\NUM{} denotes a floating-point computation. No \NUM{} result is used to support a
+\PROVED{} one.
+
 \section{Formal Verification}
 \label{sec:verification}
 
@@ -859,60 +1104,6 @@ Section~\ref{sec:setting}, attached to the step that uses it; only positivity ch
 measurability side conditions are omitted, and their count is given at each block. The
 strand contains a further $4$ accepted modules carrying $33$ audited declarations that no
 step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $57$ audited statements of the strand across its $7$ accepted modules, grouped by module.
-
-\section{Experiments}
-
-\subsection{Experimental Objectives}
-
-The theorems above are proved, so the numerical work cannot strengthen them and is not
-intended to. It has two narrower objectives. The first is to check that the implementation
-used to generate the figures computes the same quantity the theorems describe, which is a
-real risk in any paper pairing formal statements with plots. The second is to quantify the
-practical consequence of Theorem~\ref{thm:dichotomy}, which the theorems alone do not,
-because a theorem about the optimum says nothing about how far a particular heuristic falls
-from it.
-
-\subsection{Parameter Grid}
-
-The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
-$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$, giving $32$ cells. The $\kappa$ values
-straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
-the law predicts to be qualitatively different.
-
-\subsection{Baselines and Ablations}
-
-Four designs are evaluated on every cell.
-
-\begin{enumerate}
-\item[1)] \textbf{Optimal design.} Algorithm~\ref{alg:design}.
-\item[2)] \textbf{Uniform, all controls.} Every group receives a calibration query, but each
-group's budget is split evenly between the two query types rather than in the ratio
-$\sqrt{m/\kappa}$. This isolates the cost of a poor allocation from the cost of a missing
-query type.
-\item[3)] \textbf{One calibration query missing.} One group is left without a control. This
-tests whether the failure is global or local.
-\item[4)] \textbf{No calibration queries.} The anchor-free class of Theorem~\ref{thm:anchor}.
-\end{enumerate}
-
-An independent bisection optimiser over the same feasible set is run alongside as a
-cross-check. It is given the budget and the information constraint and does not know the
-closed form.
-
-\subsection{Metrics}
-
-The reported quantities are: the closed-form value \eqref{eq:pricelaw}; the optimiser's
-value; the relative difference between them; the baseline value as a fraction of the
-optimum; and the number of cells in which the optimiser \emph{exceeds} the closed form,
-which is the only outcome that would falsify Theorem~\ref{thm:upper}.
-
-\subsection{Statistical Reporting}
-
-Every quantity in this section is deterministic. The design problem contains no sampling, so
-no seeds, confidence intervals or repetitions are involved, and the tables are exact up to
-floating-point representation. Evidence classes are kept apart throughout: statements
-labelled \PROVED{} are machine-checked, \CERT{} denotes an exact rational certificate, and
-\NUM{} denotes a floating-point computation. No \NUM{} result is used to support a
-\PROVED{} one.
 
 \section{Results}
 \label{sec:results}
@@ -1005,6 +1196,80 @@ samples will, on a configuration like the witness, allocate its entire budget to
 queries---each of which is individually informative about $\theta+b$---and report a design
 whose value is zero, with no indication that anything has gone wrong. The failure is silent
 because every individual query in it looks useful.
+
+\subsection{Does the Law Predict a Realised Error Rate?}
+\label{sec:e2results}
+
+Everything above compares one formula with another. Experiment~E2 of
+Section~\ref{sec:e2} compares \eqref{eq:upper} with what an estimator actually achieves.
+Across $6{,}675$ simulated cells---$240$ instances, ten budgets, four designs, three seeds of
+$30{,}000$ replications---the finite-count prediction misses the measured error rate by
+$0.0063$ in root-mean-square and by at most $0.0545$. \NUM{}
+
+Figure~\ref{fig:collapse} shows the collapse the dimensionless budget \eqref{eq:lambda} was
+chosen to expose. Each grey point is one instance at one budget under the optimal design;
+the instances differ in group count, in both prices, in both noise levels and in separation
+by more than an order of magnitude, and they lie on one curve. The measured mean exceeds
+$\Phi(-\sqrt{\lambda})$ by between $0.0033$ and $0.0082$ at every point of the grid, with an
+instance-to-instance standard deviation never above $0.0090$. The law is therefore not merely
+an ordering of designs: it predicts the number.
+
+The offset is not noise, and Figure~\ref{fig:plugin} identifies it. The deviation is positive
+in the mean at every sample size and at every design---the plug-in test is never better than
+the asymptote it is compared against---and it decays like $1/n_{x}$, from $+0.0104$ where a
+group buys between four and eight ordinary observations to $+0.0000$ where it buys more than
+five hundred. That is the signature of estimating $v$ and $\nu$ rather than knowing them.
+An experimenter reading \eqref{eq:upper} off a design sheet should therefore expect to be
+about one percentage point optimistic in the small-sample regime and correct to three decimal
+places once each group can afford a few hundred observations.
+
+The ordering the theory predicts---optimal no worse than even, even no worse than
+anchor-free---holds in $1{,}548$ of the $1{,}553$ cells where all three designs are
+measurable. The five exceptions are worth stating precisely, because they are not
+Monte Carlo noise and not a failure of the law. In each, integer rounding gives the even split
+\emph{more} information than the price-law split: at $K=7$, $\lambda=1$, the optimum buys
+$(n_{x},n_{z})=(14,8)$ for a total information of $24.03$ while the even split buys $(16,8)$
+for $25.42$, because the continuum optimum discards a larger fraction of budget at the floor.
+The finite-count prediction ranks the two designs correctly in all five cases; only the
+continuum law does not. The price law is an upper bound on what a design can deliver, and at
+these counts a competitor can sit closer to that bound than the design the continuum argument
+names. \NUM{}
+
+Finally, the anchor-free plateau. Theorem~\ref{thm:anchor} says the anchor-free class cannot
+identify the contrast, and the marginal channel of Section~\ref{sec:e2} puts a budget-free
+cap of one unit per group on what such a design can learn. The measurement matches: within an
+instance, increasing the budget eightyfold along the whole $\lambda$ grid moves the
+anchor-free error by a median of $0.0071$ and at most $0.0297$, while the optimal design over
+the same range falls from about $0.41$ to about $0.026$. The anchor-free design does not
+degrade gracefully with budget; it stops responding to budget. \NUM{}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig8_collapse.png}
+\caption{The price law against a realised error rate. Grey points are the $240$ instances at
+each of ten budgets under the optimal design, plotted against the dimensionless budget
+$\lambda=\Gamma^{*}B$ of \eqref{eq:lambda}; the solid curve is $\Phi(-\sqrt{\lambda})$,
+predicted from \eqref{eq:upper} with no fitted constant. Instances spanning
+$K\in\{1,\dots,8\}$, two prices, two noise levels and a thirtyfold range of separation
+collapse onto it. The three broken curves are the mean over instances for the other designs:
+an even split loses a little, a single missing anchor loses more, and the anchor-free design
+is flat---it is the only one whose error does not fall as the budget grows. \NUM{}}
+\label{fig:collapse}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig9_plugin.png}
+\caption{What the asymptote costs at finite sample size. Each point is the mean of
+(measured error $-$ finite-count prediction) over all cells in a bin of ordinary observations
+per group. The deviation is positive for every design at every sample size---estimating the
+two noise levels rather than knowing them can only hurt---and falls along the dotted
+$1/n_{x}$ reference, from about one percentage point at four observations per group to below
+$10^{-4}$ beyond five hundred. The two designs that reach the axis at large $n_{x}$ do so
+because their bins contain a handful of cells where the deviation turns slightly negative,
+which is within the Monte Carlo standard error of $0.0016$. \NUM{}}
+\label{fig:plugin}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}

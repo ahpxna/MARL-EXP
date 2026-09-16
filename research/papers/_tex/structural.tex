@@ -30,9 +30,11 @@ for a single $2$ at position $j$. We further show the difficulty is not an artef
 scale or of exact optimality: after normalising the total radius, five rankings remain
 necessary for every tolerance $\varepsilon<1/114$, because a quantised objective admits no
 $\varepsilon$-optimal set that is not optimal below one grid unit. Each displayed theorem is
-machine-checked in Lean~4 with no \texttt{sorry}, and an exhaustive enumeration of all
-$57{,}724$ distinct orderings for $5\le m\le12$ confirms the defect implementation against
-the proved definition.
+machine-checked in Lean~4 with no \texttt{sorry}. An exact dynamic programme over
+prefix-sum summaries certifies every ordering for $5\le m\le120$---$6.9\times10^{38}$ of
+them, against $57{,}724$ reachable by enumeration---confirming the bound at every size and
+showing that the fraction of orderings attaining it falls from one in five to
+$3\times10^{-19}$, so the menu closes a gap that grows with the population.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -412,15 +414,18 @@ $m\ge5$ is used.
 \leanbox{\lean{exists\_one\_defect}, \lean{altFrom\_defects} in
 \lean{LeanStructuralFamilyUpperV1}}
 
-\noindent\emph{Supporting results in \lean{LeanStructuralFamilyUpperV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanStructuralFamilyUpperV1}.}~These are the construction. The alternation is defined and then its multiset, length, sum and defect vector are each checked, so the schedule it produces is verified to be a permutation of the family and to pay exactly where intended. The even and odd cases appear separately because the sign of the big element at the payment position depends on the parity of the budget, as Table~\ref{tab:m7} shows. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,12}\quad\lean{altFrom\_defects}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z}\\
 &\quad ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n}\\
 &\quad = \mathit{a} + \mathit{b} \to |\mathit{s}|\\
-&\quad \leq 1 \to |\mathit{s} - (\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z}\\
-&\quad )| \leq 1 \to \mathit{defects} \mathit{s} (\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
+&\quad \leq 1 \to |\mathit{s} - (\mathit{a}:\mathbb{Z}\\
+&\quad ) + (\mathit{b}:\mathbb{Z}\\
+&\quad )| \leq 1 \to \mathit{defects} \mathit{s}\\
+&\quad (\mathit{altFrom} \mathit{n} \mathit{s}\\
+&\quad \mathit{a}\\
 &\quad \mathit{b}) = \mathit{List}.\mathit{replicate}\\
 &\quad \mathit{n} 0
 \end{aligned} \]}
@@ -428,7 +433,8 @@ $m\ge5$ is used.
 \noindent\textbf{S\,13}\quad\lean{altFrom\_length}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\;\\
+&\quad (\mathit{hn} : \mathit{n} = \mathit{a} +\\
 &\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -440,7 +446,10 @@ $m\ge5$ is used.
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z}\\
 &\quad ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n}\\
-&\quad = \mathit{a} + \mathit{b} \to ((\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad = \mathit{a} + \mathit{b} \to ((\mathit{altFrom} \mathit{n}\\
+&\quad \mathit{s} \mathit{a} \mathit{b} :\\
+&\quad \mathit{List} \mathbb{Z} ) :\\
+&\quad \mathit{Multiset} \mathbb{Z}\\
 &\quad ) = \mathit{Multiset}.\mathit{replicate} \mathit{a}\\
 &\quad (-1) + \mathit{Multiset}.\mathit{replicate} \mathit{b}\\
 &\quad 1
@@ -449,83 +458,128 @@ $m\ge5$ is used.
 \noindent\textbf{S\,15}\quad\lean{altFrom\_sum}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\;\\
+&\quad (\mathit{hn} : \mathit{n} = \mathit{a} +\\
 &\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
-&\quad \mathit{b}).\mathit{sum} = -(\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z}\\
+&\quad \mathit{b}).\mathit{sum} =\\
+&\quad -(\mathit{a}:\mathbb{Z} ) +\\
+&\quad (\mathit{b}:\mathbb{Z}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{exists\_one\_defect}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} \mathit{j} : \mathbb{N} ),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hj1} : 1 \leq \mathit{j}),\; (\mathit{hjm} : \mathit{j} \leq \mathit{p} + \mathit{q} +\\
+&(\mathit{p} \mathit{q} \mathit{j} : \mathbb{N}\\
+&\quad ),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
+&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&\quad 1),\; (\mathit{hj1} : 1 \leq \mathit{j}),\;\\
+&\quad (\mathit{hjm} : \mathit{j} \leq \mathit{p} +\\
+&\quad \mathit{q} +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\exists \mathit{l} : \mathit{List} \mathbb{Z}\\
-&\quad , ((\mathit{l} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
-&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+&\quad , ((\mathit{l} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
+&\quad \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List}\\
+&\quad \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
 &\quad ) \wedge \mathit{defects} 0 \mathit{l} =\\
-&\quad \mathit{List}.\mathit{replicate} (\mathit{j} - 1) 0 ++ (2 : \mathbb{Z}\\
-&\quad ) :: \mathit{List}.\mathit{replicate} (\mathit{p} + \mathit{q} + 2 -\\
+&\quad \mathit{List}.\mathit{replicate} (\mathit{j} -\\
+&\quad 1) 0 ++ (2 : \mathbb{Z}\\
+&\quad ) :: \mathit{List}.\mathit{replicate}\\
+&\quad (\mathit{p} + \mathit{q} + 2 -\\
 &\quad \mathit{j}) 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,17}\quad\lean{orderEven\_defects}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
+&\quad (\mathit{htp} :\\
+&\quad \mathit{t} \leq \mathit{p}),\; (\mathit{htq} :\\
+&\quad \mathit{t} \leq \mathit{q}\\
+&\quad +\\
+&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
+&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{defects} 0 (\mathit{orderEven} \mathit{t} \mathit{p}\\
-&\quad \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} + (\mathit{t} -\\
+&\quad \mathit{q}) = \mathit{List}.\mathit{replicate}\\
+&\quad (\mathit{t} + (\mathit{t} -\\
 &\quad 1)) 0 ++ (2 : \mathbb{Z} ) ::\\
-&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} + 1 - \mathit{t}) +\\
+&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) +\\
+&\quad (\mathit{q} + 1 - \mathit{t}) +\\
 &\quad 1) 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{orderEven\_multiset}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
+&\quad (\mathit{htp} :\\
+&\quad \mathit{t} \leq \mathit{p}),\; (\mathit{htq} :\\
+&\quad \mathit{t} \leq \mathit{q}\\
+&\quad +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
-&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+\vdash\;&((\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q} :\\
+&\quad \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
+&\quad \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List}\\
+&\quad \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{S\,19}\quad\lean{orderOdd\_defects}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
+&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} :\\
+&\quad \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} :\\
+&\quad \mathit{p} \leq \mathit{q}\\
+&\quad +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{defects} 0 (\mathit{orderOdd} \mathit{t} \mathit{p}\\
-&\quad \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} +\\
+&\quad \mathit{q}) = \mathit{List}.\mathit{replicate}\\
+&\quad (\mathit{t} +\\
 &\quad \mathit{t}) 0 ++ (2 : \mathbb{Z} ) ::\\
-&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} - \mathit{t}) +\\
+&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) +\\
+&\quad (\mathit{q} - \mathit{t}) +\\
 &\quad 1) 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,20}\quad\lean{orderOdd\_multiset}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q})
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
+&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
-&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
+\vdash\;&((\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q} :\\
+&\quad \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
+&\quad \mathbb{Z}\\
+&\quad ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List}\\
+&\quad \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{S\,21}\quad\lean{totalDefect\_orderEven}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
+&\quad (\mathit{htp} :\\
+&\quad \mathit{t} \leq \mathit{p}),\; (\mathit{htq} :\\
+&\quad \mathit{t} \leq \mathit{q}\\
+&\quad +\\
+&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
+&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -535,7 +589,12 @@ $m\ge5$ is used.
 
 \noindent\textbf{S\,22}\quad\lean{totalDefect\_orderOdd}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
+&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
+&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} :\\
+&\quad \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} :\\
+&\quad \mathit{p} \leq \mathit{q}\\
+&\quad +\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -590,6 +649,20 @@ every budget $j$ there is an ordering paying exactly $2$, and paying it exactly 
 \label{fig:defect}
 \end{figure}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig5_traces.png}
+\caption{The construction of Theorem~\ref{thm:construction} at $m=7$, drawn as prefix-sum
+walks. Each curve is one ordering from the menu; the shaded band is the set of prefix sums
+$\{-1,0,1\}$ that cost nothing, because a sum of that size is within one of the parity floor.
+Every curve leaves the band exactly once, and at a different budget, which is what makes the
+menu cover all $m-1$ budgets with a single defect of $2$ each. A schedule cannot stay inside
+the band throughout: the walk starts at $-3$ and must return to $0$, and the parity argument
+of Section~\ref{sec:mechanism} forbids a free crossing. Exact integer evaluation of the
+family.}
+\label{fig:traces}
+\end{figure}
+
 \subsection{The Law}
 \label{sec:law}
 
@@ -619,28 +692,41 @@ both are achieved.
 \leanbox{\lean{ratio\_card\_concentrated\_on\_support} in
 \lean{LeanStructuralFamilyLowerV1}}
 
-\noindent\emph{Supporting results in \lean{LeanStructuralFamilyLowerV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $4$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanStructuralFamilyLowerV1}.}~These are the lower side. The defect group establishes that a non-zero defect is even and at least two, which is what makes the problem discrete; the parity bridge ties that to the regret \eqref{eq:regret}; and the mechanism pair gives the step bound and its consequence. The averaged and path bounds and their attainment are stated as four separate results because two bounds alone do not determine a ratio, and it is the attainment that turns \eqref{eq:ratio} into an identity. They are reproduced as the prover has them; a further $4$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{avg\_lower}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
-&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi}, \mathit{c} \leq \textstyle\sum \mathit{k}, \mathit{r} \mathit{pi}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
+&\quad ),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : \forall \mathit{pi}\\
+&\quad \mathit{k}, 0 \leq \mathit{r} \mathit{pi}\\
+&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi},\\
+&\quad 0 \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hsum} :\\
+&\quad \textstyle\sum \mathit{pi}, \mathit{P}\\
+&\quad \mathit{pi} =\\
+&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi},\\
+&\quad \mathit{c} \leq \textstyle\sum \mathit{k},\\
+&\quad \mathit{r} \mathit{pi}\\
 &\quad \mathit{k})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R}\\
+\vdash\;&\mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
+&\quad \mathbb{R}\\
 &\quad ) \leq (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
+&\quad \mathit{Bud}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathbf{fun}\\
+&\quad \mathit{k} => \textstyle\sum \mathit{pi},\\
+&\quad \mathit{P} \mathit{pi} * \mathit{r}\\
+&\quad \mathit{pi}\\
 &\quad \mathit{k})
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{defects\_append}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l₁} \mathit{l₂} : \mathit{List} \mathbb{Z}\\
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l₁} \mathit{l₂} :\\
+&\quad \mathit{List} \mathbb{Z}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -669,8 +755,13 @@ both are achieved.
 
 \noindent\textbf{S\,5}\quad\lean{no\_big\_step}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
-&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h0} : \mathit{totalDefect} \mathit{s} \mathit{l} =\\
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List}\\
+&\quad \mathbb{Z}\\
+&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\;\\
+&\quad (\mathit{he} : |\mathit{s} +\\
+&\quad \mathit{l}.\mathit{sum}| \leq 1),\;\\
+&\quad (\mathit{h0} : \mathit{totalDefect} \mathit{s}\\
+&\quad \mathit{l} =\\
 &\quad 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -681,49 +772,78 @@ both are achieved.
 \noindent\textbf{S\,6}\quad\lean{parity\_bridge}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{s} : \mathbb{Z} ),\; (\mathit{k} : \mathbb{N}\\
-&\quad ),\; (\mathit{h} : \mathit{s} \% 2 = (\mathit{k} : \mathbb{Z} ) \%\\
+&\quad ),\; (\mathit{h} : \mathit{s} \% 2 = (\mathit{k} : \mathbb{Z}\\
+&\quad ) \%\\
 &\quad 2)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dfc} \mathit{s} = |\mathit{s}| - (\mathit{k} : \mathbb{Z}\\
+\vdash\;&\mathit{dfc} \mathit{s} = |\mathit{s}| - (\mathit{k} :\\
+&\quad \mathbb{Z}\\
 &\quad ) \% 2
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{path\_lower}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R}\\
-&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
-&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi}, \exists \mathit{k}, \mathit{c} \leq \mathit{r} \mathit{pi}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
+&\quad ),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
+&\quad \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hsum} :\\
+&\quad \textstyle\sum \mathit{pi}, \mathit{P}\\
+&\quad \mathit{pi} =\\
+&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi},\\
+&\quad \exists \mathit{k}, \mathit{c} \leq \mathit{r}\\
+&\quad \mathit{pi}\\
 &\quad \mathit{k})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{c} \leq \textstyle\sum \mathit{pi}, \mathit{P}\\
-&\quad \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
+&\quad \mathit{pi} * ((\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
+&\quad (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
 &\quad \mathit{k}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,8}\quad\lean{ratio\_card\_concentrated\_on\_support}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{e} : \mathbb{R}\\
-&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hbal} : \forall \mathit{k}, (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}) =\\
-&\quad \mathit{e}),\; (\mathit{hconc} : \forall \mathit{pi}, \mathit{P} \mathit{pi} \neq 0 \to (\textstyle\sum \mathit{k}, \mathit{r} \mathit{pi} \mathit{k}) = (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
+&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
+&\quad ),\; (\mathit{e} : \mathbb{R}\\
+&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
+&\quad \leq \mathit{P}\\
+&\quad \mathit{pi}),\; (\mathit{hbal} : \forall \mathit{k},\\
+&\quad (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r}\\
+&\quad \mathit{pi} \mathit{k}) =\\
+&\quad \mathit{e}),\; (\mathit{hconc} : \forall \mathit{pi},\\
+&\quad \mathit{P} \mathit{pi} \neq 0 \to (\textstyle\sum \mathit{k},\\
+&\quad \mathit{r} \mathit{pi} \mathit{k}) = (\mathit{univ} :\\
+&\quad \mathit{Finset} \mathit{Bud}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r}\\
+&\quad \mathit{pi}\\
 &\quad \mathit{k}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}))) = (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R}\\
+\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
+&\quad ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \mathit{r}\\
+&\quad \mathit{pi}\\
+&\quad \mathit{k}))) =\\
+&\quad (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
+&\quad \mathbb{R}\\
 &\quad ) * (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
+&\quad \mathit{Bud}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathbf{fun}\\
+&\quad \mathit{k} => \textstyle\sum \mathit{pi},\\
+&\quad \mathit{P} \mathit{pi} * \mathit{r}\\
+&\quad \mathit{pi}\\
 &\quad \mathit{k})
 \end{aligned} \]}
 
 \noindent\textbf{S\,9}\quad\lean{totalDefect\_even}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List}\\
+&\quad \mathbb{Z}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -741,8 +861,13 @@ both are achieved.
 
 \noindent\textbf{S\,11}\quad\lean{two\_le\_totalDefect}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z}\\
-&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h3} : \exists \mathit{x} \in \mathit{l}, 2 <\\
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List}\\
+&\quad \mathbb{Z}\\
+&\quad ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\;\\
+&\quad (\mathit{he} : |\mathit{s} +\\
+&\quad \mathit{l}.\mathit{sum}| \leq 1),\;\\
+&\quad (\mathit{h3} : \exists \mathit{x} \in \mathit{l},\\
+&\quad 2 <\\
 &\quad |\mathit{x}|)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -821,19 +946,26 @@ rankings, which the exact lower bound for this witness forbids.
 \leanbox{\lean{normalized\_chi\_at\_least\_five} in
 \lean{LeanStructuralIntegerToleranceV1}}
 
-\noindent\emph{Supporting results in \lean{LeanStructuralIntegerToleranceV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanStructuralIntegerToleranceV1}.}~These answer the robustness objections. The grid lemma is stated for an arbitrary quantised objective rather than for this witness, since the mechanism---that below one grid unit slack buys nothing---is not specific to it. The normalised form then supplies the lattice spacing, and the band result follows. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,23}\quad\lean{epsilonOptimal\_on\_grid}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{cost} : \mathit{Finset} \mathit{I} \to \mathbb{N}\\
-&\quad ),\; (\mathit{scale} \mathit{eps} : \mathbb{R} ),\; (\mathit{hscale} : 0 <\\
-&\quad \mathit{scale}),\; (\mathit{heps} : \mathit{scale} * \mathit{eps} <\\
-&\quad 1),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset}\\
-&\quad \mathit{I}),\; (\mathit{h} : \mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R} )/\mathit{scale}) \mathit{eps} \mathit{k}\\
+&\quad ),\; (\mathit{scale} \mathit{eps} : \mathbb{R}\\
+&\quad ),\; (\mathit{hscale} : 0 <\\
+&\quad \mathit{scale}),\; (\mathit{heps} :\\
+&\quad \mathit{scale} * \mathit{eps} <\\
+&\quad 1),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{S} : \mathit{Finset}\\
+&\quad \mathit{I}),\; (\mathit{h} :\\
+&\quad \mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} =>\\
+&\quad (\mathit{cost} \mathit{T}:\mathbb{R}\\
+&\quad )/\mathit{scale}) \mathit{eps} \mathit{k}\\
 &\quad \mathit{S})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R}\\
+\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} =>\\
+&\quad (\mathit{cost} \mathit{T}:\mathbb{R}\\
 &\quad )/\mathit{scale}) 0 \mathit{k} \mathit{S}
 \end{aligned} \]}
 
@@ -862,6 +994,20 @@ dividing by the total radius. The slack objection is met on a band rather than o
 $\varepsilon$: five rankings are necessary up to $1/114$ and no further. The honest statement
 is that exact-optimality difficulty is robust to a \emph{quantified} amount of slack,
 computed from the objective's lattice rather than found by a sweep.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig4_tolerance.png}
+\caption{How many rankings a tolerance buys. The solid step is the scalar witness $F_{7}$
+after the normalisation $\sum_{j}\mathrm{osc}(f_{j})/2=1$: five rankings remain necessary at
+every $\varepsilon<1/114$, and that is the content of
+\lean{normalized\_chi\_at\_least\_five}---the difficulty is not an artefact of scale, and
+survives a slack of nearly one percent of the total oscillation. The broken steps are the
+staircase families $F_{r}$, whose requirement collapses at $\varepsilon=1/(2r)$; they are
+drawn to show that the witness is not merely one of them relabelled, since no staircase
+survives as far as $1/114$ at five rankings. Exact evaluation of the proved thresholds.}
+\label{fig:tolerance}
+\end{figure}
 
 \subsection{The Constrained Problem}
 \label{sec:marginal}
@@ -906,21 +1052,25 @@ On the cyclic menu, $x^{*}_{i,k}=\min(k,m)/m$ for every item $i$.
 \leanbox{\lean{cyclic\_retained}, \lean{retained\_transfer} in
 \lean{LeanStructuralRetainedMarginalV1}}
 
-\noindent\emph{Supporting results in \lean{LeanStructuralRetainedMarginalV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanStructuralRetainedMarginalV1}.}~These carry the constrained problem. The trajectory is shown non-negative, bounded by one and monotone before the column identity is proved, because those are what make it a retention frequency rather than an arbitrary matrix; the cyclic evaluation and the transfer then give the closed form. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,26}\quad\lean{card\_prefixSet}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pos} : \alpha \to \mathbb{N} ),\; (\mathit{h} : \mathit{IsRanking}\\
+&(\mathit{pos} : \alpha \to \mathbb{N} ),\; (\mathit{h} :\\
+&\quad \mathit{IsRanking}\\
 &\quad \mathit{pos}),\; (\mathit{k} : \mathbb{N} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{prefixSet} \mathit{pos}\\
-&\quad \mathit{k}).\mathit{card} = \mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha )
+&\quad \mathit{k}).\mathit{card} = \mathit{min}\\
+&\quad \mathit{k} (\mathit{Fintype}.\mathit{card}\\
+&\quad \alpha )
 \end{aligned} \]}
 
 \noindent\textbf{S\,27}\quad\lean{cyclic\_retained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{i} : \mathit{ZMod} \mathit{m}),\; (\mathit{k} : \mathbb{N}\\
+&(\mathit{i} : \mathit{ZMod} \mathit{m}),\; (\mathit{k} :\\
+&\quad \mathbb{N}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -930,30 +1080,48 @@ On the cyclic menu, $x^{*}_{i,k}=\min(k,m)/m$ for every item $i$.
 \noindent\textbf{S\,28}\quad\lean{retained\_col\_sum}
 {\footnotesize\[ \begin{aligned}[t]
 &[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{hpos} : \forall \mathit{j}, \mathit{IsRanking} (\mathit{pos}\\
+&\quad ),\; (\mathit{hpos} : \forall \mathit{j},\\
+&\quad \mathit{IsRanking} (\mathit{pos}\\
 &\quad \mathit{j})),\; (\mathit{k} : \mathbb{N} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\textstyle\sum \mathit{i} : \alpha , \mathit{retained}\\
-&\quad \mathit{pos} \mathit{i} \mathit{k} = ((\mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha ) : \mathbb{N} ) : \mathbb{R}\\
+&\quad \mathit{pos} \mathit{i} \mathit{k} = ((\mathit{min} \mathit{k}\\
+&\quad (\mathit{Fintype}.\mathit{card} \alpha ) :\\
+&\quad \mathbb{N} ) :\\
+&\quad \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{S\,29}\quad\lean{retained\_constrained\_eq\_free}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
-&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R}\\
-&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{P₀} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val}\\
+&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R}\\
+&\quad ) \to \mathit{Prop}),\; (\mathit{traj} :\\
+&\quad (\mathit{Ord} \to \mathbb{R}\\
+&\quad ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\;\\
+&\quad (\mathit{P₀} : \mathit{Ord} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hfree} : \forall \mathit{P},\\
+&\quad \mathit{Feasible} \mathit{P} \to \mathit{V}\\
+&\quad \leq \mathit{val}\\
 &\quad \mathit{P}),\; (\mathit{hF₀} : \mathit{Feasible}\\
-&\quad \mathit{P₀}),\; (\mathit{hT₀} : \forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P₀} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
-&\quad \mathit{k}),\; (\mathit{hval} : \mathit{val} \mathit{P₀} =\\
+&\quad \mathit{P₀}),\; (\mathit{hT₀} : \forall \mathit{i}\\
+&\quad \mathit{k}, \mathit{traj} \mathit{P₀}\\
+&\quad \mathit{i} \mathit{k} = \mathit{target}\\
+&\quad \mathit{i}\\
+&\quad \mathit{k}),\; (\mathit{hval} : \mathit{val}\\
+&\quad \mathit{P₀} =\\
 &\quad \mathit{V})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{P},\\
-&\quad \mathit{Feasible} \mathit{P} \wedge (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
+&\quad \mathit{Feasible} \mathit{P} \wedge (\forall \mathit{i}\\
+&\quad \mathit{k}, \mathit{traj} \mathit{P}\\
+&\quad \mathit{i} \mathit{k} =\\
+&\quad \mathit{target} \mathit{i}\\
 &\quad \mathit{k}) \wedge \mathit{val} \mathit{P} =\\
 &\quad \mathit{v}\} \mathit{V}
 \end{aligned} \]}
@@ -984,14 +1152,22 @@ On the cyclic menu, $x^{*}_{i,k}=\min(k,m)/m$ for every item $i$.
 \noindent\textbf{S\,32}\quad\lean{retained\_transfer}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
-&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R}\\
-&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val}\\
+&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R}\\
+&\quad ) \to \mathit{Prop}),\; (\mathit{traj} :\\
+&\quad (\mathit{Ord} \to \mathbb{R}\\
+&\quad ) \to \alpha \to \mathbb{N} \to \mathbb{R}\\
+&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\;\\
+&\quad (\mathit{hfree} : \forall \mathit{P},\\
+&\quad \mathit{Feasible} \mathit{P} \to \mathit{V}\\
+&\quad \leq \mathit{val}\\
 &\quad \mathit{P})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall \mathit{P}, \mathit{Feasible} \mathit{P}\\
-&\quad \to (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
+&\quad \to (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P}\\
+&\quad \mathit{i} \mathit{k} = \mathit{target} \mathit{i}\\
 &\quad \mathit{k}) \to \mathit{V} \leq \mathit{val} \mathit{P}
 \end{aligned} \]}
 
@@ -1000,6 +1176,56 @@ Theorem~\ref{thm:colsum} cuts both ways. It confirms that the uniform trajectory
 realisable rather than merely feasible on paper. But because it holds for \emph{every} menu
 it singles out none, so a prescribed column sum cannot by itself exclude the witness of
 Theorem~\ref{thm:attained}. What remains open is a prescribed \emph{non-uniform} trajectory.
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+Theorems~\ref{thm:everyorderpays} and \ref{thm:construction} quantify over all $m\ge5$, so no
+computation can strengthen them. The sweep has two objectives. The first is to confirm that
+the defect definition used in the code and the one used in the proofs agree, which is the
+failure mode a proved theorem does not protect against. The second is quantitative and the
+theorems do not address it at all: the theorems say the bound is attained, and say nothing
+about \emph{how often}. A bound attained by a fifth of all orderings and a bound attained by
+one ordering in $10^{19}$ describe very different design problems, and only the second makes
+the construction of Section~\ref{sec:construction} worth having.
+
+\subsection{Setup}
+
+The first pass enumerated orderings directly and stopped at $m=13$, which is where
+enumeration stops being possible: distinct orderings are few, but reaching them costs $m!$
+tuples, and $m=14$ alone is $8.7\times10^{10}$ of them.
+
+Nothing needs to be enumerated. Every value of $g_{m}$ is odd, so after $k$ steps the prefix
+sum $s_{k}$ has the parity of $k$ and the defect $|s_{k}|-(k\bmod 2)$ of \eqref{eq:dfcbridge}
+is a non-negative even integer. A partial ordering is summarised completely by how many
+copies of each of the four values it has used, which fixes both $k$ and $s_{k}$; the reachable
+summaries form an acyclic graph on $O(m^{2})$ nodes, and every quantity below is a path
+functional on it. The minimum total defect is a shortest path, the minimum path defect a
+bottleneck path, the census of orderings by total defect a path count in exact integers, and
+the budgets a single defect of two can cover are a reachability question under the constraint
+that the defect vanishes at every step but the target. This is exhaustive rather than sampled,
+and exact rather than floating point: the counts are unbounded integers throughout.
+
+The sweep runs $5\le m\le120$ and so accounts for $6.9\times10^{38}$ orderings. Every $m$ the
+enumeration reached is recomputed by the dynamic programme and the two agree in every
+column, which is what licenses the rows beyond it.
+
+\subsection{Metrics}
+
+Four aggregates are recorded per $m$: the minimum total defect over all orderings; the
+minimum \emph{path} defect, that is, the minimum over orderings of the maximum per-budget
+defect; the set of budgets at which some ordering achieves a defect vector with a single
+non-zero entry equal to $2$; and the full census of orderings by total defect, from which the
+fraction attaining the bound is read.
+
+\subsection{Statistical Reporting}
+
+Every quantity is deterministic and exact; there is no sampling, no seed and no confidence
+interval anywhere in this section. The tabulated law values are exact rationals evaluated in
+floating point for display only, and the census counts are exact integers displayed to three
+significant figures.
 
 \section{Formal Verification}
 \label{sec:verification}
@@ -1056,34 +1282,6 @@ Quoting \lean{two\_le\_totalDefect} as though its conclusion were already about 
 would misdescribe what the prover checked. Every audited statement of every module this paper cites is displayed in Section~
 ef{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $9$ accepted modules carrying $118$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $155$ audited statements of the strand across its $13$ accepted modules, grouped by module.
 
-\section{Experiments}
-
-\subsection{Experimental Objectives}
-
-Theorems~\ref{thm:everyorderpays} and \ref{thm:construction} quantify over all $m\ge5$, so no
-enumeration can strengthen them. The enumeration has one objective: to confirm that the
-defect definition used in the code and the one used in the proofs agree, which is the failure
-mode a proved theorem does not protect against.
-
-\subsection{Setup}
-
-Every distinct ordering of $g_{m}$ was enumerated for $5\le m\le12$---$57{,}724$ orderings in
-total---and each ordering's defect vector computed from \eqref{eq:dfcbridge} in exact integer
-arithmetic. Orderings are enumerated up to multiset repetition; there is no sampling and no
-floating point.
-
-\subsection{Metrics}
-
-Three aggregates are recorded per $m$: the minimum total defect over all orderings; the
-minimum \emph{path} defect, that is, the minimum over orderings of the maximum per-budget
-defect; and the set of budgets at which some ordering achieves a defect vector with a single
-non-zero entry equal to $2$.
-
-\subsection{Statistical Reporting}
-
-Every quantity is deterministic and exact. The tabulated law values are exact rationals
-evaluated in floating point for display only.
-
 \section{Results}
 \label{sec:results}
 
@@ -1094,13 +1292,57 @@ alongside.
 
 \subsection{Every Ordering Pays, Checked Exhaustively}
 
-The minimum total defect is $2$ at every $m$, so no ordering is free. The minimum path defect
-is also $2$, so no ordering escapes by spreading a total of $2$ across several budgets at
-lower cost each---which Corollary~\ref{cor:nocheap} already forbids and which the enumeration
-confirms the implementation respects. One-defect schedules exist at every budget for every
-$m$ in range, so the menu of Theorem~\ref{thm:attained} is realisable throughout.
+The minimum total defect is $2$ at every $m$ from $5$ to $120$, so no ordering is free. The
+minimum path defect is also $2$, so no ordering escapes by spreading a total of $2$ across
+several budgets at lower cost each---which Corollary~\ref{cor:nocheap} already forbids and
+which the sweep confirms the implementation respects. One-defect schedules exist at every
+budget at every $m$ in range, so the menu of Theorem~\ref{thm:attained} is realisable
+throughout. Table~\ref{tab:enum} reports the sweep, and every row up to $m=13$ agrees with the
+brute-force enumeration that preceded it. \NUM{}
 
 \input{structural_enum}
+
+\subsection{How Rare an Optimal Ordering Is}
+
+The theorems say the bound is attained; the census says how nearly it is missed.
+Figure~\ref{fig:enum} plots both scales together. The number of orderings passes $10^{38}$ at
+$m=120$, and the fraction of them that attain the bound falls from one in five at $m=5$ to
+three in $10^{19}$. The decay is close to geometric in $m$, which is the practically relevant
+statement: the proportion of schedules that are optimal halves roughly every time the
+population grows by two.
+
+Figure~\ref{fig:defectdist} shows why, by plotting the whole census rather than its minimum.
+The distribution of total defect has its mass in the middle and thins sharply toward the
+proved bound at $2$; the bulk of orderings pay tens of units at $m=40$ and hundreds at
+$m=80$, against a proved minimum of $2$ at both. So the gap the construction closes is not
+the gap between a good schedule and a slightly better one. A schedule chosen without regard
+to the ordering pays, in expectation, a defect that grows with the population, while the
+menu of Theorem~\ref{thm:construction} pays $2$ at every population size. That is what the
+construction is for, and the theorems alone do not say it. \NUM{}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig3_enum.png}
+\caption{The scale of the sweep and the rarity of an optimal ordering. The solid curve counts
+the distinct orderings certified at each $m$, exhaustively; the shaded region to its left is
+the range that direct enumeration can reach before the $m!$ cost of generating tuples becomes
+prohibitive, and where the dynamic programme was checked against it. The broken curve is the
+fraction of orderings attaining the proved minimum defect of $2$, falling from $0.20$ at
+$m=5$ to $3.0\times10^{-19}$ at $m=120$. \NUM{}}
+\label{fig:enum}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig6_defectdist.png}
+\caption{The full census of orderings by total defect, at four population sizes. The vertical
+line is the proved bound of Theorem~\ref{thm:everyorderpays}, which no ordering crosses at
+any $m$---the exhaustive sweep finds no counterexample, as it must not. What the census adds
+is the shape to its right: the mass sits far from the bound and moves further as $m$ grows,
+so an arbitrary ordering is not merely suboptimal but suboptimal by an amount that grows with
+the population. \NUM{}}
+\label{fig:defectdist}
+\end{figure}
 
 \subsection{The Ratio Is Exactly $m-1$, and Both Levels Fall}
 

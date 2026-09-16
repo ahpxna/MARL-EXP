@@ -34,7 +34,11 @@ $2(L_{F}(T)-L_{F}(S))\le|T\setminus S|(2\delta-\mu)$ with no symmetry or fixed-c
 assumption, and from it a \emph{sharp threshold}: a margin of $2\delta$ is sufficient for
 Top-$C$ optimality under every product reference, and for every margin below it an explicit
 construction makes Top-$C$ strictly suboptimal. Each displayed theorem is machine-checked in
-Lean~4 with no \texttt{sorry}.
+Lean~4 with no \texttt{sorry}. Sufficiency is proved for every product reference and
+necessity only at the corner; an exact rational sweep between them, validated against the
+proved identity before being reported, finds the construction degrading continuously rather
+than collapsing, and failing only past a breakdown point that grows with the margin and is
+never reached at the threshold.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -128,7 +132,8 @@ However, ``nearly additive'' is not by itself a source of novelty here, and the 
 must be drawn on three axes rather than claimed. The modulus is different: $\delta$ bounds
 mixed differences of $F$ under a product reference, not a global additivity defect. The
 reference is different and, as Section~\ref{sec:threshold} shows, decisive---the necessity
-construction collapses at every non-corner reference. And the loss is a decision loss over
+construction is stated at the corner, and the sweep of Section~\ref{sec:results} measures how
+far from the corner it survives. And the loss is a decision loss over
 Top-$C$ selection rather than an approximation error. What this paper contributes is the
 margin term: the bound $2|T\setminus S|\delta$ that an endpoint-patch argument gives is
 improved to $|T\setminus S|(2\delta-\mu)$ by retaining a score surplus that the earlier
@@ -411,11 +416,12 @@ on $[0,1]$ attains its maximum at an endpoint unless it is constant.
 \leanbox{\lean{info\_linear}, \lean{optimum\_at\_endpoint},
 \lean{transition\_at\_equal\_price} in \lean{LeanD6DesignDerivationV1}}
 
-\noindent\emph{Supporting results in \lean{LeanD6DesignDerivationV1}.}~The statements below supply the rewrites the step performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $3$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanD6DesignDerivationV1}.}~These are the design derivation. The budget identity and the uniqueness statement are separate because the first alone is consistent with the weights having been fitted; it is the uniqueness that leaves nothing to fit. The non-negativity characterisation makes the admissible range of the split a derived statement, and the affine and endpoint results then remove the need to search over the split at all. They are reproduced as the prover has them; a further $3$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{budget\_exact}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0)
+&(\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} :\\
+&\quad \mathit{c} \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{wB} \mathit{eta} + \mathit{c} * \mathit{wPair}\\
@@ -425,7 +431,9 @@ on $[0,1]$ attains its maximum at an endpoint unless it is constant.
 \noindent\textbf{S\,2}\quad\lean{flat\_when\_equal\_price}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{IB} \mathit{Ipair} \mathit{c} : \mathbb{Q}\\
-&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{heq} : \mathit{Ipair} / \mathit{c} - \mathit{IB} =\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
+&\quad (\mathit{heq} : \mathit{Ipair} / \mathit{c} -\\
+&\quad \mathit{IB} =\\
 &\quad 0),\; (\mathit{eta} \mathit{eta'} : \mathbb{Q} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -441,14 +449,17 @@ on $[0,1]$ attains its maximum at an endpoint unless it is constant.
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
-&\quad \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} / \mathit{c} -\\
+&\quad \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} /\\
+&\quad \mathit{c} -\\
 &\quad \mathit{IB})
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{weights\_unique}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{eta} \mathit{c} \mathit{a} \mathit{b} : \mathbb{Q}\\
-&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{hbudget} : \mathit{a} + \mathit{c} * \mathit{b} =\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
+&\quad (\mathit{hbudget} : \mathit{a} + \mathit{c} *\\
+&\quad \mathit{b} =\\
 &\quad 1),\; (\mathit{hshare} : \mathit{c} * \mathit{b} =\\
 &\quad \mathit{eta})
 \end{aligned} \]}
@@ -547,43 +558,103 @@ because $|T|=|S|$.
 \leanbox{\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin} in
 \lean{LeanD6MarginSensitiveExchangeV1}}
 
-\noindent\emph{Supporting results in \lean{LeanD6MarginSensitiveExchangeV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanD6MarginSensitiveExchangeV1}.}~These are the exchange law. The surplus lemma is pure finite combinatorics with no geometry in it, and it is what converts a margin hypothesis into a quantity the exchange bound can consume. The two exchange statements are ordered so that the first retains the surplus the earlier endpoint-patch argument discarded, and the second bounds that surplus below by the margin. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,5}\quad\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U}) \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} \mathit{mu} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} =\\
-&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}), |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{selected} \mathit{competitor} : \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
-&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) \mathit{selected}\\
-&\quad \mathit{k}),\; (\mathit{hCompetitorCard} : \mathit{competitor}.\mathit{card} =\\
-&\quad \mathit{k}),\; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{selected}, \forall \mathit{j} \notin \mathit{selected}, \mathit{mu} + \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{mu} : \mathbb{R}\\
+&\quad ),\; (\mathit{hWeight} : \forall \mathit{c}, 0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
+&\quad =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U}),\\
+&\quad |\mathit{mixedDifference} \mathit{F}\\
+&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
+&\quad (\mathit{selected} \mathit{competitor} :\\
+&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
+&\quad \mathit{competitor}.\mathit{card} =\\
+&\quad \mathit{k}),\; (\mathit{hMargin} : \forall \mathit{i}\\
+&\quad \in \mathit{selected}, \forall \mathit{j}\\
+&\quad \notin \mathit{selected}, \mathit{mu} +\\
+&\quad \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
+&\quad \mathit{q} \mathit{F}\\
 &\quad \mathit{i}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{selected} - \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F})\\
-&\quad \mathit{competitor}) \leq ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R}\\
+\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
+&\quad \mathit{selected} -\\
+&\quad \mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
+&\quad \mathit{competitor}) \leq ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{card} :\\
+&\quad \mathbb{R}\\
 &\quad ) * (2 * \mathit{delta} - \mathit{mu})
 \end{aligned} \]}
 
 \noindent\textbf{S\,6}\quad\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U}) \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} =\\
-&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}), |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{selected} \mathit{competitor} : \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
-&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) \mathit{selected}\\
-&\quad \mathit{k}),\; (\mathit{hCompetitorCard} : \mathit{competitor}.\mathit{card} =\\
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} : \mathbb{R} ),\;\\
+&\quad (\mathit{hWeight} : \forall \mathit{c}, 0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
+&\quad =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U}),\\
+&\quad |\mathit{mixedDifference} \mathit{F}\\
+&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
+&\quad (\mathit{selected} \mathit{competitor} :\\
+&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
+&\quad \mathit{competitor}.\mathit{card} =\\
 &\quad \mathit{k})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
+\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
 &\quad \mathit{F}) \mathit{selected} -\\
-&\quad \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F}) \mathit{competitor} \leq ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R}\\
-&\quad ) * \mathit{delta} - ((\mathit{selected} \ \mathit{competitor}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) - (\mathit{competitor} \ \mathit{selected}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{competitor} \leq ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{card} :\\
+&\quad \mathbb{R}\\
+&\quad ) * \mathit{delta} - ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{sum}\\
+&\quad (\mathbf{fun} \mathit{j}\\
+&\quad \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) - (\mathit{competitor} \\\
+&\quad \mathit{selected}).\mathit{sum} (\mathbf{fun}\\
+&\quad \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
 &\quad \mathit{j}))) / 2
 \end{aligned} \]}
 
@@ -591,9 +662,15 @@ because $|T|=|S|$.
 {\footnotesize\[ \begin{aligned}[t]
 &\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{DecidableEq}\\
 &\quad \mathit{I}],\; (\mathit{A} \mathit{B} : \mathit{Finset}\\
-&\quad \mathit{I}),\; (\mathit{score} : \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} : \mathbb{R} ),\; (\mathit{hCard} : \mathit{A}.\mathit{card} =\\
-&\quad \mathit{B}.\mathit{card}),\; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j} \in \mathit{B}, \mathit{mu} + \mathit{score} \mathit{j} \leq \mathit{score}\\
+&\quad \mathit{I}),\; (\mathit{score} : \mathit{I}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{mu} : \mathbb{R} ),\;\\
+&\quad (\mathit{hCard} : \mathit{A}.\mathit{card}\\
+&\quad =\\
+&\quad \mathit{B}.\mathit{card}),\; (\mathit{hMargin}\\
+&\quad : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j}\\
+&\quad \in \mathit{B}, \mathit{mu} + \mathit{score}\\
+&\quad \mathit{j} \leq \mathit{score}\\
 &\quad \mathit{i})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -655,26 +732,38 @@ $|A|(2-\rho)>0$.
 \leanbox{\lean{every\_subthreshold\_margin\_fails} in
 \lean{LeanD6SharpMarginThresholdV1}}
 
-\noindent\emph{Supporting results in \lean{LeanD6SharpMarginThresholdV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanD6SharpMarginThresholdV1}.}~These are the threshold. Sufficiency is proved for an arbitrary product reference, including degenerate ones, because its proof uses only the mixed-difference bound and the weight axioms. The equality statement and the sub-threshold failure are both under the corner reference, which is the asymmetry Section~\ref{sec:discussion} reports and the reference sweep of Section~\ref{sec:results} quantifies. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,8}\quad\lean{every\_subthreshold\_margin\_fails}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\; (\mathit{hne} :\\
-&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho} : \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\; (\mathit{hr2} : \mathit{rho} <\\
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
+&\quad (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
+&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
+&\quad \notin \mathit{A}),\; (\mathit{hne} :\\
+&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho}\\
+&\quad : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
+&\quad (\mathit{hr2} : \mathit{rho} <\\
 &\quad 2),\; (\mathit{hbal} :\\
-&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
+&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
 &\quad \mathit{j}).\mathit{card})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})\\
+\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j} \mathit{rho})\\
 &\quad \mathit{i})) \mathit{A} \mathit{A}.\mathit{card}\\
-&\quad \wedge \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j}\\
-&\quad \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \wedge \mathit{productCompressionLoss} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
 &\quad \mathit{rho})) \mathit{Aᶜ} <\\
-&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j}\\
-&\quad \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
+&\quad \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
 &\quad \mathit{rho})) \mathit{A}
 \end{aligned} \]}
 
@@ -682,19 +771,42 @@ $|A|(2-\rho)>0$.
 {\footnotesize\[ \begin{aligned}[t]
 &\{ \mathit{U} : \mathit{Type}*\},\; [\mathit{Fintype}\\
 &\quad \mathit{U}],\; [\mathit{Nonempty} \mathit{U}],\; \{\\
-&\quad \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I} \mathit{n} \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U}) \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} \mathit{rho} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c},0 \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c},\mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall \mathit{i} \mathit{x} \mathit{c},|\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{T} : \mathit{Finset} (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{htop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{i})) \mathit{T}\\
-&\quad \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i} \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\mathit{rho}+\mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
-&\quad \mathit{i})),\; (\mathit{hrho} : 2*\mathit{delta} \leq \mathit{rho}),\; (\mathit{S} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I}\\
+&\quad \mathit{n} \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{rho} : \mathbb{R}\\
+&\quad ),\; (\mathit{hWeight} : \forall \mathit{c},0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\mathit{jointWeight}\\
+&\quad \mathit{q}\\
+&\quad \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall \mathit{i}\\
+&\quad \mathit{x}\\
+&\quad \mathit{c},|\mathit{mixedDifference}\\
+&\quad \mathit{F} \mathit{i} \mathit{x} \mathit{c}|\\
+&\quad \leq \mathit{delta}),\; (\mathit{T} :\\
+&\quad \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{htop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{i} => \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{i})) \mathit{T}\\
+&\quad \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i}\\
+&\quad \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\mathit{rho}+\mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
+&\quad \mathit{q} \mathit{F}\\
+&\quad \mathit{i})),\; (\mathit{hrho} :\\
+&\quad 2*\mathit{delta} \leq \mathit{rho}),\;\\
+&\quad (\mathit{S} : \mathit{Finset} (\mathit{I}\\
 &\quad \mathit{n})),\; (\mathit{hS} :\\
 &\quad \mathit{S}.\mathit{card}=\mathit{k})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q}\\
+\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
 &\quad \mathit{F}) \mathit{T} \leq \mathit{productCompressionLoss}\\
 &\quad \mathit{F} (\mathit{productResponse} \mathit{q}\\
 &\quad \mathit{F}) \mathit{S}
@@ -702,14 +814,27 @@ $|A|(2-\rho)>0$.
 
 \noindent\textbf{S\,10}\quad\lean{steered\_exchange\_equality}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\; (\mathit{rho} : \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\; (\mathit{hbal} :\\
-&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
+&\quad (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
+&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
+&\quad \notin \mathit{A}),\; (\mathit{rho} :\\
+&\quad \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
+&\quad (\mathit{hbal} :\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
+&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
 &\quad \mathit{j}).\mathit{card})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{A}- \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}))\\
+\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
+&\quad \mathit{j} \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{A}-\\
+&\quad \mathit{productCompressionLoss}\\
+&\quad (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})\\
+&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j} \mathit{rho}))\\
 &\quad \mathit{Aᶜ})= (\mathit{A}.\mathit{card}:\mathbb{R}\\
 &\quad )*(2-\mathit{rho})
 \end{aligned} \]}
@@ -722,11 +847,29 @@ Three scope statements belong here rather than in the Discussion, because the re
 over-reading. It is a Top-$C$ optimality threshold, not a minimax value: it says when the
 Top-$C$ rule is optimal among same-cardinality sets, and says nothing about the minimax value
 of the whole same-response fibre, which is a different quantifier and is open. Sufficiency and
-necessity do not share a reference class, as noted above. And robustness to the reference is
-absent, and was checked rather than assumed: an exact rational sweep of the product reference
-$q_{i}(1)=t$ found that at every $t>0$ the Top-$C$ set flips to the optimal set, so the regret
-vanishes and the construction stops witnessing anything. The mechanism is that a full-support
-reference symmetrises two coordinate classes which the corner reference separates.
+necessity do not share a reference class, as noted above. And robustness to the reference
+was measured rather than assumed: an exact rational sweep of the product reference
+$q_{i}(1)=t$, reported in Section~\ref{sec:results}, finds that the witness does not collapse
+the moment the corner is left but degrades continuously, and fails only past a breakdown point
+$t^{\star}(\mu)$ that grows with the margin and is never reached at $\mu=2$. The mechanism is
+that the steered coordinate $j$ accumulates span as the reference acquires interior mass, so
+the separation the corner enforces between $A$ and its complement narrows until $j$ overtakes
+$A$ on score and $A$ is no longer the Top-$C$ set.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig3_threshold.png}
+\caption{The exchange law of \lean{steered\_exchange\_equality}, drawn at $\delta=1$. The
+doubled regret of the Top-$C$ set against its complement is exactly $|A|(2-\rho)$: positive
+below the threshold $\rho=2\delta$, where the construction of
+Theorem~\ref{thm:subthreshold} makes Top-$C$ strictly worse than a same-cardinality
+competitor, and non-positive at and above it, where Theorem~\ref{thm:sufficient} forbids any
+competitor from beating it. The two theorems meet at $\rho=2$ with no gap between them, which
+is what makes the threshold sharp rather than merely bracketed. The lines are the proved
+identity evaluated, not a fit, and the slope $-|A|$ is why a larger selected set is penalised
+more by the same margin deficit.}
+\label{fig:threshold}
+\end{figure}
 
 \subsection{The Separation Certificate on a Cell}
 \label{sec:certificate}
@@ -757,13 +900,18 @@ then the strict separation holds throughout the cell.
 \leanbox{\lean{no\_crossing\_of\_modulus}, \lean{crossing\_bracket} in
 \lean{LeanD6AlternativeReductionV1}}
 
-\noindent\emph{Supporting results in \lean{LeanD6AlternativeReductionV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $4$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanD6AlternativeReductionV1}.}~These are the certificate machinery. The quadratic infimum is given at the vertex and at each endpoint separately, which is what reduces a continuous range of $x$ to three evaluations; the crossing statements then propagate the verdict across a cell by an exact multiplicative factor rather than by sampling within it. They are reproduced as the prover has them; a further $4$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,11}\quad\lean{crossing\_bracket}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\; (\mathit{hc} : \mathit{ContinuousOn} \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0}\\
-&\quad \mathit{t1})),\; (\mathit{h0} : \mathit{f} \mathit{t0} \leq 0),\; (\mathit{h1} : 0 \leq \mathit{f}\\
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
+&\quad \mathit{t1} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
+&\quad (\mathit{hc} : \mathit{ContinuousOn}\\
+&\quad \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0}\\
+&\quad \mathit{t1})),\; (\mathit{h0} : \mathit{f}\\
+&\quad \mathit{t0} \leq 0),\; (\mathit{h1} : 0\\
+&\quad \leq \mathit{f}\\
 &\quad \mathit{t1})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -774,10 +922,19 @@ then the strict separation holds throughout the cell.
 
 \noindent\textbf{S\,12}\quad\lean{no\_crossing\_of\_modulus}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\; (\mathit{hLip} : 0 \leq \mathit{Lip}),\; (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1}, |\mathit{f} \mathit{s} - \mathit{f} \mathit{t0}| \leq \mathit{Lip} * (\mathit{s} -\\
-&\quad \mathit{t0})),\; (\mathit{hm} : \mathit{m} \leq \mathit{f}\\
-&\quad \mathit{t0}),\; (\mathit{hpos} : 0 < \mathit{m}),\; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} - \mathit{t0}) <\\
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
+&\quad \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
+&\quad (\mathit{hLip} : 0 \leq \mathit{Lip}),\;\\
+&\quad (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, |\mathit{f}\\
+&\quad \mathit{s} - \mathit{f} \mathit{t0}|\\
+&\quad \leq \mathit{Lip} * (\mathit{s} -\\
+&\quad \mathit{t0})),\; (\mathit{hm} : \mathit{m}\\
+&\quad \leq \mathit{f}\\
+&\quad \mathit{t0}),\; (\mathit{hpos} : 0 <\\
+&\quad \mathit{m}),\; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} -\\
+&\quad \mathit{t0}) <\\
 &\quad \mathit{m})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -787,12 +944,20 @@ then the strict separation holds throughout the cell.
 
 \noindent\textbf{S\,13}\quad\lean{quadratic\_inf\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} : \mathbb{R}\\
-&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 *\\
-&\quad \mathit{a})),\; (\mathit{hv2} : -\mathit{b} / (2 * \mathit{a}) \leq \mathit{hi})
+&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} :\\
+&\quad \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\;\\
+&\quad (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 *\\
+&\quad \mathit{a})),\; (\mathit{hv2} : -\mathit{b} /\\
+&\quad (2 * \mathit{a}) \leq \mathit{hi})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x} \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 * \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (2 * \mathit{a})) + \mathit{c} \leq \mathit{a} * \mathit{x} ^{2} + \mathit{b} * \mathit{x} +\\
+\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x}\\
+&\quad \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 *\\
+&\quad \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (2 *\\
+&\quad \mathit{a})) + \mathit{c} \leq \mathit{a} *\\
+&\quad \mathit{x} ^{2} +\\
+&\quad \mathit{b} * \mathit{x} +\\
 &\quad \mathit{c}) \wedge \mathit{lo} \leq -\mathit{b} / (2 *\\
 &\quad \mathit{a}) \wedge -\mathit{b} / (2 * \mathit{a})\\
 &\quad \leq \mathit{hi}
@@ -803,6 +968,85 @@ The information \eqref{eq:ib} is quadratic in $x$ with non-negative leading coef
 Lemma~\ref{lem:quadinf} reduces a continuous $x$-range to three evaluations. Both verdicts use
 outward \emph{rational} enclosures and exact gaps rather than floating point, so a certificate
 is a proof about the cell and not a statement about the points sampled in it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig4_affine.png}
+\caption{Why the optimal design is pure except on a threshold. Theorem~\ref{thm:affine} makes
+delivered information affine in the budget split $\eta$, so $I(\eta)$ is a straight line
+between $I_{B}$ at $\eta=0$ and $I_{\mathrm{pair}}/c$ at $\eta=1$, whatever the parameters.
+An affine function on an interval attains its maximum at an endpoint unless its slope is
+zero, so the optimum is pure---all budget to one query type---except on the single surface
+$I_{\mathrm{pair}}=c\,I_{B}$ where the line is flat and every split is optimal. The three
+lines show the two strict cases and the degenerate one. Exact evaluation of
+\eqref{eq:transitioncond}.}
+\label{fig:affine}
+\end{figure}
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+The theorems quantify over all parameters, so the numerical work cannot strengthen them. It
+has two objectives. The first is to confirm that the derived weights agree with the previously
+fitted ones on the cells where the fit was performed, which is a check on the implementation.
+The second concerns a hypothesis rather than an implementation. The sufficiency half of the
+threshold, Theorem~\ref{thm:sufficient}, is proved for an arbitrary product reference; the
+necessity half, Theorem~\ref{thm:subthreshold}, is proved at the corner reference only.
+Nothing in the formal development says what happens between them, and the honest question is
+not whether the witness survives an arbitrary reference---it is not claimed to---but how far
+from the corner it survives, and whether the failure is abrupt or gradual. Experiment~E2
+measures that.
+
+\subsection{Setup}
+
+The design grid is $q\in\{8,16\}$, $\mu\in\{\tfrac14,\tfrac25\}$, $c\in\{\tfrac32,2\}$ and
+$\eta\in\{\tfrac13,\tfrac{13}{20},\tfrac45\}$, giving $24$ cells. The separation certificate
+is evaluated on eight cells, and the pair-query necessity test on twenty.
+
+\subsection{E2: The Reference Sweep}
+\label{sec:e2}
+
+The reference is moved off the corner along the one-parameter product family
+$q_{i}(\mathrm{true})=t$, which places mass $t$ on the true response in every coordinate
+independently and recovers the corner at $t=0$. The grid is the seventeen rationals
+$t=0,\tfrac1{32},\dots,\tfrac12$, crossed with two dimensions $n\in\{6,8\}$ and five margins
+$\rho\in\{1,\tfrac54,\tfrac32,\tfrac74,2\}$---one hundred and seventy cells, of which one
+hundred and sixty have $t>0$.
+
+Two properties of the setup matter more than its size. First, every quantity is computed in
+exact rational arithmetic, so a reported flip is a flip and not a rounding artefact. Second,
+the definitions are not re-derived for the experiment: the gate, the coefficient map, the
+steered world and the compression loss are transcribed from the Lean sources, and the
+transcription is validated before any sweep result is reported. At $t=0$ the transcription
+must reproduce \lean{steered\_span}---oscillation $\rho$ on $A$ and $0$ off it---and
+\lean{steered\_exchange\_equality}---doubled regret exactly $|A|(2-\rho)$. It does, in all
+nine validation configurations and all ten corner cells. A sweep whose code does not
+reproduce the theorems at the one point where the theorems apply is measuring something else,
+and this check is what rules that out.
+
+\subsection{Metrics}
+
+For the design experiment: the two derived weights, the budget residual
+$w_{B}+c\,w_{\mathrm{pair}}-1$, agreement with the fitted values, the certificate verdict per
+cell and which endpoint produced it, and the number of cells in which the pair query carries
+positive weight and its necessity is certified.
+
+For E2, three quantities per cell: whether $A$ is still a Top-$C$ set under the perturbed
+reference, which is the hypothesis of Theorem~\ref{thm:subthreshold}; the doubled regret
+$2(L(A)-L(A^{\complement}))$, which is its conclusion; and the oscillation profile that
+explains the two. Reporting the hypothesis and the conclusion separately is deliberate---they
+fail at different values of $t$, and a single pass/fail per cell would hide that.
+
+\subsection{Statistical Reporting}
+
+Every quantity in this section is exact rational arithmetic; there is no sampling, no seed and
+no confidence interval anywhere in it. E2 is labelled \NUM{} throughout, not because it is
+inexact---it is exact---but because it is a finite sweep of a parameter family and supports no
+universally quantified claim. No result from it is used to support a \PROVED{} one, and where
+it bears on a proved statement, as at $t=0$, it is a check on the transcription rather than
+evidence for the theorem.
 
 \section{Formal Verification}
 \label{sec:verification}
@@ -857,32 +1101,6 @@ ruled it out. The separation certificates are issued per cell, so the file count
 the parameter grid rather than with mathematical content.
 Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $26$ accepted modules carrying $167$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $187$ audited statements of the strand across its $30$ accepted modules, grouped by module.
 
-\section{Experiments}
-
-\subsection{Experimental Objectives}
-
-The theorems quantify over all parameters, so the numerical work cannot strengthen them. It
-has one objective: to confirm that the derived weights agree with the previously fitted ones
-on the cells where the fit was performed, which is a check on the implementation.
-
-\subsection{Setup}
-
-The grid is $q\in\{8,16\}$, $\mu\in\{\tfrac14,\tfrac25\}$, $c\in\{\tfrac32,2\}$ and
-$\eta\in\{\tfrac13,\tfrac{13}{20},\tfrac45\}$, giving $24$ cells. The separation certificate
-is evaluated on eight cells, and the pair-query necessity test on twenty.
-
-\subsection{Metrics}
-
-The two derived weights, the budget residual $w_{B}+c\,w_{\mathrm{pair}}-1$, agreement with
-the fitted values, the certificate verdict per cell and which endpoint produced it, and the
-number of cells in which the pair query carries positive weight and its necessity is
-certified.
-
-\subsection{Statistical Reporting}
-
-Every quantity is exact rational arithmetic; there is no sampling, no seed and no confidence
-interval.
-
 \section{Results}
 \label{sec:results}
 
@@ -926,6 +1144,65 @@ those where the pair weight is zero.}
 \label{fig:certificates}
 \end{figure}
 
+\subsection{How Far From the Corner the Witness Survives}
+\label{sec:refsweep}
+
+The sweep of Section~\ref{sec:e2} answers a question the theorems leave open, and the answer
+is not the one the first draft of this paper assumed.
+
+At $t=0$ the transcription reproduces both proved statements exactly: the oscillation profile
+matches \lean{steered\_span} in all nine validation configurations, and the doubled regret
+equals $|A|(2-\rho)$ in all ten corner cells, to the last bit of exact rational arithmetic.
+The sweep is therefore measuring the construction the theorems describe.
+
+Away from the corner the construction does not collapse. It degrades, continuously and
+predictably. Figure~\ref{fig:reference} plots the doubled regret against $t$: every curve
+leaves its corner value $|A|(2-\rho)$ smoothly and decreases monotonically, and no curve
+drops discontinuously at any $t>0$. What does happen is that the two failure modes separate.
+The hypothesis of Theorem~\ref{thm:subthreshold} fails first in some cells and second in
+others. Its hypothesis is that $A$ is a Top-$C$ set; as $t$ grows, the steered coordinate $j$
+accumulates oscillation---its span rises from $0$ at the corner to $0.91$ at $t=\tfrac12$ in
+the $\rho=1$, $n=6$ cell, while the coordinates of $A$ fall from $1$ to $0.09$---until $j$
+overtakes $A$ and the hypothesis is no longer met. Its conclusion is that the regret is
+positive, which fails at a different $t$.
+
+The breakdown point of the hypothesis rises with the margin, monotonically and in both
+dimensions: at $n=6$ the first flip occurs at $t=\tfrac{7}{32},\tfrac{9}{32},\tfrac{11}{32}$
+and $\tfrac{15}{32}$ for $\rho=1,\tfrac54,\tfrac32,\tfrac74$, and at $n=8$ at
+$t=\tfrac{5}{32},\tfrac{7}{32},\tfrac{9}{32}$ and $\tfrac38$. Across the sweep $61$ of the
+$160$ cells with $t>0$ lose the Top-$C$ property, a rate of $38.1\%$ that falls from $68.8\%$
+at $\rho=1$ to $21.9\%$ at $\rho=\tfrac74$. Once a cell flips it stays flipped: the
+transition is a single threshold in $t$, not an oscillation. \NUM{}
+
+The $\rho=2$ column is the one to read last. At the threshold margin, $A$ remains a Top-$C$
+set at every $t$ on the grid and the doubled regret is non-positive at every $t>0$---the
+Top-$C$ set is never beaten. Theorem~\ref{thm:sufficient} is proved for an arbitrary product
+reference, so the sweep cannot confirm it in the logical sense; what it does is exercise the
+theorem on thirty-two references outside the corner where the necessity construction lives,
+and find no violation. Sufficiency and necessity behave differently off the corner in exactly
+the direction the proofs predict, which is weak evidence, but it is evidence about the part of
+the parameter space no proof here covers.
+
+The practical reading is narrower than the first draft of this paper claimed and broader than
+the theorem states. Necessity is proved at $t=0$ and holds, measurably, in a neighbourhood
+whose size grows with the margin; it is not a corner-only curiosity, and it is not a theorem
+away from the corner either.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig5_reference.png}
+\caption{The necessity construction as the reference leaves the corner, at $n=8$. Each curve
+is the doubled regret $2(L(A)-L(A^{\complement}))$ at one margin, in exact rational
+arithmetic, against the product reference $q_{i}(\mathrm{true})=t$; at $t=0$ the five curves
+begin at $|A|(2-\rho)=4,3,2,1,0$, which is \lean{steered\_exchange\_equality} reproduced by
+the transcription rather than assumed by it. Triangles mark the first $t$ at which $A$ ceases
+to be a Top-$C$ set, so the hypothesis of Theorem~\ref{thm:subthreshold} stops holding; they
+move right as the margin grows and are absent at $\rho=2$, where the set stays Top-$C$
+throughout and the regret is non-positive at every $t>0$. The construction degrades with the
+reference; it does not fail at the first perturbation. \NUM{}}
+\label{fig:reference}
+\end{figure}
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -964,10 +1241,13 @@ hypothesis explicit in the statement.
 given and not re-derived from the sampling model, so an error in either propagates
 downstream---including into \eqref{eq:transitioncond}, which compares them directly.
 
-\emph{The necessity half of the threshold is corner-only.} The reference sweep found the
-construction collapses at every $t>0$, so Theorem~\ref{thm:subthreshold} is a statement about
-corner-reference instances and no claim is made beyond them. This is the most consequential
-limitation of the margin results.
+\emph{The necessity half of the threshold is proved only at the corner.}
+Theorem~\ref{thm:subthreshold} is a statement about corner-reference instances and no claim is
+proved beyond them. The sweep of Section~\ref{sec:results} shows the situation is better than
+that in fact and worse than a theorem: the witness survives a margin-dependent neighbourhood of
+the corner and then fails, and $38.1\%$ of the swept positive-$t$ cells lose the Top-$C$
+property. Necessity away from the corner is measured, not proved, and this is the most
+consequential limitation of the margin results.
 
 \emph{No phase boundary is proved.} Theorem~\ref{thm:affine} identifies where a transition
 \emph{can} occur and does not establish that the condition is met anywhere in the parameter
@@ -981,8 +1261,9 @@ query types---where the budget simplex is no longer an interval and an interior 
 becomes possible---is the second; the objective stays linear so the optimum stays at a
 vertex, but the analogue of Proposition~\ref{prop:nonneg} becomes a polytope rather than an
 interval and it is not obvious it is cut out as cleanly. Third, whether the sharp threshold
-survives a non-corner reference, given that the present construction does not, is open and is
-the question the reference sweep raises rather than settles.
+survives a non-corner reference is open: the sweep shows the present construction survives a
+margin-dependent neighbourhood of the corner and no further, which locates the question
+without settling it.
 
 \section{Conclusion}
 

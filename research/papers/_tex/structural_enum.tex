@@ -1,26 +1,36 @@
 \begin{table}[htbp]
-\caption{Exhaustive enumeration of \emph{every} distinct ordering of $g_{m}$ for
-$5\le m\le12$---57,724 orderings in total. The minimum total defect is $2$ at every $m$,
-confirming Theorem~\ref{thm:everyorderpays}; the minimum path defect is also $2$, so no
-ordering escapes by spreading its payment; and one-defect schedules exist at every budget,
-confirming Theorem~\ref{thm:construction}. The Lean statements quantify over all $m\ge5$,
-so this table checks the implementation rather than extending the theorems.}
+\caption{Every distinct ordering of $g_{m}$, for $5\le m\le120$. The sweep is exhaustive
+and the counts are exact: the prefix-sum summary of a partial ordering fixes everything the
+defect depends on, so each row is a path functional on a graph with $O(m^{2})$ nodes rather
+than an enumeration of $m!$ tuples. The minimum total defect is $2$ at every $m$, confirming
+Theorem~\ref{thm:everyorderpays}; the minimum path defect is also $2$, so no ordering escapes
+by spreading its payment; and one-defect schedules exist at every budget, confirming
+Theorem~\ref{thm:construction}. Rows to $m=13$ were also computed by brute-force enumeration
+and agree in every column. The last column is the fraction of orderings attaining the bound.
+\NUM{}}
 \label{tab:enum}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}rrrrrrcc@{}}
+\begin{tabular}{@{}rlrrrcl@{}}
 \toprule
-$m$ & orderings & bud. & min tot. & min path & covered & pays & covers \\
+$m$ & orderings & min tot. & min path & covered & covers & at bound \\
 \midrule
-5 & 60 & 4 & 2 & 2 & 4 & yes & yes \\
-6 & 180 & 5 & 2 & 2 & 5 & yes & yes \\
-7 & 420 & 6 & 2 & 2 & 6 & yes & yes \\
-8 & 1,120 & 7 & 2 & 2 & 7 & yes & yes \\
-9 & 2,520 & 8 & 2 & 2 & 8 & yes & yes \\
-10 & 6,300 & 9 & 2 & 2 & 9 & yes & yes \\
-11 & 13,860 & 10 & 2 & 2 & 10 & yes & yes \\
-12 & 33,264 & 11 & 2 & 2 & 11 & yes & yes \\
+5 & 60 & 2 & 2 & 4/4 & yes & 0.200 \\
+6 & 180 & 2 & 2 & 5/5 & yes & 0.178 \\
+7 & 420 & 2 & 2 & 6/6 & yes & 0.086 \\
+8 & 1,120 & 2 & 2 & 7/7 & yes & 0.079 \\
+10 & 6,300 & 2 & 2 & 9/9 & yes & 0.036 \\
+12 & 33,264 & 2 & 2 & 11/11 & yes & 0.016 \\
+13 & 72,072 & 2 & 2 & 12/12 & yes & $8.0\times10^{-3}$ \\
+16 & 823,680 & 2 & 2 & 15/15 & yes & $3.6\times10^{-3}$ \\
+20 & 18,475,600 & 2 & 2 & 19/19 & yes & $8.0\times10^{-4}$ \\
+30 & $3.49\times10^{10}$ & 2 & 2 & 29/29 & yes & $2.1\times10^{-5}$ \\
+40 & $5.51\times10^{13}$ & 2 & 2 & 39/39 & yes & $5.6\times10^{-7}$ \\
+60 & $1.06\times10^{20}$ & 2 & 2 & 59/59 & yes & $4.5\times10^{-10}$ \\
+80 & $1.72\times10^{26}$ & 2 & 2 & 79/79 & yes & $3.8\times10^{-13}$ \\
+100 & $2.52\times10^{32}$ & 2 & 2 & 99/99 & yes & $3.3\times10^{-16}$ \\
+120 & $3.47\times10^{38}$ & 2 & 2 & 119/119 & yes & $3.0\times10^{-19}$ \\
 \bottomrule
 \end{tabular}
 \end{table}

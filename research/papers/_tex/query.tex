@@ -33,7 +33,10 @@ the leading constant is genuine. Along the way we supply a scalar-variable
 iterated-derivative sum rule absent from mathlib. Each displayed theorem is machine-checked
 in Lean~4 with no \texttt{sorry}. Simulating two admissible measurements of one pair of
 worlds, $4000$ repetitions per world, gives sample requirements of $4{,}678$ and
-$41{,}006$---a factor of $8.8$ attributable entirely to which measurement was legal.
+$41{,}006$---a factor of $8.8$ attributable entirely to which measurement was legal. Over
+$200$ further instances carrying perturbations of designed order $1$, $2$ and $3$, built so
+that the order is forced and then verified rather than assumed, the measured exponent matches
+$2r$ to within $0.034$ in every one of $600$ cells.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -370,36 +373,46 @@ Theorem~\ref{thm:hermite}---a contradiction.
 \leanbox{\lean{levelSum\_ne\_zero} in \lean{LeanQueryGaussianLevelV1};
 \lean{mixture\_coeff\_ne\_zero} in \lean{LeanQueryMixtureDerivativeV1}}
 
-\noindent\emph{Supporting results in \lean{LeanQueryGaussianLevelV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $2$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanQueryGaussianLevelV1}.}~These build the Gaussian derivatives and prove the one fact the crux argument consumes. The first group establishes the product form \eqref{eq:hermite} and the positivity and shift properties the factorisation in \eqref{eq:nonvanish} needs. The degree bound and the leading coefficient are separate statements because the contradiction in Theorem~\ref{thm:nonvanish} uses the coefficient specifically: a polynomial tending to zero at $+\infty$ must have it vanish, and here it cannot. They are reproduced as the prover has them; a further $2$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{gauss\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{v} \mathit{y} : \mathbb{R}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{v} \mathit{y} : \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{gauss} \sigma (\mathit{y} - \mathit{v})\\
 &\quad = \mathit{gauss} \sigma \mathit{y} *\\
-&\quad \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y} / \sigma ^{2} - \mathit{v} ^{2} / (2 * \sigma ^{2}))
+&\quad \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y} / \sigma ^{2}\\
+&\quad - \mathit{v} ^{2} / (2 * \sigma ^{2}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{hasDerivAt\_gauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{y} : \mathbb{R}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{y} : \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma ) (-(\mathit{y} / \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y})\\
+\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma ) (-(\mathit{y} /\\
+&\quad \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y})\\
 &\quad \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{hasDerivAt\_hgauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{j} : \mathbb{N}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{j} : \mathbb{N}\\
 &\quad ),\; (\mathit{z} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} => (\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} \mathit{w} * \mathit{gauss} \sigma \mathit{w}) ((\mathit{hpoly} \sigma (\mathit{j} + 1)).\mathit{eval} \mathit{z} * \mathit{gauss} \sigma \mathit{z})\\
+\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} => (\mathit{hpoly}\\
+&\quad \sigma \mathit{j}).\mathit{eval} \mathit{w} *\\
+&\quad \mathit{gauss}\\
+&\quad \sigma \mathit{w}) ((\mathit{hpoly} \sigma (\mathit{j} +\\
+&\quad 1)).\mathit{eval} \mathit{z} * \mathit{gauss}\\
+&\quad \sigma \mathit{z})\\
 &\quad \mathit{z}
 \end{aligned} \]}
 
@@ -423,7 +436,8 @@ Theorem~\ref{thm:hermite}---a contradiction.
 
 \noindent\textbf{S\,6}\quad\lean{hpoly\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{n} : \mathbb{N}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{n} : \mathbb{N}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -436,43 +450,61 @@ Theorem~\ref{thm:hermite}---a contradiction.
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{y} : \mathbb{R}\\
-&\quad ), \mathit{iteratedDeriv} \mathit{n} (\mathit{gauss} \sigma )\\
+&\quad ), \mathit{iteratedDeriv} \mathit{n}\\
+&\quad (\mathit{gauss} \sigma )\\
 &\quad \mathit{y} = (\mathit{hpoly} \sigma \mathit{n}).\mathit{eval}\\
 &\quad \mathit{y} * \mathit{gauss} \sigma \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,8}\quad\lean{iteratedDeriv\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall (\mathit{j} : \mathbb{N} ) (\mathit{h₀} : \mathbb{R}\\
-&\quad ), \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
+&\quad ), \mathit{iteratedDeriv} \mathit{j}\\
+&\quad (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
+&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
 &\quad \mathit{g})) \mathit{h₀} = (-\mathit{g}) ^{\mathit{j}}\\
-&\quad * ((\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} (\mathit{y} - \mathit{v} - \mathit{h₀} * \mathit{g}) * \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h₀} *\\
+&\quad * ((\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} (\mathit{y}\\
+&\quad - \mathit{v} - \mathit{h₀} * \mathit{g}) *\\
+&\quad \mathit{gauss} \sigma (\mathit{y}\\
+&\quad - \mathit{v} - \mathit{h₀} *\\
 &\quad \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,9}\quad\lean{levelSum\_eq\_zero\_of\_levels\_agree}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
-&\quad ),\; (\mathit{cA} \mathit{cB} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S}, \mathit{cA} \mathit{v} = \mathit{cB}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N}\\
+&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
+&\quad ),\; (\mathit{cA} \mathit{cB} : \mathbb{R}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S},\\
+&\quad \mathit{cA} \mathit{v} = \mathit{cB}\\
 &\quad \mathit{v}),\; (\mathit{y} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{levelSum} \sigma \mathit{r} \mathit{S}\\
-&\quad \mathit{cA} \mathit{y} - \mathit{levelSum} \sigma \mathit{r}\\
+&\quad \mathit{cA} \mathit{y} - \mathit{levelSum}\\
+&\quad \sigma \mathit{r}\\
 &\quad \mathit{S} \mathit{cB} \mathit{y} = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{levelSum\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{r} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R} ),\; (\mathit{c} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{vstar} : \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{S}),\; (\mathit{htop} : \forall \mathit{v} \in \mathit{S}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{c} \mathit{vstar} \neq 0)
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{r} : \mathbb{N}\\
+&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
+&\quad ),\; (\mathit{c} : \mathbb{R} \to \mathbb{R}\\
+&\quad ),\; (\mathit{vstar} : \mathbb{R} ),\;\\
+&\quad (\mathit{hvs} : \mathit{vstar} \in \mathit{S}),\;\\
+&\quad (\mathit{htop} : \forall \mathit{v} \in \mathit{S},\\
+&\quad \mathit{v} \neq \mathit{vstar} \to \mathit{v}\\
+&\quad <\\
+&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{c}\\
+&\quad \mathit{vstar} \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\exists \mathit{y}, \mathit{levelSum} \sigma \mathit{r}\\
@@ -482,27 +514,37 @@ Theorem~\ref{thm:hermite}---a contradiction.
 \noindent\textbf{S\,11}\quad\lean{sum\_by\_level}
 {\footnotesize\[ \begin{aligned}[t]
 &\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{X}],\; [\mathit{DecidableEq} \mathit{X}],\; (\mathit{pi} \mathit{f} \mathit{w} : \mathit{X} \to \mathbb{R}\\
+&\quad \mathit{X}],\; [\mathit{DecidableEq}\\
+&\quad \mathit{X}],\; (\mathit{pi} \mathit{f}\\
+&\quad \mathit{w} : \mathit{X} \to \mathbb{R}\\
 &\quad ),\; (\mathit{Q} : \mathbb{R} \to \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi}\\
-&\quad \mathit{x} * \mathit{w} \mathit{x} * \mathit{Q} (\mathit{f}\\
+&\quad \mathit{x} * \mathit{w} \mathit{x} *\\
+&\quad \mathit{Q} (\mathit{f}\\
 &\quad \mathit{x}) = \textstyle\sum \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f} \mathit{Finset}.\mathit{univ}, (\textstyle\sum \mathit{x} \in \mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} = \mathit{v}), \mathit{pi} \mathit{x} * \mathit{w}\\
+&\quad \mathit{f} \mathit{Finset}.\mathit{univ}, (\textstyle\sum \mathit{x}\\
+&\quad \in \mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
+&\quad \mathit{x} => \mathit{f} \mathit{x} =\\
+&\quad \mathit{v}), \mathit{pi}\\
+&\quad \mathit{x} * \mathit{w}\\
 &\quad \mathit{x}) * \mathit{Q} \mathit{v}
 \end{aligned} \]}
 
 
-\noindent\emph{Supporting results in \lean{LeanQueryMixtureDerivativeV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanQueryMixtureDerivativeV1}.}~These move the derivative through the finite mixture and state both halves of \eqref{eq:order}. The smoothness of a component is proved rather than assumed, because mathlib's multilinear sum rule requires it and assuming it would leave the paper's own contribution resting on an unproved side condition. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,12}\quad\lean{contDiff\_component}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g} \mathit{y} : \mathbb{R}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g} \mathit{y} :\\
+&\quad \mathbb{R}\\
 &\quad ),\; (\mathit{n} : \mathbb{N} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun} \mathit{h}\\
+&\quad : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
+&\quad \mathit{h} *\\
 &\quad \mathit{g}))
 \end{aligned} \]}
 
@@ -511,53 +553,104 @@ Theorem~\ref{thm:hermite}---a contradiction.
 &\{ \iota : \mathit{Type}*\},\; \{ \mathit{u} :\\
 &\quad \mathit{Finset} \iota \},\; \{ \mathit{n} : \mathbb{N}\\
 &\quad \},\; \{ \mathit{F} : \iota \to \mathbb{R}\\
-&\quad \to \mathbb{R} \},\; \{ \mathit{x} : \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u}, \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F} \mathit{i})\\
+&\quad \to \mathbb{R} \},\; \{ \mathit{x} :\\
+&\quad \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u},\\
+&\quad \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F}\\
+&\quad \mathit{i})\\
 &\quad \mathit{x})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun} \mathit{z} => \textstyle\sum \mathit{i} \in \mathit{u}, \mathit{F} \mathit{i}\\
-&\quad \mathit{z}) \mathit{x} = \textstyle\sum \mathit{i} \in \mathit{u},\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun} \mathit{z} =>\\
+&\quad \textstyle\sum \mathit{i} \in \mathit{u},\\
+&\quad \mathit{F} \mathit{i}\\
+&\quad \mathit{z}) \mathit{x} = \textstyle\sum \mathit{i}\\
+&\quad \in \mathit{u},\\
 &\quad \mathit{iteratedDeriv} \mathit{n} (\mathit{F}\\
 &\quad \mathit{i}) \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{S\,14}\quad\lean{iteratedDeriv\_mixture}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j} : \mathbb{N}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
+&\quad ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j}\\
+&\quad : \mathbb{N}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} - \mathit{h} * \mathit{g}\\
-&\quad \mathit{x})) 0 = \mathit{levelSum} \sigma \mathit{j} (\mathit{Finset}.\mathit{image} \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}) (\mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g}\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} :\\
+&\quad \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
+&\quad \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} -\\
+&\quad \mathit{f} \mathit{x} - \mathit{h} * \mathit{g}\\
+&\quad \mathit{x})) 0 = \mathit{levelSum} \sigma \mathit{j}\\
+&\quad (\mathit{Finset}.\mathit{image} \mathit{f}\\
+&\quad \mathit{Finset}.\mathit{univ})\\
+&\quad (\mathit{levelMoment} \mathit{pi} \mathit{f}\\
+&\quad \mathit{g}\\
 &\quad \mathit{j}) \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,15}\quad\lean{mixture\_coeff\_diff\_eq\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB} \mathit{fB} \mathit{gB} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{y} : \mathbb{R}\\
-&\quad ),\; (\mathit{hS} : \mathit{Finset}.\mathit{image} \mathit{fB} \mathit{Finset}.\mathit{univ} = \mathit{Finset}.\mathit{image} \mathit{fA}\\
-&\quad \mathit{Finset}.\mathit{univ}),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{fA} \mathit{Finset}.\mathit{univ}, \mathit{levelMoment} \mathit{piA} \mathit{fA} \mathit{gA} \mathit{j} \mathit{v} = \mathit{levelMoment} \mathit{piB} \mathit{fB} \mathit{gB} \mathit{j}\\
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB} \mathit{fB}\\
+&\quad \mathit{gB} : \mathit{X} \to \mathbb{R}\\
+&\quad ),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{y}\\
+&\quad : \mathbb{R}\\
+&\quad ),\; (\mathit{hS} :\\
+&\quad \mathit{Finset}.\mathit{image} \mathit{fB}\\
+&\quad \mathit{Finset}.\mathit{univ} =\\
+&\quad \mathit{Finset}.\mathit{image} \mathit{fA}\\
+&\quad \mathit{Finset}.\mathit{univ}),\;\\
+&\quad (\mathit{hagree} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
+&\quad \mathit{fA} \mathit{Finset}.\mathit{univ},\\
+&\quad \mathit{levelMoment} \mathit{piA} \mathit{fA}\\
+&\quad \mathit{gA} \mathit{j} \mathit{v} =\\
+&\quad \mathit{levelMoment} \mathit{piB} \mathit{fB}\\
+&\quad \mathit{gB} \mathit{j}\\
 &\quad \mathit{v})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{piA} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fA} \mathit{x} - \mathit{h} * \mathit{gA}\\
-&\quad \mathit{x})) 0 - \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{piB} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fB} \mathit{x} - \mathit{h} * \mathit{gB}\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} :\\
+&\quad \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
+&\quad \mathit{piA} \mathit{x} * \mathit{gauss}\\
+&\quad \sigma (\mathit{y} -\\
+&\quad \mathit{fA} \mathit{x} - \mathit{h} * \mathit{gA}\\
+&\quad \mathit{x})) 0 - \mathit{iteratedDeriv}\\
+&\quad \mathit{j} (\mathbf{fun} \mathit{h} :\\
+&\quad \mathbb{R} => \textstyle\sum \mathit{x} :\\
+&\quad \mathit{X}, \mathit{piB} \mathit{x} *\\
+&\quad \mathit{gauss} \sigma (\mathit{y} -\\
+&\quad \mathit{fB} \mathit{x} - \mathit{h} *\\
+&\quad \mathit{gB}\\
 &\quad \mathit{x})) 0 = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{mixture\_coeff\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{vstar} : \mathbb{R}\\
-&\quad ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{Finset}.\mathit{image} \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}),\; (\mathit{htop} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g} \mathit{r} \mathit{vstar} \neq 0)
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
+&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{N} ),\;\\
+&\quad (\mathit{vstar} : \mathbb{R}\\
+&\quad ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{Finset}.\mathit{image}\\
+&\quad \mathit{f}\\
+&\quad \mathit{Finset}.\mathit{univ}),\;\\
+&\quad (\mathit{htop} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
+&\quad \mathit{f} \mathit{Finset}.\mathit{univ},\\
+&\quad \mathit{v} \neq \mathit{vstar} \to \mathit{v}\\
+&\quad <\\
+&\quad \mathit{vstar}),\; (\mathit{hc} :\\
+&\quad \mathit{levelMoment} \mathit{pi} \mathit{f}\\
+&\quad \mathit{g} \mathit{r} \mathit{vstar}\\
+&\quad \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{y}, \mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} - \mathit{h} * \mathit{g}\\
+\vdash\;&\exists \mathit{y}, \mathit{iteratedDeriv}\\
+&\quad \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
+&\quad \textstyle\sum \mathit{x} : \mathit{X},\\
+&\quad \mathit{pi} \mathit{x} *\\
+&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} -\\
+&\quad \mathit{h} * \mathit{g}\\
 &\quad \mathit{x})) 0 \neq 0
 \end{aligned} \]}
 
@@ -601,15 +694,26 @@ constructed and proved integrable rather than assumed, gives $H^{2}\le(J/2)h^{2r
 \leanbox{\lean{hellinger\_lower\_from\_interval} in \lean{LeanQueryHellingerIntervalV1};
 \lean{hellinger\_upper\_const} in \lean{LeanQueryTaylorRemainderV1}}
 
-\noindent\emph{Supporting results in \lean{LeanQueryTaylorRemainderV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $2$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanQueryTaylorRemainderV1}.}~These supply the upper side of the sandwich. The envelope is constructed and its integrability proved; the $\chi^{2}$ comparison and the vanishing-derivative bound then convert a Taylor remainder into the constant $J/2$. The derivative-on-an-interval lemma appears because the remainder is controlled on a closed interval and the ambient derivative must be identified with the one-sided derivative there. They are reproduced as the prover has them; a further $2$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,17}\quad\lean{bound\_of\_vanishing\_derivs}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N}\\
-&\quad ),\; (\mathit{b} \mathit{C} : \mathbb{R} ),\; (\mathit{hb} : 0 <\\
-&\quad \mathit{b}),\; (\mathit{hcd} : \mathit{ContDiffOn} \mathbb{R} (\mathit{n} + 1 : \mathbb{N} ) \mathit{F} (\mathit{Icc} 0\\
-&\quad \mathit{b})),\; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n}, \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} (\mathit{Icc} 0 \mathit{b}) 0 =\\
-&\quad 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc} (0:\mathbb{R} ) \mathit{b}, |\mathit{iteratedDerivWithin} (\mathit{n} + 1) \mathit{F} (\mathit{Icc} 0 \mathit{b}) \mathit{y}| \leq \mathit{C})
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} :\\
+&\quad \mathbb{N}\\
+&\quad ),\; (\mathit{b} \mathit{C} : \mathbb{R} ),\;\\
+&\quad (\mathit{hb} : 0 <\\
+&\quad \mathit{b}),\; (\mathit{hcd} :\\
+&\quad \mathit{ContDiffOn} \mathbb{R} (\mathit{n} + 1 : \mathbb{N}\\
+&\quad ) \mathit{F} (\mathit{Icc} 0\\
+&\quad \mathit{b})),\; (\mathit{hv} : \forall \mathit{j}\\
+&\quad \leq \mathit{n}, \mathit{iteratedDerivWithin}\\
+&\quad \mathit{j} \mathit{F} (\mathit{Icc} 0\\
+&\quad \mathit{b}) 0 =\\
+&\quad 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc}\\
+&\quad (0:\mathbb{R} ) \mathit{b},\\
+&\quad |\mathit{iteratedDerivWithin} (\mathit{n} + 1)\\
+&\quad \mathit{F} (\mathit{Icc} 0 \mathit{b})\\
+&\quad \mathit{y}| \leq \mathit{C})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&|\mathit{F} \mathit{b}| \leq \mathit{C} * \mathit{b}\\
@@ -618,25 +722,39 @@ constructed and proved integrable rather than assumed, gives $H^{2}\le(J/2)h^{2r
 
 \noindent\textbf{S\,18}\quad\lean{component\_deriv\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y} \xi : \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} : |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})
+&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y} \xi :\\
+&\quad \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{N} ),\;\\
+&\quad (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} :\\
+&\quad |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
-&\quad \mathit{g})) \xi | \leq |\mathit{g}| ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval} (\mathit{y} - \mathit{v} - \xi *\\
-&\quad \mathit{g})| * \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) / (2 * \sigma ^{2}) + \mathit{M} * |\mathit{y}| / \sigma ^{2})
+\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} :\\
+&\quad \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
+&\quad \mathit{h} *\\
+&\quad \mathit{g})) \xi | \leq |\mathit{g}|\\
+&\quad ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval}\\
+&\quad (\mathit{y} - \mathit{v} - \xi *\\
+&\quad \mathit{g})| * \mathit{Real}.\mathit{exp} (-(\mathit{y}\\
+&\quad ^{2}) / (2 * \sigma ^{2}) + \mathit{M} *\\
+&\quad |\mathit{y}| / \sigma ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{S\,19}\quad\lean{derivWithin\_eq\_deriv\_on\_Icc}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N}\\
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} :\\
+&\quad \mathbb{N}\\
 &\quad ),\; (\mathit{a} \mathit{b} \mathit{x} : \mathbb{R}\\
-&\quad ),\; (\mathit{hab} : \mathit{a} < \mathit{b}),\; (\mathit{hF} : \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N} \infty )\\
-&\quad \mathit{F}),\; (\mathit{hx} : \mathit{x} \in \mathit{Icc} \mathit{a}\\
+&\quad ),\; (\mathit{hab} : \mathit{a} <\\
+&\quad \mathit{b}),\; (\mathit{hF} :\\
+&\quad \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N} \infty )\\
+&\quad \mathit{F}),\; (\mathit{hx} : \mathit{x} \in \mathit{Icc}\\
+&\quad \mathit{a}\\
 &\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDerivWithin} \mathit{n} \mathit{F} (\mathit{Icc} \mathit{a}\\
+\vdash\;&\mathit{iteratedDerivWithin} \mathit{n}\\
+&\quad \mathit{F} (\mathit{Icc} \mathit{a}\\
 &\quad \mathit{b}) \mathit{x} = \mathit{iteratedDeriv}\\
 &\quad \mathit{n} \mathit{F} \mathit{x}
 \end{aligned} \]}
@@ -646,15 +764,21 @@ constructed and proved integrable rather than assumed, gives $H^{2}\le(J/2)h^{2r
 &(\sigma \mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty ) (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty )\\
+&\quad (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y}\\
+&\quad - \mathit{v} - \mathit{h} *\\
 &\quad \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,21}\quad\lean{taylor\_vanishing\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{s} : \mathit{Set} \mathbb{R}\\
-&\quad ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N}\\
-&\quad ),\; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n}, \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} \mathit{s} 0 =\\
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{s} :\\
+&\quad \mathit{Set} \mathbb{R}\\
+&\quad ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n}\\
+&\quad : \mathbb{N}\\
+&\quad ),\; (\mathit{hv} : \forall \mathit{j}\\
+&\quad \leq \mathit{n}, \mathit{iteratedDerivWithin}\\
+&\quad \mathit{j} \mathit{F} \mathit{s} 0 =\\
 &\quad 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -736,20 +860,35 @@ $2\cdot(J/2)/(a_{E}^{2}/32)=16J/a_{E}^{2}$.
 \leanbox{\lean{sufficient\_count}, \lean{necessary\_count}, \lean{ceil\_suffices},
 \lean{matching\_rate} in \lean{LeanQuerySampleComplexityV1}}
 
-\noindent\emph{Supporting results in \lean{LeanQuerySampleComplexityV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $7$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanQuerySampleComplexityV1}.}~These transport the sandwich to sample counts. The two logarithm bounds are what give Lemma~\ref{lem:logsandwich} its factor of two, and \lean{ceil\_suffices} is stated separately because the passage from a real requirement to an integer count is exactly where an off-by-one would hide. They are reproduced as the prover has them; a further $7$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,22}\quad\lean{matching\_rate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus} \mathit{h2r} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hH0} : 0 \leq \mathit{H2}),\; (\mathit{hH1} : \mathit{H2} \leq 1/2),\; (\mathit{hLdef} : \mathit{L} = -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2})),\; (\mathit{hlo} : \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus} *\\
-&\quad \mathit{h2r}),\; (\mathit{heps} : 0 < \mathit{eps}),\; (\mathit{hcm} : 0 <\\
-&\quad \mathit{cminus}),\; (\mathit{hh} : 0 < \mathit{h2r}),\; (\mathit{hsuff} : \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) * (\mathit{cminus} *\\
+&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus}\\
+&\quad \mathit{h2r} \mathit{eps} : \mathbb{R}\\
+&\quad ),\; (\mathit{N} : \mathbb{N} ),\;\\
+&\quad (\mathit{hH0} : 0 \leq \mathit{H2}),\;\\
+&\quad (\mathit{hH1} : \mathit{H2} \leq 1/2),\;\\
+&\quad (\mathit{hLdef} : \mathit{L} =\\
+&\quad -\mathit{Real}.\mathit{log} (1 -\\
+&\quad \mathit{H2})),\; (\mathit{hlo} :\\
+&\quad \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\;\\
+&\quad (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus}\\
+&\quad *\\
+&\quad \mathit{h2r}),\; (\mathit{heps} : 0 <\\
+&\quad \mathit{eps}),\; (\mathit{hcm} : 0 <\\
+&\quad \mathit{cminus}),\; (\mathit{hh} : 0 <\\
+&\quad \mathit{h2r}),\; (\mathit{hsuff} :\\
+&\quad \mathit{Real}.\mathit{log} (1 / (2 *\\
+&\quad \mathit{eps})) \leq (\mathit{N} : \mathbb{R} )\\
+&\quad * (\mathit{cminus} *\\
 &\quad \mathit{h2r}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L} \leq 2 * (\mathit{cplus} *\\
-&\quad \mathit{h2r})) \wedge \mathit{Real}.\mathit{log} (1 / (2 *\\
+\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L}\\
+&\quad \leq 2 * (\mathit{cplus} *\\
+&\quad \mathit{h2r})) \wedge \mathit{Real}.\mathit{log}\\
+&\quad (1 / (2 *\\
 &\quad \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) *\\
 &\quad \mathit{L}
 \end{aligned} \]}
@@ -773,44 +912,86 @@ $L_{\max}=\tfrac{2401}{4096}$, both exact rationals read off the loss geometry.
 \leanbox{\lean{regret\_ge\_gamma\_error}, \lean{lrt\_regret\_le},
 \lean{bayes\_regret\_window} in \lean{LeanQueryRegretBridgeV1}}
 
-\noindent\emph{Supporting results in \lean{LeanQueryRegretBridgeV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $3$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanQueryRegretBridgeV1}.}~These convert an error probability into a regret window. The two loss-geometry constants enter through the inside and outside costs, and the likelihood-ratio bound supplies the upper end; the two ends carry different powers of the affinity, which is why the window widens rather than closes. They are reproduced as the prover has them; a further $3$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,23}\quad\lean{lrt\_regret\_le}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{aA} \mathit{aB} : \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R}\\
-&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB}\\
+&\quad ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\;\\
+&\quad (\mathit{lA} \mathit{lB} : \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{aA} \mathit{aB} :\\
+&\quad \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R}\\
+&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
+&\quad \leq \mathit{PA}\\
+&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h},\\
+&\quad 0 \leq \mathit{PB}\\
 &\quad \mathit{h}),\; (\mathit{hA0} : \mathit{lA} \mathit{aA} =\\
-&\quad 0),\; (\mathit{hB0} : \mathit{lB} \mathit{aB} = 0),\; (\mathit{hAx} : \mathit{lA} \mathit{aB} \leq \mathit{Lmax}),\; (\mathit{hBx} : \mathit{lB} \mathit{aA} \leq \mathit{Lmax})
+&\quad 0),\; (\mathit{hB0} : \mathit{lB} \mathit{aB}\\
+&\quad = 0),\; (\mathit{hAx} : \mathit{lA}\\
+&\quad \mathit{aB} \leq \mathit{Lmax}),\;\\
+&\quad (\mathit{hBx} : \mathit{lB} \mathit{aA}\\
+&\quad \leq \mathit{Lmax})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * \mathit{lA} (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * \mathit{lB} (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else}\\
-&\quad \mathit{aB})) / 2 \leq \mathit{Lmax} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (0:\mathbb{R} ) \mathbf{else} 1) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)) /\\
+\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * \mathit{lA}\\
+&\quad (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA}\\
+&\quad \mathbf{else} \mathit{aB}) + \textstyle\sum \mathit{h},\\
+&\quad \mathit{PB} \mathit{h} * \mathit{lB} (\mathbf{if} \mathit{dec}\\
+&\quad \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else}\\
+&\quad \mathit{aB})) / 2 \leq \mathit{Lmax} *\\
+&\quad ((\textstyle\sum \mathit{h}, \mathit{PA}\\
+&\quad \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then}\\
+&\quad (0:\mathbb{R} ) \mathbf{else} 1) +\\
+&\quad \textstyle\sum \mathit{h}, \mathit{PB}\\
+&\quad \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then}\\
+&\quad (1:\mathbb{R} ) \mathbf{else} 0)) /\\
 &\quad 2)
 \end{aligned} \]}
 
 \noindent\textbf{S\,24}\quad\lean{regret\_ge\_gamma\_error}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{D} : \mathit{H} \to \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{D} : \mathit{H} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{lA} \mathit{lB} : \mathit{Act}\\
+&\quad \to \mathbb{R}\\
 &\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R} ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB}\\
-&\quad \mathit{h}),\; (\mathit{hD} : \forall \mathit{h} \mathit{a}, 0 \leq \mathit{D} \mathit{h}\\
-&\quad \mathit{a}),\; (\mathit{hDsum} : \forall \mathit{h}, \textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} =\\
-&\quad 1),\; (\mathit{hlA} : \forall \mathit{a}, 0 \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hlB} : \forall \mathit{a}, 0 \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hA} : \forall \mathit{a} \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hB} : \forall \mathit{a} \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hdis} : \mathit{Disjoint} \mathit{GA}\\
+&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
+&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
+&\quad \leq \mathit{PA}\\
+&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h},\\
+&\quad 0 \leq \mathit{PB}\\
+&\quad \mathit{h}),\; (\mathit{hD} : \forall \mathit{h}\\
+&\quad \mathit{a}, 0 \leq \mathit{D} \mathit{h}\\
+&\quad \mathit{a}),\; (\mathit{hDsum} : \forall \mathit{h},\\
+&\quad \textstyle\sum \mathit{a}, \mathit{D}\\
+&\quad \mathit{h} \mathit{a} =\\
+&\quad 1),\; (\mathit{hlA} : \forall \mathit{a}, 0\\
+&\quad \leq \mathit{lA}\\
+&\quad \mathit{a}),\; (\mathit{hlB} : \forall \mathit{a},\\
+&\quad 0 \leq \mathit{lB}\\
+&\quad \mathit{a}),\; (\mathit{hA} : \forall \mathit{a}\\
+&\quad \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA}\\
+&\quad \mathit{a}),\; (\mathit{hB} : \forall \mathit{a}\\
+&\quad \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB}\\
+&\quad \mathit{a}),\; (\mathit{hdis} :\\
+&\quad \mathit{Disjoint} \mathit{GA}\\
 &\quad \mathit{GB})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (1 - \textstyle\sum \mathit{a} \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a})) /\\
-&\quad 2) \leq (\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lA} \mathit{a}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lB}\\
+\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h}, \mathit{PA}\\
+&\quad \mathit{h} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
+&\quad \mathit{D} \mathit{h} \mathit{a}) +\\
+&\quad \textstyle\sum \mathit{h},\\
+&\quad \mathit{PB} \mathit{h} * (1 - \textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
+&\quad \mathit{D} \mathit{h} \mathit{a})) /\\
+&\quad 2) \leq (\textstyle\sum \mathit{h},\\
+&\quad \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D}\\
+&\quad \mathit{h} \mathit{a} * \mathit{lA}\\
+&\quad \mathit{a}) + \textstyle\sum \mathit{h},\\
+&\quad \mathit{PB} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D}\\
+&\quad \mathit{h} \mathit{a} * \mathit{lB}\\
 &\quad \mathit{a})) / 2
 \end{aligned} \]}
 
@@ -896,6 +1077,99 @@ arithmetic on the mixture data, so candidate queries can be compared before any 
 collected. And step~11 has an explicit failure mode rather than a silent one, which is the
 honest output given that Theorem~\ref{thm:nonvanish} does not cover ties.
 
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+The theorems are proved, so the simulation cannot strengthen them. It has three objectives.
+The first is to check that the chain from Theorem~\ref{thm:sandwich} through
+Theorem~\ref{thm:regret} is arithmetically consistent, which a slip in any constant would
+break. The second is to measure the quantity the theorems predict but do not compute: how
+much the sample requirement changes when only the admissible measurement changes. The third
+is generalisation. Theorem~\ref{thm:sandwich} pins the exponent at $2r$ for every instance in
+its hypotheses, and a single pair of worlds cannot distinguish a law from a coincidence;
+Experiment~E2 therefore asks whether the exponent is $2r$ on two hundred independently drawn
+instances, at three different orders.
+
+\subsection{Setup}
+
+Two admissible measurements of the \emph{same} pair of worlds were simulated at $h=0.6$ with
+$4000$ repetitions per world: a normalised measurement of leakage order $2$ and a normalised
+measurement of leakage order $1$. The worlds $f_{0},f_{1}$, the noise scale $\sigma$ and the
+perturbation scale $h$ are identical across the two runs; only $g$ differs.
+
+\subsection{E2: The Exponent Across Instances and Orders}
+\label{sec:e2}
+
+\emph{Why the instance must carry two worlds.} An earlier version of this experiment drew $g$
+at random around a single world and obtained leakage order $1$ on every instance, which tests
+nothing. A second version tried to force higher orders by requiring the weighted level moments
+$\sum_{x\in\text{level}}\pi_{x}g(x)^{j}$ to vanish below the order. That is impossible for
+$j=2$: the weights are positive, so the moment is a sum of non-negative terms and vanishes
+only when $g$ does. Both failures came from modelling one world and a perturbation, whereas
+Theorem~\ref{thm:cancel} is a statement about \emph{two} worlds sharing a level set---the
+quantities that must agree below the order are $M^{(0)}_{j}(v)$ and $M^{(1)}_{j}(v)$, and
+their equality is a difference of two positive sums rather than the vanishing of one. Order
+three is unreachable in the first model and routine in the second, and recording this is the
+difference between an experiment that can fail and one that cannot.
+
+\emph{Instances.} Two hundred instances are drawn from declared ranges: two to four levels,
+four to six indices per level, level values drawn without replacement from
+$\{-3,\dots,3\}$, $\sigma\sim\mathrm{Unif}[0.7,1.5]$ and weights Dirichlet. World~$1$ is
+world~$0$ with a block of indices exchanged between two levels at equal weight, which
+preserves every level's mass exactly, so the two worlds are identical at $h=0$ and the
+leakage order is well posed.
+
+\emph{Designing the order.} On the exchanged block, $g$ takes the values of a
+Prouhet--Thue--Morse pair: splitting $\{0,\dots,2^{r}-1\}$ by the parity of the binary digit
+sum yields two sets whose $j$-th power sums agree for every $j<r$ and differ at $j=r$. The
+construction is invariant under the affine maps $u\mapsto\alpha u+\beta$, so scale and offset
+are randomised per instance without disturbing the order. Off the block, $g$ is drawn at
+random and cancels identically, because those indices sit in the same level in both worlds.
+Designed orders $r=1,2,3$ are used.
+
+\emph{Verification, not assumption.} The order is then recomputed from the level coefficients
+by the procedure of Section~\ref{sec:procedure} and compared with the designed one; a cell
+whose top level is tied is reported as undetermined rather than counted. A self-check runs
+before the sweep and must pass for it to be reported at all: level masses must agree to
+machine precision, the verified order must equal the designed order on every check instance,
+and $H^{2}$ must be stable between the working quadrature grid and one twice as fine and
+twice as wide.
+
+\emph{Measurement.} $H^{2}$ between the two worlds is computed by quadrature on a
+fourteen-point grid $h=0.5\cdot0.6^{i}$ reaching $6.5\times10^{-4}$. The exponent is
+estimated by least squares on the asymptotic tail only, $h\le0.023$; the full-grid fit is
+reported next to it rather than the pre-asymptotic points being dropped silently, because the
+difference between the two is itself informative about where the asymptotic regime begins.
+
+\subsection{Baselines and Comparison}
+
+The comparison is between the two measurements, not against an external baseline: the point
+is to isolate the effect of the measurement while holding everything else fixed. The
+per-sample $H^{2}$ is computed directly from \eqref{eq:mixture} in both cases rather than
+through the sandwich, so the reported divergences are properties of the measurements and not
+consequences of Theorem~\ref{thm:sandwich}.
+
+\subsection{Metrics}
+
+The reported quantities are the per-sample $H^{2}$ and $L$, the required sample count $N$
+from Theorem~\ref{thm:samples}, the measured Bayes regret under an equal prior, a percentile
+bootstrap interval, and the two ends of the window \eqref{eq:regret}.
+
+\subsection{Statistical Reporting}
+
+Uncertainty is a percentile bootstrap over the $8000$ per-repetition regrets with $2000$
+resamples. Experiment~E2 contains no sampling in its main measurement---$H^{2}$ is a
+quadrature of a density, not an average over draws---so it carries no confidence interval;
+what it carries instead is the quadrature self-check, which bounds the only error it can have.
+Where E2 does simulate, to confirm that the sample count derived from $H^{2}$ achieves the
+target error, three independent seeds of $2000$ repetitions per world are used and the
+seed-to-seed spread is retained. The window endpoints are computed in exact rational arithmetic where the loss
+geometry permits ($\gamma=13983/32768$, $L_{\max}=2401/4096$) and in double precision
+otherwise. Evidence classes are kept apart: \PROVED{}, \CERT{} and \NUM{} are distinguished
+throughout and no \NUM{} result supports a \PROVED{} one.
+
 \section{Formal Verification}
 \label{sec:verification}
 
@@ -951,45 +1225,6 @@ smoothness hypothesis in Theorem~\ref{thm:sumswap} was initially assumed rather 
 which would have left the paper's main technical contribution resting on an unproved side
 condition. Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $8$ accepted modules carrying $49$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $87$ audited statements of the strand across its $13$ accepted modules, grouped by module.
 
-\section{Experiments}
-
-\subsection{Experimental Objectives}
-
-The theorems are proved, so the simulation cannot strengthen them. It has two objectives.
-The first is to check that the chain from Theorem~\ref{thm:sandwich} through
-Theorem~\ref{thm:regret} is arithmetically consistent, which a slip in any constant would
-break. The second is to measure the quantity the theorems predict but do not compute: how
-much the sample requirement changes when only the admissible measurement changes.
-
-\subsection{Setup}
-
-Two admissible measurements of the \emph{same} pair of worlds were simulated at $h=0.6$ with
-$4000$ repetitions per world: a normalised measurement of leakage order $2$ and a normalised
-measurement of leakage order $1$. The worlds $f_{0},f_{1}$, the noise scale $\sigma$ and the
-perturbation scale $h$ are identical across the two runs; only $g$ differs.
-
-\subsection{Baselines and Comparison}
-
-The comparison is between the two measurements, not against an external baseline: the point
-is to isolate the effect of the measurement while holding everything else fixed. The
-per-sample $H^{2}$ is computed directly from \eqref{eq:mixture} in both cases rather than
-through the sandwich, so the reported divergences are properties of the measurements and not
-consequences of Theorem~\ref{thm:sandwich}.
-
-\subsection{Metrics}
-
-The reported quantities are the per-sample $H^{2}$ and $L$, the required sample count $N$
-from Theorem~\ref{thm:samples}, the measured Bayes regret under an equal prior, a percentile
-bootstrap interval, and the two ends of the window \eqref{eq:regret}.
-
-\subsection{Statistical Reporting}
-
-Uncertainty is a percentile bootstrap over the $8000$ per-repetition regrets with $2000$
-resamples. The window endpoints are computed in exact rational arithmetic where the loss
-geometry permits ($\gamma=13983/32768$, $L_{\max}=2401/4096$) and in double precision
-otherwise. Evidence classes are kept apart: \PROVED{}, \CERT{} and \NUM{} are distinguished
-throughout and no \NUM{} result supports a \PROVED{} one.
-
 \section{Results}
 \label{sec:results}
 
@@ -1030,6 +1265,20 @@ Inside the window       & yes                 & yes \\
 
 \input{query_cells}
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig5_window.png}
+\caption{The proved regret window and the measurement inside it. The two envelopes are
+\eqref{eq:regret} evaluated with the exact constants $\gamma=13983/32768$ and
+$L_{\max}=2401/4096$; they close at different rates in $N$---the lower like $\rho^{2N}$ and
+the upper like $\rho^{N}$---so the window is wide on a logarithmic axis and narrows as the
+sample count grows. The marker is the measured equal-prior regret of the order-$2$
+measurement at its required $N$. A window this wide is a weak prediction and the figure is
+drawn to make that visible rather than to hide it: what the measurement rules out is an
+arithmetic slip in the constants, not a competing theory. \NUM{}}
+\label{fig:window}
+\end{figure}
+
 \subsection{The Same Worlds, a Different Legal Query, an Order of Magnitude}
 
 The ratio $41{,}006/4{,}678\approx8.8$ is not a property of the worlds. They are identical
@@ -1052,6 +1301,88 @@ constants of Theorem~\ref{thm:sandwich}, with $r_{1}-r_{2}=1$ and $h=0.6$ here. 
 would roughly quadruple it. This is the operational content of ``the order is a property of
 the query'': the penalty for the wrong measurement is not additive and does not wash out
 with more data---it is an exponent, and it compounds as the regime gets harder.
+
+\subsection{The Exponent Is $2r$ on Every Instance Drawn}
+\label{sec:e2results}
+
+Experiment~E2 of Section~\ref{sec:e2} draws two hundred instances and builds, on each, a
+perturbation of designed leakage order $1$, $2$ and $3$. Three facts are reported in the order
+in which they must be established.
+
+First, the construction does what it claims. The self-check, which the run requires to pass
+before it will report anything, finds the two worlds' level masses agreeing to
+$1.1\times10^{-16}$---so they are identical at $h=0$ and the order is well posed---and the
+independently recomputed order equal to the designed one on every check instance. Across the
+sweep proper, the order recovered from the level coefficients equals the designed order in all
+$600$ cells, with no cell falling into the tied-top-level case that Section~\ref{sec:procedure}
+sets aside. \NUM{}
+
+Second, the exponent. Figure~\ref{fig:order} plots $H^{2}$ against $h$ for representative
+instances at each order; the three groups separate into fans of slope $2$, $4$ and $6$ and do
+not cross. Fitted on the asymptotic tail, the slope deviates from $2r$ by $0.0052$ in
+root-mean-square and by at most $0.0336$ over all $600$ cells, and the mean deviation is
+$-0.0002$, $-0.0001$ and $-0.0020$ at the three orders---no bias at any of them. This is what
+Theorem~\ref{thm:sandwich} predicts, and the instances were drawn rather than chosen.
+\NUM{}
+
+Third, and least comfortable: the fit window is not a detail. Figure~\ref{fig:slopes} shows the
+same fits performed on the whole $h$ grid instead of its tail. They are biased low, and the
+bias grows with the order---$-0.007$ at $r=1$, $-0.037$ at $r=2$, $-0.188$ at $r=3$, reaching
+$-0.53$ on the worst cell. The reason is visible in Figure~\ref{fig:order}: every curve bends
+near $h\approx0.3$, where the next term of the expansion is not yet negligible, and a
+higher-order curve spends more of the grid in that regime because its leading term is smaller.
+An analyst who fits the whole range will conclude that a high-order query is better than it is,
+by a margin that grows exactly where the effect being claimed is largest. The tail window is
+declared in Section~\ref{sec:e2} for that reason, and both fits are reported here rather than
+only the favourable one.
+
+One thing the experiment does \emph{not} show should be stated plainly, because a reader could
+reasonably expect it. At the fixed scale $h=0.5$, the sample counts derived from
+Theorem~\ref{thm:samples} do not order by leakage order: the medians are $527$, $1{,}095$ and
+$883$ at orders $1$, $2$ and $3$, so order $3$ sits below order $2$. There is no contradiction.
+The order governs the \emph{rate} at which $H^{2}$ vanishes as $h\to0$, not its value at any
+particular $h$, and at $h=0.5$ the constant in front still dominates. The instances behind the
+three medians are independent draws rather than the same worlds measured three ways, so the
+comparison is distributional and not paired; the paired statement is the one in
+Table~\ref{tab:query}, where the worlds are held fixed and only the measurement changes.
+Where E2 does check the sample count against a realised error---$90$ cells simulated at the $N$
+the theorem derives---all $90$ come in at or below the target, at mean error $0.016$ against a
+target of $0.05$, so the derived count is conservative rather than tight. \NUM{}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig3_order.png}
+\caption{$H^{2}$ between two worlds sharing a level set, against the perturbation scale, for
+three representative instances at each designed leakage order. The three groups are fans of
+slope $2r$ and do not cross. Every curve bends near $h\approx0.3$, where the next term of the
+expansion is still contributing; the dotted line marks where the fit window begins, chosen
+before the fits were performed. Quadrature on the exact mixtures, verified stable to
+$3\times10^{-13}$ against a grid twice as fine and twice as wide. \NUM{}}
+\label{fig:order}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig6_slopes.png}
+\caption{Fitted exponent minus the predicted $2r$, for all $600$ cells, under the two fit
+windows. On the asymptotic tail (circles) the deviation is centred on zero at every order and
+never exceeds $0.034$. On the full grid (squares) it is biased low, and the bias grows with the
+order, because a higher-order curve spends more of the grid in the pre-asymptotic regime. The
+figure is included to show what the choice of window costs, not to hide it. \NUM{}}
+\label{fig:slopes}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig4_samples.png}
+\caption{Samples required to reach error $0.05$ at $h=0.5$, by verified leakage order; one
+point per instance, bars at the medians. The distributions overlap heavily and their medians do
+not increase with the order, which is the expected behaviour rather than an anomaly: the order
+controls the rate at which $H^{2}$ vanishes as $h\to0$, and at a fixed moderate $h$ the leading
+constant still dominates. Instances differ across the three columns, so this is a
+distributional comparison and not a paired one. \NUM{}}
+\label{fig:samples}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}
@@ -1078,14 +1409,23 @@ result localises regret without determining it. On the order-$2$ row the two end
 roughly a factor of $27$, which reflects the $\rho^{2N}$ against $\rho^{N}$ gap rather than
 any looseness in the measurement.
 
-\emph{The comparison uses two measurements, not a family.} A sweep over many $g$ would show
-the order's effect as a curve and would let the $h$-dependence be measured rather than
-predicted. The factor $8.8$ should be read as one instance of the prediction
-$h^{-2(r_{1}-r_{2})}$, not as a fitted exponent.
+\emph{The paired comparison still uses two measurements, not a family.} Experiment~E2 supplies
+the family for the \emph{rate}---six hundred cells at three orders, with the exponent fitted
+rather than assumed---but its instances are independent draws, so it cannot pair. The factor
+$8.8$ in Table~\ref{tab:query} remains a single paired observation and should be read as one
+instance of the prediction $h^{-2(r_{1}-r_{2})}$ rather than as a fitted exponent. What E2
+adds, and what Section~\ref{sec:e2results} reports, is that the sample counts do not order by
+leakage order at a fixed $h$ at all: the paired factor is a statement about one pair of
+measurements at one scale, and generalising it to ``higher order costs more samples'' is not
+supported.
 
-\emph{The scale $h=0.6$ is not small.} The asymptotic statements hold as $h\downarrow0$, and
-at $0.6$ the remainder terms suppressed in Theorem~\ref{thm:sandwich} are not negligible.
-This is why the per-sample $H^{2}$ is computed exactly rather than from the envelope.
+\emph{Small $h$ is reached only in the exact computation.} The asymptotic statements hold as
+$h\downarrow0$, and at the simulated scale $h=0.6$ the remainder terms suppressed in
+Theorem~\ref{thm:sandwich} are not negligible---which is why the per-sample $H^{2}$ is computed
+exactly there rather than from the envelope. Experiment~E2 does reach $h=6.5\times10^{-4}$, and
+its curves show the remainder terms mattering out to about $h\approx0.3$; but it reaches that
+regime by quadrature on the exact mixtures, not by sampling, and no simulated error rate is
+reported below $h=0.5$. The asymptotic regime is therefore computed, never observed.
 
 \emph{Nothing here is minimax.} Every result concerns a fixed pair and a fixed query, and
 the dropped normalisation means the displayed expressions are not densities.

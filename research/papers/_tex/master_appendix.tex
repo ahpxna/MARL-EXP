@@ -39,7 +39,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \leq \mathit{lam} \mathit{u}),\; (\mathit{hl1} :\\
 &\quad \textstyle\sum \mathit{u}, \mathit{lam} \mathit{u} =\\
 &\quad 1),\; (\mathit{htight} : \textstyle\sum \mathit{u},\\
-&\quad \mathit{lam} \mathit{u} * \mathit{I} \mathit{u} \leq \mathit{V})
+&\quad \mathit{lam} \mathit{u} * \mathit{I}\\
+&\quad \mathit{u} \leq \mathit{V})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall \mathit{u}, 0 < \mathit{lam}\\
@@ -55,10 +56,12 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{u}),\; (\mathit{hl1} : \textstyle\sum \mathit{u},\\
 &\quad \mathit{lam} \mathit{u} = 1),\; (\mathit{u0} :\\
 &\quad \mathit{U}),\; (\mathit{hattain} : \mathit{I}\\
-&\quad \mathit{u0} = \mathit{V}),\; (\mathit{hmin} : \forall \mathit{u},\\
+&\quad \mathit{u0} = \mathit{V}),\; (\mathit{hmin} :\\
+&\quad \forall \mathit{u},\\
 &\quad \mathit{I} \mathit{u0} \leq \mathit{I}\\
 &\quad \mathit{u}),\; (\mathit{hcap} : \textstyle\sum \mathit{u},\\
-&\quad \mathit{lam} \mathit{u} * \mathit{I} \mathit{u} \leq \mathit{V})
+&\quad \mathit{lam} \mathit{u} * \mathit{I}\\
+&\quad \mathit{u} \leq \mathit{V})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\forall \mathit{u}, 0 < \mathit{lam}\\
@@ -111,27 +114,34 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 \noindent\textbf{A\,8}\quad\lean{anchor\_free\_upper}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{v} \mathit{kap} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E}\\
+&\quad \to \mathbb{R}\\
 &\quad ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R}\\
 &\quad ),\; (\mathit{tj} : \mathit{J} \to \mathbb{R}\\
 &\quad ),\; (\mathit{x} : \mathit{E} \to \mathbb{R}\\
 &\quad ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R}\\
 &\quad ),\; (\mathit{Jval} \mathit{U0} : \mathbb{R}\\
-&\quad ),\; (\mathit{hlam} : \forall \mathit{j}, 0 \leq \mathit{lam}\\
-&\quad \mathit{j}),\; (\mathit{hlamsum} : \textstyle\sum \mathit{j},\\
-&\quad \mathit{lam} \mathit{j} = 1),\; (\mathit{hx} : \forall \mathit{e},\\
+&\quad ),\; (\mathit{hlam} : \forall \mathit{j}, 0\\
+&\quad \leq \mathit{lam}\\
+&\quad \mathit{j}),\; (\mathit{hlamsum} :\\
+&\quad \textstyle\sum \mathit{j},\\
+&\quad \mathit{lam} \mathit{j} = 1),\; (\mathit{hx} :\\
+&\quad \forall \mathit{e},\\
 &\quad 0 \leq \mathit{x} \mathit{e}),\; (\mathit{hbudget} :\\
 &\quad \textstyle\sum \mathit{e}, \mathit{kap} \mathit{e} *\\
-&\quad \mathit{x} \mathit{e} = 1),\; (\mathit{hIe} : \forall \mathit{j},\\
+&\quad \mathit{x} \mathit{e} = 1),\; (\mathit{hIe} :\\
+&\quad \forall \mathit{j},\\
 &\quad \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e},\\
 &\quad \mathit{x} \mathit{e} / \mathit{v} \mathit{e} *\\
 &\quad (\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj}\\
-&\quad \mathit{j}) ^{2}) / 2),\; (\mathit{hJval} : \forall \mathit{j},\\
+&\quad \mathit{j}) ^{2}) / 2),\; (\mathit{hJval} :\\
+&\quad \forall \mathit{j},\\
 &\quad \mathit{Jval} \leq \mathit{Ival}\\
 &\quad \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e},\\
 &\quad (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} *\\
 &\quad ((\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj}\\
-&\quad \mathit{j}) ^{2} / (2 * \mathit{v} \mathit{e}))) \leq \mathit{U0}\\
+&\quad \mathit{j}) ^{2} / (2 * \mathit{v}\\
+&\quad \mathit{e}))) \leq \mathit{U0}\\
 &\quad * \mathit{kap} \mathit{e})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -146,9 +156,11 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{Design} \to \mathit{Prop}),\; (\mathit{U0}\\
 &\quad \mathit{L1} : \mathbb{R} ),\; (\mathit{hgap} :\\
 &\quad \mathit{U0} < \mathit{L1}),\; (\mathit{hcert} :\\
-&\quad \forall \mathit{D}, \mathit{anchorFree} \mathit{D} \to \mathit{value}\\
+&\quad \forall \mathit{D}, \mathit{anchorFree}\\
+&\quad \mathit{D} \to \mathit{value}\\
 &\quad \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} :\\
-&\quad \mathit{Design}),\; (\mathit{hD1} : \mathit{L1} \leq \mathit{value}\\
+&\quad \mathit{Design}),\; (\mathit{hD1} :\\
+&\quad \mathit{L1} \leq \mathit{value}\\
 &\quad \mathit{D1}),\; (\mathit{Dopt} :\\
 &\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
 &\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
@@ -329,12 +341,14 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \to \mathbb{R} ),\; (\mathit{U} \mathit{L} :\\
 &\quad \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{d},\\
 &\quad \mathit{feasible} \mathit{d} \to \mathit{exposure}\\
-&\quad \mathit{d} = 0 \to \mathit{value} \mathit{d} \leq \mathit{U}),\;\\
+&\quad \mathit{d} = 0 \to \mathit{value} \mathit{d}\\
+&\quad \leq \mathit{U}),\;\\
 &\quad (\mathit{hgap} : \mathit{U} <\\
 &\quad \mathit{L}),\; (\mathit{d} :\\
 &\quad \mathit{Design}),\; (\mathit{hd} : \mathit{feasible}\\
 &\quad \mathit{d}),\; (\mathit{hx} : 0 \leq \mathit{exposure}\\
-&\quad \mathit{d}),\; (\mathit{hv} : \mathit{L} \leq \mathit{value}\\
+&\quad \mathit{d}),\; (\mathit{hv} : \mathit{L}\\
+&\quad \leq \mathit{value}\\
 &\quad \mathit{d})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -369,7 +383,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{m} \mathit{a} \mathit{c} \mathit{z}\\
 &\quad \mathit{K} : \mathbb{R} ),\; (\mathit{h1} :\\
-&\quad \mathit{m}+1 \neq 0),\; (\mathit{hK} : \mathit{K} \neq 0)
+&\quad \mathit{m}+1 \neq 0),\; (\mathit{hK} :\\
+&\quad \mathit{K} \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{profile} \mathit{a}\\
@@ -380,7 +395,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{a}) * \mathit{K} *\\
 &\quad (8*(\mathit{m}+1)^{2}) = \mathit{a}^{2}\\
 &\quad *\\
-&\quad (2*(1-\mathit{c}*\mathit{z})*(\mathit{m}^{2}+2*\mathit{m}+5)*\mathit{K}\\
+&\quad (2 *(1-\mathit{c} *\mathit{z}) *(\mathit{m}^{2} +2 *\mathit{m}\\
+&\quad +5) *\mathit{K}\\
 &\quad - (1-\mathit{c}*\mathit{z})^{2}*(\mathit{m}-1)^{2} -\\
 &\quad (\mathit{m}+3)^{2}*\mathit{K})
 \end{aligned} \]}
@@ -402,7 +418,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{a} =\\
 &\quad \mathit{z}*\mathit{baseValue}\\
 &\quad \mathit{m} \mathit{a}*((\mathit{criticalPrice}\\
-&\quad \mathit{m}-\mathit{c})-\mathit{c}*(1-\mathit{c}+\mathit{criticalPrice}\\
+&\quad \mathit{m}-\mathit{c})-\mathit{c}\\
+&\quad *(1-\mathit{c} +\mathit{criticalPrice}\\
 &\quad \mathit{m})*\mathit{z})/(1+(1-\mathit{c})*\mathit{z})
 \end{aligned} \]}
 
@@ -412,14 +429,16 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2*(1-\mathit{c}*\mathit{z})*(\mathit{m}^{2}+2*\mathit{m}+5)*(1+(1-\mathit{c})*\mathit{z})\\
+\vdash\;&2 *(1-\mathit{c} *\mathit{z}) *(\mathit{m}^{2} +2 *\mathit{m}\\
+&\quad +5) *(1 +(1-\mathit{c}) *\mathit{z})\\
 &\quad -\\
 &\quad (1-\mathit{c}*\mathit{z})^{2}*(\mathit{m}-1)^{2}\\
 &\quad -\\
 &\quad (\mathit{m}+3)^{2}*(1+(1-\mathit{c})*\mathit{z})\\
 &\quad = \mathit{z}*((\mathit{m}-1)^{2} -\\
 &\quad \mathit{c}*(\mathit{m}+3)^{2} -\\
-&\quad \mathit{c}*((1-\mathit{c})*(\mathit{m}+3)^{2}+(\mathit{m}-1)^{2})*\mathit{z})
+&\quad \mathit{c} *((1-\mathit{c}) *(\mathit{m} +3)^{2}\\
+&\quad +(\mathit{m}-1)^{2}) *\mathit{z})
 \end{aligned} \]}
 
 \noindent\textbf{A\,29}\quad\lean{global\_upper}
@@ -427,10 +446,12 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\{ \mathit{m} : \mathbb{N} \},\; (\mathit{hm} : 2 \leq \mathit{m}),\;\\
 &\quad (\mathit{a} \mathit{c} \mathit{x} \mathit{x0} :\\
 &\quad \mathbb{R} ),\; (\mathit{w} : \mathit{Fin} \mathit{m}\\
-&\quad \to \mathbb{R} ),\; (\mathit{hx0} : 0 \leq \mathit{x0}),\;\\
+&\quad \to \mathbb{R} ),\; (\mathit{hx0} : 0\\
+&\quad \leq \mathit{x0}),\;\\
 &\quad (\mathit{hbudget} : \mathit{x} + \textstyle\sum \mathit{i},\\
 &\quad \mathit{w} \mathit{i} + \mathit{c}*\mathit{x0} =\\
-&\quad 1),\; (\mathit{hK} : 0 < \mathit{x} + \textstyle\sum \mathit{i},\\
+&\quad 1),\; (\mathit{hK} : 0 < \mathit{x} +\\
+&\quad \textstyle\sum \mathit{i},\\
 &\quad \mathit{w} \mathit{i} + \mathit{x0}),\; (\mathit{hc} :\\
 &\quad \mathit{criticalPrice} \mathit{m} \leq \mathit{c})
 \end{aligned} \]}
@@ -499,7 +520,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{c} \wedge \mathit{c}*\mathit{purchase}\\
 &\quad \mathit{m} \mathit{c} < 1 \wedge 0\\
 &\quad < (\mathit{criticalPrice}\\
-&\quad \mathit{m}-\mathit{c})-\mathit{c}*(1-\mathit{c}+\mathit{criticalPrice}\\
+&\quad \mathit{m}-\mathit{c})-\mathit{c}\\
+&\quad *(1-\mathit{c} +\mathit{criticalPrice}\\
 &\quad \mathit{m})*\mathit{purchase}\\
 &\quad \mathit{m} \mathit{c}
 \end{aligned} \]}
@@ -583,11 +605,13 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \mathit{D}),\; (\mathit{hV} : 0 <\\
 &\quad \mathit{V}),\; (\mathit{hK} : 0 <\\
 &\quad \mathit{K}),\; (\mathit{hx} : \forall \mathit{g}, 0 <\\
-&\quad \mathit{x} \mathit{g}),\; (\mathit{hz} : \forall \mathit{g},\\
+&\quad \mathit{x} \mathit{g}),\; (\mathit{hz} :\\
+&\quad \forall \mathit{g},\\
 &\quad 0 < \mathit{z} \mathit{g}),\; (\mathit{hbudget} :\\
 &\quad \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} *\\
 &\quad \mathit{x} \mathit{g} + \mathit{sk} ^{2} * \mathit{z}\\
-&\quad \mathit{g}) \leq 1),\; (\mathit{hinfo} : \forall \mathit{g},\\
+&\quad \mathit{g}) \leq 1),\; (\mathit{hinfo} :\\
+&\quad \forall \mathit{g},\\
 &\quad 2 * \mathit{V} / \mathit{D} ^{2} * (\mathit{x}\\
 &\quad \mathit{g} + \mathit{z} \mathit{g}) \leq \mathit{x}\\
 &\quad \mathit{g} * \mathit{z} \mathit{g})
@@ -768,7 +792,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad : \forall \mathit{u} \notin \mathit{A}, \mathit{V} +\\
 &\quad \mathit{s} \leq \mathit{f}\\
 &\quad \mathit{u}),\; (\mathit{hmove} : \forall \mathit{u},\\
-&\quad |\mathit{g} \mathit{u} - \mathit{f} \mathit{u}| \leq \mathit{Kt}),\;\\
+&\quad |\mathit{g} \mathit{u} - \mathit{f}\\
+&\quad \mathit{u}| \leq \mathit{Kt}),\;\\
 &\quad (\mathit{hsmall} : 2 * \mathit{Kt} <\\
 &\quad \mathit{s})
 \end{aligned} \]}
@@ -793,7 +818,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad : \forall \mathit{u} \notin \mathit{A}, \mathit{V} +\\
 &\quad \mathit{s} \leq \mathit{f}\\
 &\quad \mathit{u}),\; (\mathit{hmove} : \forall \mathit{u},\\
-&\quad |\mathit{g} \mathit{u} - \mathit{f} \mathit{u}| \leq \mathit{Kt}),\;\\
+&\quad |\mathit{g} \mathit{u} - \mathit{f}\\
+&\quad \mathit{u}| \leq \mathit{Kt}),\;\\
 &\quad (\mathit{hsmall} : 2 * \mathit{Kt} <\\
 &\quad \mathit{s})
 \end{aligned} \]}
@@ -841,7 +867,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &(\mathit{alpha} : \mathit{U} \to \mathbb{R}\\
 &\quad ),\; (\mathit{beta} : \mathit{L} \to \mathbb{R}\\
 &\quad ),\; (\mathit{rho} : \mathit{L} \to \mathbb{R}\\
-&\quad ),\; (\mathit{ha} : \forall \mathit{u}, 0 \leq \mathit{alpha}\\
+&\quad ),\; (\mathit{ha} : \forall \mathit{u}, 0\\
+&\quad \leq \mathit{alpha}\\
 &\quad \mathit{u}),\; (\mathit{hb} : \forall \mathit{l}, 0\\
 &\quad \leq \mathit{beta} \mathit{l}),\; (\mathit{hr0} :\\
 &\quad \forall \mathit{l}, 0 \leq \mathit{rho}\\
@@ -860,7 +887,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 {\footnotesize\[ \begin{aligned}[t]
 &[\mathit{DecidableEq} \mathit{L}],\; (\mathit{alpha} :\\
 &\quad \mathit{U} \to \mathbb{R} ),\; (\mathit{beta} :\\
-&\quad \mathit{L} \to \mathbb{R} ),\; (\mathit{ha} : \forall \mathit{u},\\
+&\quad \mathit{L} \to \mathbb{R} ),\; (\mathit{ha} :\\
+&\quad \forall \mathit{u},\\
 &\quad 0 \leq \mathit{alpha} \mathit{u}),\; (\mathit{hb} :\\
 &\quad \forall \mathit{l}, 0 \leq \mathit{beta}\\
 &\quad \mathit{l})
@@ -871,7 +899,8 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 &\quad \to \textstyle\sum \mathit{l}, \mathit{rho} \mathit{l}\\
 &\quad = 1 \to \mathit{mixVal} (\mathbf{fun} \mathit{u}\\
 &\quad \mathit{l} => \mathit{alpha} \mathit{u} *\\
-&\quad \mathit{beta} \mathit{l}) \mathit{rho} \leq \mathit{bestSingle}\\
+&\quad \mathit{beta} \mathit{l}) \mathit{rho}\\
+&\quad \leq \mathit{bestSingle}\\
 &\quad (\mathbf{fun} \mathit{u} \mathit{l} => \mathit{alpha}\\
 &\quad \mathit{u} * \mathit{beta} \mathit{l}))\\
 &\quad \wedge \exists \mathit{l₀} :\\

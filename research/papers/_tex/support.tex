@@ -31,7 +31,12 @@ so it said the decoder was flat, not that it was optimal, and flatness alone is 
 with every rule being bad. Flatness is itself discharged from symmetry rather than imposed.
 Finally the decide risk is exactly $\tfrac12(1-P)^{N}$, independent of $K$, while recovery
 grows: the separation is an identity against a growth rate, not a comparison of two
-estimates. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}.
+estimates. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}. Over a
+$392$-cell grid reaching $128$ classes, evaluated at $240$ digits because the recovery sum
+loses about $K$ bits to cancellation, recovery costs up to $373$ times what deciding costs and
+follows a coupon-collector shape with constant $0.89$--$0.94$; simulating the process the
+recovery identity is derived for---an inclusion--exclusion over events that are not
+independent---reproduces it in every cell to within two standard errors.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -242,32 +247,50 @@ the sum over draws; the exchange is between two finite sums and is exact.
 \leanbox{\lean{avoid\_prob}, \lean{prod\_unseen\_card}, \lean{expected\_prod\_unseen} in
 \lean{LeanSupportSamplingLawV1}}
 
-\noindent\emph{Supporting results in \lean{LeanSupportSamplingLawV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $1$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanSupportSamplingLawV1}.}~These are the sampling law and the pieces of the minimax chain that live with it. The avoidance probability and the unseen-count identity are proved by a product over the finite index set and an exchange of two finite sums, with no independence between classes assumed anywhere; the transversal mass and good-event bounds are what the decide-side computation consumes. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{avoid\_prob}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} : \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N}\\
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} :\\
+&\quad \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N}\\
 &\quad \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
-&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{k}, \mathit{h} \mathit{k} \in \mathit{A} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
-&\quad 0) = (\textstyle\sum \mathit{x} \in \mathit{A}, \mathit{p}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{k},\\
+&\quad \mathit{h} \mathit{k} \in \mathit{A}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0) = (\textstyle\sum \mathit{x} \in \mathit{A},\\
+&\quad \mathit{p}\\
 &\quad \mathit{x}) ^{\mathit{N}}
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{expected\_prod\_unseen}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
 &\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
 &\quad 1),\; (\mathit{N} : \mathbb{N} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h} \mathit{k})) * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
-&\quad ))) = (\textstyle\prod \mathit{i}, (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i}) : \mathbb{R}\\
+\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega ,\\
+&\quad (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
+&\quad \mathit{k}))\\
+&\quad * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+&\quad ))) = (\textstyle\prod \mathit{i},\\
+&\quad (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i})\\
+&\quad : \mathbb{R}\\
 &\quad )) * (1 - \textstyle\sum \mathit{i}, \mathit{pc}\\
 &\quad \mathit{i}) ^{\mathit{N}}
 \end{aligned} \]}
@@ -277,26 +300,43 @@ the sum over draws; the exchange is between two finite sums and is exact.
 &(\mathit{a} \mathit{L'} : \mathbb{N} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} : \mathbb{N} ) : \mathbb{R}\\
-&\quad ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose} (\mathit{L'} + 1) : \mathbb{N} ) : \mathbb{R}\\
-&\quad ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} : \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) +\\
+\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} :\\
+&\quad \mathbb{N} ) : \mathbb{R}\\
+&\quad ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose}\\
+&\quad (\mathit{L'} + 1) : \mathbb{N} ) : \mathbb{R}\\
+&\quad ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} :\\
+&\quad \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) +\\
 &\quad 1)
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{good\_event\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
 &\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
-&\quad 1),\; (\mathit{hpnn} : \forall \mathit{x}, 0 \leq \mathit{p}\\
-&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\mathit{hpnn} : \forall \mathit{x}, 0\\
+&\quad \leq \mathit{p}\\
+&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\;\\
+&\quad (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i})\\
 &\quad ^{\mathit{N}} \leq \textstyle\sum \mathit{h} :\\
-&\quad \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
-&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{i}, 1 \leq (\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k},\\
+&\quad \mathit{p} (\mathit{h}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{i},\\
+&\quad 1 \leq (\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
 &\quad 0)
 \end{aligned} \]}
 
@@ -304,8 +344,11 @@ the sum over draws; the exchange is between two finite sums and is exact.
 {\footnotesize\[ \begin{aligned}[t]
 &\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
 &\quad \mathit{World}],\; [\mathit{Nonempty}\\
-&\quad \mathit{World}],\; (\mathit{R} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{w}, \mathit{R} \mathit{w} =\\
+&\quad \mathit{World}],\; (\mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h}\\
+&\quad : \forall \mathit{w}, \mathit{R} \mathit{w}\\
+&\quad =\\
 &\quad \mathit{r})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -316,35 +359,53 @@ the sum over draws; the exchange is between two finite sums and is exact.
 
 \noindent\textbf{S\,6}\quad\lean{prod\_unseen\_as\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
+&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
 &\quad )) = \textstyle\sum \tau : (\mathit{i} : \iota )\\
-&\quad \to \kappa \mathit{i}, (\mathbf{if} \forall \mathit{i}, \tau \mathit{i} \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad \to \kappa \mathit{i}, (\mathbf{if} \forall \mathit{i}, \tau \mathit{i}\\
+&\quad \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
 &\quad 0)
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{prod\_unseen\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
+&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u} \mathit{h}\\
-&\quad \mathit{i}).\mathit{card} = (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet} \mathit{u}\\
+\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h}\\
+&\quad \mathit{i}).\mathit{card} =\\
+&\quad (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet}\\
+&\quad \mathit{u}\\
 &\quad \mathit{h})).\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,8}\quad\lean{transversal\_mass}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1\\
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
 &\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} =\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
 &\quad 1),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \ (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} => \mathit{u} \mathit{i} (\tau \mathit{i}))),\\
+\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \\\
+&\quad (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} =>\\
+&\quad \mathit{u} \mathit{i} (\tau \mathit{i}))),\\
 &\quad \mathit{p} \mathit{x} = 1 - \textstyle\sum \mathit{i},\\
 &\quad \mathit{pc} \mathit{i}
 \end{aligned} \]}
@@ -390,59 +451,82 @@ ratio. Both numerator and denominator are functions of $|R|$.
 \leanbox{\lean{decoder\_risk\_world\_free}, \lean{decoder\_risk\_eq\_L\_over\_aL} in
 \lean{LeanSupportEquivariantDecoderV1}}
 
-\noindent\emph{Supporting results in \lean{LeanSupportEquivariantDecoderV1}.}~The statements below supply the inequalities the step chains and the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanSupportEquivariantDecoderV1}.}~These are the decoder. The hidden-count statement is the counting fact everything rests on: every compatible world hides the same number of unsafe tips, so the conditional risk cannot depend on the world. The closed form and the world-freeness are stated separately because the second is the property that makes the first implementable. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,9}\quad\lean{bayes\_is\_minimax}
 {\footnotesize\[ \begin{aligned}[t]
 &\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
 &\quad \mathit{World}],\; [\mathit{Nonempty}\\
-&\quad \mathit{World}],\; (\mathit{pri} \mathit{R} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
-&\quad 1),\; (\mathit{hconst} : \forall \mathit{w}, \mathit{R} \mathit{w} =\\
+&\quad \mathit{World}],\; (\mathit{pri} \mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\;\\
+&\quad (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{hconst} : \forall \mathit{w},\\
+&\quad \mathit{R} \mathit{w} =\\
 &\quad \mathit{r})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} * \mathit{R}\\
-&\quad \mathit{w}) = \mathit{r} \wedge (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{w}) = \mathit{r} \wedge (\mathit{univ}\\
+&\quad : \mathit{Finset}\\
 &\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
 &\quad \mathit{R} = \mathit{r}
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{decoder\_risk\_eq\_L\_over\_aL}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
+&(\mathit{W} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
 &\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W}),\; (\mathit{hT} : \mathit{Fintype}.\mathit{card} \mathit{T} = \mathit{a} +\\
-&\quad \mathit{b}),\; (\mathit{hle} : \mathit{R}.\mathit{card} \leq \mathit{b})
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
+&\quad \subseteq \mathit{W}),\; (\mathit{hT} :\\
+&\quad \mathit{Fintype}.\mathit{card} \mathit{T}\\
+&\quad = \mathit{a} +\\
+&\quad \mathit{b}),\; (\mathit{hle} :\\
+&\quad \mathit{R}.\mathit{card} \leq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(((\mathit{W} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad )) / ((\mathit{univ} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad ) = ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
-&\quad ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
+&\quad )) / ((\mathit{univ} \\\
+&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) = ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N}\\
+&\quad ) : \mathbb{R}\\
+&\quad ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} -\\
+&\quad \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
 &\quad ))
 \end{aligned} \]}
 
 \noindent\textbf{S\,11}\quad\lean{decoder\_risk\_world\_free}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{W₁} \mathit{W₂} \mathit{R} : \mathit{Finset}\\
-&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\; (\mathit{hW₁} : \mathit{W₁}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{hW₂} : \mathit{W₂}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{h₁} : \mathit{R} \subseteq \mathit{W₁}),\; (\mathit{h₂} : \mathit{R} \subseteq \mathit{W₂}),\; (\mathit{U} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\;\\
+&\quad (\mathit{hW₁} : \mathit{W₁}.\mathit{card}\\
+&\quad =\\
+&\quad \mathit{b}),\; (\mathit{hW₂} :\\
+&\quad \mathit{W₂}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{h₁} : \mathit{R}\\
+&\quad \subseteq \mathit{W₁}),\; (\mathit{h₂} :\\
+&\quad \mathit{R} \subseteq \mathit{W₂}),\;\\
+&\quad (\mathit{U} : \mathit{Finset}\\
 &\quad \mathit{T})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&((\mathit{W₁} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \\\
+&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
 &\quad ) / \mathit{U}.\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,12}\quad\lean{hidden\_count\_world\_free}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{b} : \mathbb{N}\\
+&(\mathit{W} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N}\\
 &\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W})
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
+&\quad \subseteq \mathit{W})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{W} \ \mathit{R}).\mathit{card} = \mathit{b} -\\
@@ -544,12 +628,15 @@ invariance equates their risks.
 
 \leanbox{\lean{constant\_risk\_of\_symmetry} in \lean{LeanSupportMinimaxLowerV1}}
 
-\noindent\emph{Supporting results in \lean{LeanSupportMinimaxLowerV1}.}~The statements below supply the inequalities the step chains; produce the objects the step needs and supply the rewrites it performs, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $0$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanSupportMinimaxLowerV1}.}~These are the chain that was previously incomplete. The factorisation separates an arbitrary rule's contribution observation by observation; the pointwise bound and its attainment supply the infimum over all rules that was missing, and the attainment is what lets the conclusion be membership in the achievable set rather than an unattained bound. The symmetry statement discharges the constant-risk hypothesis the earlier treatment imposed. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,13}\quad\lean{bayesRisk\_eq\_sum\_postLoss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
 &\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -561,8 +648,11 @@ invariance equates their risks.
 
 \noindent\textbf{S\,14}\quad\lean{bayes\_optimal\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -574,8 +664,11 @@ invariance equates their risks.
 
 \noindent\textbf{S\,15}\quad\lean{bayes\_optimal\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
 &\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -586,9 +679,15 @@ invariance equates their risks.
 
 \noindent\textbf{S\,16}\quad\lean{constant\_risk\_of\_symmetry}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G} \to \mathit{World} \to \mathit{World}),\; (\mathit{R} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hinv} : \forall \mathit{g} \mathit{w}, \mathit{R} (\mathit{act} \mathit{g} \mathit{w}) = \mathit{R}\\
-&\quad \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w} \mathit{w'} : \mathit{World}, \exists \mathit{g}, \mathit{act} \mathit{g} \mathit{w} =\\
+&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G}\\
+&\quad \to \mathit{World} \to \mathit{World}),\; (\mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hinv} : \forall \mathit{g}\\
+&\quad \mathit{w}, \mathit{R} (\mathit{act} \mathit{g}\\
+&\quad \mathit{w}) = \mathit{R}\\
+&\quad \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w}\\
+&\quad \mathit{w'} : \mathit{World}, \exists \mathit{g},\\
+&\quad \mathit{act} \mathit{g} \mathit{w} =\\
 &\quad \mathit{w'})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -598,36 +697,57 @@ invariance equates their risks.
 
 \noindent\textbf{S\,17}\quad\lean{equivariant\_is\_minimax}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
-&\quad 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\; (\mathit{r} : \mathbb{R}\\
-&\quad ),\; (\mathit{hconst} : \forall \mathit{w}, \mathit{risk} \mathit{P} \mathit{L} \mathit{d₀} \mathit{w} =\\
-&\quad \mathit{r}),\; (\mathit{hopt} : \mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L} =\\
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\;\\
+&\quad (\mathit{r} : \mathbb{R}\\
+&\quad ),\; (\mathit{hconst} : \forall \mathit{w},\\
+&\quad \mathit{risk} \mathit{P} \mathit{L}\\
+&\quad \mathit{d₀} \mathit{w} =\\
+&\quad \mathit{r}),\; (\mathit{hopt} :\\
+&\quad \mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} =\\
 &\quad \mathit{r})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} | \exists \mathit{d}\\
-&\quad : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathit{risk} \mathit{P} \mathit{L}\\
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} |\\
+&\quad \exists \mathit{d}\\
+&\quad : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} :\\
+&\quad \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
+&\quad \mathit{P} \mathit{L}\\
 &\quad \mathit{d}) = \mathit{v}\} \mathit{r}
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{minimax\_ge\_bayes\_optimal}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} =\\
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
 &\quad 1),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
 &\quad \mathit{L} \leq (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty} (\mathit{risk} \mathit{P} \mathit{L}\\
+&\quad \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
+&\quad \mathit{P} \mathit{L}\\
 &\quad \mathit{d})
 \end{aligned} \]}
 
@@ -681,6 +801,19 @@ survives: the posterior loss varies across unexplored tips and the argmin is no 
 uniform rule. Theorems~\ref{thm:factor} and \ref{thm:optimal} still hold, since they assume
 nothing about the prior; what fails is the identification of the argmin with \emph{this}
 decoder.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig3_risk.png}
+\caption{What one revealed tip is worth. The decoder's risk is $L/(a+L)$ where $L$ is the
+number of unsafe tips still unresolved, so revealing tips does not reduce risk linearly: each
+one removes a term from the numerator and the denominator at once, and the curve is therefore
+convex and steepest at the end. The three series are the safe/unsafe counts $(a,b)$ marked.
+The practical reading is that the last few revelations carry most of the risk reduction,
+which is the opposite of what a linear accounting of ``fraction revealed'' would suggest.
+Exact evaluation of the decoder risk of Theorem~\ref{thm:optimal}.}
+\label{fig:risk}
+\end{figure}
 
 \subsection{Pairwise Safety Does Not Suffice, in the Real Geometry}
 \label{sec:threeworld}
@@ -755,6 +888,21 @@ What the witness does \emph{not} give is a law. It exhibits a minimal unsafe tri
 not bound the size of the smallest such group as a function of the geometry, and
 Section~\ref{sec:discussion} lists that as the open problem it is.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig5_threeworld.png}
+\caption{The obstruction that pairwise reasoning cannot see, in the three-world model of
+\lean{pairwise\_not\_sufficient\_in\_support\_model}. Each group of bars is one choice of the
+coordinate kept; each bar within it is one world's selected radius. Every \emph{pair} of
+worlds admits a kept coordinate at which both have zero radius---the three zero-regret sets
+$\{0,1\}$, $\{1,2\}$ and $\{0,2\}$---so a procedure that checks safety two worlds at a time
+finds nothing wrong. No coordinate works for all three at once: the three sets intersect
+pairwise and their triple intersection is empty. The failure is a Helly-type one and is
+invisible to any pairwise certificate, which is why the sufficiency argument has to be made
+on the whole fibre.}
+\label{fig:threeworld}
+\end{figure}
+
 \subsection{The Decide--Recover Separation}
 \label{sec:separation}
 
@@ -790,22 +938,27 @@ argument.
 \leanbox{\lean{binary\_decide\_value}, \lean{decide\_upper\_expect},
 \lean{growing\_K\_recover} in \lean{LeanSupportDecideRecoverV1}}
 
-\noindent\emph{Supporting results in \lean{LeanSupportDecideRecoverV1}.}~The statements below supply the inequalities the step chains, reproduced as the prover has them: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. A further $5$ audited declarations in this module are positivity checks and measurability side conditions, which carry no mathematical content of their own and are not displayed.
+\noindent\emph{Supporting results in \lean{LeanSupportDecideRecoverV1}.}~These are the separation. The decide value is computed exactly and the monotonicity and factor bounds are what keep it independent of the number of classes; the recovery side is bounded pointwise and then in expectation, so the comparison is between an identity and a growth rate rather than between two estimates. They are reproduced as the prover has them; a further $5$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,19}\quad\lean{binary\_decide\_value}
 {\footnotesize\[ \begin{aligned}[t]
 &[\mathit{Nonempty} \iota ],\; (\mathit{L} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)
+&\quad ),\; (\mathit{hL} : \forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R} ) / (1 + \mathit{L}\\
-&\quad \mathit{i}))) = \mathbf{if} (\forall \mathit{i}, \mathit{L} \mathit{i} =\\
+\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_{}nonempty}\\
+&\quad (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R}\\
+&\quad ) / (1 + \mathit{L}\\
+&\quad \mathit{i}))) = \mathbf{if} (\forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} =\\
 &\quad 1) \mathbf{then} (1 : \mathbb{R} ) / 2 \mathbf{else} 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,20}\quad\lean{cfac\_le\_one}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{i} : \iota )
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{i} : \iota )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{cfac} \mathit{a} \mathit{L} \mathit{i}\\
@@ -814,18 +967,27 @@ argument.
 
 \noindent\textbf{S\,21}\quad\lean{growing\_K\_recover}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)
+&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L} \mathit{i}).\mathit{choose} (\mathit{L} \mathit{i}) : \mathbb{N} ) : \mathbb{R}\\
-&\quad )) = (1 / 2 : \mathbb{R} ) ^{} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} => \mathit{L} \mathit{i} =\\
+\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L}\\
+&\quad \mathit{i}).\mathit{choose} (\mathit{L}\\
+&\quad \mathit{i}) : \mathbb{N}\\
+&\quad ) : \mathbb{R}\\
+&\quad )) = (1 / 2 : \mathbb{R} ) ^{}\\
+&\quad (\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
+&\quad \mathit{i} => \mathit{L} \mathit{i} =\\
 &\quad 1)).\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,22}\quad\lean{recover\_lower\_pointwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{ha} : \forall \mathit{i}, 1 \leq \mathit{a}\\
-&\quad \mathit{i}),\; (\mathit{i₀} : \iota ),\; (\mathit{h} : 1 \leq \mathit{L}\\
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{ha} : \forall \mathit{i}, 1\\
+&\quad \leq \mathit{a}\\
+&\quad \mathit{i}),\; (\mathit{i₀} : \iota ),\;\\
+&\quad (\mathit{h} : 1 \leq \mathit{L}\\
 &\quad \mathit{i₀})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -839,13 +1001,15 @@ argument.
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&1 - \textstyle\prod \mathit{i}, \mathit{cfac}\\
-&\quad \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i}, (\mathit{L} \mathit{i} : \mathbb{R}\\
+&\quad \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i},\\
+&\quad (\mathit{L} \mathit{i} : \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{S\,24}\quad\lean{two\_le\_choose}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\; (\mathit{hL} : 1 \leq \mathit{L})
+&(\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\;\\
+&\quad (\mathit{hL} : 1 \leq \mathit{L})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&2 \leq (\mathit{a} + \mathit{L}).\mathit{choose}\\
@@ -865,6 +1029,72 @@ R_{\mathrm{rec}}
 which assumes nothing about how the classes interact. The same quantity is sandwiched between
 $\tfrac12\Pr(U>0)$ and $\Pr(U>0)$, verified exactly at several $N$, which is what allows the
 coupon-collector scale to be quoted for orientation without being relied on.
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+Theorem~\ref{thm:separation} states the decide side exactly, so no experiment bears on it. The
+computation has three objectives. The first is to evaluate both thresholds on a grid so that
+the ratio, which the theorem does not compute, can be read off. The second is scope: twelve
+cells at one value of $P$ cannot distinguish a law from a coincidence, and the grid below is
+widened until the growth in $K$ can be fitted rather than asserted. The third is the one that
+can actually fail. Equation~\eqref{eq:recover} is an inclusion--exclusion identity over events
+that are \emph{not} independent---the classes compete for the same $N$ observations---and it
+is derived rather than measured. Experiment~E2 simulates the process it is derived for and
+compares.
+
+\subsection{Setup}
+
+The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128\}$,
+$P\in\{\tfrac{1}{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34\}$ and
+$\varepsilon\in\{\tfrac1{10},\tfrac1{20},\tfrac1{100},\tfrac1{1000}\}$, giving $392$ cells on
+the model $a_{i}=b_{i}=1$, $p_{i}=P/K$.
+
+The recovery sum alternates in sign with binomial weights, so it loses roughly $K$ bits to
+cancellation and cannot be evaluated in double precision at the top of this grid: at $K=128$
+the largest term exceeds the answer by about eighteen orders of magnitude. It is therefore
+evaluated at $240$ significant digits, and checked against exact rational arithmetic wherever
+the exact computation is affordable.
+
+\subsection{E2: The Recovery Identity Against the Process}
+\label{sec:e2}
+
+Each observation picks a class uniformly and resolves it with probability $P$; after $N$ of
+them, every class still unresolved is guessed with a fair coin. The quantity to measure is
+therefore $\mathbb{E}[2^{-U}]$, where $U$ counts the unresolved classes---not
+$\Pr(U=0)$, because a report can be correct by luck---and that expectation is exactly
+$1-R_{\mathrm{rec}}$. Sixty cells are simulated at the recovery threshold itself, with up to
+$200{,}000$ replications each, and the standard error is retained per cell.
+
+\subsection{Metrics}
+
+For each cell: the least $N$ with $\tfrac12(1-P)^{N}\le\varepsilon$; the least $N$ with
+\eqref{eq:recover} at most $\varepsilon$; their ratio; and both risks evaluated at the
+\emph{decide} count, which shows what a recovery-based procedure would still be carrying at
+the moment a decision is already safe. Across cells: whether the recovery threshold is
+monotone in $K$, and the constant in the coupon-collector reading
+$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ fitted per $(P,\varepsilon)$.
+For E2: the measured $\mathbb{E}[2^{-U}]$ against the identity, as a $z$-score in units of its
+own standard error.
+
+\subsection{Statistical Reporting}
+
+The threshold counts are obtained by bisection over exact evaluations rather than by taking a
+logarithm and rounding, so the integers are true thresholds rather than approximations. Three
+self-checks run before any sweep result is reported, and the run refuses to report if any
+fails: the recovery risk at $K=1$ must equal the decide risk \emph{exactly} in rational
+arithmetic, which it does at every cell tested; the high-precision and exact-rational
+evaluations must agree, and they agree to the last digit; and the sandwich
+$\tfrac12\Pr(U>0)\le R_{\mathrm{rec}}\le\Pr(U>0)$ must hold, which it does everywhere. Only
+E2 involves sampling, and it is reported with its standard error; no difference below twice
+that error is described as an effect.
+
+One thing recorded here must not be read as a finding. The decide threshold's independence of
+$K$ is structural, not measured: the proved expression \eqref{eq:decide} contains no $K$, so
+the flat lines in Figure~\ref{fig:counts} restate the theorem rather than confirm it. What is
+measured is the growth of the recovery threshold beside it.
 
 \section{Formal Verification}
 \label{sec:verification}
@@ -920,32 +1150,6 @@ between classes in order to factor an expectation, which is unnecessary---linear
 for the sum actually needed---and removing it also removed a hypothesis from the recovery law.
 Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $17$ accepted modules carrying $153$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $183$ audited statements of the strand across its $21$ accepted modules, grouped by module.
 
-\section{Experiments}
-
-\subsection{Experimental Objectives}
-
-Theorem~\ref{thm:separation} states the decide side exactly, so no experiment bears on it. The
-computation has one objective: to evaluate both thresholds on a grid so that the ratio, which
-the theorem does not compute, can be read off.
-
-\subsection{Setup}
-
-The grid is $K\in\{1,2,4,8,16,32\}$ and $\varepsilon\in\{\tfrac{1}{10},\tfrac{1}{100}\}$ at
-$P=\tfrac12$, giving twelve cells on the model $a_{i}=b_{i}=1$, $p_{i}=P/K$.
-
-\subsection{Metrics}
-
-For each cell: the least $N$ with $\tfrac12(1-P)^{N}\le\varepsilon$; the least $N$ with
-\eqref{eq:recover} at most $\varepsilon$; their ratio; and both risks evaluated at the
-\emph{decide} count, which shows what a recovery-based procedure would still be carrying at
-the moment a decision is already safe.
-
-\subsection{Statistical Reporting}
-
-Both counts are obtained by incrementing $N$ over exact rationals rather than by taking a
-logarithm and rounding, so the integers are true thresholds rather than approximations, and
-the risks are exact rationals. There is no sampling and no seed.
-
 \section{Results}
 \label{sec:results}
 
@@ -969,6 +1173,65 @@ decide is done; one who stops when they can identify is still far from it.
 The reason the decide count does not move is visible in \eqref{eq:decide}: $K$ does not appear.
 A decision is correct as soon as the named tip is safe, and whether it is safe is settled
 inside a single class. A recovery must resolve every class.
+
+\subsection{The Separation Over the Whole Grid}
+
+Figure~\ref{fig:counts} puts the two thresholds on one pair of axes over seven doublings of
+$K$ and four values of $P$. The decide lines are flat by construction---$K$ does not appear in
+\eqref{eq:decide}---while the recover curves climb steadily on a logarithmic $K$ axis. The
+ratio is what an experimenter feels: at $P=\tfrac12$ and $\varepsilon=\tfrac1{100}$ recovery
+costs the same $6$ samples as deciding when there is one class, $17$ at two classes, and
+$2{,}238$ at a hundred and twenty-eight---a factor of $373$. At $P=\tfrac1{10}$ the same
+comparison runs from $38$ to $11{,}208$. The separation is not a constant overhead that a
+larger budget absorbs; it widens without bound. \NUM{}
+
+The growth has a shape, and it is the coupon-collector one. Fitting
+$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ over each of the $28$
+$(P,\varepsilon)$ slices gives $c$ between $0.889$ and $0.939$ with $R^{2}$ at least
+$0.9998$ in every slice. The scale quoted for orientation in Section~\ref{sec:separation} is
+therefore the right one, with a constant slightly below one; the largest relative departure,
+$0.42$, is at the smallest $K$, where an asymptotic form has no reason to hold. \NUM{}
+
+\subsection{The Recovery Identity Against the Process It Describes}
+
+Equation~\eqref{eq:recover} is the part of the separation that could be wrong without anyone
+noticing, because it is an inclusion--exclusion over dependent events and is derived rather
+than measured. Experiment~E2 simulates the process and compares. Over $60$ cells at the
+recovery threshold itself, the measured $\mathbb{E}[2^{-U}]$ differs from the identity by at
+most $0.0028$ in absolute terms and by at most $1.85$ standard errors---no cell is off by two.
+Figure~\ref{fig:identity} shows every cell against the diagonal. \NUM{}
+
+Two exact checks sit behind that. The identity at $K=1$ reduces to the decide risk, in
+rational arithmetic, at every cell tested---which is the only point where the two sides of the
+separation must agree, and they do. And the $240$-digit evaluation agrees with exact rational
+arithmetic to the last digit wherever the exact computation is affordable, which is what
+licenses the cells at $K=128$ where double precision would return noise.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig4_counts.png}
+\caption{Samples required to reach $\varepsilon=1/100$, for deciding (dotted) and for
+recovering (solid), against the number of classes, at four values of $P$. Every point is an
+exact integer obtained by inverting the closed forms \eqref{eq:decide} and \eqref{eq:recover},
+not simulated: it is the least $N$ at which the exact risk falls below the tolerance. The
+decide lines are horizontal because $K$ does not enter \eqref{eq:decide}---that restates the
+theorem rather than confirming it---while the recovery cost grows without bound beside them.
+\NUM{}}
+\label{fig:counts}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig6_identity.png}
+\caption{The recovery identity against the process it is derived for. Each point is one cell
+at its own recovery threshold: the horizontal coordinate is $1-R_{\mathrm{rec}}$ from
+\eqref{eq:recover}, the vertical is the frequency measured by simulating the sampling and the
+coin flips, and the bars are two standard errors. The line is equality, not a fit. The
+identity assumes nothing about how the classes interact, and the classes in the simulation do
+interact---they compete for the same $N$ observations---so agreement here is a check on the
+identity rather than on the arithmetic. \NUM{}}
+\label{fig:identity}
+\end{figure}
 
 \begin{figure}[htbp]
 \centering
