@@ -54,7 +54,13 @@ def main():
             raise SystemExit(f'missing {p}: the panel is incomplete, refusing to analyse')
         per[s] = json.loads(p.read_text())
 
-    variants = sorted({v for d in per.values() for v in d['runs_by_variant']})
+    # The reported comparator set is the SEALED one, not whatever the runner emitted.
+    # The runner produces eight variants; four of them (C_split, C_pilot, C_shrink,
+    # C_known_sigma) appear nowhere in the preregistration, and reporting them here
+    # would put unregistered comparative quantities in a confirmatory artifact.
+    variants = list(PRIMARY) + list(SECOND_DEPLOY) + list(DIAGNOSTIC)
+    emitted_by_runner = sorted({v for d in per.values() for v in d['runs_by_variant']})
+    dropped = [v for v in emitted_by_runner if v not in variants]
     tab, emitted, falsesafe = {}, {}, {}
     for v in variants:
         rows = [r for s in SEEDS for r in per[s]['runs_by_variant'][v]]
@@ -80,6 +86,10 @@ def main():
         'registration_utc': '2026-09-15T20:00:17Z',
         'launch_receipt': 'research/G3_confirmatory_20260915/launch_receipt.json',
         'paired_units': len(units), 'seeds': list(SEEDS), 'horizon_H': H,
+        'comparators_reported': variants,
+        'variants_emitted_by_runner_but_not_sealed': dropped,
+        'why_dropped': 'These carry no registration; reporting them would place '
+                       'unregistered comparative quantities in a confirmatory artifact.',
         'PRIMARY': {
             'estimand': 'paired mean of (C_lucb - Uniform) restricted N_certificate at H',
             'point_estimate': point,
