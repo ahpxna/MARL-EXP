@@ -11,29 +11,36 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,1}\quad\lean{Splus\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{m} : \mathbb{N} \},\; (\mathit{d} \mathit{gmin} : \mathbb{R} ),\; (\mathit{g} \mathit{v} : \mathit{Fin} \mathit{m} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hgmin} : 0 < \mathit{gmin}),\; (\mathit{hg} : \forall \mathit{i}, \mathit{gmin} \leq \mathit{g}\\
-&\quad \mathit{i}),\; (\mathit{hv} : \forall \mathit{i}, 0 < \mathit{v} \mathit{i})
+&\{ \mathit{m} : \mathbb{N} \},\; (\mathit{d} \mathit{gmin} : \mathbb{R}\\
+&\quad ),\; (\mathit{g} \mathit{v} : \mathit{Fin} \mathit{m} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hgmin} : 0 <\\
+&\quad \mathit{gmin}),\; (\mathit{hg} : \forall \mathit{i}, \mathit{gmin} \leq \mathit{g}\\
+&\quad \mathit{i}),\; (\mathit{hv} : \forall \mathit{i}, 0 < \mathit{v}\\
+&\quad \mathit{i})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\textstyle\sum \mathit{i} : \mathit{Fin} \mathit{m}, \mathit{v} \mathit{i} / (\mathit{g} \mathit{i})\\
-&\quad ^{2}) / (1 + \mathit{d} / (2 * \mathit{gmin})) ^{2} \leq \textstyle\sum \mathit{i} :\\
-&\quad \mathit{Fin} \mathit{m}, \mathit{v} \mathit{i} / (\mathit{g} \mathit{i} + \mathit{d} / 2)\\
-&\quad ^{2}
+&\quad ^{2}) / (1 + \mathit{d} / (2 * \mathit{gmin})) ^{2}\\
+&\quad \leq \textstyle\sum \mathit{i} : \mathit{Fin}\\
+&\quad \mathit{m}, \mathit{v} \mathit{i} / (\mathit{g} \mathit{i} + \mathit{d} /\\
+&\quad 2) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,2}\quad\lean{budget}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 * (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) + \textstyle\sum \mathit{x} :\\
-&\quad \mathit{Cell} \mathit{n}, \mathit{wt} \mathit{d} \mathit{mid} \mathit{vr} \mathit{x}\\
-&\quad = 1
+\vdash\;&2 * (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) + \textstyle\sum \mathit{x} :\\
+&\quad \mathit{Cell} \mathit{n}, \mathit{wt} \mathit{d}\\
+&\quad \mathit{mid} \mathit{vr} \mathit{x} = 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,3}\quad\lean{every\_pair\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell} \mathit{n}, \mathit{a}\\
-&\quad \neq \mathit{b} \to \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} / 2\\
-&\quad \leq \mathit{pairV} (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell}\\
+&\quad \mathit{n}, \mathit{a} \neq \mathit{b} \to \mathit{bigA}\\
+&\quad \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} /\\
+&\quad 2 \leq \mathit{pairV} (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
 &\quad \mathit{vr}) (\mathit{prec} (\mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{sigC} \mathit{vr})\\
 &\quad \mathit{a}) (\mathit{prec} (\mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{sigC} \mathit{vr})\\
 &\quad \mathit{b}) (\mathit{mean} \mathit{d} \mathit{mid} \mathit{a} - \mathit{mean} \mathit{d} \mathit{mid}\\
@@ -43,90 +50,108 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,4}\quad\lean{gamma\_lower}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{lI0} \mathit{lI1} : \mathbb{R} ),\; (\mathit{l} : \mathit{Cell} \mathit{n} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hflip} : \mathit{FlipsU} \mathit{lI0} \mathit{lI1} \mathit{l})
+&\quad ),\; (\mathit{hflip} : \mathit{FlipsU} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{l})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} / 2\\
-&\quad \leq \mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d}\\
+\vdash\;&\mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} *\\
+&\quad \mathit{d} ^{2} / 2 \leq \mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d}\\
 &\quad \mathit{mid}) \mathit{lI0} \mathit{lI1} \mathit{l}
 \end{aligned} \]}
 
 \noindent\textbf{A\,5}\quad\lean{gamma\_value}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\forall (\mathit{lI0} \mathit{lI1} : \mathbb{R} ) (\mathit{l} : \mathit{Cell} \mathit{n} \to \mathbb{R} ), \mathit{FlipsU} \mathit{lI0} \mathit{lI1} \mathit{l} \to \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} / 2 \leq \mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d} \mathit{mid}) \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{l}) \wedge \mathit{FlipsU} (-(1/2) + \mathit{d}/4) (1/2 - \mathit{d}/4) (\mathit{lwit} \mathit{d}\\
+&\quad \mathit{l}) \wedge \mathit{FlipsU} (-(1/2) +\\
+&\quad \mathit{d}/4) (1/2 - \mathit{d}/4) (\mathit{lwit} \mathit{d}\\
 &\quad \mathit{mid}) \wedge \mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d} \mathit{mid}) (-(1/2) +\\
-&\quad \mathit{d}/4) (1/2 - \mathit{d}/4) (\mathit{lwit} \mathit{d} \mathit{mid})\\
-&\quad = \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} / 2
+&\quad \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d}\\
+&\quad \mathit{mid}) (-(1/2) + \mathit{d}/4) (1/2 -\\
+&\quad \mathit{d}/4) (\mathit{lwit} \mathit{d} \mathit{mid})\\
+&\quad = \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} *\\
+&\quad \mathit{d} ^{2} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,6}\quad\lean{gval\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n}, \mathit{d} / 2\\
-&\quad \leq \mathit{gval} \mathit{d} \mathit{mid} \mathit{x}
+\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n},\\
+&\quad \mathit{d} / 2 \leq \mathit{gval} \mathit{d}\\
+&\quad \mathit{mid} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,7}\quad\lean{mean\_diff\_lt\_one}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell} \mathit{n}, \mathit{mean} \mathit{d}\\
-&\quad \mathit{mid} \mathit{a} - \mathit{mean} \mathit{d} \mathit{mid} \mathit{b}\\
-&\quad < 1
+\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell}\\
+&\quad \mathit{n}, \mathit{mean} \mathit{d} \mathit{mid}\\
+&\quad \mathit{a} - \mathit{mean} \mathit{d} \mathit{mid}\\
+&\quad \mathit{b} < 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,8}\quad\lean{mean\_gap}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell} \mathit{n}, \mathit{a}\\
-&\quad \neq \mathit{b} \to \mathit{gval} \mathit{d} \mathit{mid} \mathit{a} + \mathit{gval}\\
+\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Cell}\\
+&\quad \mathit{n}, \mathit{a} \neq \mathit{b} \to \mathit{gval}\\
+&\quad \mathit{d} \mathit{mid} \mathit{a} + \mathit{gval}\\
 &\quad \mathit{d} \mathit{mid} \mathit{b} \leq 1 - (\mathit{mean} \mathit{d} \mathit{mid} \mathit{a} - \mathit{mean} \mathit{d} \mathit{mid}\\
 &\quad \mathit{b})
 \end{aligned} \]}
 
 \noindent\textbf{A\,9}\quad\lean{pairV\_to\_pairVal}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W} \mathit{pa} \mathit{pb} \mathit{D} : \mathbb{R} ),\; (\mathit{hW} : 0 <\\
-&\quad \mathit{W}),\; (\mathit{hpa} : 0 < \mathit{pa}),\; (\mathit{hpb} : 0 < \mathit{pb})
+&(\mathit{W} \mathit{pa} \mathit{pb} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{hW} : 0 < \mathit{W}),\; (\mathit{hpa} : 0 <\\
+&\quad \mathit{pa}),\; (\mathit{hpb} : 0 < \mathit{pb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pairV} \mathit{W} \mathit{W} \mathit{pa} \mathit{pb} \mathit{D}\\
-&\quad = \mathit{pairVal} (\mathit{W} / 4) (1 / (2 * (1 / \mathit{pa} + 1 / \mathit{pb})))\\
+\vdash\;&\mathit{pairV} \mathit{W} \mathit{W} \mathit{pa}\\
+&\quad \mathit{pb} \mathit{D} = \mathit{pairVal} (\mathit{W} /\\
+&\quad 4) (1 / (2 * (1 / \mathit{pa} + 1 / \mathit{pb})))\\
 &\quad \mathit{D}
 \end{aligned} \]}
 
 \noindent\textbf{A\,10}\quad\lean{resistance\_identity}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n}, \mathit{bigA} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr} * (\mathit{sigC} \mathit{vr} \mathit{x} / \mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}\\
-&\quad \mathit{x}) = (\mathit{gval} \mathit{d} \mathit{mid} \mathit{x}) ^{2} / \mathit{d} ^{2}
+\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n},\\
+&\quad \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * (\mathit{sigC} \mathit{vr} \mathit{x} / \mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}\\
+&\quad \mathit{x}) = (\mathit{gval} \mathit{d} \mathit{mid}\\
+&\quad \mathit{x}) ^{2} / \mathit{d} ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,11}\quad\lean{sandwich\_order}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{d} \mathit{S} \mathit{Splus} : \mathbb{R} ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hS} : 0 \leq \mathit{S}),\; (\mathit{hSpnn} : 0 \leq \mathit{Splus}),\; (\mathit{hle} : \mathit{Splus} \leq \mathit{S})
+&(\mathit{d} \mathit{S} \mathit{Splus} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
+&\quad \mathit{d}),\; (\mathit{hS} : 0 \leq \mathit{S}),\; (\mathit{hSpnn} : 0 \leq \mathit{Splus}),\; (\mathit{hle} : \mathit{Splus} \leq \mathit{S})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} * \mathit{S})\\
-&\quad \leq \mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} * \mathit{Splus})
+\vdash\;&\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} *\\
+&\quad \mathit{S}) \leq \mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} *\\
+&\quad \mathit{Splus})
 \end{aligned} \]}
 
 \noindent\textbf{A\,12}\quad\lean{sandwich\_ratio}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{d} \mathit{S} \mathit{Splus} \mathit{kap} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hS} : 0 \leq \mathit{S}),\; (\mathit{hkap} : 1 \leq \mathit{kap}),\; (\mathit{hSpnn} : 0 \leq \mathit{Splus}),\; (\mathit{hSp} : \mathit{S} \leq \mathit{Splus} * \mathit{kap}\\
+&(\mathit{d} \mathit{S} \mathit{Splus} \mathit{kap} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hS} : 0 \leq \mathit{S}),\; (\mathit{hkap} : 1 \leq \mathit{kap}),\; (\mathit{hSpnn} : 0 \leq \mathit{Splus}),\; (\mathit{hSp} : \mathit{S} \leq \mathit{Splus} * \mathit{kap}\\
 &\quad ^{2})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} * \mathit{Splus})\\
-&\quad \leq \mathit{kap} ^{2} * (\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} * \mathit{S}))
+\vdash\;&\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} *\\
+&\quad \mathit{Splus}) \leq \mathit{kap} ^{2} * (\mathit{d} ^{2} / (32 + 2 * \mathit{d} ^{2} *\\
+&\quad \mathit{S}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,13}\quad\lean{value}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} \mathit{H} \mathit{nn} \mathit{dd} \mathit{A} : \mathbb{R} ),\; (\mathit{hn} : 0 <\\
-&\quad \mathit{nn}),\; (\mathit{hH} : 0 \leq \mathit{H}),\; (\mathit{hc} : 0 < \mathit{c}),\; (\mathit{hdd} : \mathit{dd} ^{2} = \mathit{c} ^{2} /\\
-&\quad \mathit{nn}),\; (\mathit{hAdef} : \mathit{A} = 1 / (16 + \mathit{c} ^{2} * \mathit{H}))
+&(\mathit{c} \mathit{H} \mathit{nn} \mathit{dd} \mathit{A} : \mathbb{R}\\
+&\quad ),\; (\mathit{hn} : 0 < \mathit{nn}),\; (\mathit{hH} : 0 \leq \mathit{H}),\; (\mathit{hc} : 0 <\\
+&\quad \mathit{c}),\; (\mathit{hdd} : \mathit{dd} ^{2} = \mathit{c} ^{2} /\\
+&\quad \mathit{nn}),\; (\mathit{hAdef} : \mathit{A} = 1 / (16 + \mathit{c} ^{2} *\\
+&\quad \mathit{H}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{A} * \mathit{dd} ^{2} / 2 = \mathit{c} ^{2} / (\mathit{nn} * (32 + 2 * \mathit{c} ^{2} *\\
@@ -135,22 +160,27 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,14}\quad\lean{witness\_energy}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d}\\
-&\quad \mathit{mid}) (-(1/2) + \mathit{d}/4) (1/2 - \mathit{d}/4) (\mathit{lwit} \mathit{d}\\
-&\quad \mathit{mid}) = \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} * \mathit{d} ^{2} / 2
+\vdash\;&\mathit{energyU} (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (4 * \mathit{bigA} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{wt} \mathit{d} \mathit{mid}\\
+&\quad \mathit{vr}) (\mathit{sigC} \mathit{vr}) (\mathit{mean} \mathit{d}\\
+&\quad \mathit{mid}) (-(1/2) + \mathit{d}/4) (1/2 -\\
+&\quad \mathit{d}/4) (\mathit{lwit} \mathit{d} \mathit{mid})\\
+&\quad = \mathit{bigA} \mathit{d} \mathit{mid} \mathit{vr} *\\
+&\quad \mathit{d} ^{2} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,15}\quad\lean{witness\_flips}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{FlipsU} (-(1/2) + \mathit{d}/4) (1/2 - \mathit{d}/4) (\mathit{lwit} \mathit{d}\\
-&\quad \mathit{mid})
+\vdash\;&\mathit{FlipsU} (-(1/2) + \mathit{d}/4) (1/2 -\\
+&\quad \mathit{d}/4) (\mathit{lwit} \mathit{d} \mathit{mid})
 \end{aligned} \]}
 
 \noindent\textbf{A\,16}\quad\lean{wt\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n}, 0 < \mathit{wt} \mathit{d} \mathit{mid}\\
-&\quad \mathit{vr} \mathit{x}
+\vdash\;&\forall \mathit{x} : \mathit{Cell} \mathit{n}, 0\\
+&\quad < \mathit{wt} \mathit{d} \mathit{mid} \mathit{vr}\\
+&\quad \mathit{x}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -171,26 +201,31 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R} ,\mathit{Alternative} \mathit{delta}\\
-&\quad \mathit{z} \wedge \mathit{completeEnergy} \mathit{z}=\mathit{delta}^{2}/(2*((\mathit{Fintype}.\mathit{card} \mathit{I}:\mathbb{R}\\
+\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad ,\mathit{Alternative} \mathit{delta} \mathit{z}\\
+&\quad \wedge \mathit{completeEnergy} \mathit{z}=\mathit{delta}^{2}/(2*((\mathit{Fintype}.\mathit{card} \mathit{I}:\mathbb{R}\\
 &\quad )-1))
 \end{aligned} \]}
 
 \noindent\textbf{A\,19}\quad\lean{complete\_flat\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card} \mathit{I}),\; (\mathit{delta} : \mathbb{R}\\
-&\quad ),\; (\mathit{hd} : 0 < \mathit{delta}),\; (\mathit{z} : \mathit{I} \to \mathbb{R} ),\; (\mathit{hz} : \mathit{Alternative} \mathit{delta}\\
+&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card}\\
+&\quad \mathit{I}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
+&\quad \mathit{delta}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hz} : \mathit{Alternative} \mathit{delta}\\
 &\quad \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{delta}^{2}/(2*((\mathit{Fintype}.\mathit{card} \mathit{I}:\mathbb{R} )-1))\\
-&\quad \leq \mathit{completeEnergy} \mathit{z}
+\vdash\;&\mathit{delta}^{2}/(2*((\mathit{Fintype}.\mathit{card} \mathit{I}:\mathbb{R}\\
+&\quad )-1)) \leq \mathit{completeEnergy} \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,20}\quad\lean{contrast\_energy\_nonneg}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{hc} : \forall \mathit{a} \mathit{b},0 \leq \mathit{c} \mathit{a}\\
-&\quad \mathit{b}),\; (\mathit{z} : \mathit{I} \to \mathbb{R} )
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hc} : \forall \mathit{a} \mathit{b},0 \leq \mathit{c} \mathit{a}\\
+&\quad \mathit{b}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&0 \leq \mathit{contrastEnergy} \mathit{c} \mathit{z}
@@ -198,14 +233,16 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,21}\quad\lean{disconnected\_zero\_information}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset}\\
-&\quad \mathit{I}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{hSc} :\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{S} : \mathit{Finset} \mathit{I}),\; (\mathit{hS} :\\
+&\quad \mathit{S}.\mathit{Nonempty}),\; (\mathit{hSc} :\\
 &\quad \mathit{Sᶜ}.\mathit{Nonempty}),\; (\mathit{hzero} : \forall \mathit{a} \mathit{b},\neg (\mathit{a} \in \mathit{S} \leftrightarrow \mathit{b} \in \mathit{S}) \to \mathit{c} \mathit{a}\\
 &\quad \mathit{b}=0),\; (\mathit{delta} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R} ,\mathit{Alternative} \mathit{delta}\\
-&\quad \mathit{z} \wedge \mathit{contrastEnergy} \mathit{c} \mathit{z}=0
+\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad ,\mathit{Alternative} \mathit{delta} \mathit{z}\\
+&\quad \wedge \mathit{contrastEnergy} \mathit{c} \mathit{z}=0
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -213,30 +250,34 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,22}\quad\lean{harmonic\_energy}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
-&\quad \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R} ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
 &\quad \mathit{p})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2*\mathit{contrastEnergy} \mathit{c} \mathit{p} = \mathit{p} \mathit{a}-\mathit{p}\\
-&\quad \mathit{b}
+\vdash\;&2*\mathit{contrastEnergy} \mathit{c} \mathit{p}\\
+&\quad = \mathit{p} \mathit{a}-\mathit{p} \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{A\,23}\quad\lean{induced\_flowResistance}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
-&\quad \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R} ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
 &\quad \mathit{p})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{flowResistance} \mathit{c} (\mathbf{fun} \mathit{i} \mathit{j} => \mathit{c} \mathit{i} \mathit{j}*(\mathit{p} \mathit{i}-\mathit{p}\\
-&\quad \mathit{j})) = \mathit{p} \mathit{a}-\mathit{p} \mathit{b}
+&\quad \mathit{j})) = \mathit{p} \mathit{a}-\mathit{p}\\
+&\quad \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{A\,24}\quad\lean{induced\_unitFlow}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
-&\quad \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R} ),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
 &\quad \mathit{p})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -246,10 +287,11 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,25}\quad\lean{pair\_infimum\_exact}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
 &\quad \mathit{j}),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b} \mathit{p}),\; (\mathit{delta} : \mathbb{R}\\
-&\quad ),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{hR} : 0 < \mathit{p} \mathit{a}-\mathit{p}\\
+&\quad ),\; (\mathit{hp} : \mathit{Harmonic} \mathit{c} \mathit{a} \mathit{b}\\
+&\quad \mathit{p}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{hR} : 0 < \mathit{p} \mathit{a}-\mathit{p}\\
 &\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -263,8 +305,9 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,26}\quad\lean{complete\_information\_exact}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card} \mathit{I}),\; (\mathit{delta} : \mathbb{R}\\
-&\quad ),\; (\mathit{hd} : 0<\mathit{delta})
+&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card}\\
+&\quad \mathit{I}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} :\\
+&\quad 0<\mathit{delta})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{IsLeast} (\mathit{completeCosts} (\mathit{I}
@@ -272,8 +315,9 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,27}\quad\lean{complete\_information\_sInf}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card} \mathit{I}),\; (\mathit{delta} : \mathbb{R}\\
-&\quad ),\; (\mathit{hd} : 0<\mathit{delta})
+&(\mathit{hK} : 2 \leq \mathit{Fintype}.\mathit{card}\\
+&\quad \mathit{I}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} :\\
+&\quad 0<\mathit{delta})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{sInf} (\mathit{completeCosts} (\mathit{I}
@@ -281,15 +325,19 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,28}\quad\lean{disconnected\_infimum}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{hc} : \forall \mathit{a} \mathit{b},0 \leq \mathit{c} \mathit{a}\\
-&\quad \mathit{b}),\; (\mathit{S} : \mathit{Finset} \mathit{I}),\; (\mathit{hS} :\\
-&\quad \mathit{S}.\mathit{Nonempty}),\; (\mathit{hSc} : \mathit{Sᶜ}.\mathit{Nonempty}),\; (\mathit{hzero} : \forall \mathit{a} \mathit{b},\neg (\mathit{a} \in \mathit{S} \leftrightarrow \mathit{b} \in \mathit{S}) \to \mathit{c} \mathit{a}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hc} : \forall \mathit{a} \mathit{b},0 \leq \mathit{c} \mathit{a}\\
+&\quad \mathit{b}),\; (\mathit{S} : \mathit{Finset}\\
+&\quad \mathit{I}),\; (\mathit{hS} :\\
+&\quad \mathit{S}.\mathit{Nonempty}),\; (\mathit{hSc} :\\
+&\quad \mathit{Sᶜ}.\mathit{Nonempty}),\; (\mathit{hzero} : \forall \mathit{a} \mathit{b},\neg (\mathit{a} \in \mathit{S} \leftrightarrow \mathit{b} \in \mathit{S}) \to \mathit{c} \mathit{a}\\
 &\quad \mathit{b}=0),\; (\mathit{delta} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{z} : \mathit{I}\\
-&\quad \to \mathbb{R} ,\mathit{Alternative} \mathit{delta} \mathit{z}\\
-&\quad \wedge \mathit{v}=\mathit{contrastEnergy} \mathit{c} \mathit{z}\} 0
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{z} :\\
+&\quad \mathit{I} \to \mathbb{R} ,\mathit{Alternative}\\
+&\quad \mathit{delta} \mathit{z} \wedge \mathit{v}=\mathit{contrastEnergy}\\
+&\quad \mathit{c} \mathit{z}\} 0
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -297,61 +345,75 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,29}\quad\lean{contrastEnergy\_smul}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{t} : \mathbb{R} ),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{t} : \mathbb{R} ),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{contrastEnergy} \mathit{c} (\mathbf{fun} \mathit{i} => \mathit{t}*\mathit{p}\\
-&\quad \mathit{i}) = \mathit{t}^{2}*\mathit{contrastEnergy} \mathit{c} \mathit{p}
+&\quad \mathit{i}) = \mathit{t}^{2}*\mathit{contrastEnergy}\\
+&\quad \mathit{c} \mathit{p}
 \end{aligned} \]}
 
 \noindent\textbf{A\,30}\quad\lean{flow\_green}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{f} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b} \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b}\\
+&\quad \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\textstyle\sum \mathit{i}, \textstyle\sum \mathit{j}, \mathit{f} \mathit{i} \mathit{j}*(\mathit{z} \mathit{i}-\mathit{z}\\
-&\quad \mathit{j}))/2 = \mathit{z} \mathit{a}-\mathit{z} \mathit{b}
+&\quad \mathit{j}))/2 = \mathit{z} \mathit{a}-\mathit{z}\\
+&\quad \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{A\,31}\quad\lean{flow\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
 &\quad \mathit{j}),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{f} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b} \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hsupp} : \forall \mathit{i} \mathit{j}, \mathit{c} \mathit{i} \mathit{j} = 0 \to \mathit{f} \mathit{i} \mathit{j} =\\
+&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b}\\
+&\quad \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hsupp} : \forall \mathit{i} \mathit{j}, \mathit{c} \mathit{i} \mathit{j} = 0 \to \mathit{f} \mathit{i} \mathit{j} =\\
 &\quad 0),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hz} : \mathit{delta} \leq \mathit{z} \mathit{a}-\mathit{z} \mathit{b})
+&\quad ),\; (\mathit{hz} : \mathit{delta} \leq \mathit{z} \mathit{a}-\mathit{z}\\
+&\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{delta}^{2} \leq 2*\mathit{flowResistance} \mathit{c}\\
-&\quad \mathit{f}*\mathit{contrastEnergy} \mathit{c} \mathit{z}
+\vdash\;&\mathit{delta}^{2} \leq 2*\mathit{flowResistance}\\
+&\quad \mathit{c} \mathit{f}*\mathit{contrastEnergy}\\
+&\quad \mathit{c} \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,32}\quad\lean{flow\_lower\_div}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hc} : \forall \mathit{i} \mathit{j}, 0 \leq \mathit{c} \mathit{i}\\
 &\quad \mathit{j}),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{f} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b} \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hsupp} : \forall \mathit{i} \mathit{j}, \mathit{c} \mathit{i} \mathit{j} = 0 \to \mathit{f} \mathit{i} \mathit{j} =\\
+&\quad ),\; (\mathit{hf} : \mathit{UnitFlow} \mathit{a} \mathit{b}\\
+&\quad \mathit{f}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b}),\; (\mathit{hsupp} : \forall \mathit{i} \mathit{j}, \mathit{c} \mathit{i} \mathit{j} = 0 \to \mathit{f} \mathit{i} \mathit{j} =\\
 &\quad 0),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{z} : \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hz} : \mathit{delta} \leq \mathit{z} \mathit{a}-\mathit{z} \mathit{b}),\; (\mathit{hR} : 0 < \mathit{flowResistance} \mathit{c}\\
+&\quad ),\; (\mathit{hz} : \mathit{delta} \leq \mathit{z} \mathit{a}-\mathit{z}\\
+&\quad \mathit{b}),\; (\mathit{hR} : 0 < \mathit{flowResistance} \mathit{c}\\
 &\quad \mathit{f})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{delta}^{2}/(2*\mathit{flowResistance} \mathit{c} \mathit{f})\\
-&\quad \leq \mathit{contrastEnergy} \mathit{c} \mathit{z}
+\vdash\;&\mathit{delta}^{2}/(2*\mathit{flowResistance} \mathit{c}\\
+&\quad \mathit{f}) \leq \mathit{contrastEnergy} \mathit{c}\\
+&\quad \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,33}\quad\lean{potential\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R} ),\; (\mathit{p} : \mathit{I} \to \mathbb{R}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathit{I}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hp} : 0 < \mathit{p} \mathit{a}-\mathit{p}\\
+&(\mathit{c} : \mathit{I} \to \mathit{I} \to \mathbb{R}\\
+&\quad ),\; (\mathit{p} : \mathit{I} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{I}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hp} : 0 < \mathit{p} \mathit{a}-\mathit{p}\\
 &\quad \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R} , \mathit{Alternative} \mathit{delta}\\
-&\quad \mathit{z} \wedge \mathit{contrastEnergy} \mathit{c} \mathit{z}\\
+\vdash\;&\exists \mathit{z} : \mathit{I} \to \mathbb{R}\\
+&\quad , \mathit{Alternative} \mathit{delta} \mathit{z}\\
+&\quad \wedge \mathit{contrastEnergy} \mathit{c} \mathit{z}\\
 &\quad = \mathit{delta}^{2}*\mathit{contrastEnergy} \mathit{c} \mathit{p}/(\mathit{p} \mathit{a}-\mathit{p}\\
 &\quad \mathit{b})^{2}
 \end{aligned} \]}
@@ -361,75 +423,90 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,34}\quad\lean{JEM\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{a} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R} ),\; (\mathit{hx} :\\
-&\quad 0<\mathit{x}),\; (\mathit{ha} : 0<\mathit{a}),\; (\mathit{hp} : 0<\mathit{p}),\; (\mathit{hq} :\\
+&(\mathit{x} \mathit{a} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R}\\
+&\quad ),\; (\mathit{hx} : 0<\mathit{x}),\; (\mathit{ha} :\\
+&\quad 0<\mathit{a}),\; (\mathit{hp} : 0<\mathit{p}),\; (\mathit{hq} :\\
 &\quad 0<\mathit{q}),\; (\mathit{hu} : 0<\mathit{u}),\; (\mathit{hsum} :\\
 &\quad \mathit{p}+\mathit{q}+\mathit{u}=1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{JEM} \mathit{x} \mathit{a} \mathit{p} \mathit{q} \mathit{u}\\
-&\quad \leq \mathit{a}/(2*(\mathit{H} \mathit{x})^{2})
+\vdash\;&\mathit{JEM} \mathit{x} \mathit{a} \mathit{p}\\
+&\quad \mathit{q} \mathit{u} \leq \mathit{a}/(2*(\mathit{H}\\
+&\quad \mathit{x})^{2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,35}\quad\lean{exact\_reduced\_region}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{a} \mathit{Delta} : \mathbb{R} ),\; (\mathit{hx} : 0<\mathit{x}),\; (\mathit{ha} :\\
-&\quad 0<\mathit{a}),\; (\mathit{hEE} : (2+2*\mathit{Real}.\mathit{sqrt} 2)*\mathit{a} \leq \mathit{Delta}^{2}*\mathit{H}\\
-&\quad \mathit{x}),\; (\mathit{hMM} : 2*\mathit{a}*(\mathit{x}+1) \leq \mathit{H} \mathit{x})
+&(\mathit{x} \mathit{a} \mathit{Delta} : \mathbb{R} ),\; (\mathit{hx} :\\
+&\quad 0<\mathit{x}),\; (\mathit{ha} : 0<\mathit{a}),\; (\mathit{hEE} : (2+2*\mathit{Real}.\mathit{sqrt} 2)*\mathit{a} \leq \mathit{Delta}^{2}*\mathit{H}\\
+&\quad \mathit{x}),\; (\mathit{hMM} : 2*\mathit{a}*(\mathit{x}+1) \leq \mathit{H}\\
+&\quad \mathit{x})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{p} \mathit{q} \mathit{u} : \mathbb{R}\\
-&\quad , 0<\mathit{p} \wedge 0<\mathit{q} \wedge 0<\mathit{u}\\
-&\quad \wedge \mathit{p}+\mathit{q}+\mathit{u}=1 \wedge \mathit{v}=\mathit{reducedScore} \mathit{x}\\
-&\quad \mathit{a} \mathit{Delta} \mathit{p} \mathit{q} \mathit{u}\} (\mathit{a}/(2*(\mathit{H}\\
+\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{p}\\
+&\quad \mathit{q} \mathit{u} : \mathbb{R} , 0<\mathit{p}\\
+&\quad \wedge 0<\mathit{q} \wedge 0<\mathit{u}\\
+&\quad \wedge \mathit{p}+\mathit{q}+\mathit{u}=1\\
+&\quad \wedge \mathit{v}=\mathit{reducedScore} \mathit{x}\\
+&\quad \mathit{a} \mathit{Delta} \mathit{p} \mathit{q}\\
+&\quad \mathit{u}\} (\mathit{a}/(2*(\mathit{H}\\
 &\quad \mathit{x})^{2}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,36}\quad\lean{star\_JEE\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{a} \mathit{Delta} : \mathbb{R} ),\; (\mathit{hx} : 0<\mathit{x}),\; (\mathit{ha} : 0\leq \mathit{a}),\; (\mathit{hregion} : (2+2*\mathit{Real}.\mathit{sqrt} 2)*\mathit{a} \leq \mathit{Delta}^{2}*\mathit{H}\\
+&(\mathit{x} \mathit{a} \mathit{Delta} : \mathbb{R} ),\; (\mathit{hx} :\\
+&\quad 0<\mathit{x}),\; (\mathit{ha} : 0\leq \mathit{a}),\; (\mathit{hregion} : (2+2*\mathit{Real}.\mathit{sqrt} 2)*\mathit{a} \leq \mathit{Delta}^{2}*\mathit{H}\\
 &\quad \mathit{x})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{a}/(2*(\mathit{H} \mathit{x})^{2}) \leq \mathit{JEE} \mathit{Delta} (\mathit{pStar}\\
+\vdash\;&\mathit{a}/(2*(\mathit{H} \mathit{x})^{2})\\
+&\quad \leq \mathit{JEE} \mathit{Delta} (\mathit{pStar}\\
 &\quad \mathit{x}) (\mathit{qStar} \mathit{x})
 \end{aligned} \]}
 
 \noindent\textbf{A\,37}\quad\lean{star\_JEM}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{a} : \mathbb{R} ),\; (\mathit{hx} : 0<\mathit{x})
+&(\mathit{x} \mathit{a} : \mathbb{R} ),\; (\mathit{hx} :\\
+&\quad 0<\mathit{x})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{JEM} \mathit{x} \mathit{a} (\mathit{pStar} \mathit{x}) (\mathit{qStar} \mathit{x}) (\mathit{uStar} \mathit{x})=\mathit{a}/(2*(\mathit{H}\\
+\vdash\;&\mathit{JEM} \mathit{x} \mathit{a} (\mathit{pStar}\\
+&\quad \mathit{x}) (\mathit{qStar} \mathit{x}) (\mathit{uStar} \mathit{x})=\mathit{a}/(2*(\mathit{H}\\
 &\quad \mathit{x})^{2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,38}\quad\lean{star\_JMM\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{a} : \mathbb{R} ),\; (\mathit{hx} : 0<\mathit{x}),\; (\mathit{ha} : 0\leq \mathit{a}),\; (\mathit{hregion} : 2*\mathit{a}*(\mathit{x}+1) \leq \mathit{H}\\
+&(\mathit{x} \mathit{a} : \mathbb{R} ),\; (\mathit{hx} :\\
+&\quad 0<\mathit{x}),\; (\mathit{ha} : 0\leq \mathit{a}),\; (\mathit{hregion} : 2*\mathit{a}*(\mathit{x}+1) \leq \mathit{H}\\
 &\quad \mathit{x})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{a}/(2*(\mathit{H} \mathit{x})^{2}) \leq \mathit{JMM} \mathit{x} (\mathit{pStar}\\
+\vdash\;&\mathit{a}/(2*(\mathit{H} \mathit{x})^{2})\\
+&\quad \leq \mathit{JMM} \mathit{x} (\mathit{pStar}\\
 &\quad \mathit{x}) (\mathit{uStar} \mathit{x})
 \end{aligned} \]}
 
 \noindent\textbf{A\,39}\quad\lean{three\_cost\_identity}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R} ),\; (\mathit{hp} : \mathit{p}\neq 0),\; (\mathit{hq} : \mathit{q}\neq 0),\; (\mathit{hu} : \mathit{u}\neq 0)
+&(\mathit{x} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \mathit{p}\neq 0),\; (\mathit{hq} : \mathit{q}\neq 0),\; (\mathit{hu} : \mathit{u}\neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{x}^{2}/\mathit{u}+2/\mathit{q}+4/\mathit{p})*(\mathit{p}+\mathit{q}+\mathit{u})-(\mathit{H}\\
 &\quad \mathit{x})^{2} = (\mathit{x}*\mathit{q}-\mathit{Real}.\mathit{sqrt}\\
 &\quad 2*\mathit{u})^{2}/(\mathit{u}*\mathit{q}) +\\
-&\quad (\mathit{x}*\mathit{p}-2*\mathit{u})^{2}/(\mathit{u}*\mathit{p}) + (\mathit{Real}.\mathit{sqrt}\\
+&\quad (\mathit{x}*\mathit{p}-2*\mathit{u})^{2}/(\mathit{u}*\mathit{p})\\
+&\quad + (\mathit{Real}.\mathit{sqrt}\\
 &\quad 2*\mathit{p}-2*\mathit{q})^{2}/(\mathit{q}*\mathit{p})
 \end{aligned} \]}
 
 \noindent\textbf{A\,40}\quad\lean{three\_cost\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R} ),\; (\mathit{hp} :\\
-&\quad 0<\mathit{p}),\; (\mathit{hq} : 0<\mathit{q}),\; (\mathit{hu} : 0<\mathit{u}),\; (\mathit{hsum} :\\
+&(\mathit{x} \mathit{p} \mathit{q} \mathit{u} : \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : 0<\mathit{p}),\; (\mathit{hq} :\\
+&\quad 0<\mathit{q}),\; (\mathit{hu} : 0<\mathit{u}),\; (\mathit{hsum} :\\
 &\quad \mathit{p}+\mathit{q}+\mathit{u}=1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -441,7 +518,8 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,41}\quad\lean{Snorm\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} )
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&0 < \mathit{Snorm} \mathit{n} \mathit{d}
@@ -453,12 +531,16 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad ),\; (\mathit{hd0} : 0 < \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&-- \mathit{the} \mathit{explicit} \mathit{allocation} \mathit{is} \mathit{a}\\
-&\quad \mathit{probability} \mathit{vector} (1/\mathit{Snorm} \mathit{n} \mathit{d} + 1/\mathit{Snorm} \mathit{n} \mathit{d} + \textstyle\sum \mathit{a} : \mathit{Fin} (\mathit{n}+2), \mathit{wExp} \mathit{n} \mathit{d} \mathit{a} =\\
-&\quad 1) \wedge -- \mathit{and} \mathit{no} \mathit{flipping} \mathit{alternative} \mathit{is}\\
-&\quad \mathit{cheaper} \mathit{than} \mathit{L} \mathit{at} \mathit{it} (\forall \mathit{lI0} \mathit{lI1} : \mathbb{R} , \forall \mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} , \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO} \to \mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n} \mathit{d}) \leq \mathit{energy} (1/\mathit{Snorm} \mathit{n} \mathit{d}) (1/\mathit{Snorm} \mathit{n} \mathit{d}) (\mathit{wExp} \mathit{n} \mathit{d}) (1-\mathit{d}) \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{lO}) \wedge -- \mathit{while} \mathit{every} \mathit{allocation} \mathit{admits}\\
-&\quad \mathit{one} \mathit{of} \mathit{cost} \mathit{at} \mathit{most} 2 \mathit{L} (\forall \mathit{wI0} \mathit{wI1} : \mathbb{R} , \forall \mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} , \mathit{wI0} + \mathit{wI1} + \textstyle\sum \mathit{a}, \mathit{wO} \mathit{a} = 1 \to \exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} (1-\mathit{d}) \mathit{lI0} \mathit{lI1} \mathit{lO} \leq 2*(\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n}\\
+\vdash\;&-- \mathit{the} \mathit{explicit} \mathit{allocation}\\
+&\quad \mathit{is} \mathit{a} \mathit{probability}\\
+&\quad \mathit{vector} (1/\mathit{Snorm} \mathit{n} \mathit{d} + 1/\mathit{Snorm} \mathit{n} \mathit{d} + \textstyle\sum \mathit{a} : \mathit{Fin} (\mathit{n}+2), \mathit{wExp} \mathit{n} \mathit{d} \mathit{a} =\\
+&\quad 1) \wedge -- \mathit{and} \mathit{no} \mathit{flipping}\\
+&\quad \mathit{alternative} \mathit{is} \mathit{cheaper}\\
+&\quad \mathit{than} \mathit{L} \mathit{at} \mathit{it} (\forall \mathit{lI0} \mathit{lI1} : \mathbb{R} , \forall \mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} , \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO} \to \mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n} \mathit{d}) \leq \mathit{energy} (1/\mathit{Snorm} \mathit{n} \mathit{d}) (1/\mathit{Snorm} \mathit{n} \mathit{d}) (\mathit{wExp} \mathit{n} \mathit{d}) (1-\mathit{d}) \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO}) \wedge -- \mathit{while} \mathit{every}\\
+&\quad \mathit{allocation} \mathit{admits} \mathit{one}\\
+&\quad \mathit{of} \mathit{cost} \mathit{at} \mathit{most} 2\\
+&\quad \mathit{L} (\forall \mathit{wI0} \mathit{wI1} : \mathbb{R} , \forall \mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} , \mathit{wI0} + \mathit{wI1} + \textstyle\sum \mathit{a}, \mathit{wO} \mathit{a} = 1 \to \exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} (1-\mathit{d}) \mathit{lI0} \mathit{lI1} \mathit{lO} \leq 2*(\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n}\\
 &\quad \mathit{d})))
 \end{aligned} \]}
 
@@ -476,50 +558,59 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,44}\quad\lean{energy\_ge\_pairV}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{hlt} : \mathit{rho} <\\
-&\quad 1),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{hI0} : 0 < \mathit{wI0}),\; (\mathit{hI1} : 0 <\\
-&\quad \mathit{wI1}),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{wO}\\
-&\quad \mathit{c}),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R} ),\; (\mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
-&\quad ),\; (\mathit{hflip} : \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO})
+&\quad 1),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{hI0} : 0 <\\
+&\quad \mathit{wI0}),\; (\mathit{hI1} : 0 < \mathit{wI1}),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{wO}\\
+&\quad \mathit{c}),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hflip} : \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{a} \mathit{b} : \mathit{Fin} (\mathit{n}+2), \mathit{a}\\
-&\quad \neq \mathit{b} \wedge \mathit{pairV} \mathit{wI0} \mathit{wI1} (\mathit{wO} \mathit{a}) (\mathit{wO}\\
-&\quad \mathit{b}) (\mathit{meanO} \mathit{rho} \mathit{n} \mathit{a} - \mathit{meanO} \mathit{rho} \mathit{n}\\
-&\quad \mathit{b}) \leq \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} \mathit{rho}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lO}
+\vdash\;&\exists \mathit{a} \mathit{b} : \mathit{Fin}\\
+&\quad (\mathit{n}+2), \mathit{a} \neq \mathit{b}\\
+&\quad \wedge \mathit{pairV} \mathit{wI0} \mathit{wI1} (\mathit{wO}\\
+&\quad \mathit{a}) (\mathit{wO} \mathit{b}) (\mathit{meanO} \mathit{rho} \mathit{n} \mathit{a} - \mathit{meanO} \mathit{rho} \mathit{n}\\
+&\quad \mathit{b}) \leq \mathit{energy} \mathit{wI0}\\
+&\quad \mathit{wI1} \mathit{wO} \mathit{rho} \mathit{lI0}\\
+&\quad \mathit{lI1} \mathit{lO}
 \end{aligned} \]}
 
 \noindent\textbf{A\,45}\quad\lean{explicit\_allocation\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hd0} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R}\\
-&\quad ),\; (\mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} ),\; (\mathit{hflip} : \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd0} : 0 < \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hflip} : \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
 &\quad \mathit{lO})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n} \mathit{d})\\
-&\quad \leq \mathit{energy} (1/\mathit{Snorm} \mathit{n} \mathit{d}) (1/\mathit{Snorm} \mathit{n}\\
-&\quad \mathit{d}) (\mathit{wExp} \mathit{n} \mathit{d}) (1-\mathit{d}) \mathit{lI0} \mathit{lI1}\\
+&\quad \leq \mathit{energy} (1/\mathit{Snorm} \mathit{n}\\
+&\quad \mathit{d}) (1/\mathit{Snorm} \mathit{n} \mathit{d}) (\mathit{wExp} \mathit{n}\\
+&\quad \mathit{d}) (1-\mathit{d}) \mathit{lI0} \mathit{lI1}\\
 &\quad \mathit{lO}
 \end{aligned} \]}
 
 \noindent\textbf{A\,46}\quad\lean{explicit\_pairV\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hd0} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1),\; (\mathit{a} \mathit{b} : \mathit{Fin}\\
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd0} : 0 < \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1),\; (\mathit{a} \mathit{b} : \mathit{Fin}\\
 &\quad (\mathit{n}+2)),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n} \mathit{d})\\
-&\quad \leq \mathit{pairV} (1/\mathit{Snorm} \mathit{n} \mathit{d}) (1/\mathit{Snorm} \mathit{n}\\
-&\quad \mathit{d}) (\mathit{wExp} \mathit{n} \mathit{d} \mathit{a}) (\mathit{wExp} \mathit{n} \mathit{d}\\
+&\quad \leq \mathit{pairV} (1/\mathit{Snorm} \mathit{n}\\
+&\quad \mathit{d}) (1/\mathit{Snorm} \mathit{n} \mathit{d}) (\mathit{wExp} \mathit{n} \mathit{d}\\
+&\quad \mathit{a}) (\mathit{wExp} \mathit{n} \mathit{d}\\
 &\quad \mathit{b}) (\mathit{meanO} (1-\mathit{d}) \mathit{n} \mathit{a} - \mathit{meanO} (1-\mathit{d}) \mathit{n}\\
 &\quad \mathit{b})
 \end{aligned} \]}
 
 \noindent\textbf{A\,47}\quad\lean{incumbent\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wI0} \mathit{wI1} \mathit{lI0} \mathit{lI1} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{wI0}),\; (\mathit{h1} : 0 \leq \mathit{wI1})
+&(\mathit{wI0} \mathit{wI1} \mathit{lI0} \mathit{lI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{h0} : 0 \leq \mathit{wI0}),\; (\mathit{h1} : 0 \leq \mathit{wI1})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{wI0}*\mathit{wI1}*(1-(\mathit{lI1}-\mathit{lI0}))^{2}\\
@@ -538,18 +629,22 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,49}\quad\lean{meanO\_diff\_lt\_one}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{h1} : \mathit{rho} <\\
-&\quad 1),\; (\mathit{a} \mathit{b} : \mathit{Fin} (\mathit{n}+2))
+&\quad 1),\; (\mathit{a} \mathit{b} : \mathit{Fin}\\
+&\quad (\mathit{n}+2))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{meanO} \mathit{rho} \mathit{n} \mathit{a} - \mathit{meanO} \mathit{rho} \mathit{n}\\
-&\quad \mathit{b} < 1
+\vdash\;&\mathit{meanO} \mathit{rho} \mathit{n} \mathit{a} -\\
+&\quad \mathit{meanO} \mathit{rho} \mathit{n} \mathit{b}\\
+&\quad < 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,50}\quad\lean{outsider\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{c}, 0 \leq \mathit{wO}\\
+&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{c}, 0 \leq \mathit{wO}\\
 &\quad \mathit{c}),\; (\mathit{rho} : \mathbb{R} ),\; (\mathit{lO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathit{Fin} (\mathit{n}+2)),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
+&\quad ),\; (\mathit{a} \mathit{b} : \mathit{Fin}\\
+&\quad (\mathit{n}+2)),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{wO} \mathit{a}*\mathit{wO} \mathit{b}*((\mathit{lO} \mathit{a} - \mathit{lO} \mathit{b}) - (\mathit{meanO} \mathit{rho} \mathit{n} \mathit{a} - \mathit{meanO} \mathit{rho} \mathit{n}\\
@@ -559,13 +654,14 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,51}\quad\lean{pairV\_eq}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wI0} \mathit{wI1} \mathit{wa} \mathit{wb} \mathit{D} : \mathbb{R} ),\; (\mathit{h0} : 0 <\\
-&\quad \mathit{wI0}),\; (\mathit{h1} : 0 < \mathit{wI1}),\; (\mathit{ha} : 0 < \mathit{wa}),\; (\mathit{hb} : 0 <\\
+&(\mathit{wI0} \mathit{wI1} \mathit{wa} \mathit{wb} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{h0} : 0 < \mathit{wI0}),\; (\mathit{h1} : 0 <\\
+&\quad \mathit{wI1}),\; (\mathit{ha} : 0 < \mathit{wa}),\; (\mathit{hb} : 0 <\\
 &\quad \mathit{wb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pairV} \mathit{wI0} \mathit{wI1} \mathit{wa} \mathit{wb} \mathit{D}\\
-&\quad =\\
+\vdash\;&\mathit{pairV} \mathit{wI0} \mathit{wI1} \mathit{wa}\\
+&\quad \mathit{wb} \mathit{D} =\\
 &\quad (\mathit{wI0}*\mathit{wI1}/(2*(\mathit{wI0}+\mathit{wI1})))*(\mathit{wa}*\mathit{wb}/(2*(\mathit{wa}+\mathit{wb})))*(1-\mathit{D})^{2}\\
 &\quad / (\mathit{wI0}*\mathit{wI1}/(2*(\mathit{wI0}+\mathit{wI1})) +\\
 &\quad \mathit{wa}*\mathit{wb}/(2*(\mathit{wa}+\mathit{wb})))
@@ -573,47 +669,53 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,52}\quad\lean{pairV\_unit}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} \mathit{wa} \mathit{wb} \mathit{D} : \mathbb{R} ),\; (\mathit{hs} : 0 <\\
-&\quad \mathit{s}),\; (\mathit{hwa} : 0 < \mathit{wa}),\; (\mathit{hwb} : 0 < \mathit{wb})
+&(\mathit{s} \mathit{wa} \mathit{wb} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hwa} : 0 <\\
+&\quad \mathit{wa}),\; (\mathit{hwb} : 0 < \mathit{wb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pairV} (1/\mathit{s}) (1/\mathit{s}) \mathit{wa} \mathit{wb} \mathit{D}\\
-&\quad = (\mathit{wa}*\mathit{wb})*(1-\mathit{D})^{2}/(2*((\mathit{wa}+\mathit{wb}) +\\
+\vdash\;&\mathit{pairV} (1/\mathit{s}) (1/\mathit{s})\\
+&\quad \mathit{wa} \mathit{wb} \mathit{D} = (\mathit{wa}*\mathit{wb})*(1-\mathit{D})^{2}/(2*((\mathit{wa}+\mathit{wb}) +\\
 &\quad 2*\mathit{s}*(\mathit{wa}*\mathit{wb})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,53}\quad\lean{pairV\_unit\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} \mathit{wa} \mathit{wb} \mathit{D} \mathit{L} : \mathbb{R} ),\; (\mathit{hs} : 0 <\\
-&\quad \mathit{s}),\; (\mathit{hwa} : 0 < \mathit{wa}),\; (\mathit{hwb} : 0 < \mathit{wb}),\; (\mathit{h} : \mathit{L}*(2*((\mathit{wa}+\mathit{wb}) + 2*\mathit{s}*(\mathit{wa}*\mathit{wb}))) \leq (\mathit{wa}*\mathit{wb})*(1-\mathit{D})^{2})
+&(\mathit{s} \mathit{wa} \mathit{wb} \mathit{D} \mathit{L} : \mathbb{R}\\
+&\quad ),\; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hwa} : 0 <\\
+&\quad \mathit{wa}),\; (\mathit{hwb} : 0 < \mathit{wb}),\; (\mathit{h} : \mathit{L}*(2*((\mathit{wa}+\mathit{wb}) + 2*\mathit{s}*(\mathit{wa}*\mathit{wb}))) \leq (\mathit{wa}*\mathit{wb})*(1-\mathit{D})^{2})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{L} \leq \mathit{pairV} (1/\mathit{s}) (1/\mathit{s}) \mathit{wa} \mathit{wb}\\
-&\quad \mathit{D}
+\vdash\;&\mathit{L} \leq \mathit{pairV} (1/\mathit{s})\\
+&\quad (1/\mathit{s}) \mathit{wa} \mathit{wb} \mathit{D}
 \end{aligned} \]}
 
 \noindent\textbf{A\,54}\quad\lean{pinch}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{B} \mathit{u} \mathit{v} : \mathbb{R} ),\; (\mathit{hA} : 0 \leq \mathit{A}),\; (\mathit{hB} : 0 \leq \mathit{B})
+&(\mathit{A} \mathit{B} \mathit{u} \mathit{v} : \mathbb{R}\\
+&\quad ),\; (\mathit{hA} : 0 \leq \mathit{A}),\; (\mathit{hB} : 0 \leq \mathit{B})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{A}*\mathit{B}*(\mathit{u}+\mathit{v})^{2} \leq (\mathit{A}*\mathit{u}^{2} +\\
+\vdash\;&\mathit{A}*\mathit{B}*(\mathit{u}+\mathit{v})^{2}\\
+&\quad \leq (\mathit{A}*\mathit{u}^{2} +\\
 &\quad \mathit{B}*\mathit{v}^{2})*(\mathit{A}+\mathit{B})
 \end{aligned} \]}
 
 \noindent\textbf{A\,55}\quad\lean{two\_point}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{w1} \mathit{w2} \mathit{x} \mathit{y} : \mathbb{R} ),\; (\mathit{h1} : 0 \leq \mathit{w1}),\; (\mathit{h2} : 0 \leq \mathit{w2})
+&(\mathit{w1} \mathit{w2} \mathit{x} \mathit{y} : \mathbb{R}\\
+&\quad ),\; (\mathit{h1} : 0 \leq \mathit{w1}),\; (\mathit{h2} : 0 \leq \mathit{w2})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{w1}*\mathit{w2}*(\mathit{x}-\mathit{y})^{2} \leq (\mathit{w1}*\mathit{x}^{2} +\\
+\vdash\;&\mathit{w1}*\mathit{w2}*(\mathit{x}-\mathit{y})^{2}\\
+&\quad \leq (\mathit{w1}*\mathit{x}^{2} +\\
 &\quad \mathit{w2}*\mathit{y}^{2})*(\mathit{w1}+\mathit{w2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,56}\quad\lean{upper\_le\_ratio\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hd0} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{h2} : (1+\mathit{d})^{2} \leq 2)
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd0} : 0 < \mathit{d}),\; (\mathit{h2} : (1+\mathit{d})^{2} \leq 2)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{kappa} (1-\mathit{d})*\mathit{d}^{2}/(32*\mathit{kappa} (1-\mathit{d}) +\\
@@ -623,18 +725,20 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,57}\quad\lean{upper\_le\_two\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hd0} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1)
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd0} : 0 < \mathit{d}),\; (\mathit{hd1} : \mathit{d} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{kappa} (1-\mathit{d})*\mathit{d}^{2}/(32*\mathit{kappa} (1-\mathit{d}) +\\
-&\quad \mathit{n}*\mathit{d}^{2}) \leq 2*(\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n} \mathit{d}))
+&\quad \mathit{n}*\mathit{d}^{2}) \leq 2*(\mathit{d}^{2}/(8*\mathit{Snorm} \mathit{n}\\
+&\quad \mathit{d}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,58}\quad\lean{wExp\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{a} : \mathit{Fin} (\mathit{n}+2))
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{a} : \mathit{Fin}\\
+&\quad (\mathit{n}+2))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&0 < \mathit{wExp} \mathit{n} \mathit{d} \mathit{a}
@@ -642,12 +746,13 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,59}\quad\lean{wExp\_total}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R} )
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{d} : \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2/\mathit{Snorm} \mathit{n} \mathit{d} + \textstyle\sum \mathit{a} : \mathit{Fin}\\
-&\quad (\mathit{n}+2), \mathit{wExp} \mathit{n} \mathit{d} \mathit{a}\\
-&\quad = 1
+\vdash\;&2/\mathit{Snorm} \mathit{n} \mathit{d} + \textstyle\sum \mathit{a}\\
+&\quad : \mathit{Fin} (\mathit{n}+2), \mathit{wExp} \mathit{n}\\
+&\quad \mathit{d} \mathit{a} = 1
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -655,19 +760,22 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,60}\quad\lean{breakeven\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sa} \mathit{sb} \mathit{cc} \mathit{nuc} : \mathbb{R} ),\; (\mathit{hsa} : 0 <\\
-&\quad \mathit{sa}),\; (\mathit{hsb} : 0 < \mathit{sb})
+&(\mathit{sa} \mathit{sb} \mathit{cc} \mathit{nuc} : \mathbb{R}\\
+&\quad ),\; (\mathit{hsa} : 0 < \mathit{sa}),\; (\mathit{hsb} : 0 <\\
+&\quad \mathit{sb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{cc} * \mathit{nuc} = (\mathit{sa} + \mathit{sb}) ^{2}\\
-&\quad \leftrightarrow \mathit{cc} * \mathit{nuc} = \mathit{sa} ^{2} / (\mathit{sa} / (\mathit{sa} +\\
-&\quad \mathit{sb})) + \mathit{sb} ^{2} / (1 - \mathit{sa} / (\mathit{sa} + \mathit{sb}))
+\vdash\;&\mathit{cc} * \mathit{nuc} = (\mathit{sa} +\\
+&\quad \mathit{sb}) ^{2} \leftrightarrow \mathit{cc} *\\
+&\quad \mathit{nuc} = \mathit{sa} ^{2} / (\mathit{sa} / (\mathit{sa} +\\
+&\quad \mathit{sb})) + \mathit{sb} ^{2} / (1 - \mathit{sa} / (\mathit{sa} +\\
+&\quad \mathit{sb}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,61}\quad\lean{breakeven\_not\_four}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sa} \mathit{sb} : \mathbb{R} ),\; (\mathit{hsa} : 0 < \mathit{sa}),\; (\mathit{hsb} : 0 <\\
-&\quad \mathit{sb}),\; (\mathit{hne} : \mathit{sa} + \mathit{sb} \neq 2)
+&(\mathit{sa} \mathit{sb} : \mathbb{R} ),\; (\mathit{hsa} : 0 <\\
+&\quad \mathit{sa}),\; (\mathit{hsb} : 0 < \mathit{sb}),\; (\mathit{hne} : \mathit{sa} + \mathit{sb} \neq 2)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\mathit{sa} + \mathit{sb}) ^{2} \neq 4
@@ -675,110 +783,128 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,62}\quad\lean{design\_value\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
-&\quad ),\; (\mathit{w} : \mathit{W}),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q}, \mathit{c} \leq \mathit{f} \mathit{q}\\
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{W}),\; (\mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q}, \mathit{c} \leq \mathit{f} \mathit{q}\\
 &\quad \mathit{w})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}
+\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q}\\
+&\quad \mathit{hQ} \mathit{f} \mathit{w}
 \end{aligned} \]}
 
 \noindent\textbf{A\,63}\quad\lean{design\_value\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
 &\quad ),\; (\mathit{w} : \mathit{W}),\; \{ \mathit{q} : \iota \},\; (\mathit{hq} : \mathit{q} \in \mathit{Q})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}\\
-&\quad \leq \mathit{f} \mathit{q} \mathit{w}
+\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f}\\
+&\quad \mathit{w} \leq \mathit{f} \mathit{q} \mathit{w}
 \end{aligned} \]}
 
 \noindent\textbf{A\,64}\quad\lean{dual\_certificate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
 &\quad ),\; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam}\\
 &\quad \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} =\\
 &\quad 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{w} : \mathit{W}, \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f}\\
-&\quad \mathit{w} \leq \mathit{U}
+\vdash\;&\forall \mathit{w} : \mathit{W}, \mathit{designValue}\\
+&\quad \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}\\
+&\quad \leq \mathit{U}
 \end{aligned} \]}
 
 \noindent\textbf{A\,65}\quad\lean{dual\_gap\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
 &\quad ),\; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam}\\
 &\quad \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} =\\
-&\quad 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} : \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U}),\; (\mathit{hattain} : \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀} =\\
+&\quad 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} :\\
+&\quad \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U}),\; (\mathit{hattain} : \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀} =\\
 &\quad \mathit{U})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w} : \mathit{W}, \mathit{designValue}\\
-&\quad \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\} \mathit{U}
+\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w}\\
+&\quad : \mathit{W}, \mathit{designValue} \mathit{Q}\\
+&\quad \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\}\\
+&\quad \mathit{U}
 \end{aligned} \]}
 
 \noindent\textbf{A\,66}\quad\lean{infeasible\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} )
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels}\\
-&\quad = \mathit{none} \leftrightarrow \mathit{total} < \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
+&\quad \mathit{channels} = \mathit{none}\\
+&\quad \leftrightarrow \mathit{total} < \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
 &\quad )
 \end{aligned} \]}
 
 \noindent\textbf{A\,67}\quad\lean{information\_of\_budget}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N}\\
-&\quad ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total}),\; (\mathit{hsetup} : 0 \leq \mathit{setup}),\; (\mathit{hunit} : 0 \leq \mathit{unit})
+&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R}\\
+&\quad ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total}),\; (\mathit{hsetup} : 0 \leq \mathit{setup}),\; (\mathit{hunit} : 0 \leq \mathit{unit})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit}\\
-&\quad \wedge (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit}\\
-&\quad \leq \mathit{total} * \mathit{unit}
+\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad )) * \mathit{unit} \wedge (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad )) * \mathit{unit} \leq \mathit{total} * \mathit{unit}
 \end{aligned} \]}
 
 \noindent\textbf{A\,68}\quad\lean{scalar\_split\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sa} \mathit{sb} \mathit{p} : \mathbb{R} ),\; (\mathit{hsa} : 0 < \mathit{sa}),\; (\mathit{hsb} : 0 <\\
-&\quad \mathit{sb}),\; (\mathit{hp0} : 0 < \mathit{p}),\; (\mathit{hp1} : \mathit{p} < 1)
+&(\mathit{sa} \mathit{sb} \mathit{p} : \mathbb{R} ),\; (\mathit{hsa} : 0 <\\
+&\quad \mathit{sa}),\; (\mathit{hsb} : 0 < \mathit{sb}),\; (\mathit{hp0} : 0 <\\
+&\quad \mathit{p}),\; (\mathit{hp1} : \mathit{p} < 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{sa} + \mathit{sb}) ^{2} \leq \mathit{sa} ^{2} / \mathit{p} + \mathit{sb} ^{2} / (1 -\\
-&\quad \mathit{p})
+\vdash\;&(\mathit{sa} + \mathit{sb}) ^{2} \leq \mathit{sa} ^{2}\\
+&\quad / \mathit{p} + \mathit{sb} ^{2} / (1 - \mathit{p})
 \end{aligned} \]}
 
 \noindent\textbf{A\,69}\quad\lean{scalar\_split\_optimal}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sa} \mathit{sb} : \mathbb{R} ),\; (\mathit{hsa} : 0 < \mathit{sa}),\; (\mathit{hsb} : 0 <\\
-&\quad \mathit{sb})
+&(\mathit{sa} \mathit{sb} : \mathbb{R} ),\; (\mathit{hsa} : 0 <\\
+&\quad \mathit{sa}),\; (\mathit{hsb} : 0 < \mathit{sb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sa} ^{2} / (\mathit{sa} / (\mathit{sa} + \mathit{sb})) + \mathit{sb} ^{2} / (1 - \mathit{sa} / (\mathit{sa} +\\
+\vdash\;&\mathit{sa} ^{2} / (\mathit{sa} / (\mathit{sa} +\\
+&\quad \mathit{sb})) + \mathit{sb} ^{2} / (1 - \mathit{sa} / (\mathit{sa} +\\
 &\quad \mathit{sb})) = (\mathit{sa} + \mathit{sb}) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,70}\quad\lean{value\_of\_feasible}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total})
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N}\\
+&\quad ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R} ) \leq \mathit{total})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels}\\
-&\quad = \mathit{some} (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} ))
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
+&\quad \mathit{channels} = \mathit{some} (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
+&\quad ))
 \end{aligned} \]}
 
 \noindent\textbf{A\,71}\quad\lean{weak\_duality}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
+&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R}\\
 &\quad ),\; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam}\\
 &\quad \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} =\\
 &\quad 1),\; (\mathit{w} : \mathit{W})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}\\
-&\quad \leq \textstyle\sum \mathit{q} \in \mathit{Q}, \mathit{lam} \mathit{q} * \mathit{f}\\
-&\quad \mathit{q} \mathit{w}
+\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f}\\
+&\quad \mathit{w} \leq \textstyle\sum \mathit{q} \in \mathit{Q},\\
+&\quad \mathit{lam} \mathit{q} * \mathit{f} \mathit{q}\\
+&\quad \mathit{w}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -786,20 +912,22 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,72}\quad\lean{not\_optimal\_of\_better\_cell}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R} ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R}\\
-&\quad ),\; (\mathit{k} : \mathit{Cell}),\; (\mathit{a} : \mathbb{R} ),\; (\mathit{ha0} : 0 <\\
+&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R} ),\; (\mathit{k} :\\
+&\quad \mathit{Cell}),\; (\mathit{a} : \mathbb{R} ),\; (\mathit{ha0} : 0 <\\
 &\quad \mathit{a}),\; (\mathit{ha1} : \mathit{a} \leq 1),\; (\mathit{hbetter} : \mathit{value} \mathit{I} \mathit{w} < (\mathit{univ} : \mathit{Finset} \mathit{Alt}).\mathit{inf'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{l} => \mathit{I} \mathit{l}\\
 &\quad \mathit{k}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{value} \mathit{I} \mathit{w} < \mathit{value} \mathit{I} (\mathbf{fun} \mathit{e} => (1 - \mathit{a}) * \mathit{w} \mathit{e} + \mathit{a} * (\mathbf{if} \mathit{e} = \mathit{k} \mathbf{then} 1 \mathbf{else}\\
+\vdash\;&\mathit{value} \mathit{I} \mathit{w} < \mathit{value}\\
+&\quad \mathit{I} (\mathbf{fun} \mathit{e} => (1 - \mathit{a}) * \mathit{w} \mathit{e} + \mathit{a} * (\mathbf{if} \mathit{e} = \mathit{k} \mathbf{then} 1 \mathbf{else}\\
 &\quad 0))
 \end{aligned} \]}
 
 \noindent\textbf{A\,73}\quad\lean{optimal\_iff\_no\_better\_direction}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R} ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R}\\
-&\quad )
+&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\forall \mathit{v}, \mathit{value} \mathit{I} \mathit{v} \leq \mathit{value} \mathit{I}\\
@@ -809,32 +937,38 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,74}\quad\lean{segment\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R} ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R}\\
-&\quad ),\; (\mathit{k} : \mathit{Cell}),\; (\mathit{a} : \mathbb{R} ),\; (\mathit{ha0} : 0 \leq \mathit{a}),\; (\mathit{ha1} : \mathit{a} \leq 1)
+&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} : \mathit{Cell} \to \mathbb{R} ),\; (\mathit{k} :\\
+&\quad \mathit{Cell}),\; (\mathit{a} : \mathbb{R} ),\; (\mathit{ha0} : 0 \leq \mathit{a}),\; (\mathit{ha1} : \mathit{a} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 - \mathit{a}) * \mathit{value} \mathit{I} \mathit{w} + \mathit{a} * ((\mathit{univ} : \mathit{Finset} \mathit{Alt}).\mathit{inf'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{l} => \mathit{I} \mathit{l}\\
+\vdash\;&(1 - \mathit{a}) * \mathit{value} \mathit{I} \mathit{w}\\
+&\quad + \mathit{a} * ((\mathit{univ} : \mathit{Finset} \mathit{Alt}).\mathit{inf'} \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{l} => \mathit{I} \mathit{l}\\
 &\quad \mathit{k})) \leq \mathit{value} \mathit{I} (\mathbf{fun} \mathit{e} => (1 - \mathit{a}) * \mathit{w} \mathit{e} + \mathit{a} * (\mathbf{if} \mathit{e} = \mathit{k} \mathbf{then} 1 \mathbf{else}\\
 &\quad 0))
 \end{aligned} \]}
 
 \noindent\textbf{A\,75}\quad\lean{value\_le\_sup}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R} ),\; (\mathit{wstar} : \mathit{Cell} \to \mathbb{R}\\
+&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R}\\
+&\quad ),\; (\mathit{wstar} : \mathit{Cell} \to \mathbb{R}\\
 &\quad ),\; (\mathit{Gamma} : \mathbb{R} ),\; (\mathit{hsup} : \forall \mathit{w}, \mathit{value} \mathit{I} \mathit{w} \leq \mathit{Gamma})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{value} \mathit{I} \mathit{wstar} \leq \mathit{Gamma}
+\vdash\;&\mathit{value} \mathit{I} \mathit{wstar}\\
+&\quad \leq \mathit{Gamma}
 \end{aligned} \]}
 
 \noindent\textbf{A\,76}\quad\lean{value\_min\_linear\_concave}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R} ),\; (\mathit{w} \mathit{v} : \mathit{Cell} \to \mathbb{R}\\
+&(\mathit{I} : \mathit{Alt} \to \mathit{Cell} \to \mathbb{R}\\
+&\quad ),\; (\mathit{w} \mathit{v} : \mathit{Cell} \to \mathbb{R}\\
 &\quad ),\; (\mathit{a} : \mathbb{R} ),\; (\mathit{ha0} : 0 \leq \mathit{a}),\; (\mathit{ha1} : \mathit{a} \leq 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 - \mathit{a}) * \mathit{value} \mathit{I} \mathit{w} + \mathit{a} * \mathit{value}\\
-&\quad \mathit{I} \mathit{v} \leq \mathit{value} \mathit{I} (\mathbf{fun} \mathit{e} => (1 - \mathit{a}) * \mathit{w} \mathit{e} + \mathit{a} * \mathit{v}\\
+\vdash\;&(1 - \mathit{a}) * \mathit{value} \mathit{I} \mathit{w}\\
+&\quad + \mathit{a} * \mathit{value} \mathit{I} \mathit{v}\\
+&\quad \leq \mathit{value} \mathit{I} (\mathbf{fun} \mathit{e} => (1 - \mathit{a}) * \mathit{w} \mathit{e} + \mathit{a} * \mathit{v}\\
 &\quad \mathit{e})
 \end{aligned} \]}
 
@@ -843,78 +977,99 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,77}\quad\lean{card\_middles}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{middles} \mathit{n}).\mathit{card} = \mathit{n}
+\vdash\;&(\mathit{middles} \mathit{n}).\mathit{card}\\
+&\quad = \mathit{n}
 \end{aligned} \]}
 
 \noindent\textbf{A\,78}\quad\lean{crossover\_upper}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{h1} : \mathit{rho} <\\
-&\quad 1),\; (\mathit{hn} : 2 \leq \mathit{n}),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad 1),\; (\mathit{hn} : 2 \leq \mathit{n}),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
 &\quad ),\; (\mathit{hw} : \mathit{wI0} + \mathit{wI1} + \textstyle\sum \mathit{a}, \mathit{wO} \mathit{a} =\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} \mathit{rho}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lO} \leq \mathit{kappa} \mathit{rho}*(1-\mathit{rho})^{2}/(32*\mathit{kappa} \mathit{rho} +\\
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO},\\
+&\quad \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO}\\
+&\quad \wedge \mathit{energy} \mathit{wI0} \mathit{wI1}\\
+&\quad \mathit{wO} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO} \leq \mathit{kappa} \mathit{rho}*(1-\mathit{rho})^{2}/(32*\mathit{kappa} \mathit{rho} +\\
 &\quad \mathit{n}*(1-\mathit{rho})^{2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,79}\quad\lean{exists\_light\_one}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} ),\; (\mathit{hn} : 1 \leq \mathit{n})
+&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hn} : 1 \leq \mathit{n})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{a}, \mathit{IsMiddle} \mathit{a} \wedge (\mathit{n}:\mathbb{R} )*\mathit{wO}\\
-&\quad \mathit{a} \leq \textstyle\sum \mathit{c} \in \mathit{middles} \mathit{n}, \mathit{wO}\\
-&\quad \mathit{c}
+\vdash\;&\exists \mathit{a}, \mathit{IsMiddle} \mathit{a}\\
+&\quad \wedge (\mathit{n}:\mathbb{R} )*\mathit{wO} \mathit{a}\\
+&\quad \leq \textstyle\sum \mathit{c} \in \mathit{middles}\\
+&\quad \mathit{n}, \mathit{wO} \mathit{c}
 \end{aligned} \]}
 
 \noindent\textbf{A\,80}\quad\lean{exists\_light\_pair}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} ),\; (\mathit{hn} : 2 \leq \mathit{n})
+&(\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hn} : 2 \leq \mathit{n})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{a} \mathit{b}, \mathit{IsMiddle} \mathit{a}\\
-&\quad \wedge \mathit{IsMiddle} \mathit{b} \wedge \mathit{a} \neq \mathit{b}\\
-&\quad \wedge (\mathit{n}:\mathbb{R} )*(\mathit{wO} \mathit{a} + \mathit{wO} \mathit{b})\\
-&\quad \leq 2*\textstyle\sum \mathit{c} \in \mathit{middles} \mathit{n}, \mathit{wO} \mathit{c}
+\vdash\;&\exists \mathit{a} \mathit{b}, \mathit{IsMiddle}\\
+&\quad \mathit{a} \wedge \mathit{IsMiddle} \mathit{b}\\
+&\quad \wedge \mathit{a} \neq \mathit{b} \wedge (\mathit{n}:\mathbb{R} )*(\mathit{wO} \mathit{a} + \mathit{wO}\\
+&\quad \mathit{b}) \leq 2*\textstyle\sum \mathit{c} \in \mathit{middles}\\
+&\quad \mathit{n}, \mathit{wO} \mathit{c}
 \end{aligned} \]}
 
 \noindent\textbf{A\,81}\quad\lean{witness\_EE}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R}\\
-&\quad ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R} )
+&\quad ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} \mathit{rho}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lO} = (\mathit{wI0} + \mathit{wI1} + \mathit{wO} (\mathit{e0} \mathit{n}) + \mathit{wO} (\mathit{e1}\\
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO},\\
+&\quad \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO}\\
+&\quad \wedge \mathit{energy} \mathit{wI0} \mathit{wI1}\\
+&\quad \mathit{wO} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO} = (\mathit{wI0} + \mathit{wI1} + \mathit{wO} (\mathit{e0} \mathit{n}) + \mathit{wO} (\mathit{e1}\\
 &\quad \mathit{n}))*(1-\mathit{rho})^{2}/32
 \end{aligned} \]}
 
 \noindent\textbf{A\,82}\quad\lean{witness\_EM}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} : \mathbb{R} ),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&(\mathit{rho} : \mathbb{R} ),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
 &\quad ),\; \{ \mathit{a} : \mathit{Fin} (\mathit{n}+2)\},\; (\mathit{ha} : \mathit{IsMiddle}\\
 &\quad \mathit{a})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} \mathit{rho}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lO} = \mathit{wO} \mathit{a}*(1-\mathit{rho}/2)^{2}/2
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO},\\
+&\quad \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO}\\
+&\quad \wedge \mathit{energy} \mathit{wI0} \mathit{wI1}\\
+&\quad \mathit{wO} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO} = \mathit{wO}\\
+&\quad \mathit{a}*(1-\mathit{rho}/2)^{2}/2
 \end{aligned} \]}
 
 \noindent\textbf{A\,83}\quad\lean{witness\_MM}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} : \mathbb{R} ),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
-&\quad ),\; \{ \mathit{a} \mathit{b} : \mathit{Fin} (\mathit{n}+2)\},\; (\mathit{ha} : \mathit{IsMiddle}\\
-&\quad \mathit{a}),\; (\mathit{hb} : \mathit{IsMiddle} \mathit{b}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
+&(\mathit{rho} : \mathbb{R} ),\; (\mathit{wI0} \mathit{wI1} : \mathbb{R}\\
+&\quad ),\; (\mathit{wO} : \mathit{Fin} (\mathit{n}+2) \to \mathbb{R}\\
+&\quad ),\; \{ \mathit{a} \mathit{b} : \mathit{Fin}\\
+&\quad (\mathit{n}+2)\},\; (\mathit{ha} : \mathit{IsMiddle}\\
+&\quad \mathit{a}),\; (\mathit{hb} : \mathit{IsMiddle}\\
+&\quad \mathit{b}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO}, \mathit{Flips} \mathit{lI0} \mathit{lI1}\\
-&\quad \mathit{lO} \wedge \mathit{energy} \mathit{wI0} \mathit{wI1} \mathit{wO} \mathit{rho}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lO} = (\mathit{wO} \mathit{a} + \mathit{wO} \mathit{b})/8
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lO},\\
+&\quad \mathit{Flips} \mathit{lI0} \mathit{lI1} \mathit{lO}\\
+&\quad \wedge \mathit{energy} \mathit{wI0} \mathit{wI1}\\
+&\quad \mathit{wO} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lO} = (\mathit{wO} \mathit{a} + \mathit{wO}\\
+&\quad \mathit{b})/8
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -931,8 +1086,9 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,85}\quad\lean{endpoint\_middle\_gap}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{d} \mathit{z} \mathit{g} \mathit{D} : \mathbb{R} ),\; (\mathit{hg} : \mathit{g} = 1/2 -\\
-&\quad |\mathit{z}|),\; (\mathit{hD} : \mathit{D} = (1 - \mathit{d})/2 - \mathit{z})
+&(\mathit{d} \mathit{z} \mathit{g} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{hg} : \mathit{g} = 1/2 - |\mathit{z}|),\; (\mathit{hD} : \mathit{D} = (1 - \mathit{d})/2 -\\
+&\quad \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{g} + \mathit{d}/2 \leq 1 - \mathit{D}
@@ -940,8 +1096,10 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,86}\quad\lean{middle\_middle\_gap}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{za} \mathit{zb} \mathit{ga} \mathit{gb} \mathit{D} : \mathbb{R} ),\; (\mathit{hga} : \mathit{ga} = 1/2 -\\
-&\quad |\mathit{za}|),\; (\mathit{hgb} : \mathit{gb} = 1/2 - |\mathit{zb}|),\; (\mathit{hD} : \mathit{D} = \mathit{za} -\\
+&(\mathit{za} \mathit{zb} \mathit{ga} \mathit{gb} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{hga} : \mathit{ga} = 1/2 -\\
+&\quad |\mathit{za}|),\; (\mathit{hgb} : \mathit{gb} = 1/2 -\\
+&\quad |\mathit{zb}|),\; (\mathit{hD} : \mathit{D} = \mathit{za} -\\
 &\quad \mathit{zb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -950,10 +1108,12 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,87}\quad\lean{middle\_span}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{z} \mathit{g} : \mathbb{R} ),\; (\mathit{hg} : \mathit{g} = 1/2 - |\mathit{z}|)
+&(\mathit{z} \mathit{g} : \mathbb{R} ),\; (\mathit{hg} : \mathit{g} = 1/2 -\\
+&\quad |\mathit{z}|)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&-(1/2 - \mathit{g}) \leq \mathit{z} \wedge \mathit{z} \leq 1/2 - \mathit{g}
+\vdash\;&-(1/2 - \mathit{g}) \leq \mathit{z} \wedge \mathit{z}\\
+&\quad \leq 1/2 - \mathit{g}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -963,59 +1123,69 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{hr} : \mathit{rho} <\\
 &\quad 1),\; (\mathit{hn} : 0 < \mathit{n}),\; (\mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1} : \mathbb{R}\\
-&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R} ),\; (\mathit{hsig} : \forall \mathit{i}, 0 < \mathit{sig}\\
+&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hsig} : \forall \mathit{i}, 0 < \mathit{sig}\\
 &\quad \mathit{i}),\; (\mathit{hg} : \forall \mathit{i}, 0 < \mathit{gap} \mathit{z} \mathit{i} +\\
 &\quad (1-\mathit{rho})/2),\; (\mathit{hnorm} : \mathit{wI0} + \mathit{wI1} + \mathit{wE0} + \mathit{wE1} + \textstyle\sum \mathit{i}, \mathit{wM} \mathit{i} =\\
 &\quad 1)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}, \mathit{FlipsH}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
-&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1}\\
-&\quad \mathit{wM} \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1}\\
-&\quad \mathit{lM} \leq (1-\mathit{rho})^{2}/(32 + 2*(1-\mathit{rho})^{2}*\mathit{Splus} \mathit{z} \mathit{sig}\\
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0}\\
+&\quad \mathit{lE1} \mathit{lM}, \mathit{FlipsH} \mathit{lI0}\\
+&\quad \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
+&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0}\\
+&\quad \mathit{wI1} \mathit{wE0} \mathit{wE1} \mathit{wM}\\
+&\quad \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lE0} \mathit{lE1} \mathit{lM} \leq (1-\mathit{rho})^{2}/(32 + 2*(1-\mathit{rho})^{2}*\mathit{Splus} \mathit{z} \mathit{sig}\\
 &\quad (1-\mathit{rho}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,89}\quad\lean{min\_middle\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sig} \mathit{wM} : \mathit{Fin} \mathit{n} \to \mathbb{R} ),\; (\mathit{d} : \mathbb{R}\\
-&\quad ),\; (\mathit{hn} : 0 < \mathit{n}),\; (\mathit{hsig} : \forall \mathit{i}, 0 < \mathit{sig}\\
+&(\mathit{sig} \mathit{wM} : \mathit{Fin} \mathit{n} \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathbb{R} ),\; (\mathit{hn} : 0 <\\
+&\quad \mathit{n}),\; (\mathit{hsig} : \forall \mathit{i}, 0 < \mathit{sig}\\
 &\quad \mathit{i}),\; (\mathit{hg} : \forall \mathit{i}, 0 < \mathit{gap} \mathit{z} \mathit{i} +\\
 &\quad \mathit{d}/2),\; (\mathit{u} : \mathbb{R} ),\; (\mathit{hu} : \textstyle\sum \mathit{i}, \mathit{wM} \mathit{i} =\\
 &\quad \mathit{u})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{i} : \mathit{Fin} \mathit{n}, \mathit{wM} \mathit{i}*(\mathit{gap} \mathit{z} \mathit{i} + \mathit{d}/2)^{2}/(2*\mathit{sig} \mathit{i})*(2*\mathit{Splus} \mathit{z} \mathit{sig}\\
+\vdash\;&\exists \mathit{i} : \mathit{Fin} \mathit{n},\\
+&\quad \mathit{wM} \mathit{i}*(\mathit{gap} \mathit{z} \mathit{i} + \mathit{d}/2)^{2}/(2*\mathit{sig} \mathit{i})*(2*\mathit{Splus} \mathit{z} \mathit{sig}\\
 &\quad \mathit{d}) \leq \mathit{u}
 \end{aligned} \]}
 
 \noindent\textbf{A\,90}\quad\lean{witness\_EE}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{hr} : \mathit{rho} \leq 1),\; (\mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1} : \mathbb{R}\\
-&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R} )
+&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}, \mathit{FlipsH}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
-&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1}\\
-&\quad \mathit{wM} \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1}\\
-&\quad \mathit{lM} = (\mathit{wI0} + \mathit{wI1} + \mathit{wE0} +\\
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0}\\
+&\quad \mathit{lE1} \mathit{lM}, \mathit{FlipsH} \mathit{lI0}\\
+&\quad \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
+&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0}\\
+&\quad \mathit{wI1} \mathit{wE0} \mathit{wE1} \mathit{wM}\\
+&\quad \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lE0} \mathit{lE1} \mathit{lM} = (\mathit{wI0} + \mathit{wI1} + \mathit{wE0} +\\
 &\quad \mathit{wE1})*(1-\mathit{rho})^{2}/32
 \end{aligned} \]}
 
 \noindent\textbf{A\,91}\quad\lean{witness\_middle}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{rho} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{hr} : \mathit{rho} \leq 1),\; (\mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1} : \mathbb{R}\\
-&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R} ),\; (\mathit{i} : \mathit{Fin}\\
-&\quad \mathit{n})
+&\quad ),\; (\mathit{wM} \mathit{sig} : \mathit{Fin} \mathit{n} \to \mathbb{R}\\
+&\quad ),\; (\mathit{i} : \mathit{Fin} \mathit{n})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}, \mathit{FlipsH}\\
-&\quad \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
-&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0} \mathit{wI1} \mathit{wE0} \mathit{wE1}\\
-&\quad \mathit{wM} \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1} \mathit{lE0} \mathit{lE1}\\
-&\quad \mathit{lM} = \mathit{wM} \mathit{i}*(\mathit{gap} \mathit{z} \mathit{i} + (1-\mathit{rho})/2)^{2}/(2*\mathit{sig}\\
+\vdash\;&\exists \mathit{lI0} \mathit{lI1} \mathit{lE0}\\
+&\quad \mathit{lE1} \mathit{lM}, \mathit{FlipsH} \mathit{lI0}\\
+&\quad \mathit{lI1} \mathit{lE0} \mathit{lE1} \mathit{lM}\\
+&\quad \wedge \mathit{energyH} \mathit{z} \mathit{wI0}\\
+&\quad \mathit{wI1} \mathit{wE0} \mathit{wE1} \mathit{wM}\\
+&\quad \mathit{sig} \mathit{rho} \mathit{lI0} \mathit{lI1}\\
+&\quad \mathit{lE0} \mathit{lE1} \mathit{lM} = \mathit{wM} \mathit{i}*(\mathit{gap} \mathit{z} \mathit{i} + (1-\mathit{rho})/2)^{2}/(2*\mathit{sig}\\
 &\quad \mathit{i})
 \end{aligned} \]}
 
@@ -1024,37 +1194,43 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,92}\quad\lean{domain\_is\_sharp}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{R} \mathit{d} \mathit{g} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hg} : 0 < \mathit{g}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = 1 / 4 + \mathit{g} ^{2} / \mathit{d}\\
+&(\mathit{A} \mathit{R} \mathit{d} \mathit{g} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hg} : 0 <\\
+&\quad \mathit{g}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = 1 / 4 + \mathit{g} ^{2} / \mathit{d}\\
 &\quad ^{2}),\; (\mathit{hbad} : \mathit{g} < \mathit{d} / 2)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 - (1 - (\mathit{g} + \mathit{d} / 2))) ^{2} < \mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 /\\
-&\quad 2)
+\vdash\;&(1 - (1 - (\mathit{g} + \mathit{d} / 2))) ^{2}\\
+&\quad < \mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2)
 \end{aligned} \]}
 
 \noindent\textbf{A\,93}\quad\lean{endpoint\_pair\_ok}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{d} : \mathbb{R} ),\; (\mathit{hA} : 0 < \mathit{A})
+&(\mathit{A} \mathit{d} : \mathbb{R} ),\; (\mathit{hA} : 0 <\\
+&\quad \mathit{A})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{d} ^{2} * (\mathit{A} * (1 / (2 * \mathit{A})) + 1 / 2)\\
-&\quad \leq (1 - (1 - \mathit{d})) ^{2}
+\vdash\;&\mathit{d} ^{2} * (\mathit{A} * (1 / (2 * \mathit{A})) + 1 /\\
+&\quad 2) \leq (1 - (1 - \mathit{d})) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,94}\quad\lean{endpoint\_pair\_value}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{d} : \mathbb{R} ),\; (\mathit{hA} : 0 < \mathit{A})
+&(\mathit{A} \mathit{d} : \mathbb{R} ),\; (\mathit{hA} : 0 <\\
+&\quad \mathit{A})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pairVal} \mathit{A} \mathit{A} (1 - \mathit{d}) = \mathit{A} * \mathit{d} ^{2} / 2
+\vdash\;&\mathit{pairVal} \mathit{A} \mathit{A} (1 - \mathit{d})\\
+&\quad = \mathit{A} * \mathit{d} ^{2} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,95}\quad\lean{instantiated\_value}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} \mathit{H} \mathit{n} \mathit{d} \mathit{A} : \mathbb{R} ),\; (\mathit{hn} : 0 <\\
-&\quad \mathit{n}),\; (\mathit{hH} : 0 \leq \mathit{H}),\; (\mathit{hc} : 0 < \mathit{c}),\; (\mathit{hd} : \mathit{d} ^{2} = \mathit{c} ^{2} /\\
-&\quad \mathit{n}),\; (\mathit{hAdef} : \mathit{A} = 1 / (16 + \mathit{c} ^{2} * \mathit{H}))
+&(\mathit{c} \mathit{H} \mathit{n} \mathit{d} \mathit{A} : \mathbb{R}\\
+&\quad ),\; (\mathit{hn} : 0 < \mathit{n}),\; (\mathit{hH} : 0 \leq \mathit{H}),\; (\mathit{hc} : 0 <\\
+&\quad \mathit{c}),\; (\mathit{hd} : \mathit{d} ^{2} = \mathit{c} ^{2} /\\
+&\quad \mathit{n}),\; (\mathit{hAdef} : \mathit{A} = 1 / (16 + \mathit{c} ^{2} *\\
+&\quad \mathit{H}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{A} * \mathit{d} ^{2} / 2 = \mathit{c} ^{2} / (\mathit{n} * (32 + 2 * \mathit{c} ^{2} *\\
@@ -1063,33 +1239,41 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,96}\quad\lean{middle\_pair\_ok}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} \mathit{ga} \mathit{gb} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hga} : 0 < \mathit{ga}),\; (\mathit{hgb} : 0 < \mathit{gb}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = (\mathit{ga} ^{2} + \mathit{gb} ^{2}) / \mathit{d}\\
-&\quad ^{2}),\; (\mathit{hD} : \mathit{ga} + \mathit{gb} \leq 1 - \mathit{D}),\; (\mathit{hda} : \mathit{d} / 2 \leq \mathit{ga}),\; (\mathit{hdb} : \mathit{d} / 2 \leq \mathit{gb})
+&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} \mathit{ga} \mathit{gb} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hga} : 0 <\\
+&\quad \mathit{ga}),\; (\mathit{hgb} : 0 < \mathit{gb}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = (\mathit{ga} ^{2} + \mathit{gb} ^{2}) / \mathit{d}\\
+&\quad ^{2}),\; (\mathit{hD} : \mathit{ga} + \mathit{gb} \leq 1 -\\
+&\quad \mathit{D}),\; (\mathit{hda} : \mathit{d} / 2 \leq \mathit{ga}),\; (\mathit{hdb} : \mathit{d} / 2 \leq \mathit{gb})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2) \leq (1 - \mathit{D}) ^{2}
+\vdash\;&\mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2)\\
+&\quad \leq (1 - \mathit{D}) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,97}\quad\lean{mixed\_pair\_ok}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} \mathit{g} : \mathbb{R} ),\; (\mathit{hd} : 0 <\\
-&\quad \mathit{d}),\; (\mathit{hg} : 0 < \mathit{g}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = 1 / 4 + \mathit{g} ^{2} / \mathit{d}\\
-&\quad ^{2}),\; (\mathit{hD} : \mathit{g} + \mathit{d} / 2 \leq 1 - \mathit{D}),\; (\mathit{hdom} : \mathit{d} / 2 \leq \mathit{g})
+&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} \mathit{g} : \mathbb{R}\\
+&\quad ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{hg} : 0 <\\
+&\quad \mathit{g}),\; (\mathit{hAR} : \mathit{A} * \mathit{R} = 1 / 4 + \mathit{g} ^{2} / \mathit{d}\\
+&\quad ^{2}),\; (\mathit{hD} : \mathit{g} + \mathit{d} / 2 \leq 1 -\\
+&\quad \mathit{D}),\; (\mathit{hdom} : \mathit{d} / 2 \leq \mathit{g})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2) \leq (1 - \mathit{D}) ^{2}
+\vdash\;&\mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2)\\
+&\quad \leq (1 - \mathit{D}) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,98}\quad\lean{pairVal\_ge\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} : \mathbb{R} ),\; (\mathit{hA} : 0 <\\
-&\quad \mathit{A}),\; (\mathit{hR} : 0 < \mathit{R})
+&(\mathit{A} \mathit{R} \mathit{D} \mathit{d} : \mathbb{R}\\
+&\quad ),\; (\mathit{hA} : 0 < \mathit{A}),\; (\mathit{hR} : 0 <\\
+&\quad \mathit{R})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{A} * \mathit{d} ^{2} / 2 \leq \mathit{pairVal} \mathit{A} (1 / (2 * \mathit{R}))\\
-&\quad \mathit{D} \leftrightarrow \mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 / 2)\\
-&\quad \leq (1 - \mathit{D}) ^{2}
+\vdash\;&\mathit{A} * \mathit{d} ^{2} / 2 \leq \mathit{pairVal}\\
+&\quad \mathit{A} (1 / (2 * \mathit{R})) \mathit{D}\\
+&\quad \leftrightarrow \mathit{d} ^{2} * (\mathit{A} * \mathit{R} + 1 /\\
+&\quad 2) \leq (1 - \mathit{D}) ^{2}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1097,28 +1281,36 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,99}\quad\lean{energyU\_ge\_pairV}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{hI0} : 0 < \mathit{wI0}),\; (\mathit{hI1} : 0 <\\
-&\quad \mathit{wI1}),\; (\mathit{w} \mathit{sig} \mathit{mean} : \iota \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{w}\\
-&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig} \mathit{c}),\; (\mathit{hD} : \forall \mathit{a} \mathit{b} : \iota , \mathit{mean} \mathit{a} - \mathit{mean} \mathit{b} <\\
-&\quad 1),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R} ),\; (\mathit{l} : \iota \to \mathbb{R} ),\; (\mathit{hflip} : \mathit{FlipsU} \mathit{lI0} \mathit{lI1}\\
+&(\mathit{wI0} \mathit{wI1} : \mathbb{R} ),\; (\mathit{hI0} : 0 <\\
+&\quad \mathit{wI0}),\; (\mathit{hI1} : 0 < \mathit{wI1}),\; (\mathit{w} \mathit{sig} \mathit{mean} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{w}\\
+&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig}\\
+&\quad \mathit{c}),\; (\mathit{hD} : \forall \mathit{a} \mathit{b} : \iota , \mathit{mean} \mathit{a} - \mathit{mean} \mathit{b} <\\
+&\quad 1),\; (\mathit{lI0} \mathit{lI1} : \mathbb{R} ),\; (\mathit{l} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hflip} : \mathit{FlipsU} \mathit{lI0} \mathit{lI1}\\
 &\quad \mathit{l})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{a} \mathit{b} : \iota , \mathit{a} \neq \mathit{b}\\
-&\quad \wedge \mathit{pairV} \mathit{wI0} \mathit{wI1} (\mathit{prec} \mathit{w} \mathit{sig}\\
-&\quad \mathit{a}) (\mathit{prec} \mathit{w} \mathit{sig} \mathit{b}) (\mathit{mean} \mathit{a} - \mathit{mean}\\
-&\quad \mathit{b}) \leq \mathit{energyU} \mathit{wI0} \mathit{wI1} \mathit{w} \mathit{sig}\\
-&\quad \mathit{mean} \mathit{lI0} \mathit{lI1} \mathit{l}
+\vdash\;&\exists \mathit{a} \mathit{b} : \iota , \mathit{a}\\
+&\quad \neq \mathit{b} \wedge \mathit{pairV} \mathit{wI0}\\
+&\quad \mathit{wI1} (\mathit{prec} \mathit{w} \mathit{sig}\\
+&\quad \mathit{a}) (\mathit{prec} \mathit{w} \mathit{sig}\\
+&\quad \mathit{b}) (\mathit{mean} \mathit{a} - \mathit{mean}\\
+&\quad \mathit{b}) \leq \mathit{energyU} \mathit{wI0}\\
+&\quad \mathit{wI1} \mathit{w} \mathit{sig} \mathit{mean}\\
+&\quad \mathit{lI0} \mathit{lI1} \mathit{l}
 \end{aligned} \]}
 
 \noindent\textbf{A\,100}\quad\lean{outsiderU\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{w} \mathit{sig} \mathit{mean} : \iota \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{w}\\
-&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig} \mathit{c}),\; (\mathit{l} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \iota ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
+&(\mathit{w} \mathit{sig} \mathit{mean} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{w}\\
+&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig}\\
+&\quad \mathit{c}),\; (\mathit{l} : \iota \to \mathbb{R} ),\; (\mathit{a} \mathit{b} : \iota ),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prec} \mathit{w} \mathit{sig} \mathit{a}*\mathit{prec} \mathit{w} \mathit{sig} \mathit{b}*((\mathit{l} \mathit{a} - \mathit{l} \mathit{b}) - (\mathit{mean} \mathit{a} - \mathit{mean}\\
+\vdash\;&\mathit{prec} \mathit{w} \mathit{sig}\\
+&\quad \mathit{a}*\mathit{prec} \mathit{w} \mathit{sig} \mathit{b}*((\mathit{l} \mathit{a} - \mathit{l} \mathit{b}) - (\mathit{mean} \mathit{a} - \mathit{mean}\\
 &\quad \mathit{b}))^{2} \leq (\textstyle\sum \mathit{c}, \mathit{w} \mathit{c}*(\mathit{l} \mathit{c} - \mathit{mean} \mathit{c})^{2}/\mathit{sig} \mathit{c})*(\mathit{prec} \mathit{w} \mathit{sig} \mathit{a} + \mathit{prec} \mathit{w} \mathit{sig}\\
 &\quad \mathit{b})
 \end{aligned} \]}
@@ -1126,7 +1318,8 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,101}\quad\lean{prec\_pos}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{w} \mathit{sig} : \iota \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{c}, 0 < \mathit{w}\\
-&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig} \mathit{c}),\; (\mathit{c} : \iota )
+&\quad \mathit{c}),\; (\mathit{hs} : \forall \mathit{c}, 0 < \mathit{sig}\\
+&\quad \mathit{c}),\; (\mathit{c} : \iota )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&0 < \mathit{prec} \mathit{w} \mathit{sig} \mathit{c}
@@ -1137,31 +1330,36 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,102}\quad\lean{mandatory\_mass\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{E} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{E}],\; (\mathit{w} \mathit{d} \mathit{v} : \mathit{E} \to \mathbb{R}\\
+&\{ \mathit{E} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{E}],\; (\mathit{w} \mathit{d} \mathit{v} : \mathit{E} \to \mathbb{R}\\
 &\quad ),\; (\mathit{J} : \mathbb{R} ),\; (\mathit{hd} : \forall \mathit{e},0 < \mathit{d}\\
-&\quad \mathit{e}),\; (\mathit{hv} : \forall \mathit{e},0 < \mathit{v} \mathit{e}),\; (\mathit{hbudget} : \textstyle\sum \mathit{e},\mathit{w} \mathit{e} \leq 1),\; (\mathit{hupper} : \forall \mathit{e},\mathit{J} \leq \mathit{w} \mathit{e}*(\mathit{d} \mathit{e})^{2}/(2*\mathit{v}\\
+&\quad \mathit{e}),\; (\mathit{hv} : \forall \mathit{e},0 < \mathit{v}\\
+&\quad \mathit{e}),\; (\mathit{hbudget} : \textstyle\sum \mathit{e},\mathit{w} \mathit{e} \leq 1),\; (\mathit{hupper} : \forall \mathit{e},\mathit{J} \leq \mathit{w} \mathit{e}*(\mathit{d} \mathit{e})^{2}/(2*\mathit{v}\\
 &\quad \mathit{e}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{J}*(\textstyle\sum \mathit{e},2*\mathit{v} \mathit{e}/(\mathit{d} \mathit{e})^{2})\\
-&\quad \leq 1
+\vdash\;&\mathit{J}*(\textstyle\sum \mathit{e},2*\mathit{v} \mathit{e}/(\mathit{d}\\
+&\quad \mathit{e})^{2}) \leq 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,103}\quad\lean{one\_cell\_energy}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R} ),\; (\mathit{j} :\\
-&\quad \mathit{R}),\; (\mathit{a} : \mathit{A}),\; (\mathit{d} : \mathbb{R} )
+&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{j} : \mathit{R}),\; (\mathit{a} :\\
+&\quad \mathit{A}),\; (\mathit{d} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{energy} \mathit{theta} \mathit{w} \mathit{variance} (\mathit{shift} \mathit{theta} \mathit{j} \mathit{a}\\
+\vdash\;&\mathit{energy} \mathit{theta} \mathit{w}\\
+&\quad \mathit{variance} (\mathit{shift} \mathit{theta} \mathit{j} \mathit{a}\\
 &\quad \mathit{d}) = \mathit{w} \mathit{j} \mathit{a}*\mathit{d}^{2}/(2*\mathit{variance} \mathit{j}\\
 &\quad \mathit{a})
 \end{aligned} \]}
 
 \noindent\textbf{A\,104}\quad\lean{one\_cell\_flip}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{theta} : \mathit{R} \to \mathit{A} \to \mathbb{R} ),\; (\mathit{T} : \mathit{Finset}\\
-&\quad \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
+&(\mathit{theta} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{C} : \mathbb{R}\\
+&\quad ),\; (\mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
 &\quad \mathit{A}),\; (\mathit{hj} : \mathit{j} \notin \mathit{T}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -1171,23 +1369,29 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,105}\quad\lean{one\_cell\_information\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
+&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
 &\quad \mathit{a}),\; (\mathit{hv} : \forall \mathit{j} \mathit{a},0 < \mathit{variance} \mathit{j}\\
-&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{j} :\\
+&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset}\\
+&\quad \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{j} :\\
 &\quad \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A}),\; (\mathit{hj} : \mathit{j} \notin \mathit{T}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{information} \mathit{theta} \mathit{w} \mathit{variance} (\mathit{Crosses} \mathit{T}\\
+\vdash\;&\mathit{information} \mathit{theta} \mathit{w}\\
+&\quad \mathit{variance} (\mathit{Crosses} \mathit{T}\\
 &\quad \mathit{C}) \leq \mathit{w} \mathit{j} \mathit{a}*(\mathit{C}+\mathit{theta} \mathit{j} \mathit{b}-\mathit{theta} \mathit{j} \mathit{a})^{2}/(2*\mathit{variance} \mathit{j}\\
 &\quad \mathit{a})
 \end{aligned} \]}
 
 \noindent\textbf{A\,106}\quad\lean{outsider\_cell\_positive}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
+&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
 &\quad \mathit{a}),\; (\mathit{hv} : \forall \mathit{j} \mathit{a},0 < \mathit{variance} \mathit{j}\\
-&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{hI} : 0 < \mathit{information} \mathit{theta} \mathit{w} \mathit{variance} (\mathit{StrictCrosses} \mathit{T}\\
-&\quad \mathit{C})),\; (\mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A}),\; (\mathit{hj} : \mathit{j} \notin \mathit{T}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
+&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset}\\
+&\quad \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{hI} : 0 < \mathit{information} \mathit{theta} \mathit{w} \mathit{variance} (\mathit{StrictCrosses} \mathit{T}\\
+&\quad \mathit{C})),\; (\mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{A}),\; (\mathit{hj} : \mathit{j} \notin \mathit{T}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&0 < \mathit{w} \mathit{j} \mathit{a}
@@ -1195,13 +1399,16 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,107}\quad\lean{strict\_one\_cell\_information\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R} ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
+&(\mathit{theta} \mathit{w} \mathit{variance} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hw} : \forall \mathit{j} \mathit{a},0 \leq \mathit{w} \mathit{j}\\
 &\quad \mathit{a}),\; (\mathit{hv} : \forall \mathit{j} \mathit{a},0 < \mathit{variance} \mathit{j}\\
-&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{j} :\\
+&\quad \mathit{a}),\; (\mathit{T} : \mathit{Finset}\\
+&\quad \mathit{R}),\; (\mathit{C} : \mathbb{R} ),\; (\mathit{j} :\\
 &\quad \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A}),\; (\mathit{hj} : \mathit{j} \notin \mathit{T}),\; (\mathit{hab} : \mathit{a} \neq \mathit{b})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{information} \mathit{theta} \mathit{w} \mathit{variance} (\mathit{StrictCrosses} \mathit{T}\\
+\vdash\;&\mathit{information} \mathit{theta} \mathit{w}\\
+&\quad \mathit{variance} (\mathit{StrictCrosses} \mathit{T}\\
 &\quad \mathit{C}) \leq \mathit{w} \mathit{j} \mathit{a}*(\mathit{C}+\mathit{theta} \mathit{j} \mathit{b}-\mathit{theta} \mathit{j} \mathit{a})^{2}/(2*\mathit{variance} \mathit{j}\\
 &\quad \mathit{a})
 \end{aligned} \]}
@@ -1216,9 +1423,11 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
-&\quad \leftrightarrow \exists \mathit{i} \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
-&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \mathit{PairRegion} \mathit{Q} \mathit{i}\\
-&\quad \mathit{j} \mathit{a} \mathit{b}
+&\quad \leftrightarrow \exists \mathit{i} \in \mathit{T},\\
+&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j}\\
+&\quad \mathit{a} \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{A\,109}\quad\lean{energy\_inf\_rewrite}
@@ -1227,11 +1436,14 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative}\\
-&\quad \mathit{T} \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
-&\quad = \mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{i} \in \mathit{T}, \exists \mathit{j},\\
-&\quad \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q},\\
-&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
+\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{Q},\\
+&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
+&\quad = \mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{i}\\
+&\quad \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
+&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
 &\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
 \end{aligned} \]}
 
@@ -1241,41 +1453,51 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative} \mathit{T}\\
-&\quad \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\} = \{ \mathit{z} : \mathbb{R} |\\
-&\quad \exists \mathit{i} \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
-&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q}, \mathit{PairRegion}\\
-&\quad \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
+\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q},\\
+&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
+&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
+&\quad = \{ \mathit{z} : \mathbb{R} | \exists \mathit{i} \in \mathit{T},\\
+&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
+&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
+&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
 &\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
 \end{aligned} \]}
 
 \noindent\textbf{A\,111}\quad\lean{not\_strictTopK\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} =\\
-&\quad \mathit{k}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} )
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} : \mathbb{N}\\
+&\quad ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} =\\
+&\quad \mathit{k}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\neg \mathit{StrictTopK} (\mathbf{fun} \mathit{r} => \mathit{capacity} (\mathit{Q}\\
-&\quad \mathit{r})) \mathit{T} \mathit{k} \leftrightarrow \mathit{ClosedAlternative} \mathit{T}\\
+&\quad \mathit{r})) \mathit{T} \mathit{k}\\
+&\quad \leftrightarrow \mathit{ClosedAlternative} \mathit{T}\\
 &\quad \mathit{Q}
 \end{aligned} \]}
 
 \noindent\textbf{A\,112}\quad\lean{pairRegion\_convex}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A})
+&(\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{A})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R} \to \mathit{A}\\
-&\quad \to \mathbb{R} | \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a}\\
+\vdash\;&\mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R}\\
+&\quad \to \mathit{A} \to \mathbb{R} | \mathit{PairRegion}\\
+&\quad \mathit{Q} \mathit{i} \mathit{j} \mathit{a}\\
 &\quad \mathit{b}\}
 \end{aligned} \]}
 
 \noindent\textbf{A\,113}\quad\lean{pair\_le\_capacity}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} : \mathit{A})
+&(\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} :\\
+&\quad \mathit{A})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{f} \mathit{a} - \mathit{f} \mathit{b} \leq \mathit{capacity} \mathit{f}
+\vdash\;&\mathit{f} \mathit{a} - \mathit{f} \mathit{b}\\
+&\quad \leq \mathit{capacity} \mathit{f}
 \end{aligned} \]}
 
 \noindent\textbf{A\,114}\quad\lean{range\_ge\_iff\_exists\_pair}
@@ -1283,10 +1505,12 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &(\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity} \mathit{g}\\
-&\quad \leftrightarrow \exists \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v} :\\
-&\quad \mathit{A}, \mathit{f} \mathit{u} - \mathit{f} \mathit{v}\\
-&\quad \leq \mathit{g} \mathit{a} - \mathit{g} \mathit{b}
+\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity}\\
+&\quad \mathit{g} \leftrightarrow \exists \mathit{a}\\
+&\quad \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v}\\
+&\quad : \mathit{A}, \mathit{f} \mathit{u} - \mathit{f}\\
+&\quad \mathit{v} \leq \mathit{g} \mathit{a} - \mathit{g}\\
+&\quad \mathit{b}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1295,44 +1519,50 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,115}\quad\lean{bil\_symm}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R} )
+&\quad \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y} = \mathit{bil} \mathit{M} \mathit{y}\\
-&\quad \mathit{x}
+\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y}\\
+&\quad = \mathit{bil} \mathit{M} \mathit{y} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,116}\quad\lean{certificate\_gives\_lower\_bound}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{y} : \kappa \to \mathbb{R}\\
-&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{V} : \mathbb{R}\\
+&\quad ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
 &\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M}\\
-&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
+&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y}\\
+&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
 &\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} =\\
 &\quad 0),\; (\mathit{hval} : \mathit{V} = (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu}\\
 &\quad \mathit{p}))
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R} , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)\\
+\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R}\\
+&\quad , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)\\
 &\quad \to \mathit{V} \leq (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu}\\
 &\quad \mathit{p})
 \end{aligned} \]}
 
 \noindent\textbf{A\,117}\quad\lean{crossing\_budget}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R} ),\; (\mathit{n1} \mathit{n2} : \mathbb{N}\\
-&\quad ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1} \neq 0)
+&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R}\\
+&\quad ),\; (\mathit{n1} \mathit{n2} : \mathbb{N} ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1} \neq 0)
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} -\\
-&\quad \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1} = \mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} -\\
+&\quad \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1}\\
+&\quad = \mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} -\\
 &\quad \mathit{G1})) \mathit{kappa} \mathit{n2} \mathit{G2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,118}\quad\lean{crossing\_sign\_undetermined}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} : \mathbb{R} ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\; (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\; (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\; (\mathit{hov2} : \mathit{G1lo} \leq \mathit{G2hi})
+&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} : \mathbb{R}\\
+&\quad ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\; (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\; (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\; (\mathit{hov2} : \mathit{G1lo} \leq \mathit{G2hi})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&(\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi} \wedge \mathit{g2} \leq \mathit{g1})\\
@@ -1341,21 +1571,23 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,119}\quad\lean{information\_mono}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{B} \mathit{B'} \mathit{kappa} \mathit{G} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N}\\
-&\quad ),\; (\mathit{hG} : 0 \leq \mathit{G}),\; (\mathit{hBB} : \mathit{B} \leq \mathit{B'})
+&(\mathit{B} \mathit{B'} \mathit{kappa} \mathit{G} : \mathbb{R}\\
+&\quad ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{hG} : 0 \leq \mathit{G}),\; (\mathit{hBB} : \mathit{B} \leq \mathit{B'})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{information} \mathit{B} \mathit{kappa} \mathit{n} \mathit{G}\\
-&\quad \leq \mathit{information} \mathit{B'} \mathit{kappa} \mathit{n} \mathit{G}
+\vdash\;&\mathit{information} \mathit{B} \mathit{kappa}\\
+&\quad \mathit{n} \mathit{G} \leq \mathit{information}\\
+&\quad \mathit{B'} \mathit{kappa} \mathit{n} \mathit{G}
 \end{aligned} \]}
 
 \noindent\textbf{A\,120}\quad\lean{kkt\_certificate}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{y} : \kappa \to \mathbb{R}\\
-&\quad ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
+&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
 &\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M}\\
-&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
+&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y}\\
+&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) =\\
 &\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} =\\
 &\quad 0),\; (\mathit{lam'} : \iota \to \mathbb{R} ),\; (\mathit{hfeas'} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)
 \end{aligned} \]}
@@ -1368,27 +1600,34 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 \noindent\textbf{A\,121}\quad\lean{quad\_add}
 {\footnotesize\[ \begin{aligned}[t]
 &(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R} )
+&\quad \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d}) = \mathit{quad} \mathit{M} \mathit{a} + 2\\
-&\quad * \mathit{bil} \mathit{M} \mathit{d} \mathit{a} + \mathit{quad} \mathit{M} \mathit{d}
+\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d})\\
+&\quad = \mathit{quad} \mathit{M} \mathit{a} + 2 *\\
+&\quad \mathit{bil} \mathit{M} \mathit{d} \mathit{a} +\\
+&\quad \mathit{quad} \mathit{M} \mathit{d}
 \end{aligned} \]}
 
 \noindent\textbf{A\,122}\quad\lean{region\_min\_lower\_bounds\_J}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
+&\quad \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
 &\quad ),\; (\mathit{J} : \mathbb{R} ),\; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR}\\
-&\quad \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R} ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R}, \mathit{b} \mathit{r} \leq \mathit{cost}\\
+&\quad \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R}\\
+&\quad ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R}, \mathit{b} \mathit{r} \leq \mathit{cost}\\
 &\quad \mathit{r})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b} \leq \mathit{J}
+\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b}\\
+&\quad \leq \mathit{J}
 \end{aligned} \]}
 
 \noindent\textbf{A\,123}\quad\lean{single\_alt\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
+&\quad \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R}\\
 &\quad ),\; (\mathit{J} : \mathbb{R} ),\; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR}\\
 &\quad \mathit{cost}),\; \{ \mathit{r} : \rho \},\; (\mathit{hr} : \mathit{r} \in \mathit{R})
 \end{aligned} \]}
@@ -1406,9 +1645,9 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad \mathit{Q})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R}\\
-&\quad , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c}\\
-&\quad \leq \mathit{E} \mathit{Q}
+\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A}\\
+&\quad \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T}\\
+&\quad \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}
 \end{aligned} \]}
 
 \noindent\textbf{A\,125}\quad\lean{energy\_lower\_bound\_iff}
@@ -1424,23 +1663,27 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,126}\quad\lean{harm\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 <\\
-&\quad \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
+&\quad \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 <\\
+&\quad \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
 &\quad \mathit{w4})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4}
+\vdash\;&0 < \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3}\\
+&\quad \mathit{w4}
 \end{aligned} \]}
 
 \noindent\textbf{A\,127}\quad\lean{inner\_qp\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 <\\
-&\quad \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
+&\quad \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 <\\
+&\quad \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
 &\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R}\\
-&\quad , \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} + \mathit{x4}\\
+\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4}\\
+&\quad : \mathbb{R} , \mathit{g} \leq \mathit{x1} -\\
+&\quad \mathit{x2} - \mathit{x3} + \mathit{x4}\\
 &\quad \wedge (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
 &\quad \mathit{w4}*\mathit{x4}^{2}) / 2 = \mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3}\\
 &\quad \mathit{w4})
@@ -1448,15 +1691,16 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,128}\quad\lean{inner\_qp\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 <\\
-&\quad \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
+&\quad \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 <\\
+&\quad \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\; (\mathit{h4} : 0 <\\
 &\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R}\\
 &\quad ),\; (\mathit{hfeas} : \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} +\\
 &\quad \mathit{x4})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4})\\
-&\quad \leq (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
+\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3}\\
+&\quad \mathit{w4}) \leq (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
 &\quad \mathit{w4}*\mathit{x4}^{2}) / 2
 \end{aligned} \]}
 
@@ -1478,7 +1722,8 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &(\mathit{eta} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 * \mathit{eta} / 32
+\vdash\;&(1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 *\\
+&\quad \mathit{eta} / 32
 \end{aligned} \]}
 
 \noindent\textbf{A\,132}\quad\lean{family1\_alt\_ties}
@@ -1497,16 +1742,19 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,134}\quad\lean{family1\_ratio}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 < \mathit{eta}),\; (\mathit{hJ} : \mathit{Jfull} \leq 9 * \mathit{eta} /\\
+&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 <\\
+&\quad \mathit{eta}),\; (\mathit{hJ} : \mathit{Jfull} \leq 9 * \mathit{eta} /\\
 &\quad 32),\; (\mathit{hJ0} : 0 \leq \mathit{Jfull})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Jfull} / (1 / 32 : \mathbb{R} ) \leq 9 * \mathit{eta}
+\vdash\;&\mathit{Jfull} / (1 / 32 : \mathbb{R} ) \leq 9 *\\
+&\quad \mathit{eta}
 \end{aligned} \]}
 
 \noindent\textbf{A\,135}\quad\lean{family1\_scalar\_value}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1)) = 1 / 32
+\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1))\\
+&\quad = 1 / 32
 \end{aligned} \]}
 
 \noindent\textbf{A\,136}\quad\lean{family2\_cell\_lower}
@@ -1515,7 +1763,8 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &\quad \mathit{y})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gap} ^{2} / 4 \leq \mathit{energy} 1 1 \mathit{x} \mathit{y}
+\vdash\;&\mathit{gap} ^{2} / 4 \leq \mathit{energy} 1 1\\
+&\quad \mathit{x} \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{A\,137}\quad\lean{family2\_full\_ge}
@@ -1523,26 +1772,30 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &(\mathit{z} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z}) 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2)\\
-&\quad 0) ^{2} / 4
+\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z})\\
+&\quad 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2) 0) ^{2}\\
+&\quad / 4
 \end{aligned} \]}
 
 \noindent\textbf{A\,138}\quad\lean{family2\_ratio}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 < \mathit{eta}),\; (\mathit{hJ} : (1/128 : \mathbb{R} ) \leq \mathit{Jfull})
+&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 <\\
+&\quad \mathit{eta}),\; (\mathit{hJ} : (1/128 : \mathbb{R} ) \leq \mathit{Jfull})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 + 3 * \mathit{eta}) / (16 * \mathit{eta}) \leq \mathit{Jfull} / (\mathit{eta} / (8 * (1 + 3 *\\
+\vdash\;&(1 + 3 * \mathit{eta}) / (16 * \mathit{eta})\\
+&\quad \leq \mathit{Jfull} / (\mathit{eta} / (8 * (1 + 3 *\\
 &\quad \mathit{eta})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,139}\quad\lean{family2\_scalar\_value}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 < \mathit{eta})
+&(\mathit{eta} : \mathbb{R} ),\; (\mathit{heta} : 0 <\\
+&\quad \mathit{eta})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1/\mathit{eta} + 1 + 1 + 1))\\
-&\quad = \mathit{eta} / (8 * (1 + 3 * \mathit{eta}))
+\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1/\mathit{eta} + 1 + 1 +\\
+&\quad 1)) = \mathit{eta} / (8 * (1 + 3 * \mathit{eta}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,140}\quad\lean{positive\_parts\_sum}
@@ -1550,28 +1803,30 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &(\mathit{z} : \mathbb{R} )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 - \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2)\\
-&\quad 0
+\vdash\;&(1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 -\\
+&\quad \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2) 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,141}\quad\lean{scalar\_not\_lower\_to\_any\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
+&\quad \mathit{C})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
-&\quad \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} / (8 * (1 + 3 * \mathit{eta})))\\
-&\quad < (1 / 128 : \mathbb{R} )
+&\quad \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} / (8 * (1 + 3 *\\
+&\quad \mathit{eta}))) < (1 / 128 : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,142}\quad\lean{scalar\_not\_upper\_to\_any\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
+&\quad \mathit{C})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
-&\quad \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32 < (1 / 32 : \mathbb{R} ) /\\
-&\quad \mathit{C}
+&\quad \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32\\
+&\quad < (1 / 32 : \mathbb{R} ) / \mathit{C}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1579,12 +1834,13 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,143}\quad\lean{clamp\_dist\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{l} \mathit{z} \mathit{t} \mathit{x} : \mathbb{R} ),\; (\mathit{hz} : 0 \leq \mathit{z}),\; (\mathit{hx1} : \mathit{l} \leq \mathit{x}),\; (\mathit{hx2} : \mathit{x} \leq \mathit{l} +\\
+&(\mathit{l} \mathit{z} \mathit{t} \mathit{x} : \mathbb{R}\\
+&\quad ),\; (\mathit{hz} : 0 \leq \mathit{z}),\; (\mathit{hx1} : \mathit{l} \leq \mathit{x}),\; (\mathit{hx2} : \mathit{x} \leq \mathit{l} +\\
 &\quad \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{clamp} \mathit{l} \mathit{z} \mathit{t} - \mathit{t}|\\
-&\quad \leq |\mathit{x} - \mathit{t}|
+\vdash\;&|\mathit{clamp} \mathit{l} \mathit{z} \mathit{t} -\\
+&\quad \mathit{t}| \leq |\mathit{x} - \mathit{t}|
 \end{aligned} \]}
 
 \noindent\textbf{A\,144}\quad\lean{clamp\_mem}
@@ -1592,83 +1848,100 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 &(\mathit{l} \mathit{z} \mathit{t} : \mathbb{R} ),\; (\mathit{hz} : 0 \leq \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{l} \leq \mathit{clamp} \mathit{l} \mathit{z} \mathit{t}\\
-&\quad \wedge \mathit{clamp} \mathit{l} \mathit{z} \mathit{t}\\
-&\quad \leq \mathit{l} + \mathit{z}
+\vdash\;&\mathit{l} \leq \mathit{clamp} \mathit{l} \mathit{z}\\
+&\quad \mathit{t} \wedge \mathit{clamp} \mathit{l} \mathit{z}\\
+&\quad \mathit{t} \leq \mathit{l} + \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,145}\quad\lean{expand\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{v} \mathit{w} \mathit{g} : \mathbb{R} ),\; (\mathit{hv} : 0 < \mathit{v}),\; (\mathit{hw} : 0 <\\
-&\quad \mathit{w})
+&(\mathit{v} \mathit{w} \mathit{g} : \mathbb{R} ),\; (\mathit{hv} : 0 <\\
+&\quad \mathit{v}),\; (\mathit{hw} : 0 < \mathit{w})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{g} * \mathit{v} / (\mathit{v} + \mathit{w}) + \mathit{g} * \mathit{w} / (\mathit{v} +\\
-&\quad \mathit{w}) = \mathit{g} \wedge \mathit{energy} \mathit{v} \mathit{w} (\mathit{g} * \mathit{v} / (\mathit{v} +\\
-&\quad \mathit{w})) (\mathit{g} * \mathit{w} / (\mathit{v} + \mathit{w}))\\
-&\quad = \mathit{g} ^{2} / (2 * (\mathit{v} + \mathit{w}))
+\vdash\;&\mathit{g} * \mathit{v} / (\mathit{v} + \mathit{w}) +\\
+&\quad \mathit{g} * \mathit{w} / (\mathit{v} + \mathit{w})\\
+&\quad = \mathit{g} \wedge \mathit{energy} \mathit{v}\\
+&\quad \mathit{w} (\mathit{g} * \mathit{v} / (\mathit{v} +\\
+&\quad \mathit{w})) (\mathit{g} * \mathit{w} / (\mathit{v} +\\
+&\quad \mathit{w})) = \mathit{g} ^{2} / (2 * (\mathit{v} +\\
+&\quad \mathit{w}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,146}\quad\lean{expand\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{v} \mathit{w} \mathit{g} \mathit{u} \mathit{t} : \mathbb{R} ),\; (\mathit{hv} : 0 <\\
-&\quad \mathit{v}),\; (\mathit{hw} : 0 < \mathit{w}),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{hopen} : \mathit{g} \leq \mathit{u} +\\
+&(\mathit{v} \mathit{w} \mathit{g} \mathit{u} \mathit{t} : \mathbb{R}\\
+&\quad ),\; (\mathit{hv} : 0 < \mathit{v}),\; (\mathit{hw} : 0 <\\
+&\quad \mathit{w}),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{hopen} : \mathit{g} \leq \mathit{u} +\\
 &\quad \mathit{t})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{g} ^{2} / (2 * (\mathit{v} + \mathit{w})) \leq \mathit{energy} \mathit{v} \mathit{w}\\
-&\quad \mathit{u} \mathit{t}
+\vdash\;&\mathit{g} ^{2} / (2 * (\mathit{v} + \mathit{w}))\\
+&\quad \leq \mathit{energy} \mathit{v} \mathit{w} \mathit{u}\\
+&\quad \mathit{t}
 \end{aligned} \]}
 
 \noindent\textbf{A\,147}\quad\lean{range\_ge\_iff\_exists\_pair\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam} \leftrightarrow \exists \mathit{a} \mathit{b} :\\
-&\quad \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} - \mathit{lam} \mathit{b}
+\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam}\\
+&\quad \leftrightarrow \exists \mathit{a} \mathit{b} :\\
+&\quad \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} -\\
+&\quad \mathit{lam} \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{A\,148}\quad\lean{range\_le\_iff\_exists\_interval}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R}\\
+&\quad )
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z} \leftrightarrow \exists \mathit{l} : \mathbb{R}\\
-&\quad , \forall \mathit{a} : \mathit{A}, \mathit{l} \leq \mathit{lam} \mathit{a}\\
-&\quad \wedge \mathit{lam} \mathit{a} \leq \mathit{l} + \mathit{z}
+\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z}\\
+&\quad \leftrightarrow \exists \mathit{l} : \mathbb{R}\\
+&\quad , \forall \mathit{a} : \mathit{A}, \mathit{l}\\
+&\quad \leq \mathit{lam} \mathit{a} \wedge \mathit{lam}\\
+&\quad \mathit{a} \leq \mathit{l} + \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,149}\quad\lean{shrink\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{th} : \mathit{A} \to \mathbb{R} ),\; (\mathit{l} \mathit{z} : \mathbb{R} ),\; (\mathit{hz} : 0 \leq \mathit{z})
+&(\mathit{th} : \mathit{A} \to \mathbb{R} ),\; (\mathit{l} \mathit{z} : \mathbb{R}\\
+&\quad ),\; (\mathit{hz} : 0 \leq \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} : \mathit{A}, \mathit{l} \leq \mathit{clamp} \mathit{l} \mathit{z} (\mathit{th}\\
-&\quad \mathit{a}) \wedge \mathit{clamp} \mathit{l} \mathit{z} (\mathit{th} \mathit{a})\\
-&\quad \leq \mathit{l} + \mathit{z}
+\vdash\;&\forall \mathit{a} : \mathit{A}, \mathit{l}\\
+&\quad \leq \mathit{clamp} \mathit{l} \mathit{z} (\mathit{th}\\
+&\quad \mathit{a}) \wedge \mathit{clamp} \mathit{l} \mathit{z} (\mathit{th}\\
+&\quad \mathit{a}) \leq \mathit{l} + \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,150}\quad\lean{shrink\_cell\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{alpha} \mathit{l} \mathit{z} \mathit{t} \mathit{x} : \mathbb{R} ),\; (\mathit{halpha} : 0 \leq \mathit{alpha}),\; (\mathit{hz} : 0 \leq \mathit{z}),\; (\mathit{hx1} : \mathit{l} \leq \mathit{x}),\; (\mathit{hx2} : \mathit{x} \leq \mathit{l} +\\
+&(\mathit{alpha} \mathit{l} \mathit{z} \mathit{t} \mathit{x} : \mathbb{R}\\
+&\quad ),\; (\mathit{halpha} : 0 \leq \mathit{alpha}),\; (\mathit{hz} : 0 \leq \mathit{z}),\; (\mathit{hx1} : \mathit{l} \leq \mathit{x}),\; (\mathit{hx2} : \mathit{x} \leq \mathit{l} +\\
 &\quad \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{alpha} * (\mathit{clamp} \mathit{l} \mathit{z} \mathit{t} - \mathit{t}) ^{2} / 2\\
-&\quad \leq \mathit{alpha} * (\mathit{x} - \mathit{t}) ^{2} / 2
+\vdash\;&\mathit{alpha} * (\mathit{clamp} \mathit{l} \mathit{z} \mathit{t} -\\
+&\quad \mathit{t}) ^{2} / 2 \leq \mathit{alpha} * (\mathit{x} -\\
+&\quad \mathit{t}) ^{2} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,151}\quad\lean{shrink\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{alpha} \mathit{th} : \mathit{A} \to \mathbb{R} ),\; (\mathit{l} \mathit{z} : \mathbb{R}\\
-&\quad ),\; (\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{halpha} : \forall \mathit{a}, 0 \leq \mathit{alpha}\\
+&(\mathit{alpha} \mathit{th} : \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{l} \mathit{z} : \mathbb{R} ),\; (\mathit{lam} : \mathit{A} \to \mathbb{R}\\
+&\quad ),\; (\mathit{halpha} : \forall \mathit{a}, 0 \leq \mathit{alpha}\\
 &\quad \mathit{a}),\; (\mathit{hz} : 0 \leq \mathit{z}),\; (\mathit{hfeas} : \forall \mathit{a}, \mathit{l} \leq \mathit{lam} \mathit{a} \wedge \mathit{lam} \mathit{a} \leq \mathit{l} +\\
 &\quad \mathit{z})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
 \vdash\;&\textstyle\sum \mathit{a}, \mathit{alpha} \mathit{a} * (\mathit{clamp} \mathit{l} \mathit{z} (\mathit{th} \mathit{a}) - \mathit{th}\\
-&\quad \mathit{a}) ^{2} / 2 \leq \textstyle\sum \mathit{a}, \mathit{alpha} \mathit{a} * (\mathit{lam} \mathit{a} - \mathit{th}\\
+&\quad \mathit{a}) ^{2} / 2 \leq \textstyle\sum \mathit{a},\\
+&\quad \mathit{alpha} \mathit{a} * (\mathit{lam} \mathit{a} - \mathit{th}\\
 &\quad \mathit{a}) ^{2} / 2
 \end{aligned} \]}
 
@@ -1683,31 +1956,33 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,153}\quad\lean{budget\_wtilde}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/5 : \mathbb{R} ) + 1/5 + (1/5 + 1/5 + 3/50 + 1/25 + 1/25 + 3/50)\\
-&\quad = 1
+\vdash\;&(1/5 : \mathbb{R} ) + 1/5 + (1/5 + 1/5 + 3/50 + 1/25 + 1/25 +\\
+&\quad 3/50) = 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,154}\quad\lean{gap\_exact}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(49:\mathbb{R} )/8397 < 1/160 \wedge (1:\mathbb{R} )/160 - 49/8397\\
-&\quad = 557/1343520
+\vdash\;&(49:\mathbb{R} )/8397 < 1/160 \wedge (1:\mathbb{R}\\
+&\quad )/160 - 49/8397 = 557/1343520
 \end{aligned} \]}
 
 \noindent\textbf{A\,155}\quad\lean{mean\_diff\_lt\_one}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Fin} 6, \mathit{omean} \mathit{a} - \mathit{omean}\\
-&\quad \mathit{b} < 1
+\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Fin} 6,\\
+&\quad \mathit{omean} \mathit{a} - \mathit{omean} \mathit{b}\\
+&\quad < 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,156}\quad\lean{wstar\_endpoint\_pair}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pinch} (1568/8397) (1568/8397) (\mathit{ws} 0) (\mathit{ws} 1) (\mathit{omean} 0 - \mathit{omean}\\
-&\quad 1) = 49/8397
+\vdash\;&\mathit{pinch} (1568/8397) (1568/8397) (\mathit{ws} 0) (\mathit{ws}\\
+&\quad 1) (\mathit{omean} 0 - \mathit{omean} 1) = 49/8397
 \end{aligned} \]}
 
 \noindent\textbf{A\,157}\quad\lean{wstar\_not\_optimal}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{J} : (\mathit{Fin} 6 \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{hstar} : \mathit{J} \mathit{ws} \leq 49/8397),\; (\mathit{htilde} : (1:\mathbb{R} )/160 \leq \mathit{J}\\
+&(\mathit{J} : (\mathit{Fin} 6 \to \mathbb{R} ) \to \mathbb{R}\\
+&\quad ),\; (\mathit{hstar} : \mathit{J} \mathit{ws} \leq 49/8397),\; (\mathit{htilde} : (1:\mathbb{R} )/160 \leq \mathit{J}\\
 &\quad \mathit{wt})
 \end{aligned} \]}
 {\footnotesize\[ \begin{aligned}[t]
@@ -1716,28 +1991,34 @@ Binders are listed as the prover has them and the turnstile $\vdash$ separates t
 
 \noindent\textbf{A\,158}\quad\lean{wstar\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{i} : \mathit{Fin} 6, 0 < \mathit{ws} \mathit{i}
+\vdash\;&\forall \mathit{i} : \mathit{Fin} 6, 0 < \mathit{ws}\\
+&\quad \mathit{i}
 \end{aligned} \]}
 
 \noindent\textbf{A\,159}\quad\lean{wtilde\_pair\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Fin} 6, \mathit{a}\\
-&\quad \neq \mathit{b} \to (1:\mathbb{R} )/160 \leq \mathit{pinch} (1/5) (1/5) (\mathit{wt}\\
-&\quad \mathit{a}) (\mathit{wt} \mathit{b}) (\mathit{omean} \mathit{a} - \mathit{omean} \mathit{b})
+\vdash\;&\forall \mathit{a} \mathit{b} : \mathit{Fin} 6,\\
+&\quad \mathit{a} \neq \mathit{b} \to (1:\mathbb{R} )/160\\
+&\quad \leq \mathit{pinch} (1/5) (1/5) (\mathit{wt}\\
+&\quad \mathit{a}) (\mathit{wt} \mathit{b}) (\mathit{omean} \mathit{a} - \mathit{omean}\\
+&\quad \mathit{b})
 \end{aligned} \]}
 
 \noindent\textbf{A\,160}\quad\lean{wtilde\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{i} : \mathit{Fin} 6, 0 < \mathit{wt} \mathit{i}
+\vdash\;&\forall \mathit{i} : \mathit{Fin} 6, 0 < \mathit{wt}\\
+&\quad \mathit{i}
 \end{aligned} \]}
 
 \noindent\textbf{A\,161}\quad\lean{wtilde\_witness\_energy}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((1/5 : \mathbb{R} ) * (-(3/8) + 1/2) ^{2} + (1/5) * (3/8 - 1/2) ^{2}) / 2 + ((1/5 : \mathbb{R} ) * (3/8 - 1/4) ^{2} + (1/5) * (-(3/8) - (-(1/4)))\\
+\vdash\;&((1/5 : \mathbb{R} ) * (-(3/8) + 1/2) ^{2} + (1/5) * (3/8 - 1/2)\\
+&\quad ^{2}) / 2 + ((1/5 : \mathbb{R} ) * (3/8 - 1/4) ^{2} + (1/5) * (-(3/8) - (-(1/4)))\\
 &\quad ^{2}) / 2 = 1/160
 \end{aligned} \]}
 
 \noindent\textbf{A\,162}\quad\lean{wtilde\_witness\_flips}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|(3:\mathbb{R} )/8 - (-(3/8))| \leq (3/8 : \mathbb{R} ) - (-(3/8))
+\vdash\;&|(3:\mathbb{R} )/8 - (-(3/8))| \leq (3/8 : \mathbb{R} )\\
+&\quad - (-(3/8))
 \end{aligned} \]}

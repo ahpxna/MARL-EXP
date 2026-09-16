@@ -95,7 +95,7 @@ def split_sig(sig: str):
 BREAK = [r'\wedge', r'\vee', r'\leftrightarrow', r'\to', r'\leq', r'\geq',
          r'\neq', r'=', r'<', r'>', ',']
 
-def wrap(expr: str, width: int = 62):
+def wrap(expr: str, width: int = 44):
     """Break a transliterated expression into aligned lines at top-level operators."""
     toks = expr.split(' ')
     lines, cur, depth = [], '', 0
@@ -111,7 +111,7 @@ def wrap(expr: str, width: int = 62):
             continue
         if len(cand) > width and depth <= 0 and cur and t in BREAK:
             lines.append(cur); cur = t
-        elif len(cand) > width * 1.6 and depth <= 0 and cur:
+        elif len(cand) > width * 1.25 and depth <= 0 and cur:
             lines.append(cur); cur = t
         else:
             cur = cand
@@ -158,11 +158,11 @@ for paper, (tag, title) in STRANDS.items():
         if binders:
             bl = r',\; '.join(translit(b) for b in binders)
             L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-            for k, ln in enumerate(wrap(bl, 58)):
-                L.append((r'&' if k == 0 else r'&\quad ') + ln + (r'\\' if k < len(wrap(bl, 58)) - 1 else ''))
+            for k, ln in enumerate(wrap(bl, 44)):
+                L.append((r'&' if k == 0 else r'&\quad ') + ln + (r'\\' if k < len(wrap(bl, 44)) - 1 else ''))
             L.append(r'\end{aligned} \]}')
         L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-        cl = wrap(translit(concl), 58)
+        cl = wrap(translit(concl), 44)
         for k, ln in enumerate(cl):
             pre = r'\vdash\;&' if k == 0 else r'&\quad '
             L.append(pre + ln + (r'\\' if k < len(cl) - 1 else ''))

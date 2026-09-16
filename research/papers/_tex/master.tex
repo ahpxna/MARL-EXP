@@ -3,8 +3,8 @@
 \begin{document}
 
 \title{The Price of a Calibration Query:\\
-When an Extra Kind of Measurement Stops Being\\
-an Optimisation and Becomes a Precondition}
+An Exact Budget Law for Threshold Decisions\\
+under Unknown Group Offsets}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -13,297 +13,304 @@ Lawrenceville, NJ, USA}}
 \maketitle
 
 \begin{abstract}
-We study a decision problem in which the answer is a threshold set---which items of a
-population lie above a fixed level---and the experimenter buys observations under a
-budget. The population is partitioned into $K$ groups of $m$ items. An \emph{ordinary}
-query on an item returns its value corrupted by noise, but sees the item's value and its
-group's unknown offset only in combination; a \emph{calibration} query on a group returns
-that offset directly, at a price $\kappa$ relative to an ordinary query. We prove two
-things. First, a \emph{dichotomy}: there are configurations on which every ordinary query
-has identical means in two worlds whose answers differ, so the attainable value is exactly
-zero and no quantity of ordinary sampling recovers it. Second, a \emph{price law}: once a
-calibration query is bought, the optimal value under a unit budget is exactly
-$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$, established as a lower
-bound, as an upper bound over \emph{every} unit-budget design, and as attained by an
-explicit symmetric design---so the constant is an identity rather than an order of
-magnitude. A third result certifies, on one explicit instance in exact rational
-arithmetic, that no anchor-free design matches an anchored one. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry} and with axioms confined to $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; the corollaries, limits and worked derivations the paper carries out itself are marked as such in Section~\ref{sec:verification}. Numerical sweeps
-over $32$ parameter cells reproduce the closed form to a worst relative gap of
-$2.5\times10^{-16}$, and the same sweeps show that removing the calibration query returns
-exactly zero while a merely uniform allocation still reaches $73.5$--$100\%$ of the
-optimum: the cost of a missing query \emph{type} is total, while the cost of bad
-allocation is bounded.
+Experimental design usually treats the choice of measurement as an allocation problem: a
+budget is divided among available observations, and a better allocator buys a better
+answer. This paper shows that the framing fails when the instrument sees the quantity of
+interest only in combination with an unknown offset. We study a threshold decision over
+$K$ groups of $m$ items in which an ordinary query returns an item's value corrupted by its
+group's unknown offset, and a calibration query returns that offset directly at a relative
+price $\kappa$. We prove two results. First, a necessity dichotomy: there are
+configurations, exhibited in exact rational arithmetic, on which every ordinary query has
+identical means in two worlds whose answers differ, so the attainable value is exactly zero
+and no quantity of ordinary sampling recovers it. Second, an exact price law: once a
+calibration query is admitted, the optimal value under a unit budget is
+$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$, proved as a lower bound
+on every group, as an upper bound quantified over every unit-budget design rather than over
+a parametric family, and as attained by an explicit symmetric design. The two prices
+combine through their square roots, which yields the operational crossover $\kappa=m$ at
+which the two query types consume equal shares of each group's budget. A third result
+certifies, on one explicit instance in exact rationals, that no anchor-free design matches
+an anchored one. Every displayed theorem is machine-checked in Lean~4 with no
+\texttt{sorry} and with axioms confined to
+$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$. Numerical sweeps over
+$32$ parameter cells reproduce the closed form to a worst relative gap of
+$2.5\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
+calibration query returns exactly zero, while a merely uniform allocation still reaches
+$73.5$--$100\%$ of the optimum.
 \end{abstract}
 
 \begin{IEEEkeywords}
-optimal experimental design, discrimination designs, nuisance parameters, measurement
-cost, formal verification, interactive theorem proving
+optimal experimental design, discrimination designs, nuisance parameters, measurement cost,
+formal verification, interactive theorem proving
 \end{IEEEkeywords}
 
 \section{Introduction}
 
-A recurring situation in experimental design is that the quantity one can measure is not
-the quantity one wants. An instrument reports a signal contaminated by a slowly varying
-offset; a survey reports a response contaminated by a respondent-group effect; a sensor
-array reports a reading contaminated by a per-array calibration drift. In each case the
-experimenter may have access to a second kind of measurement---a control, a calibration,
-an anchor---that reports the contaminant directly, and that second measurement is usually
-more expensive than the first.
+A recurring situation in experimental design is that the quantity one can measure is not the
+quantity one wants. An instrument reports a signal contaminated by a slowly varying offset;
+a survey reports a response contaminated by a respondent-group effect; a sensor array
+reports a reading contaminated by a per-array calibration drift. In each case the
+experimenter may have access to a second kind of measurement---a control, a calibration, an
+anchor---that reports the contaminant directly, and that second measurement is usually more
+expensive than the first.
 
-The standard way to think about this is as a trade-off. Calibration queries consume budget
-that could have bought ordinary samples; a careful allocator balances the two, and the
-question is one of tuning. Under that framing, an experimenter who economises on
-calibration loses some efficiency and degrades gracefully.
+The standard treatment of this situation is a trade-off. Calibration queries consume budget
+that could have bought ordinary samples, a careful allocator balances the two, and the
+design question is one of tuning. Under that framing an experimenter who economises on
+calibration loses efficiency and degrades gracefully.
 
 This paper shows that the framing is wrong in a precise and consequential way. There exist
-configurations---exhibited here in exact rational arithmetic, not argued asymptotically---on
-which \emph{every} ordinary query has identical means in two worlds whose answers differ.
-On such a configuration the attainable value is not small; it is exactly zero. No
-allocation of ordinary samples, however large, separates the two worlds, so the calibration
-query is not a refinement of an otherwise workable design. It is a precondition for the
-problem to be solvable at all, and an experimenter who omits it fails outright rather than
-gracefully.
+configurations on which every ordinary query has identical means in two worlds whose
+answers differ. On such a configuration the attainable value is not small; it is exactly
+zero. No allocation of ordinary samples, however large, separates the two worlds, so the
+calibration query is not a refinement of an otherwise workable design. It is a precondition
+for the problem to be solvable, and an experimenter who omits it fails outright rather than
+gracefully. The configuration is exhibited in exact rational arithmetic on four items, not
+argued in a limit, so the failure can be reproduced and tested against.
 
-Having established that the query is sometimes mandatory, the natural next question is what
-it costs. We answer it exactly. Writing $\Delta$ for the separation between the two worlds
-to be distinguished, $m$ for the group size and $\kappa$ for the price of a calibration
-query in units of an ordinary one, the optimal value of the design problem under a unit
-budget is
+Having established that the query is sometimes mandatory, the paper computes what it costs.
+Writing $\Delta$ for the separation between the two worlds to be distinguished, $m$ for the
+group size and $\kappa$ for the price of a calibration query in units of an ordinary one,
+the optimal value under a unit budget is
 \begin{equation}
-\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(\sqrt{m}+\sqrt{\kappa})^{2}},
+\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(\sqrt{m}+\sqrt{\kappa})^{2}} .
 \label{eq:pricelaw}
 \end{equation}
-and this is an identity: it is matched by a lower bound on every group, by an upper bound
-quantified over \emph{every} unit-budget design rather than over a parametric family, and
-by an explicit design that attains it. The two query prices combine through their square
-roots, which is the signature of a two-resource harmonic trade-off, and neither type can be
-dropped without losing the group entirely.
+This is an identity rather than an order of magnitude: it is matched by a lower bound on
+every group, by an upper bound quantified over \emph{every} unit-budget design rather than
+over a parametric family, and by an explicit design that attains it. The two query prices
+enter through their square roots, which is the signature of a two-resource harmonic
+trade-off, and neither type can be dropped without losing the group entirely.
 
-\subsection{Contributions}
+The paper makes four contributions. First, it exhibits a necessity dichotomy with an exact
+witness, showing that an additional \emph{type} of measurement can be a precondition rather
+than an optimisation. Second, it computes the exact price of one unit of information in a
+group, $(\sqrt{m}+\sqrt{\kappa})^{2}$, and the split that attains it. Third, it proves the
+price law \eqref{eq:pricelaw} on both sides and exhibits the attaining design, from which
+the operational crossover $\kappa=m$ follows. Fourth, it certifies on an explicit instance
+that no anchor-free design matches an anchored one, with both sides in exact rationals.
 
-\begin{enumerate}
-\item[C1.] \textbf{A necessity dichotomy with an exact witness.} We exhibit two worlds, in
-exact rationals, that every ordinary query fails to distinguish while their answers differ
-(Theorem~\ref{thm:dichotomy}). On such a configuration the attainable value is exactly
-zero.
+The scope of the claim is deliberately bounded. This paper does not solve the heterogeneous
+design problem, does not characterise the configurations on which calibration is mandatory,
+and does not propose an estimator or a confidence set. It computes an information and
+budget law for a homogeneous model, proves it exactly, and separates the cost of a bad
+allocation from the cost of a missing query type. The method is therefore positioned as a
+diagnostic for when a design problem has become infeasible rather than merely inefficient.
 
-\item[C2.] \textbf{The exact price of one unit of information in a group.} A group required
-to deliver profiled information $h$ costs at least $h(\sqrt{m}+\sqrt{\kappa})^{2}$
-(Theorem~\ref{thm:grouplower}), and the split attaining it is exhibited
-(Theorem~\ref{thm:groupattained}).
+\section{Background}
 
-\item[C3.] \textbf{The price law, matched on both sides and attained.} Equation
-\eqref{eq:pricelaw} holds as an upper bound over every unit-budget design
-(Theorem~\ref{thm:upper}) together with a design meeting it
-(Theorem~\ref{thm:attained}), and yields the operational crossover $\kappa=m$ at which the
-two query types consume equal shares of each group's budget.
+\subsection{Optimal Discrimination Design}
 
-\item[C4.] \textbf{A certified instance where omitting the query is strictly worse.} On one
-explicit instance we cap every anchor-free design at $1/8$---a bound that is itself
-attained, hence tight---and exhibit an anchored design reaching $261/1520$, a gap of
-$37.4\%$, both sides in exact rationals (Theorem~\ref{thm:anchor}).
+The design of experiments for discriminating between rival models originates with Atkinson
+and Fedorov, who introduced the $T$-optimality criterion for choosing observations that
+separate two candidate regression models \cite{atkinson1975}. Dette and Titoff later
+analysed this criterion in closed form: their Theorem~2.1 establishes that the $T$-optimal
+value equals the squared Chebyshev approximation error,
+\begin{equation}
+\sup_{\xi}\Delta(\xi)
+  \;=\; \inf_{\theta_{(2)}}\bigl\lVert \eta-\eta_{2}(\cdot,\theta_{(2)})\bigr\rVert_{\infty}^{2},
+\label{eq:chebyshev}
+\end{equation}
+and their Theorem~2.2 characterises \emph{all} $T$-optimal designs through a linear system
+under uniqueness and interiority of the best approximation \cite{dette2009}. Their criterion
+is itself a profiled quantity, and the local-alternative noncentrality is
+$\delta^{2}=\theta_{(0)}^{\top}M_{11.2}(\xi)\theta_{(0)}$ with $M_{11.2}$ a Schur
+complement---exactly the shape of the profiled information that appears in
+Section~\ref{sec:profile}. Profiling, the Schur-complement form, the existence of a
+closed-form value for a discrimination criterion, and the characterisation of optimal
+designs and their non-uniqueness therefore belong to this line of work and are cited, never
+claimed.
 
-\item[C5.] \textbf{Every claim machine-checked.} Four Lean~4 modules, $29$ axiom-audited
-declarations, no \texttt{sorry}, axioms confined to the three standard ones. Numerical
-sweeps are reported separately from theorems and never substitute for one.
-\end{enumerate}
+However, this literature optimises over measures on a \emph{fixed} design space in which
+every support point carries the same cost. No parameter plays the role of $\kappa$, so the
+question of what an additional kind of measurement costs cannot be posed inside it. This
+paper differs by pricing the query \emph{type}: the design space contains two kinds of
+point at different prices, and the resulting law \eqref{eq:pricelaw} is a rate in the
+structural parameters $(K,m,\kappa)$ rather than a Chebyshev approximation constant.
 
-\subsection{What is not claimed}
+\subsection{Cost-Constrained and Classical Design Theory}
 
-The machinery used here is decades old and the boundary is stated at the front rather than
-in an appendix. Section~\ref{sec:related} records what belongs to prior work, read at
-theorem level from the papers themselves rather than from abstracts: profiling a nuisance
-parameter out of a discrimination criterion, the Schur-complement form of the resulting
-information, the existence of closed-form values for optimal discrimination criteria, the
-characterisation of optimal designs and their non-uniqueness, and the identifiability half
-of any sufficiency witness. What survives as new is the \emph{price} and the
-\emph{necessity}, and nothing else.
+The general apparatus of optimal design---information matrices, equivalence theorems, and
+the characterisation of optimal designs through directional derivatives---is standard
+\cite{pukelsheim2006,silvey1980}, and design problems in which support points carry unequal
+prices are a long-studied formulation \cite{stigler1971}. In that formulation cost enters as
+a weight in the budget constraint, and the criterion remains positive for any positive
+allocation, so the design question is always quantitative.
 
-\section{Problem setting}
+But what does not appear there is a regime in which the value is exactly zero unless a
+particular kind of query is bought. This paper differs by separating the two failure modes.
+The dichotomy of Section~\ref{sec:dichotomy} is a statement about the observation model,
+not about the budget, and it is what distinguishes this problem from a weighted-cost design
+problem in which more budget always buys more information.
+
+\subsection{Data Sufficiency}
+
+Bennouna, Chen and Van Parys characterise sufficiency exactly: a data set $\mathcal{D}$
+suffices for uncertainty set $\mathcal{C}$ and decision set $\mathcal{X}$ if and only if
+$\Delta(\mathcal{X},\mathcal{C})\subseteq\operatorname{span}\mathcal{D}$, they identify that
+span, and they bound their construction \cite{bennouna2025}. This is the natural framework
+for asking whether a given body of evidence supports a given decision, and the
+identifiability half of the witness in Section~\ref{sec:dichotomy} is exactly the kind of
+statement it characterises in general.
+
+However, every result in that line is existential---whether a \emph{fixed} data set
+suffices---and the query set $\mathcal{Q}$ is predefined throughout. Their theorems
+determine which queries from a given $\mathcal{Q}$ are required; they are silent on when
+$\mathcal{Q}$ itself must be enlarged. This paper addresses precisely that question, and
+computes the price of the enlargement.
+
+\subsection{Machine-Checked Mathematics}
+
+The Lean~4 system and its mathematics library are used here as a checking discipline rather
+than as a subject \cite{demoura2021,mathlib2020}. The relevant point for a design-theory
+audience is what the discipline rules out. It does not certify that the model of
+Section~\ref{sec:setting} describes any particular experiment; modelling is outside the
+prover. It certifies that no step between the model and \eqref{eq:pricelaw} contains a gap,
+an unstated hypothesis or a sign error---the class of defect that is hardest to find by
+reading and that a numerical sweep cannot detect, because an incorrect theorem and a
+matching incorrect implementation agree perfectly. That guarantee is why the numerical work
+in Section~\ref{sec:results} is deliberately narrow.
+
+\subsection{The Gap}
+
+The literature therefore leaves a specific opening. Discrimination design prices allocations
+but not query types; cost-constrained design prices support points but admits no zero-value
+regime; data sufficiency decides whether a fixed query set suffices but not what enlarging
+it costs. No existing treatment simultaneously: (i) identifies when a design problem has
+value exactly zero without a particular kind of query; (ii) computes the exact price of that
+kind once admitted; (iii) proves the price as an identity rather than a rate, matched on
+both sides and attained; and (iv) separates the bounded cost of a poor allocation from the
+total cost of a missing query type.
+
+\section{Research Aims, Questions, and Hypotheses}
+
+\subsection{Research Aim}
+
+The aim of this work is to determine when an additional \emph{type} of measurement is a
+precondition rather than an optimisation in a budgeted threshold-decision problem, and to
+compute exactly what that measurement costs once it is admitted.
+
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Are there configurations of the observation model on which the
+attainable value is exactly zero without a calibration query, rather than merely reduced?
+\item \textbf{RQ2.} Once a calibration query is admitted at relative price $\kappa$, what is
+the exact optimal value under a unit budget, as a function of $(K,m,\kappa,\Delta)$?
+\item \textbf{RQ3.} Is that value attained by an explicit design, or only bounded above?
+\item \textbf{RQ4.} How does the cost of allocating badly compare with the cost of omitting
+the query type entirely?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} A configuration exists in which two worlds with different answers induce
+identical means for every ordinary query, so no ordinary sampling rule separates them.
+\item \textbf{H2.} The exact price of one unit of profiled information in a group is
+$(\sqrt{m}+\sqrt{\kappa})^{2}$, so the two prices combine through their square roots rather
+than additively.
+\item \textbf{H3.} The resulting bound is attained by a symmetric design that saturates the
+budget, making \eqref{eq:pricelaw} an identity.
+\item \textbf{H4.} Omitting the query type costs the entire value, whereas allocating
+uniformly costs a bounded fraction of it.
+\end{itemize}
+
+\section{Methodology}
 \label{sec:setting}
+
+\subsection{Framework Overview}
 
 A population of $K\cdot m$ items carries unknown values $\theta_{i}\in\mathbb{R}$ and is
 partitioned into $K$ groups of $m$ items each. Write $g(i)$ for the group of item $i$. Each
 group $g$ carries an unknown common offset $b_{g}\in\mathbb{R}$. The answer to be returned
-is the threshold set
-\begin{equation}
-A(\theta) \;=\; \{\, i : \theta_{i} > \tau \,\}
-\end{equation}
-for a fixed level $\tau$; the values themselves are not the goal.
+is the threshold set $A(\theta)=\{\,i:\theta_{i}>\tau\,\}$ for a fixed level $\tau$; the
+values themselves are not the goal.
 
-\begin{definition}[Query types]
-An \emph{ordinary} query on item $i$ observes
-$\theta_{i}+b_{g(i)}+\varepsilon$ with $\varepsilon\sim\mathcal{N}(0,v)$, at unit price. A
-\emph{calibration} query on group $g$ observes $b_{g}+\varepsilon'$ with
-$\varepsilon'\sim\mathcal{N}(0,\nu)$, at price $\kappa$.
-\end{definition}
-
+An \emph{ordinary} query on item $i$ observes $\theta_{i}+b_{g(i)}+\varepsilon$ with
+$\varepsilon\sim\mathcal{N}(0,v)$, at unit price. A \emph{calibration} query on group $g$
+observes $b_{g}+\varepsilon'$ with $\varepsilon'\sim\mathcal{N}(0,\nu)$, at price $\kappa$.
 The defining feature of the ordinary query is that it sees $\theta_{i}$ and $b_{g(i)}$ only
-in combination, never apart. We write $a=x/v$ for the ordinary precision purchased on an
-item, where $x$ is the number of ordinary samples allocated to it, and $b=z/\nu$ for the
-control precision purchased on its group. We abbreviate $s_{m}=\sqrt{m}$ and
-$s_{\kappa}=\sqrt{\kappa}$.
+in combination, never apart; this single property drives every result in the paper.
 
-\begin{definition}[Design]
-A \emph{design} is a non-negative allocation $(x,z)$ of samples to items and groups
-satisfying the unit budget
+A design is a non-negative allocation $(x,z)$ of samples to items and groups satisfying the
+unit budget
 \begin{equation}
-\sum_{g}\Bigl( m\,x_{g} + \kappa\,z_{g} \Bigr) \;\le\; 1 .
+\sum_{g}\Bigl( m\,x_{g} + \kappa\,z_{g} \Bigr) \;\le\; 1 ,
 \label{eq:budget}
 \end{equation}
-A design is \emph{anchor-free} if $z_{g}=0$ for every $g$.
-\end{definition}
+and it is \emph{anchor-free} if $z_{g}=0$ for every $g$. Throughout, $a=x/v$ and $b=z/\nu$
+denote the precisions purchased, and $s_{m}=\sqrt{m}$, $s_{\kappa}=\sqrt{\kappa}$.
 
-The value of a design is the information it delivers against the closest alternative that
-would change the answer; $\Delta$ denotes the separation between the two worlds in
-question. We write $\Gamma$ for the attainable value and $\Gamma^{*}$ for its optimum over
-designs satisfying \eqref{eq:budget}.
+A distinction is maintained throughout the development. The quantity
+$\Gamma^{*}$ is the optimal \emph{information} value under the budget, not the performance
+of any estimator. The paper uses $\Gamma^{*}$ to decide when a design problem is feasible
+and what a query type costs, but it does not claim that any particular procedure attains
+$\Gamma^{*}$ in finite samples.
 
-\begin{table}[htbp]
-\caption{Notation.}
-\label{tab:notation}
-\centering
-\footnotesize
-\begin{tabular}{@{}ll@{}}
-\toprule
-Symbol & Meaning \\
-\midrule
-$K$ & number of groups \\
-$m$ & items per group \\
-$g(i)$ & group of item $i$ \\
-$\theta_{i}$ & unknown value of item $i$ \\
-$b_{g}$ & unknown offset of group $g$ \\
-$\tau$ & decision threshold \\
-$A(\theta)$ & answer, the set of items above $\tau$ \\
-$v,\ \nu$ & ordinary and control noise variances \\
-$\kappa$ & calibration price (ordinary query $=1$) \\
-$x_{g},z_{g}$ & ordinary and control allocation in group $g$ \\
-$a,b$ & precisions $x/v$ and $z/\nu$ \\
-$\Delta$ & separation between the two worlds \\
-$h$ & profiled information required of a group \\
-$s_{m},s_{\kappa}$ & $\sqrt{m},\ \sqrt{\kappa}$ \\
-$\Gamma,\ \Gamma^{*}$ & attainable value, and its optimum \\
-\bottomrule
-\end{tabular}
-\end{table}
+\subsection{Simplifying Assumptions}
 
-\subsection{From the likelihood to the energy}
+\begin{enumerate}
+\item[1)] \textbf{Homogeneity.} All items share the noise variance $v$, all groups share the
+control variance $\nu$ and the price $\kappa$, and the separation $\Delta$ is common. This
+is what makes \eqref{eq:pricelaw} a closed form rather than a weighted sum, and
+Section~\ref{sec:discussion} states what is lost.
+
+\item[2)] \textbf{Additive group offset.} The contaminant enters as a single scalar added to
+every item in the group. This is the minimal model in which an ordinary query is blinded,
+and it is consistent with the motivating cases---an instrument drift, a respondent-group
+effect, a per-array calibration---in which one unknown shifts a whole block.
+
+\item[3)] \textbf{Known variances and Gaussian noise.} The variances $v,\nu$ are known and
+the noise is Gaussian. Gaussianity enters only through the quadratic energy of
+Section~\ref{sec:energy}; any noise family with the same log-likelihood ratio gives the same
+law.
+
+\item[4)] \textbf{Positive precision.} Every allocation entry is strictly positive where it
+appears in a bound. This excludes the degenerate designs that the dichotomy already handles
+separately, and keeps the harmonic denominators finite.
+
+\item[5)] \textbf{Unit budget.} The total spend is normalised to one. Since every quantity
+in \eqref{eq:pricelaw} is homogeneous in the budget, a budget $B$ scales
+$\Gamma^{*}$ by $B$ and changes nothing structural.
+\end{enumerate}
+
+\subsection{From the Observation Model to the Energy}
 \label{sec:energy}
 
-The quadratic energy that Section~\ref{sec:profile} minimises is not an assumption; it is
-the Gaussian log-likelihood ratio, and it is worth deriving once so that the role of each
-precision is unambiguous.
+The quadratic energy that the rest of the development minimises is not an assumption; it is
+the Gaussian log-likelihood ratio, and deriving it once fixes the role of each precision.
 
-Fix a group $g$ and suppress the index. Let $x$ ordinary samples be taken on the items of
-the group and $z$ control samples on the group itself. Under the null world the ordinary
-observations have mean $\theta_{i}+b$ and the control observations have mean $b$; under the
-alternative, the item values are displaced by $\Delta$ and the offset is displaced by some
-$t$ that the alternative is free to choose. The log-likelihood ratio between the two worlds
-is then, up to an additive constant that does not depend on $t$,
+Fix a group and suppress the index. Under the null world the ordinary observations have mean
+$\theta_{i}+b$ and the control observations have mean $b$. Under the alternative the item
+values are displaced by $\Delta$ and the offset is displaced by some $t$ that the
+alternative is free to choose. The log-likelihood ratio is then, up to an additive constant
+independent of $t$,
 \begin{equation}
 \ell(t)\;=\;\frac{x}{2v}\,(\Delta-t)^{2}\;+\;\frac{z}{2\nu}\,t^{2}
         \;=\;\frac{a(\Delta-t)^{2}}{2}+\frac{b\,t^{2}}{2}.
 \label{eq:llr}
 \end{equation}
-The first term is the ordinary channel: it sees the displacement only through the
-\emph{combination} $\theta+b$, so an alternative that moves the offset by $t$ pays only for
-the residual $\Delta-t$. The second term is the control channel, which sees $t$ directly
-and therefore charges for it in full.
+The form of \eqref{eq:llr} is what makes the problem what it is. The first term is the
+ordinary channel: it sees the displacement only through the \emph{combination} $\theta+b$,
+so an alternative that moves the offset by $t$ pays only for the residual $\Delta-t$. The
+second term is the control channel, which sees $t$ directly and therefore charges for it in
+full.
 
-An adversary choosing the alternative picks $t$ to make \eqref{eq:llr} as small as
-possible; the value that survives is $\inf_{t}\ell(t)$, and that infimum is exactly what
-Theorem~\ref{thm:profile} computes. Two consequences are already visible. If $b=0$---no
-control precision at all---the adversary takes $t=\Delta$ and the infimum is $0$, whatever
-$a$ may be: this is the analytic shadow of Theorem~\ref{thm:dichotomy}. If instead
-$a=0$, the adversary takes $t=0$ and the infimum is again $0$. Both channels are therefore
-necessary, and the question is only what mixture of them is cheapest.
+An adversary choosing the alternative picks $t$ to make \eqref{eq:llr} as small as possible,
+and the value that survives is $\inf_{t}\ell(t)$. Two consequences are already visible and
+they justify studying both channels rather than one. If $b=0$---no control precision at
+all---the adversary takes $t=\Delta$ and the infimum is $0$ whatever $a$ may be; this is the
+analytic shadow of the dichotomy below. If instead $a=0$, the adversary takes $t=0$ and the
+infimum is again $0$. Both channels are therefore necessary, and the only remaining question
+is which mixture is cheapest.
 
-\section{Related work and the novelty boundary}
-\label{sec:related}
-
-\subsection{Optimal discrimination design}
-
-Dette and Titoff \cite{dette2009} study $T$-optimal designs for discriminating between two
-regression models. Their Theorem~2.1 establishes that the $T$-optimal value equals the
-squared Chebyshev approximation error,
-\begin{equation}
-\sup_{\xi}\Delta(\xi)
-  \;=\; \sup_{\xi}\inf_{\theta_{(2)}}\Delta(\theta_{(2)},\xi)
-  \;=\; \inf_{\theta_{(2)}}\bigl\lVert \eta-\eta_{2}(\cdot,\theta_{(2)})\bigr\rVert_{\infty}^{2},
-\end{equation}
-and their Theorem~2.2 characterises \emph{all} $T$-optimal designs by a linear system,
-under uniqueness and interiority of the best approximation. Their criterion is itself a
-profiled quantity, and the local-alternative noncentrality is
-$\delta^{2}=\theta_{(0)}^{\top}M_{11.2}(\xi)\theta_{(0)}$ with $M_{11.2}$ a \emph{Schur
-complement}---exactly the shape of the information $I_{u}=D_{u}-M_{u}^{2}/(2K)$ that
-appears in Section~\ref{sec:profile} below.
-
-It follows that profiling, the Schur-complement form, the existence of a closed-form value
-for a discrimination criterion, and the characterisation of optimal designs and their
-non-uniqueness are all prior work. They are cited here, never claimed.
-
-What \cite{dette2009} does not contain is equally definite. No price is attached to a query
-\emph{type}: the design space is fixed and every support point costs the same, so no
-parameter plays the role of $\kappa$. There is no necessity dichotomy identifying when a
-design problem has value exactly zero without a particular kind of query. And there is no
-rate in the structural parameters $(K,m,\kappa)$---a Chebyshev approximation constant is
-not such a rate.
-
-\subsection{Data sufficiency}
-
-Bennouna et al.\ \cite{bennouna2025} characterise sufficiency exactly: a data set
-$\mathcal{D}$ suffices for uncertainty set $\mathcal{C}$ and decision set $\mathcal{X}$ if
-and only if $\Delta(\mathcal{X},\mathcal{C})\subseteq\operatorname{span}\mathcal{D}$
-(their Theorem~1), they identify that span (Theorem~2), and they bound their construction
-(Theorem~3). Every result is existential---whether a \emph{fixed} data set suffices---and
-the query set $\mathcal{Q}$ is \emph{predefined} throughout. Their theorems determine which
-queries from a given $\mathcal{Q}$ are required; they are silent on when $\mathcal{Q}$
-itself must be enlarged, which is precisely the calibration question.
-
-The identifiability half of the witness in Section~\ref{sec:dichotomy} is exactly the kind
-of statement this line characterises in general, and is credited to it.
-
-\subsection{Classical design theory}
-
-The design of experiments for discriminating between rival models originates with Atkinson
-and Fedorov \cite{atkinson1975}, who introduced the $T$-optimality criterion that
-\cite{dette2009} later analysed in closed form. The general apparatus---information
-matrices, equivalence theorems, the characterisation of optimal designs through directional
-derivatives---is standard \cite{pukelsheim2006,silvey1980}, and the present paper uses none
-of it beyond the profiling identity of Section~\ref{sec:profile}. The reason is structural:
-the classical theory optimises over measures on a \emph{fixed} design space, whereas the
-question here is whether the design space must be enlarged by a new kind of point.
-
-Cost-constrained design, in which support points carry unequal prices, is also not new as a
-formulation. What does not appear in that literature is a regime in which the value is
-exactly zero unless a particular price is paid---the cost usually enters as a weight in the
-budget, and the criterion remains positive for any positive allocation. The dichotomy of
-Section~\ref{sec:dichotomy} is a statement about the observation model, not about the
-budget, and it is what separates this problem from a weighted-cost design problem.
-
-\subsection{Formal verification of mathematical results}
-
-The Lean~4 system \cite{demoura2021} and its mathematics library \cite{mathlib2020} are
-used here as a checking discipline rather than as a subject. The relevant point for a
-design-theory audience is what the discipline rules out. It does not certify that the model
-of Section~\ref{sec:setting} describes any particular experiment; modelling is outside the
-prover. What it does certify is that no step between the model and \eqref{eq:pricelaw}
-contains a gap, an unstated hypothesis or a sign error---the class of defect that is
-hardest to find by reading and that a numerical sweep cannot detect, since an incorrect
-theorem and a matching incorrect implementation agree perfectly.
-
-That guarantee is exactly why Section~\ref{sec:experiments} is short. When the derivation is
-checked, the sweeps have only to confirm that the code and the algebra describe the same
-object, which is a much weaker thing to ask of them.
-
-\subsection{Summary of the boundary}
-
-This paper claims the price and the necessity: when a query of a new \emph{type} must be
-added to the admissible set, and what that addition costs, expressed exactly in the
-structural parameters. Every other ingredient is cited.
-
-\section{The dichotomy}
+\subsection{When Two Worlds Cannot Be Told Apart}
 \label{sec:dichotomy}
+
+The analytic argument above shows that zero control precision gives zero value. It does not
+yet show that a concrete configuration realises this, because a real instance must also have
+two worlds whose \emph{answers} differ. We exhibit one.
 
 Consider four items in two groups, with $g(0)=g(1)=0$ and $g(2)=g(3)=1$, and threshold
 $\tau=\tfrac{1}{2}$. Take the two worlds
@@ -313,6 +320,9 @@ $\tau=\tfrac{1}{2}$. Take the two worlds
 \lambda &= \Bigl(\tfrac{1}{4},\;-\tfrac{3}{4},\;0,\;1\Bigr), & b^{(1)} &= \Bigl(\tfrac{3}{4},\,0\Bigr).
 \label{eq:world1}
 \end{align}
+The construction is chosen so that the first group is shifted by $\tfrac34$ and the shift is
+paid back through that group's offset. That is the only mechanism by which an ordinary query
+can be blinded, which is why the witness takes this form and not another.
 
 \begin{theorem}[Necessity dichotomy]
 \label{thm:dichotomy}
@@ -335,56 +345,40 @@ such a group is $\Gamma=0$.
 \begin{proof}
 Both conjuncts are finite rational identities. For \eqref{eq:meansagree}, check the four
 items in turn: $1+0=\tfrac14+\tfrac34$, $0+0=-\tfrac34+\tfrac34$, $0+0=0+0$, and $1+0=1+0$.
-For \eqref{eq:answersdiffer}, the left-hand set is $\{0,3\}$ because $\theta^{(0)}_{0}=1$
-and $\theta^{(0)}_{3}=1$ exceed $\tfrac12$ while $\theta^{(0)}_{1}=\theta^{(0)}_{2}=0$ do
-not; the right-hand set is $\{3\}$ because $\lambda_{0}=\tfrac14<\tfrac12$. The two sets
-differ at item $0$. Since the mean of every ordinary query is the same in both worlds by
-\eqref{eq:meansagree}, the likelihood of any collection of ordinary observations is
-identical under the two worlds, so no decision rule based on ordinary queries alone
-separates them; as the answers differ, the attainable value is zero.
+For \eqref{eq:answersdiffer}, the left-hand set is $\{0,3\}$ because
+$\theta^{(0)}_{0}=\theta^{(0)}_{3}=1$ exceed $\tfrac12$ while
+$\theta^{(0)}_{1}=\theta^{(0)}_{2}=0$ do not; the right-hand set is $\{3\}$ because
+$\lambda_{0}=\tfrac14<\tfrac12$. The two sets differ at item $0$. Since the mean of every
+ordinary query agrees across the two worlds by \eqref{eq:meansagree}, the likelihood of any
+collection of ordinary observations is identical under both, so no decision rule based on
+ordinary queries separates them; as the answers differ, the attainable value is zero.
 \end{proof}
 
 \leanbox{\lean{hidden\_shift\_means}, \lean{hidden\_shift\_answers\_differ},
 \lean{hidden\_shift\_witness} in \lean{LeanMasterCalibrationLawV1}}
 
-\begin{remark}
-The witness is exhibited in exact rational arithmetic, so Theorem~\ref{thm:dichotomy} is a
-certificate and not a numerical observation. It is also minimal in a practical sense: the
-construction shifts one group by $\tfrac34$ and pays the shift back through that group's
-offset, which is the only mechanism by which an ordinary query can be blinded.
-\end{remark}
-
-\begin{remark}
-Theorem~\ref{thm:dichotomy} exhibits two indistinguishable worlds; it does not characterise
-the set of all configurations with this property, and no such characterisation is claimed.
-\end{remark}
+Two properties of this statement are worth naming. It is a certificate rather than a
+numerical observation, because the witness is exhibited in exact rational arithmetic and
+checked as a closed arithmetic identity with no real-analytic content. And it is a witness
+rather than a characterisation: it exhibits two indistinguishable worlds and does not
+describe the set of all configurations with that property.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{master_fig4_witness.png}
 \caption{The witness of Theorem~\ref{thm:dichotomy}. Left: the two worlds differ at item
-$0$, whose value crosses the threshold $\tau=\tfrac12$ in one world and not in the other,
-so the answers are different sets. Right: the observable means $\theta_{i}+b_{g(i)}$ agree
-at every one of the four items, so every ordinary query has the same distribution in both
-worlds. The construction pays the shift back through the group offset, which is the only
-channel through which an ordinary query can be blinded.}
+$0$, whose value crosses the threshold $\tau=\tfrac12$ in one world and not in the other, so
+the answers are different sets. Right: the observable means $\theta_{i}+b_{g(i)}$ agree at
+every one of the four items, so every ordinary query has the same distribution in both
+worlds.}
 \label{fig:witness}
 \end{figure}
 
-\subsection{Why an exact witness rather than an asymptotic argument}
-
-An asymptotic statement---that discrimination becomes hard as some parameter degenerates---
-would be weaker in two respects. It would leave open whether the difficulty is an artefact
-of the limit, and it would give the practitioner no instance to test an implementation
-against. The construction above is neither: it is four items, two groups and four rational
-numbers, and it is checked by the theorem prover as a closed arithmetic identity with no
-real-analytic content. An implementation that claims to solve the design problem can be run
-on it directly, and must return either a calibration query or a failure.
-
-\section{Profiling the group offset}
+\subsection{Profiling the Group Offset}
 \label{sec:profile}
 
-With a calibration query available, the unknown offset can be eliminated from the energy.
+With a calibration query available the unknown offset can be eliminated from
+\eqref{eq:llr}, and the resulting value is the quantity every later bound is stated about.
 
 \begin{theorem}[Profiled information]
 \label{thm:profile}
@@ -395,36 +389,32 @@ For $a,b>0$ and $\Delta\in\mathbb{R}$,
 \;=\;\frac{\Delta^{2}}{2\left(\frac{1}{a}+\frac{1}{b}\right)} ,
 \label{eq:profile}
 \end{equation}
-and the infimum is attained at $t^{*}=a\Delta/(a+b)$.
+attained at $t^{*}=a\Delta/(a+b)$.
 \end{theorem}
 
 \begin{proof}
-Write $f(t)=\tfrac12\bigl(a(\Delta-t)^{2}+bt^{2}\bigr)$. Completing the square,
-\begin{equation}
-f(t)=\frac{a+b}{2}\Bigl(t-\frac{a\Delta}{a+b}\Bigr)^{2}+\frac{ab\Delta^{2}}{2(a+b)},
-\end{equation}
-which is at least the second term for every $t$, with equality exactly at $t=t^{*}$. The
-second equality in \eqref{eq:profile} is $ab/(a+b)=1/(1/a+1/b)$.
+Completing the square in \eqref{eq:llr} gives
+$\ell(t)=\tfrac{a+b}{2}\bigl(t-\tfrac{a\Delta}{a+b}\bigr)^{2}+\tfrac{ab\Delta^{2}}{2(a+b)}$,
+which is at least the second term for every $t$, with equality exactly at $t^{*}$. The
+second equality is $ab/(a+b)=1/(1/a+1/b)$.
 \end{proof}
 
 \leanbox{\lean{profiled\_information}, \lean{profiled\_information\_form} in
 \lean{LeanMasterCalibrationLawV1}}
 
-Both halves are proved separately in the formalisation: the inequality for every $t$, and
-the value at the minimiser. The harmonic form on the right of \eqref{eq:profile} is the
-shape that propagates through the remainder of the argument, and per
-Section~\ref{sec:related} that shape belongs to prior work. What is new is that the two
-precisions being combined belong to two differently \emph{priced} query types, which is
-what turns Section~\ref{sec:groupcost} into a statement about cost rather than about
-information.
+The second form in \eqref{eq:profile} is written harmonically because that is the shape
+which propagates: the two precisions enter only through $1/a+1/b$, so the problem reduces to
+buying reciprocal precision as cheaply as possible. As noted in the Background, this shape
+belongs to the discrimination-design literature. What is new here is that the two precisions
+being combined belong to two differently \emph{priced} query types, which is what turns the
+next subsection into a statement about cost rather than about information.
 
-\section{The cost of one group}
+\subsection{The Price of One Group}
 \label{sec:groupcost}
 
-A group required to deliver profiled information $h$ must satisfy the information
-constraint $h(x+z)\le xz$, where $x$ and $z$ are the ordinary and control sample counts
-allocated to it. The cost of that allocation, at prices $m$ and $\kappa$, is
-$m\,x+\kappa\,z$.
+A group required to deliver profiled information $h$ must satisfy $h(x+z)\le xz$, which is
+\eqref{eq:profile} rearranged. Its cost at prices $m$ and $\kappa$ is $m\,x+\kappa\,z$. We
+bound that cost below, and then exhibit the allocation that meets the bound.
 
 \begin{theorem}[Group cost, lower bound]
 \label{thm:grouplower}
@@ -436,23 +426,23 @@ h\,(s_{m}+s_{\kappa})^{2} \;\le\; s_{m}^{2}\,x + s_{\kappa}^{2}\,z .
 \end{theorem}
 
 \begin{proof}
-By Cauchy--Schwarz applied to $(s_{m}x-s_{\kappa}z)^{2}\ge 0$,
+Expanding $(s_{m}x-s_{\kappa}z)^{2}\ge0$ and rearranging gives the Cauchy--Schwarz form
 \begin{equation}
 (s_{m}+s_{\kappa})^{2}\,xz \;\le\; \bigl(s_{m}^{2}x+s_{\kappa}^{2}z\bigr)(x+z).
 \label{eq:cs}
 \end{equation}
-The hypothesis gives $h(x+z)\le xz$, so multiplying by $(s_{m}+s_{\kappa})^{2}>0$,
-\begin{equation}
-h\,(s_{m}+s_{\kappa})^{2}(x+z) \;\le\; (s_{m}+s_{\kappa})^{2}\,xz .
-\end{equation}
-Chaining with \eqref{eq:cs} and dividing by $x+z>0$ yields \eqref{eq:grouplower}.
+The hypothesis gives $h(x+z)\le xz$; multiplying it by $(s_{m}+s_{\kappa})^{2}>0$ and
+chaining with \eqref{eq:cs}, then dividing by $x+z>0$, yields \eqref{eq:grouplower}.
 \end{proof}
 
 \leanbox{\lean{group\_cost\_lower} in \lean{LeanMasterCalibrationLawV1}}
 
-No optimiser is run and no multiplier theorem is invoked; the inequality is elementary and
-holds for every feasible pair $(x,z)$. A lower bound alone, however, leaves the constant
-unidentified, and the next result removes that gap.
+The proof is elementary by design. No optimiser is run and no multiplier theorem is invoked,
+which matters because \eqref{eq:grouplower} must hold for \emph{every} feasible pair
+$(x,z)$ and not only for an optimal one; the summation step in
+Section~\ref{sec:law} depends on exactly that universality. A lower bound alone, however,
+leaves the constant unidentified, so the next statement exhibits the allocation that meets
+it.
 
 \begin{theorem}[Group cost, attained]
 \label{thm:groupattained}
@@ -463,41 +453,40 @@ x^{\star}=\frac{h(s_{m}+s_{\kappa})}{s_{m}},
 z^{\star}=\frac{h(s_{m}+s_{\kappa})}{s_{\kappa}} .
 \label{eq:groupsplit}
 \end{equation}
-Then $s_{m}^{2}x^{\star}+s_{\kappa}^{2}z^{\star}=h(s_{m}+s_{\kappa})^{2}$ and the
-information constraint holds with equality, $h(x^{\star}+z^{\star})=x^{\star}z^{\star}$.
+Then $s_{m}^{2}x^{\star}+s_{\kappa}^{2}z^{\star}=h(s_{m}+s_{\kappa})^{2}$, and the
+information constraint holds with equality.
 \end{theorem}
 
 \begin{proof}
 Direct substitution. For the cost,
-$s_{m}^{2}x^{\star}+s_{\kappa}^{2}z^{\star}
-= h(s_{m}+s_{\kappa})(s_{m}+s_{\kappa})=h(s_{m}+s_{\kappa})^{2}$.
-For the constraint, $x^{\star}+z^{\star}=h(s_{m}+s_{\kappa})^{2}/(s_{m}s_{\kappa})$ and
+$s_{m}^{2}x^{\star}+s_{\kappa}^{2}z^{\star}=h(s_{m}+s_{\kappa})^{2}$. For the constraint,
+$x^{\star}+z^{\star}=h(s_{m}+s_{\kappa})^{2}/(s_{m}s_{\kappa})$ and
 $x^{\star}z^{\star}=h^{2}(s_{m}+s_{\kappa})^{2}/(s_{m}s_{\kappa})$, so multiplying the
 former by $h$ gives the latter.
 \end{proof}
 
 \leanbox{\lean{group\_cost\_attained} in \lean{LeanMasterCalibrationLawV1}}
 
-\begin{corollary}
-\label{cor:groupprice}
-With $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$, the exact price of one unit of
-profiled information in a group is $(\sqrt{m}+\sqrt{\kappa})^{2}$, and the optimal split
-satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$.
-\end{corollary}
+The split \eqref{eq:groupsplit} takes this form because the two channels must be bought in
+inverse proportion to the square roots of their prices: substituting anything else into
+\eqref{eq:cs} leaves slack. Writing $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$, the
+exact price of one unit of profiled information in a group is $(\sqrt{m}+\sqrt{\kappa})^{2}$
+and the optimal split satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$. Neither type can be
+dropped: as $x\to\infty$ with $z$ fixed, the constraint forces $h\le z$, so a group with no
+control precision cannot deliver information exceeding what its control alone
+supports---which by Theorem~\ref{thm:dichotomy} may be nothing at all.
 
-The two query prices combine through their square roots. This is the signature of a
-two-resource harmonic trade-off, and it has the practical consequence that neither type can
-be dropped: as $x\to\infty$ with $z$ fixed, the constraint $h(x+z)\le xz$ forces
-$h\le z$, so a group with no control precision cannot deliver information exceeding what
-its control alone supports---which, by Theorem~\ref{thm:dichotomy}, may be nothing at all.
-
-\section{The price law}
+\subsection{The Price Law}
 \label{sec:law}
+
+The group bound is now summed. The step is legitimate precisely because
+Theorem~\ref{thm:grouplower} holds for every feasible pair, so no design can evade it by
+being non-symmetric.
 
 \begin{theorem}[Upper bound over every design]
 \label{thm:upper}
 Let $x_{g},z_{g}>0$ for $g=1,\dots,K$, let $s_{m},s_{\kappa},\Delta,V>0$, and suppose the
-unit budget \eqref{eq:budget} holds together with the per-group information requirement
+unit budget \eqref{eq:budget} holds together with the per-group requirement
 \begin{equation}
 \frac{2V}{\Delta^{2}}\,(x_{g}+z_{g}) \;\le\; x_{g}z_{g}
 \qquad\text{for every } g .
@@ -511,364 +500,241 @@ V \;\le\; \frac{\Delta^{2}}{2K\,(s_{m}+s_{\kappa})^{2}} .
 \end{theorem}
 
 \begin{proof}
-Put $h=2V/\Delta^{2}>0$. Hypothesis \eqref{eq:inforeq} is exactly $h(x_{g}+z_{g})\le
-x_{g}z_{g}$, so Theorem~\ref{thm:grouplower} applies to each group and gives
-$h(s_{m}+s_{\kappa})^{2}\le s_{m}^{2}x_{g}+s_{\kappa}^{2}z_{g}$. Summing over $g$,
-\begin{equation}
-K\,h\,(s_{m}+s_{\kappa})^{2}
-\;\le\;\sum_{g}\bigl(s_{m}^{2}x_{g}+s_{\kappa}^{2}z_{g}\bigr)\;\le\;1,
-\end{equation}
-the last step by the budget \eqref{eq:budget}. Substituting $h=2V/\Delta^{2}$ and
-rearranging gives \eqref{eq:upper}.
+Put $h=2V/\Delta^{2}>0$, so \eqref{eq:inforeq} is exactly $h(x_{g}+z_{g})\le x_{g}z_{g}$ and
+Theorem~\ref{thm:grouplower} applies to each group. Summing over $g$ gives
+$K\,h\,(s_{m}+s_{\kappa})^{2}\le\sum_{g}(s_{m}^{2}x_{g}+s_{\kappa}^{2}z_{g})\le1$ by the
+budget, and substituting $h=2V/\Delta^{2}$ yields \eqref{eq:upper}.
 \end{proof}
 
 \leanbox{\lean{calibration\_rate\_upper} in \lean{LeanMasterCalibrationLawV1}}
 
-The statement quantifies over \emph{every} unit-budget design satisfying
-\eqref{eq:inforeq}, not over a parametric family, so no design escapes it.
+The statement quantifies over every unit-budget design satisfying \eqref{eq:inforeq}, not
+over a parametric family. This is deliberate: in a paper whose point is that a query type is
+mandatory, a family-restricted bound would leave open that some unexamined design avoids the
+calibration query, and that gap would be fatal to the claim.
 
 \begin{theorem}[The bound is attained]
 \label{thm:attained}
 The symmetric design allocating \eqref{eq:groupsplit} to each of the $K$ groups, with
 $h=1/\bigl(K(s_{m}+s_{\kappa})^{2}\bigr)$, satisfies the budget with equality and attains
-the value in \eqref{eq:upper}. Consequently
-\begin{equation}
-\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(\sqrt{m}+\sqrt{\kappa})^{2}} .
-\end{equation}
+\eqref{eq:upper}. Consequently \eqref{eq:pricelaw} holds as an identity.
 \end{theorem}
 
 \begin{proof}
 By Theorem~\ref{thm:groupattained} each group spends exactly $h(s_{m}+s_{\kappa})^{2}$, so
 the total spend is $Kh(s_{m}+s_{\kappa})^{2}=1$ by the choice of $h$, and the information
-constraint holds with equality in each group. The value delivered is
-$V=h\Delta^{2}/2=\Delta^{2}/\bigl(2K(s_{m}+s_{\kappa})^{2}\bigr)$, which is the right-hand
-side of \eqref{eq:upper}. Together with Theorem~\ref{thm:upper} this is an identity.
+constraint holds with equality in each group. The delivered value is
+$V=h\Delta^{2}/2$, the right-hand side of \eqref{eq:upper}.
 \end{proof}
 
 \leanbox{\lean{calibration\_rate\_attained} in \lean{LeanMasterCalibrationLawV1}}
 
-\subsection{Reading the law}
-
-Two limits follow immediately and carry the practical content.
-
-\begin{corollary}[Free calibration]
-As $\kappa\to0$, $\Gamma^{*}\to\Delta^{2}/(2Km)$: the cost reduces to that of the ordinary
-queries alone.
-\end{corollary}
-
-\begin{corollary}[Expensive calibration]
-As $\kappa\to\infty$, $\Gamma^{*}\asymp\Delta^{2}/(2K\kappa)$: the calibration query
-dominates the budget and the group size becomes irrelevant.
-\end{corollary}
-
-\begin{corollary}[Crossover]
-\label{cor:crossover}
-At $\kappa=m$ the two square roots in \eqref{eq:pricelaw} are equal, and by
-Corollary~\ref{cor:groupprice} the optimal split satisfies $z^{\star}=x^{\star}$: each
-query type consumes exactly half of each group's budget.
-\end{corollary}
-
-Corollary~\ref{cor:crossover} gives the practitioner a concrete rule. Below $\kappa=m$,
-ordinary sampling dominates the budget and calibration is cheap insurance; above it, the
-calibration query is the binding cost and the group size $m$ is what must be reconsidered.
+Three readings of \eqref{eq:pricelaw} follow immediately and carry its practical content.
+As $\kappa\to0$ the value tends to $\Delta^{2}/(2Km)$, the cost of the ordinary queries
+alone. As $\kappa\to\infty$ it behaves as $\Delta^{2}/(2K\kappa)$, so the calibration query
+dominates the budget and the group size becomes irrelevant. At $\kappa=m$ the two square
+roots are equal and, by \eqref{eq:groupsplit}, $z^{\star}=x^{\star}$: each query type
+consumes exactly half of each group's budget. That crossover is the operational form of the
+law. Below it, ordinary sampling dominates the budget and calibration is cheap insurance;
+above it, the calibration query is the binding cost and the group size $m$ is what must be
+reconsidered.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{master_fig1_rate.png}
-\caption{The closed form \eqref{eq:pricelaw} against an independent bisection optimiser
-over the same feasible set, across the parameter grid. The curves coincide to
-floating-point precision at every cell; the largest relative gap in the sweep is
-$2.5\times10^{-16}$. The decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope,
-not a fitted rate.}
+\caption{The closed form \eqref{eq:pricelaw} against an independent bisection optimiser over
+the same feasible set. The curves coincide to floating-point precision at every cell; the
+decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted rate.}
 \label{fig:rate}
 \end{figure}
 
-\subsection{Constructing the optimal design}
-
-The proof of Theorem~\ref{thm:attained} is constructive, and the construction is short
-enough to state in full.
-
-\begin{enumerate}
-\item Compute $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$ from the group size and the
-calibration price.
-\item Set the per-group information target
-$h=1/\bigl(K(s_{m}+s_{\kappa})^{2}\bigr)$, which is the largest value the unit budget
-supports across $K$ groups.
-\item In every group allocate
-$x^{\star}=h(s_{m}+s_{\kappa})/s_{m}$ ordinary samples and
-$z^{\star}=h(s_{m}+s_{\kappa})/s_{\kappa}$ control samples, as in \eqref{eq:groupsplit}.
-\item Report $\Gamma^{*}=h\Delta^{2}/2$.
-\end{enumerate}
-
-No iteration, no matrix inversion and no numerical optimiser appears. Step~3 spends exactly
-$h(s_{m}+s_{\kappa})^{2}$ per group by Theorem~\ref{thm:groupattained}, so step~2 makes the
-total spend exactly one, and the budget is saturated rather than approached. The ratio
-$z^{\star}/x^{\star}=\sqrt{m/\kappa}$ is independent of $K$, of $h$ and of $\Delta$: the
-\emph{shape} of the optimal design within a group depends only on the two prices, and the
-scale is what the budget and the group count determine.
-
-\subsection{Why the upper bound has to quantify over all designs}
-
-A weaker theorem would fix a parametric family---symmetric designs, say, or designs with a
-single control per group---and optimise inside it. Such a statement cannot rule out that a
-cleverer family does better, and in a paper whose point is that a query type is
-\emph{mandatory} that gap would be fatal: an opponent could always answer that some
-unexamined design avoids the calibration query. Theorem~\ref{thm:upper} closes that route.
-Its hypotheses are the budget and the per-group information requirement, both of which any
-design delivering value $V$ must satisfy; nothing about the design's structure is assumed.
-The route from a per-group inequality to a global one is the summation step, and it is
-legitimate precisely because Theorem~\ref{thm:grouplower} holds for \emph{every} feasible
-pair $(x_{g},z_{g})$ rather than for an optimal one.
-
-\section{The anchor is mandatory on an instance}
+\subsection{The Anchor Certificate}
 \label{sec:anchor}
 
-Theorem~\ref{thm:dichotomy} shows that a group can be blind. The companion statement is
-that on a \emph{specific} instance no anchor-free design matches an anchored one, with both
-sides certified in exact rational arithmetic.
+Theorem~\ref{thm:dichotomy} shows that a group can be blind. The companion statement is that
+on a \emph{specific} instance no anchor-free design matches an anchored one, with both sides
+certified in exact rational arithmetic.
 
 \begin{theorem}[Anchor necessity, certified]
 \label{thm:anchor}
-On the instance of Section~\ref{sec:anchorinstance}, every anchor-free feasible design has
-value at most $U_{0}=\tfrac18$, and this cap is attained. An explicit anchored design with
-budget $\tfrac{9}{20}+\tfrac{9}{20}+\tfrac{1}{10}\cdot 1 = 1$ attains
-$L_{1}=\tfrac{261}{1520}$. Since $\tfrac18 < \tfrac{261}{1520}$, the anchor is mandatory on
-this instance.
+On the instance of Section~\ref{sec:anchor}, every anchor-free feasible design has value at
+most $U_{0}=\tfrac18$, and this cap is attained. An explicit anchored design with budget
+$\tfrac{9}{20}+\tfrac{9}{20}+\tfrac{1}{10}\cdot1=1$ attains $L_{1}=\tfrac{261}{1520}$. Since
+$\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 \end{theorem}
 
 \leanbox{\lean{anchorFree\_le}, \lean{anchorFree\_attained}, \lean{anchored\_value},
 \lean{gap\_positive}, \lean{anchor\_is\_mandatory} in \lean{LeanMasterAnchorInstanceV1};
 \lean{anchor\_mandatory} in \lean{LeanMasterAnchorCertificateV1}}
 
-\subsection{The instance and the certificate}
-\label{sec:anchorinstance}
-
-The cap on anchor-free designs is a dual certificate valid for \emph{every} such design,
-including those placing mass anywhere in the feasible set, and it is attained, so it is
-tight rather than merely valid. The anchored value comes from an explicit design whose
-budget is exhibited above. Numerically $\tfrac18=0.125$ and
+The cap is a dual certificate valid for every anchor-free design, and it is attained, so it
+is tight rather than merely valid. Numerically $\tfrac18=0.125$ and
 $\tfrac{261}{1520}\approx0.171710$, a gap of $37.4\%$.
 
-The formal statement \lean{anchor\_mandatory} is given for an \emph{abstract} design type.
-No optimality of the anchored design is assumed: the theorem says only that an upper
-certificate for one class is strictly below an achieved value in another, which is the
-minimal statement that establishes necessity.
-
-\begin{remark}
-Theorem~\ref{thm:anchor} certifies one instance. It proves that anchor-free designs
-\emph{can} be strictly beaten, not that they always are.
-\end{remark}
+The statement is deliberately weaker than ``the anchored design is optimal''. Proving
+optimality of the anchored side would require an argument whose weakness would propagate
+into the necessity claim; instead \lean{anchor\_mandatory} is stated for an \emph{abstract}
+design type, taking an upper certificate $U_{0}$ for the anchor-free predicate and an
+achieved value $L_{1}$, and concluding strict separation from $U_{0}<L_{1}$ alone. Necessity
+therefore rests on one inequality between two rationals and on nothing about how either side
+was found.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{master_fig3_anchor.png}
 \caption{The certified gap of Theorem~\ref{thm:anchor}. The anchor-free class is capped at
-$\tfrac18$ by a dual certificate valid for every member of the class, and that cap is
-attained, so it cannot be improved. An explicit anchored design reaches $\tfrac{261}{1520}$.
-Both numbers are exact rationals verified by the theorem prover, so the $37.4\%$ gap is a
-certificate rather than a measurement.}
+$\tfrac18$ by a dual certificate valid for every member of the class, and the cap is
+attained. An explicit anchored design reaches $\tfrac{261}{1520}$. Both numbers are exact
+rationals, so the $37.4\%$ gap is a certificate rather than a measurement.}
 \label{fig:anchor}
 \end{figure}
 
-\subsection{Why the certificate is stated for an abstract design type}
+\subsection{Algorithm Summary}
+\label{sec:algorithm}
 
-It would be easy, and misleading, to prove the anchored design optimal on this instance and
-report the gap to the optimum. That statement would require an optimality argument for the
-anchored side, and any weakness in it would propagate into the necessity claim. The
-formalisation avoids the dependency: \lean{anchor\_mandatory} takes an abstract type of
-designs, a predicate marking the anchor-free ones, an upper certificate $U_{0}$ for that
-predicate, and an achieved value $L_{1}$ for some design, and concludes strict
-separation from $U_{0}<L_{1}$ alone. The instance then supplies $U_{0}=\tfrac18$ and
-$L_{1}=\tfrac{261}{1520}$. Necessity therefore rests on one inequality between two
-rationals, and on nothing about how either side was found.
+The proof of Theorem~\ref{thm:attained} is constructive. Given $(K,m,\kappa,\Delta)$ the
+optimal design is obtained as follows.
 
-\section{Gain factorisation}
-\label{sec:gain}
+\begin{algorithm}[htbp]
+\caption{Optimal design under a unit budget}
+\label{alg:design}
+\begin{algorithmic}[1]
+\STATE Compute $s_{m}\leftarrow\sqrt{m}$ and $s_{\kappa}\leftarrow\sqrt{\kappa}$.
+\STATE Set the per-group information target
+       $h\leftarrow 1/\bigl(K(s_{m}+s_{\kappa})^{2}\bigr)$.
+\FOR{each group $g=1,\dots,K$}
+  \STATE Allocate $x_{g}\leftarrow h(s_{m}+s_{\kappa})/s_{m}$ ordinary samples.
+  \STATE Allocate $z_{g}\leftarrow h(s_{m}+s_{\kappa})/s_{\kappa}$ control samples.
+\ENDFOR
+\STATE Report $\Gamma^{*}\leftarrow h\Delta^{2}/2$.
+\end{algorithmic}
+\end{algorithm}
 
-The $K$-group sum in Theorem~\ref{thm:upper} is assembled from per-group statements. Two
-structural facts make that assembly legitimate without a separate convexity argument.
+No iteration, no matrix inversion and no numerical optimiser appears. Step~4--5 spend
+exactly $h(s_{m}+s_{\kappa})^{2}$ per group by Theorem~\ref{thm:groupattained}, so step~2
+makes the total spend exactly one and the budget is saturated rather than approached. The
+ratio $z_{g}/x_{g}=\sqrt{m/\kappa}$ is independent of $K$, of $h$ and of $\Delta$: the
+\emph{shape} of the optimal design within a group depends only on the two prices, and the
+budget and group count determine only its scale.
 
-\begin{lemma}[Hadamard square]
-\label{lem:hadamard}
-The entrywise square of a width-$r$ product is a product of width $r^{2}$; in particular
-$(c_{k}d_{k})^{2}=c_{k}^{2}d_{k}^{2}$ for every $k$.
-\end{lemma}
-
-\begin{lemma}[Slack law]
-\label{lem:slack}
-The minimum after a perturbation is attained on the active set, so inactive constraints may
-be dropped without changing the value.
-\end{lemma}
-
-\leanbox{\lean{hadamard\_square\_factor}, \lean{hadamard\_factor\_symm},
-\lean{min\_attained\_on\_active}, \lean{inactive\_dropped} in
-\lean{LeanMasterGainFactorizationV1}}
-
-\section{Formal verification}
+\section{Formal Verification}
 \label{sec:verification}
 
-Every theorem stated above is machine-checked in Lean~4, toolchain
-\texttt{leanprover/lean4:v4.34.0-rc2} against mathlib revision \texttt{1f495c61}.
+\subsection{Acceptance Contract}
 
-\subsection{Acceptance contract}
-
-A module counts as accepted only when all six of the following hold: the compiler exits
-zero with no errors; the source hash is unchanged \emph{across} the compile, so the file
-checked is the file on disk; the compiled artifact is newer than its source; at least one
-\texttt{\#print axioms} directive is present; the axiom set of every audited declaration
-lies within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-\subsection{Modules}
+The contract is stated in full because each clause excludes a specific way of appearing
+verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
 
-\begin{table}[htbp]
-\caption{Lean modules behind the results of this paper.}
-\label{tab:modules}
-\centering
-\begin{tabular}{@{}lrr@{}}
-\toprule
-Module & Audited & Results \\
-\midrule
-\lean{LeanMasterCalibrationLawV1}   & 10 & Thms \ref{thm:dichotomy}--\ref{thm:attained} \\
-\lean{LeanMasterAnchorCertificateV1} &  6 & Thm \ref{thm:anchor} \\
-\lean{LeanMasterAnchorInstanceV1}    &  8 & Thm \ref{thm:anchor} \\
-\lean{LeanMasterGainFactorizationV1} &  5 & Lems \ref{lem:hadamard}, \ref{lem:slack} \\
-\midrule
-Total                                & 29 & \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{The statements as they are checked}
-
-Formal-methods claims are only as strong as the statements actually proved, so the two
-load-bearing ones are reproduced exactly as the prover has them.
-
-\begin{figure}[htbp]
-\footnotesize
-\hrule\vspace{4pt}
-\begin{tabbing}
-\quad\=\quad\=\kill
-\lean{theorem group\_cost\_lower (h x z sm sk : $\mathbb{R}$)} \\
-\> \lean{(hsm : 0 < sm) (hsk : 0 < sk) (hh : 0 < h)} \\
-\> \lean{(hx : 0 < x) (hz : 0 < z)} \\
-\> \lean{(hinfo : h * (x + z) $\le$ x * z) :} \\
-\> \lean{h * (sm + sk)\^{}2 $\le$ sm\^{}2 * x + sk\^{}2 * z} \\[6pt]
-\lean{theorem calibration\_rate\_upper} \\
-\> \lean{(sm sk D V : $\mathbb{R}$) (x z : Fin K $\to$ $\mathbb{R}$)} \\
-\> \lean{(hsm : 0 < sm) (hsk : 0 < sk) (hD : 0 < D)} \\
-\> \lean{(hV : 0 < V) (hK : 0 < K)} \\
-\> \lean{(hx : $\forall$ g, 0 < x g) (hz : $\forall$ g, 0 < z g)} \\
-\> \lean{(hbudget : $\sum$ g, (sm\^{}2 * x g + sk\^{}2 * z g) $\le$ 1)} \\
-\> \lean{(hinfo : $\forall$ g, 2*V/D\^{}2 * (x g + z g) $\le$ x g * z g) :} \\
-\> \lean{V $\le$ D\^{}2 / (2 * (K : $\mathbb{R}$) * (sm + sk)\^{}2)}
-\end{tabbing}
-\vspace{-4pt}\hrule
-\caption{The two statements carrying the price law, as checked ($D$ is the paper's
-$\Delta$; $K$ is a section variable). The upper bound quantifies over arbitrary allocation
-functions \lean{x z : Fin K $\to$ $\mathbb{R}$} constrained only by the budget and the
-information requirement; no structure on the design is assumed and no parametric family is
-fixed.}
-\label{fig:statements}
-\end{figure}
-
-Three details of Fig.~\ref{fig:statements} are worth naming. The hypothesis \lean{hinfo} is
-an inequality, not an equality, so the lower bound covers designs that over-deliver
-information as well as those that meet the requirement exactly. The budget
-\lean{hbudget} is likewise an inequality, so designs that underspend are included. And $V$
-is universally quantified rather than defined as a supremum, which is what makes the
-conclusion a bound on every achievable value rather than a statement about a particular
-optimum.
-
-\subsection{What the paper derives rather than cites}
-
-Four displayed results carry no \lean{leanbox} because the paper obtains them itself from
-the checked ones, and they are listed here rather than left to inference:
-Corollary~\ref{cor:groupprice} (substituting $s_{m}=\sqrt{m}$, $s_{\kappa}=\sqrt{\kappa}$
-into Theorem~\ref{thm:groupattained}), the two limits $\kappa\to0$ and $\kappa\to\infty$,
-and Corollary~\ref{cor:crossover} (setting $\kappa=m$). Each is one line of algebra from a
-machine-checked statement. The likelihood derivation \eqref{eq:llr} and the
-Cauchy--Schwarz step \eqref{eq:cs} are likewise worked out in the paper; the identity they
-lead to is \lean{profiled\_information} and \lean{group\_cost\_lower} respectively, both
-checked.
-
-\subsection{Evidence per step of the argument}
-
-Table~\ref{tab:inventory} records, for each step of the development, the declarations the
-step cites and the module they live in. It is included because a formal-methods claim is
-not checkable from a count of theorems alone: the question is always which named result
-carries which step.
+\subsection{Evidence per Step}
 
 \begin{table}[htbp]
 \caption{Evidence per step. All cited declarations are axiom-audited.}
 \label{tab:inventory}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llr@{}}
 \toprule
-Step & Cited declarations & Aud. \\
+Step & Module & Aud. \\
 \midrule
-Dichotomy, Thm~\ref{thm:dichotomy}
-  & \lean{hidden\_shift\_means} & 10 \\
-  & \lean{hidden\_shift\_answers\_differ} & \\
-  & \lean{hidden\_shift\_witness} & \\
-Profiling, Thm~\ref{thm:profile}
-  & \lean{profiled\_information} & 10 \\
-  & \lean{profiled\_information\_form} & \\
-Group lower, Thm~\ref{thm:grouplower}
-  & \lean{group\_cost\_lower} & 10 \\
-Group att., Thm~\ref{thm:groupattained}
-  & \lean{group\_cost\_attained} & 10 \\
-Upper bd., Thm~\ref{thm:upper}
-  & \lean{calibration\_rate\_upper} & 10 \\
-Attained, Thm~\ref{thm:attained}
-  & \lean{calibration\_rate\_attained} & 10 \\
-Anchor cap, Thm~\ref{thm:anchor}
-  & \lean{anchorFree\_le} & 8 \\
-  & \lean{anchorFree\_attained} & \\
-Anchor val., Thm~\ref{thm:anchor}
-  & \lean{anchored\_value} & 8 \\
-  & \lean{gap\_positive} & \\
-Necessity, Thm~\ref{thm:anchor}
-  & \lean{anchor\_mandatory} & 6 \\
-Factorise, Lem~\ref{lem:hadamard}
-  & \lean{hadamard\_square\_factor} & 5 \\
-Slack, Lem~\ref{lem:slack}
-  & \lean{min\_attained\_on\_active} & 5 \\
-  & \lean{inactive\_dropped} & \\
+Dichotomy, Thm~\ref{thm:dichotomy}   & \lean{LeanMasterCalibrationLawV1}    & 10 \\
+Profiling, Thm~\ref{thm:profile}     & \lean{LeanMasterCalibrationLawV1}    & 10 \\
+Group bounds, Thms~\ref{thm:grouplower}--\ref{thm:groupattained} & \lean{LeanMasterCalibrationLawV1} & 10 \\
+Price law, Thms~\ref{thm:upper}--\ref{thm:attained} & \lean{LeanMasterCalibrationLawV1} & 10 \\
+Anchor, Thm~\ref{thm:anchor}         & \lean{LeanMasterAnchorInstanceV1}    & 8 \\
+                                     & \lean{LeanMasterAnchorCertificateV1} & 6 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Scope of the formalisation}
+\subsection{Scope of the Formalisation}
 
-The displayed results are the load-bearing chain, not the whole development. The MASTER
-strand contains $15$ Lean source files with $122$ theorem and lemma statements, of which the
-modules in Table~\ref{tab:modules} carry acceptance receipts covering $57$ audited
-declarations. Across the programme of which this paper is one part: $762$ files, $7{,}199$
-statements, $111$ accepted modules, $875$ audited declarations. The statements not
-displayed are the arithmetic identities, positivity checks and finite-sum exchanges that
-each displayed result rests on.
+The displayed results are the load-bearing chain. The MASTER strand contains $15$ Lean
+source files with $122$ theorem and lemma statements, of which $7$ modules carry an acceptance
+receipt covering $57$ declarations whose axiom set was printed and checked. Across the
+programme of which this paper is one part: $762$ files, $7{,}199$ statements, $111$ accepted
+modules, $875$ audited declarations. No module cited here contains a \texttt{sorry}; seven
+occurrences exist in the wider repository, in audit scaffolding and in files named as
+conjectures, and the overlap with the cited set is empty. Appendix~\ref{app:inventory}
+reproduces every audited statement of the strand.
 
-No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
-wider repository, in audit scaffolding and in files named as conjectures; the overlap
-between the cited set and the files containing them was computed and is empty.
+\section{Experiments}
 
-\section{Numerical validation}
-\label{sec:experiments}
+\subsection{Experimental Objectives}
 
-The theorems above are proved, so numerical work here serves only to check the
-implementation and to quantify the practical consequence. It is reported separately and
-never substitutes for a proof.
+The theorems above are proved, so the numerical work cannot strengthen them and is not
+intended to. It has two narrower objectives. The first is to check that the implementation
+used to generate the figures computes the same quantity the theorems describe, which is a
+real risk in any paper pairing formal statements with plots. The second is to quantify the
+practical consequence of Theorem~\ref{thm:dichotomy}, which the theorems alone do not,
+because a theorem about the optimum says nothing about how far a particular heuristic falls
+from it.
 
-\subsection{The law against an independent optimiser}
+\subsection{Parameter Grid}
 
-Over $32$ parameter cells spanning $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
-$\kappa\in\{\tfrac14,\tfrac23,1,4\}$, we compare the closed form \eqref{eq:pricelaw}
-against an independent numerical optimum computed by bisection on the information
-constraint over the same feasible set. The optimiser does not know the closed form; it is
-given the budget, the constraint and nothing else.
+The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
+$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$, giving $32$ cells. The $\kappa$ values
+straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
+the law predicts to be qualitatively different.
+
+\subsection{Baselines and Ablations}
+
+Four designs are evaluated on every cell.
+
+\begin{enumerate}
+\item[1)] \textbf{Optimal design.} Algorithm~\ref{alg:design}.
+\item[2)] \textbf{Uniform, all controls.} Every group receives a calibration query, but each
+group's budget is split evenly between the two query types rather than in the ratio
+$\sqrt{m/\kappa}$. This isolates the cost of a poor allocation from the cost of a missing
+query type.
+\item[3)] \textbf{One calibration query missing.} One group is left without a control. This
+tests whether the failure is global or local.
+\item[4)] \textbf{No calibration queries.} The anchor-free class of Theorem~\ref{thm:anchor}.
+\end{enumerate}
+
+An independent bisection optimiser over the same feasible set is run alongside as a
+cross-check. It is given the budget and the information constraint and does not know the
+closed form.
+
+\subsection{Metrics}
+
+The reported quantities are: the closed-form value \eqref{eq:pricelaw}; the optimiser's
+value; the relative difference between them; the baseline value as a fraction of the
+optimum; and the number of cells in which the optimiser \emph{exceeds} the closed form,
+which is the only outcome that would falsify Theorem~\ref{thm:upper}.
+
+\subsection{Statistical Reporting}
+
+Every quantity in this section is deterministic. The design problem contains no sampling, so
+no seeds, confidence intervals or repetitions are involved, and the tables are exact up to
+floating-point representation. Evidence classes are kept apart throughout: statements
+labelled \PROVED{} are machine-checked, \CERT{} denotes an exact rational certificate, and
+\NUM{} denotes a floating-point computation. No \NUM{} result is used to support a
+\PROVED{} one.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Reporting Protocol}
+
+Results are reported per cell in Table~\ref{tab:cells} and summarised in
+Tables~\ref{tab:numeric} and \ref{tab:baselines}. The closed form and the optimiser are
+compared by relative difference; the baselines are compared as fractions of the optimum.
+All $32$ cells are reported, with none excluded.
+
+\subsection{The Closed Form Against an Independent Optimiser}
+
+The closed form and the bisection optimiser agree in all $32$ cells. The largest relative
+gap anywhere in the sweep is $2.5\times10^{-16}$, which is floating-point agreement, and in
+no cell does the optimiser exceed the closed form.
 
 \begin{table}[htbp]
 \caption{Closed form against an independent optimiser.}
@@ -878,28 +744,30 @@ given the budget, the constraint and nothing else.
 \toprule
 Quantity & Value \\
 \midrule
-Parameter cells                        & 32 \\
-Cells in which the two agree           & 32 \\
-Largest relative gap                   & $2.5\times10^{-16}$ \\
+Parameter cells                            & 32 \\
+Cells in which the two agree               & 32 \\
+Largest relative gap                       & $2.5\times10^{-16}$ \\
 Cells where the optimiser exceeds the form & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The last row is the informative one. An upper bound is falsified by a numerical optimum
-that exceeds it, and none does; the remaining rows only confirm that the implementation and
-the algebra describe the same object. Per-cell values are given in Table~\ref{tab:cells},
-which also carries the uniform baseline discussed next.
+The last row carries the weight. Theorem~\ref{thm:upper} is falsified by a numerical optimum
+that exceeds the bound, and none does. The remaining rows confirm only that the
+implementation and the algebra describe the same object.
 
-\subsection{Baselines: the cost of a missing query type}
+\subsection{The Cost of a Missing Query Type}
 
-Over the same $32$ cells we evaluate three baselines against the analytic optimum. Removing
-all calibration queries, and removing a single one, both return \emph{exactly} zero. This
-is not a small number and not a solver failure: the configuration is the witness of
-Theorem~\ref{thm:dichotomy}, and unidentifiability is detected before any solver is called.
-A uniform design that retains all calibration queries but splits each group's budget
-evenly reaches $73.5$--$100\%$ of the optimum, with the worst case at the extreme of the
-$\kappa$ range where the optimal split is most lopsided.
+The two control-free baselines return exactly zero on every cell. This is not a small number
+and not a solver failure: the configuration is the witness of Theorem~\ref{thm:dichotomy},
+and unidentifiability is detected before any solver is called. Removing a single calibration
+query is as damaging as removing all of them, because the affected group contributes nothing
+and the remaining groups cannot compensate.
+
+The uniform design, which retains every calibration query but splits each group's budget
+evenly, reaches between $73.5\%$ and $100\%$ of the optimum, with a median of $91.7\%$. Its
+worst cells are those where $\kappa$ is furthest from $m$, which is where the optimal split
+$\sqrt{m/\kappa}$ is most lopsided and an even split is therefore most wrong.
 
 \begin{table}[htbp]
 \caption{Baselines as a fraction of the analytic optimum, 32 cells.}
@@ -923,21 +791,19 @@ Optimal design                & $1.000$ \\
 \caption{The asymmetry of Table~\ref{tab:baselines}. A uniform allocation that keeps every
 calibration query loses a bounded fraction of the optimum. Dropping the query type returns
 exactly zero on every cell, and the zero is structural: the two worlds have identical
-observable means, so no allocation of ordinary samples---and no estimator built on
-them---separates them.}
+observable means, so no allocation of ordinary samples separates them.}
 \label{fig:baselines}
 \end{figure}
 
 \input{master_cells}
 
-\subsection{Reading the asymmetry}
+\subsection{Reading the Asymmetry}
 
 The two halves of Table~\ref{tab:baselines} are asymmetric, and that asymmetry is the
-practical message of the paper. An experimenter who allocates badly loses a bounded
-fraction of the attainable information: at worst about a quarter, on this grid. An
-experimenter who omits the query \emph{type} loses everything, and no amount of sampling
-recovers it, because the deficiency is in the observation model rather than in the sample
-size.
+practical finding. An experimenter who allocates badly loses a bounded fraction of the
+attainable information---at worst about a quarter on this grid. An experimenter who omits
+the query \emph{type} loses everything, and no amount of sampling recovers it, because the
+deficiency is in the observation model rather than in the sample size.
 
 Efficiency and feasibility are therefore not points on a single scale. A design procedure
 that treats the calibration query as one more option to be traded off against ordinary
@@ -946,125 +812,76 @@ queries---each of which is individually informative about $\theta+b$---and repor
 whose value is zero, with no indication that anything has gone wrong. The failure is silent
 because every individual query in it looks useful.
 
-\subsection{What the numerical work does and does not add}
+\section{Discussion}
+\label{sec:discussion}
 
-None of the tables above proves anything: Theorems~\ref{thm:upper} and \ref{thm:attained}
-are already machine-checked, and a sweep cannot strengthen a theorem. The sweeps serve two
-narrower purposes. They check that the implementation used to generate the figures computes
-the same quantity the theorems describe, which is a real risk in any paper pairing formal
-statements with plots. And they quantify the consequence---the $73.5\%$ floor and the exact
-zeros---which the theorems alone do not, because a theorem about the optimum says nothing
-about how far a particular heuristic falls from it.
-
-Consistent with this, evidence classes are kept apart throughout: statements labelled
-\PROVED{} are machine-checked, \CERT{} denotes an exact rational certificate, and \NUM{}
-denotes a floating-point computation. No \NUM{} result is used to support a \PROVED{} one.
-
-\section{Discussion and scope}
-\label{sec:scope}
-
-\subsection{What the results establish}
+\subsection{What the Results Establish}
 
 The calibration query is not an efficiency improvement that a careful allocator could do
 without. On the configurations exhibited here the attainable value is exactly zero until a
 query of the new type is bought; once bought, its price is exact, matched by a lower bound,
 by an upper bound over all unit-budget designs, and by an attaining design. The crossover
-$\kappa=m$ converts the law into an operational rule.
+$\kappa=m$ converts the law into a rule a designer can apply without running an optimiser.
 
-\subsection{A worked example}
+\subsection{Shortcomings and Limitations}
 
-Suppose an array of $K=8$ sensor groups, each holding $m=4$ instruments, is to be screened
-against a threshold, and a calibration run on a group costs four times an ordinary reading,
-so $\kappa=4$. Then $s_{m}=2$, $s_{\kappa}=2$, and the price of one unit of profiled
-information in a group is $(2+2)^{2}=16$. The budget supports
-$h=1/(8\cdot 16)=1/128$ per group, and Corollary~\ref{cor:crossover} applies exactly---
-$\kappa=m$---so the optimal split is even: $x^{\star}=z^{\star}=h\cdot 4/2=1/64$. Half of
-every group's budget buys calibration. With $\Delta=1$ the attainable value is
-$\Gamma^{*}=1/256\approx 0.0039$, which is the $K=8$, $m=4$, $\kappa=4$ row of
-Table~\ref{tab:cells}.
+The method has five limitations, and they bound the claims correspondingly.
 
-Now suppose the calibration runs are made cheaper, $\kappa=1$. The price per unit drops to
-$(2+1)^{2}=9$, the attainable value rises to $1/144\approx 0.0069$, and the split tilts:
-$z^{\star}/x^{\star}=\sqrt{4/1}=2$, so calibration now takes two thirds of each group's
-sample count although it still costs less in budget terms. The direction is worth noting
-because it is the opposite of the intuitive one---cheaper calibration buys \emph{more}
-calibration samples, not fewer, since the constraint that binds is information rather than
-convenience.
+\emph{The law assumes homogeneity.} Section~\ref{sec:law} fixes a common variance $v$, a
+common control variance $\nu$, a common price $\kappa$ and equal gaps. Heterogeneous
+$v_{i},\nu_{g},\kappa_{g}$ and unequal gaps are not covered, and the corresponding weighted
+quantity is not computed. This is the most consequential restriction, because real
+instruments rarely share a noise scale.
 
-Finally, suppose the calibration is dropped entirely on the grounds that $\kappa=4$ was
-expensive and the instruments are nominally identical. If the group offsets are in fact
-non-zero and arranged as in Section~\ref{sec:dichotomy}, the value is not $0.0039$ reduced
-by some efficiency factor; it is zero, and the screening returns an answer that is wrong on
-at least one item with no accompanying signal of failure.
+\emph{The anchor result is one instance.} Theorem~\ref{thm:anchor} certifies a single
+explicit configuration. It shows that anchor-free designs \emph{can} be strictly beaten; it
+does not show that they always are, and it gives no bound on how often the gap is large.
 
-\subsection{What the results do not establish}
+\emph{The dichotomy is a witness, not a test.} Theorem~\ref{thm:dichotomy} exhibits two
+indistinguishable worlds without characterising all such configurations. A practitioner can
+check whether their instance is the witness, but cannot in general decide whether their
+instance is of that kind, which is what a usable diagnostic would require.
 
-\begin{enumerate}
-\item \textbf{Homogeneity.} The law of Section~\ref{sec:law} assumes a common variance $v$,
-a common control variance $\nu$, a common price $\kappa$ and equal gaps. Heterogeneous
-$v_{i},\nu_{g},\kappa_{g}$ and unequal gaps are not covered, and the corresponding
-weighted quantity is not computed here.
+\emph{No estimator is provided.} Everything here is an information and budget statement.
+There is no estimator, no confidence set and no finite-sample guarantee, so the gap between
+$\Gamma^{*}$ and what a procedure actually achieves is not addressed.
 
-\item \textbf{One instance for the anchor.} Theorem~\ref{thm:anchor} certifies a single
-explicit instance. It shows anchor-free designs can be strictly beaten, not that they
-always are.
+\emph{The numerical evidence is narrow by construction.} The sweeps are deterministic and
+cover $32$ cells of a homogeneous model. They check the implementation and quantify the
+baseline gap; they do not probe robustness to model misspecification, and nothing here tests
+what happens when the additive-offset assumption fails.
 
-\item \textbf{A witness, not a characterisation.} Theorem~\ref{thm:dichotomy} exhibits two
-indistinguishable worlds without characterising all such configurations.
+\subsection{Open Problems}
 
-\item \textbf{An information statement.} Everything above is an information and budget
-statement. No estimator, no confidence set and no finite-sample guarantee is claimed, and
-the Gaussian noise model enters only through the quadratic energy.
+The heterogeneous law is the obvious next step: replacing
+$K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the corresponding weighted quantity and determining
+whether it remains exactly attainable. The per-group argument of
+Section~\ref{sec:groupcost} survives unchanged, since Theorem~\ref{thm:grouplower} never
+uses homogeneity; what changes is the summation step, where the budget is shared between
+groups at different prices.
 
-\item \textbf{Algebraic gain factorisation.} Lemmas~\ref{lem:hadamard} and \ref{lem:slack}
-are algebraic and carry no probabilistic content.
-\end{enumerate}
+A characterisation, rather than a witness, of the configurations on which the calibration
+query is mandatory would upgrade Section~\ref{sec:dichotomy} from an existence statement to
+a test. The obstruction is that the property depends on the threshold $\tau$ and the answer
+map, not on the observation model alone, so the characterisation cannot be a rank condition
+on a design matrix.
 
-\subsection{Open problems}
-
-Four questions are left open, in rough order of how tractable they look.
-
-\emph{The heterogeneous law.} Replace the common $(v,\nu,\kappa,\Delta)$ by per-item and
-per-group values. The per-group argument of Section~\ref{sec:groupcost} survives unchanged,
-since Theorem~\ref{thm:grouplower} never uses homogeneity; what changes is the summation
-step, where the budget is now shared between groups with different prices. The natural
-conjecture is that $K(\sqrt{m}+\sqrt{\kappa})^{2}$ becomes
-$\bigl(\sum_{g}(\sqrt{m_{g}}+\sqrt{\kappa_{g}})\Delta_{g}^{-1}\bigr)^{2}$-like in form, and
-whether it is still exactly attainable is the question.
-
-\emph{A test rather than a witness.} Theorem~\ref{thm:dichotomy} exhibits one blinded
-configuration. A characterisation of the configurations on which the calibration query is
-mandatory would let a practitioner \emph{check} an instance rather than hope it is not one
-of the bad ones. The obstruction is that the property depends on the threshold $\tau$ and
-on the answer map, not on the observation model alone, so the characterisation cannot be a
-rank condition on the design matrix.
-
-\emph{Partial calibration.} The results treat calibration as available or absent per group.
-An intermediate regime---where a calibration query returns a linear combination of several
-offsets, as a differential or a relative measurement would---interpolates between the two,
-and the price in that regime is not computed here.
-
-\emph{The meaning of the crossover.} At $\kappa=m$ the two query types consume equal shares
-of each group's budget, and the value has the clean form $\Delta^{2}/(8Km)$. Whether that
-coincidence has an operational reading---a point at which some qualitative property of the
-optimal design changes---or is an artefact of the square-root algebra, is open.
+An intermediate regime in which a calibration query returns a linear combination of several
+offsets---as a differential or relative measurement would---interpolates between the two
+query types, and its price is not computed here.
 
 \section{Conclusion}
 
-We have shown that an additional \emph{type} of measurement can be a precondition rather
-than an optimisation, exhibited a configuration in exact rationals where this is so, and
-computed the exact price of that measurement once it is admitted. The price law
+An additional \emph{type} of measurement can be a precondition rather than an optimisation.
+This paper exhibits a configuration in exact rationals where that is so, and computes the
+exact price of the measurement once it is admitted. The price law
 $\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$ is an identity: matched
-on both sides and attained. Every claim is machine-checked, and the numerical work is
-reported separately from the proofs it validates.
-
-The narrower message, for a practitioner, is a checklist rather than a theory. Ask whether
-the observation model sees the quantity of interest only in combination with something
-unknown; if it does, ask whether any pair of worlds with different answers produces
-identical observable means; and if such a pair exists, stop optimising the allocation,
-because the value of every allocation is the same and it is zero.
-
-\input{master_appendix}
+on both sides and attained by an explicit design. For a practitioner the finding reduces to
+a check that costs nothing to perform. Ask whether the observation model sees the quantity
+of interest only in combination with something unknown; if it does, ask whether any pair of
+worlds with different answers produces identical observable means; and if such a pair
+exists, stop optimising the allocation, because every allocation has the same value and it
+is zero.
 
 \section*{Acknowledgment}
 
@@ -1072,20 +889,23 @@ The formal development uses the Lean~4 theorem prover and the mathlib library.
 
 \begin{thebibliography}{00}
 
-\bibitem{dette2009} H. Dette and S. Titoff, ``Optimal discrimination designs,''
-\emph{Ann. Statist.}, vol.~37, no.~4, pp.~2056--2082, 2009.
-
-\bibitem{bennouna2025} O. Bennouna, R. Chen, and B. Van Parys, ``What data enables optimal
-decisions?,'' arXiv:2505.21692, 2025.
-
 \bibitem{atkinson1975} A. C. Atkinson and V. V. Fedorov, ``The design of experiments for
 discriminating between two rival models,'' \emph{Biometrika}, vol.~62, pp.~57--70, 1975.
+
+\bibitem{dette2009} H. Dette and S. Titoff, ``Optimal discrimination designs,''
+\emph{Ann. Statist.}, vol.~37, no.~4, pp.~2056--2082, 2009.
 
 \bibitem{pukelsheim2006} F. Pukelsheim, \emph{Optimal Design of Experiments}. Philadelphia,
 PA: SIAM Classics in Applied Mathematics, 2006.
 
+\bibitem{silvey1980} S. D. Silvey, \emph{Optimal Design}. London, U.K.: Chapman and Hall,
+1980.
+
 \bibitem{stigler1971} S. M. Stigler, ``Optimal experimental design for polynomial
 regression,'' \emph{J. Amer. Statist. Assoc.}, vol.~66, pp.~311--318, 1971.
+
+\bibitem{bennouna2025} O. Bennouna, R. Chen, and B. Van Parys, ``What data enables optimal
+decisions?,'' arXiv:2505.21692, 2025.
 
 \bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
 \emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
@@ -1095,9 +915,8 @@ pp.~367--381.
 programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
 pp.~625--635.
 
-\bibitem{silvey1980} S. D. Silvey, \emph{Optimal Design}. London, U.K.: Chapman and Hall,
-1980.
-
 \end{thebibliography}
+
+\input{master_appendix}
 
 \end{document}

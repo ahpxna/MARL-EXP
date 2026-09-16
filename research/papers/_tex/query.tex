@@ -4,7 +4,7 @@
 
 \title{Which Query You Are Allowed to Ask\\
 Sets the Leakage Order:\\
-Holding the Worlds Fixed and Varying the Measurement}
+An Exponent Fixed by the Measurement, Not the Worlds}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -13,26 +13,27 @@ Lawrenceville, NJ, USA}}
 \maketitle
 
 \begin{abstract}
-Two fixed worlds are to be told apart from observations. The usual way to make such a
-problem harder or easier is to move the worlds closer together or further apart. We do the
-opposite: the worlds are held fixed and the \emph{admissible measurement} is varied. The
+The difficulty of telling two worlds apart is normally treated as a property of the pair:
+the worlds are near or far in some divergence, and the sample complexity follows. This
+paper holds the worlds fixed and varies the \emph{admissible measurement} instead. The
 observation law of each world at perturbation scale $h$ is a finite Gaussian mixture;
 expanding in $h$ produces coefficients $\Delta_{j}$, and the \emph{leakage order} is the
 least $j$ with $\Delta_{j}\not\equiv0$. We prove that this order is a property of the query
 rather than of the parameter space, and we compute what a change of query costs. The
-technical core is the half that is usually asserted: that $\Delta_{r}$ does not vanish
-identically---the shifted Gaussian derivatives making up the coefficient could in principle
-cancel one another, and we prove they cannot. From non-vanishing we obtain a two-sided
-Hellinger sandwich with explicit constants, $a_{E}^{2}h^{2r}/32\le H^{2}\le (J/2)h^{2r}$,
-both sides of slope $2r$ so the order is pinned rather than bounded above; this converts
-into matching sufficiency and necessity sample counts differing only by explicit factors,
-and then into a proved two-sided window on Bayes regret. We further prove that the
-normalised ratio $H^{2}/h^{2r}$ \emph{converges}, with a strictly positive limit, so the
-leading constant is genuine rather than an artefact of the sandwich. Along the way we
-supply a scalar-variable iterated-derivative sum rule absent from mathlib. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}; Section~\ref{sec:verification} states exactly which steps the paper works out itself instead. Simulation of two admissible measurements
-of the same pair of worlds, $4000$ repetitions per world, gives sample requirements of
-$4{,}678$ and $41{,}006$---a factor of $8.8$ attributable entirely to which measurement was
-legal---with measured regret inside the proved window in both cases.
+technical core is the half that is usually assumed: that $\Delta_{r}$ does not vanish
+identically. The coefficient is a sum of Hermite-type polynomials times Gaussians, each
+shifted to a different level, so a non-zero individual coefficient establishes nothing---the
+shifted terms could cancel pointwise---and we prove they cannot when the top level carrying
+weight is strictly largest. From non-vanishing we obtain a two-sided Hellinger sandwich with
+explicit constants, $a_{E}^{2}h^{2r}/32\le H^{2}\le(J/2)h^{2r}$, whose two sides share the
+exponent $2r$, so the order is pinned rather than bounded above; this converts into matching
+sufficiency and necessity sample counts and then into a proved two-sided window on Bayes
+regret. We further prove that $H^{2}/h^{2r}$ converges with a strictly positive limit, so
+the leading constant is genuine. Along the way we supply a scalar-variable
+iterated-derivative sum rule absent from mathlib. Each displayed theorem is machine-checked
+in Lean~4 with no \texttt{sorry}. Simulating two admissible measurements of one pair of
+worlds, $4000$ repetitions per world, gives sample requirements of $4{,}678$ and
+$41{,}006$---a factor of $8.8$ attributable entirely to which measurement was legal.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -43,15 +44,15 @@ formal verification, interactive theorem proving
 \section{Introduction}
 
 Consider two worlds $W\in\{0,1\}$ that an experimenter must tell apart from data. In the
-standard formulation the difficulty of the problem is a property of the pair: the worlds
-are near or far in some divergence, and the sample complexity follows. The experimenter's
-freedom, when there is any, lies in how many observations to take.
+standard formulation the difficulty of the problem belongs to the pair: the worlds are near
+or far in some divergence, and the sample complexity follows from that distance. The
+experimenter's freedom, when there is any, lies in how many observations to take.
 
 This paper studies the other degree of freedom. The worlds are fixed once and for all, and
 what varies is the set of measurements the experimenter is \emph{allowed} to perform. We
 show that this choice determines not merely a constant in the sample complexity but its
-\emph{exponent}, and we compute the price of a bad choice on an instance where the worlds
-are identical across the comparison.
+exponent, and we compute the price of a bad choice on an instance where the worlds are
+byte-identical across the comparison.
 
 Formally, the observation density of world $W$ at perturbation scale $h$ is a finite
 Gaussian mixture,
@@ -62,189 +63,184 @@ p_{W,h}(y)\;=\;\sum_{x}\pi_{x}\,
 \end{equation}
 where $x$ ranges over a finite index set, $\pi$ is a probability vector, $f_{W}$ is the
 world's response, $g$ is the perturbation direction and $\varphi_{\sigma}$ is the centred
-Gaussian density with variance $\sigma^{2}$. Expanding \eqref{eq:mixture} in $h$ yields
-coefficient functions $\Delta_{j}(y)$, and we define the \emph{leakage order} as
+Gaussian density. Expanding \eqref{eq:mixture} in $h$ yields coefficient functions
+$\Delta_{j}(y)$, and the \emph{leakage order} is
 \begin{equation}
 r \;=\; \min\{\, j : \Delta_{j}\not\equiv 0 \,\}.
 \label{eq:order}
 \end{equation}
 
-\subsection{The half that is usually skipped}
+Definition \eqref{eq:order} requires two facts of very unequal difficulty. That the
+coefficients below order $r$ cancel is a computation. That $\Delta_{r}$ does \emph{not}
+vanish identically is not, and it is the statement on which everything downstream rests. The
+reason is visible in the structure of the coefficient: as
+Section~\ref{sec:assembly} shows, $\Delta_{j}$ is a sum of Hermite-type polynomials times
+Gaussians, each \emph{shifted} by a different amount. Knowing that some individual
+coefficient is non-zero says nothing, because the shifted terms could cancel one another
+pointwise. If they did, the leakage order would be undefined at the level claimed and every
+rate statement downstream would concern the wrong exponent.
 
-Definition \eqref{eq:order} requires two facts, and they are not of equal difficulty. That
-the coefficients below order $r$ cancel is a computation. That $\Delta_{r}$ does
-\emph{not} vanish identically is not, and it is the statement on which everything else
-rests.
+The paper makes six contributions. First, it establishes that the order is a property of the
+query, and computes the sample cost of restoring distinguishability at a given order. Second,
+it proves that the order-$r$ coefficient does not vanish, by building the Gaussian iterated
+derivatives explicitly, pushing the derivative through the finite mixture sum, and showing
+the top-level term cannot be cancelled by those below it. Third, it proves a two-sided
+Hellinger sandwich with both constants explicit and both sides of exponent $2r$. Fourth, it
+converts the sandwich into matching sample counts and then into a two-sided regret window.
+Fifth, it proves the normalised ratio converges with a strictly positive limit, so the
+leading constant is genuine rather than an artefact of the envelope. Sixth, it supplies a
+scalar-variable iterated-derivative sum rule that mathlib lacks, with the smoothness side
+condition proved rather than assumed.
 
-The reason is visible in the structure of the coefficient. As Section~\ref{sec:assembly}
-shows, $\Delta_{j}$ is a sum of Hermite-type polynomials times Gaussians, each
-\emph{shifted} by a different amount:
-\begin{equation}
-\Delta_{j}(y)\;=\;\sum_{v}M_{j}(v)\;H_{j}(y-v)\,\varphi_{\sigma}(y-v).
-\label{eq:assembly}
-\end{equation}
-Knowing that some individual coefficient $M_{j}(v)$ is non-zero says nothing, because the
-shifted terms could in principle cancel one another pointwise. If they did, the leakage
-order would be undefined at the level claimed, and every rate statement downstream would be
-about the wrong exponent. Section~\ref{sec:nonvanish} proves they cannot.
+The scope is bounded. Nothing here is a minimax statement: every result concerns a fixed
+pair of worlds and a fixed query. Normalising constants are dropped throughout, so the
+displayed expressions are not densities. And the regret window's two ends separate as the
+sample count grows, so the result localises regret without determining it.
 
-\subsection{Contributions}
+\section{Background}
 
-\begin{enumerate}
-\item[C1.] \textbf{The order is a property of the query.} The same two worlds acquire
-different leakage orders under different admissible measurements, and we compute the sample
-cost of restoring distinguishability at a given order (Section~\ref{sec:experiments}).
-
-\item[C2.] \textbf{The order-$r$ coefficient is proved not to vanish.} We build the
-Gaussian iterated derivatives explicitly as a Hermite-type sequence
-(Theorem~\ref{thm:hermite}), push the derivative through the finite mixture sum
-(Theorem~\ref{thm:sumswap}), and prove the top-level coefficient cannot be cancelled by the
-shifted derivatives below it (Theorem~\ref{thm:nonvanish}).
-
-\item[C3.] \textbf{A two-sided Hellinger sandwich with explicit constants.} We prove
-$a_{E}^{2}h^{2r}/32\le H^{2}\le (J/2)h^{2r}$ (Theorem~\ref{thm:sandwich}). Both sides have
-slope $2r$, so the order is pinned rather than merely bounded above, and the lower constant
-is $32$ rather than the $16$ a careless Cauchy--Schwarz gives.
-
-\item[C4.] \textbf{Matching sample complexity and a two-sided regret window.} The sandwich
-converts into sufficiency and necessity counts differing only by explicit factors
-(Theorem~\ref{thm:samples}), and then into a proved window on Bayes regret
-(Theorem~\ref{thm:regret}).
-
-\item[C5.] \textbf{The analytic limit, not just the sandwich.} We prove the normalised
-ratio $H^{2}/h^{2r}$ \emph{converges} and that its limit is strictly positive
-(Theorem~\ref{thm:limit}), so the leading constant is genuine.
-
-\item[C6.] \textbf{A missing mathlib lemma supplied.} Mathlib has the multilinear
-\lean{iteratedFDeriv\_fun\_sum\_apply} but no scalar-variable counterpart; we prove it, and
-discharge the smoothness hypothesis rather than assuming it.
-\end{enumerate}
-
-\subsection{The practical stake}
-
-If the leakage order is a property of the query rather than of the parameter space, then an
-experimenter who cannot change the worlds can still change the rate, by changing what is
-legal to measure. Section~\ref{sec:experiments} exhibits two admissible measurements of one
-pair of worlds whose sample requirements differ by a factor of $8.8$; since the worlds are
-identical across the two runs, the entire difference is attributable to the measurement.
-
-\subsection{Roadmap}
-
-Section~\ref{sec:setting} fixes the setting and Section~\ref{sec:related} the novelty
-boundary. Sections~\ref{sec:hermite}--\ref{sec:nonvanish} build the expansion and prove the
-crux non-vanishing theorem. Section~\ref{sec:sandwich} converts it into a two-sided
-divergence bound, Section~\ref{sec:samples} into sample counts and a regret window, and
-Section~\ref{sec:limit} into a genuine leading constant.
-Section~\ref{sec:experiments} reports the simulation, Section~\ref{sec:instance} the
-concrete instance behind it, and Section~\ref{sec:procedure} the resulting design
-procedure. Section~\ref{sec:verification} records the formal development and
-Section~\ref{sec:discussion} the scope.
-
-The dependency is linear and each arrow is load-bearing: Theorem~\ref{thm:hermite} supplies
-the non-zero leading coefficient that Theorem~\ref{thm:nonvanish} contradicts against,
-Theorem~\ref{thm:sumswap} supplies the finite level sum that
-Theorem~\ref{thm:nonvanish} is a statement about, Theorem~\ref{thm:nonvanish} supplies the
-interval that the lower side of Theorem~\ref{thm:sandwich} integrates over, and so on to
-the end. No step is decorative, and Section~\ref{sec:verification} names which declaration
-carries which arrow.
-
-\section{Setting and notation}
-\label{sec:setting}
-
-\begin{table}[htbp]
-\caption{Notation.}
-\label{tab:notation}
-\centering
-\footnotesize
-\begin{tabular}{@{}ll@{}}
-\toprule
-Symbol & Meaning \\
-\midrule
-$W$ & world index, $W\in\{0,1\}$ \\
-$h$ & perturbation scale \\
-$x$ & finite mixture index \\
-$\pi_{x}$ & mixture weight \\
-$f_{W}(x)$ & response of world $W$ \\
-$g(x)$ & perturbation direction \\
-$\varphi_{\sigma}$ & centred Gaussian density \\
-$\Delta_{j}$ & order-$j$ expansion coefficient \\
-$r$ & leakage order, least $j$ with $\Delta_{j}\not\equiv0$ \\
-$H_{n}$ & Hermite-type polynomial of degree $n$ \\
-$v$ & a level, i.e.\ a value of $f_{W}(x)$ \\
-$M_{j}(v)$ & level-$v$ coefficient at order $j$ \\
-$H^{2}$ & squared Hellinger distance between the worlds \\
-$L$ & per-sample log-affinity $-\log(1-H^{2})$ \\
-$\rho$ & per-sample affinity $1-H^{2}$ \\
-$N$ & sample count \\
-$R_{N}^{*}$ & Bayes regret at $N$ samples \\
-$\gamma,L_{\max}$ & loss-geometry constants \\
-$a_{E},J$ & sandwich constants \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-An \emph{admissible measurement} is a choice of the map $g$ together with the index set and
-weights; two measurements of the same pair of worlds share $f_{0},f_{1}$ and differ in $g$.
-A \emph{level} is a value taken by the response, and the level structure is what
-\eqref{eq:assembly} sums over. Throughout, normalising constants $1/(\sigma\sqrt{2\pi})$
-and $1/j!$ are dropped from displayed expressions; this is harmless for the order
-statements, which are invariant under positive scaling, but it means the dropped
-expressions must not be quoted as densities.
-
-\section{Related work and the novelty boundary}
-\label{sec:related}
-
-\subsection{Divergence-to-sample-complexity transfer}
+\subsection{Divergence-to-Sample-Complexity Transfer}
 
 That a squared Hellinger distance controls the sample complexity of a binary test is
-classical; the tensorisation identity for product measures and Le Cam's two-point method
-\cite{lecam1973,tsybakov2009} are the standard tools, and the exposition in
-\cite{ibragimov1981} treats the local-alternative regime in which our $h\downarrow0$ sits.
-Lemma~\ref{lem:logsandwich} and Theorem~\ref{thm:samples} are transfers of that kind and
-are claimed only as careful bookkeeping: what is unusual here is that every constant is
-written down rather than absorbed into an order symbol, which is what makes the two ends of
-Theorem~\ref{thm:samples} comparable.
+classical. Le~Cam's two-point method reduces a testing lower bound to a divergence between
+two candidate laws \cite{lecam1973}, the tensorisation identity carries that divergence to
+product measures, and the standard expositions develop the local-alternative regime in which
+the scale $h\downarrow0$ sits \cite{tsybakov2009,ibragimov1981}. The transfers in
+Section~\ref{sec:samples} are instances of this machinery and are claimed only as careful
+bookkeeping.
 
-\subsection{Identifiability and rates for finite mixtures}
+What is unusual here is not the machinery but the accounting. In that literature constants
+are routinely absorbed into order symbols, because the object of interest is an asymptotic
+rate. This paper writes every constant down, because its comparison is between two
+measurements at a \emph{fixed} $h=0.6$, and at fixed $h$ an unquantified $\asymp$ permits
+the two envelopes to be separated by any factor whatever.
+
+\subsection{Identifiability and Rates for Finite Mixtures}
 
 The difficulty of estimating finite mixtures is governed by how many derivatives of the
-component density must be taken before the parameter difference appears, and the rate
-degrades accordingly \cite{chen1995,heinrich2018}. That literature fixes the observation
-channel and varies the mixture; the order that emerges is a property of the parameter
-space, and strong identifiability conditions are imposed to guarantee that the relevant
-coefficient does not vanish.
+component density must be taken before the parameter difference appears, and the minimax
+rate degrades accordingly. Chen established the $n^{-1/4}$ rate for the mixing distribution
+under a strong identifiability condition \cite{chen1995}, and Heinrich and Kahn later gave
+matching minimax rates for finite mixture estimation under related conditions
+\cite{heinrich2018}. That literature fixes the observation channel and varies the mixture;
+the order that emerges is a property of the parameter space, and non-degeneracy of the
+relevant coefficient is imposed as a strong-identifiability hypothesis.
 
-The present paper inverts both. The mixture is fixed---the two worlds never change---and the
+This paper inverts both. The mixture is fixed---the two worlds never change---and the
 \emph{channel} varies, which is why the resulting order is attributable to the query. And
-the non-degeneracy that the mixture literature assumes as a condition is here proved as
+the non-degeneracy that the mixture literature assumes is here proved as
 Theorem~\ref{thm:nonvanish}, for the specific shifted-Hermite structure that
 \eqref{eq:assembly} produces. The proof is not a specialisation of a strong-identifiability
 condition; it is an argument about competing exponential decay rates at $+\infty$, and it
-needs the leading coefficient of $H_{r}$ computed in Theorem~\ref{thm:hermite}.
+consumes the leading coefficient computed in Theorem~\ref{thm:hermite}.
 
-\subsection{Hermite expansions}
+\subsection{Hermite Expansions}
 
-The polynomials of Theorem~\ref{thm:hermite} are the probabilists' Hermite polynomials up
-to normalisation, and their classical theory \cite{szego1939} contains everything we prove
-about them and a great deal more. We reprove the two facts needed---the product form and
-the leading coefficient---because the formal development requires them as Lean statements
-about the specific iterated derivative appearing in \eqref{eq:mixture}, and importing the
-classical theory would have been a larger task than proving the two facts directly.
+The polynomials of Theorem~\ref{thm:hermite} are the probabilists' Hermite polynomials up to
+normalisation, and the classical theory contains everything we prove about them and a great
+deal more \cite{szego1939}. We reprove the two facts needed---the product form and the
+leading coefficient---because the formal development requires them as statements about the
+specific iterated derivative appearing in \eqref{eq:mixture}, and importing the classical
+theory would have been a larger task than proving the two facts directly.
 
-\subsection{Summary of the boundary}
+\subsection{Machine-Checked Mathematics}
 
-Claimed as new: that the leakage order is attributable to the admissible measurement rather
-than to the parameter space (C1); the non-vanishing theorem for shifted Hermite sums with a
-strict top level (C2); the sandwich with both constants explicit and matching exponents
-(C3); and the analytic limit with certified positivity (C5). Everything else---the
-divergence-to-samples machinery, the Hermite facts, the tensorisation---is standard and
-cited.
+Lean~4 and mathlib are used as a checking discipline \cite{demoura2021,mathlib2020}. Two of
+the defects that discipline caught are reported in Section~\ref{sec:verification}, because
+they indicate what it is worth on a problem of this shape: one was a constant that a
+numerical check cannot detect, and one was a hypothesis that had been assumed rather than
+derived.
 
-\section{The Gaussian derivatives, built}
+\subsection{The Gap}
+
+The literature therefore leaves a specific opening. Divergence-to-samples transfer is
+available but is stated asymptotically; mixture-rate theory determines orders but fixes the
+channel and assumes non-degeneracy; Hermite theory supplies the polynomials but not the
+non-vanishing of their shifted sums. No existing treatment simultaneously: (i) attributes
+the leakage order to the admissible measurement rather than the parameter space;
+(ii) \emph{proves} non-vanishing for shifted Hermite sums instead of assuming it;
+(iii) gives a sandwich whose two sides share the exponent and whose constants are both
+written down; and (iv) certifies that the normalised ratio has a positive limit, so that two
+measurements are compared through genuine leading terms rather than envelopes.
+
+\section{Research Aims, Questions, and Hypotheses}
+
+\subsection{Research Aim}
+
+The aim of this work is to determine whether the exponent governing the sample complexity of
+a fixed discrimination problem is a property of the admissible measurement, and if so to
+prove the exponent well defined and compute the cost of changing the measurement.
+
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Is the order-$r$ coefficient of the expansion provably non-vanishing, so
+that the leakage order \eqref{eq:order} is well defined rather than assumed?
+\item \textbf{RQ2.} Can the squared Hellinger distance be bracketed by two envelopes sharing
+the exponent $2r$, with both constants explicit?
+\item \textbf{RQ3.} Does the normalised ratio $H^{2}/h^{2r}$ converge, and is its limit
+strictly positive?
+\item \textbf{RQ4.} On one pair of worlds, how much does the sample requirement change when
+only the admissible measurement changes?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} When the largest level carrying a non-zero coefficient is strictly
+largest, the shifted Hermite terms cannot cancel, so $\Delta_{r}\not\equiv0$.
+\item \textbf{H2.} The two envelopes share the exponent, so the order is pinned rather than
+bounded above, and the lower constant is $32$ rather than the $16$ a careless bound gives.
+\item \textbf{H3.} The ratio converges by dominated convergence, and positivity of the limit
+is equivalent to the non-vanishing of H1.
+\item \textbf{H4.} Two measurements differing by one in $r$ differ in sample requirement by a
+factor of order $h^{-2}$, not by a constant.
+\end{itemize}
+
+\section{Methodology}
+\label{sec:setting}
+
+\subsection{Framework Overview}
+
+An \emph{admissible measurement} is a choice of the perturbation map $g$ together with the
+index set and weights; two measurements of the same pair of worlds share $f_{0},f_{1}$ and
+differ in $g$. A \emph{level} is a value taken by the response, and the level structure is
+what \eqref{eq:assembly} sums over.
+
+A distinction is maintained throughout. The leakage order $r$ is a property of the
+\emph{expansion} of \eqref{eq:mixture}, not of any estimator; the sample counts of
+Section~\ref{sec:samples} are what that order implies for an optimal test, and no claim is
+made that a particular procedure attains them.
+
+\subsection{Simplifying Assumptions}
+
+\begin{enumerate}
+\item[1)] \textbf{Dropped normalisation.} Constants $1/(\sigma\sqrt{2\pi})$ and $1/j!$ are
+omitted from displayed expressions. This is harmless for order statements, which are
+invariant under positive scaling, but it means the displayed expressions must not be quoted
+as densities.
+
+\item[2)] \textbf{Shared level set.} The two worlds take values in the same finite level
+set. This is what lets the order-$j$ coefficients pair term by term in
+Theorem~\ref{thm:cancel}; worlds with disjoint level structure are outside every statement
+here.
+
+\item[3)] \textbf{Strict top level.} At order $r$ the largest level carrying a non-zero
+coefficient is strictly largest. This is the hypothesis Theorem~\ref{thm:nonvanish} needs,
+and Section~\ref{sec:nonvanish} explains why ties break the argument rather than merely
+complicating it.
+
+\item[4)] \textbf{Fixed pair, fixed query.} Every result concerns one pair of worlds and one
+admissible measurement. Nothing is a statement about the worst case over a class.
+\end{enumerate}
+
+\subsection{The Gaussian Derivatives, Built}
 \label{sec:hermite}
 
-The expansion in $h$ is an iterated derivative, so the first task is an explicit form for
-the iterated derivatives of a Gaussian.
+The expansion in $h$ is an iterated derivative, so the first task is an explicit form for the
+iterated derivatives of a Gaussian. We build them rather than cite them, because the
+non-vanishing argument needs one specific fact---the value of the leading coefficient---and
+that fact must be available as a checked statement about this object.
 
 \begin{theorem}[Hermite-type sequence]
 \label{thm:hermite}
@@ -254,32 +250,30 @@ There is a sequence of polynomials $H_{n}$ with
    \;=\;H_{n}(y)\,e^{-y^{2}/2\sigma^{2}},
 \label{eq:hermite}
 \end{equation}
-and the degree-$n$ coefficient of $H_{n}$ equals $(-1/\sigma^{2})^{n}\neq 0$. In
-particular $H_{n}\neq 0$ for every $n$.
+and the degree-$n$ coefficient of $H_{n}$ equals $(-1/\sigma^{2})^{n}\neq0$. In particular
+$H_{n}\neq0$ for every $n$.
 \end{theorem}
 
 \begin{proof}
-Induction on $n$. For $n=0$ take $H_{0}=1$. Given \eqref{eq:hermite} at $n$, differentiate
-the product: $\frac{d}{dy}\bigl(H_{n}(y)e^{-y^{2}/2\sigma^{2}}\bigr)
-=\bigl(H_{n}'(y)-\tfrac{y}{\sigma^{2}}H_{n}(y)\bigr)e^{-y^{2}/2\sigma^{2}}$, so
+Induction on $n$, with $H_{0}=1$. Differentiating the product gives
 $H_{n+1}=H_{n}'-\tfrac{y}{\sigma^{2}}H_{n}$. The first term lowers degree and the second
-raises it by one, multiplying the leading coefficient by $-1/\sigma^{2}$; the claim on the
-degree-$n$ coefficient follows by induction, and a polynomial with a non-zero coefficient is
-non-zero.
+raises it by one, multiplying the leading coefficient by $-1/\sigma^{2}$; the claim follows
+by induction, and a polynomial with a non-zero coefficient is non-zero.
 \end{proof}
 
 \leanbox{\lean{iteratedDeriv\_gauss}, \lean{hpoly\_coeff}, \lean{hpoly\_ne\_zero} in
 \lean{LeanQueryGaussianLevelV1}}
 
-The statement about the leading coefficient is not decoration. It is exactly what the
-non-vanishing argument of Section~\ref{sec:nonvanish} consumes: without a non-zero top
-coefficient, the contradiction there does not close.
+The statement about the leading coefficient is not decoration. It is exactly what
+Section~\ref{sec:nonvanish} consumes: without a non-zero top coefficient the contradiction
+there does not close, and the leakage order would remain undefined.
 
-\section{Pushing the derivative through the sum}
+\subsection{Pushing the Derivative Through the Sum}
 \label{sec:assembly}
 
 Theorem~\ref{thm:hermite} differentiates one mixture component. The observation law is a
-finite sum of components, so the derivative must be moved inside the sum.
+finite sum of components, so the derivative must be moved inside the sum. Mathlib provides
+the multilinear version of this exchange but not the scalar one, so we prove it.
 
 \begin{theorem}[Scalar iterated-derivative sum rule]
 \label{thm:sumswap}
@@ -292,127 +286,97 @@ For a finite family $(F_{x})$ of functions each $C^{\infty}$ near $0$,
 \end{theorem}
 
 \begin{proof}
-Mathlib provides the multilinear statement \lean{iteratedFDeriv\_fun\_sum\_apply} for the
-Fréchet iterated derivative of a finite sum. The scalar iterated derivative is that object
-evaluated at the all-ones vector, so \eqref{eq:sumswap} follows once the smoothness
-hypothesis is discharged for each summand. Smoothness of a mixture component is proved from
-smoothness of $\exp$ composed with a polynomial in $h$, not assumed.
+Mathlib's \lean{iteratedFDeriv\_fun\_sum\_apply} gives the Fréchet iterated derivative of a
+finite sum. The scalar iterated derivative is that object evaluated at the all-ones vector,
+so \eqref{eq:sumswap} follows once the smoothness hypothesis is discharged for each summand.
+Smoothness of a mixture component is proved from smoothness of $\exp$ composed with a
+polynomial in $h$, not assumed.
 \end{proof}
 
 \leanbox{\lean{iteratedDeriv\_fun\_sum}, \lean{contDiff\_component},
 \lean{iteratedDeriv\_mixture} in \lean{LeanQueryMixtureDerivativeV1}}
 
-\begin{remark}
-The scalar counterpart of \lean{iteratedFDeriv\_fun\_sum\_apply} is not in mathlib at the
-pinned revision. Supplying it, with the smoothness side condition proved rather than
-assumed, is a small but reusable contribution independent of the rest of the paper.
-\end{remark}
+Combining Theorems~\ref{thm:hermite} and \ref{thm:sumswap} and grouping the components by
+the level $v=f_{W}(x)$ they sit at gives the assembly
+\begin{equation}
+\Delta_{j}(y)\;=\;\sum_{v}M_{j}(v)\;H_{j}(y-v)\,\varphi_{\sigma}(y-v),
+\label{eq:assembly}
+\end{equation}
+where $M_{j}(v)$ collects the mixture weights at level $v$. Equation~\eqref{eq:assembly} is
+the form the whole paper turns on: each term is shifted to its own level, so no term-by-term
+comparison is available, and whether the sum vanishes is a genuine question rather than a
+computation.
 
-Combining Theorems~\ref{thm:hermite} and \ref{thm:sumswap} and grouping the mixture
-components by the level $v=f_{W}(x)$ they sit at gives the assembly \eqref{eq:assembly}:
-the $j$-th derivative at $h=0$ is a sum over levels of a Hermite-type polynomial times a
-Gaussian, each shifted to its own level, with coefficient $M_{j}(v)$ collecting the mixture
-weights at that level.
-
-\section{Cancellation below the order: the easy half}
+\subsection{Cancellation Below the Order}
 \label{sec:cancel}
 
-Definition \eqref{eq:order} has two halves. This section disposes of the first, both to make
-the paper self-contained and to make precise what ``the coefficients below order $r$
-cancel'' means, since the phrase is ambiguous between two statements of very different
-strength.
+Definition \eqref{eq:order} has two halves. This subsection disposes of the easy one, both
+for completeness and to make precise what ``the coefficients below order $r$ cancel'' means.
 
 \begin{theorem}[Cancellation below the order]
 \label{thm:cancel}
-Suppose the two worlds share a level set, and that at order $j<r$ the level coefficients
-satisfy $M^{(0)}_{j}(v)=M^{(1)}_{j}(v)$ for every level $v$. Then
-$\Delta_{j}\equiv0$.
+Suppose the two worlds share a level set and that at order $j<r$ the level coefficients
+satisfy $M^{(0)}_{j}(v)=M^{(1)}_{j}(v)$ for every level $v$. Then $\Delta_{j}\equiv0$.
 \end{theorem}
 
 \begin{proof}
 By Theorem~\ref{thm:sumswap} the order-$j$ coefficient of each world is the finite level sum
-\eqref{eq:assembly} with that world's coefficients. The two worlds share a level set by
-hypothesis, so the two sums range over the same index set and pair term by term. Since
-corresponding coefficients agree, the difference is a sum of zero terms, hence identically
-zero as a function.
+\eqref{eq:assembly} with that world's coefficients. The shared level set makes the two sums
+range over the same index set, so they pair term by term; corresponding coefficients agree,
+so the difference is a sum of zero terms.
 \end{proof}
 
 \leanbox{\lean{mixture\_coeff\_diff\_eq\_zero} in \lean{LeanQueryMixtureDerivativeV1}}
 
-The proof is short, and that is the point. Cancellation below the order is a bookkeeping
-identity: the terms agree, so their difference vanishes. It carries no analytic content and
-its hypotheses are checkable by inspection of the mixture data.
+The proof is short, and that is the point. Cancellation below the order is bookkeeping: the
+terms agree, so their difference vanishes, and the hypotheses are checkable by inspecting
+the mixture data. The converse situation---showing that a sum of terms which do \emph{not}
+pair off is nonetheless non-zero as a function---has no such structure, which is why the next
+subsection is the length it is.
 
-The converse situation---showing a sum of terms that do \emph{not} pair off is nonetheless
-non-zero as a function---has no such structure, because the terms are shifted differently
-and no term-by-term comparison is available. That asymmetry is why
-Section~\ref{sec:nonvanish} is the length it is, and why a paper that proves only
-Theorem~\ref{thm:cancel} and asserts the other half has proved the easy half.
-
-\begin{remark}
-The shared-level-set hypothesis is genuinely needed. If world $0$ places weight at a level
-where world $1$ places none, the sums do not pair, and the difference at order $j$ is that
-unpaired term---which by Theorem~\ref{thm:hermite} is not the zero function. Worlds with
-disjoint level structure are therefore outside Theorem~\ref{thm:cancel}, and the paper
-claims nothing about them.
-\end{remark}
-
-\section{Non-vanishing: the hard half}
+\subsection{Non-Vanishing: the Hard Half}
 \label{sec:nonvanish}
 
 Fix the order $r$ and let $v^{*}$ be the largest level carrying a non-zero coefficient.
-Write
+Factoring the Gaussian at level $v^{*}$ out of $\Delta_{r}$ leaves
 \begin{equation}
-T(y)\;=\;c_{v^{*}}H_{r}(y-v^{*})\;+\;\sum_{v<v^{*}}c_{v}\,H_{r}(y-v),
+T(y)\;=\;c_{v^{*}}H_{r}(y-v^{*})\;+\;\sum_{v<v^{*}}c_{v}\,H_{r}(y-v).
 \label{eq:nonvanish}
 \end{equation}
-the expression obtained from $\Delta_{r}$ after factoring out the Gaussian at level $v^{*}$.
+The expression is written this way because the factorisation is what separates the terms: it
+converts a sum of equal-footing shifted Gaussians into one polynomial plus a remainder that
+decays.
 
 \begin{theorem}[The order-$r$ coefficient does not vanish]
 \label{thm:nonvanish}
-If $c_{v^{*}}\neq 0$ and $v^{*}$ is strictly the largest level, then
-$T\not\equiv0$; consequently $\Delta_{r}\not\equiv0$ and the leakage order
-\eqref{eq:order} is well defined.
+If $c_{v^{*}}\neq0$ and $v^{*}$ is strictly the largest level, then $T\not\equiv0$;
+consequently $\Delta_{r}\not\equiv0$ and the leakage order \eqref{eq:order} is well defined.
 \end{theorem}
 
 \begin{proof}
-Divide \eqref{eq:nonvanish} by the Gaussian factor at level $v^{*}$. Each term with
-$v<v^{*}$ then carries the ratio
-$\varphi_{\sigma}(y-v)/\varphi_{\sigma}(y-v^{*})=\exp\bigl(-(v^{*}-v)(y-\tfrac{v+v^{*}}{2})/\sigma^{2}\bigr)$,
-which, since $v^{*}-v>0$, decays to $0$ as $y\to+\infty$. Each such term is therefore a
-polynomial against a decaying exponential and tends to $0$.
+After the factorisation, each term with $v<v^{*}$ carries the ratio
+$\varphi_{\sigma}(y-v)/\varphi_{\sigma}(y-v^{*})
+=\exp\bigl(-(v^{*}-v)(y-\tfrac{v+v^{*}}{2})/\sigma^{2}\bigr)$, which decays to $0$ as
+$y\to+\infty$ because $v^{*}-v>0$. Each such term is therefore a polynomial against a
+decaying exponential and tends to $0$.
 
-Suppose $T\equiv0$. Then along $y\to+\infty$ the surviving term
-$c_{v^{*}}H_{r}(y-v^{*})$ must tend to $0$ as well. A polynomial tending to $0$ at
-$+\infty$ has vanishing leading coefficient, so the degree-$r$ coefficient of $H_{r}$ times
-$c_{v^{*}}$ is zero. But $c_{v^{*}}\neq0$ by hypothesis and the degree-$r$ coefficient of
-$H_{r}$ is $(-1/\sigma^{2})^{r}\neq0$ by Theorem~\ref{thm:hermite}---a contradiction.
-Hence $T\not\equiv0$.
+Suppose $T\equiv0$. Then along $y\to+\infty$ the surviving term $c_{v^{*}}H_{r}(y-v^{*})$
+must tend to $0$ as well. A polynomial tending to $0$ at $+\infty$ has vanishing leading
+coefficient, so $c_{v^{*}}$ times the degree-$r$ coefficient of $H_{r}$ is zero. But
+$c_{v^{*}}\neq0$ by hypothesis and that coefficient is $(-1/\sigma^{2})^{r}\neq0$ by
+Theorem~\ref{thm:hermite}---a contradiction.
 \end{proof}
 
 \leanbox{\lean{levelSum\_ne\_zero} in \lean{LeanQueryGaussianLevelV1};
-\lean{mixture\_coeff\_ne\_zero}, \lean{mixture\_coeff\_diff\_eq\_zero} in
-\lean{LeanQueryMixtureDerivativeV1}}
+\lean{mixture\_coeff\_ne\_zero} in \lean{LeanQueryMixtureDerivativeV1}}
 
-\begin{remark}
-The argument requires a \emph{strict} top level: if two levels tie at the maximum, their
-exponential factors have the same decay and the separation used above disappears. Ties at
-the top are outside the scope of Theorem~\ref{thm:nonvanish}, and no claim is made for
-them.
-\end{remark}
+The strictness of the top level is where the argument lives and not a technical convenience.
+If two levels tie at the maximum, their exponential factors have identical decay, the
+separation used above disappears, and the limit argument produces $0=0$ rather than a
+contradiction. Ties at the top are therefore outside Theorem~\ref{thm:nonvanish}, and no
+claim is made for them.
 
-\subsection{Why this step is the crux}
-
-A reader may reasonably ask why a non-vanishing statement deserves a section. The reason is
-that everything downstream is a statement about the \emph{exponent} $2r$, and an exponent
-is determined by which coefficient is the first non-zero one. If $\Delta_{r}$ vanished, the
-true order would be some $r'>r$, the sandwich of Section~\ref{sec:sandwich} would still be
-true as an upper bound but false as a lower one, and the comparison between two admissible
-queries---the entire point of the paper---would be comparing the wrong numbers. The
-literature routinely asserts non-degeneracy at this point; here it is proved, and the proof
-is what the strict-top-level hypothesis buys.
-
-\section{The Hellinger sandwich}
+\subsection{The Hellinger Sandwich}
 \label{sec:sandwich}
 
 \begin{theorem}[Two-sided sandwich with explicit constants]
@@ -425,54 +389,47 @@ With $r$ the leakage order and constants $a_{E},J>0$ determined by the mixture,
 \end{theorem}
 
 \begin{proof}[Proof outline]
-\emph{Lower side.} Theorem~\ref{thm:nonvanish} gives $\Delta_{r}\not\equiv0$; by continuity
-there is a bounded interval $E$ and a constant $a_{E}>0$ with $|\Delta_{r}|\ge a_{E}$ on
-$E$. On $E$ the two densities differ by $h^{r}\Delta_{r}$ plus a remainder that is
-$O(h^{r+1})$ uniformly, so for $h$ small the difference is at least $a_{E}h^{r}/2$ in
-absolute value throughout $E$.
+\emph{Lower side.} Theorem~\ref{thm:nonvanish} gives $\Delta_{r}\not\equiv0$, so by
+continuity there is a bounded interval $E$ and $a_{E}>0$ with $|\Delta_{r}|\ge a_{E}$ on
+$E$. On $E$ the two densities differ by $h^{r}\Delta_{r}$ plus a uniform $O(h^{r+1})$
+remainder, so for small $h$ the difference is at least $a_{E}h^{r}/2$ throughout $E$. The
+Hellinger distance is bounded below through
+$(\sqrt{p}-\sqrt{q})^{2}=(p-q)^{2}/(\sqrt{p}+\sqrt{q})^{2}$; bounding
+$(\sqrt{p}+\sqrt{q})^{2}\le2(p+q)$ and applying Cauchy--Schwarz on $E$ gives, for every
+$t>0$, a bound whose optimisation over $t$ yields the stated quadratic form. Tracking the
+factors---two from the denominator bound, two from the remainder, two from the Hellinger
+normalisation, four from the square---produces $32$.
 
-The Hellinger distance is bounded below by the difference of the densities through the
-elementary identity $(\sqrt{p}-\sqrt{q})^{2}=(p-q)^{2}/(\sqrt{p}+\sqrt{q})^{2}$. Bounding
-$(\sqrt{p}+\sqrt{q})^{2}\le 2(p+q)$ and applying Cauchy--Schwarz on $E$ gives, for every
-$t>0$, an inequality of the form
-\begin{equation}
-\Bigl(\tfrac{a_{E}h^{r}}{2}\Bigr)^{2}\,|E|^{2}
-  \;\le\; \bigl(2H^{2}\bigr)\cdot\Bigl(t + \tfrac{1}{t}\,\textstyle\int_{E}(p+q)\Bigr),
-\end{equation}
-and optimising the free parameter $t$ yields the stated quadratic bound. Tracking the
-factors---$2$ from the denominator bound, $2$ from the remainder, $2$ from the Hellinger
-normalisation, and $4$ from the square---produces $32$ in the denominator. The value is
-worth stating precisely because an argument that bounds
-$(\sqrt{p}+\sqrt{q})^{2}\le p+q$, which is false, produces $16$ and an incorrect
-lower envelope.
-
-\emph{Upper side.} Pointwise, $(\sqrt{p}-\sqrt{q})^{2}\le (p-q)^{2}/q$, so the Hellinger
-integrand is dominated by the $\chi^{2}$ integrand. Expanding $p-q$ to order $r$ in $h$ with
-a uniform Taylor remainder, and bounding the remainder by an integrable envelope---the
-envelope is constructed and its integrability proved, not assumed---gives
-$H^{2}\le (J/2)h^{2r}$ with $J$ the integral of the squared order-$r$ coefficient against
-the reference density.
+\emph{Upper side.} Pointwise $(\sqrt{p}-\sqrt{q})^{2}\le(p-q)^{2}/q$, so the Hellinger
+integrand is dominated by the $\chi^{2}$ integrand. Expanding $p-q$ to order $r$ with a
+uniform Taylor remainder, and bounding the remainder by an integrable envelope that is
+constructed and proved integrable rather than assumed, gives $H^{2}\le(J/2)h^{2r}$.
 \end{proof}
 
 \leanbox{\lean{hellinger\_lower\_from\_interval} in \lean{LeanQueryHellingerIntervalV1};
 \lean{hellinger\_upper\_const} in \lean{LeanQueryTaylorRemainderV1}}
 
+The constant $32$ is stated rather than absorbed because it is where a plausible error
+lives. An argument that bounds $(\sqrt{p}+\sqrt{q})^{2}\le p+q$---which is false---produces
+$16$ and an incorrect lower envelope, and no numerical check on an instance with slack would
+reveal it.
+
 Both sides of \eqref{eq:sandwich} carry $h^{2r}$ with the same exponent. On a log-log plot
 this is two parallel lines of slope $2r$ with $H^{2}$ trapped between them
 (Fig.~\ref{fig:sandwich}), which is what \emph{pinning} the order means: an upper bound
-alone would leave open that the true decay is faster, i.e.\ that the order is larger.
+alone would leave open that the true decay is faster, that is, that the order is larger.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{query_fig2_sandwich.png}
 \caption{The Hellinger sandwich of Theorem~\ref{thm:sandwich}. Both envelopes have slope
 $2r$ on this log-log plot, so the leakage order is pinned rather than merely bounded above.
-The gap between the envelopes is the ratio of the two explicit constants, and does not grow
-as $h\downarrow0$.}
+The gap between them is the ratio of the two explicit constants and does not grow as
+$h\downarrow0$.}
 \label{fig:sandwich}
 \end{figure}
 
-\section{From divergence to samples}
+\subsection{From Divergence to Samples}
 \label{sec:samples}
 
 \begin{lemma}[Per-sample information]
@@ -485,17 +442,17 @@ H^{2}\;\leq\;-\log\bigl(1-H^{2}\bigr)\;\leq\;2H^{2}.
 \end{lemma}
 
 \begin{proof}
-The left inequality is $\log(1-u)\le-u$ for $u\in[0,1)$. The right is
-$-\log(1-u)\le 2u$ on $[0,\tfrac12]$, which holds because the function
-$u\mapsto 2u+\log(1-u)$ vanishes at $0$ and has derivative $2-1/(1-u)\ge0$ exactly on that
-range.
+The left inequality is $\log(1-u)\le-u$ on $[0,1)$. The right is $-\log(1-u)\le2u$ on
+$[0,\tfrac12]$, since $u\mapsto2u+\log(1-u)$ vanishes at $0$ and has derivative
+$2-1/(1-u)\ge0$ exactly there.
 \end{proof}
 
 \leanbox{\lean{log\_sandwich} in \lean{LeanQuerySampleComplexityV1}}
 
-Lemma~\ref{lem:logsandwich} transports \eqref{eq:sandwich} from the Hellinger distance to
-the per-sample log-affinity $L=-\log(1-H^{2})$, at the cost of a factor $2$---an explicit
-factor, tracked rather than absorbed.
+Lemma~\ref{lem:logsandwich} transports \eqref{eq:sandwich} from the Hellinger distance to the
+per-sample log-affinity $L=-\log(1-H^{2})$ at the cost of a factor $2$. The factor is
+tracked rather than absorbed because it is one of the two explicit constants separating
+sufficiency from necessity below.
 
 \begin{theorem}[Matching sample counts]
 \label{thm:samples}
@@ -507,42 +464,27 @@ Writing $\rho=1-H^{2}$ for the per-sample affinity and $\varepsilon$ for the tar
 \label{eq:samples}
 \end{equation}
 The integer ceiling of the left-hand requirement suffices, and the corresponding necessity
-count differs from it only by the factor $2$ of Lemma~\ref{lem:logsandwich} and the ratio
-of the two constants of Theorem~\ref{thm:sandwich}.
+count differs from it only by the factor $2$ of Lemma~\ref{lem:logsandwich} and the ratio of
+the two constants of Theorem~\ref{thm:sandwich}.
 \end{theorem}
+
+\begin{proof}
+The $N$-sample affinity between product measures tensorises to $\rho^{N}$, and the optimal
+test's error probability is at most half the affinity. Requiring $\rho^{N}/2\le\varepsilon$
+gives $N\log(1/\rho)\ge\log(1/2\varepsilon)$, which is the stated condition with
+$L=\log(1/\rho)$. Since $N$ is an integer, its ceiling suffices; this is stated separately
+because the passage from a real requirement to an integer count is exactly where an
+off-by-one would hide. For necessity the same affinity bounds the error probability from
+below up to a constant, so both counts scale as $h^{-2r}$ and their ratio is
+$2\cdot(J/2)/(a_{E}^{2}/32)=16J/a_{E}^{2}$.
+\end{proof}
 
 \leanbox{\lean{sufficient\_count}, \lean{necessary\_count}, \lean{ceil\_suffices},
 \lean{matching\_rate} in \lean{LeanQuerySampleComplexityV1}}
 
-\begin{proof}
-The $N$-sample affinity between product measures tensorises: it is $\rho^{N}$. The optimal
-test's error probability is at most half the affinity, so it is at most $\rho^{N}/2$.
-Requiring this to be at most $\varepsilon$ gives $\rho^{N}\le 2\varepsilon$, i.e.\
-$N\log(1/\rho)\ge\log(1/2\varepsilon)$, which is the left-hand condition in
-\eqref{eq:samples} once $L=\log(1/\rho)$ is substituted. Since $N$ must be an integer, the
-ceiling of $\log(1/2\varepsilon)/L$ suffices; this is \lean{ceil\_suffices}, and it is
-stated separately because the passage from a real requirement to an integer count is
-exactly where an off-by-one would hide.
-
-For necessity, the same affinity bounds the error probability from below up to a constant,
-so a count smaller than $\log(1/2\varepsilon)/L$ by more than the tracked factors cannot
-achieve error $\varepsilon$. Combining with Lemma~\ref{lem:logsandwich}, which relates $L$
-to $H^{2}$ within a factor $2$, and with Theorem~\ref{thm:sandwich}, which brackets $H^{2}$
-between two multiples of $h^{2r}$, the sufficiency and necessity counts both scale as
-$h^{-2r}$, and their ratio is the product of $2$ and $(J/2)/(a_{E}^{2}/32)=16J/a_{E}^{2}$.
-Both are explicit.
-\end{proof}
-
-\begin{remark}
-The word ``matching'' in Theorem~\ref{thm:samples} means matching \emph{in the exponent},
-with the constant separating the two sides written down. It does not mean the two counts
-coincide. A statement that the constants also match would require sharpening both sides of
-Theorem~\ref{thm:sandwich}, and is not claimed.
-\end{remark}
-
-The point of stating necessity alongside sufficiency is that the two together determine the
-\emph{rate} in $h$, not merely an upper bound on it. Both counts scale as $h^{-2r}$ with
-the same $r$, and every constant separating them is written down.
+``Matching'' here means matching \emph{in the exponent}, with the separating constant written
+down. It does not mean the two counts coincide; a statement that the constants also match
+would require sharpening both sides of Theorem~\ref{thm:sandwich} and is not claimed.
 
 \begin{theorem}[Regret window]
 \label{thm:regret}
@@ -551,32 +493,31 @@ With loss-geometry constants $\gamma$ and $L_{\max}$,
 \frac{\gamma}{4}\,\rho^{2N}\;\leq\;R_{N}^{*}\;\leq\;\frac{L_{\max}}{2}\,\rho^{N}.
 \label{eq:regret}
 \end{equation}
-On the instance of Section~\ref{sec:experiments}, $\gamma=\tfrac{13983}{32768}$ and
+On the instance of Section~\ref{sec:results}, $\gamma=\tfrac{13983}{32768}$ and
 $L_{\max}=\tfrac{2401}{4096}$, both exact rationals read off the loss geometry.
 \end{theorem}
 
 \leanbox{\lean{regret\_ge\_gamma\_error}, \lean{lrt\_regret\_le},
 \lean{bayes\_regret\_window} in \lean{LeanQueryRegretBridgeV1}}
 
-\begin{proof}[Proof sketch]
+\begin{proof}[Proof outline]
 The lower side bounds regret below by the error probability times the smallest loss gap
-$\gamma$, and the error probability below by a function of the affinity. The upper side
-uses the likelihood-ratio test: its error probability is at most $\rho^{N}/2$, and the
-regret it incurs is at most $L_{\max}$ times that.
+$\gamma$, and the error probability below by a function of the affinity. The upper side uses
+the likelihood-ratio test, whose error probability is at most $\rho^{N}/2$ and whose regret
+is at most $L_{\max}$ times that.
 \end{proof}
 
-\begin{remark}
-The two ends of \eqref{eq:regret} carry $\rho^{2N}$ and $\rho^{N}$, so the window widens on
-a log scale as $N$ grows. It localises regret; it does not determine it. This is stated
-plainly because the figure in Section~\ref{sec:experiments} plots measurements against a
-band, and a band that widens is a weaker claim than one that closes.
-\end{remark}
+The two ends of \eqref{eq:regret} carry $\rho^{2N}$ and $\rho^{N}$, so the window widens on a
+log scale as $N$ grows. It localises regret; it does not determine it. This is stated plainly
+because Section~\ref{sec:results} plots measurements against a band, and a band that widens
+is a weaker claim than one that closes.
 
-\section{The analytic limit}
+\subsection{The Analytic Limit}
 \label{sec:limit}
 
 A sandwich localises the normalised ratio inside an interval. It does not say the ratio
-converges, and it does not identify a limit. Both are proved.
+converges, and it does not identify a limit. Both are proved, and the second closes the loop
+back to the crux.
 
 \begin{theorem}[Convergence with positive limit]
 \label{thm:limit}
@@ -588,12 +529,12 @@ As $h\downarrow0$,
 \end{equation}
 \end{theorem}
 
-\begin{proof}[Proof sketch]
+\begin{proof}[Proof outline]
 Convergence is dominated convergence along $h\downarrow0$, with the integrable envelope
 already constructed for the upper side of Theorem~\ref{thm:sandwich} as the dominating
 function. For strict positivity, the integrand $\Delta_{r}^{2}/p_{0}$ is non-negative and
-integrable; a non-negative integrable function with zero integral is almost everywhere
-zero, which would force $\Delta_{r}\equiv0$ almost everywhere, contradicting
+integrable; a non-negative integrable function with zero integral is almost everywhere zero,
+which would force $\Delta_{r}\equiv0$ almost everywhere, contradicting
 Theorem~\ref{thm:nonvanish}.
 \end{proof}
 
@@ -601,28 +542,161 @@ Theorem~\ref{thm:nonvanish}.
 \lean{limit\_pos\_of\_ae\_ne\_zero}, \lean{eventually\_pos\_of\_limit\_pos} in
 \lean{LeanQueryAnalyticLimitV1}}
 
-Theorem~\ref{thm:limit} is what upgrades the result from ``the rate is $h^{2r}$ up to
-constants'' to ``the leading constant exists and is positive''. It also closes the loop
-back to Section~\ref{sec:nonvanish}: positivity of the limit is \emph{equivalent} to
-non-vanishing of $\Delta_{r}$, so the crux step is used twice, once to get a lower envelope
-and once to certify that the envelope is not vacuous.
+Theorem~\ref{thm:limit} upgrades the result from ``the rate is $h^{2r}$ up to constants'' to
+``the leading constant exists and is positive''. Positivity of the limit is \emph{equivalent}
+to non-vanishing of $\Delta_{r}$, so the crux step is used twice: once to obtain a lower
+envelope, and once to certify that the envelope is not vacuous.
+
+\subsection{Determining the Order of a Candidate Query}
+\label{sec:procedure}
+
+The results are worth little to a designer who cannot tell, given a candidate measurement,
+what order it has. The proofs supply a finite procedure.
+
+\begin{algorithm}[htbp]
+\caption{Leakage order of a candidate measurement}
+\label{alg:order}
+\begin{algorithmic}[1]
+\STATE Collect the distinct levels $v$ taken by $f_{W}$, with the aggregate weight at each.
+\STATE $j\leftarrow0$.
+\REPEAT
+  \STATE Form the level coefficients $M_{j}(v)$ by grouping the order-$j$ terms of the
+         expansion of \eqref{eq:mixture}; by Theorem~\ref{thm:sumswap} this is a finite
+         exact sum.
+  \IF{the $M_{j}(v)$ cancel across levels}
+    \STATE $j\leftarrow j+1$.
+  \ENDIF
+\UNTIL{cancellation fails}
+\STATE Let $v^{*}$ be the largest level with $M_{j}(v^{*})\neq0$.
+\IF{$v^{*}$ is strictly largest}
+  \STATE \textbf{return} $r=j$ \COMMENT{certified by Theorem~\ref{thm:nonvanish}}
+\ELSE
+  \STATE \textbf{return} \textsc{undetermined} \COMMENT{ties are outside the theorem}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+Two properties matter. The procedure never simulates the measurement: steps 1--8 are exact
+arithmetic on the mixture data, so candidate queries can be compared before any data are
+collected. And step~11 has an explicit failure mode rather than a silent one, which is the
+honest output given that Theorem~\ref{thm:nonvanish} does not cover ties.
+
+\section{Formal Verification}
+\label{sec:verification}
+
+\subsection{Acceptance Contract}
+
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+\texttt{sorry} appears anywhere in the file.
+
+The contract is stated in full because each clause excludes a specific way of appearing
+verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
+
+\subsection{Evidence per Step}
+
+\begin{table}[htbp]
+\caption{Evidence per step. All cited declarations are axiom-audited.}
+\label{tab:inventory}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Step & Module & Aud. \\
+\midrule
+Derivatives, Thm~\ref{thm:hermite}     & \lean{LeanQueryGaussianLevelV1}     & 13 \\
+Sum rule, Thm~\ref{thm:sumswap}        & \lean{LeanQueryMixtureDerivativeV1} &  5 \\
+Cancellation, Thm~\ref{thm:cancel}     & \lean{LeanQueryMixtureDerivativeV1} &  5 \\
+Non-vanishing, Thm~\ref{thm:nonvanish} & \lean{LeanQueryGaussianLevelV1}     & 18 \\
+Sandwich, Thm~\ref{thm:sandwich}       & \lean{LeanQueryHellingerIntervalV1} & 14 \\
+Samples, Thm~\ref{thm:samples}         & \lean{LeanQuerySampleComplexityV1}  &  8 \\
+Regret, Thm~\ref{thm:regret}           & \lean{LeanQueryRegretBridgeV1}      &  5 \\
+Limit, Thm~\ref{thm:limit}             & \lean{LeanQueryAnalyticLimitV1}     &  4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scope of the Formalisation}
+
+The Query strand contains $27$ Lean source files with $167$ theorem and lemma statements,
+of which $13$ modules carry an acceptance receipt covering $87$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+declarations.
+
+Two defects in earlier drafts were found by the prover rather than by reading. The lower
+constant in Theorem~\ref{thm:sandwich} was initially $16$, produced by bounding
+$(\sqrt{p}+\sqrt{q})^{2}$ by $p+q$, which is false; the error is invisible in a numerical
+check because the resulting envelope is still valid wherever slack absorbs the factor. And the
+smoothness hypothesis in Theorem~\ref{thm:sumswap} was initially assumed rather than derived,
+which would have left the paper's main technical contribution resting on an unproved side
+condition. Appendix~\ref{app:inventory} reproduces every audited statement.
 
 \section{Experiments}
-\label{sec:experiments}
 
-\subsection{Design}
+\subsection{Experimental Objectives}
 
-Two admissible measurements of the \emph{same} pair of worlds were simulated at $h=0.6$
-with $4000$ repetitions per world: a normalised measurement of leakage order $2$ and a
-normalised measurement of leakage order $1$. For each, the per-sample Hellinger distance
-$H^{2}$ was computed, the required sample count $N$ derived from
-Theorem~\ref{thm:samples}, and the Bayes regret measured under an equal prior and compared
-against the window \eqref{eq:regret}. Uncertainty is a percentile bootstrap with $2000$
-resamples.
+The theorems are proved, so the simulation cannot strengthen them. It has two objectives.
+The first is to check that the chain from Theorem~\ref{thm:sandwich} through
+Theorem~\ref{thm:regret} is arithmetically consistent, which a slip in any constant would
+break. The second is to measure the quantity the theorems predict but do not compute: how
+much the sample requirement changes when only the admissible measurement changes.
+
+\subsection{Setup}
+
+Two admissible measurements of the \emph{same} pair of worlds were simulated at $h=0.6$ with
+$4000$ repetitions per world: a normalised measurement of leakage order $2$ and a normalised
+measurement of leakage order $1$. The worlds $f_{0},f_{1}$, the noise scale $\sigma$ and the
+perturbation scale $h$ are identical across the two runs; only $g$ differs.
+
+\subsection{Baselines and Comparison}
+
+The comparison is between the two measurements, not against an external baseline: the point
+is to isolate the effect of the measurement while holding everything else fixed. The
+per-sample $H^{2}$ is computed directly from \eqref{eq:mixture} in both cases rather than
+through the sandwich, so the reported divergences are properties of the measurements and not
+consequences of Theorem~\ref{thm:sandwich}.
+
+\subsection{Metrics}
+
+The reported quantities are the per-sample $H^{2}$ and $L$, the required sample count $N$
+from Theorem~\ref{thm:samples}, the measured Bayes regret under an equal prior, a percentile
+bootstrap interval, and the two ends of the window \eqref{eq:regret}.
+
+\subsection{Statistical Reporting}
+
+Uncertainty is a percentile bootstrap over the $8000$ per-repetition regrets with $2000$
+resamples. The window endpoints are computed in exact rational arithmetic where the loss
+geometry permits ($\gamma=13983/32768$, $L_{\max}=2401/4096$) and in double precision
+otherwise. Evidence classes are kept apart: \PROVED{}, \CERT{} and \NUM{} are distinguished
+throughout and no \NUM{} result supports a \PROVED{} one.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Reporting Protocol}
+
+Both measurements are reported, with per-world rows, the equal-prior combination, the
+bootstrap interval and the proved window. No run is excluded.
+
+\subsection{The Measured Regret Lands Inside the Proved Window}
+
+The order-$2$ measurement has per-sample $H^{2}=4.92\times10^{-4}$, requires $N=4{,}678$,
+and shows equal-prior mean regret $0.008353$ with bootstrap interval
+$[0.006888,0.009892]$ against the window $[0.001066,0.029298]$. The order-$1$ measurement
+has $H^{2}=5.62\times10^{-5}$, requires $N=41{,}006$, and shows mean regret $0.009159$. Both
+fall strictly inside their windows, and neither bootstrap interval crosses either end.
+
+This is a consistency check on the chain rather than an independent confirmation of it---the
+theorems are proved---but a chain with an arithmetic slip in any constant would fail it.
 
 \begin{table}[htbp]
 \caption{Two admissible measurements of one pair of worlds, $h=0.6$, $4000$ repetitions per
-world. The worlds are identical across the two rows.}
+world. The worlds are identical across the two columns.}
 \label{tab:query}
 \centering
 \footnotesize
@@ -634,43 +708,29 @@ Per-sample $H^{2}$      & $4.92\times10^{-4}$ & $5.62\times10^{-5}$ \\
 Per-sample $L$          & $4.92\times10^{-4}$ & $5.62\times10^{-5}$ \\
 Required $N$            & $4{,}678$           & $41{,}006$ \\
 Measured regret         & $0.008353$          & $0.009159$ \\
-Bootstrap CI95 lower    & $0.006888$          & --- \\
-Bootstrap CI95 upper    & $0.009892$          & --- \\
-Window lower            & $0.001066$          & --- \\
-Window upper            & $0.029298$          & --- \\
 Inside the window       & yes                 & yes \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Findings}
+\input{query_cells}
 
-\emph{The measured regret lands inside the proved window.} Both measurements produce a mean
-regret strictly between the two ends of \eqref{eq:regret}, and neither bootstrap interval
-crosses either end. This is a consistency check on the chain from
-Theorem~\ref{thm:sandwich} through Theorem~\ref{thm:regret}, not an independent
-confirmation of it---the theorems are proved---but a chain with an arithmetic slip in any
-constant would fail it.
+\subsection{The Same Worlds, a Different Legal Query, an Order of Magnitude}
 
-\emph{The same worlds, a different legal query, an order of magnitude in cost.} The ratio
-$41{,}006/4{,}678\approx 8.8$ is not a property of the worlds. They are identical in both
-runs: same $f_{0}$, same $f_{1}$, same noise. The entire factor is attributable to which
-measurement was admissible, which is the claim C1 makes.
+The ratio $41{,}006/4{,}678\approx8.8$ is not a property of the worlds. They are identical
+in both runs: same $f_{0}$, same $f_{1}$, same noise. The entire factor is attributable to
+which measurement was admissible.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{query_fig1_regret.png}
-\caption{Measured Bayes regret against the proved window of Theorem~\ref{thm:regret} for
-two admissible measurements of the same worlds. The shaded band is the window; the black
-bar is a percentile bootstrap $95\%$ interval over $2000$ resamples. The order-$1$
-measurement needs almost nine times as many samples as the order-$2$ measurement to reach
-the same error, although the worlds it is discriminating are identical.}
+\caption{Measured Bayes regret against the proved window of Theorem~\ref{thm:regret} for two
+admissible measurements of the same worlds. The shaded band is the window; the black bar is
+a percentile bootstrap $95\%$ interval over $2000$ resamples.}
 \label{fig:regret}
 \end{figure}
 
-\input{query_cells}
-
-\subsection{Reading the factor 8.8}
+\subsection{Reading the Factor}
 
 The factor is not a constant of the problem; it is $h^{-2(r_{1}-r_{2})}$ up to the explicit
 constants of Theorem~\ref{thm:sandwich}, with $r_{1}-r_{2}=1$ and $h=0.6$ here. Halving $h$
@@ -678,264 +738,10 @@ would roughly quadruple it. This is the operational content of ``the order is a 
 the query'': the penalty for the wrong measurement is not additive and does not wash out
 with more data---it is an exponent, and it compounds as the regime gets harder.
 
-\section{The constants}
-\label{sec:constants}
-
-Theorem~\ref{thm:sandwich} contains two constants, and their status differs.
-
-\subsection{$a_{E}$, and why it is instance-specific}
-
-The lower constant arises from an interval $E$ and a bound $|\Delta_{r}|\ge a_{E}$ on it.
-Theorem~\ref{thm:nonvanish} guarantees such a pair exists---a continuous function that is
-not identically zero is bounded away from zero on some interval---but it does not produce
-the best one, and the best one depends on the instance. Taking $E$ larger increases the
-measure entering the Cauchy--Schwarz step but decreases the achievable $a_{E}$; the product
-$a_{E}^{2}|E|^{2}$ is what the bound actually depends on, and optimising it is a
-one-dimensional problem on the instance.
-
-For the comparison of Section~\ref{sec:experiments} this optimisation is unnecessary,
-because the two measurements are compared through their exact per-sample $H^{2}$ rather than
-through the envelope. The constant matters only when the envelope itself is to be used as a
-prediction, which is a stronger use than the paper makes of it.
-
-\subsection{$J$, and what makes it finite}
-
-The upper constant is the integral of the squared order-$r$ coefficient against the
-reference density,
-\begin{equation}
-J \;=\; \int \frac{\Delta_{r}^{2}}{p_{0}} ,
-\end{equation}
-the same quantity that appears in the limit \eqref{eq:limit} up to the factor $8$. Its
-finiteness is not automatic: $\Delta_{r}$ is a polynomial times a Gaussian and $p_{0}$ is a
-mixture of Gaussians, so the ratio is a polynomial times a ratio of Gaussians, and the
-latter can grow. What controls it is that every level appearing in $\Delta_{r}$ also
-appears in $p_{0}$---again the shared-level-set hypothesis---so the growing exponential is
-dominated. This is the integrable envelope that the upper side of
-Theorem~\ref{thm:sandwich} and the dominated convergence of Theorem~\ref{thm:limit} both
-consume, and it is constructed rather than assumed.
-
-\subsection{Why the two constants are reported rather than absorbed}
-
-It would be shorter to state Theorem~\ref{thm:sandwich} as
-$H^{2}\asymp h^{2r}$. That form is adequate for an asymptotic claim and inadequate for the
-paper's actual use, which is a comparison between two measurements at a \emph{fixed}
-$h=0.6$. At fixed $h$ an unquantified $\asymp$ permits the two envelopes to be separated by
-any factor whatever, and the observed ratio $8.8$ could then be attributed entirely to
-constants rather than to the order. Writing both constants down is what makes the
-attribution in C1 checkable.
-
-\section{A worked instance}
-\label{sec:instance}
-
-The abstract statements are easier to trust against a concrete case, so we record the one
-the experiments use.
-
-The response takes values in a finite set of levels; the perturbation $g$ redistributes
-mixture weight among them. For the order-$2$ measurement, the level coefficients
-$M_{1}(v)$ cancel identically across levels---each level's contribution at order $1$ is
-matched by another's---so $\Delta_{1}\equiv0$ and the order is at least $2$. At order $2$
-the cancellation fails at the top level: the largest level carrying weight has
-$c_{v^{*}}\neq0$ and is strictly largest, so Theorem~\ref{thm:nonvanish} applies and
-$r=2$ exactly.
-
-For the order-$1$ measurement, the same two worlds are probed by a different $g$ under
-which the order-$1$ coefficients do \emph{not} cancel, so $r=1$. Note the direction: the
-order-$1$ measurement is the \emph{worse} one. A smaller leakage order means the difference
-between the worlds appears at a lower power of $h$ in the \emph{coefficient} indexing, and
-in this parameterisation that corresponds to the smaller Hellinger distance---
-$5.62\times10^{-5}$ against $4.92\times10^{-4}$---hence the larger sample requirement. The
-numbers in Table~\ref{tab:query} are computed from \eqref{eq:mixture} directly, with no
-appeal to the sandwich, which is what makes their position inside the window a check on the
-sandwich rather than a consequence of it.
-
-\section{Determining the order of a candidate query}
-\label{sec:procedure}
-
-The results above are worth little to a designer who cannot tell, given a candidate
-measurement, what order it has. The proofs supply a procedure, and it is finite.
-
-\begin{enumerate}
-\item \textbf{Enumerate the levels.} Collect the distinct values $v$ taken by the response
-$f_{W}$ over the mixture index set, together with the aggregate weight sitting at each.
-\item \textbf{Form the level coefficients.} For $j=0,1,2,\dots$ compute $M_{j}(v)$ by
-grouping the $j$-th order terms of the expansion of \eqref{eq:mixture} by level. By
-Theorem~\ref{thm:sumswap} this is a finite sum, so the computation is exact.
-\item \textbf{Test cancellation.} If every $M_{j}(v)$ vanishes, or if the non-zero ones
-cancel across levels, increment $j$. This is the half handled by
-\lean{mixture\_coeff\_diff\_eq\_zero}.
-\item \textbf{Check the top level.} At the first $j$ where cancellation fails, identify the
-largest level $v^{*}$ with $M_{j}(v^{*})\neq0$. If it is strictly largest,
-Theorem~\ref{thm:nonvanish} certifies $r=j$ and the procedure terminates. If it ties with
-another level, the procedure returns ``undetermined'': this case is outside the theorem and
-is reported rather than guessed.
-\item \textbf{Read the cost.} With $r$ in hand, Theorem~\ref{thm:sandwich} brackets
-$H^{2}$, Theorem~\ref{thm:samples} converts the bracket into a sample count, and
-Theorem~\ref{thm:regret} into a regret window.
-\end{enumerate}
-
-Two properties of this procedure are worth noting. It never requires simulating the
-measurement: steps 1--4 are exact arithmetic on the mixture data, so a designer can
-compare candidate queries before collecting any data. And step~4 has an explicit failure
-mode rather than a silent one---the tie case is reported as undetermined, which is the
-honest output given that Theorem~\ref{thm:nonvanish} does not cover it.
-
-\subsection{What the procedure costs}
-
-Steps 1--3 are linear in the number of mixture components per order examined, and the
-number of orders examined is $r+1$. There is no search and no optimisation. The expensive
-part in practice is not the order determination but the constants $a_{E}$ and $J$ of
-Theorem~\ref{thm:sandwich}, which require an interval on which $|\Delta_{r}|$ is bounded
-below and an integrable envelope respectively; both are constructive but instance-specific.
-For the comparison in Section~\ref{sec:experiments} the orders alone were sufficient,
-because the two measurements differ by one in $r$ and the $h^{-2}$ factor dominates any
-ratio of constants at $h=0.6$.
-
-\section{Formal verification}
-\label{sec:verification}
-
-Every theorem above is machine-checked in Lean~4, toolchain
-\texttt{leanprover/lean4:v4.34.0-rc2} against mathlib revision \texttt{1f495c61}.
-
-\subsection{Acceptance contract}
-
-A module counts as accepted only when all six of the following hold: the compiler exits
-zero with no errors; the source hash is unchanged \emph{across} the compile, so the file
-checked is the file on disk; the compiled artifact is newer than its source; at least one
-\texttt{\#print axioms} directive is present; the axiom set of every audited declaration
-lies within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
-\texttt{sorry} appears anywhere in the file.
-
-\subsection{The crux statements as they are checked}
-
-\begin{figure}[htbp]
-\footnotesize
-\hrule\vspace{4pt}
-\begin{tabbing}
-\quad\=\quad\=\kill
-\lean{theorem levelSum\_ne\_zero ($\sigma$ : $\mathbb{R}$) (h$\sigma$ : $\sigma$ $\ne$ 0)} \\
-\> \lean{(r : $\mathbb{N}$) (S : Finset $\mathbb{R}$) (c : $\mathbb{R}$ $\to$ $\mathbb{R}$) (vstar : $\mathbb{R}$)} \\
-\> \lean{(hvs : vstar $\in$ S)} \\
-\> \lean{(htop : $\forall$ v $\in$ S, v $\ne$ vstar $\to$ v < vstar)} \\
-\> \lean{(hc : c vstar $\ne$ 0) :} \\
-\> \lean{$\exists$ y, levelSum $\sigma$ r S c y $\ne$ 0} \\[6pt]
-\lean{theorem mixture\_coeff\_ne\_zero ($\sigma$ : $\mathbb{R}$) (h$\sigma$ : $\sigma$ $\ne$ 0)} \\
-\> \lean{(pi f g : X $\to$ $\mathbb{R}$) (r : $\mathbb{N}$) (vstar : $\mathbb{R}$)} \\
-\> \lean{(hvs : vstar $\in$ Finset.image f univ)} \\
-\> \lean{(htop : $\forall$ v $\in$ Finset.image f univ,} \\
-\> \qquad\lean{v $\ne$ vstar $\to$ v < vstar)} \\
-\> \lean{(hc : levelMoment pi f g r vstar $\ne$ 0) :} \\
-\> \lean{$\exists$ y, iteratedDeriv r} \\
-\> \qquad\lean{(fun h $\Rightarrow$ $\sum$ x, pi x * gauss $\sigma$ (y - f x - h * g x)) 0 $\ne$ 0}
-\end{tabbing}
-\vspace{-4pt}\hrule
-\caption{The non-vanishing theorem and its mixture form, reproduced as the prover has them.
-The hypothesis \lean{htop} is the strict top level of Remark~2; \lean{hc} is the non-zero
-coefficient there. Both are quantified over an arbitrary finite level set, an arbitrary
-coefficient function, and---in the mixture form---arbitrary weights \lean{pi}, response
-\lean{f} and perturbation \lean{g}, so nothing is assumed about how the configuration
-arose.}
-\label{fig:statements}
-\end{figure}
-
-The conclusion is \lean{$\exists$ y, $\ldots$ $\ne$ 0}, which is exactly
-$\Delta_{r}\not\equiv0$: a function is not identically zero precisely when it is non-zero
-somewhere. That is the form the leakage order \eqref{eq:order} needs, and it is weaker than
-it may look in one respect worth stating---it produces \emph{a} point where the coefficient
-survives, not a set of positive measure. The lower side of
-Theorem~\ref{thm:sandwich} needs an interval, and it obtains one from this point by
-continuity, which is a step the paper carries out rather than a Lean statement.
-
-The companion \lean{mixture\_coeff\_diff\_eq\_zero} supplies the other half of
-\eqref{eq:order}---that the coefficients below order $r$ cancel---with the shared level set
-appearing as an explicit hypothesis \lean{hS} and the agreeing moments as \lean{hagree}.
-The two together justify the definition rather than only its non-degeneracy.
-
-\subsection{Evidence per step}
-
-\begin{table}[htbp]
-\caption{Evidence per step of the chain. All cited declarations are axiom-audited.}
-\label{tab:inventory}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llr@{}}
-\toprule
-Step & Module & Aud. \\
-\midrule
-Derivatives, Thm~\ref{thm:hermite}   & \lean{LeanQueryGaussianLevelV1}     & 13 \\
-Sum rule, Thm~\ref{thm:sumswap}      & \lean{LeanQueryMixtureDerivativeV1} &  5 \\
-Non-vanishing, Thm~\ref{thm:nonvanish} & \lean{LeanQueryGaussianLevelV1}   & 18 \\
-                                     & \lean{LeanQueryMixtureDerivativeV1} &    \\
-Sandwich, Thm~\ref{thm:sandwich}     & \lean{LeanQueryHellingerIntervalV1} & 14 \\
-                                     & \lean{LeanQueryTaylorRemainderV1}   &    \\
-Per-sample, Lem~\ref{lem:logsandwich}& \lean{LeanQuerySampleComplexityV1}  &  8 \\
-Sample counts, Thm~\ref{thm:samples} & \lean{LeanQuerySampleComplexityV1}  &  8 \\
-Regret, Thm~\ref{thm:regret}         & \lean{LeanQueryRegretBridgeV1}      &  5 \\
-Limit, Thm~\ref{thm:limit}           & \lean{LeanQueryAnalyticLimitV1}     &  4 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{What formalisation caught}
-
-Three defects in earlier drafts of this chain were found by the prover rather than by
-reading, and they are recorded because they indicate what the discipline is worth on a
-problem of this shape.
-
-The lower constant in Theorem~\ref{thm:sandwich} was initially $16$. The step producing it
-bounded $(\sqrt{p}+\sqrt{q})^{2}$ by $p+q$, which is false---the correct bound is
-$2(p+q)$---and the error is invisible in a numerical check, because the resulting envelope
-is still a valid lower bound on any instance where the slack absorbs the factor. The prover
-refused the step.
-
-The smoothness hypothesis in Theorem~\ref{thm:sumswap} was initially assumed. Mathlib's
-multilinear sum rule requires $C^{\infty}$ of each summand, and the mixture components are
-$C^{\infty}$ only because $\exp$ composed with a polynomial is; stating that as an
-assumption would have left the paper's main technical contribution resting on an unproved
-side condition. It is now derived.
-
-The non-vanishing argument originally used the largest level without requiring it to be
-\emph{strictly} largest. With a tie, the two exponential factors have identical decay and
-the limit argument in Theorem~\ref{thm:nonvanish} produces $0=0$ rather than a
-contradiction. The hypothesis \lean{htop} in Fig.~\ref{fig:statements} is the repair, and
-the tie case is now reported as out of scope in Remark~2 rather than silently assumed away.
-
-\subsection{Scope of the formalisation}
-
-The displayed results are the load-bearing chain, not the corpus. The Query strand contains
-$27$ Lean source files with $167$ theorem and lemma statements, of which $13$ modules carry
-an acceptance receipt covering $87$ declarations whose axiom set was printed and checked.
-Across the programme of which this paper is one part: $762$ files, $7{,}199$ statements,
-$111$ accepted modules, $875$ audited declarations.
-
-No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
-wider repository, in audit scaffolding and in files named as conjectures; the overlap
-between the cited set and the files containing them was computed and is empty.
-
-The statements not displayed are the machinery the displayed ones stand on: arithmetic
-lemmas, measurability side conditions, finite-sum exchanges, and the counterexamples that
-ruled out earlier formulations of the sandwich---including one in which the lower constant
-was taken to be $16$, which the prover rejected.
-
-\subsection{Reproducibility}
-
-The simulation is deterministic given its seed. Each row of Table~\ref{tab:fullquery} is
-$4000$ independent repetitions per world at the stated $N$, with the decision rule being the
-likelihood-ratio test that Theorem~\ref{thm:regret}'s upper side analyses; the regret is the
-realised loss minus the loss of the best fixed action, averaged, and the equal-prior figure
-is the mean of the two per-world means. The bootstrap is a percentile bootstrap over the
-$8000$ per-repetition regrets with $2000$ resamples.
-
-The quantities entering the window---$\gamma$, $L_{\max}$, and $\rho=1-H^{2}$---are computed
-in exact rational arithmetic where the loss geometry permits ($\gamma=13983/32768$,
-$L_{\max}=2401/4096$) and in double precision otherwise. The window endpoints in
-Table~\ref{tab:fullquery} are therefore reproducible to the last digit shown, and the
-measured regrets to within the reported standard errors.
-
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{What the results establish}
+\subsection{What the Results Establish}
 
 The result reframes what an experimenter controls. Where the parameter space is fixed by
 nature, the measurement class is often a design choice, and the leakage order---hence the
@@ -943,114 +749,56 @@ exponent of the rate---moves with it. Theorem~\ref{thm:nonvanish} is what licens
 reframing: without it a vanishing order-$r$ coefficient would leave the order undefined and
 the comparison between queries meaningless. Theorem~\ref{thm:limit} then certifies that the
 constant in front of the rate is real, so the comparison is between two genuine leading
-terms rather than between two envelopes.
+terms.
 
-\subsection{What the results do not establish}
+\subsection{Shortcomings and Limitations}
 
-\begin{enumerate}
-\item \textbf{Normalisation.} Constants $1/(\sigma\sqrt{2\pi})$ and $1/j!$ are dropped
-throughout. The dropped expressions must not be quoted as densities.
+\emph{Ties at the top are not covered.} Theorem~\ref{thm:nonvanish} needs the largest level
+carrying a non-zero coefficient to be strictly largest. When two levels tie, the exponential
+factors no longer separate and the argument gives $0=0$. Whether non-vanishing survives a tie
+is open, and this is the most likely place for the result to fail in practice.
 
-\item \textbf{A shared level set.} The cancellation statement assumes the two worlds share a
-level set. Worlds whose responses have disjoint level structure are outside it.
+\emph{The window does not close.} The ends of \eqref{eq:regret} separate as $N$ grows, so the
+result localises regret without determining it. On the order-$2$ row the two ends differ by
+roughly a factor of $27$, which reflects the $\rho^{2N}$ against $\rho^{N}$ gap rather than
+any looseness in the measurement.
 
-\item \textbf{A strict top level.} Theorem~\ref{thm:nonvanish} needs the largest level
-carrying a non-zero coefficient to be strictly largest. Ties at the top are not covered, and
-no claim is made about them.
+\emph{The comparison uses two measurements, not a family.} A sweep over many $g$ would show
+the order's effect as a curve and would let the $h$-dependence be measured rather than
+predicted. The factor $8.8$ should be read as one instance of the prediction
+$h^{-2(r_{1}-r_{2})}$, not as a fitted exponent.
 
-\item \textbf{A window, not a value.} The ends of \eqref{eq:regret} separate as $N$ grows,
-so the result localises regret without determining it.
+\emph{The scale $h=0.6$ is not small.} The asymptotic statements hold as $h\downarrow0$, and
+at $0.6$ the remainder terms suppressed in Theorem~\ref{thm:sandwich} are not negligible.
+This is why the per-sample $H^{2}$ is computed exactly rather than from the envelope.
 
-\item \textbf{No minimax statement.} Nothing here is a statement about the worst case over
-a class of worlds or of measurements. Every result is about a fixed pair and a fixed query.
-\end{enumerate}
+\emph{Nothing here is minimax.} Every result concerns a fixed pair and a fixed query, and
+the dropped normalisation means the displayed expressions are not densities.
 
-\subsection{Why the comparison is fair}
+\subsection{Open Problems}
 
-An objection to C1 would be that the two measurements differ in more than their order---in
-their noise scale, say, or their effective sample size per observation---so that
-attributing the factor $8.8$ to the order is overreach. Three features of the design close
-that objection. The worlds $f_{0},f_{1}$ are byte-identical across the two runs, so the
-parameter space is fixed by construction. The noise $\sigma$ and the perturbation scale
-$h=0.6$ are shared, so the per-observation cost is the same. And the per-sample $H^{2}$ is
-computed directly from \eqref{eq:mixture} in both cases rather than through the sandwich,
-so the reported $4.92\times10^{-4}$ and $5.62\times10^{-5}$ are properties of the
-measurements themselves.
-
-What remains is the sample count, and it is determined by $H^{2}$ through
-Theorem~\ref{thm:samples} with no free parameter. The comparison therefore isolates exactly
-one difference---which $g$ was legal---and reports its price.
-
-\subsection{Limitations of the simulation}
-
-Three limitations of Section~\ref{sec:experiments} are worth naming, none of which affects
-the theorems.
-
-The comparison uses two measurements, not a family. A sweep over many $g$ would show the
-order's effect as a curve rather than as two points, and would let the $h$-dependence of the
-factor be measured rather than predicted. It was not run, and the factor $8.8$ should be
-read as one instance of the prediction $h^{-2(r_{1}-r_{2})}$ up to constants rather than as
-a fitted exponent.
-
-The scale $h=0.6$ is not small. The asymptotic statements hold as $h\downarrow0$, and at
-$0.6$ the remainder terms suppressed in Theorem~\ref{thm:sandwich} are not negligible. This
-is why the per-sample $H^{2}$ is computed exactly from \eqref{eq:mixture} rather than from
-the envelope; the envelope is used only to place the measured regret inside a window, which
-it does with room to spare in both rows of Table~\ref{tab:fullquery}.
-
-The regret window is wide. Its ends differ by a factor of roughly $27$ on the order-$2$
-row, which reflects the $\rho^{2N}$ against $\rho^{N}$ gap of Theorem~\ref{thm:regret}
-rather than any looseness in the measurement. A measured value inside such a window is a
-consistency check, not a sharp test, and it is reported as such.
-
-\subsection{Open problems}
-
-Closing the regret window---replacing \eqref{eq:regret} by a two-sided bound whose ends
-agree to a constant factor uniformly in $N$---is the first question, and it appears to need
-a sharper handle on the likelihood-ratio test's error than the affinity supplies. The tied
-top level is the second: when two levels share the maximum, the exponential factors in
-Theorem~\ref{thm:nonvanish} no longer separate, and whether non-vanishing survives is open.
-Third, the map from a measurement to its leakage order is currently computed case by case;
-a criterion reading $r$ off $g$ and the level structure directly would turn the design
-question into a calculation. Finally, the limit in Theorem~\ref{thm:limit} is identified as
-an integral but not evaluated in closed form for any non-trivial family.
-
-\subsection{Where the framing applies}
-
-The pattern the paper isolates is not specific to Gaussian mixtures. It requires only that
-the observation law admit an expansion in a perturbation scale whose coefficients depend on
-the measurement, and that the first non-vanishing coefficient control a divergence. Where
-those hold, the same three questions arise: whether the cancellation below the claimed
-order is genuine, whether the coefficient at that order really fails to vanish, and whether
-the resulting envelope has a positive limit. The middle question is the one this paper
-argues should not be assumed, and the tie case of Remark~2 is a concrete reminder that the
-assumption can fail.
-
-Conversely, the framing has no content where the measurement class is a single element---
-where the experimenter observes what nature provides and cannot choose---which is the
-setting of most of the mixture-rate literature. The contribution is therefore
-complementary to that work rather than competing with it: the same expansion machinery, run
-with the roles of the fixed and the variable object exchanged.
+Closing the regret window---replacing \eqref{eq:regret} by a two-sided bound whose ends agree
+to a constant factor uniformly in $N$---is the first question, and it appears to need a
+sharper handle on the likelihood-ratio test's error than the affinity supplies. The tied top
+level is the second. Third, the map from a measurement to its leakage order is currently
+computed case by case; a criterion reading $r$ off $g$ and the level structure directly would
+turn the design question into a calculation. Finally, the limit in
+Theorem~\ref{thm:limit} is identified as an integral but not evaluated in closed form for any
+non-trivial family.
 
 \section{Conclusion}
 
 The leakage order is a property of the query, not of the parameter space, and the chain
-establishing this is closed end to end and machine-checked: Gaussian derivatives built
-explicitly, the derivative pushed through the finite sum, the order-$r$ coefficient proved
-not to vanish, $H^{2}$ sandwiched with explicit constants of matching exponent, converted
-into matching sample counts, bracketed as regret, and finally shown to converge with a
-strictly positive limit. On an instance where the worlds are held fixed, changing which
-measurement is legal changes the sample requirement by a factor of $8.8$, and that factor
-is an exponent in $h$ rather than a constant.
-
-For a practitioner the summary is short. Before choosing a measurement, enumerate its
-levels and find the first order at which the coefficients fail to cancel; check that the
-top level carrying weight there is strictly largest; and if it is, the sample requirement
-scales as $h^{-2r}$ with that $r$. If two candidate measurements differ by one in $r$, the
-cheaper one is cheaper by a factor of order $h^{-2}$, and no amount of additional data from
-the expensive one recovers the difference---it is an exponent, not a constant.
-
-\input{query_appendix}
+establishing this is closed end to end: Gaussian derivatives built explicitly, the derivative
+pushed through the finite sum, the order-$r$ coefficient proved not to vanish, $H^{2}$
+sandwiched with explicit constants of matching exponent, converted into matching sample
+counts, bracketed as regret, and shown to converge with a strictly positive limit. On an
+instance where the worlds are held fixed, changing which measurement is legal changes the
+sample requirement by a factor of $8.8$, and that factor is an exponent in $h$ rather than a
+constant. For a practitioner the summary is a procedure rather than a theorem: enumerate the
+levels of a candidate measurement, find the first order at which the coefficients fail to
+cancel, check that the top level carrying weight there is strictly largest, and read the
+sample requirement off $r$.
 
 \section*{Acknowledgment}
 
@@ -1061,18 +809,21 @@ The formal development uses the Lean~4 theorem prover and the mathlib library.
 \bibitem{lecam1973} L. Le Cam, ``Convergence of estimates under dimensionality
 restrictions,'' \emph{Ann. Statist.}, vol.~1, pp.~38--53, 1973.
 
+\bibitem{ibragimov1981} I. A. Ibragimov and R. Z. Has'minskii, \emph{Statistical Estimation:
+Asymptotic Theory}. New York, NY: Springer, 1981.
+
 \bibitem{tsybakov2009} A. B. Tsybakov, \emph{Introduction to Nonparametric Estimation}.
 New York, NY: Springer, 2009.
-
-\bibitem{ibragimov1981} I. A. Ibragimov and R. Z. Has'minskii, \emph{Statistical
-Estimation: Asymptotic Theory}. New York, NY: Springer, 1981.
 
 \bibitem{chen1995} J. Chen, ``Optimal rate of convergence for finite mixture models,''
 \emph{Ann. Statist.}, vol.~23, no.~1, pp.~221--233, 1995.
 
-\bibitem{heinrich2018} P. Heinrich and J. Kahn, ``Strong identifiability and optimal
-minimax rates for finite mixture estimation,'' \emph{Ann. Statist.}, vol.~46, no.~6A,
+\bibitem{heinrich2018} P. Heinrich and J. Kahn, ``Strong identifiability and optimal minimax
+rates for finite mixture estimation,'' \emph{Ann. Statist.}, vol.~46, no.~6A,
 pp.~2844--2870, 2018.
+
+\bibitem{szego1939} G. Szeg\H{o}, \emph{Orthogonal Polynomials}. Providence, RI: American
+Mathematical Society, 1939.
 
 \bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
 \emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
@@ -1082,9 +833,8 @@ pp.~367--381.
 programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
 pp.~625--635.
 
-\bibitem{szego1939} G. Szeg\H{o}, \emph{Orthogonal Polynomials}. Providence, RI: American
-Mathematical Society, 1939.
-
 \end{thebibliography}
+
+\input{query_appendix}
 
 \end{document}

@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\title{House Monotonicity and Quota\\
-Cannot Both Hold:\\
-Closing the Inputs of an Adaptive Stopping Analysis}
+\title{House Monotonicity and Quota Cannot Both Hold:\\
+Closing the Probabilistic Inputs of an\\
+Adaptive Stopping Analysis}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -15,229 +15,187 @@ Lawrenceville, NJ, USA}}
 \begin{abstract}
 An adaptive scheme allocates samples across arms, stops when a certificate is available, and
 must be analysed on three fronts: the probability that its confidence event holds, the
-expected time at which it stops, and whether its realised counts actually follow the
-intended proportions. Three claims in that analysis were carried as inputs rather than
-theorems. The per-arm, per-count concentration inequality was assumed; the step from a tail
-bound to a bound on the \emph{expected} stopping time was cited as standard rather than
-proved---and high-probability correctness alone gives nothing here, because off the good
-event the scheme may never stop at all; and whether an online rule can realise the intended
-proportions was simply open. This paper closes all three, and the third has a negative
-answer that is itself the result. We prove the layer-cake identity---the integral of an
-$\mathbb{N}$-valued stopping time equals the sum of its tail probabilities---so a geometric
-tail bounds the expected stopping time rather than merely the tail sum. We discharge the
-concentration input from a sub-Gaussian hypothesis at an explicit threshold. We prove that
-for every target on the simplex and every horizon there \emph{exists} an integer allocation
-spending exactly the horizon with per-arm deficit at most one, by construction rather than
-by an existence argument. And we prove that the natural online rule---serve the arm of
-largest deficit, which is house-monotone by construction---does \emph{not} satisfy quota, by
-an exact five-arm witness on targets $\frac{1}{23}(17,1,1,3,1)$ whose deficit reaches
-$\frac{26}{23}$ at horizon eleven. The arithmetic of that violation is machine-checked; the
-identification of the counts as the rule's own trajectory is an exact computation reported
-here, and Section~\ref{sec:gap} draws the line precisely. The first three results are machine-checked in Lean~4 with no \texttt{sorry}; for the fourth, Section~\ref{sec:verification} states precisely which part is machine-checked and which part rests on an exact computation reported here.
+expected time at which it stops, and whether its realised counts follow the intended
+proportions. Three claims in that analysis were carried without proof, and they were carried
+in three different ways. The per-arm concentration inequality appeared as a hypothesis of the
+enclosing lemma, so a reader could see it but nothing established that anything satisfies it.
+The step from a tail bound to a bound on the \emph{expected} stopping time was cited in a
+comment as standard, which is weaker, since a comment does not appear in the statement. And
+the tracking bound was taken for granted in prose describing what the sampling rule does,
+which is the worst position of the three: an assumption nobody wrote down is one nobody
+checked. This paper closes all three, and the third has a negative answer that is itself the
+result. We prove the layer-cake identity for an $\mathbb{N}$-valued stopping time, so a
+geometric tail bounds the expected stopping time rather than merely the tail sum. We discharge
+the concentration input from a sub-Gaussian hypothesis at an explicit threshold. We prove by
+construction that for every target and every horizon there \emph{exists} an integer allocation
+spending exactly the horizon with per-arm deficit at most one. And we show that the natural
+online rule---serve the arm of largest deficit, which is house-monotone by construction---does
+\emph{not} achieve it, on an exact five-arm witness reaching deficit $\tfrac{26}{23}$ at
+horizon eleven. An exhaustive search over $5{,}070$ rational targets finds $1{,}147$ that
+violate the bound, the worst reaching $\tfrac32$ and the earliest at $t=3$.
 \end{abstract}
 
 \begin{IEEEkeywords}
-adaptive sampling, stopping times, concentration inequalities, apportionment, house
-monotonicity, quota, formal verification
+adaptive sampling, stopping times, concentration inequalities, apportionment,
+house monotonicity, quota, formal verification
 \end{IEEEkeywords}
 
 \section{Introduction}
 
-An adaptive sampling scheme decides, at each round, which arm to sample; it stops when the
-data support a certificate; and its guarantee has three components. The confidence event
-must hold with the claimed probability. The expected stopping time must be finite and
-bounded. And the realised sample counts must follow the proportions the analysis assumes,
-because the bound on stopping time is derived from those proportions.
+An adaptive sampling scheme decides at each round which arm to sample, stops when the data
+support a certificate, and its guarantee has two parts: the recommendation is correct with
+probability at least $1-\delta$, and the expected stopping time is bounded.
 
-In the analysis this paper takes as its subject, all three were treated unequally. The first
-rested on an assumed per-arm, per-count concentration inequality. The second cited a
-standard transfer from a tail bound to an expectation. The third---whether an online rule
-can realise the intended proportions---was open.
+The two parts are proved differently, and it is easy to let the first do the second's work.
+Correctness follows from a union bound over confidence intervals---the good event---and is
+where a concentration input enters. The stopping-time bound cannot follow from the good event,
+because that event says nothing about its complement, and on the complement the scheme may
+draw forever. It follows instead from a tail bound on the stopping time itself, and converting
+that tail into an expectation is the layer-cake step. Citing that step is reasonable in prose
+and inadequate in a development that claims its results are checked.
 
-\subsection{Three inputs, unequally treated}
+Between the two sits the sampling rule. The tail bound is obtained by showing that after
+enough rounds the statistic must cross, and ``enough'' is computed from how many samples each
+arm has by then---which is where the intended proportions enter, and where the tracking
+question lives. Writing $D_{i}(t)=t\,w_{i}-N_{i}(t)$ for the deficit of arm $i$ against target
+$w$, an analysis would like to assume $|D_{i}(t)|\le1$ at every horizon.
 
-It is worth being precise about what ``carried as an input'' means, since the three cases
-differ.
+This paper proves such an allocation always \emph{exists} and that the natural online rule does
+not \emph{achieve} it. The two together say the bound is true as an existence statement and
+false as a property of the rule an algorithm would use, which is exactly the distinction an
+analysis must respect. The obstruction is the apportionment paradox in algorithmic form: house
+monotonicity---counts only increase as the horizon grows---and quota cannot both hold.
 
-The concentration inequality was written as a hypothesis of the enclosing lemma: the
-development stated ``assuming the per-arm deviation satisfies \ldots'' and proceeded. Anyone
-reading it could see the assumption; what was missing was a proof that anything satisfies
-it, and Section~\ref{sec:subgauss} supplies one from a sub-Gaussian condition that Gaussian
-noise meets.
+The paper makes five contributions. First, it proves the layer-cake identity, so a geometric
+tail bounds the expected stopping time. Second, it discharges the concentration input from a
+sub-Gaussian hypothesis at an explicit threshold. Third, it proves the per-horizon existence
+by construction rather than by an existence argument. Fourth, it refutes the online bound with
+an exact witness whose eleven steps are each a genuine largest-deficit choice. Fifth, it
+states the transfer an analysis actually consumes with the constant left free, so that
+whatever bound a specific rule can prove may be substituted.
 
-The layer-cake step was cited in a comment as standard. This is weaker than a hypothesis,
-because a hypothesis at least appears in the statement; a citation in a comment does not,
-and a reader checking the statement would not see it.
+The scope is bounded. The refutation concerns \emph{this} rule and does not prove that no
+online monotone rule achieves any constant bound; the search establishing how common the
+failure is covers a finite family; the concentration result assumes a known sub-Gaussian
+parameter; and the geometric tail itself remains an input supplied by the algorithm's own
+analysis.
 
-The tracking bound was in the worst position of the three: it was neither assumed in a
-statement nor cited, but taken for granted in the prose describing what the sampling rule
-does. Section~\ref{sec:fails} shows it is false, which is why this position is the worst---
-an assumption nobody wrote down is one nobody checked.
+\section{Background}
 
-\subsection{Why high-probability correctness is not enough}
+\subsection{Fixed-Confidence Sampling}
 
-It is worth being explicit about why the second item cannot be waved through. A scheme that
-is correct with probability $1-\delta$ says nothing about what happens on the remaining
-event, and in a stopping problem the remaining event is exactly where the scheme may never
-stop. An expected-stopping-time bound therefore cannot be obtained from the confidence
-guarantee; it must come from a tail bound on the stopping time itself, and converting a tail
-bound into an expectation is the layer-cake identity. Citing that identity is reasonable in
-prose and inadequate in a development that claims its results are checked, so
-Section~\ref{sec:layercake} proves it.
+Garivier and Kaufmann establish the framework in which this analysis sits: a stopping rule
+based on a generalised likelihood-ratio statistic, a sampling rule that tracks the
+optimal-allocation weights, and a sample-complexity bound matching a lower bound
+asymptotically \cite{garivier2016}. Kaufmann, Capp\'e and Garivier give the complexity of
+best-arm identification in the general bandit model \cite{kaufmann2016}. The tracking device
+in that framework is the direct source of the question
+Sections~\ref{sec:exists}--\ref{sec:fails} answer, and the concentration inputs are the ones
+Section~\ref{sec:subgauss} discharges.
 
-\subsection{The tracking question, and its answer}
-
-The third item is the interesting one. Write $D_{i}(t)=t\,w_{i}-N_{i}(t)$ for the deficit of
-arm $i$ at time $t$ against target $w$. An analysis would like to assume $|D_{i}(t)|\le1$:
-the realised counts track the targets to within one sample per arm, at every horizon.
-
-Section~\ref{sec:exists} proves such an allocation always \emph{exists}. Section~\ref{sec:fails}
-proves the natural online rule does not \emph{achieve} it. The two together say the bound is
-true as an existence statement and false as a property of the rule an algorithm would use,
-which is precisely the distinction an analysis must respect. The obstruction is the
-apportionment paradox in algorithmic form: house monotonicity---counts only increase as the
-horizon grows---and quota cannot both hold.
-
-\subsection{Contributions}
-
-\begin{enumerate}
-\item[C1.] \textbf{The layer-cake identity, proved.} The integral of an $\mathbb{N}$-valued
-stopping time equals the sum of its tail probabilities (Theorem~\ref{thm:layercake}), so a
-geometric tail bounds the expected stopping time (Corollary~\ref{cor:expstop}).
-
-\item[C2.] \textbf{The concentration input, discharged.} A sub-Gaussian deviation meets any
-budget at an explicit threshold (Theorem~\ref{thm:subgauss}), so the per-arm inequality the
-peeling argument needs is supplied rather than assumed.
-
-\item[C3.] \textbf{A tracking allocation always exists.} For every target on the simplex and
-every horizon there is an integer allocation spending exactly the horizon with per-arm
-deficit at most one (Theorem~\ref{thm:exists}), proved by construction.
-
-\item[C4.] \textbf{But no online monotone rule achieves it.} The largest-deficit rule is
-house-monotone by construction and does not satisfy quota
-(Theorem~\ref{thm:quotafails}), by an exact five-arm witness whose eleven steps are each a
-genuine largest-deficit choice.
-
-\item[C5.] \textbf{The consequences the analysis consumes.} Deficits sum to zero, so some arm
-is always behind and a greedy rule never idles (Lemma~\ref{lem:sumzero},
-Corollary~\ref{cor:deficient}); and a deficit bound of $c$ pins the empirical allocation to
-within $c/t$ of the target (Theorem~\ref{thm:freq}).
-\end{enumerate}
-
-\subsection{Roadmap}
-
-Section~\ref{sec:setting} fixes notation, Section~\ref{sec:related} the novelty boundary.
-Sections~\ref{sec:layercake} and \ref{sec:subgauss} close the two probabilistic inputs, and
-Section~\ref{sec:where} says where each sits in the surrounding analysis.
-Sections~\ref{sec:deficits}--\ref{sec:consumes} treat tracking: the elementary facts, the
-existence theorem, the impossibility for the online rule, and the transfer an analysis
-actually consumes. Section~\ref{sec:reading} reads the witness,
-Section~\ref{sec:results} reports the search, Section~\ref{sec:verification} the formal
-development and Section~\ref{sec:discussion} the scope.
-
-The three contributions are logically independent---C1 and C2 concern the stopping analysis,
-C3 and C4 the allocation---and are presented together because they are the three places the
-same analysis leaned on something unproved. Two of the three turned out to be true and
-merely uncited; the third turned out to be false, which is why it gets the most space.
-
-\section{Setting and notation}
-\label{sec:setting}
-
-\begin{table}[htbp]
-\caption{Notation.}
-\label{tab:notation}
-\centering
-\footnotesize
-\begin{tabular}{@{}ll@{}}
-\toprule
-Symbol & Meaning \\
-\midrule
-$K$ & number of arms \\
-$w$ & target allocation on the simplex \\
-$t$ & horizon (number of samples spent) \\
-$N_{i}(t)$ & count of arm $i$ at horizon $t$ \\
-$D_{i}(t)$ & deficit, $t\,w_{i}-N_{i}(t)$ \\
-$\tau$ & stopping time, $\mathbb{N}$-valued \\
-$\mu$ & the underlying measure \\
-$\rho$ & geometric tail ratio \\
-$C$ & tail constant \\
-$c$ & sub-Gaussian parameter \\
-$\beta,\delta$ & confidence budgets \\
-$X$ & a deviation \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-An allocation rule is \emph{house-monotone} when $N_{i}(t)$ is non-decreasing in $t$ for
-every $i$---no arm's count ever falls as the horizon grows. It satisfies \emph{quota} at
-constant $c$ when $|D_{i}(t)|\le c$ for every $i$ and $t$. Any rule that serves one arm per
-round is house-monotone by construction, since counts only increase.
-
-\section{Related work and the novelty boundary}
-\label{sec:related}
-
-\subsection{Fixed-confidence sampling}
-
-Garivier and Kaufmann \cite{garivier2016} establish the fixed-confidence framework in which
-this analysis sits: a stopping rule based on a generalised likelihood-ratio statistic, a
-sampling rule that tracks the optimal weights, and a sample-complexity bound matching a
-lower bound asymptotically. The tracking device there is exactly the source of the question
-Sections~\ref{sec:exists}--\ref{sec:fails} answer, and the concentration inputs are exactly
-the ones Section~\ref{sec:subgauss} discharges.
-
-Nothing here improves their bounds. What is contributed is that two of their analysis's
-inputs become theorems in this development, and that the tracking assumption is shown to be
+Nothing here improves their bounds. What is contributed is that two of the analysis's inputs
+become theorems in this development, and that the tracking assumption is shown to be
 unavailable in the form an analysis would most like to use.
 
 \subsection{Apportionment}
 
-Balinski and Young \cite{balinski1982} prove the impossibility at the heart of C4: no
-apportionment method satisfies both house monotonicity and quota. Divisor methods are
-house-monotone and violate quota; quota methods violate house monotonicity. That result is
-about apportionment methods in general, stated in the language of seats and states.
+Balinski and Young prove the impossibility at the heart of the negative result: no
+apportionment method satisfies both house monotonicity and quota, so divisor methods are
+house-monotone and violate quota while quota methods violate house monotonicity
+\cite{balinski1982}. That result is stated in the language of seats and states, for
+apportionment methods in general.
 
-Theorem~\ref{thm:quotafails} is not a restatement of it. It is a statement about one
-specific rule---largest-deficit-first---exhibited with an explicit witness at an explicit
-horizon, with every step verified. The general impossibility says \emph{some} violation
-exists for any house-monotone method; the witness says \emph{this} rule violates quota at
-$t=11$ on $\frac{1}{23}(17,1,1,3,1)$ by $\frac{26}{23}$, which is what an analysis needs in
-order to know that assuming $c=1$ is unsound. The connection to \cite{balinski1982} is
-acknowledged and is the reason the failure is unsurprising in hindsight; the witness is what
-makes it usable.
+Theorem~\ref{thm:quotafails} is not a restatement of it, and the difference is what makes it
+usable. The general impossibility says \emph{some} violation exists for any house-monotone
+method. The witness says \emph{this} rule violates quota at $t=11$ on
+$\frac{1}{23}(17,1,1,3,1)$ by $\frac{26}{23}$. An analysis that assumes a unit deficit bound
+needs the second, not the first: it needs a horizon, a target and a magnitude. The connection
+to \cite{balinski1982} is acknowledged and is why the failure is unsurprising in hindsight.
 
 \subsection{Concentration}
 
 The sub-Gaussian Chernoff bound of Section~\ref{sec:subgauss} is standard
-\cite{boucheron2013}. It is proved here because the peeling argument needs it at a specific
-threshold with a specific budget, and because the point of the exercise is to have no
+\cite{boucheron2013}, as is the measure-theoretic apparatus behind the layer-cake identity
+\cite{durrett2019}. Both are proved here because the peeling argument needs the first at a
+specific threshold with a specific budget, and because the point of the exercise is to have no
 assumed inequalities left.
 
-\section{What an adaptive scheme has to prove}
-\label{sec:whatprove}
+\subsection{The Gap}
 
-Before the theorems, a short account of the guarantee they serve, so that the three inputs
-have somewhere to sit.
+The literature therefore leaves a specific opening. The fixed-confidence framework supplies
+the analysis but carries concentration and layer-cake as inputs; apportionment supplies a
+general impossibility but no instance an analysis can use; concentration theory supplies the
+inequality but not its instantiation at the peeling budget. No existing treatment
+simultaneously: (i) proves the layer-cake transfer for the $\mathbb{N}$-valued stopping time
+the analysis needs; (ii) discharges the per-arm concentration input at the peeling budget;
+(iii) separates per-horizon existence from online achievability by proving the first and
+refuting the second; and (iv) quantifies how common and how early the online failure is.
 
-A fixed-confidence scheme is specified by three rules. A \emph{sampling rule} chooses which
-arm to draw at each round. A \emph{stopping rule} decides when the evidence is sufficient. A
-\emph{recommendation rule} names the answer at the stopping time. Its guarantee has two
-parts: with probability at least $1-\delta$ the recommendation is correct, and the expected
-stopping time is at most some explicit function of the problem and $\delta$.
+\section{Research Aims, Questions, and Hypotheses}
 
-The two parts are proved differently and it is easy to let the first do the second's work.
-Correctness follows from a union bound over confidence intervals---the good event---and is
-where the concentration input enters. The stopping-time bound cannot follow from the good
-event, because the good event says nothing about the complement, and on the complement the
-scheme may draw forever. It follows instead from a tail bound on the stopping time, and
-converting that tail into an expectation is the layer-cake step.
+\subsection{Research Aim}
 
-Between them sits the sampling rule. The tail bound is obtained by showing that after enough
-rounds the statistic must cross, and ``enough'' is computed from how many samples each arm
-has by then---which is where the intended proportions enter, and where the tracking question
-lives. All three inputs are therefore in series: a gap in any one breaks the stopping-time
-half of the guarantee, and the correctness half depends on the first alone.
+The aim of this work is to remove the unproved inputs from an adaptive stopping analysis and
+to determine whether the tracking bound that analysis relies on is achievable by an online
+rule.
 
-\section{The layer-cake identity}
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Does a geometric tail on the stopping time bound its expectation, as a
+theorem rather than a citation?
+\item \textbf{RQ2.} Can the per-arm, per-count concentration inequality be supplied rather
+than assumed, at the budget the peeling argument allocates?
+\item \textbf{RQ3.} Does an integer allocation with per-arm deficit at most one exist at every
+horizon?
+\item \textbf{RQ4.} Does the natural online monotone rule achieve that bound?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} Writing the stopping time as a sum of indicators and exchanging with the
+integral gives the layer-cake identity, from which a geometric tail yields $C/(1-\rho)$.
+\item \textbf{H2.} A sub-Gaussian deviation meets any budget $\beta$ at threshold
+$\sqrt{2c\log(1/\beta)}$, which is what the peeling budget requires.
+\item \textbf{H3.} Taking floors and distributing the shortfall one unit per arm gives an
+allocation with deficit at most one, at every horizon.
+\item \textbf{H4.} The online rule does not achieve it, and the failure is neither rare nor
+asymptotic.
+\end{itemize}
+
+\section{Methodology}
+\label{sec:setting}
+
+\subsection{Framework Overview}
+
+An allocation rule is \emph{house-monotone} when $N_{i}(t)$ is non-decreasing in $t$ for every
+$i$---no arm's count ever falls as the horizon grows. It satisfies \emph{quota} at constant
+$c$ when $|D_{i}(t)|\le c$ for every $i$ and $t$. Any rule serving one arm per round is
+house-monotone by construction, since counts only increase; that is why the natural online
+rule sits on one side of the impossibility automatically.
+
+\subsection{Simplifying Assumptions}
+
+\begin{enumerate}
+\item[1)] \textbf{Known sub-Gaussian parameter.} Theorem~\ref{thm:subgauss} assumes the
+deviation is sub-Gaussian with a \emph{known} parameter $c$. Gaussian noise satisfies this, so
+the hypothesis is met in the intended setting; with an estimated variance it is not automatic,
+and nothing here covers that case.
+
+\item[2)] \textbf{Geometric tail as an input.} Corollary~\ref{cor:expstop} converts a
+geometric tail into an expectation bound. Establishing the tail is the algorithm's own
+analysis and is not done here.
+
+\item[3)] \textbf{One sample per round.} The rule serves exactly one arm per round, which is
+what makes it house-monotone and what makes the granularity argument of
+Section~\ref{sec:reading} apply.
+
+\item[4)] \textbf{Targets on the simplex.} $w$ is non-negative and sums to one, which is what
+makes the deficits sum to zero in Lemma~\ref{lem:sumzero}.
+\end{enumerate}
+
+\subsection{The Layer-Cake Identity}
 \label{sec:layercake}
 
 \begin{theorem}[Layer cake for an $\mathbb{N}$-valued stopping time]
@@ -250,40 +208,37 @@ For an $\mathbb{N}$-valued measurable $\tau$,
 \end{theorem}
 
 \begin{proof}
-At each point, write $\tau=\sum_{n\ge0}\mathbf{1}\{n<\tau\}$. The sum is finite at every
-point---it has exactly $\tau$ non-zero terms---and telescopes to the value itself. Exchange
-the sum with the integral, which is legitimate for non-negative measurable terms by the
-monotone convergence theorem, and the exchange yields \eqref{eq:layercake}.
+At each point write $\tau=\sum_{n\ge0}\mathbf{1}\{n<\tau\}$, a sum with exactly $\tau$
+non-zero terms which telescopes to the value itself. Exchange the sum with the integral, which
+is legitimate for non-negative measurable terms by monotone convergence.
 \end{proof}
 
 \leanbox{\lean{lintegral\_nat\_eq\_tsum\_meas\_gt} in
 \lean{LeanAdaptiveExpectedStoppingV1}}
 
+The $\mathbb{N}$-valued case is stated separately rather than derived from the general
+layer-cake formula for non-negative functions, because the integer case yields a countable sum
+rather than an integral over levels, and the countable form is what the next statement needs
+in order to sum a geometric series.
+
 \begin{corollary}[Geometric tail bounds the expectation]
 \label{cor:expstop}
 If $\mu\{\tau>n\}\le C\rho^{n}$ with $0\le\rho<1$, then
-\begin{equation}
-\mathbb{E}[\tau]\;\leq\;\frac{C}{1-\rho}.
-\end{equation}
+$\mathbb{E}[\tau]\le C/(1-\rho)$.
 \end{corollary}
-
-\begin{proof}
-Substitute the tail bound into \eqref{eq:layercake} and sum the geometric series.
-\end{proof}
 
 \leanbox{\lean{expected\_stopping\_le} in \lean{LeanAdaptiveExpectedStoppingV1}}
 
-The earlier development cited \eqref{eq:layercake}; it is now a theorem, so a geometric tail
-bounds the \emph{expected} stopping time and not merely the tail sum. As
-Section~\ref{sec:discussion} notes, the geometric tail itself remains a hypothesis supplied
-by the algorithm's own analysis---what is closed is the transfer, not the input.
+The hypothesis $\rho<1$ is explicit because an earlier version omitted it; the statement is
+then false, and the omission is invisible in prose because ``geometric tail'' carries the
+condition informally.
 
-\section{The concentration input}
+\subsection{The Concentration Input}
 \label{sec:subgauss}
 
 \begin{theorem}[Sub-Gaussian threshold]
 \label{thm:subgauss}
-If $X$ is sub-Gaussian with parameter $c$, then for any budget $\beta\in(0,1)$,
+If $X$ is sub-Gaussian with parameter $c\ge0$, then for any budget $\beta\in(0,1)$,
 \begin{equation}
 \mu\Bigl\{\sqrt{2c\log(1/\beta)}\leq X\Bigr\}\;\leq\;\beta .
 \label{eq:subgauss}
@@ -291,76 +246,28 @@ If $X$ is sub-Gaussian with parameter $c$, then for any budget $\beta\in(0,1)$,
 \end{theorem}
 
 \begin{proof}
-The sub-Gaussian Chernoff bound gives
-$\mu\{X\ge u\}\le\exp(-u^{2}/2c)$. Evaluating at $u=\sqrt{2c\log(1/\beta)}$ makes the
-exponent $-\log(1/\beta)$, so the bound is $\beta$.
+The sub-Gaussian Chernoff bound gives $\mu\{X\ge u\}\le\exp(-u^{2}/2c)$; evaluating at
+$u=\sqrt{2c\log(1/\beta)}$ makes the exponent $-\log(1/\beta)$.
 \end{proof}
 
 \leanbox{\lean{subgaussian\_threshold} in \lean{LeanAdaptiveExpectedStoppingV1}}
 
-Feeding the peeling budget $\delta/(K\,n(n+1))$ into \eqref{eq:subgauss} gives the
-confidence event's probability with no assumed inequality. Gaussian noise is sub-Gaussian,
-so the hypothesis is met in the intended setting; with an estimated variance it is not
-automatic, and Section~\ref{sec:discussion} records that.
+The threshold is stated in terms of an arbitrary budget $\beta$ rather than a fixed
+$\delta$ because that is the form the peeling argument consumes: it allocates
+$\delta/(K\,n(n+1))$ to arm $i$ at count $n$---the factor chosen so that
+$\sum_{n\ge1}1/(n(n+1))=1$---and \eqref{eq:subgauss} converts that budget into an interval
+half-width. Without it the peeling argument has a budget and no way to spend it.
 
-\section{Where each input sits in the analysis}
-\label{sec:where}
-
-The three results are inputs to different parts of the same argument, and setting out where
-each enters explains why all three belong in one paper.
-
-\subsection{The confidence event}
-
-A fixed-confidence scheme maintains, for each arm and each count, a confidence interval, and
-the good event is that every one of them contains the truth. A union bound over arms and
-counts requires a per-arm, per-count tail bound at a budget that sums to $\delta$, and the
-standard peeling allocates $\delta/(K\,n(n+1))$ to arm $i$ at count $n$---chosen because
-$\sum_{n\ge1}1/(n(n+1))=1$.
-
-Theorem~\ref{thm:subgauss} is what converts that budget into a threshold. Given the budget
-$\beta$, the interval half-width is $\sqrt{2c\log(1/\beta)}$ and the tail is at most
-$\beta$. Without it the peeling argument has a budget and no way to spend it.
-
-\subsection{The stopping time}
-
-The scheme stops when the statistic crosses a threshold. On the good event one shows the
-statistic crosses within a computable number of rounds; off it, nothing is guaranteed, and
-in particular the scheme may run forever. An expected-stopping-time bound therefore requires
-a tail bound on $\tau$ itself---typically geometric, obtained by observing that each block
-of rounds independently has a constant chance of triggering the threshold---and then
-Corollary~\ref{cor:expstop} to convert it.
-
-This is the place where citing the layer-cake identity is most tempting and least
-defensible, because the identity is genuinely standard and the conversion is genuinely one
-line. It is also the place where the whole finiteness of the expected stopping time rests,
-so a development claiming its results are checked cannot leave it out.
-
-\subsection{The sample counts}
-
-The bound on how long the statistic takes to cross depends on how many samples each arm has
-received, which the analysis reads off the target proportions. That step is valid only to
-the extent the realised counts match the targets, which is the tracking question. Sections
-\ref{sec:exists}--\ref{sec:consumes} settle what may be assumed: existence at each horizon
-(Theorem~\ref{thm:exists}), \emph{not} the online bound
-(Theorem~\ref{thm:quotafails}), and the transfer at whatever constant a rule can prove
-(Theorem~\ref{thm:freq}).
-
-\section{Deficits, and why a greedy rule never idles}
+\subsection{Deficits, and Why a Greedy Rule Never Idles}
 \label{sec:deficits}
 
 \begin{lemma}[Deficits sum to zero]
 \label{lem:sumzero}
-\begin{equation}
-D_{i}(t)\;=\;t\,w_{i}-N_{i}(t),
-\qquad
-\sum_{i} D_{i}(t)\;=\;0 .
-\label{eq:deficit}
-\end{equation}
+$D_{i}(t)=t\,w_{i}-N_{i}(t)$ satisfies $\sum_{i} D_{i}(t)=0$.
 \end{lemma}
 
 \begin{proof}
-$\sum_{i}D_{i}(t)=t\sum_{i}w_{i}-\sum_{i}N_{i}(t)=t\cdot1-t=0$, using that the targets sum
-to one and the counts sum to the horizon.
+$\sum_{i}D_{i}(t)=t\sum_{i}w_{i}-\sum_{i}N_{i}(t)=t-t=0$.
 \end{proof}
 
 \leanbox{\lean{deficit\_sum\_zero} in \lean{LeanAdaptiveTrackingV1}}
@@ -376,52 +283,46 @@ A finite family of reals summing to zero cannot be everywhere negative.
 
 \leanbox{\lean{exists\_deficient} in \lean{LeanAdaptiveTrackingV1}}
 
-Corollary~\ref{cor:deficient} is what an analysis uses to know a greedy rule never idles:
-there is always an arm with non-negative deficit to serve, so the rule is well defined at
-every horizon. It is elementary and it is worth having as a theorem because the alternative
-is an implicit assumption that the rule's argmax is meaningful.
+Corollary~\ref{cor:deficient} is elementary and is stated because it is what makes the greedy
+rule well defined: there is always an arm with non-negative deficit to serve, so the rule's
+argmax is meaningful at every horizon. The alternative is an implicit assumption to that
+effect.
 
-\section{A tracking allocation exists}
+\subsection{A Tracking Allocation Exists}
 \label{sec:exists}
 
 \begin{theorem}[Existence at every horizon]
 \label{thm:exists}
 \begin{equation}
 \forall\,w,\;\forall\,t:\;\;
-\exists\,N\;\;\text{with}\;\;\sum_{i} N_{i}=t
+\exists\,N:\;\;\sum_{i} N_{i}=t
 \;\;\text{and}\;\;\bigl|N_{i}-t\,w_{i}\bigr|\leq 1 .
 \label{eq:exists}
 \end{equation}
 \end{theorem}
 
 \begin{proof}[Construction]
-Take $N_{i}^{0}=\lfloor t\,w_{i}\rfloor$. Then $\sum_{i}N_{i}^{0}\le t$, and the shortfall
-$t-\sum_{i}N_{i}^{0}$ is strictly less than $K$ because each floor loses less than one.
-Distribute the shortfall one unit per arm over a subset of that size. Every count then lies
-between $\lfloor t\,w_{i}\rfloor$ and $\lfloor t\,w_{i}\rfloor+1$, so
-$|N_{i}-t\,w_{i}|\le1$.
+Take $N_{i}^{0}=\lfloor t\,w_{i}\rfloor$. Then $\sum_{i}N_{i}^{0}\le t$, and the shortfall is
+strictly less than $K$ because each floor loses less than one. Distribute the shortfall one
+unit per arm over a subset of that size; every count then lies between
+$\lfloor t\,w_{i}\rfloor$ and $\lfloor t\,w_{i}\rfloor+1$.
 \end{proof}
 
 \leanbox{\lean{tracking\_bound}, \lean{tracking\_exists} in \lean{LeanAdaptiveTrackingV1}}
 
-The construction uses $\lfloor\cdot\rfloor$ and a correction set and nothing else; it is not
-an existence argument, and the allocation it produces can be written down for any $(w,t)$.
+The construction uses floors and a correction set and nothing else, so the allocation can be
+written down for any $(w,t)$. But it is per-horizon: for each $t$ separately it gives an
+allocation meeting the bound. It does \emph{not} give a single rule whose counts are monotone
+in $t$ and meet the bound at every $t$ simultaneously, and that stronger statement is what an
+algorithm needs.
 
-\begin{remark}[This is per-horizon]
-Theorem~\ref{thm:exists} gives, for each $t$ separately, an allocation meeting the bound. It
-does \emph{not} give a single rule whose counts are monotone in $t$ and meet the bound at
-every $t$ simultaneously. That stronger statement is what an algorithm needs, and
-Section~\ref{sec:fails} shows the natural candidate does not provide it.
-\end{remark}
-
-\section{The online rule fails quota}
+\subsection{The Online Rule Fails Quota}
 \label{sec:fails}
 
 \begin{theorem}[Largest-deficit-first violates quota]
 \label{thm:quotafails}
-On five arms with targets $w=\frac{1}{23}(17,1,1,3,1)$, the rule that serves the arm of
-largest deficit reaches counts $(7,1,1,1,1)$ after eleven steps
-(\NUM{}, Section~\ref{sec:gap}), at which point (\PROVED{})
+On five arms with targets $w=\frac{1}{23}(17,1,1,3,1)$, the rule serving the arm of largest
+deficit reaches counts $(7,1,1,1,1)$ after eleven steps, at which point
 \begin{equation}
 D_{0}(11)\;=\;11\cdot\frac{17}{23}-7\;=\;\frac{26}{23}\;>\;1 .
 \label{eq:quotafail}
@@ -429,86 +330,47 @@ D_{0}(11)\;=\;11\cdot\frac{17}{23}-7\;=\;\frac{26}{23}\;>\;1 .
 Continuing to horizon fourteen the deficit reaches $\frac{31}{23}$.
 \end{theorem}
 
-\leanbox{\lean{greedy\_steps}, \lean{deficit\_exceeds\_one}, \lean{online\_quota\_fails},
-\lean{weights\_sum\_one}, \lean{counts\_sum} in \lean{LeanAdaptiveOnlineQuotaFailsV1}}
+\leanbox{\lean{weights\_sum\_one}, \lean{counts\_sum}, \lean{deficit\_exceeds\_one},
+\lean{online\_quota\_fails} in \lean{LeanAdaptiveOnlineQuotaFailsV1}}
 
 \input{adaptive_trace}
 
-\subsection{Why every step must be checked}
+A counterexample to a rule's behaviour is only as good as the claim that the trace is what the
+rule produces, so Table~\ref{tab:trace} records the deficit of every arm at every step and the
+served arm is compared against each alternative rather than asserted to be the argmax. At every
+step in the table the maximum is attained uniquely, so any implementation of
+largest-deficit-first produces these counts whatever it does about ties.
 
-A counterexample to a rule's behaviour is only as good as the claim that the trace is what
-the rule produces. Table~\ref{tab:trace} therefore records, at every step, the deficit of
-\emph{every} arm, and the served arm is compared against each alternative rather than
-asserted to be the argmax. This matters because a trace produced by a tie-breaking accident
-would establish nothing about the rule: at every step in the table the maximum is attained
-uniquely, so any implementation of largest-deficit-first produces these counts whatever it
-does about ties.
+\subsection{What Is Machine-Checked Here, and What Is Not}
+\label{sec:gap}
 
-Where that check lives is worth stating exactly, and Section~\ref{sec:gap} does so. The
-arithmetic of the violation---the target on the simplex, the counts summing to eleven, and
-$D_{0}(11)>1$---is machine-checked. The eleven step comparisons are kernel-checked as
-rational facts inside a proof whose conclusion is \lean{True}, so they do not escape it, and
-no Lean statement ties them to the target and counts. The trace in
-Table~\ref{tab:trace} is therefore reproduced from an independent exact-rational simulation,
-reported as a \NUM{} result.
+This paper's subject is inputs carried without proof, so the evidence behind
+Theorem~\ref{thm:quotafails} is separated rather than summarised.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\columnwidth]{adaptive_fig1_quota.png}
-\caption{The deficit of the first arm under largest-deficit-first on
-$w=\frac{1}{23}(17,1,1,3,1)$. The per-horizon bound of one---achievable offline by
-Theorem~\ref{thm:exists}---is crossed at $t=11$ and exceeded thereafter. Exact rationals
-throughout; each step is a genuine largest-deficit choice rather than a tie-breaking
-artefact, by the recomputation of Section~\ref{sec:gap}.}
-\label{fig:quota}
-\end{figure}
+\emph{Machine-checked.} That $w$ lies on the simplex; that the count vector spends exactly
+eleven pulls; and that $11\,w_{0}-N_{0}>1$ in exact rational arithmetic. Together these prove:
+there is a target on the simplex and an allocation of eleven pulls whose first-arm deficit
+exceeds one.
 
-\subsection{The apportionment obstruction}
+\emph{Not machine-checked.} That $N=(7,1,1,1,1)$ is the allocation the largest-deficit rule
+actually reaches. The eleven step comparisons sit in the proof body of a lemma whose conclusion
+is \lean{True}, written as hardcoded rationals; each is kernel-checked as an arithmetic fact,
+but nothing about them is exported and no statement connects those literals to $w$ and $N$.
+The rule-to-counts link---the part that makes this a statement about the \emph{rule} rather
+than about some allocation---is carried by a comment in the module, not by a proof.
 
-Theorem~\ref{thm:quotafails} is the apportionment obstruction \cite{balinski1982} in
-algorithmic form. The rule is house-monotone by construction---counts only increase---and
-house monotonicity and quota cannot both hold. What the witness adds to the general
-impossibility is a horizon, a target and a magnitude: the failure appears at $t=11$, not
-asymptotically, and the excess is $\frac{3}{23}$ at first violation, growing to
-$\frac{8}{23}$ by $t=14$.
+\emph{How the link is established instead.} We recomputed the trajectory independently in
+exact rational arithmetic, simulating largest-deficit-first on $w$ from $t=0$ and comparing
+the served arm against all four alternatives at every step. It reproduces
+Table~\ref{tab:trace} exactly, including the serve order $[0,3,0,0,1,0,0,2,0,0,4]$, the counts
+$(7,1,1,1,1)$ and $D_{0}(11)=\frac{26}{23}$. That computation is a \NUM{} result: exact,
+reproducible, and not machine-checked.
 
-\section{How much does quota actually cost?}
-\label{sec:cost}
+Theorem~\ref{thm:quotafails} should therefore be read as one \PROVED{} half and one \NUM{}
+half. Closing the gap means formalising the greedy rule as a Lean function and proving
+$\mathrm{greedyCount}(w,11)=N$, which is not done.
 
-Theorem~\ref{thm:quotafails} refutes a bound. A reader entitled to ask ``by how much'' finds
-the answer in Table~\ref{tab:search}, and it is worth drawing out three readings of it.
-
-\subsection{The violation is bounded in the search but not in theory}
-
-Across $5{,}070$ targets the worst deficit found is $\frac{3}{2}$, and nothing in this paper
-bounds the worst deficit over all targets, all arm counts and all horizons. A bound of that
-kind would be the natural companion to Theorem~\ref{thm:quotafails}---an impossibility with
-a matching constant---and it is the paper's first open problem for that reason. The
-apportionment literature \cite{balinski1982} characterises the violation for divisor
-methods; the corresponding constant for largest-deficit-first is not computed there and is
-not computed here.
-
-\subsection{Skewed targets are the dangerous ones}
-
-Every one of the ten worst targets in Table~\ref{tab:search} has a dominant component above
-$\tfrac23$ and several components below $\tfrac{1}{10}$. Near-uniform targets do not appear,
-and the reason is the mechanism of Section~\ref{sec:reading}: a violation requires an arm
-whose per-round entitlement is small enough that serving it once overshoots substantially.
-
-This matters because optimal allocations in best-arm identification are typically skewed---
-budget concentrates on the arms that are hard to separate---so the regime in which the
-tracking assumption is least safe is the regime the algorithm actually operates in. An
-empirical check on near-uniform targets would find nothing and would be checking the wrong
-thing.
-
-\subsection{Violations appear early}
-
-The earliest violation in the search is at $t=3$. There is no burn-in period during which
-the bound holds and after which it may fail: a target can break it on the third sample. An
-analysis that assumes the bound holds for $t$ beyond some threshold is therefore not
-salvageable by making the threshold larger.
-
-\section{What the analysis actually consumes}
+\subsection{What the Analysis Actually Consumes}
 \label{sec:consumes}
 
 \begin{theorem}[Deficit bound transfers to frequencies]
@@ -521,246 +383,38 @@ salvageable by making the threshold larger.
 \end{equation}
 \end{theorem}
 
-\begin{proof}
-Divide the hypothesis by $t>0$.
-\end{proof}
-
 \leanbox{\lean{frequency\_converges}, \lean{pull\_count\_lower} in
 \lean{LeanAdaptiveTrackingV1}}
 
-Theorem~\ref{thm:freq} is the transfer an analysis actually uses, and it is stated with $c$
-free for a reason. Whatever bound a specific rule can prove---not the $c=1$ that
-Section~\ref{sec:fails} refutes for largest-deficit-first---converts into a statement about
-empirical proportions at rate $c/t$. A companion bound converts it into a lower bound on
+Theorem~\ref{thm:freq} is stated with $c$ free for a reason. Whatever bound a specific rule can
+prove---not the $c=1$ that Section~\ref{sec:fails} refutes---converts into a statement about
+empirical proportions at rate $c/t$, and a companion bound converts it into a lower bound on
 pull counts between any two times, which is what a peeling argument needs.
 
-\section{The existence construction, worked}
-\label{sec:worked}
-
-Theorem~\ref{thm:exists} is constructive, and running it on the witness target shows what
-the online rule is failing to match.
-
-Take $w=\frac{1}{23}(17,1,1,3,1)$ and $t=11$. The floors are
-\begin{align}
-\lfloor 11\cdot\tfrac{17}{23}\rfloor &= \lfloor \tfrac{187}{23}\rfloor
-  = \lfloor 8.13\ldots\rfloor = 8, \notag\\
-\lfloor 11\cdot\tfrac{1}{23}\rfloor &= 0
-  \quad\text{(three arms)}, \notag\\
-\lfloor 11\cdot\tfrac{3}{23}\rfloor &= \lfloor 1.43\ldots\rfloor = 1 .
-\end{align}
-These sum to $8+0+0+1+0=9$, short of $t=11$ by two. Distributing the shortfall one unit per
-arm over any two of the remaining arms---say the two unit-weight arms with the largest
-fractional parts---gives, for instance, $N=(8,1,1,1,0)$, whose deficits are
-\begin{multline}
-D=\Bigl(\tfrac{187}{23}-8,\;\tfrac{11}{23}-1,\;\tfrac{11}{23}-1,\;\tfrac{33}{23}-1,\;
-        \tfrac{11}{23}\Bigr)\\
- =\Bigl(\tfrac{3}{23},\,-\tfrac{12}{23},\,-\tfrac{12}{23},\,\tfrac{10}{23},\,
-        \tfrac{11}{23}\Bigr),
-\end{multline}
-every one of absolute value at most one, and summing to zero as Lemma~\ref{lem:sumzero}
-requires.
-
-\subsection{What the online rule produced instead}
-
-At the same horizon, Table~\ref{tab:trace} shows largest-deficit-first at $N=(7,1,1,1,1)$
-with $D_{0}=\frac{26}{23}>1$. The two allocations differ by one sample: the offline
-construction gives the dominant arm eight and the fifth arm none; the online rule gives the
-dominant arm seven and the fifth arm one.
-
-That single sample is the whole failure, and it is not recoverable by the online rule,
-because at $t=10$ the fifth arm's deficit was $\frac{10}{23}$ against the dominant arm's
-$\frac{9}{23}$---so serving the fifth arm was the locally correct action, and the rule had
-no way to know it would cost the quota bound one round later.
-
-\subsection{Why this is the shape of every such failure}
-
-The offline construction can look at $t$ and decide; the online rule commits at each round
-without seeing the future. Theorem~\ref{thm:exists} therefore says the target is reachable
-by \emph{some} allocation and Theorem~\ref{thm:quotafails} says not by \emph{this
-sequence of commitments}, and the gap between them is exactly the information the online
-rule does not have. That is what makes the impossibility structural rather than a defect of
-the greedy choice.
-
-\section{Results}
-\label{sec:results}
-
-\subsection{The online rule violates quota at horizon eleven}
-
-With targets $\frac{1}{23}(17,1,1,3,1)$ the largest-deficit rule reaches counts
-$(7,1,1,1,1)$ after eleven steps, at which point the first arm's deficit is
-$\frac{26}{23}\approx1.130$, exceeding the per-horizon bound of one. Continuing to horizon
-fourteen the deficit reaches $\frac{31}{23}\approx1.348$. Every step is verified against
-every alternative, so this is a property of the rule rather than of a particular
-implementation of it.
-
-\subsection{The failure is common, not exceptional}
-
-The witness of Theorem~\ref{thm:quotafails} is not a fragile special case. Exhaustive search
-over rational targets on $K\in\{3,4,5\}$ arms with denominators up to $30$, run to horizon
-$40$, checks $5{,}070$ targets; $1{,}147$ of them---$22.6\%$---drive the largest-deficit
-rule past the bound of one (Table~\ref{tab:search}).
-
-Two facts sharpen the picture. The worst deficit found is $\frac{3}{2}$, on
-$w=\frac{1}{30}(1,1,1,6,21)$, which is larger than the $\frac{31}{23}\approx1.348$ reached
-by the paper's headline witness at $t=14$; an earlier and narrower search over smaller
-denominators had reported $\frac{31}{23}$ as its worst, and that figure should be read as
-the worst \emph{within that search} rather than as a bound. And the earliest violation
-occurs at $t=3$, not at $t=11$: on $w=\frac{1}{30}(1,1,1,6,21)$ the greedy counts after
-three steps are $(1,0,0,1,1)$ and the fifth arm's deficit is
-$3\cdot\frac{21}{30}-1=\frac{11}{10}>1$.
-
-The failure is therefore neither asymptotic nor rare. It occurs at horizon three on a target
-with denominator thirty, and it occurs on roughly one target in five across the searched
-family. No minimality is claimed beyond the search: targets with larger denominators, more
-arms, or longer horizons are not covered, and nothing here bounds the worst deficit over all
-targets.
-
-\input{adaptive_search}
-
-\subsection{Why the headline witness is still the one to cite}
-
-Table~\ref{tab:search} contains worse targets than $\frac{1}{23}(17,1,1,3,1)$, so it is
-worth saying why that one carries Theorem~\ref{thm:quotafails}. It is the witness whose
-its eleven steps are the ones the formal development records, and we have recomputed each
-choice against every alternative arm in exact rational arithmetic
-(Section~\ref{sec:gap}). The search
-results are exact rational arithmetic but are computed rather than proved, and they are
-reported as a \NUM{} result accordingly.
-
-The distinction is the usual one in this development. Theorem~\ref{thm:quotafails} is
-\PROVED{}; Table~\ref{tab:search} is \NUM{}, and it strengthens the practical reading of the
-theorem without being part of it.
-
-\section{Reading the witness}
-\label{sec:reading}
-
-Table~\ref{tab:trace} repays a slow reading, because the mechanism of the failure is visible
-in it and is not what one would guess.
-
-\subsection{The small arms are what break it}
-
-The target $\frac{1}{23}(17,1,1,3,1)$ has one dominant arm and four small ones. Naively the
-dominant arm should be served almost every round, and its deficit should stay small. What
-happens instead is that each small arm accumulates deficit slowly until it briefly exceeds
-the dominant arm's, takes one sample, and resets---at $t=1,4,7,10$ in the trace. Each of
-those rounds is a round the dominant arm does \emph{not} get, and its deficit grows by
-$\frac{17}{23}$ in the meantime.
-
-After four such interruptions the dominant arm is four samples behind where proportionality
-would put it, minus what it recovered in between, and at $t=11$ the shortfall crosses one.
-The mechanism is therefore not that the rule mis-serves the dominant arm; it is that
-serving a small arm costs a full sample, while the small arm's entitlement in that round is
-only $\frac{1}{23}$.
-
-\subsection{Granularity, not greed}
-
-This is why the failure is a property of integrality rather than of the greedy choice. The
-rule always serves an arm with maximal deficit, which is the locally correct action; the
-problem is that the unit of service is one sample and the entitlements being balanced are
-fractions much smaller than one. Any rule that serves whole samples and never revokes them
-faces the same arithmetic, which is the content of the apportionment impossibility.
-
-It also explains the pattern in Table~\ref{tab:search}: the worst targets found all have
-several very small components alongside one dominant one, exactly the configuration in which
-a small arm's occasional service is most expensive relative to its entitlement. A target
-close to uniform does not produce large deficits, because every arm's entitlement per round
-is comparable to the unit of service.
-
-\subsection{What an analysis should take from this}
-
-Two things. First, the assumption $|D_{i}(t)|\le1$ is unsafe for any rule of this shape, and
-the violation is not small---half a sample at the worst target found, on a problem with five
-arms. Second, the magnitude of the violation grows with the spread of the target, so an
-analysis that holds for near-uniform targets may fail badly for the skewed ones that
-best-arm identification actually produces, since optimal allocations concentrate on hard
-arms.
-
-\section{Formal verification}
+\section{Formal Verification}
 \label{sec:verification}
 
-Every theorem above is machine-checked in Lean~4, toolchain
-\texttt{leanprover/lean4:v4.34.0-rc2} against mathlib revision \texttt{1f495c61}.
-
-\subsection{Acceptance contract}
+\subsection{Acceptance Contract}
 
 A module counts as accepted only when all six of the following hold: the compiler exits zero
-with no errors; the source hash is unchanged \emph{across} the compile; the compiled
-artifact is newer than its source; at least one \texttt{\#print axioms} directive is
-present; the axiom set of every audited declaration lies within
-$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no \texttt{sorry}
-appears anywhere in the file.
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+\texttt{sorry} appears anywhere in the file.
 
-\subsection{The crux statements as they are checked}
+The contract is stated in full because each clause excludes a specific way of appearing
+verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
 
-\begin{figure}[htbp]
-\footnotesize
-\hrule\vspace{4pt}
-\begin{tabbing}
-\quad\=\quad\=\kill
-\lean{theorem lintegral\_nat\_eq\_tsum\_meas\_gt} \\
-\> \lean{($\mu$ : Measure $\Omega$) (tau : $\Omega$ $\to$ $\mathbb{N}$)} \\
-\> \lean{(htau : Measurable tau) :} \\
-\> \lean{$\int^-$ $\omega$, (tau $\omega$ : $\mathbb{R}\geq0\infty$) $\partial\mu$} \\
-\> \qquad\lean{= $\sum'$ n : $\mathbb{N}$, $\mu$ \{$\omega$ | n < tau $\omega$\}} \\[6pt]
-\lean{def w : Fin 5 $\to$ $\mathbb{Q}$ := !\lbrack 17/23,1/23,1/23,3/23,1/23\rbrack} \\
-\lean{def N : Fin 5 $\to$ $\mathbb{N}$ := !\lbrack 7,1,1,1,1\rbrack} \\[6pt]
-\lean{theorem greedy\_steps : True} \\[6pt]
-\lean{theorem online\_quota\_fails :} \\
-\> \lean{($\sum$ i, w i = 1) $\wedge$ ($\sum$ i, N i = 11)} \\
-\> \lean{$\wedge$ (1 : $\mathbb{Q}$) < (11 : $\mathbb{Q}$) * w 0 - (N 0 : $\mathbb{Q}$)}
-\end{tabbing}
-\vspace{-4pt}\hrule
-\caption{The two statements behind Theorem~\ref{thm:layercake} and
-Theorem~\ref{thm:quotafails}, reproduced as the prover has them. The layer-cake identity is
-general: an arbitrary measurable $\mathbb{N}$-valued \lean{tau} on an arbitrary measure
-space. \lean{online\_quota\_fails} is \emph{not} quantified: \lean{w} and \lean{N} are the
-fixed definitions above and the horizon is the literal $11$.
-\lean{greedy\_steps} concludes \lean{True}; its proof body checks eleven rational
-comparisons, but they are written as literals and nothing in the statement ties them to
-\lean{w} and \lean{N}. Section~\ref{sec:gap} says what follows and what does not.}
-\label{fig:statements}
-\end{figure}
-
-\subsection{What the Lean does and does not establish here}
-\label{sec:gap}
-
-Figure~\ref{fig:statements} is reproduced exactly because the gap it exposes is easy to
-paper over, and this paper's subject is inputs carried without proof.
-
-\emph{What is machine-checked.} That \lean{w} lies on the simplex; that \lean{N} spends
-exactly eleven pulls; and that $11\cdot w_{0}-N_{0}>1$ in exact rational arithmetic. Taken
-together, \lean{online\_quota\_fails} proves: \emph{there is a target on the simplex and an
-allocation of eleven pulls whose first-arm deficit exceeds one.}
-
-\emph{What is not.} That $N=(7,1,1,1,1)$ is the allocation the largest-deficit rule
-actually reaches. The eleven step comparisons sit in \lean{greedy\_steps}'s proof body as
-hardcoded rationals; each is kernel-checked as an arithmetic fact, but the theorem's
-conclusion is \lean{True}, so nothing about them is exported, and no Lean statement connects
-those literals to \lean{w} and \lean{N}. The rule-to-counts link---the part that makes this
-a statement about the \emph{rule} rather than about some allocation---is carried by the
-comment in the module, not by a proof.
-
-\emph{How the link is established instead.} We recomputed the trajectory independently in
-exact rational arithmetic, simulating largest-deficit-first on $w$ from $t=0$ and comparing
-the served arm against all four alternatives at every step. It reproduces
-Table~\ref{tab:trace} exactly, including the serve order $[0,3,0,0,1,0,0,2,0,0,4]$, the
-counts $(7,1,1,1,1)$ and $D_{0}(11)=\frac{26}{23}$. That computation is a \NUM{} result in
-this paper's evidence classes---exact, reproducible, and not machine-checked.
-
-Theorem~\ref{thm:quotafails} should therefore be read as one \PROVED{} half and one \NUM{}
-half: the arithmetic of the violation is checked by the prover, and the identification of
-$N$ as the rule's own trajectory rests on the computation reported here. Closing that gap
-means formalising the greedy rule as a Lean function and proving
-\lean{greedyCount w 11 = N}, which is not done.
-
-\subsection{Evidence per step}
+\subsection{Evidence per Step}
 
 \begin{table}[htbp]
 \caption{Evidence per step. All cited declarations are axiom-audited.}
 \label{tab:inventory}
-\centering
-\footnotesize
-\setlength{\tabcolsep}{3pt}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llr@{}}
 \toprule
 Step & Module & Aud. \\
@@ -775,241 +429,193 @@ Transfer, Thm~\ref{thm:freq}          & \lean{LeanAdaptiveTrackingV1}          &
 \end{tabular}
 \end{table}
 
-\subsection{What formalisation caught}
+\subsection{Scope of the Formalisation}
 
-Three formulations were withdrawn under the prover, and the third is the paper's main
-result.
+The Adaptive strand contains $13$ Lean source files with $50$ theorem and lemma statements,
+of which $6$ modules carry an acceptance receipt covering $27$ audited declarations. Across the
+programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+declarations.
 
-The first attempt at Corollary~\ref{cor:expstop} applied the geometric sum without checking
-$\rho<1$. The statement is then false---the series diverges---and the omission is invisible
-in prose because ``geometric tail'' carries the condition informally. The hypothesis is now
-explicit.
+Three formulations were withdrawn under the prover, and the third is this paper's main result.
+Corollary~\ref{cor:expstop} initially applied the geometric sum without requiring $\rho<1$.
+Theorem~\ref{thm:subgauss} initially took a real parameter that could be negative, making the
+threshold ill-defined. And an early attempt asserted the invariant $D_{i}(t)\le1-w_{i}$ for the
+greedy rule---a natural-looking strengthening which is false, since on
+$w=(\tfrac{9}{10},\tfrac{1}{10})$ the first arm's deficit reaches $\tfrac45$ while
+$1-w_{1}=\tfrac{1}{10}$. Attempting to prove it is what led to the search that produced
+Theorem~\ref{thm:quotafails}. Appendix~\ref{app:inventory} reproduces every audited
+statement.
 
-The second was in Theorem~\ref{thm:subgauss}. Mathlib's sub-Gaussian API carries the
-parameter as an $\mathbb{R}_{\ge0}$ rather than an $\mathbb{R}$, and an early version stated
-the threshold with a real $c$ that could be negative, making
-$\sqrt{2c\log(1/\beta)}$ ill-defined. The type change is cosmetic in effect and forced the
-statement to record that the parameter is non-negative, which is where it belongs.
+\section{Experiments}
 
-The third was the tracking invariant. An early attempt asserted $D_{i}(t)\le1-w_{i}$ for the
-greedy rule---a natural-looking strengthening, since an arm just served is exactly $1-w_{i}$
-behind its next entitlement. It is false: on $w=(\tfrac{9}{10},\tfrac{1}{10})$ the first
-arm's deficit reaches $\tfrac45$ while $1-w_{1}=\tfrac{1}{10}$. Attempting to prove it is
-what led to the search that produced Theorem~\ref{thm:quotafails}, so the paper's central
-result began as a failed proof of something stronger and false.
+\subsection{Experimental Objectives}
 
-\subsection{Scope of the formalisation}
+Theorem~\ref{thm:quotafails} refutes the bound on one target. The search has two objectives:
+to determine how common the failure is, and how early it appears, neither of which the theorem
+answers.
 
-The displayed results are the load-bearing chain, not the corpus. The Adaptive strand
-contains $13$ Lean source files with $50$ theorem and lemma statements, of which $6$ modules
-carry an acceptance receipt covering $27$ declarations whose axiom set was printed and
-checked. Across the programme of which this paper is one part: $762$ files, $7{,}199$
-statements, $111$ accepted modules, $875$ audited declarations.
+\subsection{Setup}
 
-No module cited in this paper contains a \texttt{sorry}. Seven occurrences exist in the
-wider repository, in audit scaffolding and in files named as conjectures; the overlap
-between the cited set and the files containing them was computed and is empty.
+Every way of writing $1$ as a sum of $K$ positive rationals with a common denominator $d$ was
+enumerated, for $K\in\{3,4,5\}$ and $K\le d\le30$, up to the ordering of the arms---legitimate
+because the rule is equivariant under permuting arms. Each target was run to horizon $40$ in
+exact rational arithmetic.
 
-\section{Generalising the three results}
-\label{sec:general}
+\subsection{Metrics}
 
-\subsection{The layer cake needs nothing}
+Per target: the maximum deficit over the run and the first horizon at which it exceeds one.
+Aggregated: the number of targets checked, the number violating the bound, the worst deficit
+and the earliest violation.
 
-Theorem~\ref{thm:layercake} holds for any measurable $\mathbb{N}$-valued function on any
-measure space; the stopping interpretation plays no role in the proof. It is stated in that
-generality in the formal development, so
-Corollary~\ref{cor:expstop} applies wherever a tail bound is available---including to the
-number of rounds a different scheme takes, or to any counting variable with geometric decay.
-Nothing about the adaptive setting is used.
+\subsection{Statistical Reporting}
 
-The reason the $\mathbb{N}$-valued case is stated separately rather than derived from the
-general layer-cake formula for non-negative functions is practical: the integer case has a
-countable sum rather than an integral over levels, and the countable form is what
-Corollary~\ref{cor:expstop} needs in order to sum a geometric series.
+There is no sampling and no floating point; the run takes about two seconds. The horizon $40$
+is short, and lengthening it can only find larger deficits, so the reported worst case is a
+lower bound on the worst case over longer horizons.
 
-\subsection{The concentration input is the standard one}
+\section{Results}
+\label{sec:results}
 
-Theorem~\ref{thm:subgauss} is the sub-Gaussian Chernoff bound evaluated at a threshold, and
-it transfers to any peeling scheme whose per-step budget is known. What does not transfer is
-the hypothesis: the parameter $c$ must be known, and an implementation estimating the
-variance from data does not have it. That is a genuine limitation rather than an artefact of
-the statement, and the open problem it raises is which concentration inequality survives an
-estimated variance at the peeling budget.
+\subsection{Reporting Protocol}
 
-\subsection{The impossibility is about integrality}
+All targets in range are counted; the ten worst are tabulated.
 
-Theorem~\ref{thm:quotafails} exhibits one rule failing, and
-Section~\ref{sec:reading} argues the mechanism is granularity rather than greed. That
-suggests the shape of a general statement: any rule serving whole samples, never revoking
-them, and balancing fractional entitlements much smaller than one will face the same
-arithmetic. Balinski and Young \cite{balinski1982} prove the corresponding statement for
-apportionment methods, and the translation is direct---arms are states, samples are seats,
-horizons are house sizes.
+\subsection{The Failure Is Common, Not Exceptional}
 
-What the present paper adds is the algorithmic instance with a horizon and a magnitude
-attached, which is what an analysis needs. What it does not add is a new impossibility: the
-general result is cited, not claimed.
+Of $5{,}070$ targets checked, $1{,}147$---$22.6\%$---drive the largest-deficit rule past the
+bound of one. The worst deficit found is $\tfrac32$, on $w=\frac{1}{30}(1,1,1,6,21)$, and the
+earliest violation occurs at $t=3$: on that target the greedy counts after three steps are
+$(1,0,0,1,1)$ and the fifth arm's deficit is $3\cdot\tfrac{21}{30}-1=\tfrac{11}{10}>1$.
+
+There is therefore no burn-in period during which the bound holds and after which it may fail.
+An analysis assuming the bound holds for $t$ beyond some threshold is not salvageable by making
+the threshold larger.
+
+\input{adaptive_search}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig1_quota.png}
+\caption{The deficit of the first arm under largest-deficit-first on
+$w=\frac{1}{23}(17,1,1,3,1)$. The per-horizon bound of one---achievable offline by
+Theorem~\ref{thm:exists}---is crossed at $t=11$ and exceeded thereafter.}
+\label{fig:quota}
+\end{figure}
+
+\subsection{Skewed Targets Are the Dangerous Ones}
+
+Every one of the ten worst targets has a dominant component above $\tfrac23$ and several
+components below $\tfrac{1}{10}$; near-uniform targets do not appear. This matters because
+optimal allocations in best-arm identification are typically skewed---budget concentrates on
+the arms that are hard to separate---so the regime in which the tracking assumption is least
+safe is the regime the algorithm actually operates in. An empirical check on near-uniform
+targets would find nothing and would be checking the wrong thing.
+
+\subsection{Reading the Witness}
+\label{sec:reading}
+
+The mechanism of the failure is visible in Table~\ref{tab:trace} and is not what one would
+guess. The target has one dominant arm and four small ones, so naively the dominant arm should
+be served almost every round and its deficit stay small. What happens instead is that each
+small arm accumulates deficit slowly until it briefly exceeds the dominant arm's, takes one
+sample, and resets---at $t=1,4,7,10$. Each of those is a round the dominant arm does not get,
+and its deficit grows by $\tfrac{17}{23}$ meanwhile. After four such interruptions the
+shortfall crosses one.
+
+The failure is therefore a property of integrality rather than of greed. The rule always serves
+an arm with maximal deficit, which is the locally correct action; the problem is that the unit
+of service is one whole sample while the entitlements being balanced are fractions much smaller
+than one. Any rule serving whole samples and never revoking them faces the same arithmetic,
+which is the content of the apportionment impossibility \cite{balinski1982}. It also explains
+the pattern in the search: the worst targets all have several very small components alongside
+one dominant one, exactly the configuration in which a small arm's occasional service is most
+expensive relative to its entitlement.
 
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{Why a refutation is worth a paper}
-
-Two of this paper's three contributions establish that standard things are true, and the
-third establishes that a convenient thing is false. The asymmetry in how they are usually
-valued is worth addressing directly.
-
-A refuted assumption is more useful than a confirmed one, because a confirmed assumption
-changes no downstream work while a refuted one invalidates every result derived from it. In
-this case the assumption is not merely unproved but false, and the failure is not
-conservative---an analysis assuming a unit deficit bound will understate how far the realised
-allocation can drift, and every sample-complexity bound derived from the intended
-proportions inherits that understatement in the wrong direction.
-
-The refutation also comes with a replacement, which is what makes it actionable rather than
-merely destructive. Theorem~\ref{thm:exists} says the target is achievable offline, so the
-problem is the online commitment rather than the arithmetic;
-Theorem~\ref{thm:freq} is stated with the constant free, so an analysis can substitute
-whatever its rule can prove; and Section~\ref{sec:discussion} sets out the three options an
-implementer has. A refutation without a replacement would leave the analysis with nothing;
-this one leaves it with a template and a warning about which constant to put in it.
-
-\subsection{The negative result is the useful one}
+\subsection{What the Results Establish}
 
 An analysis that assumes an online rule can hold the deficit below one is assuming something
-false, and the error is not conservative---it understates how far the realised allocation
-can drift from the intended one, and every downstream bound derived from the assumed
-proportions inherits the understatement.
+false, and the error is not conservative---it understates how far the realised allocation can
+drift, so every bound derived from the intended proportions inherits the understatement in the
+wrong direction.
 
 What an analysis may use instead is the per-horizon existence of Theorem~\ref{thm:exists}
 together with the transfer of Theorem~\ref{thm:freq}, applied to whatever bound the specific
-rule can actually prove. The existence statement is still worth having: it says the target
-is not unreachable in principle, so a rule failing to meet it is failing for reasons of
-online-ness rather than of arithmetic.
+rule can actually prove. The existence statement is still worth having: it says the target is
+not unreachable in principle, so a rule failing to meet it fails for reasons of online-ness
+rather than of arithmetic.
 
-\subsection{What C1 and C2 remove}
+Three replacements are available to an implementer, in increasing order of cost. Keep
+largest-deficit-first with a larger constant, which must exceed $\tfrac32$ on the searched
+family and is not bounded by anything proved here. Use a divisor method, which is
+house-monotone with a characterised violation \cite{balinski1982}, at the cost of no longer
+serving the largest deficit. Or recompute the allocation from scratch at each horizon using
+Theorem~\ref{thm:exists}, which achieves deficit at most one but is not house-monotone---an
+arm's count can fall as the horizon grows, which is meaningless once the samples are drawn.
+The three exhaust what the obstruction permits.
 
-The layer-cake step matters because high-probability correctness alone gives nothing: off
-the good event the scheme may never stop, so a tail bound is the only route to a finite
-expected time, and that route now runs through a theorem rather than a citation. The
-concentration step matters because the peeling argument allocates a specific budget per arm
-and per count, and an assumed inequality at that budget is exactly the kind of input that
-looks harmless and is load-bearing.
+\subsection{Shortcomings and Limitations}
 
-Together they leave the stopping analysis with one probabilistic hypothesis---the geometric
-tail---supplied by the algorithm's own argument, rather than three.
+\emph{One rule, not all rules.} Theorem~\ref{thm:quotafails} refutes the bound $1$ for
+\emph{this} rule. It does not prove that no online monotone rule achieves any constant bound,
+and the constant for a divisor method is not computed here.
 
-\subsection{What a practitioner should do instead}
+\emph{The rule-to-counts link is not machine-checked.} As Section~\ref{sec:gap} states, the
+arithmetic of the violation is proved and the identification of $N$ as the greedy trajectory
+rests on an exact recomputation reported here.
 
-The negative result leaves an implementer needing a replacement, and three options are
-available, in increasing order of cost.
+\emph{The search covers a finite family.} Rational targets on three to five arms with
+denominators to $30$, run to horizon $40$. Nothing here bounds the worst deficit over all
+targets, arm counts and horizons, and such a bound---an impossibility with a matching
+constant---is the natural companion this paper does not supply.
 
-\emph{Use a larger constant.} Theorem~\ref{thm:freq} is stated with $c$ free precisely so
-that a rule's own provable bound can be substituted. If largest-deficit-first is kept, the
-constant must exceed $\frac{3}{2}$ on the searched family and is not bounded by anything
-proved here; an implementation should either compute it for its own target distribution or
-treat it as unknown and avoid analyses that depend on it.
+\emph{A known sub-Gaussian parameter is assumed.} With an estimated variance the hypothesis of
+Theorem~\ref{thm:subgauss} is not automatic, and which concentration inequality suffices at the
+peeling budget in that case is not settled.
 
-\emph{Use a divisor method.} These are house-monotone and violate quota by a known,
-characterised amount \cite{balinski1982}, so a constant is available from that literature
-even though it is not computed here. The cost is that the rule no longer serves the largest
-deficit and the connection to the intended proportions becomes less direct.
+\emph{The geometric tail is an input.} Corollary~\ref{cor:expstop} converts it; establishing it
+belongs to the algorithm's own analysis.
 
-\emph{Recompute the allocation from scratch at each horizon.} Theorem~\ref{thm:exists}'s
-construction achieves deficit at most one at every horizon and is cheap to evaluate. What it
-is not is house-monotone: an arm's count can \emph{fall} as the horizon grows, which is
-meaningless if the samples have already been drawn. This option is therefore available only
-in a planning setting where the whole allocation is chosen before sampling begins---which is
-exactly the setting in which the tracking question does not arise.
+\subsection{Open Problems}
 
-The three options exhaust what the obstruction permits, and the exhaustion is the practical
-content of C4: an adaptive scheme that draws samples one at a time cannot have both
-monotonicity and a unit deficit bound, so one of them must be given up explicitly rather
-than assumed away.
+Computing the smallest constant achievable online, for a specific rule, would turn
+Theorem~\ref{thm:freq} from a template into a bound. Whether $\tfrac32$ is the worst case over
+all targets rather than over the searched family is second. Third, the sub-Gaussian hypothesis
+with an estimated variance---the setting an implementation actually faces---requires a
+different concentration input.
 
-\subsection{What is not established}
+\subsection{Why a Refutation Is Worth Reporting}
 
-\begin{enumerate}
-\item \textbf{One rule, not all rules.} Theorem~\ref{thm:quotafails} refutes the bound $1$
-for \emph{this} rule. It does not prove that no online monotone rule achieves any constant
-bound, and a divisor method achieves house monotonicity with a different, larger constant
-that is not computed here.
+Two of this paper's three contributions establish that standard things are true, and the third
+establishes that a convenient thing is false. The asymmetry in how they are usually valued is
+worth addressing. A refuted assumption is more useful than a confirmed one, because a confirmed
+assumption changes no downstream work while a refuted one invalidates results derived from it.
+The refutation also comes with a replacement, which is what makes it actionable rather than
+merely destructive: the existence theorem says the problem is the online commitment rather than
+the arithmetic, and the transfer is stated with the constant free so that an analysis can
+substitute what its rule can prove.
 
-\item \textbf{Minimality within a search.} The search producing the witness covered rational
-targets with small denominators on three to five arms, and minimality is claimed only within
-it.
-
-\item \textbf{A known sub-Gaussian parameter.} Theorem~\ref{thm:subgauss} assumes the
-deviation is sub-Gaussian with a \emph{known} parameter; with an estimated variance that
-hypothesis is not automatic.
-
-\item \textbf{The geometric tail is an input.} Corollary~\ref{cor:expstop} converts a
-geometric tail into an expectation bound. Establishing the tail is the algorithm's own
-analysis and is not done here.
-\end{enumerate}
-
-\subsection{Reproducing the search}
-
-Table~\ref{tab:search} enumerates every way of writing $1$ as a sum of $K$ positive rationals
-with a common denominator $d$, for $K\in\{3,4,5\}$ and $K\le d\le30$, up to the ordering of
-the arms. For each, the largest-deficit rule is run to horizon $40$ in exact rational
-arithmetic and the maximum deficit and first violation recorded. There is no sampling and no
-floating point; the run takes about two seconds.
-
-Two choices in that design are worth naming. The horizon $40$ is short, and lengthening it
-can only find larger deficits, so the reported worst case is a lower bound on the worst case
-over longer horizons. And targets are enumerated up to arm ordering, since the rule is
-equivariant under permuting arms---serving the largest deficit does not depend on the
-labels---so the $5{,}070$ targets checked cover every distinct instance in the family.
-
-\subsection{Relation to the rest of the analysis}
-
-It is worth closing with what this paper does \emph{not} disturb. The fixed-confidence
-framework's correctness guarantee is unaffected: Theorem~\ref{thm:subgauss} supplies the
-concentration input the confidence event needs, and supplying it strengthens the argument
-rather than changing its conclusion. The expected-stopping-time bound is likewise unaffected
-in form; Corollary~\ref{cor:expstop} makes its derivation self-contained.
-
-What is disturbed is the sample-complexity constant, and only through the tracking step. An
-analysis that assumed $|D_{i}(t)|\le1$ and propagated it through
-Theorem~\ref{thm:freq} obtained an empirical-allocation error of $1/t$; the correct
-statement carries whatever constant the rule can prove, which on the searched family exceeds
-$\frac{3}{2}$. The resulting bound is a constant factor worse in the term the tracking
-controls, not asymptotically different.
-
-That is a modest correction and it is worth having for a reason beyond its size: an analysis
-whose inputs are all proved can be extended, reused and audited, and one carrying a false
-input cannot be trusted anywhere the input is load-bearing. Finding that the correction is
-small is a conclusion, not a premise, and it was available only after the refutation.
-
-\subsection{Open problems}
-
-The obvious next question is the constant. Balinski and Young's divisor methods are
-house-monotone, so some constant $c>1$ is achievable online; computing the smallest such $c$
-for a specific rule would turn Theorem~\ref{thm:freq} from a template into a bound. Second,
-whether $\frac{31}{23}$ is the worst case over all targets, rather than over the searched
-family, is open. Third, the sub-Gaussian hypothesis with an estimated variance---the setting
-an implementation actually faces---requires a different concentration input, and which one
-suffices at the peeling budget is not settled here.
+The correction is modest in size. An analysis assuming $|D_{i}(t)|\le1$ obtained an
+empirical-allocation error of $1/t$; the correct statement carries whatever constant the rule
+can prove, which on the searched family exceeds $\tfrac32$. The resulting bound is a constant
+factor worse in the term the tracking controls, not asymptotically different. Finding that the
+correction is small is a conclusion, not a premise, and it was available only after the
+refutation.
 
 \section{Conclusion}
 
-The two probabilistic inputs of the stopping analysis are now theorems: the layer-cake
-identity is proved, so a geometric tail bounds the expected stopping time, and the per-arm
-concentration inequality is discharged from a sub-Gaussian hypothesis. The tracking question
-is settled, and the answer is negative: an allocation with deficit at most one exists at
-every horizon, but the natural online monotone rule cannot achieve it, by an exact witness
-whose violation arithmetic is machine-checked and whose trajectory is reproduced by exact
-computation.
-
-The broader lesson concerns which parts of an analysis deserve scrutiny. Of the three inputs
-closed here, two---the layer-cake identity and the sub-Gaussian threshold---were true and
-merely uncited, so closing them changed nothing except the development's self-sufficiency.
-The third was false in the form it was wanted, and no amount of care in the other two would
-have revealed that. An input carried as an assumption is not automatically a small risk, and
-the only way to find out which kind one has is to try to prove it.
-
-\input{adaptive_appendix}
+The two probabilistic inputs of the stopping analysis are now theorems: the layer-cake identity
+is proved, so a geometric tail bounds the expected stopping time, and the per-arm concentration
+inequality is discharged from a sub-Gaussian hypothesis. The tracking question is settled and
+the answer is negative: an allocation with deficit at most one exists at every horizon, but the
+natural online monotone rule cannot achieve it, and the failure occurs on nearly a quarter of
+the targets searched, as early as the third sample, and most severely on exactly the skewed
+targets that best-arm identification produces. The broader lesson concerns which parts of an
+analysis deserve scrutiny. Of the three inputs closed here, two were true and merely uncited,
+so closing them changed nothing except the development's self-sufficiency. The third was false
+in the form it was wanted, and no amount of care in the other two would have revealed that.
 
 \section*{Acknowledgment}
 
@@ -1020,28 +626,28 @@ The formal development uses the Lean~4 theorem prover and the mathlib library.
 \bibitem{garivier2016} A. Garivier and E. Kaufmann, ``Optimal best arm identification with
 fixed confidence,'' in \emph{Proc. 29th Annu. Conf. Learning Theory (COLT)}, 2016.
 
-\bibitem{balinski1982} M. L. Balinski and H. P. Young, \emph{Fair Representation: Meeting
-the Ideal of One Man, One Vote}. New Haven, CT: Yale Univ. Press, 1982.
+\bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
+best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.},
+vol.~17, pp.~1--42, 2016.
+
+\bibitem{balinski1982} M. L. Balinski and H. P. Young, \emph{Fair Representation: Meeting the
+Ideal of One Man, One Vote}. New Haven, CT: Yale Univ. Press, 1982.
 
 \bibitem{boucheron2013} S. Boucheron, G. Lugosi, and P. Massart, \emph{Concentration
-Inequalities: A Nonasymptotic Theory of Independence}. Oxford, U.K.: Oxford Univ. Press,
-2013.
+Inequalities: A Nonasymptotic Theory of Independence}. Oxford, U.K.: Oxford Univ. Press, 2013.
+
+\bibitem{durrett2019} R. Durrett, \emph{Probability: Theory and Examples}, 5th ed. Cambridge,
+U.K.: Cambridge Univ. Press, 2019.
 
 \bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
 \emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
 pp.~367--381.
 
-\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
-programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
-pp.~625--635.
-
-\bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
-best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.},
-vol.~17, pp.~1--42, 2016.
-
-\bibitem{durrett2019} R. Durrett, \emph{Probability: Theory and Examples}, 5th ed.
-Cambridge, U.K.: Cambridge Univ. Press, 2019.
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and programming
+language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021, pp.~625--635.
 
 \end{thebibliography}
+
+\input{adaptive_appendix}
 
 \end{document}
