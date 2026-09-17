@@ -31,8 +31,13 @@ construction that for every target and every horizon there \emph{exists} an inte
 spending exactly the horizon with per-arm deficit at most one. And we show that the natural
 online rule---serve the arm of largest deficit, which is house-monotone by construction---does
 \emph{not} achieve it, on an exact five-arm witness reaching deficit $\tfrac{26}{23}$ at
-horizon eleven. An exhaustive search over $5{,}070$ rational targets finds $1{,}147$ that
-violate the bound, the worst reaching $\tfrac32$ and the earliest at $t=3$.
+horizon eleven. An exhaustive search over $1{,}228{,}079$ rational targets finds
+$375{,}239$ that violate the bound, the worst reaching $\tfrac74$ and the earliest at $t=3$.
+Seven online rules are then compared, four of them classical apportionment divisor methods,
+and the comparison corrects a claim this paper previously made: Jefferson's rule violates the
+deficit bound on none of the targets, so the failure is not common to every rule. What no
+rule escapes is both bounds at once---the deficit and the surplus---so the failure can be
+moved between the two directions but not removed.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -698,14 +703,46 @@ All targets in range are counted; the ten worst are tabulated.
 
 \subsection{The Failure Is Common, Not Exceptional}
 
-Of $5{,}070$ targets checked, $1{,}147$---$22.6\%$---drive the largest-deficit rule past the
-bound of one. The worst deficit found is $\tfrac32$, on $w=\frac{1}{30}(1,1,1,6,21)$, and the
-earliest violation occurs at $t=3$: on that target the greedy counts after three steps are
-$(1,0,0,1,1)$ and the fifth arm's deficit is $3\cdot\tfrac{21}{30}-1=\tfrac{11}{10}>1$.
+Of $1{,}228{,}079$ targets checked, $375{,}239$---$30.6\%$---drive the largest-deficit rule
+past the bound of one. The worst deficit found is $\tfrac74$, at eight arms on
+$w=\frac{1}{60}(1,1,1,1,1,5,5,45)$, and the earliest violation occurs at $t=3$: after three
+steps the greedy counts leave the dominant arm one whole sample behind an entitlement it has
+already accrued three times over.
 
-There is therefore no burn-in period during which the bound holds and after which it may fail.
-An analysis assuming the bound holds for $t$ beyond some threshold is not salvageable by making
-the threshold larger.
+Two things about that rate are worth separating. It is not driven by one corner of the grid:
+the violating fraction is between $26\%$ and $33\%$ at every arm count from three to eight,
+peaking at four arms and declining only slowly thereafter, so more arms neither rescue the
+bound nor are needed to break it. And the severity does grow with the arm count even where the
+rate does not---the number of targets whose deficit exceeds $\tfrac32$ rises from none at three
+arms to $510$ at eight. \NUM{}
+
+There is also no burn-in period during which the bound holds and after which it may fail. The
+earliest violation is at $t=3$ at \emph{every} arm count, and a fifth of all violations have
+occurred by $t=10$. An analysis assuming the bound holds for $t$ beyond some threshold is not
+salvageable by making the threshold larger.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig5_onset.png}
+\caption{The failure across arm counts. Bars are the fraction of targets on which the
+largest-deficit rule exceeds the quota bound, and the line is the worst deficit reached. The
+fraction is flat to within a few points from three arms to eight---the failure is not a
+small-$K$ artefact and not a large-$K$ one---while the worst case climbs steadily, so adding
+arms changes how badly the bound fails rather than whether it does. Exhaustive over rational
+targets with denominator up to $64$, in exact arithmetic. \NUM{}}
+\label{fig:onset}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig3_search.png}
+\caption{How far past the bound the violations go. The census of all $375{,}239$ violating
+targets by the worst deficit each reaches; the vertical line is the bound of one. The mass
+sits just above it, which is what makes the refutation easy to miss by sampling---most
+violations are narrow---but the tail runs to $\tfrac74$, so a bound of one is not merely tight
+but wrong by three quarters of a whole sample in the worst case found. \NUM{}}
+\label{fig:search}
+\end{figure}
 
 \input{adaptive_search}
 

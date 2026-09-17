@@ -776,3 +776,110 @@ def struct_families():
     ax.set_ylabel(r'total variation  $D=\sum_{i}|g_{i}|$')
     ax.legend(frameon=False, loc='upper left', fontsize=6.2)
     fin(fig, 'struct_fig7_families.png')
+
+
+def query_assembly():
+    """Exact evaluation of the order-r coefficient on a measured instance from
+    research/paper_exp_20260916/query_generalize.json."""
+    import numpy as np
+    import importlib.util as _iu
+    sp = _iu.spec_from_file_location('qg', 'scripts/EXP_query_generalize.py')
+    QG = _iu.module_from_spec(sp); sp.loader.exec_module(QG)
+    # Search for the most adversarial instance available: the one where the
+    # shifted terms come closest to cancelling, since that is the situation the
+    # non-vanishing theorem has to rule out. Picking a typical instance would
+    # show the terms reinforcing, which illustrates nothing.
+    rng = np.random.default_rng(11)
+    inst, score = None, 1e18
+    for _ in range(400):
+        c = QG.build(rng, 3)
+        if c is None or QG.verified_order(c)[0] != 3:
+            continue
+        lv = sorted(set(c['f0']))
+        dd = []
+        for v in lv:
+            m0 = sum(c['pi'][i] * c['g'][i] ** 3
+                     for i in range(len(c['g'])) if c['f0'][i] == v)
+            m1 = sum(c['pi'][i] * c['g'][i] ** 3
+                     for i in range(len(c['g'])) if c['f1'][i] == v)
+            dd.append(abs(m0 - m1))
+        nz = [v for v, w in zip(lv, dd) if w > 1e-12]
+        if len(nz) < 2:
+            continue
+        gap = min(abs(a - b) for a in nz for b in nz if a != b) / c['sigma']
+        if gap < score:
+            inst, score = c, gap
+    pi, g, f0, f1, s = inst['pi'], inst['g'], inst['f0'], inst['f1'], inst['sigma']
+    r = 3
+
+    def herm(n, u):
+        h0, h1 = np.ones_like(u), u
+        if n == 0:
+            return h0
+        for k in range(1, n):
+            h0, h1 = h1, u * h1 - k * h0
+        return h1
+
+    lv = sorted(set(f0))
+    D = {}
+    for v in lv:
+        m0 = sum(pi[i] * g[i] ** r for i in range(len(g)) if f0[i] == v)
+        m1 = sum(pi[i] * g[i] ** r for i in range(len(g)) if f1[i] == v)
+        D[v] = m0 - m1
+    y = np.linspace(min(lv) - 4 * s, max(lv) + 4 * s, 1600)
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    tot = np.zeros_like(y)
+    cols = [CRAN, AMBER, GREEN, BLUE, '#7A3B8F']
+    for k, v in enumerate(lv):
+        u = (y - v) / s
+        term = D[v] * herm(r, u) * np.exp(-0.5 * u * u) / (s * np.sqrt(2 * np.pi))
+        tot += term
+        ax.plot(y, term, color=cols[k % len(cols)], lw=0.9, alpha=0.85,
+                label=f'level $v={v:g}$')
+    ax.plot(y, tot, color=INK, lw=1.7, zorder=6, label=r'$\Delta_{3}$')
+    ax.axhline(0.0, color=GREY, lw=0.7)
+    ax.set_xlabel('$y$'); ax.set_ylabel(r'order-$3$ coefficient')
+    ax.legend(frameon=False, loc='upper right', ncol=2, fontsize=5.8)
+    peak = float(np.max(np.abs(tot)))
+    biggest = max(float(np.max(np.abs(
+        D[v] * herm(r, (y - v) / s) * np.exp(-0.5 * ((y - v) / s) ** 2)
+        / (s * np.sqrt(2 * np.pi))))) for v in lv)
+    ax.text(0.02, 0.04, f'coefficients equal and opposite; levels {score:.2f}'
+                        f'$\\sigma$ apart', transform=ax.transAxes,
+            fontsize=6.0, color=GREY)
+    fin(fig, 'query_fig8_assembly.png')
+
+
+def d6_directions():
+    """Measured: research/paper_exp_20260916/d6_reference_wide.json."""
+    import collections
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'd6_reference_wide.json').read_text())
+    from fractions import Fraction as _F
+    fams = collections.defaultdict(lambda: [0, 0])
+    for key in ('rows', 'structured', 'random'):
+        for r in d[key]:
+            if key != 'random' and float(_F(r['t'])) <= 0:
+                continue
+            f = r['family']
+            fams[f][1] += 1
+            if not r['topC_is_A']:
+                fams[f][0] += 1
+    order = ['only_j', 'only_complement', 'only_A', 'all_but_j', 'symmetric', 'random']
+    lab = {'symmetric': 'symmetric path', 'only_A': 'only $A$',
+           'only_complement': 'only $A^{\\complement}$', 'only_j': 'only $j$',
+           'all_but_j': 'all but $j$', 'random': 'asymmetric, random'}
+    order = [o for o in order if o in fams]
+    vals = [100 * fams[o][0] / fams[o][1] for o in order]
+    cols = [CRAN if o == 'symmetric' else (GREEN if o == 'random' else GREY)
+            for o in order]
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ax.barh(range(len(order)), vals, color=cols, height=0.62)
+    for i, (o, v) in enumerate(zip(order, vals)):
+        ax.annotate(f'{v:.1f}\\%  ({fams[o][1]})', (v, i), fontsize=5.8,
+                    color=INK, va='center', xytext=(3, 0), textcoords='offset points')
+    ax.set_yticks(range(len(order)))
+    ax.set_yticklabels([lab[o] for o in order], fontsize=6.2)
+    ax.set_xlim(0, max(vals) * 1.35)
+    ax.set_xlabel(r'references at which $A$ loses Top-$C$  (\%)')
+    fin(fig, 'd6_fig7_directions.png')

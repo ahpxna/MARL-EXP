@@ -46,14 +46,24 @@ MASTER_SEED = 31337
 
 
 def compositions(total, parts):
-    """Every way of writing `total` as `parts` positive integers, up to order."""
-    out = []
-    for c in combinations(range(1, total), parts - 1):
-        cuts = (0,) + c + (total,)
-        p = tuple(cuts[i + 1] - cuts[i] for i in range(parts))
-        if all(p[i] <= p[i + 1] for i in range(parts - 1)):
-            out.append(p)
-    return out
+    """Every way of writing `total` as `parts` positive integers, up to order.
+
+    Generated directly as non-decreasing tuples. The obvious implementation
+    walks all C(total-1, parts-1) ordered compositions and keeps the sorted
+    ones, which for this sweep means enumerating 442 million tuples to keep
+    478 thousand -- a factor of 924 thrown away, and the reason the sweep used
+    to take hours rather than minutes.
+    """
+    def gen(remaining, k, least):
+        if k == 1:
+            if remaining >= least:
+                yield (remaining,)
+            return
+        top = remaining // k
+        for first in range(least, top + 1):
+            for rest in gen(remaining - first, k - 1, first):
+                yield (first,) + rest
+    return list(gen(total, parts, 1))
 
 
 def pick(rule, w, N, t, rng):
