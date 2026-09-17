@@ -1610,6 +1610,54 @@ rather than being spread uniformly over it. \NUM{}}
 \label{fig:proxy}
 \end{figure}
 
+\subsection{A Search for a Duality Gap}
+\label{sec:e3results}
+
+Theorem~\ref{thm:kkt} is deliberately arranged as sufficiency and deliberately assumes only
+semidefiniteness, because an allocator that has learned something loses rank and a certificate
+needing $M^{-1}$ fails exactly then. The price of that arrangement is that strong duality is
+left open, and it is left open for a reason: the textbook statements are usually quoted under
+definiteness or a Slater condition, neither of which is available here.
+
+The question has a sharp refutable form---one instance with a gap settles it---so
+Experiment~E3 is run as a search for a counterexample over three families of increasing
+awkwardness: $M$ definite, where duality is classical and which therefore serves as the
+self-check; $M$ singular; and $M$ singular with its null space deliberately aligned to the
+constraint normals, which is the only structural route by which a semidefinite programme can
+lose its dual. Over $1{,}054$ solved instances the largest relative gap found is
+$1.5\times10^{-11}$ on the definite family, $2.0\times10^{-13}$ on the singular one and
+$1.7\times10^{-14}$ on the aligned one---machine precision in every case, and smallest
+precisely on the family built to break it. No instance survived re-solution with a gap.
+\NUM{}
+
+That is evidence and not a proof, and the asymmetry is worth stating plainly: a single
+counterexample would have settled the question, and a thousand instances without one settles
+nothing. What the search does establish is narrower and still useful---the mechanism one would
+suspect does not produce a gap, so an attempt at the theorem need not work around it.
+
+Two false alarms along the way are worth recording, because both would have been reported as
+findings by a less suspicious run. The first was a sign error in the dual objective, caught by
+the definite family's self-check, which returned a relative gap of $7\times10^{9}$ rather than
+zero. The second was subtler and nearly survived: $\lambda=0$ is always feasible, so the
+optimum is frequently zero, and a gap normalised by $|J_{\mathrm{full}}|$ turns a difference of
+$10^{-15}$ into an apparent gap of $10^{-2}$. Three instances were flagged that way; the flag
+disappeared when the gap was measured against the scale the problem supplies---the objective at
+the feasible point $\lambda=0$---rather than against a vanishing optimum. A gap contradicting
+classical convex duality is a reason to suspect the measurement first, and here the suspicion
+was right twice.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig7_duality.png}
+\caption{The search for a duality gap on the pair-region programme. Distribution of the
+relative gap over three families; the dashed line is the threshold above which an instance is
+re-solved from many starts on both sides and re-checked. Nothing reaches it. The family built
+to be adversarial---$M$ singular with its null space aligned to the constraint normals---has
+the \emph{smallest} gaps of the three, which is the opposite of what a real obstruction would
+look like. \NUM{}}
+\label{fig:duality}
+\end{figure}
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1661,7 +1709,9 @@ distribution attached, so a sweep would report a property of the generator.
 Assembling the full oracle equality is first, and it requires the separability statement named
 above rather than more optimisation. Building an allocator on the exact oracle and comparing
 it against $\mathrm{C\_lucb}$ on the same panel is second. Whether strong duality holds for
-the pair-region programme is third. Finally, the families are two-relation and three-action;
+the pair-region programme is third; Section~\ref{sec:e3results} searched $1{,}054$ instances
+for a gap, including a family built to produce one, and found none above machine precision,
+which locates the question without answering it. Finally, the families are two-relation and three-action;
 whether the failure ratios can be driven to their limits with fewer actions, or must worsen
 with more relations, is not known.
 

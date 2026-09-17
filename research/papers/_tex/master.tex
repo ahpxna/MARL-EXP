@@ -1353,6 +1353,54 @@ than on average. \NUM{}}
 \label{fig:misspec}
 \end{figure}
 
+\subsection{Groups That Are Not Alike}
+\label{sec:e4results}
+
+Section~\ref{sec:opens} names the heterogeneous law as the first thing to settle, and observes
+that the per-group argument survives unchanged while the summation step does not. Writing
+$s_{g}^{2}=(\sqrt{v_{g}m_{g}}+\sqrt{\nu_{g}\kappa_{g}})^{2}$ for group $g$'s price of one unit
+of profiled information, the natural candidate replaces $K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the
+\emph{sum} $\sum_{g}s_{g}^{2}$ rather than by any average. Experiment~E4 puts that candidate
+in front of two tests it could fail separately, on instances whose groups differ by a median
+factor of $3.9$ and up to $24.5$ in price.
+
+\emph{As a bound.} An independent optimiser, given the budget and the per-group information
+constraint but not the closed form, was run on $250$ instances. It beat the candidate on
+none of them; the best it found was a median of $99.97\%$ and never above $100\%$ of the
+claimed value. A single instance above would have refuted the candidate outright, so this is
+the test that could have ended the question and did not. \NUM{}
+
+\emph{As a predictor.} A bound can be correct and still be a poor description of what an
+estimator does. Over $601$ cells the realised error of the plug-in profiled test departs from
+the finite-count prediction by $0.0043$ in root-mean-square, and from
+$\Phi(-\sqrt{K\Gamma^{*}_{\mathrm{het}}B})$ by $0.0062$---the same $0.006$ the homogeneous
+experiment measured in Section~\ref{sec:e2results}. Heterogeneity costs the prediction
+nothing. Figure~\ref{fig:hetero} shows the collapse with the price spread as colour: the
+points do not separate by spread, which is the specific thing that would have shown the sum
+to be the wrong combination. \NUM{}
+
+The factor $K$ in that exponent is worth one sentence, because getting it wrong is invisible
+to the bound test. Every group delivers the same $h$ and the information \emph{adds}, so the
+total is $K$ times the per-group amount; a first version of this experiment normalised without
+it and produced a bound test that passed while the prediction missed by $0.12$. Only having
+both tests separated the two failures.
+
+None of this proves the heterogeneous law. It says the candidate survived the test designed to
+kill it, and predicts a realised error as well as the proved homogeneous law does---which is
+the most an experiment can contribute to a question that wants a proof.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig11_hetero.png}
+\caption{The conjectured heterogeneous law against a realised error rate. Each point is one
+instance at one budget, coloured by how far apart its groups' prices are; the curve is
+$\Phi(-\sqrt{\lambda})$ with $\lambda=K\Gamma^{*}_{\mathrm{het}}B$ and no fitted constant.
+Instances whose groups differ by a factor of twenty-four lie on the same curve as instances
+whose groups are nearly alike---the colour does not stratify the scatter---which is what
+would have failed if the sum over groups were the wrong combination. \NUM{}}
+\label{fig:hetero}
+\end{figure}
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1393,10 +1441,15 @@ baseline gap; they do not probe robustness to model misspecification, and nothin
 what happens when the additive-offset assumption fails.
 
 \subsection{Open Problems}
+\label{sec:opens}
 
 The heterogeneous law is the obvious next step: replacing
 $K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the corresponding weighted quantity and determining
-whether it remains exactly attainable. The per-group argument of
+whether it remains exactly attainable. Section~\ref{sec:e4results} narrows the target---the
+quantity is the \emph{sum} $\sum_{g}s_{g}^{2}$ and not an average, it was not beaten by an
+independent optimiser on any of $250$ instances, and it predicts a realised error as well as
+the proved homogeneous law---but narrowing a target is not hitting it, and the attainability
+statement is still open. The per-group argument of
 Section~\ref{sec:groupcost} survives unchanged, since Theorem~\ref{thm:grouplower} never
 uses homogeneity; what changes is the summation step, where the budget is shared between
 groups at different prices.

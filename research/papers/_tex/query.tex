@@ -1494,6 +1494,48 @@ chosen for being inconvenient. \NUM{}}
 \label{fig:highorder}
 \end{figure}
 
+\subsection{How Near to Vanishing the Coefficient Gets}
+\label{sec:e4results}
+
+Section~\ref{sec:limits} calls the tied top level the most likely place for
+Theorem~\ref{thm:nonvanish} to fail in practice, and the proof shows why: the factorisation
+that separates the terms needs the gap $v^{*}-v$ to be strictly positive, and at a tie the
+argument returns $0=0$. What the proof cannot say is whether the \emph{conclusion} survives.
+That has a measurable form. Experiment~E4 drives the top-level gap from $2\sigma$ down to
+$10^{-3}\sigma$ by construction and measures $\|\Delta_{r}\|$ against the single largest term
+it is assembled from. Two findings, and they point in opposite directions.
+
+\emph{The hypothesis is essential.} The ratio falls, and it falls at slope $1.000$, $1.000$
+and $1.000$ at orders one, two and three on a log-log axis---linearly in the gap, over three
+decades, with no departure at either end. So the strict-largest hypothesis is not an artefact
+of the proof technique that a cleverer argument could remove: the quantity the theorem is
+about really does go to zero as the gap closes, and any statement covering the tied case would
+have to say something different rather than something stronger.
+
+\emph{Nothing pathological happens on the way.} Across all $2{,}160$ cells, not one had
+$\Delta_{r}$ vanish. The approach to zero is smooth and it is exactly first order, which is
+what the construction predicts and what Figure~\ref{fig:tiedtop} shows: the two contributing
+levels carry equal and opposite coefficients, so at separation $\delta$ they differ to first
+order by $\delta$ times the derivative of a single term. There is no gap, no threshold and no
+oscillation---the tie is a limit point, not a boundary. \NUM{}
+
+For anyone attempting the tied case, that is the useful part. The difficulty is not that
+$\Delta_{r}$ might vanish at some positive gap and has to be excluded; it is that the quantity
+being bounded below degenerates continuously, so a bound covering the tie must carry the gap
+explicitly rather than be uniform in it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig9_tiedtop.png}
+\caption{The assembled order-$r$ coefficient as the top-level gap closes, relative to the
+largest single term it is built from. Medians over sixty instances per point, at three
+orders, with the gap set by construction rather than by chance. All three fall at slope one
+over three decades---linearly in the gap---so the strict-largest hypothesis of
+Theorem~\ref{thm:nonvanish} is essential, and the degeneration is smooth: no cell in the
+sweep reached zero at any positive gap. \NUM{}}
+\label{fig:tiedtop}
+\end{figure}
+
 \section{Discussion}
 \label{sec:discussion}
 
@@ -1508,11 +1550,15 @@ constant in front of the rate is real, so the comparison is between two genuine 
 terms.
 
 \subsection{Shortcomings and Limitations}
+\label{sec:limits}
 
 \emph{Ties at the top are not covered.} Theorem~\ref{thm:nonvanish} needs the largest level
 carrying a non-zero coefficient to be strictly largest. When two levels tie, the exponential
 factors no longer separate and the argument gives $0=0$. Whether non-vanishing survives a tie
 is open, and this is the most likely place for the result to fail in practice.
+Section~\ref{sec:e4results} measures the approach: the coefficient degenerates linearly in the
+gap and never vanishes at a positive one, so the hypothesis is essential and cannot simply be
+dropped, but nothing discontinuous happens at the tie either.
 
 \emph{The window does not close.} The ends of \eqref{eq:regret} separate as $N$ grows, so the
 result localises regret without determining it. On the order-$2$ row the two ends differ by

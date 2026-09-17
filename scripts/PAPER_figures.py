@@ -883,3 +883,77 @@ def d6_directions():
     ax.set_xlim(0, max(vals) * 1.35)
     ax.set_xlabel(r'references at which $A$ loses Top-$C$  (\%)')
     fin(fig, 'd6_fig7_directions.png')
+
+
+def master_hetero():
+    """Measured: research/paper_exp_20260916/master_hetero.json."""
+    import numpy as np
+    from math import sqrt, erfc
+    d = json.loads(Path('research/paper_exp_20260916/master_hetero.json').read_text())
+    rows = d['rows']
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    sp = np.array([r['price_spread'] for r in rows])
+    xs = np.array([r['lam'] for r in rows]); ys = np.array([r['error'] for r in rows])
+    lo, hi = sp.min(), sp.max()
+    sc = ax.scatter(xs, ys, c=sp, s=7, cmap='copper_r', norm=matplotlib.colors.LogNorm(lo, hi),
+                    linewidths=0, zorder=3)
+    grid = [xs.min() * (xs.max() / xs.min()) ** (i / 120) for i in range(121)]
+    ax.plot(grid, [0.5 * erfc(sqrt(g) / sqrt(2)) for g in grid], color=CRAN, lw=1.6,
+            zorder=5, label=r'$\Phi(-\sqrt{\lambda})$')
+    cb = fig.colorbar(sc, ax=ax, pad=0.02)
+    cb.set_label('price spread within an instance', fontsize=6.2)
+    cb.ax.tick_params(labelsize=6.0)
+    ax.set_xscale('log'); ax.set_yscale('log')
+    ax.set_xlabel(r'$\lambda=K\,\Gamma^{*}_{\mathrm{het}}B$')
+    ax.set_ylabel('realised error')
+    ax.legend(frameon=False, loc='lower left', fontsize=6.4)
+    fin(fig, 'master_fig11_hetero.png')
+
+
+def query_tiedtop():
+    """Measured: research/paper_exp_20260916/query_tiedtop.json."""
+    import numpy as np
+    d = json.loads(Path('research/paper_exp_20260916/query_tiedtop.json').read_text())
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    cols = {1: CRAN, 2: AMBER, 3: GREEN}
+    for o in d['orders']:
+        gs = sorted(d['gaps'])
+        med = [d['summary'][f'{o}|{g}']['median'] for g in gs]
+        ax.plot(gs, med, 'o-', ms=3.0, color=cols[o], lw=1.2, label=f'order $r={o}$')
+    ref = [g for g in sorted(d['gaps'])]
+    ax.plot(ref, [1.6 * g for g in ref], ':', color=GREY, lw=1.1,
+            label=r'slope $1$')
+    ax.set_xscale('log'); ax.set_yscale('log')
+    ax.set_xlabel(r'top-level gap  $(v^{*}-v)/\sigma$')
+    ax.set_ylabel(r'$\|\Delta_{r}\|$ / largest single term')
+    ax.legend(frameon=False, loc='upper left', fontsize=6.2)
+    ax.text(0.97, 0.06, 'no cell reached zero', transform=ax.transAxes,
+            ha='right', fontsize=6.2, color=GREY)
+    fin(fig, 'query_fig9_tiedtop.png')
+
+
+def functional_duality():
+    """Measured: research/paper_exp_20260916/functional_duality.json."""
+    import numpy as np
+    d = json.loads(Path('research/paper_exp_20260916/functional_duality.json').read_text())
+    fams = d['families']
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    cols = {'full': GREY, 'singular': AMBER, 'aligned': CRAN}
+    lab = {'full': 'definite (classical)', 'singular': 'singular',
+           'aligned': 'null space aligned'}
+    bins = np.logspace(-18, -9, 40)
+    for f in fams:
+        v = [abs(r['relative_gap']) for r in d['rows']
+             if r['family'] == f and r['solved']]
+        v = [max(x, 1e-18) for x in v]
+        ax.hist(v, bins=bins, histtype='step', lw=1.3, color=cols[f],
+                label=f'{lab[f]} ({len(v)})')
+    ax.axvline(d['flag_threshold'], color=INK, lw=1.0, ls='--')
+    ax.annotate('flagged above here', xy=(d['flag_threshold'], 1), fontsize=6.0,
+                color=INK, xytext=(-4, 0), textcoords='offset points',
+                ha='right', rotation=90)
+    ax.set_xscale('log')
+    ax.set_xlabel('relative duality gap')
+    ax.set_ylabel('instances')
+    ax.legend(frameon=False, loc='upper left', fontsize=6.0)
+    fin(fig, 'func_fig7_duality.png')
