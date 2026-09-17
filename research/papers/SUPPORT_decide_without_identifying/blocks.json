@@ -15,32 +15,13 @@
  {
   "kind": "header",
   "lines": [
-   "II.  Contributions"
+   "II.  Methodology"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "C1.  A DECODER WHOSE RISK IS A FUNCTION OF THE TRANSCRIPT ALONE. The number of unsafe tips still hidden is the same for EVERY world compatible with the transcript, so the decoder's conditional risk depends on the transcript and not on the world. Equivariance is proved, not assumed.",
-   "C2.  MINIMAXITY OVER ALL DECISION RULES. The earlier statement lifted a Bayes bound to a worst case for THIS decoder, but took constant risk as a hypothesis and contained no infimum over rules \u2014 so it said the decoder was flat, not that it was optimal. We close that gap: we prove Bayes risk factors through a posterior loss, that the pointwise argmin rule is optimal over ALL rules, that such a rule EXISTS, and hence that the equivariant decoder is a LEAST element of the achievable worst-case risks.",
-   "C3.  FLATNESS FROM SYMMETRY RATHER THAN ASSUMPTION. A risk invariant under a transitive relabelling of worlds is constant; this is how the constant-risk hypothesis is discharged instead of being imposed.",
-   "C4.  AN EXACT DECIDE\u2013RECOVER SEPARATION, FLAT IN K. The decide risk is exactly \u00bd(1\u2212P)^N, independent of the number of classes, while recovery grows like K log K. The separation is an identity, not an asymptotic comparison.",
-   "C5.  THE SAMPLING LAW, EXACTLY. The probability that a tuple goes unseen is (1\u2212s)^N by a product law, and the expectation of a product of indicators factors as B(1\u2212s)^N by exchanging two finite sums."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "III.  Methodology"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "STEP 1 \u2014 THE SAMPLING LAW  (C5).",
-   "HOW IT IS CLOSED. The per-draw avoidance probability is computed by a product over the finite index set; the expectation of the product of unseen indicators is obtained by exchanging two finite sums, which is exact and needs no independence assumption between classes.",
-   "STEP 2 \u2014 THE DECODER AND ITS RISK  (C1).",
-   "WHY THIS FOLLOWS FROM STEP 1. Step 1 gives what a transcript reveals; Step 2 asks what a decoder can do with it. The key counting fact is that every world compatible with a transcript has exactly b unsafe tips and contains all revealed ones, so the number still hidden is the same in all of them:"
+   " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE SAMPLING LAW  (C5). HOW IT IS CLOSED. The per-draw avoidance probability is computed by a product over the finite index set; the expectation of the product of unseen indicators is obtained by exchanging two finite sums, which is exact and needs no independence assumption between classes. STEP 2 \u2014 THE DECODER AND ITS RISK  (C1). WHY THIS FOLLOWS FROM STEP 1. Step 1 gives what a transcript reveals; Step 2 asks what a decoder can do with it. The key counting fact is that every world compatible with a transcript has exactly b unsafe tips and contains all revealed ones, so the number still hidden is the same in all of them:"
   ]
  },
  {
@@ -51,7 +32,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  A cardinality computation on the compatible worlds, then division by the size of the unexplored set."
   ]
  },
  {
@@ -62,7 +43,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Exchanging the sum over worlds with the sum over observations, then collecting the rule's action at each observation."
   ]
  },
  {
@@ -73,7 +54,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Each summand is at least the pointwise minimum over actions, and the bound is ATTAINED by choosing an argmin at every observation \u2014 a rule that."
   ]
  },
  {
@@ -84,7 +65,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Two inequalities composed."
   ]
  },
  {
@@ -95,13 +76,24 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  In the symmetric model the decide risk collapses to an exact closed form that does not mention K at all, while the recovery count is bounded below by."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/support_fig3_risk.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 4.  What one revealed tip is worth. Each revelation removes a term from numerator and denominator at once, so the curve is convex: the last few revelations carry most of the risk reduction."
   ]
  },
  {
   "kind": "header",
   "lines": [
-   "IV.  Results"
+   "III.  Results"
   ]
  },
  {
@@ -136,48 +128,48 @@
  {
   "kind": "header",
   "lines": [
-   "V.  Discussion"
+   "IV.  Discussion"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "The gap closed here is small to state and large in consequence. A constant-risk decoder is not automatically a good one: constancy is a property of the decoder, optimality is a property of the problem. Without an infimum over rules, the earlier statement was compatible with every rule being bad. Step 4 supplies that infimum, and because the action set is finite the infimum is attained, so the argument needs no compactness and no limit.",
-   "The practical reading of C4 is that an experimenter facing many classes should not pay for identification. The cost of naming a safe tip does not grow with the number of classes; the cost of learning which world one is in does.",
-   "SCOPE \u2014 WHAT IS NOT ESTABLISHED. The prior is arbitrary but FIXED: this is minimaxity through one Bayes prior, not a general minimax theorem, and no saddle point is claimed in the abstract. Worlds, transcripts and actions are finite throughout, and nothing extends to infinite action sets where the pointwise minimum may fail to be attained. The transitivity of the relabelling group is a hypothesis supplied where it is used, and is a fact about this problem rather than a theorem proved in general."
+   "THE SEPARATION OVER THE WHOLE GRID, NOT TWELVE CELLS. 1080 cells reaching 1024 classes. At P = 1/2 and \u03b5 = 1/100, recovery costs the same 6 samples as deciding at one class, 17 at two, and 22,192 at 1024 \u2014 a factor of 3699. The separation is not an overhead a larger budget absorbs; it widens without bound. THE GROWTH HAS A SHAPE. Fitting N_rec \u2248 c\u00b7(K/P)(ln K + ln 1/\u03b5) over each of 54 (P, \u03b5) slices gives c between 0.916 and 0.966 with R\u00b2 at least 0.99996 \u2014 the coupon-collector scale quoted for orientation is the right one, with a constant just under one. THE IDENTITY AGAINST THE PROCESS IT DESCRIBES. Equation (6) is an inclusion\u2013exclusion over events that are NOT independent \u2014 the classes compete for the same N observations \u2014 and it is derived rather than measured. Simulating the process and comparing: over 200 cells the measured value differs from the identity by at most 0.0043 and 2.98 standard errors, which over that many cells is what the null predicts. ONE THING NOT TO MISREAD. The flatness of the decide cost in K is STRUCTURAL: K does not appear in the formula. The flat lines restate the theorem; what is measured is the growth beside them."
   ]
  },
  {
-  "kind": "header",
-  "lines": [
-   "VI.  Conclusions"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "The natural decoder \u2014 name a tip uniformly from the unexplored set \u2014 is not merely convenient. Its risk is a function of the transcript alone, and it is a least element of the worst-case risks achievable by ANY decision rule. Deciding costs a number that does not grow with the number of classes, while identifying the world does, so the two problems are separated exactly and not merely asymptotically.",
-   "VERIFICATION. Lean 4, toolchain leanprover/lean4:v4.34.0-rc2, mathlib 1f495c61. A module is accepted only when lean_exit = 0 with zero errors, the source hash is unchanged across the compile, the .olean is newer than its source, at least one #print axioms is present, the axiom set lies within {propext, Classical.choice, Quot.sound}, and no sorry appears anywhere. Numerical sweeps are reported separately from theorems and never substitute for one."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "Formal corpus behind each step"
-  ]
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/support_fig5_threeworld.png",
+  "width": 14.44
  },
  {
   "kind": "caption",
   "lines": [
-   "step                                   mod   thms  audited",
-   "1. The sampling law                     1      9      9",
-   "2. The decoder and its risk             1      4      4",
-   "3. Bayes risk factors                   1      6      6",
-   "4. Optimality over all rules            1      6      6",
-   "5. The minimax statement                1      6      6",
-   "6. Decide-recover separation            1     11     11",
-   "",
-   "Support strand total: 38 files, 390 theorem and lemma statements, 21 accepted modules, 184 axiom-audited declarations. Programme total: 427 files, 3,115 statements, 108 accepted modules, 860 audited declarations."
+   "Fig. 3.  The obstruction pairwise reasoning cannot see. Every pair of worlds admits a safe coordinate; no coordinate works for all three."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Deciding and identifying are different problems, and the gap between them is not an overhead a larger budget absorbs. The decoder is minimax over ALL decision rules, not merely flat; the decide cost is exactly \u00bd(1\u2212P)^N and contains no K; and recovery grows on a coupon-collector scale with a constant just under one, reaching 3699 times the decide cost at 1024 classes. The recovery identity assumes nothing about how classes interact, and simulating the process they actually follow reproduces it in every cell tested."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "PRECISION IS SET FROM THE PROBLEM, NOT PICKED. The recovery sum alternates with binomial weights and loses about K bits to cancellation \u2014 at K = 128 the largest term already exceeds the answer by eighteen orders of magnitude. Working precision is therefore 120 + \u2308K\u00b7log\u2081\u2080 2\u2309 + 40 digits, 469 at K = 1024. A fixed precision would return noise at the top of the grid. THREE SELF-CHECKS RUN BEFORE ANY RESULT IS REPORTED. The recovery risk at K = 1 must equal the decide risk exactly in rational arithmetic \u2014 the one point where the two sides must agree. The high-precision and exact-rational evaluations must agree. And the sandwich \u00bd\u00b7Pr(U>0) \u2264 R_rec \u2264 Pr(U>0) must hold. All three do. THRESHOLDS ARE INVERTED BY BISECTION over exact evaluations, so the integers are true thresholds rather than rounded logarithms."
   ]
  },
  {
@@ -189,9 +181,7 @@
  {
   "kind": "caption",
   "lines": [
-   "[1] S. Javdani, Y. Chen, A. Karbasi, A. Krause, J. A. Bagnell and S. Srinivasa, \u201cNear-optimal Bayesian active learning for decision making,\u201d in Proc. AISTATS, 2014.",
-   "[2] E. L. Lehmann and G. Casella, Theory of Point Estimation, 2nd ed. New York, NY: Springer, 1998.",
-   "[3] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. CPP, 2020."
+   "[1] S. Javdani, Y. Chen, A. Karbasi, A. Krause, J. A. Bagnell and S. Srinivasa, \u201cNear-optimal Bayesian active learning for decision making,\u201d in Proc. AISTATS, 2014. [2] E. L. Lehmann and G. Casella, Theory of Point Estimation, 2nd ed. New York, NY: Springer, 1998."
   ]
  }
 ]

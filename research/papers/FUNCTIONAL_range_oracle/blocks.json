@@ -26,25 +26,13 @@
  {
   "kind": "header",
   "lines": [
-   "II.  Contributions"
+   "II.  Methodology"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "C1.  THE SCALAR PROXY IS WRONG IN BOTH DIRECTIONS, BY NO CONSTANT. Two explicit two-relation, three-action families drive J_full/J_scalar to 0 and to +\u221e. Both are exact-arithmetic constructions with explicit feasible alternatives \u2014 no optimiser, no sampled world, no seed \u2014 so no constant correction can repair the proxy. C2.  THE TRUE ALTERNATIVE SET IS A FINITE UNION OF CONVEX PAIR REGIONS, proved on the real RANGE target rather than a Top-1 surrogate, with the extrema chosen from the ALTERNATIVE and never frozen at truth, and no definiteness assumed anywhere. C3.  THE ENERGY ORACLE BECOMES A FINITE CHECK. A number lower-bounds the energy over the whole set iff it does so on every pair region, so no infimum over an infinite-dimensional set is ever taken. C4.  SHRINK AND EXPAND, AS EQUIVALENCES. Range \u2264 z iff all cells lie in a common interval of length z; range \u2265 z iff some ORDERED pair is separated by z. Equivalences, so nothing is relaxed. C5.  AN OPTIMALITY CERTIFICATE THAT NEEDS NO MATRIX INVERSE. The textbook dual requires M invertible. We prove optimality from primal feasibility, dual non-negativity, stationarity and complementary slackness using only symmetry and positive SEMIdefiniteness, so a singular information matrix costs no extra hypothesis and no pseudoinverse. C6.  THE SETUP-COST LAW, WITH INFEASIBILITY REPORTED AS INFEASIBILITY. An infeasible configuration has NO value and is never clamped to a small positive one; the crossing budget between two supports is derived, and when the two values are only bracketed we prove both orders remain consistent, so the honest output is UNDECIDED."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "III.  Methodology"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "STEP 1 \u2014 THE FINITE MAX/MIN SET IDENTITY  (C2)."
+   " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE FINITE MAX/MIN SET IDENTITY  (C2)."
   ]
  },
  {
@@ -55,7 +43,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Forward, choose a maximiser and a minimiser of the challenger relation."
   ]
  },
  {
@@ -71,7 +59,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Convexity of each region is checked directly on the defining inequalities, with no assumption on M."
   ]
  },
  {
@@ -99,7 +87,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Completing the square against the explicit minimiser."
   ]
  },
  {
@@ -110,7 +98,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Expand the quadratic at the competitor, write the cross term using stationarity, and observe it equals minus the dual value at the competitor \u2014 which."
   ]
  },
  {
@@ -163,7 +151,7 @@
  {
   "kind": "header",
   "lines": [
-   "IV.  Results"
+   "III.  Results"
   ]
  },
  {
@@ -197,55 +185,48 @@
  {
   "kind": "header",
   "lines": [
-   "V.  Discussion"
+   "IV.  Discussion"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "The families settle a methodological question rather than a numerical one. Because the proxy errs in both directions without a constant, no calibration of it is safe: an allocator trusting it may waste budget excluding an alternative that is already cheap, or stop early against one far cheaper than it believes. The correct object is the union of pair regions, and it is no harder to certify. Step 6 matters for practice as much as rigour: information matrices at sparse allocations are routinely singular, and a certificate surviving that without a pseudoinverse is what makes the oracle usable at the boundary. SCOPE. The DECOMPOSITION step is not formalised and the full oracle equality is not assembled. Free response table, known variance, positive precision. The certificate is SUFFICIENCY, not a characterisation. Only weak duality is proved \u2014 a search over 1054 instances found no gap, which is not a proof. No allocator built on this oracle has been compared against C_lucb."
+   "THE PROXY'S FAILURE IS PREDICTABLE, NOT DIFFUSE. On 6000 random instances the median ratio J_full/J_scalar is 1.000, but the tails run from 0.018 to 41.7. The cause is exact rather than statistical: of the 1367 instances on which the proxy OVERSTATES, every single one has a cheapest alternative that opens a pair which is not currently extremal \u2014 the mechanism family 1 was built to exhibit \u2014 and not one instance with its extrema fixed produced a ratio below one. The converse fails, as it should: 1597 instances have a moving extremum and 230 of those are still exact. So a moving extremum is necessary and not sufficient, and it is CHECKABLE on the instance in hand before \u2014(5) is trusted. STRONG DUALITY: A SEARCH, NOT A PROOF. The certificate assumes only semidefiniteness, which is why duality is left open. A search over 1054 instances \u2014 including a family built with M singular and its null space aligned to the constraint normals, the only structural route to a gap \u2014 found none above machine precision, and the adversarial family had the SMALLEST gaps. One counterexample would have settled it; a thousand instances without one settle nothing, and the poster says so."
   ]
  },
  {
-  "kind": "header",
-  "lines": [
-   "VI.  Conclusions"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "When the extrema can move, the scalar pair-flip proxy is a bound in neither direction, and no constant repairs it. The true alternative set is a finite union of convex pair regions on the real range target; its energy oracle is a finite conjunction of convex problems; the inner problem has a closed form; and its certificate needs no matrix inverse, so a singular information matrix costs nothing extra. VERIFICATION. Lean 4 (v4.34.0-rc2, mathlib 1f495c61): zero errors, unchanged source hash across the compile, newer .olean, printed axioms within {propext, Classical.choice, Quot.sound}, no sorry."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "Formal corpus behind each step"
-  ]
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/func_fig7_duality.png",
+  "width": 14.44
  },
  {
   "kind": "caption",
   "lines": [
-   "step                                   mod   thms  audited",
-   "1. Finite max/min set identity          1      7      7",
-   "2. Union of polyhedra                   1      7      7",
-   "3. Oracle is a finite check             1      5      5",
-   "4. Shrink and expand                    1      9      9",
-   "5. Inner QP in closed form              1      5      5",
-   "6. Certificate without an inverse       1     11      9",
-   "7. Family 1: proxy overstates           1     15     14",
-   "8. Family 2: proxy understates          1     15     14",
-   "9. Setup cost and its crossing          2     25     21",
-   "10. Break-even, without the 4           1     14     12",
-   "",
-   "Functional strand total: 36 files, 319 theorem and lemma statements, 21 accepted modules, 162 axiom-audited declarations. Programme total: 427 files, 3,115 statements, 108 accepted modules, 860 audited declarations."
+   "Fig. 3.  A search for a duality gap over 1054 instances. Nothing reaches the re-check threshold, and the family built to be adversarial has the smallest gaps."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "EXPERIMENT SCALE. The confirmatory panel is 10 seeds x 1,000 instances x 8 policies = 80,000 policy runs at horizon 131,072, drawing 5,042,978,194 samples in total, with 29.1% of runs censored at the horizon. That is ten times the earlier panel, and it ran as ten parallel processes for roughly six CPU-hours each. Every number reported on this poster comes from that run or from exact arithmetic; none is simulated for illustration."
+   "When the extrema can move, the scalar proxy is a bound in neither direction and no constant repairs it. The true alternative set is a finite union of convex pair regions on the real range target, its oracle is a finite conjunction of convex problems, the inner problem has a closed form, and the certificate needs no matrix inverse \u2014 so a singular information matrix, which is what a working allocator produces, costs nothing extra. The failure is also diagnosable: on 6000 random instances the proxy overstated only when an extremum moves, which can be checked before it is trusted."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "THE TRUE VALUE IS COMPUTED, NOT ESTIMATED. J_full is solved exactly by the shrink\u2013expand decomposition, with the window position obtained in closed form rather than searched \u2014 an earlier version scanned only the breakpoints and over-estimated, because the optimum is generally interior. AND IT IS CHECKED AGAINST A SOLVER THAT SHARES NONE OF ITS STRUCTURE. SLSQP is run on the raw variables. A local optimiser can only land at or above the true minimum, so a cell where it lands BELOW would expose a defect; across the cross-checked cells, none did. THE PROVED FAMILIES ARE THE SELF-CHECK. Before any random instance is reported the code must reproduce the published numbers on both families \u2014 J_scalar = 1/32 and J_full \u2264 9\u03b7/32 on the first, J_scalar = \u03b7/(8(1+3\u03b7)) and J_full \u2265 1/128 on the second."
   ]
  },
  {
@@ -257,10 +238,7 @@
  {
   "kind": "caption",
   "lines": [
-   "[1] M. Jourdan, R. Degenne and E. Kaufmann, \u201cDealing with unknown variances in best-arm identification,\u201d in Proc. COLT, 2023.",
-   "[2] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016.",
-   "[3] S. Boyd and L. Vandenberghe, Convex Optimization. Cambridge, U.K.: Cambridge Univ. Press, 2004.",
-   "[4] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. CPP, 2020."
+   "[1] M. Jourdan, R. Degenne and E. Kaufmann, \u201cDealing with unknown variances in best-arm identification,\u201d in Proc. COLT, 2023. [2] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016. [3] S. Boyd and L. Vandenberghe, Convex Optimization. Cambridge, U.K.: Cambridge Univ. Press, 2004."
   ]
  }
 ]

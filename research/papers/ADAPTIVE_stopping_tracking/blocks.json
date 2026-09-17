@@ -16,29 +16,13 @@
  {
   "kind": "header",
   "lines": [
-   "II.  Contributions"
+   "II.  Methodology"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "C1.  THE LAYER-CAKE IDENTITY, PROVED. We prove that the integral of an \u2115-valued stopping time equals the sum of its tail probabilities, by writing the stopping time as a sum of indicators and exchanging the sum with the integral. The earlier file cited this; it is now a theorem, so a geometric tail bounds the EXPECTED stopping time and not merely the tail sum.",
-   "C2.  THE CONCENTRATION INPUT, DISCHARGED. We prove that a sub-Gaussian deviation meets any budget at an explicit threshold, so the per-arm, per-count inequality the peeling argument needs is supplied rather than assumed. Gaussian noise is sub-Gaussian, so the hypothesis is met in the intended setting.",
-   "C3.  A TRACKING ALLOCATION ALWAYS EXISTS. For every target on the simplex and every horizon there is an integer allocation spending exactly the horizon with per-arm deficit at most one. This is proved by construction from the floors of the targets plus a correction set, not by an existence argument.",
-   "C4.  BUT NO ONLINE MONOTONE RULE ACHIEVES IT. The natural online rule \u2014 serve the arm of largest deficit \u2014 is house-monotone by construction, since counts only increase. We prove it does NOT satisfy quota, by an exact five-arm witness whose every step is verified to be a genuine largest-deficit choice. The bound of C3 is therefore unattainable online, and an analysis must use a bound it can prove rather than the per-horizon one.",
-   "C5.  THE CONSEQUENCES THE ANALYSIS CONSUMES. Deficits sum to zero, so some arm is always behind and a greedy rule never idles; and a deficit bound of c pins the empirical allocation to within c/t of the target."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "III.  Methodology"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "STEP 1 \u2014 THE LAYER-CAKE IDENTITY  (C1)."
+   " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE LAYER-CAKE IDENTITY  (C1)."
   ]
  },
  {
@@ -49,7 +33,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Write the stopping time at each point as the sum over n of the indicator of {n < \u03c4}, which is a finite sum at every point and telescopes to the value."
   ]
  },
  {
@@ -60,7 +44,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  The sub-Gaussian Chernoff bound evaluated at the stated threshold, where the exponent collapses to the logarithm of the budget."
   ]
  },
  {
@@ -71,7 +55,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  The deficits sum to zero because the targets sum to one and the counts sum to the horizon."
   ]
  },
  {
@@ -82,7 +66,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Take the floor of each target's share; the floors sum to at most the horizon, and the shortfall is smaller than the number of arms, so it can be."
   ]
  },
  {
@@ -93,7 +77,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  The witness is exhibited in exact rationals on five arms, and all eleven of its steps are verified: at each step the served arm's deficit is checked."
   ]
  },
  {
@@ -104,13 +88,24 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED."
+   "HOW IT IS CLOSED.  Dividing the deficit bound by the horizon."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig2_trace.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 4.  Why the rule fails, as five deficits. Each small arm in turn overtakes the dominant one, takes its single sample and resets; the dominant arm gains 17/23 of deficit each time it is skipped."
   ]
  },
  {
   "kind": "header",
   "lines": [
-   "IV.  Results"
+   "III.  Results"
   ]
  },
  {
@@ -145,48 +140,48 @@
  {
   "kind": "header",
   "lines": [
-   "V.  Discussion"
+   "IV.  Discussion"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "The negative result is the useful one. An analysis that assumes an online rule can hold the deficit below one is assuming something false, and the error is not conservative \u2014 it understates how far the realised allocation can drift from the intended one. What an analysis may use is the per-horizon existence of C3 together with the transfer of C5, applied to whatever bound the specific rule can actually prove.",
-   "C1 and C2 remove the two remaining places where the stopping analysis leaned on citation. The layer-cake step matters because high-probability correctness alone gives nothing: off the good event the scheme may never stop, so a tail bound is the only route to a finite expected time, and that route now runs through a theorem.",
-   "SCOPE \u2014 WHAT IS NOT ESTABLISHED. C4 refutes the bound one for THIS rule; it does not prove that no online monotone rule achieves any constant bound, and a divisor method achieves house monotonicity with a different, larger constant that is not computed here. The search producing the witness covered rational targets with small denominators on three to five arms, and minimality is claimed only within that search. C2 assumes the deviation is sub-Gaussian with a KNOWN parameter; with an estimated variance that hypothesis is not automatic. The geometric tail of C1 remains a hypothesis supplied by the algorithm's own analysis."
+   "THE FAILURE IS COMMON, AND FLAT ACROSS ARM COUNTS. Exhaustive over 1,228,079 rational targets: 375,239 \u2014 30.6% \u2014 drive the largest-deficit rule past the bound of one, the worst reaching 7/4 at eight arms. The violating fraction stays between 26% and 33% from three arms to eight, so the failure is neither a small-K nor a large-K artefact, while the severity grows with K. There is no burn-in: the earliest violation is t = 3 at every arm count, and a fifth of all violations have occurred by t = 10. A CLAIM THIS WORK PREVIOUSLY MADE, AND WHICH IS WRONG. It is tempting to conclude that any rule serving whole samples faces the same arithmetic. Seven rules were run on the same targets, four of them classical apportionment divisor methods. Jefferson's rule violates the deficit bound on ZERO of the 1,228,079 targets \u2014 never, not rarely. Adams is its mirror image: 95.6% on the deficit side and none on the surplus side. WHAT IS ACTUALLY TRUE. No rule respects BOTH bounds. The failure can be relocated between the deficit and the surplus directions but not removed, which is what the apportionment impossibility gives and what the sweep confirms without exception. An analysis needing both directions has no rule to appeal to; one needing only the surplus direction may use Jefferson."
   ]
  },
  {
-  "kind": "header",
-  "lines": [
-   "VI.  Conclusions"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "The two probabilistic inputs of the stopping analysis are now theorems: the layer-cake identity is proved, so a geometric tail bounds the expected stopping time, and the per-arm concentration inequality is discharged from a sub-Gaussian hypothesis. The tracking question is settled, and the answer is negative: an allocation with deficit at most one exists at every horizon, but the natural online monotone rule cannot achieve it, by an exact witness whose every step is verified.",
-   "VERIFICATION. Lean 4, toolchain leanprover/lean4:v4.34.0-rc2, mathlib 1f495c61. A module is accepted only when lean_exit = 0 with zero errors, the source hash is unchanged across the compile, the .olean is newer than its source, at least one #print axioms is present, the axiom set lies within {propext, Classical.choice, Quot.sound}, and no sorry appears anywhere. Numerical sweeps are reported separately from theorems and never substitute for one."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "Formal corpus behind each step"
-  ]
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig3_search.png",
+  "width": 14.44
  },
  {
   "kind": "caption",
   "lines": [
-   "step                                   mod   thms  audited",
-   "1. The layer-cake identity              1      3      3",
-   "2. The concentration input              1      3      3",
-   "3. Deficits, greedy never idles         1      6      6",
-   "4. A tracking allocation exists         1      6      6",
-   "5. The online rule fails quota          1      5      5",
-   "6. What the analysis consumes           1      6      6",
-   "",
-   "Adaptive strand total: 11 files, 45 theorem and lemma statements, 6 accepted modules, 27 axiom-audited declarations. Programme total: 427 files, 3,115 statements, 108 accepted modules, 860 audited declarations."
+   "Fig. 3.  How far past the bound the violations go. The mass sits just above one, which is what makes the refutation easy to miss by sampling, but the tail runs to 7/4."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "House monotonicity and quota cannot both hold, and the consequence for an adaptive stopping analysis is concrete: the tracking assumption that the per-horizon deficit stays below one is false for the rule such an analysis would naturally assume, on 30.6% of targets, from t = 3 onwards. The refutation cannot be evaded by changing rules \u2014 only relocated. Jefferson's rule never violates the deficit bound and always eventually violates the surplus bound; Adams does the reverse; no rule escapes both. An analysis requiring two-sided control has nothing to appeal to."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "EXHAUSTIVE OVER RATIONAL TARGETS, IN INTEGERS. Every target shares a denominator d, so the deficit t\u00b7w\u1d62 \u2212 N\u1d62 equals (t\u00b7p\u1d62 \u2212 N\u1d62\u00b7d)/d and the whole simulation runs in integer arithmetic. Rational arithmetic gives identical answers and is far slower; targets are generated as partitions rather than filtered compositions, which avoids enumerating 442 million tuples to keep 478 thousand. BOTH REWRITES WERE CHECKED, NOT TRUSTED. The partition generator produces the identical set on every (K, d) tested, and the rewritten sweep reproduces the earlier rational run field for field \u2014 same target count, same violation count, same worst deficit, same earliest horizon. AND THE SWEEP CHECKS ITSELF. On the published five-arm witness the largest-deficit rule must first exceed the bound at t = 11, which is the stated result; the sweep reports nothing otherwise. A HORIZON BOUND CAN ONLY UNDERSTATE: running longer can only find more violations, so every count here is a lower bound."
   ]
  },
  {
@@ -198,10 +193,7 @@
  {
   "kind": "caption",
   "lines": [
-   "[1] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016.",
-   "[2] M. L. Balinski and H. P. Young, Fair Representation: Meeting the Ideal of One Man, One Vote. New Haven, CT: Yale Univ. Press, 1982.",
-   "[3] S. Boucheron, G. Lugosi and P. Massart, Concentration Inequalities. Oxford, U.K.: Oxford Univ. Press, 2013.",
-   "[4] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. CPP, 2020."
+   "[1] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016. [2] M. L. Balinski and H. P. Young, Fair Representation: Meeting the Ideal of One Man, One Vote. New Haven, CT: Yale Univ. Press, 1982. [3] S. Boucheron, G. Lugosi and P. Massart, Concentration Inequalities. Oxford, U.K.: Oxford Univ. Press, 2013."
   ]
  }
 ]
