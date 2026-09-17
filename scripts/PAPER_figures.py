@@ -957,3 +957,30 @@ def functional_duality():
     ax.set_ylabel('instances')
     ax.legend(frameon=False, loc='upper left', fontsize=6.0)
     fin(fig, 'func_fig7_duality.png')
+
+
+# ---------------------------------------------------------------------------
+# Poster variants. A poster column is about 15 inches wide, so a figure drawn at
+# the paper's single-column aspect becomes twelve inches tall and eats forty per
+# cent of the column, which is what forces the body text down to sixteen point.
+# Re-rendering the same figure wider costs nothing and returns the column.
+def poster_variants(names=None):
+    """Re-render chosen figures at a poster aspect into _figures/poster/."""
+    import importlib
+    global W, H, OUT
+    targets = names or [
+        'master_collapse', 'master_misspec', 'query_order_curves', 'query_slopes',
+        'struct_enum', 'struct_families', 'func_proxy', 'func_ratio',
+        'd6_threshold', 'd6_wide', 'support_counts', 'support_identity',
+        'adaptive_rules', 'adaptive_onset']
+    oldW, oldH, oldOUT = W, H, OUT
+    W, H = 5.6, 2.35                     # 2.4:1 rather than 1.4:1
+    OUT = oldOUT / 'poster'
+    OUT.mkdir(parents=True, exist_ok=True)
+    g = globals()
+    for t in targets:
+        try:
+            g[t]()
+        except Exception as e:
+            print(f'  {t}: SKIPPED ({e})')
+    W, H, OUT = oldW, oldH, oldOUT

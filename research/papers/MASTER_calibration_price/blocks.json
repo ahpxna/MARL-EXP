@@ -8,11 +8,7 @@
  {
   "kind": "prose",
   "lines": [
-   "A population of K\u00b7m items carries unknown values \u03b8\u1d62 and is partitioned into K groups. Each group g carries an unknown common offset b_g. Under a unit sampling budget the experimenter must return a threshold set \u2014 which items lie above a fixed level. The values themselves are not the goal; the answer is.",
-   "Two kinds of measurement are available, and the distinction between them is the entire subject of this work. An ORDINARY query on item i returns \u03b8\u1d62 + b_g(i) with noise of variance v at unit price; crucially it sees the item's value and its group's offset only in combination, never apart. A CALIBRATION query on group g returns the offset b_g directly, with variance \u03bd, at price \u03ba measured in units of an ordinary query.",
-   "Throughout, a = x/v is the ordinary precision purchased on an item, b = z/\u03bd the control precision purchased on its group, \u0394 the separation between the two worlds to be distinguished, and s_m = \u221am, s_\u03ba = \u221a\u03ba. A design is any non-negative allocation of the unit budget across query types and groups.",
-   "The dilemma is concrete. Calibration queries consume budget that could have bought ordinary samples. If they merely improve efficiency, a careful allocator can trade them off and the question is one of tuning. If instead there exist configurations on which no quantity of ordinary sampling can ever answer the question, then the trade-off framing is wrong: the calibration query is a precondition, not a refinement, and an allocator that economises on it fails outright rather than gracefully.",
-   "This work answers two questions and no others. WHEN does the calibration query stop being an efficiency gain and become mandatory? And WHAT does it cost \u2014 the exact optimal value under a unit budget, not an order of magnitude and not a rate up to unspecified constants."
+   "A population of K\u00b7m items carries unknown values \u03b8\u1d62 in K groups, each group g with an unknown common offset b_g. Under a unit budget the experimenter must return a threshold set \u2014 which items lie above a fixed level. The values are not the goal; the answer is. Two measurements are available, and the distinction between them is the whole subject. An ORDINARY query on item i returns \u03b8\u1d62 + b_g(i) with variance v at unit price, seeing value and offset only in combination. A CALIBRATION query on group g returns b_g directly, with variance \u03bd, at price \u03ba. The dilemma is concrete: calibration consumes budget that could have bought ordinary samples. If it merely improves efficiency, a careful allocator trades it off and the question is tuning. If instead some configurations admit no answer from ordinary sampling at all, the trade-off framing is wrong \u2014 calibration is a precondition, and an allocator economising on it fails outright rather than gracefully. Two questions, and no others: WHEN does the calibration query become mandatory, and WHAT does it cost exactly?"
   ]
  },
  {
@@ -24,11 +20,7 @@
  {
   "kind": "prose",
   "lines": [
-   "C1.  A NECESSITY DICHOTOMY, WITH AN EXACT WITNESS. We exhibit two worlds, in exact rationals, that every ordinary query cannot tell apart while their answers differ. On such a configuration the attainable value is exactly zero. The calibration query is therefore a precondition for the problem to be solvable at all, not an efficiency option, and no quantity of ordinary sampling changes that.",
-   "C2.  THE EXACT PRICE OF ONE UNIT OF INFORMATION IN A GROUP. We prove that a group required to deliver profiled information h costs at least h(\u221am + \u221a\u03ba)\u00b2, and we exhibit the split attaining it. The two query prices combine through their SQUARE ROOTS \u2014 the signature of a two-resource harmonic trade-off \u2014 and this constant is exact rather than an order of magnitude.",
-   "C3.  THE PRICE LAW, MATCHED ON BOTH SIDES AND ATTAINED. We prove \u0393* = \u0394\u00b2/(2K(\u221am+\u221a\u03ba)\u00b2) as an upper bound over EVERY unit-budget design, not over a parametric family, together with a design meeting it. The result is an identity in the structural parameters (K, m, \u03ba), and it yields the operational crossover \u03ba = m at which the two query types consume equal shares of each group's budget.",
-   "C4.  A CERTIFIED INSTANCE WHERE OMITTING THE QUERY IS STRICTLY WORSE. On one explicit instance we cap every anchor-free design at 1/8 \u2014 a bound that is itself attained, hence tight \u2014 and exhibit an anchored design reaching 261/1520, a gap of 37.4%. Both sides are exact rationals and the cap is stated for an abstract design type, so no optimality of the anchored design is assumed.",
-   "C5.  EVERY CLAIM MACHINE-CHECKED. Four Lean 4 modules, 29 audited declarations, no sorry, axioms confined to {propext, Classical.choice, Quot.sound}. Numerical sweeps are reported separately from theorems and never substitute for one."
+   "C1.  NECESSITY, WITH AN EXACT WITNESS. Two worlds, in exact rationals, that every ordinary query cannot tell apart while their answers differ. The attainable value there is exactly zero, so calibration is a precondition rather than an option. C2.  THE EXACT PRICE OF ONE UNIT. A group delivering profiled information h costs at least h(\u221am + \u221a\u03ba)\u00b2, and the attaining split is exhibited. The two prices combine through their SQUARE ROOTS, and the constant is exact. C3.  THE PRICE LAW, MATCHED AND ATTAINED. \u0393* = \u0394\u00b2/(2K(\u221am+\u221a\u03ba)\u00b2), proved over EVERY unit-budget design rather than a parametric family, with a design meeting it. It yields the operational crossover \u03ba = m. C4.  OMITTING THE QUERY IS STRICTLY WORSE. On one explicit instance every anchor-free design is capped at 1/8 \u2014 attained, hence tight \u2014 against 261/1520 anchored, a gap of 37.4%. C5.  MACHINE-CHECKED. Four Lean 4 modules, 29 audited declarations, no sorry, axioms confined to {propext, Classical.choice, Quot.sound}."
   ]
  },
  {
@@ -53,7 +45,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. Both conjuncts are finite rational identities discharged by case analysis over the four items. No analysis and no limiting argument enters: the first is checked item by item, the second is a disagreement between two explicitly computed finite sets."
+   "HOW IT IS CLOSED."
   ]
  },
  {
@@ -77,9 +69,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. Completing the square in the shift t, with both halves proved separately: the inequality for every t, and the value attained at t = a\u0394/(a+b). The harmonic form on the right is the shape that propagates through the rest of the chain, and it is what makes Step 3 a statement about COST rather than about information.",
-   "STEP 3 \u2014 THE COST OF ONE GROUP, LOWER BOUND  (contribution C2).",
-   "WHY THIS FOLLOWS FROM STEP 2. Step 2 fixes how much information a group delivers at given precisions. Step 3 inverts the question: a group required to deliver h obeys h(x+z) \u2264 xz, and we ask what that costs at prices m and \u03ba."
+   "HOW IT IS CLOSED."
   ]
  },
  {
@@ -90,9 +80,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. Cauchy\u2013Schwarz applied to (s_m x \u2212 s_\u03ba z)\u00b2, then division by the positive quantity x + z. No optimiser is run and no multiplier theorem is invoked; the inequality is elementary and holds for every feasible pair.",
-   "STEP 4 \u2014 THE COST OF ONE GROUP, ATTAINED  (contribution C2).",
-   "WHY THIS FOLLOWS FROM STEP 3. A lower bound alone leaves the constant unidentified. Step 4 exhibits the allocation meeting it, so the constant is exact and not merely valid."
+   "HOW IT IS CLOSED."
   ]
  },
  {
@@ -103,12 +91,12 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. Substitution and rational algebra: the stated split makes the information constraint an equality and the budget expression collapses to h(\u221am + \u221a\u03ba)\u00b2. Neither query type can be dropped without losing the group entirely."
+   "HOW IT IS CLOSED."
   ]
  },
  {
   "kind": "fig",
-  "path": "research/papers/_figures/master_fig8_collapse.png",
+  "path": "research/papers/_figures/poster/master_fig8_collapse.png",
   "width": 15.048
  },
  {
@@ -138,9 +126,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. The per-group bound is applied inside a finite sum, then the budget constraint is used once. The statement quantifies over EVERY unit-budget design, so no design escapes it.",
-   "STEP 6 \u2014 THE BOUND IS ATTAINED  (contribution C3).",
-   "Steps 5 and 6 are the two halves of an identity: a cap over all designs, and a design meeting it."
+   "HOW IT IS CLOSED."
   ]
  },
  {
@@ -169,9 +155,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW IT IS CLOSED. The cap on anchor-free designs is a dual certificate valid for every such design and is itself attained, hence tight; the anchored value comes from an explicit design spending 9/20 + 9/20 + (1/10)\u00b71 = 1. Both sides are exact rationals.",
-   "STEP 8 \u2014 GAIN FACTORISATION.",
-   "Step 5 assembles a K-group sum from per-group statements; Step 8 supplies the structural facts making that assembly legitimate without a separate convexity argument."
+   "HOW IT IS CLOSED."
   ]
  },
  {
@@ -188,14 +172,12 @@
  {
   "kind": "prose",
   "lines": [
-   "THE LAW IS EXACT AND INDEPENDENT NUMERICS AGREE TO MACHINE PRECISION. Bisection and Nelder\u2013Mead were run over the same feasible set in 32 parameter cells. The largest relative gap against the closed form is 2.5 \u00d7 10\u207b\u00b9\u2076, and Nelder\u2013Mead never exceeds the closed form in any cell \u2014 the direction that would falsify an upper bound.",
-   "REMOVING THE CONTROL QUERY GIVES EXACTLY ZERO. Over the same 32 cells, the no-control and one-control-missing baselines return exactly 0, by the Step 1 witness verified before any solver is called.",
-   "BAD ALLOCATION COSTS A BOUNDED FRACTION. A uniform design retaining all controls reaches 73.5\u2013100% of the optimum, median 91.7%."
+   "THE LAW IS EXACT, AND INDEPENDENT NUMERICS AGREE. Bisection and Nelder\u2013Mead over the same feasible set, 32 cells: largest relative gap 2.5\u00d710\u207b\u00b9\u2076, and neither ever exceeds the closed form \u2014 the direction that would falsify an upper bound. REMOVING THE CONTROL QUERY GIVES EXACTLY ZERO on all 32 cells. BAD ALLOCATION COSTS A BOUNDED FRACTION: a uniform design keeping all controls reaches 73.5\u2013100% of the optimum, median 91.7%. THE LAW PREDICTS A REALISED ERROR, not only a design value: over 240 random instances the error of a plug-in profiled test collapses onto \u03a6(\u2212\u221a(\u0393*B)) with rms 0.006."
   ]
  },
  {
   "kind": "fig",
-  "path": "research/papers/_figures/master_fig10_misspec.png",
+  "path": "research/papers/_figures/poster/master_fig10_misspec.png",
   "width": 15.443999999999999
  },
  {
@@ -213,9 +195,7 @@
  {
   "kind": "prose",
   "lines": [
-   "The two results above are asymmetric, and that asymmetry is the practical message. An experimenter who allocates badly loses a bounded fraction of the attainable information; an experimenter who omits the query TYPE loses everything, and no amount of sampling recovers it. Efficiency and feasibility are therefore not points on one scale, and a procedure treating the calibration query as one more option to trade off cannot detect the failure.",
-   "The crossover \u03ba = m gives a concrete rule. Below it, ordinary sampling dominates the budget and calibration is cheap insurance; above it, the calibration query is the binding cost and the group size m is what must be reconsidered.",
-   "SCOPE \u2014 WHAT IS NOT ESTABLISHED. The law assumes a common variance v, a common control variance \u03bd, a common price \u03ba and equal gaps; heterogeneous cases are not covered. Step 7 certifies ONE instance: it proves anchor-free designs CAN be strictly beaten, not that they always are. Step 1 exhibits two indistinguishable worlds without characterising all such configurations. Everything here is an information and budget statement \u2014 no estimator, no confidence set and no finite-sample guarantee is claimed."
+   "The two results are asymmetric, and that is the practical message. Allocating badly loses a bounded fraction of the attainable information; omitting the query TYPE loses everything, and no amount of sampling recovers it. Efficiency and feasibility are not points on one scale, and a procedure treating calibration as one more option cannot detect the failure. The crossover \u03ba = m gives the rule: below it calibration is cheap insurance, above it calibration is the binding cost and the group size m is what must be reconsidered. SCOPE. The law assumes common v, \u03bd, \u03ba and equal gaps; heterogeneous cases are measured but not proved. Step 7 certifies ONE instance \u2014 anchor-free designs CAN be beaten, not that they always are. Step 1 exhibits two indistinguishable worlds without characterising all of them. Everything is an information and budget statement: no estimator and no finite-sample guarantee is claimed."
   ]
  },
  {
@@ -227,28 +207,13 @@
  {
   "kind": "prose",
   "lines": [
-   "A calibration query is not an efficiency improvement a careful allocator could do without. On the configurations exhibited here the attainable value is exactly zero until a query of the new type is bought; once bought, its price is exact, matched by a lower bound, an upper bound over all unit-budget designs, and an attaining design.",
-   "VERIFICATION. Lean 4, toolchain leanprover/lean4:v4.34.0-rc2, mathlib 1f495c61. A module is accepted only when lean_exit = 0 with zero errors, the source hash is unchanged across the compile, the .olean is newer than its source, at least one #print axioms is present, the axiom set lies within {propext, Classical.choice, Quot.sound}, and no sorry appears. Modules: LeanMasterCalibrationLawV1 (10), LeanMasterAnchorCertificateV1 (6), LeanMasterAnchorInstanceV1 (8), LeanMasterGainFactorizationV1 (5)."
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "The 9 displayed equations are the load-bearing chain, not the corpus. The MASTER strand contains 11 Lean source files with 88 theorem and lemma statements, of which 7 modules carry an acceptance receipt covering 57 declarations whose axiom set was printed and checked. Across the whole programme: 427 files, 3,115 statements, 108 accepted modules, 860 audited declarations.",
-   "Every audited declaration was checked to depend only on {propext, Classical.choice, Quot.sound}. No module cited by any gate in this work contains a sorry: the seven that exist in the wider repository sit in audit scaffolding and in files named as conjectures, and the overlap with the cited set is empty.",
-   "What the poster shows is the shortest path from the problem statement to the claim. The remaining statements are the machinery that path stands on \u2014 arithmetic lemmas, measurability side conditions, finite-sum exchanges and the counterexamples that ruled out earlier formulations."
+   "A calibration query is not an efficiency improvement a careful allocator could do without. On the configurations exhibited here the attainable value is exactly zero until a query of the new type is bought; once bought, its price is exact \u2014 matched by a lower bound, an upper bound over all unit-budget designs, and an attaining design. VERIFICATION. Lean 4 (v4.34.0-rc2, mathlib 1f495c61). A module is accepted only on zero errors, an unchanged source hash across the compile, a newer .olean, a printed axiom set within {propext, Classical.choice, Quot.sound}, and no sorry."
   ]
  },
  {
   "kind": "header",
   "lines": [
    "Formal corpus behind each step"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "The displayed equations are the load-bearing chain, not the corpus. Each step below names the theorems the poster cites; the columns count the modules those theorems live in, the theorem and lemma statements those modules contain, and the declarations whose axiom set was printed and checked."
   ]
  },
  {
@@ -265,13 +230,6 @@
    "8. Gain factorisation                   1      5      5",
    "",
    "MASTER strand total: 11 files, 88 theorem and lemma statements, 7 accepted modules, 57 axiom-audited declarations. Programme total: 427 files, 3,115 statements, 108 accepted modules, 860 audited declarations."
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "The statements not displayed are not filler. They are the arithmetic identities, measurability side conditions, finite-sum exchanges, positivity checks and explicit counterexamples that each displayed equation rests on \u2014 and in several cases they are the reason an earlier formulation was withdrawn. A poster can show the path; it cannot show the ground the path is laid on.",
-   "Every audited declaration was checked to depend only on {propext, Classical.choice, Quot.sound}. No module cited anywhere in this work contains a sorry; the overlap between the cited set and the files that do was computed and is empty."
   ]
  },
  {
