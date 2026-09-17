@@ -1,0 +1,506 @@
+{
+ "boxes": {
+  "1": [
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 4.1,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "I.  Introduction"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 5.12,
+    "width": 12.9,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "A schedule reveals items one at a time; a client with budget k sees the first k. The question is how well a SINGLE schedule \u2014 or a small MENU of schedules \u2014 can serve every budget at once, when the items carry SIGNED weights that cancel."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 7.09,
+    "width": 12.9,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "The family studied here is"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 1.43,
+    "top": 7.7,
+    "width": 12.64,
+    "height": 0.87,
+    "ref": "struct_family"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 8.73,
+    "width": 12.9,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "An ordering is a permutation; the retained prefix at budget k has sum s_k, and the normalised regret is (|s_k| \u2212 k mod 2)/D, because every g_i is odd and so the minimum of |\u03a3 g_i| over subsets of size k equals k mod 2 by parity."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 10.69,
+    "width": 12.9,
+    "height": 2.71,
+    "shape": null,
+    "lines": [
+     "Signed cancellation changes the problem qualitatively. With non-negative weights, adding an item never hurts, and a single well-chosen order degrades gracefully across budgets. Here a prefix can overshoot and then be corrected, so a schedule that is excellent at one budget can be poor at the next, and the question of how many schedules a menu needs becomes sharp."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 13.56,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "II.  Methodology"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 14.58,
+    "width": 12.9,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE DEFECT IS THE RIGHT NUMERATOR  (C2)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 2.51,
+    "top": 16.1,
+    "width": 10.48,
+    "height": 0.5,
+    "ref": "struct_dfc"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 16.76,
+    "width": 12.9,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  A parity argument: every weight is odd, so |s_k| and k share parity and the even part of |s_k| is exactly the normalised numerator."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 5.69,
+    "top": 18.27,
+    "width": 4.13,
+    "height": 0.67,
+    "ref": "struct_avg"
+   },
+   {
+    "kind": "eq",
+    "left": 5.93,
+    "top": 19.11,
+    "width": 3.64,
+    "height": 0.67,
+    "ref": "struct_path"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 19.94,
+    "width": 12.9,
+    "height": 2.26,
+    "shape": null,
+    "lines": [
+     "HOW THEY ARE CLOSED. The first bounds a maximum below by an average over budgets; the second bounds an expectation below by moving a per-schedule maximum inside. Each is a finite-sum inequality with no structure of the family used, so they apply to any non-negative regret."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 22.36,
+    "width": 12.9,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 4 \u2014 BOTH ARE ATTAINED  (C1, C4)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 22.97,
+    "width": 12.9,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "WHY THIS FOLLOWS FROM STEP 3. Bounds alone do not give a ratio. The uniform mixture over one-defect schedules attains the averaged bound at c/|Bud| and the path bound at c, so neither is loose and the ratio between them is exact."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 24.93,
+    "width": 12.9,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 5 \u2014 THE CONSTRUCTION  (C3)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 25.54,
+    "width": 12.9,
+    "height": 2.26,
+    "shape": null,
+    "lines": [
+     "WHY THIS FOLLOWS FROM STEP 4. Step 4 needs one-defect schedules to exist for every budget. Step 5 builds them: a greedy alternation maintaining the invariant |s| \u2264 1 \u2227 |s \u2212 a + b| \u2264 1 produces, for every m \u2265 5 and every j, an ordering of the multiset paying exactly 2 and paying it exactly at j."
+    ],
+    "text": null
+   }
+  ],
+  "2": [
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 4.1,
+    "width": 15.2,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 6 \u2014 THE RATIO  (C1)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 18.48,
+    "top": 4.71,
+    "width": 9.04,
+    "height": 0.72,
+    "ref": "struct_law"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 5.59,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  Under balance and concentration the expectation of the maximum equals |Bud| times the maximum of the expectation; with |Bud| = m \u2212 1 and the values."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 18.15,
+    "top": 7.1,
+    "width": 9.7,
+    "height": 0.91,
+    "ref": "struct_marginal"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 8.18,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  A length-k prefix of a ranking holds exactly min(k,n) items, proved by transporting the prefix through the ranking and counting; summing over items."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 18.71,
+    "top": 9.69,
+    "width": 8.58,
+    "height": 0.7,
+    "ref": "struct_cyclic"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 10.55,
+    "width": 15.2,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "so the uniform trajectory is REALISABLE rather than merely feasible on paper."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 15.4,
+    "top": 11.16,
+    "width": 15.2,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "III.  Results"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 12.18,
+    "width": 15.2,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "THE RATIO IS EXACTLY m \u2212 1, AND BOTH LEVELS FALL. Over m = 5 to 20 the two values decrease like 1/m while their ratio grows linearly. The growth of the ratio and the decay of the level are simultaneous, so a fixed-\u03b5 unbounded separation is NOT claimed and is not implied."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 14.15,
+    "width": 15.2,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "THE CONSTRUCTION COVERS EVERY BUDGET. For each m \u2265 5 and each budget j the built ordering pays exactly 2 and pays it exactly at j, so a menu of m \u2212 1 schedules covers every budget for free in the averaged sense \u2014 while Step 2 shows no single schedule can."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 16.11,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "THE COLUMN SUM IS A BUDGET, FOR EVERY MENU. The retained trajectory satisfies \u03a3_i x*_{i,k} = min(k,n) identically. No menu can change this count, which is why it cannot by itself distinguish menus."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 17.63,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/struct_fig3_enum.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 23.78,
+    "width": 15.2,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 1.  Orderings certified at each population size, exhaustively, past 10^38 \u2014 and the fraction attaining the proved minimum defect, falling to 3 in 10^19."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 24.73,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/struct_fig7_families.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 30.89,
+    "width": 15.2,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 2.  The paper\u2019s g_m is not the cheapest family forcing a defect, but it is the cheapest that also covers every budget, at every size."
+    ],
+    "text": null
+   }
+  ],
+  "3": [
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 4.1,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "IV.  Discussion"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 5.12,
+    "width": 15.6,
+    "height": 6.77,
+    "shape": null,
+    "lines": [
+     "EXHAUSTIVE, NOT SAMPLED \u2014 AND FAR PAST ENUMERATION. Enumerating orderings costs m! tuples, so m = 14 alone is 8.7\u00d710\u00b9\u2070. Every value of g\u2098 is odd, so a partial ordering is summarised completely by how many copies of each value it has used, and every quantity here becomes a path functional on a graph with O(m\u00b2) nodes. That certifies every ordering for 5 \u2264 m \u2264 120 \u2014 6.9\u00d710\u00b3\u2078 of them \u2014 in two minutes, agreeing with brute force everywhere the two overlap. HOW RARE AN OPTIMAL ORDERING IS. The theorems say the bound is attained; the census says how nearly it is missed. The fraction of orderings attaining defect 2 falls from one in five at m = 5 to three in 10\u00b9\u2079 at m = 120, and the bulk of orderings pay tens of units at m = 40 and hundreds at m = 80. The construction does not close a gap between good and slightly better. IS THE FAMILY SPECIAL? Over every balanced family of odd values: forcing a defect turns out to be GENERIC, 98 to 100 per cent, not rare as expected. What is rare is covering every budget \u2014 one or two families per size. And g\u2098 is not the cheapest witness (m+2 suffices) but is exactly the cheapest MENU (m+4), at every size tested."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 31.58,
+    "top": 12.05,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/struct_fig6_defectdist.png"
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 18.2,
+    "width": 15.6,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 3.  The full census of orderings by total defect. The proved bound is the extreme left tail, and the mass moves further from it as m grows."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 19.16,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "V.  Conclusions"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 20.18,
+    "width": 15.6,
+    "height": 3.16,
+    "shape": null,
+    "lines": [
+     "One schedule cannot serve every budget, and the cost of serving them all is exactly the menu size m\u22121. Every ordering pays at least two, verified for every m from 5 to 120 rather than argued asymptotically. The construction is not merely a witness: among all balanced families of odd values it has the least total variation of any that covers every budget, though not of any that merely forces a defect. And an ordering chosen without regard to the law pays a defect that grows with the population, while the menu pays two at every size."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 23.5,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "How the numbers were produced"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 24.52,
+    "width": 15.6,
+    "height": 4.06,
+    "shape": null,
+    "lines": [
+     "EXHAUSTIVE AND EXACT, WITH NO FLOATING POINT ANYWHERE. Counts are unbounded integers; the census of orderings by total defect is exact. There is no seed and no confidence interval in this section because there is no sampling in it. THE FAST METHOD IS CHECKED AGAINST THE SLOW ONE. Every m the brute-force enumeration could reach \u2014 up to 13 \u2014 is recomputed by the dynamic programme, and the two agree in every column. That agreement is what licenses the rows beyond it, out to m = 120. AND THE GENERAL EVALUATOR IS CHECKED AGAINST THE SPECIFIC ONE. The family sweep runs g\u2098 itself through its general code path and requires the published answer back at every m before reporting anything about other families."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 28.74,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "References"
+    ],
+    "text": null
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 29.76,
+    "width": 15.6,
+    "height": 1.19,
+    "shape": null,
+    "lines": [
+     "[1] Y. Disser, M. Klimm, K. Schewior and D. Weckbecker, \u201cIncremental maximization,\u201d arXiv:2305.01310. [2] A. Bernstein, Y. Disser, M. Gro\u00df and S. Himburg, \u201cGeneral bounds for incremental maximization,\u201d in Proc. ICALP, 2017."
+    ],
+    "text": null
+   }
+  ]
+ },
+ "report": {
+  "1": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 23.7,
+   "available_in": 31.75,
+   "fill": 0.746,
+   "blocks": 17,
+   "stack_in": 23.7,
+   "verdict": "thin \u2014 add content"
+  },
+  "2": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 27.58,
+   "available_in": 31.75,
+   "fill": 0.869,
+   "blocks": 15,
+   "stack_in": 27.58,
+   "verdict": "good"
+  },
+  "3": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 26.85,
+   "available_in": 31.75,
+   "fill": 0.846,
+   "blocks": 10,
+   "stack_in": 26.85,
+   "verdict": "good"
+  }
+ }
+}

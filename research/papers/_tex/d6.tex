@@ -1,0 +1,1423 @@
+\input{preamble}
+
+\begin{document}
+
+\title{The Slice Is Not a Restriction, the Design Is Not Fitted,\\
+and the Margin Threshold Is Sharp}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A scalar query measures $q$ coordinates and must distinguish the truth from an alternative.
+Its per-sample information is customarily stated against an alternative parameterised by
+$(d,x)$: $d$ coordinates displaced by $\mu$, the remaining $q-d$ displaced by $x$. Two
+objections stand against using that statement, and neither is answered by more cells or more
+search. A bound proved only over a two-parameter \emph{slice} says nothing about alternatives
+outside it, so a lower bound quantified over $(d,x)$ is not a lower bound over the class; and
+the design weights reproducing the corpus's coefficients were \emph{fitted}, so a consistent
+non-negative solution in $24$ of $24$ cells is evidence rather than a derivation. This paper
+supplies an argument for each. We define the general alternative as an arbitrary shift
+vector, show the $(d,x)$ formula is exactly the general information evaluated on the slice,
+and prove that every alternative in the class costs at least the slice value, with equality
+precisely on the slice---so the reduction loses nothing and gains nothing. The same
+computation shows the general information vanishes only at the zero shift, so the scalar
+query is blind in no direction. We then prove that the budget constraint together with the
+split \emph{forces} the two weights, which depend on the split and the price alone and not on
+the model parameters; the delivered information is consequently affine in the split, so the
+optimum sits at an endpoint unless the two queries buy information at exactly the same rate
+per unit price. Finally we prove a margin-sensitive exchange bound
+$2(L_{F}(T)-L_{F}(S))\le|T\setminus S|(2\delta-\mu)$ with no symmetry or fixed-cell
+assumption, and from it a \emph{sharp threshold}: a margin of $2\delta$ is sufficient for
+Top-$C$ optimality under every product reference, and for every margin below it an explicit
+construction makes Top-$C$ strictly suboptimal. Each displayed theorem is machine-checked in
+Lean~4 with no \texttt{sorry}. Sufficiency is proved for every product reference and
+necessity only at the corner; an exact rational sweep between them, validated against the
+proved identity before being reported, finds the construction degrading continuously rather
+than collapsing, and failing only past a breakdown point that grows with the margin and is
+never reached at the threshold.
+\end{abstract}
+
+\begin{IEEEkeywords}
+experimental design, information bounds, alternative families, budget allocation,
+approximate modularity, formal verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+A scalar query measures $q$ coordinates at once and returns a noisy scalar summary. To
+certify an answer it must distinguish the truth from an alternative, and the standard way to
+state what it can do is to fix a two-parameter family of alternatives---$d$ coordinates
+displaced by $\mu$, the remaining $q-d$ by $x$---and compute the per-sample information
+$I_{B}(d,x)$ against that family.
+
+This is convenient, and it is what a corpus of results is stated against. It is also open to
+two objections that no amount of further computation answers.
+
+The first is about quantifiers. A lower bound proved by quantifying over $(d,x)$ is a lower
+bound over a two-dimensional slice of a $q$-dimensional class. An alternative outside the
+slice is not covered, and for all the bound says it could be cheaper. Using such a bound as
+though it were class-quantified is a quantifier error, and it is repaired by an argument or
+not at all: no finite collection of alternatives sampled from outside the slice establishes a
+universal claim.
+
+The second is about provenance. The design weights reproducing the corpus's coefficients were
+obtained by fitting. A consistent non-negative solution in $24$ of $24$ parameter cells is
+good evidence that the coefficients come from the model rather than from the fit; it is not a
+derivation, and the difference matters if the weights are to be used outside the cells
+tested. This objection too is not closed by more cells, since the existing cells were already
+consistent.
+
+The paper makes five contributions. First, it shows the slice is not a restriction: every
+alternative in the class costs at least the slice value. Second, it shows the slice is exactly
+tight, so the reduction is lossless. Third, it shows the general information vanishes only at
+the zero shift, so the scalar query has no blind direction---which is what makes a mixed
+design with the pair query an interesting question at all. Fourth, it derives the design from
+the budget and the split rather than fitting it, and draws the consequence that the delivered
+information is affine, so the optimum is pure except on an explicitly computable threshold.
+Fifth, it proves a margin-sensitive exchange bound and the sharp threshold that follows from
+it.
+
+The scope is bounded. The reduction is for the scalar query, whose information is separable
+across coordinates; the pair query has a blind direction and is not covered. The reduction
+converts a \emph{lower} bound only. And the necessity half of the sharp threshold uses the
+corner reference, for a reason Section~\ref{sec:threshold} states and quantifies rather than
+leaves implicit.
+
+\section{Background}
+
+\subsection{Alternative Families in Design and Testing}
+
+Reducing a high-dimensional alternative class to a low-dimensional family is an old device.
+In optimal design it appears as the restriction of the criterion to a parametric direction
+\cite{pukelsheim2006,fedorov1972}; in testing it appears as the choice of a least-favourable
+alternative. The device is sound when the restriction is shown to be extremal, and unsound
+when it is merely convenient.
+
+However, that distinction is not always drawn, and it is exactly what the slice objection
+raises. A family chosen for computability may or may not contain the minimiser, and the
+descriptions in the literature are typically constructive---``$d$ coordinates at $\mu$ and
+the rest at $x$''---which gives no indication whether the family is a restriction or an
+extreme point of something larger. This paper settles the status for one case:
+Theorem~\ref{thm:reduction} shows the family is extremal within the magnitude-constrained
+class, and Corollary~\ref{cor:tight} that it is exactly so.
+
+\subsection{Budget-Constrained Allocation}
+
+Allocating a budget between measurement types under a linear price is a standard convex
+programme \cite{boyd2004}, and the affine structure of Theorem~\ref{thm:affine} is a special
+case of the observation that a linear objective over a simplex attains its optimum at a
+vertex.
+
+What is specific here is that the reduction to an affine objective is not assumed but
+derived. It follows from Theorem~\ref{thm:unique}, which removes the apparent freedom in the
+weights and leaves the split as the only variable. Without that step one optimises over a
+two-dimensional weight space subject to one budget constraint, and the objective on that
+space is linear but the feasible set is a segment whose parameterisation is not obviously the
+split. Fixing the parameterisation is what makes the transition condition readable as ``equal
+information per unit price'' rather than as an arbitrary algebraic condition.
+
+\subsection{Approximate Modularity and Exchange Bounds}
+
+The exchange bound of Section~\ref{sec:margin} sits near the literature on approximately
+modular set functions, which studies how far a function can be from additive and what that
+costs for optimisation; Feige, Feldman and Talgam-Cohen give stability and approximation
+results for that class \cite{feige2020}, and the general theory of decompositions for
+categorical inputs is well developed.
+
+However, ``nearly additive'' is not by itself a source of novelty here, and the distinction
+must be drawn on three axes rather than claimed. The modulus is different: $\delta$ bounds
+mixed differences of $F$ under a product reference, not a global additivity defect. The
+reference is different and, as Section~\ref{sec:threshold} shows, decisive---the necessity
+construction is stated at the corner, and the sweep of Section~\ref{sec:results} measures how
+far from the corner it survives. And the loss is a decision loss over
+Top-$C$ selection rather than an approximation error. What this paper contributes is the
+margin term: the bound $2|T\setminus S|\delta$ that an endpoint-patch argument gives is
+improved to $|T\setminus S|(2\delta-\mu)$ by retaining a score surplus that the earlier
+argument discarded.
+
+\subsection{Interval and Rational Certificates}
+
+The enclosure discipline of Section~\ref{sec:certificate} is standard interval arithmetic
+\cite{moore2009} carried out over the rationals so that the enclosures are exact rather than
+outward-rounded floats. Nothing about the technique is new; it is used because the
+conclusions are strict inequalities, and a strict inequality established in floating point is
+not established.
+
+\subsection{The Gap}
+
+The literature therefore leaves a specific opening. Design theory uses restricted alternative
+families without always settling whether they are extremal; budget allocation gives vertex
+optima but not a derivation of the weights that makes the objective affine; approximate
+modularity gives exchange bounds but under a different modulus, reference and loss. No
+existing treatment simultaneously: (i) proves a constructive alternative family extremal and
+exactly tight; (ii) derives the design weights from the budget rather than fitting them;
+(iii) retains the score surplus in the exchange bound so that a margin appears explicitly;
+and (iv) exhibits a sharp threshold at which Top-$C$ selection stops being optimal.
+
+\section{Research Aims, Questions, and Hypotheses}
+
+\subsection{Research Aim}
+
+The aim of this work is to settle the status of two ingredients that a corpus of information
+bounds currently carries without argument---the restricted alternative family and the fitted
+design---and to determine the exact margin at which Top-$C$ selection ceases to be optimal.
+
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Is the two-parameter alternative family extremal within the
+magnitude-constrained class, so that a slice-quantified lower bound is class-quantified?
+\item \textbf{RQ2.} Are the design weights forced by the budget and the split, or is there
+residual freedom that a fit is choosing?
+\item \textbf{RQ3.} Where can the optimal design change character as the split varies?
+\item \textbf{RQ4.} At what margin does Top-$C$ selection stop being optimal, and is that
+threshold sharp?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} Because the class is cut out by \emph{lower} bounds on coordinate
+magnitudes and the objective increases in each, the minimiser is where every constraint is
+active, which is the slice.
+\item \textbf{H2.} The budget is one linear equation and the split supplies a second, so the
+weight pair is determined and depends on $(\eta,c)$ alone.
+\item \textbf{H3.} With the weights determined, the delivered information is affine in the
+split, so the optimum is at an endpoint unless the slope vanishes.
+\item \textbf{H4.} A margin of $2\delta$ is sufficient for Top-$C$ optimality, and below it
+an explicit construction attains the exchange bound with equality, making the threshold
+sharp.
+\end{itemize}
+
+\section{Methodology}
+\label{sec:setting}
+
+\subsection{Framework Overview}
+
+The \emph{class} of alternatives is cut out by per-coordinate magnitude constraints: a shift
+$v\in\mathbb{R}^{q}$ belongs to the class determined by $(S,\mu,x)$ when $|v_{i}|\ge\mu$ for
+$i\in S$ and $|v_{i}|\ge x$ for $i\notin S$, with $|S|=d$. The slice is the sub-family in
+which every inequality holds with equality and every sign agrees.
+
+For the margin results we additionally write $\mathrm{osc}(f)=\max f-\min f$, $Q_{j}$ for the
+product response of coordinate $j$ under a product reference, and $L_{F}(S)$ for the
+compression loss of retaining the coordinate set $S$.
+
+A distinction is maintained throughout. The information formulas $I_{B}$ and
+$I_{\mathrm{pair}}$ are taken as given from the corpus and are not re-derived from the
+sampling model. The paper's subject is what can be concluded \emph{from} them, and a reader
+who disputes them disputes the premises rather than the argument.
+
+\subsection{Simplifying Assumptions}
+
+\begin{enumerate}
+\item[1)] \textbf{Magnitude-constrained class.} The alternative set is cut out by
+per-coordinate lower bounds on $|v_{i}|$. This is what makes the slice an extreme point; an
+alternative set defined by a norm bound or by a linear subspace is outside every statement
+here.
+
+\item[2)] \textbf{Separable scalar information.} The scalar query's information is a sum of
+per-coordinate terms, which is what lets Theorem~\ref{thm:reduction} argue coordinate-wise.
+The pair query is not separable and is explicitly excluded.
+
+\item[3)] \textbf{Positive price, admissible split.} $c>0$ and $0\le\eta\le1$. The second is
+derived rather than assumed---Proposition~\ref{prop:nonneg} shows it is exactly the condition
+for both weights to be non-negative---and the first is needed for
+Theorem~\ref{thm:unique} to determine the pair.
+
+\item[4)] \textbf{Uncapped profile.} The design derivation is for the uncapped profile. Where
+the unconstrained nuisance minimiser leaves its window the clipped branch applies and is
+settled separately.
+
+\item[5)] \textbf{Bounded mixed differences.} For the margin results,
+$|\mathrm{mixedDiff}_{F}(i,x,c)|\le\delta$ for all $i,x,c$, and the reference is a product
+reference with non-negative weights summing to one.
+\end{enumerate}
+
+\subsection{Two Formulas, One Object}
+\label{sec:reduction}
+
+\begin{definition}[General and slice information]
+For a shift vector $v\in\mathbb{R}^{q}$,
+\begin{equation}
+I(v)\;=\;\frac{1}{2q}\sum_{i=1}^{q} v_{i}^{2},
+\label{eq:igen}
+\end{equation}
+and for the two-parameter family,
+\begin{equation}
+I_{B}(d,x)\;=\;\frac{1}{2}\left(\frac{d\,\mu^{2}}{q}+\frac{(q-d)\,x^{2}}{q}\right).
+\label{eq:ib}
+\end{equation}
+\end{definition}
+
+\begin{theorem}[The slice identity]
+\label{thm:slice}
+If $v_{i}=\mu$ for $i\in S$ with $|S|=d$ and $v_{i}=x$ otherwise, then $I(v)=I_{B}(d,x)$.
+\end{theorem}
+
+\begin{proof}
+Split the index set into $S$ and its complement. The summand is constant on each part, so
+$\sum_{i}v_{i}^{2}=d\mu^{2}+|S^{c}|x^{2}$ with $|S^{c}|=q-d$; dividing by $2q$ gives
+\eqref{eq:ib}.
+\end{proof}
+
+\leanbox{\lean{Igen}, \lean{IB\_eq\_of\_slice} in \lean{LeanD6GeneralFamilyV1}}
+
+This is stated first because without it the two objections cannot even be posed together: it
+establishes that \eqref{eq:igen} and \eqref{eq:ib} are not two different models but one
+expression written two ways.
+
+\begin{theorem}[Every alternative costs at least the slice value]
+\label{thm:reduction}
+If $|v_{i}|\ge\mu$ for $i\in S$, $|v_{i}|\ge x$ for $i\notin S$, and $|S|=d$, then
+\begin{equation}
+I_{B}(d,x)\;\leq\;I(v).
+\label{eq:reduction}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+For $i\in S$, monotonicity of the square on non-negative arguments gives
+$v_{i}^{2}=|v_{i}|^{2}\ge\mu^{2}$; for $i\notin S$ likewise $v_{i}^{2}\ge x^{2}$. Summing over
+$S$ and its complement and dividing by the positive normaliser $2q$ gives
+\eqref{eq:reduction}.
+\end{proof}
+
+\leanbox{\lean{IB\_le\_general} in \lean{LeanD6GeneralFamilyV1}}
+
+The proof is coordinate-wise and the sum is finite, so no optimiser and no rearrangement
+argument is needed. This is worth noting because a reduction of this kind is often attempted
+by an exchange argument, which requires care about which coordinate is moved and in what
+order; here the monotonicity of the square does all the work, and it does so because
+assumption 1 cuts the class out by \emph{lower} bounds while the objective \emph{increases}
+in each magnitude. A minimiser therefore sits where every constraint is active, and that set
+is exactly the slice.
+
+\begin{corollary}[The slice is exactly tight]
+\label{cor:tight}
+Equality holds in \eqref{eq:reduction} precisely when $|v_{i}|=\mu$ on $S$ and $|v_{i}|=x$
+off it, that is, precisely on the slice.
+\end{corollary}
+
+\leanbox{\lean{slice\_is\_tight} in \lean{LeanD6GeneralFamilyV1}}
+
+\begin{corollary}[Quantifier upgrade]
+\label{cor:upgrade}
+If $L\le I_{B}(d,x)$ for every $(d,x)$ in the slice, then $L\le I(v)$ for every $v$ in the
+class. Conversely no bound better than $\inf_{\text{slice}}I_{B}$ holds over the class.
+\end{corollary}
+
+The first half is the upgrade the paper set out to obtain: the two-parameter family stops
+being a limitation. The second half is what makes the upgrade free rather than lossy---
+enlarging the class would not have produced a better bound. The direction matters:
+Corollary~\ref{cor:upgrade} converts a \emph{lower} bound, and an upper bound quantified over
+the slice would still say nothing about the class, because Theorem~\ref{thm:reduction} runs
+the wrong way for that purpose.
+
+\begin{theorem}[No blind direction]
+\label{thm:nonblind}
+$I(v)>0$ for every $v\neq0$.
+\end{theorem}
+
+\begin{proof}
+$I(v)$ is a positive multiple of a sum of squares.
+\end{proof}
+
+\leanbox{\lean{Igen\_pos\_of\_ne\_zero} in \lean{LeanD6GeneralFamilyV1}}
+
+The scalar query is therefore blind in no direction whatsoever: a single non-zero coordinate
+suffices to make it informative. Stated this way the fact needs no reference to the slice, and
+it is what makes the mixture question of the next subsection interesting. If both queries were
+blind in no direction, the choice between them would be a matter of price alone; because the
+pair query has a kernel and the scalar query does not, the mixture has content.
+
+\subsection{The Design from Its Price}
+\label{sec:design}
+
+\begin{theorem}[Budget identity and uniqueness]
+\label{thm:unique}
+With
+\begin{equation}
+w_{B}=1-\eta,\qquad
+w_{\mathrm{pair}}=\frac{\eta}{c},
+\label{eq:design}
+\end{equation}
+the unit budget holds exactly, $w_{B}+c\,w_{\mathrm{pair}}=1$. Moreover, given the split
+$\eta$ and the price $c\neq0$, the pair satisfying the budget is unique and equals
+\eqref{eq:design}.
+\end{theorem}
+
+\begin{proof}
+For the identity, $(1-\eta)+c\cdot\eta/c=1$. For uniqueness, the budget is one linear
+equation in two unknowns and the split supplies the second, $c\,w_{\mathrm{pair}}=\eta$; two
+independent linear equations determine the pair.
+\end{proof}
+
+\leanbox{\lean{budget\_exact}, \lean{weights\_unique} in
+\lean{LeanD6DesignDerivationV1}}
+
+The conclusion is an \emph{equality}, not an existence. That is the whole content of the
+provenance repair: an existential---``there exist non-negative weights satisfying the
+budget''---would be consistent with the weights having been fitted, whereas an equality leaves
+nothing to fit.
+
+\begin{proposition}[Admissible range, derived]
+\label{prop:nonneg}
+Both weights are non-negative exactly when $0\le\eta\le1$ and $c>0$.
+\end{proposition}
+
+\leanbox{\lean{weights\_nonneg\_iff} in \lean{LeanD6DesignDerivationV1}}
+
+The range of the split is therefore derived rather than assumed, and the point is small but
+real: an implementation that clamps $\eta$ to $[0,1]$ by fiat cannot distinguish a genuinely
+infeasible configuration from one it has silently repaired.
+
+\begin{corollary}[Independence of the model parameters]
+\label{cor:indep}
+$w_{B}$ and $w_{\mathrm{pair}}$ depend on $(\eta,c)$ alone, and not on $(q,\mu)$.
+\end{corollary}
+
+\begin{proof}
+Neither $q$ nor $\mu$ appears in \eqref{eq:design}, and by Theorem~\ref{thm:unique} no other
+solution exists.
+\end{proof}
+
+Corollary~\ref{cor:indep} is what answers the provenance objection. The fitted weights were
+observed to be constant across $(q,\mu)$ in the cells tested; the derivation explains why and
+extends the statement to every $(q,\mu)$ rather than to the cells.
+
+\input{d6_cells}
+
+\begin{theorem}[Affine in the split, and the transition]
+\label{thm:affine}
+With the weights \eqref{eq:design},
+\begin{equation}
+I(\eta)\;=\;I_{B}+\eta\left(\frac{I_{\mathrm{pair}}}{c}-I_{B}\right),
+\label{eq:affine}
+\end{equation}
+so the optimum sits at an endpoint unless the slope vanishes, which happens exactly when
+\begin{equation}
+c\,I_{B}\;=\;I_{\mathrm{pair}},
+\label{eq:transitioncond}
+\end{equation}
+and on that condition every split is optimal.
+\end{theorem}
+
+\begin{proof}
+The delivered information is $w_{B}I_{B}+w_{\mathrm{pair}}I_{\mathrm{pair}}$; substituting
+\eqref{eq:design} and collecting the $\eta$ terms gives \eqref{eq:affine}. An affine function
+on $[0,1]$ attains its maximum at an endpoint unless it is constant.
+\end{proof}
+
+\leanbox{\lean{info\_linear}, \lean{optimum\_at\_endpoint},
+\lean{transition\_at\_equal\_price} in \lean{LeanD6DesignDerivationV1}}
+
+\noindent\emph{Supporting results in \lean{LeanD6DesignDerivationV1}.}~These are the design derivation. The budget identity and the uniqueness statement are separate because the first alone is consistent with the weights having been fitted; it is the uniqueness that leaves nothing to fit. The non-negativity characterisation makes the admissible range of the split a derived statement, and the affine and endpoint results then remove the need to search over the split at all. They are reproduced as the prover has them; a further $3$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{budget\_exact}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} :\\
+&\quad \mathit{c} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{wB} \mathit{eta} + \mathit{c} * \mathit{wPair}\\
+&\quad \mathit{eta} \mathit{c} = 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{flat\_when\_equal\_price}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{IB} \mathit{Ipair} \mathit{c} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
+&\quad (\mathit{heq} : \mathit{Ipair} / \mathit{c} -\\
+&\quad \mathit{IB} =\\
+&\quad 0),\; (\mathit{eta} \mathit{eta'} : \mathbb{Q} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
+&\quad \mathit{c} = \mathit{info} \mathit{IB} \mathit{Ipair}\\
+&\quad \mathit{eta'} \mathit{c}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{info\_linear}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
+&\quad \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} /\\
+&\quad \mathit{c} -\\
+&\quad \mathit{IB})
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{weights\_unique}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eta} \mathit{c} \mathit{a} \mathit{b} : \mathbb{Q}\\
+&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
+&\quad (\mathit{hbudget} : \mathit{a} + \mathit{c} *\\
+&\quad \mathit{b} =\\
+&\quad 1),\; (\mathit{hshare} : \mathit{c} * \mathit{b} =\\
+&\quad \mathit{eta})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{a} = \mathit{wB} \mathit{eta} \wedge \mathit{b}\\
+&\quad = \mathit{wPair} \mathit{eta} \mathit{c}
+\end{aligned} \]}
+
+
+Condition \eqref{eq:transitioncond} is written with the factor $c$ on the left rather than
+divided out because that form has a reading: dividing through gives
+$I_{B}/1=I_{\mathrm{pair}}/c$, so the two queries deliver equal information per unit of budget
+spent. Below the threshold the scalar query is the better buy and takes the whole budget;
+above it the pair query does; on it the design is undetermined by information considerations
+and may be fixed on other grounds. Two readings must be resisted. The theorem locates where a
+transition \emph{can} occur and does not claim one exists in any parameter range; and the
+knife-edge case is not degenerate noise but a genuine statement that every split delivers the
+same value.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig1_design.png}
+\caption{Derived weights against the budget split. The lines are the formula
+\eqref{eq:design}; the markers are the artifact's own fitted weights in all $24$ cells. They
+coincide exactly, and as Corollary~\ref{cor:indep} predicts the weights do not depend on
+$(q,\mu)$, so each marker stands for several cells differing in $(q,\mu)$.}
+\label{fig:design}
+\end{figure}
+
+\subsection{The Margin-Sensitive Exchange Law}
+\label{sec:margin}
+
+The results so far concern the alternative family and the design. A sharper object is
+available from the same development: an exchange bound in which the \emph{margin} between
+selected and unselected coordinates appears explicitly.
+
+\begin{lemma}[Score surplus from a common margin]
+\label{lem:surplus}
+Let $A,B$ be finite with $|A|=|B|$ and suppose every element of $A$ beats every element of
+$B$ by at least $\mu$ in $\mathrm{score}$. Then
+\begin{equation}
+|A|\,\mu\;\leq\;\sum_{i\in A}\mathrm{score}(i)-\sum_{j\in B}\mathrm{score}(j).
+\label{eq:surplus}
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+If $B$ is empty both sides vanish. Otherwise take $b\in B$ maximising $\mathrm{score}$ on
+$B$. Summing $\mu+\mathrm{score}(b)\le\mathrm{score}(i)$ over $A$ gives
+$|A|(\mu+\mathrm{score}(b))\le\sum_{A}\mathrm{score}$, and
+$\sum_{B}\mathrm{score}\le|B|\mathrm{score}(b)=|A|\mathrm{score}(b)$; subtracting gives
+\eqref{eq:surplus}.
+\end{proof}
+
+\leanbox{\lean{score\_surplus\_ge\_card\_mul\_margin} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+The lemma is pure finite combinatorics---no geometry, no design---and it is stated separately
+because it is what converts a margin hypothesis into a quantity the exchange bound can
+consume.
+
+\begin{theorem}[Exchange bound retaining the surplus]
+\label{thm:exchange}
+With $T$ Top-$k$ by $\mathrm{osc}\circ Q$ and $|S|=k$, writing $A=T\setminus S$ and
+$B=S\setminus T$,
+\begin{equation}
+L_{F}(T)-L_{F}(S)\;\leq\;|A|\,\delta
+ \;-\;\frac{1}{2}\Bigl(\sum_{j\in A}\mathrm{osc}(Q_{j})-\sum_{j\in B}\mathrm{osc}(Q_{j})\Bigr).
+\label{eq:exchangesurplus}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+The bracketed term is the surplus. An earlier endpoint-patch argument dropped it and retained
+only $|A|\delta$; because $T$ is Top-$k$ the surplus is non-negative, so
+\eqref{eq:exchangesurplus} is never weaker and is strictly stronger whenever the selected
+scores exceed the unselected ones.
+
+\begin{theorem}[Margin-sensitive exchange]
+\label{thm:marginexchange}
+If in addition every selected coordinate beats every unselected one by at least $\mu$, then
+\begin{equation}
+2\bigl(L_{F}(T)-L_{F}(S)\bigr)\;\leq\;|T\setminus S|\;\bigl(2\delta-\mu\bigr).
+\label{eq:marginexchange}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Apply Theorem~\ref{thm:exchange}, then bound the surplus below by Lemma~\ref{lem:surplus}
+with $\mathrm{score}=\mathrm{osc}\circ Q$, using $|T\setminus S|=|S\setminus T|$ which holds
+because $|T|=|S|$.
+\end{proof}
+
+\leanbox{\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin} in
+\lean{LeanD6MarginSensitiveExchangeV1}}
+
+\noindent\emph{Supporting results in \lean{LeanD6MarginSensitiveExchangeV1}.}~These are the exchange law. The surplus lemma is pure finite combinatorics with no geometry in it, and it is what converts a margin hypothesis into a quantity the exchange bound can consume. The two exchange statements are ordered so that the first retains the surplus the earlier endpoint-patch argument discarded, and the second bounds that surplus below by the margin. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,5}\quad\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{mu} : \mathbb{R}\\
+&\quad ),\; (\mathit{hWeight} : \forall \mathit{c}, 0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
+&\quad =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U}),\\
+&\quad |\mathit{mixedDifference} \mathit{F}\\
+&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
+&\quad (\mathit{selected} \mathit{competitor} :\\
+&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
+&\quad \mathit{competitor}.\mathit{card} =\\
+&\quad \mathit{k}),\; (\mathit{hMargin} : \forall \mathit{i}\\
+&\quad \in \mathit{selected}, \forall \mathit{j}\\
+&\quad \notin \mathit{selected}, \mathit{mu} +\\
+&\quad \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
+&\quad \mathit{q} \mathit{F}\\
+&\quad \mathit{i}))
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
+&\quad \mathit{selected} -\\
+&\quad \mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
+&\quad \mathit{competitor}) \leq ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{card} :\\
+&\quad \mathbb{R}\\
+&\quad ) * (2 * \mathit{delta} - \mathit{mu})
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} : \mathbb{R} ),\;\\
+&\quad (\mathit{hWeight} : \forall \mathit{c}, 0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
+&\quad =\\
+&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
+&\quad (\mathit{n} + 1) \to \mathit{U}),\\
+&\quad |\mathit{mixedDifference} \mathit{F}\\
+&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
+&\quad (\mathit{selected} \mathit{competitor} :\\
+&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
+&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
+&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
+&\quad \mathit{competitor}.\mathit{card} =\\
+&\quad \mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{selected} -\\
+&\quad \mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{competitor} \leq ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{card} :\\
+&\quad \mathbb{R}\\
+&\quad ) * \mathit{delta} - ((\mathit{selected} \\\
+&\quad \mathit{competitor}).\mathit{sum}\\
+&\quad (\mathbf{fun} \mathit{j}\\
+&\quad \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F} \mathit{j})) - (\mathit{competitor} \\\
+&\quad \mathit{selected}).\mathit{sum} (\mathbf{fun}\\
+&\quad \mathit{j} \mapsto \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}))) / 2
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{score\_surplus\_ge\_card\_mul\_margin}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{DecidableEq}\\
+&\quad \mathit{I}],\; (\mathit{A} \mathit{B} : \mathit{Finset}\\
+&\quad \mathit{I}),\; (\mathit{score} : \mathit{I}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{mu} : \mathbb{R} ),\;\\
+&\quad (\mathit{hCard} : \mathit{A}.\mathit{card}\\
+&\quad =\\
+&\quad \mathit{B}.\mathit{card}),\; (\mathit{hMargin}\\
+&\quad : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j}\\
+&\quad \in \mathit{B}, \mathit{mu} + \mathit{score}\\
+&\quad \mathit{j} \leq \mathit{score}\\
+&\quad \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{A}.\mathit{card} : \mathbb{R} ) * \mathit{mu}\\
+&\quad \leq \mathit{A}.\mathit{sum} \mathit{score} -\\
+&\quad \mathit{B}.\mathit{sum} \mathit{score}
+\end{aligned} \]}
+
+
+No symmetry is assumed, no active cell is fixed, and the reference is an arbitrary product
+reference. The improvement over the $\delta$-only form is exactly $|T\setminus S|\mu$, which
+is what makes the next subsection possible.
+
+\subsection{The Sharp Threshold at Margin $2\delta$}
+\label{sec:threshold}
+
+Equation \eqref{eq:marginexchange} has an immediate consequence: at margin $2\delta$ the
+right-hand side turns non-positive.
+
+\begin{theorem}[Sufficiency]
+\label{thm:sufficient}
+If $2\delta\leq\rho$ then $L_{F}(T)\leq L_{F}(S)$ for every $S$ with $|S|=k$.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:marginexchange} the doubled difference is at most
+$|T\setminus S|(2\delta-\rho)\le0$.
+\end{proof}
+
+\leanbox{\lean{margin\_two\_sufficient} in \lean{LeanD6SharpMarginThresholdV1}}
+
+Theorem~\ref{thm:sufficient} holds for \emph{every} product reference, including degenerate
+ones, because its proof uses only the mixed-difference bound and the weight axioms. That
+matters because the matching necessity result does not.
+
+\begin{theorem}[The steering construction attains the bound exactly]
+\label{thm:steered}
+For $A$ a coordinate set, $j\notin A$, $1\le\rho$, with $|A^{\complement}|=|A|$ and at least
+two coordinates outside $A\cup\{j\}$, under the corner reference
+\begin{equation}
+2\bigl(L(A)-L(A^{\complement})\bigr)\;=\;|A|\,(2-\rho).
+\label{eq:steered}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{steered\_exchange\_equality} in \lean{LeanD6SharpMarginThresholdV1}}
+
+\begin{theorem}[Every sub-threshold margin fails]
+\label{thm:subthreshold}
+For $A$ non-empty and every $\rho\in[1,2)$, $A$ is Top-$k$ by the oscillation score and yet
+$L(A^{\complement})<L(A)$.
+\end{theorem}
+
+\begin{proof}
+$A$ is Top-$k$ by construction, and by \eqref{eq:steered} the doubled difference equals
+$|A|(2-\rho)>0$.
+\end{proof}
+
+\leanbox{\lean{every\_subthreshold\_margin\_fails} in
+\lean{LeanD6SharpMarginThresholdV1}}
+
+\noindent\emph{Supporting results in \lean{LeanD6SharpMarginThresholdV1}.}~These are the threshold. Sufficiency is proved for an arbitrary product reference, including degenerate ones, because its proof uses only the mixed-difference bound and the weight axioms. The equality statement and the sub-threshold failure are both under the corner reference, which is the asymmetry Section~\ref{sec:discussion} reports and the reference sweep of Section~\ref{sec:results} quantifies. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,8}\quad\lean{every\_subthreshold\_margin\_fails}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
+&\quad (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
+&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
+&\quad \notin \mathit{A}),\; (\mathit{hne} :\\
+&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho}\\
+&\quad : \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
+&\quad (\mathit{hr2} : \mathit{rho} <\\
+&\quad 2),\; (\mathit{hbal} :\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
+&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\quad \mathit{j}).\mathit{card})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j} \mathit{rho})\\
+&\quad \mathit{i})) \mathit{A} \mathit{A}.\mathit{card}\\
+&\quad \wedge \mathit{productCompressionLoss} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{Aᶜ} <\\
+&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
+&\quad \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{A}
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{margin\_two\_sufficient}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{U} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{U}],\; [\mathit{Nonempty} \mathit{U}],\; \{\\
+&\quad \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I}\\
+&\quad \mathit{n} \to \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U})\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{delta} \mathit{rho} : \mathbb{R}\\
+&\quad ),\; (\mathit{hWeight} : \forall \mathit{c},0\\
+&\quad \leq \mathit{jointWeight} \mathit{q}\\
+&\quad \mathit{c}),\; (\mathit{hNorm} :\\
+&\quad \textstyle\sum \mathit{c},\mathit{jointWeight}\\
+&\quad \mathit{q}\\
+&\quad \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\;\\
+&\quad (\mathit{hdelta} : \forall \mathit{i}\\
+&\quad \mathit{x}\\
+&\quad \mathit{c},|\mathit{mixedDifference}\\
+&\quad \mathit{F} \mathit{i} \mathit{x} \mathit{c}|\\
+&\quad \leq \mathit{delta}),\; (\mathit{T} :\\
+&\quad \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{k} : \mathbb{N} ),\;\\
+&\quad (\mathit{htop} : \mathit{IsTopKByScore}\\
+&\quad (\mathbf{fun} \mathit{i} => \mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{i})) \mathit{T}\\
+&\quad \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i}\\
+&\quad \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\mathit{rho}+\mathit{osc}\\
+&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
+&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
+&\quad \mathit{q} \mathit{F}\\
+&\quad \mathit{i})),\; (\mathit{hrho} :\\
+&\quad 2*\mathit{delta} \leq \mathit{rho}),\;\\
+&\quad (\mathit{S} : \mathit{Finset} (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{hS} :\\
+&\quad \mathit{S}.\mathit{card}=\mathit{k})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
+&\quad (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{T} \leq \mathit{productCompressionLoss}\\
+&\quad \mathit{F} (\mathit{productResponse} \mathit{q}\\
+&\quad \mathit{F}) \mathit{S}
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{steered\_exchange\_equality}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
+&\quad (\mathit{I}\\
+&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
+&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
+&\quad \notin \mathit{A}),\; (\mathit{rho} :\\
+&\quad \mathbb{R}\\
+&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
+&\quad (\mathit{hbal} :\\
+&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
+&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
+&\quad \mathit{j}).\mathit{card})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
+&\quad \mathit{j} \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho})) \mathit{A}-\\
+&\quad \mathit{productCompressionLoss}\\
+&\quad (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})\\
+&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j} \mathit{rho}))\\
+&\quad \mathit{Aᶜ})= (\mathit{A}.\mathit{card}:\mathbb{R}\\
+&\quad )*(2-\mathit{rho})
+\end{aligned} \]}
+
+
+Together these make the condition $\rho\ge2\delta$ sharp at $\delta=1$: sufficient for
+Top-$C$ optimality, and violated for every $\rho$ in $[1,2)$.
+
+Three scope statements belong here rather than in the Discussion, because the result invites
+over-reading. It is a Top-$C$ optimality threshold, not a minimax value: it says when the
+Top-$C$ rule is optimal among same-cardinality sets, and says nothing about the minimax value
+of the whole same-response fibre, which is a different quantifier and is open. Sufficiency and
+necessity do not share a reference class, as noted above. And robustness to the reference
+was measured rather than assumed: an exact rational sweep of the product reference
+$q_{i}(1)=t$, reported in Section~\ref{sec:results}, finds that the witness does not collapse
+the moment the corner is left but degrades continuously, and fails only past a breakdown point
+$t^{\star}(\mu)$ that grows with the margin and is never reached at $\mu=2$. The mechanism is
+that the steered coordinate $j$ accumulates span as the reference acquires interior mass, so
+the separation the corner enforces between $A$ and its complement narrows until $j$ overtakes
+$A$ on score and $A$ is no longer the Top-$C$ set.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig3_threshold.png}
+\caption{The exchange law of \lean{steered\_exchange\_equality}, drawn at $\delta=1$. The
+doubled regret of the Top-$C$ set against its complement is exactly $|A|(2-\rho)$: positive
+below the threshold $\rho=2\delta$, where the construction of
+Theorem~\ref{thm:subthreshold} makes Top-$C$ strictly worse than a same-cardinality
+competitor, and non-positive at and above it, where Theorem~\ref{thm:sufficient} forbids any
+competitor from beating it. The two theorems meet at $\rho=2$ with no gap between them, which
+is what makes the threshold sharp rather than merely bracketed. The lines are the proved
+identity evaluated, not a fit, and the slope $-|A|$ is why a larger selected set is penalised
+more by the same margin deficit.}
+\label{fig:threshold}
+\end{figure}
+
+\subsection{The Separation Certificate on a Cell}
+\label{sec:certificate}
+
+A separate question is whether a claimed strict separation survives across a whole parameter
+cell rather than at sampled points.
+
+\begin{lemma}[Quadratic infimum on an interval]
+\label{lem:quadinf}
+For $f(x)=ax^{2}+bx+c$ with $a\ge0$ on $[l,u]$,
+$\inf_{[l,u]}f=\min\{f(l),f(u),f(x^{\dagger})\}$ with $x^{\dagger}=-b/2a$ when $a>0$ and
+$x^{\dagger}\in[l,u]$.
+\end{lemma}
+
+\leanbox{\lean{quadratic\_inf\_Icc} in \lean{LeanD6AlternativeReductionV1}}
+
+\begin{theorem}[Separation across a cell]
+\label{thm:modulus}
+On a cell $[t_{0},t_{1}]$, if
+\begin{equation}
+L_{\mathrm{full}}(t_{0})\;>\;\rho_{\mathrm{two}}\;U_{\mathrm{two}}(t_{0}),
+\qquad \rho\;=\;r^{(t_{1}-t_{0})/q},
+\label{eq:modulus}
+\end{equation}
+then the strict separation holds throughout the cell.
+\end{theorem}
+
+\leanbox{\lean{no\_crossing\_of\_modulus}, \lean{crossing\_bracket} in
+\lean{LeanD6AlternativeReductionV1}}
+
+\noindent\emph{Supporting results in \lean{LeanD6AlternativeReductionV1}.}~These are the certificate machinery. The quadratic infimum is given at the vertex and at each endpoint separately, which is what reduces a continuous range of $x$ to three evaluations; the crossing statements then propagate the verdict across a cell by an exact multiplicative factor rather than by sampling within it. They are reproduced as the prover has them; a further $4$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,11}\quad\lean{crossing\_bracket}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
+&\quad \mathit{t1} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
+&\quad (\mathit{hc} : \mathit{ContinuousOn}\\
+&\quad \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0}\\
+&\quad \mathit{t1})),\; (\mathit{h0} : \mathit{f}\\
+&\quad \mathit{t0} \leq 0),\; (\mathit{h1} : 0\\
+&\quad \leq \mathit{f}\\
+&\quad \mathit{t1})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, \mathit{f} \mathit{t}\\
+&\quad = 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,12}\quad\lean{no\_crossing\_of\_modulus}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
+&\quad \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R}\\
+&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
+&\quad (\mathit{hLip} : 0 \leq \mathit{Lip}),\;\\
+&\quad (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, |\mathit{f}\\
+&\quad \mathit{s} - \mathit{f} \mathit{t0}|\\
+&\quad \leq \mathit{Lip} * (\mathit{s} -\\
+&\quad \mathit{t0})),\; (\mathit{hm} : \mathit{m}\\
+&\quad \leq \mathit{f}\\
+&\quad \mathit{t0}),\; (\mathit{hpos} : 0 <\\
+&\quad \mathit{m}),\; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} -\\
+&\quad \mathit{t0}) <\\
+&\quad \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
+&\quad \mathit{t0} \mathit{t1}, 0 < \mathit{f} \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{S\,13}\quad\lean{quadratic\_inf\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} :\\
+&\quad \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\;\\
+&\quad (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 *\\
+&\quad \mathit{a})),\; (\mathit{hv2} : -\mathit{b} /\\
+&\quad (2 * \mathit{a}) \leq \mathit{hi})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x}\\
+&\quad \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 *\\
+&\quad \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (2 *\\
+&\quad \mathit{a})) + \mathit{c} \leq \mathit{a} *\\
+&\quad \mathit{x} ^{2} +\\
+&\quad \mathit{b} * \mathit{x} +\\
+&\quad \mathit{c}) \wedge \mathit{lo} \leq -\mathit{b} / (2 *\\
+&\quad \mathit{a}) \wedge -\mathit{b} / (2 * \mathit{a})\\
+&\quad \leq \mathit{hi}
+\end{aligned} \]}
+
+
+The information \eqref{eq:ib} is quadratic in $x$ with non-negative leading coefficient, so
+Lemma~\ref{lem:quadinf} reduces a continuous $x$-range to three evaluations. Both verdicts use
+outward \emph{rational} enclosures and exact gaps rather than floating point, so a certificate
+is a proof about the cell and not a statement about the points sampled in it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig4_affine.png}
+\caption{Why the optimal design is pure except on a threshold. Theorem~\ref{thm:affine} makes
+delivered information affine in the budget split $\eta$, so $I(\eta)$ is a straight line
+between $I_{B}$ at $\eta=0$ and $I_{\mathrm{pair}}/c$ at $\eta=1$, whatever the parameters.
+An affine function on an interval attains its maximum at an endpoint unless its slope is
+zero, so the optimum is pure---all budget to one query type---except on the single surface
+$I_{\mathrm{pair}}=c\,I_{B}$ where the line is flat and every split is optimal. The three
+lines show the two strict cases and the degenerate one. Exact evaluation of
+\eqref{eq:transitioncond}.}
+\label{fig:affine}
+\end{figure}
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+The theorems quantify over all parameters, so the numerical work cannot strengthen them. It
+has two objectives. The first is to confirm that the derived weights agree with the previously
+fitted ones on the cells where the fit was performed, which is a check on the implementation.
+The second concerns a hypothesis rather than an implementation. The sufficiency half of the
+threshold, Theorem~\ref{thm:sufficient}, is proved for an arbitrary product reference; the
+necessity half, Theorem~\ref{thm:subthreshold}, is proved at the corner reference only.
+Nothing in the formal development says what happens between them, and the honest question is
+not whether the witness survives an arbitrary reference---it is not claimed to---but how far
+from the corner it survives, and whether the failure is abrupt or gradual. Experiment~E2
+measures that.
+
+\subsection{Setup}
+
+The design grid is $q\in\{8,16\}$, $\mu\in\{\tfrac14,\tfrac25\}$, $c\in\{\tfrac32,2\}$ and
+$\eta\in\{\tfrac13,\tfrac{13}{20},\tfrac45\}$, giving $24$ cells. The separation certificate
+is evaluated on eight cells, and the pair-query necessity test on twenty.
+
+\subsection{E2: The Reference Sweep}
+\label{sec:e2}
+
+The reference is moved off the corner along the one-parameter product family
+$q_{i}(\mathrm{true})=t$, which places mass $t$ on the true response in every coordinate
+independently and recovers the corner at $t=0$. The grid is the seventeen rationals
+$t=0,\tfrac1{32},\dots,\tfrac12$, crossed with two dimensions $n\in\{6,8\}$ and five margins
+$\rho\in\{1,\tfrac54,\tfrac32,\tfrac74,2\}$---one hundred and seventy cells, of which one
+hundred and sixty have $t>0$.
+
+\begin{algorithm}[htbp]
+\caption{Evaluating the construction under one reference}
+\label{alg:sweep}
+\begin{algorithmic}[1]
+\REQUIRE dimension $n$, selected set $A$, steered coordinate $j\notin A$, margin $\mu$,
+         product reference $q_{i}(\mathrm{true})=t_{i}$
+\ENSURE whether $A$ is still a Top-$C$ set, and the doubled regret against its complement
+\STATE $F(x)\leftarrow\textsc{Steered}(A,j,\mu)(x)$ for every $x\in\{0,1\}^{n}$
+       \COMMENT{independent of the reference, so tabulated once per configuration and
+       reused across every $t$ --- this is what makes the wide sweep affordable}
+\STATE $W(c)\leftarrow\prod_{i}\bigl(t_{i}\text{ if }c_{i}\text{ else }1-t_{i}\bigr)$
+\FORALL{coordinates $i$ and values $u\in\{0,1\}$}
+  \STATE $Q_{i}(u)\leftarrow\sum_{c}W(c)\,F(c\text{ with }c_{i}:=u)$
+\ENDFOR
+\STATE $\mathrm{osc}_{i}\leftarrow|Q_{i}(1)-Q_{i}(0)|$;
+       $\;T\leftarrow$ the $|A|$ coordinates of largest $\mathrm{osc}$
+\STATE $L(S)\leftarrow\tfrac12\bigl(\max_{x}-\min_{x}\bigr)
+       \bigl[F(x)-\sum_{i\in S}Q_{i}(x_{i})\bigr]$
+\RETURN $\bigl[T=A\bigr]$ and $2\bigl(L(A)-L(A^{\complement})\bigr)$
+\end{algorithmic}
+\end{algorithm}
+
+\noindent All of it is exact rational arithmetic, so a reported flip is a flip and not a
+rounding artefact. Two properties of the setup matter more than its size. First, every quantity is computed in
+exact rational arithmetic, so a reported flip is a flip and not a rounding artefact. Second,
+the definitions are not re-derived for the experiment: the gate, the coefficient map, the
+steered world and the compression loss are transcribed from the Lean sources, and the
+transcription is validated before any sweep result is reported. At $t=0$ the transcription
+must reproduce \lean{steered\_span}---oscillation $\rho$ on $A$ and $0$ off it---and
+\lean{steered\_exchange\_equality}---doubled regret exactly $|A|(2-\rho)$. It does, in all
+nine validation configurations and all ten corner cells. A sweep whose code does not
+reproduce the theorems at the one point where the theorems apply is measuring something else,
+and this check is what rules that out.
+
+\subsection{E3: Four Axes Instead of One}
+\label{sec:e3}
+
+E2 moves the reference along a single symmetric path. That leaves the obvious objection
+unanswered: the path is symmetric, the construction is symmetric, and a symmetric
+perturbation may be the one direction in which nothing happens. E3 widens the sweep on four
+axes at once.
+
+\emph{Dimension.} $n\in\{6,8,10\}$ with $|A|=n/2$. The balance is not a convenience: the
+exchange equality carries the hypothesis $|A^{\complement}|=|A|$, so these are the
+configurations the theorems speak about. Twelve unbalanced configurations are swept as well,
+in a separate arm, precisely because the theorem does not cover them---and nothing there is
+checked against it.
+
+\emph{Margin and resolution.} Nine margins from $1$ to $2$ rather than five, on a
+sixty-five-point grid in $t$, so the breakdown point is located to $1/64$ and can be traced
+against the margin rather than sampled.
+
+\emph{Direction.} This is the axis that answers the objection. Besides the symmetric path,
+four structured directions perturb only $A$, only its complement, only the steered coordinate
+$j$, or everything but $j$; and two hundred references per configuration are drawn with an
+independent $t_{i}$ in each coordinate. If the finding survives an asymmetric reference it is
+not an artefact of the symmetric one.
+
+Responses of the steered world do not depend on the reference, so they are tabulated once per
+configuration and reused, which is what makes the wider sweep affordable. Both self-checks of
+Section~\ref{sec:e2} are re-run at every configuration.
+
+\subsection{Metrics}
+
+For the design experiment: the two derived weights, the budget residual
+$w_{B}+c\,w_{\mathrm{pair}}-1$, agreement with the fitted values, the certificate verdict per
+cell and which endpoint produced it, and the number of cells in which the pair query carries
+positive weight and its necessity is certified.
+
+For E2, three quantities per cell: whether $A$ is still a Top-$C$ set under the perturbed
+reference, which is the hypothesis of Theorem~\ref{thm:subthreshold}; the doubled regret
+$2(L(A)-L(A^{\complement}))$, which is its conclusion; and the oscillation profile that
+explains the two. Reporting the hypothesis and the conclusion separately is deliberate---they
+fail at different values of $t$, and a single pass/fail per cell would hide that.
+
+\subsection{Statistical Reporting}
+
+Every quantity in this section is exact rational arithmetic; there is no sampling, no seed and
+no confidence interval anywhere in it. E2 is labelled \NUM{} throughout, not because it is
+inexact---it is exact---but because it is a finite sweep of a parameter family and supports no
+universally quantified claim. No result from it is used to support a \PROVED{} one, and where
+it bears on a proved statement, as at $t=0$, it is a check on the transcription rather than
+evidence for the theorem.
+
+\section{Formal Verification}
+\label{sec:verification}
+
+\subsection{Acceptance Contract}
+
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+\texttt{sorry} appears anywhere in the file.
+
+The contract is stated in full because each clause excludes a specific way of appearing
+verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
+
+\subsection{Evidence per Step}
+
+\begin{table}[htbp]
+\caption{Evidence per step. All cited declarations are axiom-audited.}
+\label{tab:inventory}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Step & Module & Aud. \\
+\midrule
+Slice, Thms~\ref{thm:slice}--\ref{thm:nonblind} & \lean{LeanD6GeneralFamilyV1}       & 5 \\
+Design, Thms~\ref{thm:unique}--\ref{thm:affine} & \lean{LeanD6DesignDerivationV1}    & 7 \\
+Surplus, Lem~\ref{lem:surplus}                  & \lean{LeanD6MarginSensitiveExchangeV1} & 3 \\
+Exchange, Thms~\ref{thm:exchange}--\ref{thm:marginexchange} & \lean{LeanD6MarginSensitiveExchangeV1} & 3 \\
+Threshold, Thms~\ref{thm:sufficient}--\ref{thm:subthreshold} & \lean{LeanD6SharpMarginThresholdV1} & 3 \\
+Separation, Thm~\ref{thm:modulus}               & \lean{LeanD6AlternativeReductionV1} & 7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scope of the Formalisation}
+
+The D6 strand contains $444$ Lean source files with $4{,}087$ theorem and lemma statements,
+of which $30$ modules carry an acceptance receipt covering $181$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+declarations.
+
+The ratio of strand size to displayed equations invites the question of what the rest is doing,
+and the answer is characteristic. Most of the strand is search and refutation: establishing
+that the $(d,x)$ family is the right one required first establishing that several other
+candidate families were not, and each withdrawn formulation leaves behind the statements that
+ruled it out. The separation certificates are issued per cell, so the file count scales with
+the parameter grid rather than with mathematical content.
+Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $26$ accepted modules carrying $167$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $187$ audited statements of the strand across its $30$ accepted modules, grouped by module.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Reporting Protocol}
+
+All $24$ cells are reported with no exclusions.
+
+\subsection{The Derived Weights Match All 24 Cells Exactly}
+
+The previously fitted weights agree with \eqref{eq:design} in every cell, and the budget
+identity holds exactly in each. The weights vary with $(\eta,c)$ and are constant across
+$(q,\mu)$, exactly as Corollary~\ref{cor:indep} predicts.
+
+The logical status of the table changed with Section~\ref{sec:design}. Before the derivation
+it was the evidence---$24$ consistent cells, suggestive but not conclusive, licensing no
+prediction at a $25$th cell. After it, the table is a check on the arithmetic: the theorem
+says the agreement must hold at every $(q,\mu,c,\eta)$, so a disagreeing cell would now be an
+implementation bug rather than a puzzle.
+
+\subsection{The Separation Is Certified on Every Cell Tested}
+
+Eight of eight cells certify the strict separation across the whole cell, all by the
+left-endpoint test of \eqref{eq:modulus}, with exact rational gaps. That every certificate
+came from the same endpoint is itself informative: the modulus decays across the cell, so the
+binding case is the left edge, and a procedure testing the midpoint would have been testing
+the easy case.
+
+\subsection{The Pair Query Is Necessary Wherever It Is Used}
+
+On $20$ parameter cells the pair query carries positive weight in $17$, and in all $17$ its
+necessity is certified: the full value strictly exceeds the best value achievable without it.
+The three cells without a certificate are exactly those where the pair weight is zero. The
+coincidence of those two sets is the point---a missing certificate indicates a cell where the
+query is unused, not one where the argument failed.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig2_certificates.png}
+\caption{Certificate counts. The three cells without a necessity certificate are exactly
+those where the pair weight is zero.}
+\label{fig:certificates}
+\end{figure}
+
+\subsection{How Far From the Corner the Witness Survives}
+\label{sec:refsweep}
+
+The sweep of Section~\ref{sec:e2} answers a question the theorems leave open, and the answer
+is not the one the first draft of this paper assumed.
+
+At $t=0$ the transcription reproduces both proved statements exactly: the oscillation profile
+matches \lean{steered\_span} in all nine validation configurations, and the doubled regret
+equals $|A|(2-\rho)$ in all ten corner cells, to the last bit of exact rational arithmetic.
+The sweep is therefore measuring the construction the theorems describe.
+
+Away from the corner the construction does not collapse. It degrades, continuously and
+predictably. Figure~\ref{fig:reference} plots the doubled regret against $t$: every curve
+leaves its corner value $|A|(2-\rho)$ smoothly and decreases monotonically, and no curve
+drops discontinuously at any $t>0$. What does happen is that the two failure modes separate.
+The hypothesis of Theorem~\ref{thm:subthreshold} fails first in some cells and second in
+others. Its hypothesis is that $A$ is a Top-$C$ set; as $t$ grows, the steered coordinate $j$
+accumulates oscillation---its span rises from $0$ at the corner to $0.91$ at $t=\tfrac12$ in
+the $\rho=1$, $n=6$ cell, while the coordinates of $A$ fall from $1$ to $0.09$---until $j$
+overtakes $A$ and the hypothesis is no longer met. Its conclusion is that the regret is
+positive, which fails at a different $t$.
+
+The breakdown point of the hypothesis rises with the margin, monotonically and in both
+dimensions: at $n=6$ the first flip occurs at $t=\tfrac{7}{32},\tfrac{9}{32},\tfrac{11}{32}$
+and $\tfrac{15}{32}$ for $\rho=1,\tfrac54,\tfrac32,\tfrac74$, and at $n=8$ at
+$t=\tfrac{5}{32},\tfrac{7}{32},\tfrac{9}{32}$ and $\tfrac38$. Across the sweep $61$ of the
+$160$ cells with $t>0$ lose the Top-$C$ property, a rate of $38.1\%$ that falls from $68.8\%$
+at $\rho=1$ to $21.9\%$ at $\rho=\tfrac74$. Once a cell flips it stays flipped: the
+transition is a single threshold in $t$, not an oscillation. \NUM{}
+
+The $\rho=2$ column is the one to read last. At the threshold margin, $A$ remains a Top-$C$
+set at every $t$ on the grid and the doubled regret is non-positive at every $t>0$---the
+Top-$C$ set is never beaten. Theorem~\ref{thm:sufficient} is proved for an arbitrary product
+reference, so the sweep cannot confirm it in the logical sense; what it does is exercise the
+theorem on thirty-two references outside the corner where the necessity construction lives,
+and find no violation. Sufficiency and necessity behave differently off the corner in exactly
+the direction the proofs predict, which is weak evidence, but it is evidence about the part of
+the parameter space no proof here covers.
+
+The practical reading is narrower than the first draft of this paper claimed and broader than
+the theorem states. Necessity is proved at $t=0$ and holds, measurably, in a neighbourhood
+whose size grows with the margin; it is not a corner-only curiosity, and it is not a theorem
+away from the corner either.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig5_reference.png}
+\caption{The necessity construction as the reference leaves the corner, at $n=8$. Each curve
+is the doubled regret $2(L(A)-L(A^{\complement}))$ at one margin, in exact rational
+arithmetic, against the product reference $q_{i}(\mathrm{true})=t$; at $t=0$ the five curves
+begin at $|A|(2-\rho)=4,3,2,1,0$, which is \lean{steered\_exchange\_equality} reproduced by
+the transcription rather than assumed by it. Triangles mark the first $t$ at which $A$ ceases
+to be a Top-$C$ set, so the hypothesis of Theorem~\ref{thm:subthreshold} stops holding; they
+move right as the margin grows and are absent at $\rho=2$, where the set stays Top-$C$
+throughout and the regret is non-positive at every $t>0$. The construction degrades with the
+reference; it does not fail at the first perturbation. \NUM{}}
+\label{fig:reference}
+\end{figure}
+
+\subsection{The Finding Is Not an Artefact of the Symmetric Path}
+\label{sec:e3results}
+
+Three results from the wider sweep of Section~\ref{sec:e3}, in order of what they rule out.
+
+\emph{The breakdown point is a real function of the margin.} At every one of the three sizes,
+the first $t$ at which $A$ ceases to be the Top-$C$ set rises monotonically with the margin,
+with no exception and no reversal: at $n=6$ it runs from $13/64$ at $\mu=1$ to $15/32$ at
+$\mu=7/4$, at $n=8$ from $5/32$ to $7/16$, and at $n=10$ from $1/8$ to $23/64$.
+Figure~\ref{fig:wide} plots all three. The curves also fall with $n$, so the construction
+tolerates less perturbation as the space grows---which is worth knowing and which the
+single-path sweep could only hint at from two points. The transition is a threshold, not an
+oscillation: once a cell flips it stays flipped, at every configuration. \NUM{}
+
+\emph{It is not the symmetric path.} Asymmetric references drawn with an independent $t_{i}$
+per coordinate flip the Top-$C$ set at a \emph{higher} rate than the symmetric path,
+$49.6\%$ against $41.2\%$, and the four structured directions at a lower one, $18.0\%$. The
+symmetric path is therefore neither the most nor the least favourable direction; it sits
+inside the range the other directions span, which is what licenses reading it as
+representative rather than as special.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig7_directions.png}
+\caption{How often the Top-$C$ set is lost, by the direction the reference is moved in, with
+the number of references in each direction in brackets. The symmetric path---the only one the
+first sweep used---sits inside the range the other directions span, not at either end:
+perturbing only the steered coordinate almost never costs the Top-$C$ property, perturbing
+everything but it costs the most among the structured directions, and asymmetric references
+drawn independently per coordinate cost more than the symmetric path. Reading the symmetric
+path as representative is therefore licensed by measurement rather than by assumption.
+\NUM{}}
+\label{fig:directions}
+\end{figure}
+
+\emph{Sufficiency survives everything tested.} At $\mu=2$, $A$ remains a Top-$C$ set at every
+reference in the sweep---$99$ symmetric, $204$ structured and $600$ asymmetric, $903$ in
+all---and the doubled regret is non-positive at every one of them.
+Theorem~\ref{thm:sufficient} is proved for an arbitrary product reference, so this cannot
+confirm it in the logical sense; what it does is exercise the theorem on nine hundred
+references outside the corner where the necessity construction lives, including directions
+chosen to be awkward, and find no violation. Sufficiency and necessity behave differently off
+the corner in exactly the direction the proofs predict. \NUM{}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig6_wide.png}
+\caption{Where the necessity construction breaks, as a function of the margin, at the three
+balanced configurations. Each point is the first $t$ on a sixty-five-point exact grid at
+which $A$ stops being a Top-$C$ set, so the hypothesis of
+Theorem~\ref{thm:subthreshold} stops holding. The curves rise monotonically with the margin
+at every size and fall with the size; the crosses at $\mu=2$ mark that no breakdown occurs
+anywhere on the grid there, which is the sufficiency theorem exercised rather than assumed.
+Exact rational arithmetic throughout. \NUM{}}
+\label{fig:wide}
+\end{figure}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Two Objections of Different Kinds}
+
+The slice objection is about \emph{quantifiers}: it converts a slice-quantified lower bound
+into a class-quantified one, and the two-parameter family may now be used without apology.
+The provenance objection is about \emph{derivation}: it replaces a fit with an argument, so
+the weights are no longer numbers that happened to work in the cells tested. The distinction
+matters for how each should be judged, because neither is closed by more data---the $24$ cells
+were already consistent, and no quantity of alternatives sampled outside the slice
+establishes a universal claim.
+
+Three of the paper's statements sound like limitations and are in fact the contribution.
+Corollary~\ref{cor:tight} says the bound cannot be improved by enlarging the class, which
+reads as a ceiling but is what makes the reduction free. Theorem~\ref{thm:unique} says there
+is no freedom in the weights, which reads as a loss of generality but is what converts a fit
+into a derivation. Theorem~\ref{thm:affine} says the optimum is at an endpoint, which reads
+as a degenerate answer but is what removes the need to search.
+
+\subsection{Shortcomings and Limitations}
+
+\emph{The reduction is for the scalar query only.} The pair query has a blind direction, so
+the coordinate-wise argument of Theorem~\ref{thm:reduction} cannot start: there are non-zero
+shifts it cannot see, and no positive lower bound holds uniformly over its class.
+
+\emph{Lower bounds only.} An upper bound quantified over the slice still says nothing about
+the class.
+
+\emph{The class is a modelling choice.} An alternative set defined by a norm bound or a
+subspace is outside every statement here, and nothing in the formal development can detect a
+mismatch, because it is a modelling question. What the development does is make the
+hypothesis explicit in the statement.
+
+\emph{The information formulas are premises.} $I_{B}$ and $I_{\mathrm{pair}}$ are taken as
+given and not re-derived from the sampling model, so an error in either propagates
+downstream---including into \eqref{eq:transitioncond}, which compares them directly.
+
+\emph{The necessity half of the threshold is proved only at the corner.}
+Theorem~\ref{thm:subthreshold} is a statement about corner-reference instances and no claim is
+proved beyond them. The sweep of Section~\ref{sec:results} shows the situation is better than
+that in fact and worse than a theorem: the witness survives a margin-dependent neighbourhood of
+the corner and then fails, and $38.1\%$ of the swept positive-$t$ cells lose the Top-$C$
+property. Necessity away from the corner is measured, not proved, and this is the most
+consequential limitation of the margin results.
+
+\emph{No phase boundary is proved.} Theorem~\ref{thm:affine} identifies where a transition
+\emph{can} occur and does not establish that the condition is met anywhere in the parameter
+range of interest.
+
+\subsection{Open Problems}
+
+Whether the reduction extends to the pair query, in some form accounting for its blind
+direction, is the natural next question. Whether the affine structure survives three or more
+query types---where the budget simplex is no longer an interval and an interior optimum
+becomes possible---is the second; the objective stays linear so the optimum stays at a
+vertex, but the analogue of Proposition~\ref{prop:nonneg} becomes a polytope rather than an
+interval and it is not obvious it is cut out as cleanly. Third, whether the sharp threshold
+survives a non-corner reference is open: the sweep shows the present construction survives a
+margin-dependent neighbourhood of the corner and no further, which locates the question
+without settling it.
+
+\section{Conclusion}
+
+The two-parameter alternative family is not a restriction: every alternative in its class
+costs at least the slice value, and the bound is attained exactly on the slice. The design
+that reproduces the corpus's coefficients is not fitted: it is forced by the budget constraint
+and the split, depends only on the split and the price, and makes the delivered information
+affine, so the optimal design is pure except on an explicitly computable threshold. And the
+margin at which Top-$C$ selection stops being optimal is sharp at $2\delta$: sufficient under
+every product reference, and violated below it by an explicit construction under the corner
+reference. The wider point concerns how a corpus of results should be maintained. Both
+objections answered here were raised against statements that were, numerically, entirely
+correct; what was missing in each case was an argument connecting the statement to the claim
+it was used to support, and in both cases that argument turned out to be short.
+
+\section*{Acknowledgment}
+
+The formal development uses the Lean~4 theorem prover and the mathlib library.
+
+\begin{thebibliography}{00}
+
+\bibitem{pukelsheim2006} F. Pukelsheim, \emph{Optimal Design of Experiments}. Philadelphia,
+PA: SIAM Classics in Applied Mathematics, 2006.
+
+\bibitem{fedorov1972} V. V. Fedorov, \emph{Theory of Optimal Experiments}. New York, NY:
+Academic Press, 1972.
+
+\bibitem{boyd2004} S. Boyd and L. Vandenberghe, \emph{Convex Optimization}. Cambridge,
+U.K.: Cambridge Univ. Press, 2004.
+
+\bibitem{feige2020} U. Feige, M. Feldman, and I. Talgam-Cohen, ``Approximate modularity
+revisited,'' \emph{SIAM J. Comput.}, vol.~49, no.~1, pp.~67--97, 2020.
+
+\bibitem{moore2009} R. E. Moore, R. B. Kearfott, and M. J. Cloud, \emph{Introduction to
+Interval Analysis}. Philadelphia, PA: SIAM, 2009.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\input{d6_appendix}
+
+\end{document}

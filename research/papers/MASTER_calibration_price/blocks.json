@@ -1,0 +1,234 @@
+[
+ {
+  "kind": "header",
+  "lines": [
+   "I.  Introduction"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "A population of K\u00b7m items carries unknown values \u03b8\u1d62 in K groups, each group g with an unknown common offset b_g. Under a unit budget the experimenter must return a threshold set \u2014 which items lie above a fixed level. The values are not the goal; the answer is. Two measurements are available, and the distinction between them is the whole subject. An ORDINARY query on item i returns \u03b8\u1d62 + b_g(i) with variance v at unit price, seeing value and offset only in combination. A CALIBRATION query on group g returns b_g directly, with variance \u03bd, at price \u03ba. The dilemma is concrete: calibration consumes budget that could have bought ordinary samples. If it merely improves efficiency, a careful allocator trades it off and the question is tuning. If instead some configurations admit no answer from ordinary sampling at all, the trade-off framing is wrong \u2014 calibration is a precondition, and an allocator economising on it fails outright rather than gracefully. Two questions, and no others: WHEN does the calibration query become mandatory, and WHAT does it cost exactly?"
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "II.  Methodology"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The argument is a chain of eight steps. Each states what is proved, how it was closed, and how it depends on the step before. Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE DICHOTOMY. Four items, two per group, are exhibited together with a second world reached by shifting one group and paying the shift back through its offset:"
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_witness",
+  "width": 15.048
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Both conjuncts are finite rational identities discharged by case analysis over the four items."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_dichotomy",
+  "width": 15.048
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Item 0 lies above threshold in the first world and below it in the second, while item 3 lies above in both \u2014 yet every ordinary query has an identical mean in the two worlds. The attainable value is exactly zero, not merely small.",
+   "STEP 2 \u2014 PROFILING THE GROUP OFFSET.",
+   "WHY THIS FOLLOWS FROM STEP 1. Step 1 shows the offset must be measured. Step 2 asks what a measurement of it is worth, by eliminating the offset from the energy:"
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_profile",
+  "width": 13.984
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Completing the square in the shift t, with both halves proved separately: the inequality for every t, and the value attained at t = a\u0394/(a+b)."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_group_lower",
+  "width": 15.048
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Cauchy\u2013Schwarz applied to (s_m x \u2212 s_\u03ba z)\u00b2, then division by the positive quantity x + z."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_group_attained",
+  "width": 15.048
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Substitution and rational algebra: the stated split makes the information constraint an equality and the budget expression collapses to h(\u221am + \u221a\u03ba)\u00b2."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/master_fig8_collapse.png",
+  "width": 15.048
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 1.  The price law against a realised error rate. 240 random instances, spanning eight group counts and a thirtyfold range of separation, collapse onto the predicted curve."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "II.  Methodology, continued"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "STEP 5 \u2014 THE K-GROUP UPPER BOUND.",
+   "WHY THIS FOLLOWS FROM STEP 4. Step 4 prices one group; Step 5 sums that price across K groups and confronts it with the unit budget, converting a per-group cost into a cap on the whole design."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_upper",
+  "width": 15.443999999999999
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  The per-group bound is applied inside a finite sum, then the budget constraint is used once."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_rate",
+  "width": 8.58
+ },
+ {
+  "kind": "eq",
+  "key": "master_limits",
+  "width": 15.443999999999999
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Free calibration recovers the cost of the ordinary queries alone; expensive calibration dominates the budget; at the crossover \u03ba = m the two square roots are equal and each query type consumes exactly half of each group's budget.",
+   "STEP 7 \u2014 THE ANCHOR IS MANDATORY.",
+   "WHY THIS FOLLOWS FROM STEP 6. Step 6 prices a design that already includes the calibration query; Step 7 asks whether omitting it can ever be competitive, on one instance where both sides are computable exactly."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_anchor",
+  "width": 15.443999999999999
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  The cap on anchor-free designs is a dual certificate valid for every such design and is itself attained, hence tight; the anchored value comes from."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "master_hadamard",
+  "width": 14.352
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "III.  Results"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "THE LAW IS EXACT, AND INDEPENDENT NUMERICS AGREE. Bisection and Nelder\u2013Mead over the same feasible set, 32 cells: largest relative gap 2.5\u00d710\u207b\u00b9\u2076, and neither ever exceeds the closed form \u2014 the direction that would falsify an upper bound. REMOVING THE CONTROL QUERY GIVES EXACTLY ZERO on all 32 cells. BAD ALLOCATION COSTS A BOUNDED FRACTION: a uniform design keeping all controls reaches 73.5\u2013100% of the optimum, median 91.7%. THE LAW PREDICTS A REALISED ERROR, not only a design value: over 240 random instances the error of a plug-in profiled test collapses onto \u03a6(\u2212\u221a(\u0393*B)) with rms 0.006."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/master_fig10_misspec.png",
+  "width": 15.443999999999999
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 2.  What each broken assumption costs. Misspecifying the noise shape is nearly free; a wrong separation, or contaminated anchors, costs an order of magnitude more."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "IV.  Discussion"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "THE LAW PREDICTS A DECISION, NOT ONLY A DESIGN VALUE. Over 240 random instances and ten budgets, the realised error of a plug-in profiled test collapses onto \u03a6(\u2212\u221a(\u0393*B)) with a root-mean-square gap of 0.006. The residual is positive everywhere \u2014 estimating the two variances can only cost \u2014 and decays like 1/n, from one percentage point at four observations per group to below 10\u207b\u2074 beyond five hundred. WHICH ASSUMPTION THE LAW ACTUALLY NEEDS. Breaking one assumption at a time, over twelve generators: heavier-tailed noise costs nothing (t\u2083 is better than predicted), a heavy-tailed offset nothing, variances differing ninefold nothing. A separation guessed at twice its true value costs +0.157, and contaminating 5% of anchors +0.176 \u2014 an order of magnitude more, and on 100% of cells rather than on average. The law is robust to the shape of the noise and fragile to the numbers the experimenter supplies. AN HONEST EXCEPTION. In 5 of 1553 cells the even split beats the price-law optimum. Integer rounding is why: at those counts the continuum optimum discards more budget at the floor. The finite-count prediction ranks all five correctly; only the continuum law does not."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/master_fig11_hetero.png",
+  "width": 15.048
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 3.  The conjectured heterogeneous law against a realised error. Instances whose groups differ by a factor of twenty-four lie on the same curve as instances whose groups are alike."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "A calibration query is not an efficiency improvement a careful allocator could do without. On the configurations exhibited here the attainable value is exactly zero until one is bought; once bought its price is exact, matched by a lower bound, an upper bound over all unit-budget designs, and an attaining design. What the experiments add is that the same formula predicts a realised ERROR to 0.006, that it stays that accurate when groups differ in price by a factor of twenty-four, and that the assumption it actually needs is not the shape of the noise but the separation the design is sized for."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "EXACT WHERE IT CAN BE. The design sweep is exact rational arithmetic \u2014 no seed, no interval. The simulations are seeded once at the top of the run and reproduce bit for bit: re-running the script and comparing field by field finds no difference. EVERY SWEEP CHECKS ITSELF AGAINST A THEOREM BEFORE IT REPORTS. The finite-sample run must reproduce the finite-count prediction where that prediction is sharp (at least 64 observations per group) before any misspecified arm is reported; it agrees to 0.0011. A run whose code does not reproduce the theorem at the one point the theorem applies is measuring something else. CLASSES OF EVIDENCE ARE KEPT APART. Proved, certified in exact rationals, and numerical are distinguished throughout, and no numerical result is used to support a proved one. 2,925 cells were excluded for buying too few observations to estimate a variance, and are counted rather than dropped."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "References"
+  ]
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "[1] H. Dette and S. Titoff, \u201cOptimal discrimination designs,\u201d Ann. Statist., vol. 37, no. 4, pp. 2056\u20132082, 2009. [2] O. Bennouna et al., \u201cWhat data enables optimal decisions?,\u201d arXiv:2505.21692, 2025. [3] F. Pukelsheim, Optimal Design of Experiments. Philadelphia, PA: SIAM Classics, 2006."
+  ]
+ }
+]

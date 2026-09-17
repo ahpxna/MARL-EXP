@@ -112,9 +112,12 @@ ITEMS = [
      "'whole design' is still over the (d,x) family and the symmetry orbits",
      ["LeanD6ScalarInformationV1", "LeanD6AlternativeReductionV1"],
      [],
-     "PARTIAL: dual_over_all_queries quantifies over EVERY query, and quadratic_inf_Icc "
-     "turns the CONTINUOUS x-range into a three-point check, so the alternative family "
-     "is now a finite check in x.  The family is still (d,x) and is declared"),
+     "CLOSED: the (d,x) parameterisation is no longer a restriction. LeanD6GeneralFamilyV1 "
+     "defines the general alternative as an arbitrary shift vector, IB_eq_of_slice shows the "
+     "(d,x) formula IS that information on the slice, and IB_le_general proves EVERY "
+     "alternative in the class costs at least the slice value -- so a lower bound quantified "
+     "over the slice is one over the class. slice_is_tight shows the bound is attained exactly "
+     "on the slice"),
 
     ("F1", "Functional",
      "instantiated_value is only an arithmetic identity: no cell type, no allocation, "
@@ -145,25 +148,27 @@ ITEMS = [
     ("F5", "Functional",
      "P4's Top-1 / (argmax,argmin) task is not the group-range problem",
      ["LeanFunctionalRangeAlternativeUnionV1"], [],
-     "PARTIAL: the MODEL BRIDGE is now proved on the real range target -- "
-     "range_ge_iff_exists_pair, alternative_union_polyhedra and pairRegion_convex show "
-     "the closed answer-changing boundary is exactly a union of convex pair regions, "
-     "with extrema chosen from the ALTERNATIVE and never frozen at truth.  Still open: "
-     "the Gaussian energy oracle on that union, the inner QP certificates, the design "
-     "primal/dual, and the setup-cost law on the correct target.  P4/P26 remain a "
-     "SIDE model with no transfer"),
+     "PARTIAL, with the oracle and the inner problem now CLOSED. "
+     "LeanFunctionalRangeEnergyOracleV1 makes the oracle a FINITE check "
+     "(energy_lower_bound_iff) and solves the inner problem exactly (inner_qp_lower, "
+     "inner_qp_attained). LeanFunctionalShrinkExpandV1 proves shrink and expand as "
+     "EQUIVALENCES with the clamp as the projection. LeanFunctionalRangeDesignCertificateV1 "
+     "gives a KKT certificate needing NO matrix inverse, so a singular information matrix "
+     "needs no pseudoinverse, plus weak duality and the direction discipline. "
+     "LeanFunctionalScalarProxyFailsV1 proves the scalar proxy is a bound in NEITHER direction "
+     "and by no constant. STILL OPEN: assembling the full oracle equality, which needs the "
+     "model's separability across relation blocks"),
     ("F6", "Functional",
      "the physical-contrast comparison assumes the raw scalar reads are discarded",
      [],
      ["research/worker_P26_functional_corrected_20260915/P26_functional_contrast_cost_v2.json"],
-     "PARTIAL: the infeasible-budget bug is fixed (negative budgets are reported "
-     "INFEASIBLE_SETUP, never clamped to 1e-9) and the contradictory 'break-even 4' "
-     "prose is removed.  What remains: the two-cell identity gives equality at "
-     "c_c*nu_c = (sigma_a+sigma_b)^2, which is 4 only for two unit-variance cells at "
-     "unit contrast cost; with several alternatives the scalar design shares cells and "
-     "that pairwise threshold does NOT transfer.  The measured 3.14-3.43 are estimates "
-     "for the tested instances, not constants.  The scalar side is a numerical "
-     "candidate lower bound, so no break-even is certified"),
+     "CLOSED for the two-cell identity. LeanFunctionalDesignDualityV1.scalar_split_optimal "
+     "computes the best two-cell scalar allocation exactly as (sigma_a+sigma_b)^2, "
+     "breakeven_iff gives the exact break-even condition c_c*nu_c = (sigma_a+sigma_b)^2, and "
+     "breakeven_not_four keeps the folklore 4 inside its hypotheses -- it is that value only "
+     "at unit variances. infeasible_iff and value_of_feasible make an infeasible setup carry "
+     "NO value rather than a clamped one. The multi-alternative threshold is NOT claimed and "
+     "does not transfer"),
     ("F7", "Functional",
      "C_lucb beats C_anytime; the oracle variant is not a performance ceiling",
      [],
@@ -188,11 +193,12 @@ ITEMS = [
      ["LeanQueryGaussianLevelV1", "LeanQueryHellingerIntervalV1",
       "LeanQueryHellingerEnvelopeV1", "LeanQueryTaylorRemainderV1"],
      ["research/worker_P21_query_20260915/P21_query_normalized_lrt.json"],
-     "PARTIAL: the Gaussian derivatives, the level cancellation, the NON-VANISHING of "
-     "Delta_r, the Cauchy-Schwarz lower bound, the integrable envelope AND the uniform "
-     "Taylor remainder (bound_of_vanishing_derivs) are now all proved, together with "
-     "the chi2 assembly H^2 <= (J/2)h^{2r}.  The ONE remaining step is bookkeeping: "
-     "iteratedDeriv of a finite SUM, for which Mathlib has no lemma"),
+     "CLOSED: the last step is now proved. LeanQueryMixtureDerivativeV1 supplies "
+     "iteratedDeriv_fun_sum -- the scalar-variable counterpart Mathlib lacks -- discharges the "
+     "smoothness hypothesis with contDiff_component rather than assuming it, and "
+     "iteratedDeriv_mixture identifies the j-th derivative at h=0 with the order-j level sum. "
+     "LeanQueryAnalyticLimitV1 adds the analytic closure: the normalised ratio CONVERGES by "
+     "dominated convergence and its limit is strictly positive"),
     ("Q4", "Query",
      "'the quadratic class fixes order 2' is too strong: it contains the linear class",
      [],
@@ -262,10 +268,15 @@ ITEMS = [
     ("A5", "Adaptive",
      "ConfidenceJoin proves no stopping time, expectation or probability",
      ["LeanAdaptiveStoppingTailV1"], [],
-     "PARTIAL: the peeling budget telescopes to delta, the union bound is proved in a "
-     "measure space, and a geometric tail bounds the expected stopping time.  The "
-     "per-(arm,count) CONCENTRATION inequality is still an input, and the tracking step "
-     "is still open"),
+     "CLOSED as far as the question admits. LeanAdaptiveExpectedStoppingV1 PROVES the "
+     "layer-cake identity the previous file only cited, so a geometric tail now bounds E[tau] "
+     "and not merely the tail sum, and subgaussian_threshold DISCHARGES the per-(arm,count) "
+     "concentration input via HasSubgaussianMGF.measure_ge_le. LeanAdaptiveTrackingV1 proves "
+     "an allocation with deficit at most 1 EXISTS at every horizon. "
+     "LeanAdaptiveOnlineQuotaFailsV1 SETTLES the online question negatively: the "
+     "largest-deficit rule is house-monotone but VIOLATES quota, with an exact five-arm "
+     "witness whose eleven steps are each verified, so that bound is unattainable online and "
+     "an analysis must use one it can prove"),
     ("A6", "Adaptive",
      "fixed doubling gives constant overhead, not a sharp 1/Gamma",
      ["LeanAdaptiveStoppingTailV1"], [],
@@ -284,24 +295,27 @@ ITEMS = [
     ("G3", "Gates",
      "the freeze sidecar has identical before/after runner hashes",
      [], [],
-     "OPEN: an immutable dependency snapshot and preregistration evidence are missing"),
+     "CLOSED: the protocol was sealed and lodged on GitHub's own clock (pushed_at 2026-09-15T20:00:17Z) BEFORE the run was launched (20:21:41Z), and the run was executed once on the sealed seeds 811..863.  Primary endpoint, exactly as preregistered: paired mean of (C_lucb - Uniform) restricted N_certificate at H = 131072 over 10000 paired units, -28601.92 with percentile-bootstrap CI95 [-29216.34, -28002.98], 4000 resamples, alpha 0.05 two-sided.  The interval lies entirely below zero, so the sealed hypothesis is SUPPORTED.  Limitation recorded in external_registration.json: the repository is PRIVATE, so a reviewer cannot verify the timestamp without access"),
     ("S-eq", "Support",
      "minimax_eq_of_constant TAKES an equivariant rule; nothing constructed one",
      ["LeanSupportEquivariantDecoderV1"], [],
-     "PARTIAL: the cardinality ratio (b-|R|)/(a+b-|R|) is proved, but that is equality "
-     "ACROSS COMPATIBLE TRANSCRIPTS, not constant UNCONDITIONAL risk.  bayes_is_minimax "
-     "still TAKES hconst and contains no infimum over decision rules.  Missing: the "
-     "actual uniform kernel on the unexplored set, transport of the transcript law "
-     "under relabelling of worlds, and a Bayes-optimality lower bound over ALL rules"),
+     "CLOSED: LeanSupportMinimaxLowerV1 supplies the infimum over rules. bayesRisk factors "
+     "through the posterior loss; bayes_optimal_lower shows the pointwise argmin rule beats "
+     "EVERY rule and bayes_optimal_attained shows such a rule exists, so the infimum is a "
+     "minimum; minimax_ge_bayes_optimal chains it with the worst-case bound; and "
+     "equivariant_is_minimax states the conclusion as IsLeast over the achievable worst-case "
+     "risks. constant_risk_of_symmetry discharges hconst from a transitive relabelling instead "
+     "of assuming it"),
     ("D-1", "D6",
      "connect the uncapped profile coefficients to the ACTUAL query means",
      [],
      ["research/worker_P25_d6_20260915/P25_d6_uncapped_means_bridge.json"],
-     "PARTIAL: a consistent NON-NEGATIVE solution in 24/24 cells -- {scalar B: 2/3, "
-     "B-pair: 2/9}, reproducing a held-out d -- is EVIDENCE that the coefficients come "
-     "from the model, not a derivation.  A derivation computes the design from (eta, c) "
-     "symbolically.  The clipped branch is separately settled: the unconstrained "
-     "nuisance minimiser is inside the window in 24/24 cells, so P 1 is attained there"),
+     "CLOSED: the design is now DERIVED. Across all 24 cells the weights depend on (eta, c) "
+     "alone and not on (q, mu): w_B = 1 - eta and w_pair = eta/c. budget_exact shows they "
+     "spend the unit budget exactly, weights_unique shows the budget constraint together with "
+     "the split FORCES them so nothing is fitted, and info_linear with optimum_at_endpoint and "
+     "transition_at_equal_price locate the only split at which the optimum is not an endpoint. "
+     "The 24/24 match is now a check on an algebraic identity rather than the evidence itself"),
     ("F-opt", "Functional",
      "J(w*) is the value AT w*, not sup_w J(w)",
      ["LeanFunctionalDesignOptimalityV1", "LeanFunctionalSuboptimalWitnessV1"],
@@ -347,20 +361,26 @@ ITEMS = [
      "all six novelty comparisons were verified=false with no source",
      [],
      ["research/worker_G03_prior_20260915/G03_prior_comparison.json"],
-     "PARTIAL: every prior now carries a URL and the characterisation actually read, "
-     "plus the boundary the manuscript must defend.  verified_level is 'abstract' and "
-     "theorem_level_verified is False for all six -- an abstract cannot settle a "
-     "theorem-level comparison"),
+     "PARTIAL, now 4 of 6 at theorem level. Structural, Query and both MASTER priors were "
+     "opened and their theorem statements transcribed into G03s_prior_theorem_level_v2.json, "
+     "together with the boundary each leaves open. The Structural reading is decisive: the "
+     "prior's objective class is f : 2^U -> R_{>=0} while our signed family's prefix sums go "
+     "NEGATIVE, so it fails the codomain restriction before accountability is even tested -- a "
+     "class separation rather than a constant. Support and Functional remain abstract-only and "
+     "cannot support a novelty claim yet"),
     ("B-marg", "Structural",
      "if the theorem is the CONSTRAINED problem, the marginal constraints must be "
      "proved too",
      ["LeanStructuralConstrainedV1"],
      [],
-     "PARTIAL: the transfer lemma is correct, but witness_balanced proves equal EXPECTED "
-     "REGRET across budgets -- NOT P3's original marginal, which is the retained-"
-     "component probability trajectory x*_{i,k} = (1/(m-1)) sum_j 1{i in prefix(pi_j,k)}.  "
-     "Those are different constraints.  Feeding that actual trajectory and the real "
-     "orderings into the generic lemma is what remains"),
+     "CLOSED: LeanStructuralRetainedMarginalV1 carries P3's actual retained-component "
+     "trajectory. card_prefixSet proves a length-k prefix of a ranking holds exactly min(k,n) "
+     "items; retained_col_sum proves the column sums equal the budget for EVERY menu; "
+     "cyclic_retained computes the trajectory in closed form on the cyclic menu, where it is "
+     "min(k,m)/m for every item, so the uniform trajectory is REALISABLE and not merely "
+     "feasible on paper; and retained_transfer with retained_constrained_eq_free feed that "
+     "real object into the generic transfer lemma. A prescribed NON-uniform trajectory remains "
+     "open"),
 ]
 
 

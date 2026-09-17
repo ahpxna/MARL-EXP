@@ -1,0 +1,273 @@
+{
+ "paper": "STRUCTURAL — one schedule cannot serve every budget",
+ "text": {
+  "0": [
+   "One Schedule Cannot Serve Every Budget",
+   "An exact menu law under signed cancellation, for every m ≥ 5",
+   "Vu Phan An Nguyen",
+   "Rider University  ·  CIG-AMF formal research programme  ·  4 Lean 4 modules, 38 audited declarations, 0 sorry, axioms only {propext, Classical.choice, Quot.sound}"
+  ],
+  "22": [
+   "The question"
+  ],
+  "20": [
+   "A schedule reveals items one at a time; a client with budget k sees the first k. How well can a SINGLE schedule — or a small MENU of schedules — serve every budget at once, when the items carry SIGNED weights that cancel?",
+   "",
+   "THE FAMILY",
+   "",
+   "",
+   "",
+   "An ordering is a permutation; the retained prefix at budget k has sum s_k, and the normalised regret is (|s_k| − k mod 2)/D, because every g_i is odd and so min over |S| = k of |Σ g_i| equals k mod 2 by parity.",
+   "",
+   "WHAT IS NOT NEW  (read at theorem level)",
+   "Disser, Klimm, Schewior & Weckbecker, arXiv:2305.01310.  Their objective is f : 2^U → ℝ≥0, ACCOUNTABLE, meaning for every X there is e ∈ X with f(X∖{e}) ≥ f(X) − f(X)/|X|.  Thm 1: GreedyScaling attains the best-possible ratio ρ* ≥ 1.  Thm 4: the lower bound 2.246.  Thm 5: a 1.772-competitive randomised algorithm.",
+   "The whole incremental-maximisation programme for monotone accountable objectives is PRIOR, as is the idea of one schedule serving every budget. We credit all of it.",
+   "THREE SEPARATIONS, AND THE FIRST IS DECISIVE.  (1) CLASS: their codomain is ℝ≥0; our prefix sums go NEGATIVE, so the objective fails the codomain restriction BEFORE accountability is even tested — a class separation, not a constant improvement. (2) METRIC: theirs is multiplicative, ours additive and normalised by D. The numbers are not on the same scale and must never be tabulated together. (3) OBJECT: they ask for ONE ordering; we ask for the MINIMUM MENU."
+  ],
+  "9": [
+   "Objectives"
+  ],
+  "8": [
+   "1.  Prove an EXACT two-sided law for the family, for every m ≥ 5, with no saturation, balance or concentration hypothesis on the lower side.",
+   "2.  Give an explicit CONSTRUCTION of the one-defect schedules, not a numerical check over finitely many m.",
+   "3.  Separate max 𝔼 from 𝔼 max, and show both bounds are attained.",
+   "4.  Carry P3's ACTUAL retained-component marginal, not a stylised stand-in."
+  ],
+  "4": [
+   "The chain — the mechanism"
+  ],
+  "1": [
+   "STEP 1.   THE DEFECT, AND WHY IT IS THE RIGHT NUMERATOR.        parity_bridge,  dfc_eq_zero_iff,  two_le_dfc",
+   "",
+   "",
+   "",
+   "",
+   "So dfc IS the normalised numerator, and no index bookkeeping is needed anywhere below. A budget is free iff its prefix sum lies in {−1, 0, 1}; any defect is an even number ≥ 2.",
+   "",
+   "STEP 2.   THE MECHANISM.        no_big_step,  two_le_totalDefect",
+   "If a schedule pays nothing at any budget, then every single element moves the prefix sum by at most 2. The element 3 is a step that forbids — so EVERY ordering of the family pays at least 2.",
+   "This is where the signed structure does the work. A non-negative objective has no analogue of no_big_step, which is the technical reason the prior class cannot host this argument."
+  ],
+  "14": [
+   "STEP 3.   THE TWO LOWER BOUNDS.        avg_lower,  path_lower",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "The two differ only in the order of max and 𝔼, and that is the entire content of the paper: max 𝔼 against 𝔼 max."
+  ],
+  "18": [
+   "STEP 4.   BOTH ARE ATTAINED.        avg_achieved,  path_achieved",
+   "The uniform mixture over the one-defect schedules attains the averaged bound at c/|Bud| and the path bound at c. Neither bound is loose.",
+   "",
+   "STEP 5.   THE CONSTRUCTION.        exists_one_defect,  altFrom_defects",
+   "For all p, q with q ≤ p ≤ q+1 — that is, for every m ≥ 5 — and every budget j, there is an ordering of the multiset g_m whose defect vector is (0,…,0, 2, 0,…,0) with the 2 at position j. Built by altFrom, a greedy alternation maintaining |s| ≤ 1 ∧ |s − a + b| ≤ 1. A construction, not an existence argument: the list is built."
+  ],
+  "3": [
+   "The chain — the law and the marginal"
+  ],
+  "16": [
+   "STEP 6.   THE RATIO.        ratio_card_concentrated_on_support",
+   "If the mixture is balanced and each supported schedule is concentrated, then 𝔼[max] = |Bud| · max 𝔼. With |Bud| = m − 1 this closes the law:",
+   "",
+   "",
+   "",
+   "",
+   "",
+   "Both hypotheses are satisfied by the witness of step 4, and the conclusion is an identity. Note that hconc is required only on the SUPPORT of P, not for every ranking — the lower bounds still quantify over all permutations.",
+   "",
+   "STEP 7.   THE CONSTRAINED PROBLEM.        free_bound_transfers,  constrained_eq_free",
+   "A free lower bound is a constrained lower bound, because the constrained feasible set is a SUBSET. So the only thing that can break is achievability: the witness must lie inside the constraint.",
+   "",
+   "STEP 8.   P3's ACTUAL MARGINAL.        card_prefixSet,  retained_col_sum,  cyclic_retained",
+   "The marginal actually at issue is the retained-component trajectory, a matrix indexed by (item, budget) — not a scalar per budget:",
+   "",
+   "",
+   "",
+   "",
+   "For EVERY menu of rankings the column sum is the budget, so no menu can change that count. On the cyclic menu the trajectory is computable in closed form:",
+   "",
+   "",
+   "",
+   "so the uniform trajectory is REALISABLE, not merely feasible on paper. retained_transfer and retained_constrained_eq_free then feed the real object into the generic lemma."
+  ],
+  "15": [
+   "Figure 1.  The exact law. Left: both levels fall like 1/m while their ratio grows. Right: the ratio is exactly m − 1, proved for every m ≥ 5. The ratio grows while the LEVEL falls, so a fixed-ε unbounded separation is NOT claimed."
+  ],
+  "5": [
+   "Results and Discussion"
+  ],
+  "12": [
+   "Figure 2.  The one-defect construction. For every m ≥ 5 and every budget j there is an ordering of the family paying exactly 2, exactly at j — so a menu of m − 1 schedules covers every budget for free in the averaged sense, while no single schedule can (step 2)."
+  ],
+  "7": [
+   "Conclusions"
+  ],
+  "13": [
+   "Under signed cancellation the gap between one schedule and a menu is not a constant factor but an exact function of the population: V_path / V_avg = m − 1, for every m ≥ 5, with both sides attained.",
+   "",
+   "The prior's monotone accountable class cannot host this: its objectives take values in ℝ≥0, and the whole mechanism here rests on prefix sums that go negative. This is a class separation, and no constant of theirs is comparable to any constant of ours.",
+   "",
+   "SCOPE — NOT ESTABLISHED.  (1) ONE family. Not a theorem about arbitrary signed weights. (2) retained_col_sum is an identity EVERY menu satisfies; it singles out no menu, and a prescribed NON-uniform trajectory may exclude the witness and change the value — that case is open. (3) The cyclic menu is chosen for computability, not shown optimal. (4) Step 6 has two hypotheses: balance and concentration. (5) No algorithm, and no competitive ratio in the prior's sense is claimed or computed."
+  ],
+  "6": [
+   "References"
+  ],
+  "2": [
+   "[1] Disser, Klimm, Schewior & Weckbecker. Incremental maximization. arXiv:2305.01310.",
+   "[2] Bernstein, Disser, Groß & Himburg. General bounds for incremental maximization. ICALP 2017.",
+   "[3] Bienkowski et al. Incremental submodular maximization.   [4] The mathlib Community. CPP, 2020."
+  ]
+ },
+ "pictures": {
+  "21": "research/papers/_figures/struct_fig2_defect.png",
+  "23": "research/papers/_figures/struct_fig1_law.png"
+ },
+ "geometry": {
+  "20": {
+   "left": 1.3,
+   "top": 5.1,
+   "width": 12.9,
+   "height": 9.5
+  },
+  "9": {
+   "left": 1.5,
+   "top": 15.0,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "8": {
+   "left": 1.3,
+   "top": 16.0,
+   "width": 12.9,
+   "height": 3.6
+  },
+  "4": {
+   "left": 1.5,
+   "top": 19.9,
+   "width": 12.7,
+   "height": 0.9
+  },
+  "1": {
+   "left": 1.4,
+   "top": 20.9,
+   "width": 12.8,
+   "height": 6.1
+  },
+  "14": {
+   "left": 1.4,
+   "top": 27.3,
+   "width": 12.8,
+   "height": 4.1
+  },
+  "18": {
+   "left": 1.4,
+   "top": 31.6,
+   "width": 12.8,
+   "height": 4.0
+  },
+  "16": {
+   "left": 15.4,
+   "top": 5.1,
+   "width": 15.2,
+   "height": 21.6
+  },
+  "21": {
+   "left": 18.4,
+   "top": 26.9,
+   "width": 9.2,
+   "height": 7.6
+  },
+  "15": {
+   "left": 15.4,
+   "top": 34.6,
+   "width": 15.2,
+   "height": 1.2
+  },
+  "23": {
+   "left": 31.0,
+   "top": 5.1,
+   "width": 15.6,
+   "height": 9.1
+  },
+  "12": {
+   "left": 31.0,
+   "top": 14.3,
+   "width": 15.6,
+   "height": 2.2
+  },
+  "7": {
+   "left": 31.0,
+   "top": 16.8,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "13": {
+   "left": 31.0,
+   "top": 17.8,
+   "width": 15.6,
+   "height": 15.2
+  },
+  "6": {
+   "left": 31.0,
+   "top": 33.3,
+   "width": 15.5,
+   "height": 0.9
+  },
+  "2": {
+   "left": 30.9,
+   "top": 34.3,
+   "width": 15.8,
+   "height": 1.3
+  }
+ },
+ "equations": {
+  "struct_family": {
+   "left": 1.6,
+   "top": 7.0,
+   "width": 12.4
+  },
+  "struct_dfc": {
+   "left": 1.6,
+   "top": 21.9,
+   "width": 12.4
+  },
+  "struct_avg": {
+   "left": 4.4,
+   "top": 28.1,
+   "width": 6.8
+  },
+  "struct_path": {
+   "left": 4.4,
+   "top": 29.4,
+   "width": 6.4
+  },
+  "struct_law": {
+   "left": 16.4,
+   "top": 7.2,
+   "width": 13.2
+  },
+  "struct_marginal": {
+   "left": 16.4,
+   "top": 17.4,
+   "width": 13.2
+  },
+  "struct_cyclic": {
+   "left": 17.4,
+   "top": 21.0,
+   "width": 11.2
+  }
+ },
+ "delete": [
+  "19",
+  "24",
+  "28",
+  "17",
+  "27",
+  "11",
+  "25",
+  "26"
+ ]
+}

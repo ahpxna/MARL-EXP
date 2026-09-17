@@ -1,0 +1,546 @@
+{
+ "boxes": {
+  "1": [
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 4.1,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "I.  Introduction"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 5.12,
+    "width": 12.9,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "A design buys observations to certify the Top-k of a set of relations ranked by CAPACITY \u2014 the range max_a \u03b8_ra \u2212 min_a \u03b8_ra. Certifying means excluding every alternative that would change the answer, so the design's value is the cheapest such alternative."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 7.09,
+    "width": 12.9,
+    "height": 2.71,
+    "shape": null,
+    "lines": [
+     "Three quantities must be kept distinct. J_scalar is the pair-flip value computed at the CURRENT extrema with ordering constraints dropped; J_old is the quadratic programme inside the current-extrema region; J_full is the infimum over the whole alternative set, with the extrema free in either relation. By inclusion of feasible sets:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 2.01,
+    "top": 9.95,
+    "width": 11.48,
+    "height": 0.5,
+    "ref": "func_order"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 10.61,
+    "width": 12.9,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "and there is NO general order between J_scalar and J_full. Allocators are routinely built on J_scalar because it is cheap. This work asks what that costs when the extrema can move \u2014 and the answer is that it costs everything, in both directions."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 12.58,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "II.  Methodology"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 13.6,
+    "width": 12.9,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE FINITE MAX/MIN SET IDENTITY  (C2)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 2.97,
+    "top": 15.11,
+    "width": 9.55,
+    "height": 0.52,
+    "ref": "func_union"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 15.79,
+    "width": 12.9,
+    "height": 0.9,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  Forward, choose a maximiser and a minimiser of the challenger relation."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 4.1,
+    "top": 16.85,
+    "width": 7.3,
+    "height": 0.52,
+    "ref": "func_polyhedron"
+   },
+   {
+    "kind": "eq",
+    "left": 3.19,
+    "top": 17.53,
+    "width": 9.12,
+    "height": 0.77,
+    "ref": "func_J"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 18.46,
+    "width": 12.9,
+    "height": 0.9,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  Convexity of each region is checked directly on the defining inequalities, with no assumption on M."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 4.43,
+    "top": 19.53,
+    "width": 6.64,
+    "height": 0.85,
+    "ref": "func_shrink"
+   },
+   {
+    "kind": "eq",
+    "left": 5.54,
+    "top": 20.54,
+    "width": 4.43,
+    "height": 0.87,
+    "ref": "func_expand"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 21.57,
+    "width": 12.9,
+    "height": 2.26,
+    "shape": null,
+    "lines": [
+     "HOW THEY ARE CLOSED. Shrink: the clamp into the interval is at least as close to the target as any feasible point, proved by cases on where the target lies, and the per-cell costs then sum. Expand: minimising a separable quadratic under ONE linear constraint, with the minimiser exhibited so the value is exact."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 23.99,
+    "width": 12.9,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 5 \u2014 THE INNER QP IN CLOSED FORM."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 1.98,
+    "top": 24.6,
+    "width": 11.55,
+    "height": 1.17,
+    "ref": "func_innerqp"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 25.92,
+    "width": 12.9,
+    "height": 0.9,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  Completing the square against the explicit minimiser."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 2.25,
+    "top": 26.99,
+    "width": 10.99,
+    "height": 0.55,
+    "ref": "func_kkt"
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 27.7,
+    "width": 12.9,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "HOW IT IS CLOSED.  Expand the quadratic at the competitor, write the cross term using stationarity, and observe it equals minus the dual value at the competitor \u2014 which."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 4.42,
+    "top": 29.21,
+    "width": 6.67,
+    "height": 0.64,
+    "ref": "func_family1"
+   }
+  ],
+  "2": [
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 4.1,
+    "width": 15.2,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 8 \u2014 FAMILY 2: THE PROXY UNDERSTATES  (C1)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 4.71,
+    "width": 15.2,
+    "height": 1.81,
+    "shape": null,
+    "lines": [
+     "\u03b8_i = (0, 1, \u00be), \u03b1_i = (1, \u03b7, 1); \u03b8_j = (0, \u00bd, \u00bc), \u03b1_j = (1, 1, 1). For ANY capacity-inverting alternative pick z between the two new capacities. Shrinking i below z costs at least [\u00be\u2212z]\u208a\u00b2/4, opening j above z at least [z\u2212\u00bd]\u208a\u00b2/4, and the two positive parts always sum to at least \u00bc:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 19.66,
+    "top": 6.68,
+    "width": 6.68,
+    "height": 0.67,
+    "ref": "func_family2"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 7.5,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "HOW BOTH ARE CLOSED. One side is an explicit feasible alternative whose energy is computed; the other is an elementary lower bound holding for every alternative in the class. The positive-parts inequality is proved by three cases on z."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 9.02,
+    "width": 15.2,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 9 \u2014 SETUP COST AND ITS CROSSING  (C6)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 21.29,
+    "top": 9.63,
+    "width": 3.42,
+    "height": 0.69,
+    "ref": "func_crossing"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 10.47,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "and if the two values are only bracketed with overlapping brackets, both orders of \u0393\u2081, \u0393\u2082 remain consistent, so the sign of the denominator is undetermined and no crossing may be reported."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 11.99,
+    "width": 15.2,
+    "height": 0.45,
+    "shape": null,
+    "lines": [
+     "STEP 10 \u2014 THE BREAK-EVEN, WITHOUT THE FOLKLORE 4."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 16.84,
+    "top": 12.6,
+    "width": 12.31,
+    "height": 0.82,
+    "ref": "func_breakeven"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 13.58,
+    "width": 15.2,
+    "height": 1.35,
+    "shape": null,
+    "lines": [
+     "The number 4 is the value of (\u03c3_a+\u03c3_b)\u00b2 at unit variances and nothing more. With several alternatives the scalar design shares cells and the pairwise threshold does not transfer."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 15.4,
+    "top": 15.1,
+    "width": 15.2,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "III.  Results"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 16.12,
+    "width": 15.2,
+    "height": 3.16,
+    "shape": null,
+    "lines": [
+     "THE TWO FAMILIES SEPARATE WITHOUT LIMIT. As \u03b7 \u2192 0 one family drives the ratio to zero and the other to infinity \u2014 PROVED bounds in exact arithmetic, not sampled points. ON RANDOM INSTANCES THE FAILURE IS PREDICTABLE. Over 6000 drawn instances, all 1367 on which the proxy overstates have a moving extremum, and none with fixed extrema does. ON THE MAIN PANEL, C_lucb IS THE BASELINE TO BEAT: 797 worlds certified at median 20,996 queries against 749 and 605. A result on this panel, not a domination theorem."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 19.44,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/func_fig6_proxy.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 25.59,
+    "width": 15.2,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 1.  The scalar proxy against the true value, 6000 random instances. All 1367 instances where the proxy overstates have a moving extremum; none with fixed extrema does."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.78,
+    "top": 26.54,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/func_fig4_ratio.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 32.69,
+    "width": 15.2,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 2.  The two families on one axis. Any constant correction factor is a horizontal line, and both curves cross every such line."
+    ],
+    "text": null
+   }
+  ],
+  "3": [
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 4.1,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "IV.  Discussion"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 5.12,
+    "width": 15.6,
+    "height": 6.77,
+    "shape": null,
+    "lines": [
+     "THE PROXY'S FAILURE IS PREDICTABLE, NOT DIFFUSE. On 6000 random instances the median ratio J_full/J_scalar is 1.000, but the tails run from 0.018 to 41.7. The cause is exact rather than statistical: of the 1367 instances on which the proxy OVERSTATES, every single one has a cheapest alternative that opens a pair which is not currently extremal \u2014 the mechanism family 1 was built to exhibit \u2014 and not one instance with its extrema fixed produced a ratio below one. The converse fails, as it should: 1597 instances have a moving extremum and 230 of those are still exact. So a moving extremum is necessary and not sufficient, and it is CHECKABLE on the instance in hand before \u2014(5) is trusted. STRONG DUALITY: A SEARCH, NOT A PROOF. The certificate assumes only semidefiniteness, which is why duality is left open. A search over 1054 instances \u2014 including a family built with M singular and its null space aligned to the constraint normals, the only structural route to a gap \u2014 found none above machine precision, and the adversarial family had the SMALLEST gaps. One counterexample would have settled it; a thousand instances without one settle nothing, and the poster says so."
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 31.58,
+    "top": 12.05,
+    "width": 14.44,
+    "height": 5.99,
+    "ref": "research/papers/_figures/poster/func_fig7_duality.png"
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 18.2,
+    "width": 15.6,
+    "height": 0.79,
+    "shape": null,
+    "lines": [
+     "Fig. 3.  A search for a duality gap over 1054 instances. Nothing reaches the re-check threshold, and the family built to be adversarial has the smallest gaps."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 19.16,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "V.  Conclusions"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 20.18,
+    "width": 15.6,
+    "height": 3.61,
+    "shape": null,
+    "lines": [
+     "When the extrema can move, the scalar proxy is a bound in neither direction and no constant repairs it. The true alternative set is a finite union of convex pair regions on the real range target, its oracle is a finite conjunction of convex problems, the inner problem has a closed form, and the certificate needs no matrix inverse \u2014 so a singular information matrix, which is what a working allocator produces, costs nothing extra. The failure is also diagnosable: on 6000 random instances the proxy overstated only when an extremum moves, which can be checked before it is trusted."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 23.95,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "How the numbers were produced"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 24.97,
+    "width": 15.6,
+    "height": 4.51,
+    "shape": null,
+    "lines": [
+     "THE TRUE VALUE IS COMPUTED, NOT ESTIMATED. J_full is solved exactly by the shrink\u2013expand decomposition, with the window position obtained in closed form rather than searched \u2014 an earlier version scanned only the breakpoints and over-estimated, because the optimum is generally interior. AND IT IS CHECKED AGAINST A SOLVER THAT SHARES NONE OF ITS STRUCTURE. SLSQP is run on the raw variables. A local optimiser can only land at or above the true minimum, so a cell where it lands BELOW would expose a defect; across the cross-checked cells, none did. THE PROVED FAMILIES ARE THE SELF-CHECK. Before any random instance is reported the code must reproduce the published numbers on both families \u2014 J_scalar = 1/32 and J_full \u2264 9\u03b7/32 on the first, J_scalar = \u03b7/(8(1+3\u03b7)) and J_full \u2265 1/128 on the second."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 29.64,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "References"
+    ],
+    "text": null
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 30.66,
+    "width": 15.6,
+    "height": 1.59,
+    "shape": null,
+    "lines": [
+     "[1] M. Jourdan, R. Degenne and E. Kaufmann, \u201cDealing with unknown variances in best-arm identification,\u201d in Proc. COLT, 2023. [2] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016. [3] S. Boyd and L. Vandenberghe, Convex Optimization. Cambridge, U.K.: Cambridge Univ. Press, 2004."
+    ],
+    "text": null
+   }
+  ]
+ },
+ "report": {
+  "1": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 25.76,
+   "available_in": 31.75,
+   "fill": 0.811,
+   "blocks": 21,
+   "stack_in": 25.76,
+   "verdict": "good"
+  },
+  "2": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 29.39,
+   "available_in": 31.75,
+   "fill": 0.926,
+   "blocks": 16,
+   "stack_in": 29.39,
+   "verdict": "good"
+  },
+  "3": {
+   "text_scale": 1.0,
+   "figure_scale": 1.0,
+   "natural_in": 28.15,
+   "available_in": 31.75,
+   "fill": 0.887,
+   "blocks": 10,
+   "stack_in": 28.15,
+   "verdict": "good"
+  }
+ }
+}

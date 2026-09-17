@@ -1,0 +1,923 @@
+\appendices
+\section{Complete statement inventory}
+\label{app:inventory}
+
+The MASTER strand contributes $57$ axiom-audited theorems and lemmas across its accepted modules. Those that any step of this paper uses are displayed in Section~\ref{sec:setting}, beside the step that consumes them. This appendix reproduces the \emph{complete} chain---every audited statement of the strand, grouped by module, including the ones already shown---so that the development can be read end to end without reassembling it from the body.
+
+Each entry is a symbol-level transliteration of the Lean statement: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. Binders are listed as the prover has them and the turnstile $\vdash$ separates them from the conclusion. Every entry carries an acceptance receipt and an axiom audit confining it to $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; none contains \texttt{sorry}.
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterActiveSetV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,1}\quad\lean{anchor\_worthless\_when\_offset\_cancels}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{D} \mathit{K} \mathit{s} : \mathbb{R}\\
+&\quad ),\; (\mathit{hM} : (0:\mathbb{R} ) =\\
+&\quad 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{D} - (0:\mathbb{R} )^{2}/(2*(\mathit{K} +\\
+&\quad \mathit{s})) = \mathit{D}
+\end{aligned} \]}
+
+\noindent\textbf{A\,2}\quad\lean{cancelling\_design\_exists}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{d₁} \mathit{d₂} : \mathbb{R}\\
+&\quad ),\; (\mathit{h₁} : 0 < \mathit{d₁}),\; (\mathit{h₂} :\\
+&\quad \mathit{d₂} < 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathbf{let} \mathit{a₁}
+\end{aligned} \]}
+
+\noindent\textbf{A\,3}\quad\lean{complementary\_slackness}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{I} \mathit{lam} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hV} :\\
+&\quad \forall \mathit{u}, \mathit{V} \leq \mathit{I}\\
+&\quad \mathit{u}),\; (\mathit{hl0} : \forall \mathit{u}, 0\\
+&\quad \leq \mathit{lam} \mathit{u}),\; (\mathit{hl1} :\\
+&\quad \textstyle\sum \mathit{u}, \mathit{lam} \mathit{u} =\\
+&\quad 1),\; (\mathit{htight} : \textstyle\sum \mathit{u},\\
+&\quad \mathit{lam} \mathit{u} * \mathit{I}\\
+&\quad \mathit{u} \leq \mathit{V})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{u}, 0 < \mathit{lam}\\
+&\quad \mathit{u} \to \mathit{I} \mathit{u}\\
+&\quad = \mathit{V}
+\end{aligned} \]}
+
+\noindent\textbf{A\,4}\quad\lean{dual\_support\_active}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{I} \mathit{lam} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hl0} :\\
+&\quad \forall \mathit{u}, 0 \leq \mathit{lam}\\
+&\quad \mathit{u}),\; (\mathit{hl1} : \textstyle\sum \mathit{u},\\
+&\quad \mathit{lam} \mathit{u} = 1),\; (\mathit{u0} :\\
+&\quad \mathit{U}),\; (\mathit{hattain} : \mathit{I}\\
+&\quad \mathit{u0} = \mathit{V}),\; (\mathit{hmin} :\\
+&\quad \forall \mathit{u},\\
+&\quad \mathit{I} \mathit{u0} \leq \mathit{I}\\
+&\quad \mathit{u}),\; (\mathit{hcap} : \textstyle\sum \mathit{u},\\
+&\quad \mathit{lam} \mathit{u} * \mathit{I}\\
+&\quad \mathit{u} \leq \mathit{V})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{u}, 0 < \mathit{lam}\\
+&\quad \mathit{u} \to \mathit{I} \mathit{u}\\
+&\quad = \mathit{V}
+\end{aligned} \]}
+
+\noindent\textbf{A\,5}\quad\lean{min\_improves}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{I'} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hall} :\\
+&\quad \forall \mathit{u}, \mathit{V} < \mathit{I'}\\
+&\quad \mathit{u})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{V} < (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{U}).\mathit{inf'}\\
+&\quad \mathit{univ\_{}nonempty} \mathit{I'}
+\end{aligned} \]}
+
+\noindent\textbf{A\,6}\quad\lean{one\_bad\_blocks}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{I'} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{u0} :\\
+&\quad \mathit{U}),\; (\mathit{hbad} : \mathit{I'}\\
+&\quad \mathit{u0} \leq \mathit{V})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{U}).\mathit{inf'}\\
+&\quad \mathit{univ\_{}nonempty} \mathit{I'}\\
+&\quad \leq \mathit{V}
+\end{aligned} \]}
+
+\noindent\textbf{A\,7}\quad\lean{value\_improves\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{I'} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{V} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{V} < (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{U}).\mathit{inf'} \mathit{univ\_{}nonempty}\\
+&\quad \mathit{I'}) \leftrightarrow (\forall \mathit{u},\\
+&\quad \mathit{V} < \mathit{I'} \mathit{u})
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterAnchorCertificateV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,8}\quad\lean{anchor\_free\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{kap} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{tj} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R}\\
+&\quad ),\; (\mathit{Jval} \mathit{U0} : \mathbb{R}\\
+&\quad ),\; (\mathit{hlam} : \forall \mathit{j}, 0\\
+&\quad \leq \mathit{lam}\\
+&\quad \mathit{j}),\; (\mathit{hlamsum} :\\
+&\quad \textstyle\sum \mathit{j},\\
+&\quad \mathit{lam} \mathit{j} = 1),\; (\mathit{hx} :\\
+&\quad \forall \mathit{e},\\
+&\quad 0 \leq \mathit{x} \mathit{e}),\; (\mathit{hbudget} :\\
+&\quad \textstyle\sum \mathit{e}, \mathit{kap} \mathit{e} *\\
+&\quad \mathit{x} \mathit{e} = 1),\; (\mathit{hIe} :\\
+&\quad \forall \mathit{j},\\
+&\quad \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e},\\
+&\quad \mathit{x} \mathit{e} / \mathit{v} \mathit{e} *\\
+&\quad (\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj}\\
+&\quad \mathit{j}) ^{2}) / 2),\; (\mathit{hJval} :\\
+&\quad \forall \mathit{j},\\
+&\quad \mathit{Jval} \leq \mathit{Ival}\\
+&\quad \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e},\\
+&\quad (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} *\\
+&\quad ((\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj}\\
+&\quad \mathit{j}) ^{2} / (2 * \mathit{v}\\
+&\quad \mathit{e}))) \leq \mathit{U0}\\
+&\quad * \mathit{kap} \mathit{e})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Jval} \leq \mathit{U0}
+\end{aligned} \]}
+
+\noindent\textbf{A\,9}\quad\lean{anchor\_mandatory}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{Design} :\\
+&\quad \mathit{Type}*\},\; (\mathit{value} : \mathit{Design}\\
+&\quad \to \mathbb{R} ),\; (\mathit{anchorFree} :\\
+&\quad \mathit{Design} \to \mathit{Prop}),\; (\mathit{U0}\\
+&\quad \mathit{L1} : \mathbb{R} ),\; (\mathit{hgap} :\\
+&\quad \mathit{U0} < \mathit{L1}),\; (\mathit{hcert} :\\
+&\quad \forall \mathit{D}, \mathit{anchorFree}\\
+&\quad \mathit{D} \to \mathit{value}\\
+&\quad \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} :\\
+&\quad \mathit{Design}),\; (\mathit{hD1} :\\
+&\quad \mathit{L1} \leq \mathit{value}\\
+&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
+&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
+&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
+&\quad \mathit{Dopt})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\neg \mathit{anchorFree} \mathit{Dopt}
+\end{aligned} \]}
+
+\noindent\textbf{A\,10}\quad\lean{energy\_completed}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
+&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\;\\
+&\quad (\mathit{hK} : \mathit{Kcap} \mathit{v} \mathit{x}\\
+&\quad \mathit{x0} \mathit{v0} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{energy} \mathit{v} \mathit{d}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0}\\
+&\quad \mathit{t} = \mathit{Dval} \mathit{v}\\
+&\quad \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v}\\
+&\quad \mathit{d} \mathit{x}) ^{2} / (2 * \mathit{Kcap}\\
+&\quad \mathit{v} \mathit{x} \mathit{x0}\\
+&\quad \mathit{v0}) + \mathit{Kcap} \mathit{v}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0} / 2\\
+&\quad * (\mathit{t} - \mathit{Mval} \mathit{v} \mathit{d}\\
+&\quad \mathit{x} / \mathit{Kcap} \mathit{v} \mathit{x}\\
+&\quad \mathit{x0} \mathit{v0}) ^{2}
+\end{aligned} \]}
+
+\noindent\textbf{A\,11}\quad\lean{energy\_expand}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
+&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{energy} \mathit{v} \mathit{d}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0}\\
+&\quad \mathit{t} = \mathit{Dval} \mathit{v}\\
+&\quad \mathit{d} \mathit{x} - \mathit{Mval}\\
+&\quad \mathit{v} \mathit{d} \mathit{x} *\\
+&\quad \mathit{t} + \mathit{Kcap} \mathit{v}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0} *\\
+&\quad \mathit{t} ^{2} / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,12}\quad\lean{profiled\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x0} \mathit{v0} : \mathbb{R}\\
+&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\;\\
+&\quad (\mathit{hK} : 0 < \mathit{Kcap} \mathit{v} \mathit{x}\\
+&\quad \mathit{x0} \mathit{v0})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{energy} \mathit{v} \mathit{d}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0} (\mathit{Mval}\\
+&\quad \mathit{v} \mathit{d} \mathit{x} / \mathit{Kcap}\\
+&\quad \mathit{v} \mathit{x} \mathit{x0}\\
+&\quad \mathit{v0}) = \mathit{Dval} \mathit{v}\\
+&\quad \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v}\\
+&\quad \mathit{d} \mathit{x}) ^{2} / (2 * \mathit{Kcap}\\
+&\quad \mathit{v} \mathit{x} \mathit{x0}\\
+&\quad \mathit{v0})
+\end{aligned} \]}
+
+\noindent\textbf{A\,13}\quad\lean{profiled\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
+&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\;\\
+&\quad (\mathit{hK} : 0 < \mathit{Kcap} \mathit{v} \mathit{x}\\
+&\quad \mathit{x0} \mathit{v0})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Dval} \mathit{v} \mathit{d}\\
+&\quad \mathit{x} - (\mathit{Mval} \mathit{v} \mathit{d}\\
+&\quad \mathit{x}) ^{2} / (2 * \mathit{Kcap} \mathit{v}\\
+&\quad \mathit{x} \mathit{x0} \mathit{v0})\\
+&\quad \leq \mathit{energy} \mathit{v}\\
+&\quad \mathit{d} \mathit{x} \mathit{x0}\\
+&\quad \mathit{v0} \mathit{t}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterAnchorInstanceV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,14}\quad\lean{anchorFree\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{min} (\mathit{Ifree} (1/2)) (\mathit{Ifree}\\
+&\quad (1/2)) = 1 / 8
+\end{aligned} \]}
+
+\noindent\textbf{A\,15}\quad\lean{anchorFree\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{x1} \mathit{x2} : \mathbb{Q}\\
+&\quad ),\; (\mathit{h1} : 0 \leq \mathit{x1}),\;\\
+&\quad (\mathit{h2} : 0 \leq \mathit{x2}),\; (\mathit{hb} :\\
+&\quad \mathit{x1} + \mathit{x2} = 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{min} (\mathit{Ifree}\\
+&\quad \mathit{x1}) (\mathit{Ifree}\\
+&\quad \mathit{x2}) \leq 1 / 8
+\end{aligned} \]}
+
+\noindent\textbf{A\,16}\quad\lean{anchor\_is\_mandatory}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Design} : \mathit{Type}*),\; (\mathit{value}\\
+&\quad : \mathit{Design} \to \mathbb{Q} ),\;\\
+&\quad (\mathit{anchorFree} : \mathit{Design} \to \mathit{Prop}),\;\\
+&\quad (\mathit{hcert} : \forall \mathit{D},\\
+&\quad \mathit{anchorFree} \mathit{D} \to \mathit{value}\\
+&\quad \mathit{D} \leq 1/8),\; (\mathit{D1} :\\
+&\quad \mathit{Design}),\; (\mathit{hD1} : (261 : \mathbb{Q}\\
+&\quad )/1520 \leq \mathit{value}\\
+&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
+&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
+&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
+&\quad \mathit{Dopt})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\neg \mathit{anchorFree} \mathit{Dopt}
+\end{aligned} \]}
+
+\noindent\textbf{A\,17}\quad\lean{anchored\_K}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(9/20 : \mathbb{Q} ) + 9/20 + 1 = 19/10
+\end{aligned} \]}
+
+\noindent\textbf{A\,18}\quad\lean{anchored\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(9/20 : \mathbb{Q} ) + 9/20 + (1/10) *\\
+&\quad 1 = 1
+\end{aligned} \]}
+
+\noindent\textbf{A\,19}\quad\lean{anchored\_value}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Ianch} (9/20) (19/10) = 261 /\\
+&\quad 1520
+\end{aligned} \]}
+
+\noindent\textbf{A\,20}\quad\lean{dual\_H\_value}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Hval} 1 0 (1/2) = 1 / 8\\
+&\quad \wedge \mathit{Hval} 0 1 (1/2) = 1 / 8
+\end{aligned} \]}
+
+\noindent\textbf{A\,21}\quad\lean{gap\_positive}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1 : \mathbb{Q} ) / 8 < 261 / 1520
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterAnchorThresholdV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,22}\quad\lean{anchor\_dual}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} : \mathbb{R}\\
+&\quad ),\; (\mathit{hm} : 2 \leq \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{shift} \mathit{m}\\
+&\quad \mathit{a})^{2}/2 =\\
+&\quad \mathit{criticalPrice} \mathit{m} *\\
+&\quad \mathit{baseValue} \mathit{m}\\
+&\quad \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,23}\quad\lean{anchor\_required}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{Design} :\\
+&\quad \mathit{Type}*\},\; (\mathit{feasible} :\\
+&\quad \mathit{Design} \to \mathit{Prop}),\;\\
+&\quad (\mathit{exposure} \mathit{value} : \mathit{Design}\\
+&\quad \to \mathbb{R} ),\; (\mathit{U} \mathit{L} :\\
+&\quad \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{d},\\
+&\quad \mathit{feasible} \mathit{d} \to \mathit{exposure}\\
+&\quad \mathit{d} = 0 \to \mathit{value} \mathit{d}\\
+&\quad \leq \mathit{U}),\;\\
+&\quad (\mathit{hgap} : \mathit{U} <\\
+&\quad \mathit{L}),\; (\mathit{d} :\\
+&\quad \mathit{Design}),\; (\mathit{hd} : \mathit{feasible}\\
+&\quad \mathit{d}),\; (\mathit{hx} : 0 \leq \mathit{exposure}\\
+&\quad \mathit{d}),\; (\mathit{hv} : \mathit{L}\\
+&\quad \leq \mathit{value}\\
+&\quad \mathit{d})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&0 < \mathit{exposure} \mathit{d}
+\end{aligned} \]}
+
+\noindent\textbf{A\,24}\quad\lean{base\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} : \mathbb{R}\\
+&\quad ),\; (\mathit{hm} : 2 \leq \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{profile} \mathit{a} (\mathit{xWeight}\\
+&\quad \mathit{m}) (\mathit{yWeight}\\
+&\quad \mathit{m}) 1 = \mathit{baseValue}\\
+&\quad \mathit{m} \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,25}\quad\lean{below\_threshold}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} \mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hm} : 2 \leq \mathit{m}),\; (\mathit{ha}\\
+&\quad : 0 < \mathit{a}),\; (\mathit{hc} : 0 <\\
+&\quad \mathit{c}),\; (\mathit{hlt} : \mathit{c} <\\
+&\quad \mathit{criticalPrice} \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathbf{let} \mathit{z}
+\end{aligned} \]}
+
+\noindent\textbf{A\,26}\quad\lean{gain\_cleared}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} \mathit{c} \mathit{z}\\
+&\quad \mathit{K} : \mathbb{R} ),\; (\mathit{h1} :\\
+&\quad \mathit{m}+1 \neq 0),\; (\mathit{hK} :\\
+&\quad \mathit{K} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{profile} \mathit{a}\\
+&\quad ((1-\mathit{c}*\mathit{z})*\mathit{xWeight}\\
+&\quad \mathit{m})\\
+&\quad ((1-\mathit{c}*\mathit{z})*\mathit{yWeight}\\
+&\quad \mathit{m}) \mathit{K} - \mathit{baseValue} \mathit{m}\\
+&\quad \mathit{a}) * \mathit{K} *\\
+&\quad (8*(\mathit{m}+1)^{2}) = \mathit{a}^{2}\\
+&\quad *\\
+&\quad (2 *(1-\mathit{c} *\mathit{z}) *(\mathit{m}^{2} +2 *\mathit{m}\\
+&\quad +5) *\mathit{K}\\
+&\quad - (1-\mathit{c}*\mathit{z})^{2}*(\mathit{m}-1)^{2} -\\
+&\quad (\mathit{m}+3)^{2}*\mathit{K})
+\end{aligned} \]}
+
+\noindent\textbf{A\,27}\quad\lean{gain\_identity}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} \mathit{c} \mathit{z} :\\
+&\quad \mathbb{R} ),\; (\mathit{hm} : 2 \leq \mathit{m}),\;\\
+&\quad (\mathit{hden} : 1+(1-\mathit{c})*\mathit{z} \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{profile} \mathit{a}\\
+&\quad ((1-\mathit{c}*\mathit{z})*\mathit{xWeight}\\
+&\quad \mathit{m})\\
+&\quad ((1-\mathit{c}*\mathit{z})*\mathit{yWeight}\\
+&\quad \mathit{m})\\
+&\quad (1+(1-\mathit{c})*\mathit{z}) -\\
+&\quad \mathit{baseValue} \mathit{m}\\
+&\quad \mathit{a} =\\
+&\quad \mathit{z}*\mathit{baseValue}\\
+&\quad \mathit{m} \mathit{a}*((\mathit{criticalPrice}\\
+&\quad \mathit{m}-\mathit{c})-\mathit{c}\\
+&\quad *(1-\mathit{c} +\mathit{criticalPrice}\\
+&\quad \mathit{m})*\mathit{z})/(1+(1-\mathit{c})*\mathit{z})
+\end{aligned} \]}
+
+\noindent\textbf{A\,28}\quad\lean{gain\_poly}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{c} \mathit{z} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 *(1-\mathit{c} *\mathit{z}) *(\mathit{m}^{2} +2 *\mathit{m}\\
+&\quad +5) *(1 +(1-\mathit{c}) *\mathit{z})\\
+&\quad -\\
+&\quad (1-\mathit{c}*\mathit{z})^{2}*(\mathit{m}-1)^{2}\\
+&\quad -\\
+&\quad (\mathit{m}+3)^{2}*(1+(1-\mathit{c})*\mathit{z})\\
+&\quad = \mathit{z}*((\mathit{m}-1)^{2} -\\
+&\quad \mathit{c}*(\mathit{m}+3)^{2} -\\
+&\quad \mathit{c} *((1-\mathit{c}) *(\mathit{m} +3)^{2}\\
+&\quad +(\mathit{m}-1)^{2}) *\mathit{z})
+\end{aligned} \]}
+
+\noindent\textbf{A\,29}\quad\lean{global\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{m} : \mathbb{N} \},\; (\mathit{hm} : 2 \leq \mathit{m}),\;\\
+&\quad (\mathit{a} \mathit{c} \mathit{x} \mathit{x0} :\\
+&\quad \mathbb{R} ),\; (\mathit{w} : \mathit{Fin} \mathit{m}\\
+&\quad \to \mathbb{R} ),\; (\mathit{hx0} : 0\\
+&\quad \leq \mathit{x0}),\;\\
+&\quad (\mathit{hbudget} : \mathit{x} + \textstyle\sum \mathit{i},\\
+&\quad \mathit{w} \mathit{i} + \mathit{c}*\mathit{x0} =\\
+&\quad 1),\; (\mathit{hK} : 0 < \mathit{x} +\\
+&\quad \textstyle\sum \mathit{i},\\
+&\quad \mathit{w} \mathit{i} + \mathit{x0}),\; (\mathit{hc} :\\
+&\quad \mathit{criticalPrice} \mathit{m} \leq \mathit{c})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{u}, \mathit{profile}\\
+&\quad \mathit{a} \mathit{x} (\mathit{w}\\
+&\quad \mathit{u}) (\mathit{x} + \textstyle\sum \mathit{i},\\
+&\quad \mathit{w} \mathit{i} + \mathit{x0})\\
+&\quad \leq \mathit{baseValue} \mathit{m}\\
+&\quad \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,30}\quad\lean{ordinary\_dual}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{a} : \mathbb{R}\\
+&\quad ),\; (\mathit{hm} : 2 \leq \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{a}-\mathit{shift} \mathit{m}\\
+&\quad \mathit{a})^{2}/2 = \mathit{baseValue}\\
+&\quad \mathit{m} \mathit{a} \wedge ((\mathit{a}+\mathit{shift}\\
+&\quad \mathit{m}\\
+&\quad \mathit{a})^{2}+(\mathit{m}-1)*(\mathit{shift}\\
+&\quad \mathit{m}\\
+&\quad \mathit{a})^{2})/(2*\mathit{m}) =\\
+&\quad \mathit{baseValue} \mathit{m}\\
+&\quad \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,31}\quad\lean{profile\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{x} \mathit{y} \mathit{K} :\\
+&\quad \mathbb{R} ),\; (\mathit{hK} : 0 <\\
+&\quad \mathit{K})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{energy} \mathit{a} \mathit{x}\\
+&\quad \mathit{y} \mathit{K}\\
+&\quad (\mathit{a}*(\mathit{x}-\mathit{y})/\mathit{K})\\
+&\quad = \mathit{profile} \mathit{a}\\
+&\quad \mathit{x} \mathit{y} \mathit{K}
+\end{aligned} \]}
+
+\noindent\textbf{A\,32}\quad\lean{profile\_le\_energy}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{x} \mathit{y} \mathit{K}\\
+&\quad \mathit{t} : \mathbb{R} ),\; (\mathit{hK} : 0 <\\
+&\quad \mathit{K})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{profile} \mathit{a} \mathit{x}\\
+&\quad \mathit{y} \mathit{K} \leq \mathit{energy}\\
+&\quad \mathit{a} \mathit{x} \mathit{y}\\
+&\quad \mathit{K} \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{A\,33}\quad\lean{purchase\_properties}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{c} : \mathbb{R}\\
+&\quad ),\; (\mathit{hm} : 2 \leq \mathit{m}),\; (\mathit{hc}\\
+&\quad : 0 < \mathit{c}),\; (\mathit{hlt} : \mathit{c} <\\
+&\quad \mathit{criticalPrice} \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&0 < \mathit{purchase} \mathit{m}\\
+&\quad \mathit{c} \wedge \mathit{c}*\mathit{purchase}\\
+&\quad \mathit{m} \mathit{c} < 1 \wedge 0\\
+&\quad < (\mathit{criticalPrice}\\
+&\quad \mathit{m}-\mathit{c})-\mathit{c}\\
+&\quad *(1-\mathit{c} +\mathit{criticalPrice}\\
+&\quad \mathit{m})*\mathit{purchase}\\
+&\quad \mathit{m} \mathit{c}
+\end{aligned} \]}
+
+\noindent\textbf{A\,34}\quad\lean{queryEnergy\_eq}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{m} : \mathbb{N} \},\; (\mathit{a}\\
+&\quad \mathit{x} : \mathbb{R} ),\; (\mathit{w} :\\
+&\quad \mathit{Fin} \mathit{m} \to \mathbb{R}\\
+&\quad ),\; (\mathit{x0} : \mathbb{R} ),\; (\mathit{u} :\\
+&\quad \mathit{Fin} \mathit{m}),\; (\mathit{t} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{queryEnergy} \mathit{a}\\
+&\quad \mathit{x} \mathit{w} \mathit{x0}\\
+&\quad \mathit{u} \mathit{t} = \mathit{energy}\\
+&\quad \mathit{a} \mathit{x} (\mathit{w}\\
+&\quad \mathit{u}) (\mathit{x} + \textstyle\sum \mathit{i},\\
+&\quad \mathit{w} \mathit{i} + \mathit{x0})\\
+&\quad \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{A\,35}\quad\lean{weight\_diff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} : \mathbb{R} ),\; (\mathit{h1} :\\
+&\quad \mathit{m}+1 \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{xWeight} \mathit{m} -\\
+&\quad \mathit{yWeight} \mathit{m} =\\
+&\quad (\mathit{m}-1)/(2*(\mathit{m}+1))
+\end{aligned} \]}
+
+\noindent\textbf{A\,36}\quad\lean{weight\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} : \mathbb{R} ),\; (\mathit{h1} :\\
+&\quad \mathit{m}+1 \neq 0)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{xWeight} \mathit{m} +\\
+&\quad \mathit{yWeight} \mathit{m} =\\
+&\quad (\mathit{m}^{2}+2*\mathit{m}+5)/(2*(\mathit{m}+1)^{2})
+\end{aligned} \]}
+
+\noindent\textbf{A\,37}\quad\lean{weights}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} : \mathbb{R} ),\; (\mathit{hm} : 2 \leq \mathit{m})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&0 < \mathit{xWeight} \mathit{m}\\
+&\quad \wedge 0 < \mathit{yWeight} \mathit{m}\\
+&\quad \wedge \mathit{xWeight} \mathit{m} +\\
+&\quad \mathit{m}*\mathit{yWeight} \mathit{m}\\
+&\quad = 1
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterCalibrationLawV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,38}\quad\lean{calibration\_rate\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{sm} \mathit{sk} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{hsm} : 0 <\\
+&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hD} : 0 <\\
+&\quad \mathit{D}),\; (\mathit{hK} : 0 <\\
+&\quad \mathit{K})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathbf{let} \mathit{h} : \mathbb{R}
+\end{aligned} \]}
+
+\noindent\textbf{A\,39}\quad\lean{calibration\_rate\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{sm} \mathit{sk} \mathit{D} \mathit{V} :\\
+&\quad \mathbb{R} ),\; (\mathit{x} \mathit{z} : \mathit{Fin}\\
+&\quad \mathit{K} \to \mathbb{R} ),\; (\mathit{hsm} : 0 <\\
+&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hD} : 0 <\\
+&\quad \mathit{D}),\; (\mathit{hV} : 0 <\\
+&\quad \mathit{V}),\; (\mathit{hK} : 0 <\\
+&\quad \mathit{K}),\; (\mathit{hx} : \forall \mathit{g}, 0 <\\
+&\quad \mathit{x} \mathit{g}),\; (\mathit{hz} :\\
+&\quad \forall \mathit{g},\\
+&\quad 0 < \mathit{z} \mathit{g}),\; (\mathit{hbudget} :\\
+&\quad \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} *\\
+&\quad \mathit{x} \mathit{g} + \mathit{sk} ^{2} * \mathit{z}\\
+&\quad \mathit{g}) \leq 1),\; (\mathit{hinfo} :\\
+&\quad \forall \mathit{g},\\
+&\quad 2 * \mathit{V} / \mathit{D} ^{2} * (\mathit{x}\\
+&\quad \mathit{g} + \mathit{z} \mathit{g}) \leq \mathit{x}\\
+&\quad \mathit{g} * \mathit{z} \mathit{g})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{V} \leq \mathit{D} ^{2} / (2 * (\mathit{K} :\\
+&\quad \mathbb{R} ) * (\mathit{sm} + \mathit{sk})\\
+&\quad ^{2})
+\end{aligned} \]}
+
+\noindent\textbf{A\,40}\quad\lean{group\_cost\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{h} \mathit{sm} \mathit{sk} : \mathbb{R}\\
+&\quad ),\; (\mathit{hsm} : 0 <\\
+&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hh} : 0 <\\
+&\quad \mathit{h})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{sm} ^{2} * (\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) / \mathit{sm}) + \mathit{sk} ^{2} *\\
+&\quad (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
+&\quad \mathit{sk}) = \mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) ^{2}) \wedge \mathit{h} * ((\mathit{h} *\\
+&\quad (\mathit{sm} + \mathit{sk}) / \mathit{sm}) +\\
+&\quad (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
+&\quad \mathit{sk})) = (\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) / \mathit{sm}) * (\mathit{h} *\\
+&\quad (\mathit{sm} + \mathit{sk}) /\\
+&\quad \mathit{sk})
+\end{aligned} \]}
+
+\noindent\textbf{A\,41}\quad\lean{group\_cost\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{h} \mathit{x} \mathit{z} \mathit{sm}\\
+&\quad \mathit{sk} : \mathbb{R} ),\; (\mathit{hsm} : 0 <\\
+&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
+&\quad \mathit{sk}),\; (\mathit{hh} : 0 <\\
+&\quad \mathit{h}),\; (\mathit{hx} : 0 <\\
+&\quad \mathit{x}),\; (\mathit{hz} : 0 <\\
+&\quad \mathit{z}),\; (\mathit{hinfo} : \mathit{h} *\\
+&\quad (\mathit{x} + \mathit{z}) \leq \mathit{x} *\\
+&\quad \mathit{z})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{h} * (\mathit{sm} +\\
+&\quad \mathit{sk}) ^{2} \leq \mathit{sm} ^{2}\\
+&\quad * \mathit{x} + \mathit{sk} ^{2} *\\
+&\quad \mathit{z}
+\end{aligned} \]}
+
+\noindent\textbf{A\,42}\quad\lean{hidden\_shift\_answers}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((1:\mathbb{Q} )/2 < \mathit{theta0} 0 \wedge \neg ((1:\mathbb{Q}\\
+&\quad )/2 < \mathit{lam} 0)) \wedge ((1:\mathbb{Q} )/2 <\\
+&\quad \mathit{theta0} 3 \wedge (1:\mathbb{Q} )/2 <\\
+&\quad \mathit{lam} 3)
+\end{aligned} \]}
+
+\noindent\textbf{A\,43}\quad\lean{hidden\_shift\_answers\_differ}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 =>\\
+&\quad (1:\mathbb{Q} )/2 < \mathit{theta0}\\
+&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 =>\\
+&\quad (1:\mathbb{Q} )/2 < \mathit{lam}\\
+&\quad \mathit{i}))
+\end{aligned} \]}
+
+\noindent\textbf{A\,44}\quad\lean{hidden\_shift\_means}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{i} : \mathit{Fin} 4,\\
+&\quad \mathit{theta0} \mathit{i} +\\
+&\quad \mathit{off0} (\mathit{grp} \mathit{i})\\
+&\quad = \mathit{lam} \mathit{i} +\\
+&\quad \mathit{off1} (\mathit{grp} \mathit{i})
+\end{aligned} \]}
+
+\noindent\textbf{A\,45}\quad\lean{hidden\_shift\_witness}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0}\\
+&\quad \mathit{i} + \mathit{off0} (\mathit{grp} \mathit{i}) =\\
+&\quad \mathit{lam} \mathit{i} + \mathit{off1} (\mathit{grp}\\
+&\quad \mathit{i})) \wedge (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 =>\\
+&\quad (1:\mathbb{Q} )/2 < \mathit{theta0}\\
+&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
+&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 =>\\
+&\quad (1:\mathbb{Q} )/2 < \mathit{lam}\\
+&\quad \mathit{i}))
+\end{aligned} \]}
+
+\noindent\textbf{A\,46}\quad\lean{profiled\_information}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hb} :\\
+&\quad 0 < \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{t} : \mathbb{R} , \mathit{a} *\\
+&\quad \mathit{b} * \mathit{D} ^{2} / (2 * (\mathit{a} +\\
+&\quad \mathit{b})) \leq \mathit{a} * (\mathit{D} -\\
+&\quad \mathit{t}) ^{2} / 2 + \mathit{b} * \mathit{t} ^{2} /\\
+&\quad 2) \wedge \mathit{a} * (\mathit{D} - \mathit{a} *\\
+&\quad \mathit{D} / (\mathit{a} + \mathit{b}))\\
+&\quad ^{2} / 2 + \mathit{b} * (\mathit{a} * \mathit{D} /\\
+&\quad (\mathit{a} + \mathit{b})) ^{2} / 2\\
+&\quad = \mathit{a} * \mathit{b} * \mathit{D}\\
+&\quad ^{2} / (2 * (\mathit{a} + \mathit{b}))
+\end{aligned} \]}
+
+\noindent\textbf{A\,47}\quad\lean{profiled\_information\_form}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hb} :\\
+&\quad 0 < \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{D} ^{2} / (2 * (1 / \mathit{a} + 1 /\\
+&\quad \mathit{b})) = \mathit{a} * \mathit{b}\\
+&\quad * \mathit{D} ^{2} / (2 * (\mathit{a} +\\
+&\quad \mathit{b}))
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterGainFactorizationV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,48}\quad\lean{hadamard\_factor\_symm}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{R} : \mathit{Type}*\},\; (\mathit{c} :\\
+&\quad \mathit{R} \to \mathbb{R} ),\; (\mathit{k} \mathit{k'}\\
+&\quad : \mathit{R})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{c} \mathit{k} * \mathit{c}\\
+&\quad \mathit{k'} = \mathit{c} \mathit{k'} *\\
+&\quad \mathit{c} \mathit{k}
+\end{aligned} \]}
+
+\noindent\textbf{A\,49}\quad\lean{hadamard\_square\_factor}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{R} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{R}],\; [\mathit{DecidableEq}\\
+&\quad \mathit{R}],\; (\mathit{c} : \mathit{R} \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathit{R} \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{k}, \mathit{c} \mathit{k} *\\
+&\quad \mathit{d} \mathit{k}) ^{2} =\\
+&\quad \textstyle\sum \mathit{k},\\
+&\quad \textstyle\sum \mathit{k'}, (\mathit{c} \mathit{k} *\\
+&\quad \mathit{c} \mathit{k'}) * (\mathit{d} \mathit{k} *\\
+&\quad \mathit{d} \mathit{k'})
+\end{aligned} \]}
+
+\noindent\textbf{A\,50}\quad\lean{hadamard\_square\_rank\_one}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{c} \mathit{d} : \mathbb{R} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{c} * \mathit{d}) ^{2} =\\
+&\quad \mathit{c} ^{2} * \mathit{d} ^{2}
+\end{aligned} \]}
+
+\noindent\textbf{A\,51}\quad\lean{inactive\_dropped}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{U}],\; (\mathit{f}\\
+&\quad \mathit{g} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{A} : \mathit{Finset}\\
+&\quad \mathit{U}),\; (\mathit{V} \mathit{s} \mathit{Kt} :\\
+&\quad \mathbb{R} ),\; (\mathit{hA} :\\
+&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{hs} : 0 <\\
+&\quad \mathit{s}),\; (\mathit{hKt} : 0 \leq \mathit{Kt}),\;\\
+&\quad (\mathit{hact} : \forall \mathit{u} \in \mathit{A},\\
+&\quad \mathit{f} \mathit{u} = \mathit{V}),\; (\mathit{hina}\\
+&\quad : \forall \mathit{u} \notin \mathit{A}, \mathit{V} +\\
+&\quad \mathit{s} \leq \mathit{f}\\
+&\quad \mathit{u}),\; (\mathit{hmove} : \forall \mathit{u},\\
+&\quad |\mathit{g} \mathit{u} - \mathit{f}\\
+&\quad \mathit{u}| \leq \mathit{Kt}),\;\\
+&\quad (\mathit{hsmall} : 2 * \mathit{Kt} <\\
+&\quad \mathit{s})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{U}).\mathit{inf'}\\
+&\quad \mathit{univ\_{}nonempty} \mathit{g}\\
+&\quad = \mathit{A}.\mathit{inf'} \mathit{hA}\\
+&\quad \mathit{g}
+\end{aligned} \]}
+
+\noindent\textbf{A\,52}\quad\lean{min\_attained\_on\_active}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} \mathit{g} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{A} : \mathit{Finset}\\
+&\quad \mathit{U}),\; (\mathit{V} \mathit{s} \mathit{Kt} :\\
+&\quad \mathbb{R} ),\; (\mathit{hA} :\\
+&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{hs} : 0 <\\
+&\quad \mathit{s}),\; (\mathit{hKt} : 0 \leq \mathit{Kt}),\;\\
+&\quad (\mathit{hact} : \forall \mathit{u} \in \mathit{A},\\
+&\quad \mathit{f} \mathit{u} = \mathit{V}),\; (\mathit{hina}\\
+&\quad : \forall \mathit{u} \notin \mathit{A}, \mathit{V} +\\
+&\quad \mathit{s} \leq \mathit{f}\\
+&\quad \mathit{u}),\; (\mathit{hmove} : \forall \mathit{u},\\
+&\quad |\mathit{g} \mathit{u} - \mathit{f}\\
+&\quad \mathit{u}| \leq \mathit{Kt}),\;\\
+&\quad (\mathit{hsmall} : 2 * \mathit{Kt} <\\
+&\quad \mathit{s})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{u₀} \in \mathit{A},\\
+&\quad \forall \mathit{u} : \mathit{U},\\
+&\quad \mathit{g} \mathit{u₀} \leq \mathit{g}\\
+&\quad \mathit{u}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanMasterGroupCalibrationV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,53}\quad\lean{bestSingle\_le\_mixVal\_pure}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{G} : \mathit{U} \to \mathit{L} \to \mathbb{R}\\
+&\quad ),\; [\mathit{DecidableEq} \mathit{L}]
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{l₀} : \mathit{L},\\
+&\quad \mathit{bestSingle} \mathit{G} =\\
+&\quad \mathit{mixVal} \mathit{G} (\mathbf{fun} \mathit{l} =>\\
+&\quad \mathbf{if} \mathit{l} = \mathit{l₀} \mathbf{then} 1\\
+&\quad \mathbf{else} 0)
+\end{aligned} \]}
+
+\noindent\textbf{A\,54}\quad\lean{mixVal\_pure}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{G} : \mathit{U} \to \mathit{L} \to \mathbb{R}\\
+&\quad ),\; [\mathit{DecidableEq}\\
+&\quad \mathit{L}],\; (\mathit{l₀} :\\
+&\quad \mathit{L})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{mixVal} \mathit{G} (\mathbf{fun} \mathit{l} =>\\
+&\quad \mathbf{if} \mathit{l} = \mathit{l₀} \mathbf{then} 1\\
+&\quad \mathbf{else} 0) = (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{U}).\mathit{inf'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{u} =>\\
+&\quad \mathit{G} \mathit{u} \mathit{l₀})
+\end{aligned} \]}
+
+\noindent\textbf{A\,55}\quad\lean{rank\_one\_no\_complementarity}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{alpha} : \mathit{U} \to \mathbb{R}\\
+&\quad ),\; (\mathit{beta} : \mathit{L} \to \mathbb{R}\\
+&\quad ),\; (\mathit{rho} : \mathit{L} \to \mathbb{R}\\
+&\quad ),\; (\mathit{ha} : \forall \mathit{u}, 0\\
+&\quad \leq \mathit{alpha}\\
+&\quad \mathit{u}),\; (\mathit{hb} : \forall \mathit{l}, 0\\
+&\quad \leq \mathit{beta} \mathit{l}),\; (\mathit{hr0} :\\
+&\quad \forall \mathit{l}, 0 \leq \mathit{rho}\\
+&\quad \mathit{l}),\; (\mathit{hr1} : \textstyle\sum \mathit{l},\\
+&\quad \mathit{rho} \mathit{l} = 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{mixVal} (\mathbf{fun} \mathit{u} \mathit{l} =>\\
+&\quad \mathit{alpha} \mathit{u} * \mathit{beta}\\
+&\quad \mathit{l}) \mathit{rho} \leq \mathit{bestSingle}\\
+&\quad (\mathbf{fun} \mathit{u} \mathit{l} => \mathit{alpha}\\
+&\quad \mathit{u} * \mathit{beta} \mathit{l})
+\end{aligned} \]}
+
+\noindent\textbf{A\,56}\quad\lean{rank\_one\_value}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{DecidableEq} \mathit{L}],\; (\mathit{alpha} :\\
+&\quad \mathit{U} \to \mathbb{R} ),\; (\mathit{beta} :\\
+&\quad \mathit{L} \to \mathbb{R} ),\; (\mathit{ha} :\\
+&\quad \forall \mathit{u},\\
+&\quad 0 \leq \mathit{alpha} \mathit{u}),\; (\mathit{hb} :\\
+&\quad \forall \mathit{l}, 0 \leq \mathit{beta}\\
+&\quad \mathit{l})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\forall \mathit{rho} : \mathit{L} \to \mathbb{R} ,\\
+&\quad (\forall \mathit{l}, 0 \leq \mathit{rho} \mathit{l})\\
+&\quad \to \textstyle\sum \mathit{l}, \mathit{rho} \mathit{l}\\
+&\quad = 1 \to \mathit{mixVal} (\mathbf{fun} \mathit{u}\\
+&\quad \mathit{l} => \mathit{alpha} \mathit{u} *\\
+&\quad \mathit{beta} \mathit{l}) \mathit{rho}\\
+&\quad \leq \mathit{bestSingle}\\
+&\quad (\mathbf{fun} \mathit{u} \mathit{l} => \mathit{alpha}\\
+&\quad \mathit{u} * \mathit{beta} \mathit{l}))\\
+&\quad \wedge \exists \mathit{l₀} :\\
+&\quad \mathit{L}, \mathit{bestSingle} (\mathbf{fun}\\
+&\quad \mathit{u} \mathit{l} => \mathit{alpha} \mathit{u} *\\
+&\quad \mathit{beta} \mathit{l}) =\\
+&\quad \mathit{mixVal} (\mathbf{fun} \mathit{u} \mathit{l} =>\\
+&\quad \mathit{alpha} \mathit{u} * \mathit{beta}\\
+&\quad \mathit{l}) (\mathbf{fun} \mathit{l} => \mathbf{if}\\
+&\quad \mathit{l} = \mathit{l₀} \mathbf{then} 1 \mathbf{else}\\
+&\quad 0)
+\end{aligned} \]}
+
+\noindent\textbf{A\,57}\quad\lean{rank\_two\_complementarity}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bestSingle} \mathit{Gex} = 0\\
+&\quad \wedge \mathit{mixVal} \mathit{Gex} (\mathbf{fun}\\
+&\quad \mathit{\_{}} => (1 : \mathbb{R} ) / 2)\\
+&\quad = 3 / 2
+\end{aligned} \]}

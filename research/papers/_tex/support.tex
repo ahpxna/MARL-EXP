@@ -1,0 +1,1393 @@
+\input{preamble}
+
+\begin{document}
+
+\title{Deciding Without Identifying:\\
+An Equivariant Decoder That Is Minimax\\
+Over All Decision Rules}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A class contains $a$ safe tips and $b$ unsafe tips in a finite set $T$. A world is the unsafe
+set $W\subseteq T$ with $|W|=b$; observations reveal only unsafe tips, so a transcript is a
+revealed subset $R\subseteq W$. The task is to \emph{name a safe tip}, not to identify $W$.
+Identifying the world is a coupon-collector problem whose cost grows with the number of
+classes $K$; naming a safe tip need not be. This paper determines exactly how much cheaper
+deciding is, and whether the natural decoder---name a tip drawn uniformly from the unexplored
+set---is optimal or merely convenient. We prove five things. The number of unsafe tips still
+hidden is the same for every world compatible with a transcript, so the decoder's conditional
+risk is a function of the transcript alone and equals $L/(a+L)$ with $L=b-|R|$: equivariance
+is proved, not assumed. Bayes risk factors through a posterior loss; the pointwise-argmin rule
+is optimal over \emph{all} rules; and such a rule exists because the action set is finite, so
+the infimum is attained and no limiting argument is needed. Chaining these, the equivariant
+decoder is a \emph{least element} of the achievable worst-case risks. This closes a real gap:
+the earlier statement took constant risk as a hypothesis and contained no infimum over rules,
+so it said the decoder was flat, not that it was optimal, and flatness alone is compatible
+with every rule being bad. Flatness is itself discharged from symmetry rather than imposed.
+Finally the decide risk is exactly $\tfrac12(1-P)^{N}$, independent of $K$, while recovery
+grows: the separation is an identity against a growth rate, not a comparison of two
+estimates. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}. Over a
+$1{,}080$-cell grid reaching $1024$ classes, at a precision set from $K$ because the recovery
+sum loses about $K$ bits to cancellation, recovery costs up to $3{,}699$ times what deciding
+costs and follows a coupon-collector shape with constant $0.92$--$0.97$; simulating the process the
+recovery identity is derived for---an inclusion--exclusion over events that are not
+independent---reproduces it in every cell to within two standard errors.
+\end{abstract}
+
+\begin{IEEEkeywords}
+decision theory, minimax risk, Bayes risk, active learning, decision region determination,
+equivariance, formal verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Suppose a finite set $T$ of tips contains $a$ safe ones and $b$ unsafe ones. The world is the
+unsafe set $W\subseteq T$ with $|W|=b$. Observations are one-sided: they reveal only unsafe
+tips, so a transcript is a revealed subset $R\subseteq W$, and nothing in it distinguishes
+between the ways the remaining $b-|R|$ unsafe tips could be distributed among the tips not yet
+seen.
+
+The task is to name a safe tip. It is \emph{not} to identify $W$, and that distinction is the
+subject of the paper. The asymmetry in the observation process is what makes it interesting
+rather than trivial. If both safe and unsafe tips were revealed, a transcript of size $|R|$
+would pin down $|R|$ tips exactly and the decision would be immediate as soon as any safe tip
+had been seen. Because only unsafe tips appear, the transcript never directly exhibits a safe
+tip, and the decoder must always name an item it has no direct evidence about.
+
+The abstraction describes a recurring situation. A maintenance crew inspects components and a
+failed inspection identifies a bad component while a passed one is not recorded; a security
+team probes endpoints and only vulnerable ones respond; a screening process flags positives
+and is silent on negatives. In each case the operational question is not what the full state
+is but which single item is safe to use.
+
+Two questions follow. How much cheaper is deciding than recovering---and is the answer an
+asymptotic comparison or an exact one? And is the natural decoder, which names a tip drawn
+uniformly from the unexplored set, actually optimal, or merely the obvious thing to do?
+
+The paper makes five contributions. First, it proves the decoder's risk is a function of the
+transcript alone, with a closed form. Second, it completes the minimax chain for this problem,
+supplying the infimum over all rules that was missing. Third, it discharges the constant-risk
+hypothesis from symmetry rather than imposing it. Fourth, it gives an exact decide--recover
+separation whose decide side does not mention the number of classes. Fifth, it proves the
+sampling law exactly, with no independence assumption between classes.
+
+The scope is bounded. The result is minimaxity through one Bayes prior rather than a general
+minimax theorem, and no saddle point is claimed. Worlds, transcripts and actions are finite
+throughout. And the observation process is given: nothing here designs the sampling.
+
+\section{Background}
+
+\subsection{Decision Region Determination}
+
+The closest prior work asks precisely the question this paper's title names. Javdani, Chen,
+Karbasi, Krause, Bagnell and Srinivasa formulate near-optimal Bayesian active learning for
+decision making, where the goal is to choose well rather than to learn the hypothesis, and
+their Hyperedge Cutting algorithm handles overlapping decision regions with an approximation
+guarantee \cite{javdani2014}. Their framework already contains the observation that a set of
+surviving hypotheses must lie in a common decision region, which is exactly why checking pairs
+does not suffice.
+
+However, that line of work designs the \emph{policy}---which observation to take next---under
+adaptive submodularity \cite{golovin2011}, and its guarantees are approximation ratios for
+greedy selection. This paper is complementary and narrower: the observation process is given,
+not designed, and what is analysed is the terminal decision on a completed transcript. The
+result is an exact minimax statement for that decision rather than an approximation ratio for
+a policy, and nothing here improves on their policy guarantees.
+
+\subsection{Minimax Decision Theory}
+
+The chain running from Bayes risk through a posterior loss to a pointwise minimisation and
+then to a minimax lower bound is textbook \cite{lehmann1998,wald1950}.
+Theorems~\ref{thm:factor} and \ref{thm:optimal} are instances of it.
+
+They are proved here rather than cited for two reasons. The formal development needs them as
+statements about this problem's finite structures; and, more substantively, the step that was
+missing from the earlier treatment of this problem is exactly
+Theorem~\ref{thm:optimal}, so writing it out is the point rather than a preliminary. The
+statement obtained is minimaxity \emph{through one Bayes prior}---a single prior whose
+Bayes-optimal risk equals the decoder's constant risk---which is a standard route and is
+weaker than a general minimax theorem.
+
+\subsection{Coupon Collection and Recovery Cost}
+
+The recovery side of the separation rests on the classical coupon-collector analysis
+\cite{motwani1995}: identifying every class requires seeing enough of each, and the expected
+cost grows with the number of classes. That growth is what the decide side is compared
+against.
+
+But the comparison is made carefully rather than between an exact quantity and an asymptotic
+rate. Section~\ref{sec:results} computes both sides as exact thresholds---the least $N$
+meeting the same error target---so the ratio is a quotient of integers rather than a constant
+hidden in a rate. The coupon-collector constant itself is quoted for orientation only and is
+not relied upon.
+
+\subsection{Data Sufficiency in Optimisation}
+
+Bennouna, Bennouna, Amin and Ozdaglar characterise when a data set is informative enough to
+identify an optimal decision in linear optimisation under uncertainty, with a geometric
+criterion---the data must capture every cost direction that could change the optimum---and
+with combinatorial and noisy-observation extensions \cite{bennouna2026}. This is the same
+family of question at a different level of generality.
+
+The difference is where the uncertainty sits. There the feasible set and the cost directions
+are the objects; here the unknown is which items are unsafe, the observation process is
+one-sided, and the decision is to name one safe item. What survives as distinct is the
+one-sidedness and the resulting equivariance, which has no analogue in the cost-direction
+characterisation.
+
+\subsection{The Gap}
+
+The literature therefore leaves a specific opening. Decision-region determination designs
+policies and gives approximation ratios but not an exact optimality statement for a terminal
+decoder; minimax decision theory supplies the chain but was not run to completion for this
+problem; coupon collection supplies the recovery cost but not an exact comparison. No existing
+treatment simultaneously: (i) proves the decoder's risk depends on the transcript alone;
+(ii) establishes optimality over \emph{all} decision rules with the infimum attained;
+(iii) derives the constant-risk property from symmetry rather than assuming it; and
+(iv) exhibits a decide--recover separation in which the decide side is an identity independent
+of the number of classes.
+
+\section{Research Aims, Questions, and Hypotheses}
+
+\subsection{Research Aim}
+
+The aim of this work is to determine whether the natural decoder for a one-sided observation
+process is optimal among all decision rules, and to quantify exactly how much cheaper naming
+a safe item is than identifying the world.
+
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Does the decoder's conditional risk depend on the world, or only on the
+transcript?
+\item \textbf{RQ2.} Is the decoder optimal over all decision rules, and is the relevant
+infimum attained?
+\item \textbf{RQ3.} Can the constant-risk property be derived rather than assumed?
+\item \textbf{RQ4.} How does the cost of deciding scale with the number of classes compared
+with the cost of recovering?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} Every world compatible with a transcript hides the same number of unsafe
+tips, so the conditional risk is $L/(a+L)$ regardless of the world.
+\item \textbf{H2.} Bayes risk factors observation by observation, so minimising it is a
+pointwise minimisation, and finiteness of the action set makes the minimum attained.
+\item \textbf{H3.} A risk invariant under a transitive relabelling of worlds is constant, so
+symmetry supplies the hypothesis the earlier treatment imposed.
+\item \textbf{H4.} The decide risk does not mention $K$, so the ratio to recovery grows
+without bound.
+\end{itemize}
+
+\section{Methodology}
+\label{sec:setting}
+
+\subsection{Framework Overview}
+
+A \emph{decision rule} is any map from observations to actions. Nothing in the development
+restricts rules to be deterministic, non-adaptive or measurable in any non-trivial sense: the
+observation and action sets are finite, so every map is a rule. This breadth is what gives
+Theorem~\ref{thm:minimax} its force, and it is stated here because a narrower rule class would
+make the conclusion much weaker while looking the same.
+
+A draw selects a tip according to the model's per-tip probabilities and reports it only if it
+is unsafe. Safe tips generate no record, so the number of draws is not recoverable from the
+transcript, and $|R|\le b$ always with saturation once every unsafe tip has been seen. The
+analysis therefore conditions on the transcript rather than on the draw count---a decoder sees
+$R$ and not $N$, so a risk expressed in terms of $N$ would not be implementable.
+
+\subsection{Simplifying Assumptions}
+
+\begin{enumerate}
+\item[1)] \textbf{One-sided observation.} Only unsafe tips are reported. This is the
+structural feature the whole paper turns on, and it is what forces the decoder to name an item
+about which it has no direct evidence.
+
+\item[2)] \textbf{Fixed unsafe count.} Every world has exactly $b$ unsafe tips. Together with
+compatibility this is what makes Lemma~\ref{lem:hidden} true; if $|W|$ were unknown the hidden
+count would vary across compatible worlds and the conditional risk would depend on the world
+after all.
+
+\item[3)] \textbf{Everything finite.} Worlds, transcripts and actions are finite. This makes
+the pointwise minimum of Theorem~\ref{thm:optimal} attained; with an infinite action set the
+conclusion weakens from a least element to an infimum that may not be achieved.
+
+\item[4)] \textbf{Relabelling-invariant prior.} The prior is arbitrary but invariant under
+relabelling tips. This supplies the transitivity that Proposition~\ref{prop:symmetry} needs,
+and Section~\ref{sec:natural} shows where it fails if the prior is asymmetric.
+
+\item[5)] \textbf{Symmetric class model for the separation.} For
+Section~\ref{sec:separation}, $a_{i}=b_{i}=1$ per class and $p_{i}=P/K$ with total unsafe mass
+$P$ fixed as $K$ grows. Holding $P$ fixed is what makes the comparison meaningful; letting it
+grow with $K$ would make both costs grow and confound the question.
+\end{enumerate}
+
+\subsection{The Sampling Law}
+\label{sec:sampling}
+
+\begin{theorem}[Product law and its expectation]
+\label{thm:sampling}
+The probability that a given tuple goes unseen in $N$ draws is $(1-s)^{N}$, where $s$ is its
+per-draw probability, and the expectation of the sum of unseen indicators over a family of $B$
+tuples is $B(1-s)^{N}$.
+\end{theorem}
+
+\begin{proof}
+The per-draw avoidance probability is a product over the finite index set, giving $(1-s)$ per
+draw and $(1-s)^{N}$ over $N$ draws. For the expectation, exchange the sum over tuples with
+the sum over draws; the exchange is between two finite sums and is exact.
+\end{proof}
+
+\leanbox{\lean{avoid\_prob}, \lean{prod\_unseen\_card}, \lean{expected\_prod\_unseen} in
+\lean{LeanSupportSamplingLawV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportSamplingLawV1}.}~These are the sampling law and the pieces of the minimax chain that live with it. The avoidance probability and the unseen-count identity are proved by a product over the finite index set and an exchange of two finite sums, with no independence between classes assumed anywhere; the transversal mass and good-event bounds are what the decide-side computation consumes. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{avoid\_prob}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} :\\
+&\quad \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N}\\
+&\quad \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{k},\\
+&\quad \mathit{h} \mathit{k} \in \mathit{A}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0) = (\textstyle\sum \mathit{x} \in \mathit{A},\\
+&\quad \mathit{p}\\
+&\quad \mathit{x}) ^{\mathit{N}}
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{expected\_prod\_unseen}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\mathit{N} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega ,\\
+&\quad (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
+&\quad \mathit{k}))\\
+&\quad * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+&\quad ))) = (\textstyle\prod \mathit{i},\\
+&\quad (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i})\\
+&\quad : \mathbb{R}\\
+&\quad )) * (1 - \textstyle\sum \mathit{i}, \mathit{pc}\\
+&\quad \mathit{i}) ^{\mathit{N}}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{fixed\_tip\_unsafe\_fraction}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L'} : \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} :\\
+&\quad \mathbb{N} ) : \mathbb{R}\\
+&\quad ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose}\\
+&\quad (\mathit{L'} + 1) : \mathbb{N} ) : \mathbb{R}\\
+&\quad ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} :\\
+&\quad \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) +\\
+&\quad 1)
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{good\_event\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\mathit{hpnn} : \forall \mathit{x}, 0\\
+&\quad \leq \mathit{p}\\
+&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\;\\
+&\quad (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i})\\
+&\quad ^{\mathit{N}} \leq \textstyle\sum \mathit{h} :\\
+&\quad \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k},\\
+&\quad \mathit{p} (\mathit{h}\\
+&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{i},\\
+&\quad 1 \leq (\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0)
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{minimax\_eq\_of\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{World}],\; [\mathit{Nonempty}\\
+&\quad \mathit{World}],\; (\mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h}\\
+&\quad : \forall \mathit{w}, \mathit{R} \mathit{w}\\
+&\quad =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
+&\quad \mathit{R} = \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,6}\quad\lean{prod\_unseen\_as\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
+&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
+&\quad )) = \textstyle\sum \tau : (\mathit{i} : \iota )\\
+&\quad \to \kappa \mathit{i}, (\mathbf{if} \forall \mathit{i}, \tau \mathit{i}\\
+&\quad \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}\\
+&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
+&\quad 0)
+\end{aligned} \]}
+
+\noindent\textbf{S\,7}\quad\lean{prod\_unseen\_card}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
+&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u}\\
+&\quad \mathit{h}\\
+&\quad \mathit{i}).\mathit{card} =\\
+&\quad (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet}\\
+&\quad \mathit{u}\\
+&\quad \mathit{h})).\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,8}\quad\lean{transversal\_mass}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
+&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
+&\quad \to \Omega ),\;\\
+&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
+&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
+&\quad => \mathit{u} \mathit{x}.1\\
+&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
+&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
+&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
+&\quad \mathit{j}) = \mathit{pc}\\
+&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
+&\quad \mathit{p} \mathit{x} =\\
+&\quad 1),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \\\
+&\quad (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} =>\\
+&\quad \mathit{u} \mathit{i} (\tau \mathit{i}))),\\
+&\quad \mathit{p} \mathit{x} = 1 - \textstyle\sum \mathit{i},\\
+&\quad \mathit{pc} \mathit{i}
+\end{aligned} \]}
+
+
+No independence between classes is assumed anywhere. Linearity of expectation suffices because
+the quantity needed is a sum, which is why the result is an identity rather than an
+approximation; an earlier version did assume independence, and removing it also removed a
+hypothesis from the recovery law of Section~\ref{sec:separation}.
+
+\subsection{The Decoder and Its Risk}
+\label{sec:decoder}
+
+\begin{lemma}[The hidden count is world-free]
+\label{lem:hidden}
+Every world compatible with a transcript $R$ has exactly $b$ unsafe tips and contains all of
+$R$. Hence the number still hidden is $L=b-|R|$ in all of them.
+\end{lemma}
+
+\begin{proof}
+Compatibility means $R\subseteq W$ and $|W|=b$, so $|W\setminus R|=b-|R|$.
+\end{proof}
+
+\leanbox{\lean{hidden\_count\_world\_free} in \lean{LeanSupportEquivariantDecoderV1}}
+
+\begin{theorem}[Equivariance and the closed-form risk]
+\label{thm:equivariant}
+The decoder naming a tip uniformly from the unexplored set has conditional risk
+\begin{equation}
+r\;=\;\frac{b-|R|}{a+b-|R|}\;=\;\frac{L}{a+L},
+\qquad L=b-|R|,
+\label{eq:decoder}
+\end{equation}
+which depends on the transcript alone.
+\end{theorem}
+
+\begin{proof}
+The unexplored set has $a+b-|R|$ elements, of which $L$ are unsafe by
+Lemma~\ref{lem:hidden}. Drawing uniformly, the probability of naming an unsafe tip is the
+ratio. Both numerator and denominator are functions of $|R|$.
+\end{proof}
+
+\leanbox{\lean{decoder\_risk\_world\_free}, \lean{decoder\_risk\_eq\_L\_over\_aL} in
+\lean{LeanSupportEquivariantDecoderV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportEquivariantDecoderV1}.}~These are the decoder. The hidden-count statement is the counting fact everything rests on: every compatible world hides the same number of unsafe tips, so the conditional risk cannot depend on the world. The closed form and the world-freeness are stated separately because the second is the property that makes the first implementable. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,9}\quad\lean{bayes\_is\_minimax}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
+&\quad \mathit{World}],\; [\mathit{Nonempty}\\
+&\quad \mathit{World}],\; (\mathit{pri} \mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{r} : \mathbb{R} ),\;\\
+&\quad (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{hconst} : \forall \mathit{w},\\
+&\quad \mathit{R} \mathit{w} =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} * \mathit{R}\\
+&\quad \mathit{w}) = \mathit{r} \wedge (\mathit{univ}\\
+&\quad : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
+&\quad \mathit{R} = \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{decoder\_risk\_eq\_L\_over\_aL}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
+&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
+&\quad \subseteq \mathit{W}),\; (\mathit{hT} :\\
+&\quad \mathit{Fintype}.\mathit{card} \mathit{T}\\
+&\quad = \mathit{a} +\\
+&\quad \mathit{b}),\; (\mathit{hle} :\\
+&\quad \mathit{R}.\mathit{card} \leq \mathit{b})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(((\mathit{W} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad )) / ((\mathit{univ} \\\
+&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) = ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N}\\
+&\quad ) : \mathbb{R}\\
+&\quad ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} -\\
+&\quad \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
+&\quad ))
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{decoder\_risk\_world\_free}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W₁} \mathit{W₂} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\;\\
+&\quad (\mathit{hW₁} : \mathit{W₁}.\mathit{card}\\
+&\quad =\\
+&\quad \mathit{b}),\; (\mathit{hW₂} :\\
+&\quad \mathit{W₂}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{h₁} : \mathit{R}\\
+&\quad \subseteq \mathit{W₁}),\; (\mathit{h₂} :\\
+&\quad \mathit{R} \subseteq \mathit{W₂}),\;\\
+&\quad (\mathit{U} : \mathit{Finset}\\
+&\quad \mathit{T})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&((\mathit{W₁} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \\\
+&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
+&\quad ) / \mathit{U}.\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,12}\quad\lean{hidden\_count\_world\_free}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{W} \mathit{R} : \mathit{Finset}\\
+&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N}\\
+&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
+&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
+&\quad \subseteq \mathit{W})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{W} \ \mathit{R}).\mathit{card} = \mathit{b} -\\
+&\quad \mathit{R}.\mathit{card}
+\end{aligned} \]}
+
+
+Equivariance is therefore a cardinality computation, not an assumption, and it uses very
+little: only that compatibility forces $R\subseteq W$ with $|W|=b$. Any observation process
+with those two properties gives the same conclusion whatever its dynamics.
+
+It is also not obvious in advance. The decoder names an unexplored tip, and the unexplored set
+is the part of $T$ about which the transcript is silent, so one might expect its composition
+to vary across compatible worlds. Lemma~\ref{lem:hidden} says it does not, and that single
+counting fact is what the rest of the argument is built on.
+
+\subsection{Bayes Risk Factors}
+\label{sec:bayes}
+
+Optimality over all rules cannot be argued rule by rule. It needs a form in which an arbitrary
+rule's contribution separates observation by observation, and producing that form is the only
+purpose of the next statement.
+
+\begin{theorem}[Factorisation]
+\label{thm:factor}
+\begin{align}
+B(d)&\;=\;\sum_{x} g\bigl(x,\,d(x)\bigr),\notag\\
+g(x,a)&\;=\;\sum_{w}\pi(w)\,P(w,x)\,L(w,a).
+\label{eq:bayes}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+Write the Bayes risk as $\sum_{w}\pi(w)\sum_{x}P(w,x)L(w,d(x))$ and exchange the two finite
+sums, then collect the rule's action at each observation.
+\end{proof}
+
+\leanbox{\lean{bayesRisk\_eq\_sum\_postLoss} in \lean{LeanSupportMinimaxLowerV1}}
+
+After \eqref{eq:bayes} the rule appears only inside $g$, once per observation, so the Bayes
+risk of an arbitrary rule is a sum of independent terms each depending on the rule through a
+single action. That is exactly the structure the next theorem exploits.
+
+\subsection{Optimality Over All Rules}
+\label{sec:minimax}
+
+\begin{theorem}[The pointwise minimum is optimal and attained]
+\label{thm:optimal}
+\begin{equation}
+\sum_{x}\;\min_{a}\;g(x,a)\;\;\leq\;\;B(d)
+\qquad\text{for every rule } d,
+\label{eq:optimal}
+\end{equation}
+and the bound is attained by any rule choosing an argmin at every observation. Such a rule
+exists because the action set is finite and non-empty.
+\end{theorem}
+
+\begin{proof}
+By Theorem~\ref{thm:factor}, $B(d)=\sum_{x}g(x,d(x))$ and each summand is at least
+$\min_{a}g(x,a)$. For attainment, define $d^{*}(x)$ to be an argmin of $g(x,\cdot)$, which
+exists as the action set is finite and non-empty.
+\end{proof}
+
+\leanbox{\lean{bayes\_optimal\_lower}, \lean{bayes\_optimal\_attained} in
+\lean{LeanSupportMinimaxLowerV1}}
+
+The infimum over rules is therefore a \emph{minimum}, and no limiting argument is required.
+This is the step the earlier treatment lacked, and it is the reason the conclusion can be
+stated as membership in the achievable set rather than as an unattained bound.
+
+\begin{theorem}[Minimax lower bound]
+\label{thm:minimax}
+\begin{equation}
+\sum_{x}\min_{a}g(x,a)\;\;\leq\;\;\sup_{w}R(w,d)
+\label{eq:minimax}
+\end{equation}
+for every rule $d$ and every prior $\pi$. Consequently a rule whose risk is constant and equal
+to that number is a least element of the achievable worst-case risks.
+\end{theorem}
+
+\begin{proof}
+A weighted average is at most a supremum, so $B(d)\le\sup_{w}R(w,d)$; chaining with
+\eqref{eq:optimal} gives \eqref{eq:minimax}. A rule with constant risk equal to the left-hand
+side achieves that worst case, and by \eqref{eq:minimax} no rule achieves less.
+\end{proof}
+
+\leanbox{\lean{minimax\_ge\_bayes\_optimal}, \lean{equivariant\_is\_minimax} in
+\lean{LeanSupportMinimaxLowerV1}}
+
+\begin{proposition}[Flatness from symmetry]
+\label{prop:symmetry}
+A risk invariant under a transitive relabelling of worlds is constant.
+\end{proposition}
+
+\begin{proof}
+Transitivity supplies, for any two worlds, a relabelling carrying one to the other;
+invariance equates their risks.
+\end{proof}
+
+\leanbox{\lean{constant\_risk\_of\_symmetry} in \lean{LeanSupportMinimaxLowerV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportMinimaxLowerV1}.}~These are the chain that was previously incomplete. The factorisation separates an arbitrary rule's contribution observation by observation; the pointwise bound and its attainment supply the infimum over all rules that was missing, and the attainment is what lets the conclusion be membership in the achievable set rather than an unattained bound. The symmetry statement discharges the constant-risk hypothesis the earlier treatment imposed. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,13}\quad\lean{bayesRisk\_eq\_sum\_postLoss}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{d} = \textstyle\sum \mathit{x},\\
+&\quad \mathit{postLoss} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{x} (\mathit{d} \mathit{x})
+\end{aligned} \]}
+
+\noindent\textbf{S\,14}\quad\lean{bayes\_optimal\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\exists \mathit{d} : \mathit{Obs} \to \mathit{Act},\\
+&\quad \mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad \mathit{d} = \mathit{bayesOptValue} \mathit{pri}\\
+&\quad \mathit{P} \mathit{L}
+\end{aligned} \]}
+
+\noindent\textbf{S\,15}\quad\lean{bayes\_optimal\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} \leq \mathit{bayesRisk} \mathit{pri}\\
+&\quad \mathit{P} \mathit{L} \mathit{d}
+\end{aligned} \]}
+
+\noindent\textbf{S\,16}\quad\lean{constant\_risk\_of\_symmetry}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G}\\
+&\quad \to \mathit{World} \to \mathit{World}),\; (\mathit{R} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{hinv} : \forall \mathit{g}\\
+&\quad \mathit{w}, \mathit{R} (\mathit{act} \mathit{g}\\
+&\quad \mathit{w}) = \mathit{R}\\
+&\quad \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w}\\
+&\quad \mathit{w'} : \mathit{World}, \exists \mathit{g},\\
+&\quad \mathit{act} \mathit{g} \mathit{w} =\\
+&\quad \mathit{w'})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\forall \mathit{w} \mathit{w'} : \mathit{World},\\
+&\quad \mathit{R} \mathit{w} = \mathit{R} \mathit{w'}
+\end{aligned} \]}
+
+\noindent\textbf{S\,17}\quad\lean{equivariant\_is\_minimax}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\;\\
+&\quad (\mathit{r} : \mathbb{R}\\
+&\quad ),\; (\mathit{hconst} : \forall \mathit{w},\\
+&\quad \mathit{risk} \mathit{P} \mathit{L}\\
+&\quad \mathit{d₀} \mathit{w} =\\
+&\quad \mathit{r}),\; (\mathit{hopt} :\\
+&\quad \mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} =\\
+&\quad \mathit{r})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} |\\
+&\quad \exists \mathit{d}\\
+&\quad : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} :\\
+&\quad \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
+&\quad \mathit{P} \mathit{L}\\
+&\quad \mathit{d}) = \mathit{v}\} \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{S\,18}\quad\lean{minimax\_ge\_bayes\_optimal}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
+&\quad \mathit{World} \to \mathbb{R}\\
+&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
+&\quad \to \mathbb{R}\\
+&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
+&\quad \leq \mathit{pri}\\
+&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
+&\quad \mathit{pri} \mathit{w} =\\
+&\quad 1),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
+&\quad \mathit{L} \leq (\mathit{univ} : \mathit{Finset}\\
+&\quad \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
+&\quad \mathit{P} \mathit{L}\\
+&\quad \mathit{d})
+\end{aligned} \]}
+
+
+Proposition~\ref{prop:symmetry} is how the constant-risk hypothesis is discharged rather than
+imposed. Combined with Theorem~\ref{thm:equivariant}---a risk depending only on $|R|$ is
+unchanged by relabelling---it yields constancy, and Theorem~\ref{thm:minimax} then yields
+optimality.
+
+The order matters. Flatness rules nothing out on its own: the rule that always names the first
+tip in a fixed enumeration has perfectly constant risk $b/(a+b)$ at every transcript, and is
+strictly worse than the equivariant decoder after even one observation. What the earlier
+treatment established was that the equivariant decoder is in the same category as that trivial
+rule with respect to world-dependence, which is a real property but says nothing about how it
+compares to other rules. The infimum of Theorem~\ref{thm:optimal} supplies the comparison.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig2_minimax.png}
+\caption{The minimax chain. Bayes risk factors through the posterior loss; the pointwise
+minimum lower-bounds every rule and is attained; the worst case dominates the Bayes risk; and
+the equivariant decoder's constant risk meets the resulting bound. The third step---optimality
+over \emph{all} rules---is the one that was missing.}
+\label{fig:minimax}
+\end{figure}
+
+\subsection{Why the Decoder Is the Natural One}
+\label{sec:natural}
+
+Theorem~\ref{thm:minimax} says the equivariant decoder is optimal. It does not explain why
+that decoder, of all rules, meets the bound, and the explanation is short.
+
+Fix a relabelling-invariant prior. The posterior at a transcript $R$ is uniform over the
+compatible worlds by symmetry, and by Lemma~\ref{lem:hidden} each compatible world has exactly
+$L$ unsafe tips among the $a+L$ unexplored ones. Summing over compatible worlds, each
+unexplored tip is unsafe in the same number of them, so the posterior probability that a given
+unexplored tip is unsafe is $L/(a+L)$, identically for every unexplored tip. The posterior
+loss $g(x,a)$ is therefore constant across unexplored tips and strictly larger for explored
+ones, which are known to be unsafe.
+
+An immediate consequence is that the decoder is not \emph{uniquely} optimal: every rule naming
+some unexplored tip is Bayes-optimal at that transcript. What all optimal rules share is the
+constraint---never name an explored tip---and the freedom is in which unexplored one. This
+identifies what the result actually rules out. It does not say randomisation helps or that the
+uniform choice is special; it says the information in the transcript is exhausted by the set of
+explored tips, so a rule weighting unexplored tips by some heuristic cannot do better, because
+there is nothing left to be clever about.
+
+The argument uses relabelling invariance twice, and with an asymmetric prior neither step
+survives: the posterior loss varies across unexplored tips and the argmin is no longer the
+uniform rule. Theorems~\ref{thm:factor} and \ref{thm:optimal} still hold, since they assume
+nothing about the prior; what fails is the identification of the argmin with \emph{this}
+decoder.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig3_risk.png}
+\caption{What one revealed tip is worth. The decoder's risk is $L/(a+L)$ where $L$ is the
+number of unsafe tips still unresolved, so revealing tips does not reduce risk linearly: each
+one removes a term from the numerator and the denominator at once, and the curve is therefore
+convex and steepest at the end. The three series are the safe/unsafe counts $(a,b)$ marked.
+The practical reading is that the last few revelations carry most of the risk reduction,
+which is the opposite of what a linear accounting of ``fraction revealed'' would suggest.
+Exact evaluation of the decoder risk of Theorem~\ref{thm:optimal}.}
+\label{fig:risk}
+\end{figure}
+
+\subsection{Pairwise Safety Does Not Suffice, in the Real Geometry}
+\label{sec:threeworld}
+
+The minimax chain above concerns a single class. Across classes a second question arises, and
+it is the one the decision-region literature identifies: a decision safe for every \emph{pair}
+of surviving worlds need not be safe for all of them at once \cite{javdani2014}. That
+phenomenon is easy to exhibit against an abstract regret function, which establishes only that
+the abstract API permits it. We realise it inside the support-radius model the rest of the
+development uses.
+
+Take three relations and three worlds, each world having support $\{\text{anchor},\,
+\mathrm{tip}(w)\}$ with anchor $(0,0,0)$, and let component $j$ read coordinate $j$. Set
+\begin{align}
+\mathrm{tip}(0)&=(\phantom{-}1,\phantom{-}1,-1), \notag\\
+\mathrm{tip}(1)&=(-1,\phantom{-}1,\phantom{-}1), \notag\\
+\mathrm{tip}(2)&=(\phantom{-}1,-1,\phantom{-}1).
+\label{eq:tips}
+\end{align}
+
+\begin{proposition}[Radius of a retained singleton]
+\label{prop:radius}
+For every world $w$ and relation $j$,
+\begin{equation}
+\mathrm{selectedRadius}\bigl(F_{w},\{j\}\bigr)
+\;=\;\frac{\bigl|\sum_{l\neq j}\mathrm{tip}(w)_{l}\bigr|}{2}.
+\label{eq:radius}
+\end{equation}
+\end{proposition}
+
+\leanbox{\lean{radius\_formula}, \lean{zeroRegret\_spec} in
+\lean{LeanSupportThreeWorldWitnessV1}}
+
+Equation \eqref{eq:radius} is what ties the construction to the corpus rather than to a toy:
+the regret of keeping relation $j$ is half the oscillation of the sum of the omitted
+relations, which is the quantity the rest of the development uses. Evaluating it on
+\eqref{eq:tips} gives radii $(0,0,1)$, $(1,0,0)$ and $(0,1,0)$ for the three worlds, so the
+zero-regret decision sets are $\{0,1\}$, $\{1,2\}$ and $\{0,2\}$.
+
+\begin{theorem}[Pairwise safety is not whole-fibre safety]
+\label{thm:threeworld}
+On the construction \eqref{eq:tips},
+\begin{multline}
+\bigl(\forall w,w'\;\exists j:\;
+ \mathrm{selectedRadius}(F_{w},\{j\})=0 \\ \wedge\;
+ \mathrm{selectedRadius}(F_{w'},\{j\})=0\bigr)
+\;\wedge\;\\
+\neg\,\exists j\;\forall w:\;\mathrm{selectedRadius}(F_{w},\{j\})=0 .
+\label{eq:threeworld}
+\end{multline}
+\end{theorem}
+
+\begin{proof}
+The three zero-regret sets pairwise intersect---$\{0,1\}\cap\{1,2\}=\{1\}$,
+$\{1,2\}\cap\{0,2\}=\{2\}$, $\{0,1\}\cap\{0,2\}=\{0\}$---but their triple intersection is
+empty.
+\end{proof}
+
+\leanbox{\lean{pairwise\_common\_decision}, \lean{no\_common\_decision},
+\lean{pairwise\_not\_sufficient\_in\_support\_model} in
+\lean{LeanSupportThreeWorldWitnessV1}}
+
+Three points about this statement are worth making. It uses no \texttt{native\_decide} and no
+decision procedure over the reals; the two \texttt{decide} calls are over a three-element
+\lean{Finset (Fin 3)}. It is stated on \lean{selectedRadius} rather than on an abstract
+regret, so it establishes the obstruction in the model rather than merely in the API. And it
+bounds what a pairwise test can certify: a procedure verifying safety two worlds at a time
+will pass this instance and be wrong, which is exactly the failure the Hyperedge Cutting
+construction is designed to handle \cite{javdani2014}.
+
+What the witness does \emph{not} give is a law. It exhibits a minimal unsafe triple; it does
+not bound the size of the smallest such group as a function of the geometry, and
+Section~\ref{sec:discussion} lists that as the open problem it is.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig5_threeworld.png}
+\caption{The obstruction that pairwise reasoning cannot see, in the three-world model of
+\lean{pairwise\_not\_sufficient\_in\_support\_model}. Each group of bars is one choice of the
+coordinate kept; each bar within it is one world's selected radius. Every \emph{pair} of
+worlds admits a kept coordinate at which both have zero radius---the three zero-regret sets
+$\{0,1\}$, $\{1,2\}$ and $\{0,2\}$---so a procedure that checks safety two worlds at a time
+finds nothing wrong. No coordinate works for all three at once: the three sets intersect
+pairwise and their triple intersection is empty. The failure is a Helly-type one and is
+invisible to any pairwise certificate, which is why the sufficiency argument has to be made
+on the whole fibre.}
+\label{fig:threeworld}
+\end{figure}
+
+\subsection{The Decide--Recover Separation}
+\label{sec:separation}
+
+Before the numbers, the two costs must be tied to an error criterion, since ``deciding'' and
+``recovering'' are informal until they are.
+
+\emph{Deciding} means: after $N$ observations, name one tip and be wrong with probability at
+most $\varepsilon$, where wrong means the named tip is unsafe. \emph{Recovering} means: report
+the full unsafe set across all classes and be wrong with probability at most $\varepsilon$.
+Both costs are the least $N$ meeting the same $\varepsilon$, so the comparison is between two
+thresholds computed the same way rather than between an exact quantity and an asymptotic rate.
+
+\begin{theorem}[Exact separation]
+\label{thm:separation}
+In the symmetric model the decide risk is
+\begin{equation}
+R_{\mathrm{dec}}\;=\;\frac{1}{2}(1-P)^{N}
+\quad\text{exactly, flat in } K,
+\label{eq:decide}
+\end{equation}
+while the recovery cost grows with $K$.
+\end{theorem}
+
+\begin{proof}[Proof outline]
+The decide risk collapses to \eqref{eq:decide} by Theorem~\ref{thm:sampling} and the
+equivariant form \eqref{eq:decoder}. The expression does not mention $K$ because a decision is
+correct as soon as the named tip is safe, and that event's probability is settled inside a
+single class; the other $K-1$ classes contribute nothing. The recovery cost is computed from
+an inclusion--exclusion identity over the classes and is bounded below by a coupon-collector
+argument.
+\end{proof}
+
+\leanbox{\lean{binary\_decide\_value}, \lean{decide\_upper\_expect},
+\lean{growing\_K\_recover} in \lean{LeanSupportDecideRecoverV1}}
+
+\noindent\emph{Supporting results in \lean{LeanSupportDecideRecoverV1}.}~These are the separation. The decide value is computed exactly and the monotonicity and factor bounds are what keep it independent of the number of classes; the recovery side is bounded pointwise and then in expectation, so the comparison is between an identity and a growth rate rather than between two estimates. They are reproduced as the prover has them; a further $5$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,19}\quad\lean{binary\_decide\_value}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{hL} : \forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} \leq 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_{}nonempty}\\
+&\quad (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R}\\
+&\quad ) / (1 + \mathit{L}\\
+&\quad \mathit{i}))) = \mathbf{if} (\forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} =\\
+&\quad 1) \mathbf{then} (1 : \mathbb{R} ) / 2 \mathbf{else} 0
+\end{aligned} \]}
+
+\noindent\textbf{S\,20}\quad\lean{cfac\_le\_one}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{i} : \iota )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{cfac} \mathit{a} \mathit{L} \mathit{i}\\
+&\quad \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{S\,21}\quad\lean{growing\_K\_recover}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i},\\
+&\quad \mathit{L} \mathit{i} \leq 1)
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L}\\
+&\quad \mathit{i}).\mathit{choose} (\mathit{L}\\
+&\quad \mathit{i}) : \mathbb{N}\\
+&\quad ) : \mathbb{R}\\
+&\quad )) = (1 / 2 : \mathbb{R} ) ^{}\\
+&\quad (\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
+&\quad \mathit{i} => \mathit{L} \mathit{i} =\\
+&\quad 1)).\mathit{card}
+\end{aligned} \]}
+
+\noindent\textbf{S\,22}\quad\lean{recover\_lower\_pointwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
+&\quad ),\; (\mathit{ha} : \forall \mathit{i}, 1\\
+&\quad \leq \mathit{a}\\
+&\quad \mathit{i}),\; (\mathit{i₀} : \iota ),\;\\
+&\quad (\mathit{h} : 1 \leq \mathit{L}\\
+&\quad \mathit{i₀})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(1:\mathbb{R} ) / 2 \leq 1 - \textstyle\prod \mathit{i},\\
+&\quad \mathit{cfac} \mathit{a} \mathit{L} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{S\,23}\quad\lean{recover\_upper\_pointwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} )
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&1 - \textstyle\prod \mathit{i}, \mathit{cfac}\\
+&\quad \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i},\\
+&\quad (\mathit{L} \mathit{i} : \mathbb{R}\\
+&\quad )
+\end{aligned} \]}
+
+\noindent\textbf{S\,24}\quad\lean{two\_le\_choose}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\;\\
+&\quad (\mathit{hL} : 1 \leq \mathit{L})
+\end{aligned} \]}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 \leq (\mathit{a} + \mathit{L}).\mathit{choose}\\
+&\quad \mathit{L}
+\end{aligned} \]}
+
+
+The recovery side is computed as an identity rather than a bound, and this matters because an
+independence assumption would weaken the comparison. The probability that recovery is
+incomplete is
+\begin{equation}
+R_{\mathrm{rec}}
+\;=\;1-\sum_{k}\binom{K}{k}\Bigl(-\tfrac12\Bigr)^{k}
+     \Bigl(1-\tfrac{kP}{K}\Bigr)^{N},
+\label{eq:recover}
+\end{equation}
+which assumes nothing about how the classes interact. The same quantity is sandwiched between
+$\tfrac12\Pr(U>0)$ and $\Pr(U>0)$, verified exactly at several $N$, which is what allows the
+coupon-collector scale to be quoted for orientation without being relied on.
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+Theorem~\ref{thm:separation} states the decide side exactly, so no experiment bears on it. The
+computation has three objectives. The first is to evaluate both thresholds on a grid so that
+the ratio, which the theorem does not compute, can be read off. The second is scope: twelve
+cells at one value of $P$ cannot distinguish a law from a coincidence, and the grid below is
+widened until the growth in $K$ can be fitted rather than asserted. The third is the one that
+can actually fail. Equation~\eqref{eq:recover} is an inclusion--exclusion identity over events
+that are \emph{not} independent---the classes compete for the same $N$ observations---and it
+is derived rather than measured. Experiment~E2 simulates the process it is derived for and
+compares.
+
+\subsection{Setup}
+
+The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128,192,256,384,512,768,1024\}$,
+$P\in\{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\}$
+and $\varepsilon$ from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the model
+$a_{i}=b_{i}=1$, $p_{i}=P/K$.
+
+The recovery sum alternates in sign with binomial weights, so it loses roughly $K$ bits to
+cancellation and cannot be evaluated in double precision anywhere near the top of this grid:
+at $K=128$ the largest term already exceeds the answer by about eighteen orders of magnitude.
+The working precision is therefore set from $K$ itself, at
+$120+\lceil K\log_{10}2\rceil+40$ significant digits---$469$ at $K=1024$---and checked
+against exact rational arithmetic wherever the exact computation is affordable. A fixed
+precision would have returned noise at the largest sizes rather than an answer.
+
+\begin{algorithm}[htbp]
+\caption{The two thresholds, at a precision set from $K$}
+\label{alg:threshold}
+\begin{algorithmic}[1]
+\REQUIRE class count $K$, per-class resolution probability $P$, tolerance $\varepsilon$
+\ENSURE the least $N$ meeting $\varepsilon$ for deciding and for recovering
+\STATE working precision $\leftarrow 120+\lceil K\log_{10}2\rceil+40$ significant digits
+       \COMMENT{the recovery sum alternates with binomial weights and loses about $K$ bits;
+       a fixed precision returns noise at the top of the grid}
+\STATE $R_{\mathrm{dec}}(N)\leftarrow\tfrac12(1-P)^{N}$ \COMMENT{exact rationals; $K$ does
+       not appear}
+\STATE $R_{\mathrm{rec}}(N)\leftarrow1-\sum_{k=0}^{K}\binom{K}{k}\bigl(-\tfrac12\bigr)^{k}
+       \bigl(1-\tfrac{kP}{K}\bigr)^{N}$
+\FOR{each of the two risks}
+  \STATE double $N$ from $1$ until the risk falls below $\varepsilon$, then bisect
+         \COMMENT{a true threshold, not a rounded logarithm}
+\ENDFOR
+\STATE \textbf{self-check:} $R_{\mathrm{rec}}$ at $K=1$ must equal $R_{\mathrm{dec}}$ in
+       rational arithmetic; the high-precision and exact evaluations must agree; and
+       $\tfrac12\Pr(U>0)\le R_{\mathrm{rec}}\le\Pr(U>0)$ must hold
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{E2: The Recovery Identity Against the Process}
+\label{sec:e2}
+
+Each observation picks a class uniformly and resolves it with probability $P$; after $N$ of
+them, every class still unresolved is guessed with a fair coin. The quantity to measure is
+therefore $\mathbb{E}[2^{-U}]$, where $U$ counts the unresolved classes---not
+$\Pr(U=0)$, because a report can be correct by luck---and that expectation is exactly
+$1-R_{\mathrm{rec}}$. Two hundred cells are simulated at the recovery threshold itself, with up to
+$400{,}000$ replications each---traded against the horizon, since a long horizon costs
+proportionally more per replication---and the standard error is retained per cell.
+
+\subsection{Metrics}
+
+For each cell: the least $N$ with $\tfrac12(1-P)^{N}\le\varepsilon$; the least $N$ with
+\eqref{eq:recover} at most $\varepsilon$; their ratio; and both risks evaluated at the
+\emph{decide} count, which shows what a recovery-based procedure would still be carrying at
+the moment a decision is already safe. Across cells: whether the recovery threshold is
+monotone in $K$, and the constant in the coupon-collector reading
+$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ fitted per $(P,\varepsilon)$.
+For E2: the measured $\mathbb{E}[2^{-U}]$ against the identity, as a $z$-score in units of its
+own standard error.
+
+\subsection{Statistical Reporting}
+
+The threshold counts are obtained by bisection over exact evaluations rather than by taking a
+logarithm and rounding, so the integers are true thresholds rather than approximations. Three
+self-checks run before any sweep result is reported, and the run refuses to report if any
+fails: the recovery risk at $K=1$ must equal the decide risk \emph{exactly} in rational
+arithmetic, which it does at every cell tested; the high-precision and exact-rational
+evaluations must agree, and they agree to the last digit; and the sandwich
+$\tfrac12\Pr(U>0)\le R_{\mathrm{rec}}\le\Pr(U>0)$ must hold, which it does everywhere. Only
+E2 involves sampling, and it is reported with its standard error; no difference below twice
+that error is described as an effect.
+
+One thing recorded here must not be read as a finding. The decide threshold's independence of
+$K$ is structural, not measured: the proved expression \eqref{eq:decide} contains no $K$, so
+the flat lines in Figure~\ref{fig:counts} restate the theorem rather than confirm it. What is
+measured is the growth of the recovery threshold beside it.
+
+\section{Formal Verification}
+\label{sec:verification}
+
+\subsection{Acceptance Contract}
+
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+\texttt{sorry} appears anywhere in the file.
+
+The contract is stated in full because each clause excludes a specific way of appearing
+verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
+
+\subsection{Evidence per Step}
+
+\begin{table}[htbp]
+\caption{Evidence per step. All cited declarations are axiom-audited.}
+\label{tab:inventory}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Step & Module & Aud. \\
+\midrule
+Sampling, Thm~\ref{thm:sampling}      & \lean{LeanSupportSamplingLawV1}        & 9 \\
+Decoder, Thm~\ref{thm:equivariant}    & \lean{LeanSupportEquivariantDecoderV1} & 4 \\
+Factorisation, Thm~\ref{thm:factor}   & \lean{LeanSupportMinimaxLowerV1}       & 6 \\
+Optimality, Thm~\ref{thm:optimal}     & \lean{LeanSupportMinimaxLowerV1}       & 6 \\
+Minimax, Thm~\ref{thm:minimax}        & \lean{LeanSupportMinimaxLowerV1}       & 6 \\
+Three worlds, Thm~\ref{thm:threeworld}& \lean{LeanSupportThreeWorldWitnessV1}  & 5 \\
+Separation, Thm~\ref{thm:separation}  & \lean{LeanSupportDecideRecoverV1}      & 11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scope of the Formalisation}
+
+The Support strand contains $50$ Lean source files with $870$ theorem and lemma statements,
+of which $22$ modules carry an acceptance receipt covering $189$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+declarations.
+
+Two formulations were withdrawn under the prover. The original minimax statement took constant
+risk as a premise and contained no quantifier over rules anywhere in its statement; written out
+formally, the gap was unmissable, since the conclusion mentions one rule and one prior and
+there is no second rule to compare against. And the sampling law initially assumed independence
+between classes in order to factor an expectation, which is unnecessary---linearity suffices
+for the sum actually needed---and removing it also removed a hypothesis from the recovery law.
+Every audited statement of every module this paper cites is displayed in Section~\ref{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $17$ accepted modules carrying $153$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $183$ audited statements of the strand across its $21$ accepted modules, grouped by module.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Reporting Protocol}
+
+All twelve cells are reported with no exclusions.
+
+\subsection{Deciding Is Flat in $K$; Recovering Is Not}
+
+At $P=\tfrac12$ and $\varepsilon=\tfrac{1}{100}$, deciding takes $6$ samples whether there is
+one class or thirty-two. Recovering takes $6$ at $K=1$, $17$ at $K=2$, and more as $K$ grows.
+Both columns are exact integers obtained by inverting closed forms.
+
+The risk columns say the same thing from the other side. At the moment the decide risk has
+reached $\tfrac{1}{128}$, the recovery risk is still $\tfrac{713}{4096}$ at $K=2$---about
+twenty-two times larger---and the gap widens with $K$. An experimenter who stops when they can
+decide is done; one who stops when they can identify is still far from it.
+
+\input{support_sep}
+
+The reason the decide count does not move is visible in \eqref{eq:decide}: $K$ does not appear.
+A decision is correct as soon as the named tip is safe, and whether it is safe is settled
+inside a single class. A recovery must resolve every class.
+
+\subsection{The Separation Over the Whole Grid}
+
+Figure~\ref{fig:counts} puts the two thresholds on one pair of axes over ten doublings of
+$K$ and four values of $P$. The decide lines are flat by construction---$K$ does not appear in
+\eqref{eq:decide}---while the recover curves climb steadily on a logarithmic $K$ axis. The
+ratio is what an experimenter feels: at $P=\tfrac12$ and $\varepsilon=\tfrac1{100}$ recovery
+costs the same $6$ samples as deciding when there is one class, $17$ at two classes, and
+$22{,}192$ at a thousand and twenty-four---a factor of $3{,}699$. At $P=\tfrac1{10}$ the same
+comparison runs from $38$ to $110{,}981$. The separation is not a constant overhead that a
+larger budget absorbs; it widens without bound. \NUM{}
+
+The growth has a shape, and it is the coupon-collector one. Fitting
+$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ over each of the $54$
+$(P,\varepsilon)$ slices gives $c$ between $0.916$ and $0.966$ with $R^{2}$ at least
+$0.99996$ in every slice. The scale quoted for orientation in Section~\ref{sec:separation} is
+therefore the right one, with a constant slightly below one; the largest relative departure,
+$0.53$, is at the smallest $K$, where an asymptotic form has no reason to hold. \NUM{}
+
+\subsection{The Recovery Identity Against the Process It Describes}
+
+Equation~\eqref{eq:recover} is the part of the separation that could be wrong without anyone
+noticing, because it is an inclusion--exclusion over dependent events and is derived rather
+than measured. Experiment~E2 simulates the process and compares. Over $200$ cells at the
+recovery threshold itself, the measured $\mathbb{E}[2^{-U}]$ differs from the identity by at
+most $0.0043$ in absolute terms and by at most $2.98$ standard errors, which over two hundred
+cells is what the null predicts---about half a cell beyond $2.98$ is expected, and one is
+seen.
+Figure~\ref{fig:identity} shows every cell against the diagonal. \NUM{}
+
+Two exact checks sit behind that. The identity at $K=1$ reduces to the decide risk, in
+rational arithmetic, at every cell tested---which is the only point where the two sides of the
+separation must agree, and they do. And the $240$-digit evaluation agrees with exact rational
+arithmetic to the last digit wherever the exact computation is affordable, which is what
+licenses the cells at $K=128$ where double precision would return noise.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig4_counts.png}
+\caption{Samples required to reach $\varepsilon=1/100$, for deciding (dotted) and for
+recovering (solid), against the number of classes, at four values of $P$. Every point is an
+exact integer obtained by inverting the closed forms \eqref{eq:decide} and \eqref{eq:recover},
+not simulated: it is the least $N$ at which the exact risk falls below the tolerance. The
+decide lines are horizontal because $K$ does not enter \eqref{eq:decide}---that restates the
+theorem rather than confirming it---while the recovery cost grows without bound beside them.
+\NUM{}}
+\label{fig:counts}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig6_identity.png}
+\caption{The recovery identity against the process it is derived for. Each point is one cell
+at its own recovery threshold: the horizontal coordinate is $1-R_{\mathrm{rec}}$ from
+\eqref{eq:recover}, the vertical is the frequency measured by simulating the sampling and the
+coin flips, and the bars are two standard errors. The line is equality, not a fit. The
+identity assumes nothing about how the classes interact, and the classes in the simulation do
+interact---they compete for the same $N$ observations---so agreement here is a check on the
+identity rather than on the arithmetic. \NUM{}}
+\label{fig:identity}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{support_fig1_separation.png}
+\caption{Exact sample counts. Deciding is flat in the number of classes; recovering grows.
+Both counts are exact integers computed from the closed forms rather than simulated, so the
+widening gap is an identity against a growth rate.}
+\label{fig:separation}
+\end{figure}
+
+\subsection{The Comparison Is Between Two Thresholds}
+
+Because both costs are defined as the least $N$ meeting the same $\varepsilon$, the ratio is a
+quotient of integers and not a comparison against a rate with a hidden constant. It is also
+not scale-free: at $\varepsilon=\tfrac{1}{10}$ and $K=2$ the ratio is $8/3\approx2.67$, at
+$\varepsilon=\tfrac{1}{100}$ it is $17/6\approx2.83$. The ratio grows with $K$, which is the
+claim, and moves slightly with $\varepsilon$, which is neither claimed nor surprising.
+
+\subsection{The Decoder Is Optimal, Not Merely Flat}
+
+With Theorem~\ref{thm:minimax} the equivariant decoder is a least element of the achievable
+worst-case risks, so no decision rule---randomised or not, adaptive or not---achieves a
+smaller worst case on this problem. The quantifier is over all maps from observations to
+actions, which in a finite setting is every rule there is.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the Results Establish}
+
+The gap closed here is small to state and large in consequence. A constant-risk decoder is not
+automatically a good one: constancy is a property of the decoder, optimality a property of the
+problem, and without an infimum over rules the earlier statement was compatible with every
+rule being bad, including this one.
+
+The practical reading of the separation is that an experimenter facing many classes should not
+pay for identification. The corollary for system design is that the question ``what do I need
+to know?'' should be asked before ``how do I learn it?''. If the downstream decision is a
+choice among actions rather than a report of the parameter, the identification cost may be
+entirely avoidable, and Theorem~\ref{thm:minimax} says the avoidance is not a heuristic.
+
+\subsection{Shortcomings and Limitations}
+
+\emph{One prior, not a minimax theorem.} The prior is arbitrary but fixed: this is minimaxity
+through one Bayes prior, and no saddle point is claimed. What is obtained is a value
+lower-bounding the worst-case risk of every rule and achieved by one, which is the definition
+of a minimax-optimal rule; what is not obtained is a least-favourable prior.
+
+\emph{Everything is finite.} Attainment of the pointwise minimum is immediate in a finite
+action set; with an infinite one the conclusion weakens to an infimum that may not be achieved.
+The ease is in the proof rather than the statement---the earlier treatment had the same finite
+setting and not the result---but the limitation is real for any extension.
+
+\emph{The decoder is not uniquely optimal.} As Section~\ref{sec:natural} shows, every rule
+naming some unexplored tip attains the bound. The result constrains rather than selects.
+
+\emph{Symmetry is doing work.} With an asymmetric prior the identification of the argmin with
+the uniform decoder fails, so Theorem~\ref{thm:minimax}'s conclusion about \emph{that} decoder
+no longer follows.
+
+\emph{The separation is model-specific.} Theorem~\ref{thm:separation} holds on
+$a_{i}=b_{i}=1$ with total unsafe mass fixed. It does not extend the fixed-$K$ constants,
+which depend on $K$, and it says nothing about problems where the transcript is used for
+something other than naming one safe tip.
+
+\emph{The observation process is given.} Nothing here designs the sampling, which is exactly
+what the decision-region literature does; the two are complementary rather than competing.
+
+\subsection{Open Problems}
+
+Whether the least-element conclusion survives an infinite action set, with attainment recovered
+under a compactness hypothesis, is the first question. Whether the flatness of
+\eqref{eq:decide} in $K$ survives asymmetric classes---where the relabelling group is no longer
+transitive and Proposition~\ref{prop:symmetry} fails---is the second. Third, the separation
+compares an exact decide cost against an inclusion--exclusion recovery threshold; a closed form
+for the latter would make the comparison an identity on both sides. Finally, Theorem~\ref{thm:threeworld} exhibits a
+minimal unsafe triple but not a law: bounding the size of the smallest group of worlds
+admitting no common safe decision, as a function of the support geometry, would connect this
+analysis to the decision-region framework at the level of complexity rather than of
+instances.
+
+\section{Conclusion}
+
+The natural decoder---name a tip uniformly from the unexplored set---is not merely convenient.
+Its risk is a function of the transcript alone, and it is a least element of the worst-case
+risks achievable by \emph{any} decision rule. Deciding costs a number that does not grow with
+the number of classes, while identifying the world does, so the two problems are separated
+exactly rather than asymptotically. The general lesson is about what to prove rather than what
+to build: the decoder was never in doubt as a practical choice, and what was in doubt was
+whether implementing it was a compromise. Answering that took a quantifier over all rules
+rather than a better decoder, and where a practical choice is obvious the useful theoretical
+work is often to establish that it cannot be improved.
+
+\section*{Acknowledgment}
+
+The formal development uses the Lean~4 theorem prover and the mathlib library.
+
+\begin{thebibliography}{00}
+
+\bibitem{javdani2014} S. Javdani, Y. Chen, A. Karbasi, A. Krause, J. A. Bagnell, and
+S. Srinivasa, ``Near-optimal Bayesian active learning for decision making,'' in
+\emph{Proc. 17th Int. Conf. Artificial Intelligence and Statistics (AISTATS)}, 2014.
+
+\bibitem{golovin2011} D. Golovin and A. Krause, ``Adaptive submodularity: Theory and
+applications in active learning and stochastic optimization,'' \emph{J. Artif. Intell. Res.},
+vol.~42, pp.~427--486, 2011.
+
+\bibitem{lehmann1998} E. L. Lehmann and G. Casella, \emph{Theory of Point Estimation},
+2nd ed. New York, NY: Springer, 1998.
+
+\bibitem{wald1950} A. Wald, \emph{Statistical Decision Functions}. New York, NY: Wiley, 1950.
+
+\bibitem{motwani1995} R. Motwani and P. Raghavan, \emph{Randomized Algorithms}. Cambridge,
+U.K.: Cambridge Univ. Press, 1995.
+
+\bibitem{bennouna2026} A. Bennouna, O. Bennouna, S. Amin, and A. Ozdaglar, ``Data
+informativeness in linear optimization under uncertainty,'' 2026.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\input{support_appendix}
+
+\end{document}

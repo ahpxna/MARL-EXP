@@ -1,0 +1,199 @@
+[
+ {
+  "kind": "header",
+  "lines": [
+   "I.  Introduction"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "An adaptive scheme allocates samples across arms, stops when a certificate is available, and must be analysed on three fronts: the probability that its confidence event holds, the expected time at which it stops, and whether its realised counts actually follow the intended proportions.",
+   "Three claims in that analysis were carried as inputs rather than theorems. The per-arm, per-count concentration inequality was assumed. The step from a bound on the tail sum to a bound on the EXPECTED stopping time was cited as standard rather than proved \u2014 and high-probability correctness alone gives nothing here, because off the good event the algorithm may never stop at all. And tracking \u2014 whether an online rule can realise the intended proportions \u2014 was simply open.",
+   "This work closes all three, and the third has a negative answer that is itself the result."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "II.  Methodology"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   " Every statement displayed below is machine-checked, with no unproved step anywhere in the chain.  STEP 1 \u2014 THE LAYER-CAKE IDENTITY  (C1)."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_layercake",
+  "width": 13.68
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Write the stopping time at each point as the sum over n of the indicator of {n < \u03c4}, which is a finite sum at every point and telescopes to the value."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_subgauss",
+  "width": 10.943999999999999
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  The sub-Gaussian Chernoff bound evaluated at the stated threshold, where the exponent collapses to the logarithm of the budget."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_deficit",
+  "width": 14.44
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  The deficits sum to zero because the targets sum to one and the counts sum to the horizon."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_exists",
+  "width": 14.44
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Take the floor of each target's share; the floors sum to at most the horizon, and the shortfall is smaller than the number of arms, so it can be."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_quota_fail",
+  "width": 14.44
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  The witness is exhibited in exact rationals on five arms, and all eleven of its steps are verified: at each step the served arm's deficit is checked."
+  ]
+ },
+ {
+  "kind": "eq",
+  "key": "adp_freq",
+  "width": 12.16
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "HOW IT IS CLOSED.  Dividing the deficit bound by the horizon."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig2_trace.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 4.  Why the rule fails, as five deficits. Each small arm in turn overtakes the dominant one, takes its single sample and resets; the dominant arm gains 17/23 of deficit each time it is skipped."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "III.  Results"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "THE ONLINE RULE VIOLATES QUOTA AT HORIZON ELEVEN. With targets (17, 1, 1, 3, 1)/23 the largest-deficit rule reaches counts (7, 1, 1, 1, 1) after eleven steps, at which point the first arm's deficit is 26/23 \u2248 1.13, exceeding the per-horizon bound of one. Continuing to horizon fourteen the deficit reaches 31/23 \u2248 1.35. Every step is verified against every alternative, so this is a property of the rule.",
+   "A SEARCH OVER SMALL-DENOMINATOR TARGETS FOUND WORSE. Over rational targets on three to five arms the worst deficit observed was 31/23, and the first violation appears as early as horizon eleven \u2014 so the failure is not asymptotic and not rare."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig6_rules.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 1.  Seven online rules by how often each violates the two quota bounds, over 32018 targets. The origin \u2014 respecting both \u2014 is empty; the axes are traded, not escaped."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig5_onset.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 2.  The failure across arm counts. The violating fraction is flat from three arms to eight while the worst deficit climbs."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "IV.  Discussion"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "THE FAILURE IS COMMON, AND FLAT ACROSS ARM COUNTS. Exhaustive over 1,228,079 rational targets: 375,239 \u2014 30.6% \u2014 drive the largest-deficit rule past the bound of one, the worst reaching 7/4 at eight arms. The violating fraction stays between 26% and 33% from three arms to eight, so the failure is neither a small-K nor a large-K artefact, while the severity grows with K. There is no burn-in: the earliest violation is t = 3 at every arm count, and a fifth of all violations have occurred by t = 10. A CLAIM THIS WORK PREVIOUSLY MADE, AND WHICH IS WRONG. It is tempting to conclude that any rule serving whole samples faces the same arithmetic. Seven rules were run on the same targets, four of them classical apportionment divisor methods. Jefferson's rule violates the deficit bound on ZERO of the 1,228,079 targets \u2014 never, not rarely. Adams is its mirror image: 95.6% on the deficit side and none on the surplus side. WHAT IS ACTUALLY TRUE. No rule respects BOTH bounds. The failure can be relocated between the deficit and the surplus directions but not removed, which is what the apportionment impossibility gives and what the sweep confirms without exception. An analysis needing both directions has no rule to appeal to; one needing only the surplus direction may use Jefferson."
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/adaptive_fig3_search.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 3.  How far past the bound the violations go. The mass sits just above one, which is what makes the refutation easy to miss by sampling, but the tail runs to 7/4."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "House monotonicity and quota cannot both hold, and the consequence for an adaptive stopping analysis is concrete: the tracking assumption that the per-horizon deficit stays below one is false for the rule such an analysis would naturally assume, on 30.6% of targets, from t = 3 onwards. The refutation cannot be evaded by changing rules \u2014 only relocated. Jefferson's rule never violates the deficit bound and always eventually violates the surplus bound; Adams does the reverse; no rule escapes both. An analysis requiring two-sided control has nothing to appeal to."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "EXHAUSTIVE OVER RATIONAL TARGETS, IN INTEGERS. Every target shares a denominator d, so the deficit t\u00b7w\u1d62 \u2212 N\u1d62 equals (t\u00b7p\u1d62 \u2212 N\u1d62\u00b7d)/d and the whole simulation runs in integer arithmetic. Rational arithmetic gives identical answers and is far slower; targets are generated as partitions rather than filtered compositions, which avoids enumerating 442 million tuples to keep 478 thousand. BOTH REWRITES WERE CHECKED, NOT TRUSTED. The partition generator produces the identical set on every (K, d) tested, and the rewritten sweep reproduces the earlier rational run field for field \u2014 same target count, same violation count, same worst deficit, same earliest horizon. AND THE SWEEP CHECKS ITSELF. On the published five-arm witness the largest-deficit rule must first exceed the bound at t = 11, which is the stated result; the sweep reports nothing otherwise. A HORIZON BOUND CAN ONLY UNDERSTATE: running longer can only find more violations, so every count here is a lower bound."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "References"
+  ]
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "[1] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016. [2] M. L. Balinski and H. P. Young, Fair Representation: Meeting the Ideal of One Man, One Vote. New Haven, CT: Yale Univ. Press, 1982. [3] S. Boucheron, G. Lugosi and P. Massart, Concentration Inequalities. Oxford, U.K.: Oxford Univ. Press, 2013."
+  ]
+ }
+]
