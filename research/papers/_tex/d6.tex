@@ -1015,7 +1015,30 @@ $t=0,\tfrac1{32},\dots,\tfrac12$, crossed with two dimensions $n\in\{6,8\}$ and 
 $\rho\in\{1,\tfrac54,\tfrac32,\tfrac74,2\}$---one hundred and seventy cells, of which one
 hundred and sixty have $t>0$.
 
-Two properties of the setup matter more than its size. First, every quantity is computed in
+\begin{algorithm}[htbp]
+\caption{Evaluating the construction under one reference}
+\label{alg:sweep}
+\begin{algorithmic}[1]
+\REQUIRE dimension $n$, selected set $A$, steered coordinate $j\notin A$, margin $\mu$,
+         product reference $q_{i}(\mathrm{true})=t_{i}$
+\ENSURE whether $A$ is still a Top-$C$ set, and the doubled regret against its complement
+\STATE $F(x)\leftarrow\textsc{Steered}(A,j,\mu)(x)$ for every $x\in\{0,1\}^{n}$
+       \COMMENT{independent of the reference, so tabulated once per configuration and
+       reused across every $t$ --- this is what makes the wide sweep affordable}
+\STATE $W(c)\leftarrow\prod_{i}\bigl(t_{i}\text{ if }c_{i}\text{ else }1-t_{i}\bigr)$
+\FORALL{coordinates $i$ and values $u\in\{0,1\}$}
+  \STATE $Q_{i}(u)\leftarrow\sum_{c}W(c)\,F(c\text{ with }c_{i}:=u)$
+\ENDFOR
+\STATE $\mathrm{osc}_{i}\leftarrow|Q_{i}(1)-Q_{i}(0)|$;
+       $\;T\leftarrow$ the $|A|$ coordinates of largest $\mathrm{osc}$
+\STATE $L(S)\leftarrow\tfrac12\bigl(\max_{x}-\min_{x}\bigr)
+       \bigl[F(x)-\sum_{i\in S}Q_{i}(x_{i})\bigr]$
+\RETURN $\bigl[T=A\bigr]$ and $2\bigl(L(A)-L(A^{\complement})\bigr)$
+\end{algorithmic}
+\end{algorithm}
+
+\noindent All of it is exact rational arithmetic, so a reported flip is a flip and not a
+rounding artefact. Two properties of the setup matter more than its size. First, every quantity is computed in
 exact rational arithmetic, so a reported flip is a flip and not a rounding artefact. Second,
 the definitions are not re-derived for the experiment: the gate, the coefficient map, the
 steered world and the compression loss are transcribed from the Lean sources, and the

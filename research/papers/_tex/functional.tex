@@ -1345,6 +1345,33 @@ is piecewise linear, so the optimal position is a root on one of the intervals b
 breakpoints---and, as it happens, generally interior rather than at a breakpoint, which is
 where a first implementation of this experiment went wrong and over-estimated the value.
 
+\begin{algorithm}[htbp]
+\caption{Exact least energy of a capacity-inverting alternative}
+\label{alg:jfull}
+\begin{algorithmic}[1]
+\REQUIRE responses $\theta_{i},\theta_{j}$ and precisions $\alpha_{i},\alpha_{j}$
+\ENSURE $J_{\mathrm{full}}=\min\{\text{energy}:C_{i}(\lambda)\le C_{j}(\lambda)\}$, exactly
+\STATE for a target width $z$, relation $i$ must fit inside a window of width $z$ and
+       relation $j$ must open some ordered pair to at least $z$; write $z=C_{i}(\lambda)$
+\STATE \textbf{shrink cost } $S_{i}(z)$: the optimal row is $\theta_{i}$ clipped into
+       $[l,l+z]$, so the cost is a sum of one-sided squared hinges and is convex in $l$; its
+       derivative is piecewise linear with breakpoints at $\theta_{i}$ and $\theta_{i}-z$,
+       so solve $D(l)=0$ on each interval and keep the root inside it
+       \COMMENT{the minimiser is generally \emph{interior}; scanning breakpoints alone
+       over-estimates}
+\STATE \textbf{expand cost } $E^{(c,d)}_{j}(z)=\tfrac12\bigl[z-(\theta_{jc}-\theta_{jd})\bigr]_{+}^{2}
+       \dfrac{\alpha_{jc}\alpha_{jd}}{\alpha_{jc}+\alpha_{jd}}$
+       \COMMENT{split the move between the two cells in inverse proportion to precision}
+\STATE $S_{i}$ does not depend on the pair, so evaluate it once on a grid of $z$ and add the
+       pair costs vectorised
+\FORALL{ordered pairs $(c,d)$ of relation $j$}
+  \STATE $S_{i}(z)+E^{(c,d)}_{j}(z)$ is convex in $z$, so refine the grid minimum by
+         golden section on the bracketing interval
+\ENDFOR
+\RETURN the least value over all pairs
+\end{algorithmic}
+\end{algorithm}
+
 \emph{Checking the solver rather than trusting it.} The decomposition is cross-checked
 against SLSQP running on the raw variables, which uses none of it. A local optimiser can only
 land at or above the true minimum, so a cell where it lands \emph{below} would expose a

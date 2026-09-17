@@ -1060,6 +1060,29 @@ $120+\lceil K\log_{10}2\rceil+40$ significant digits---$469$ at $K=1024$---and c
 against exact rational arithmetic wherever the exact computation is affordable. A fixed
 precision would have returned noise at the largest sizes rather than an answer.
 
+\begin{algorithm}[htbp]
+\caption{The two thresholds, at a precision set from $K$}
+\label{alg:threshold}
+\begin{algorithmic}[1]
+\REQUIRE class count $K$, per-class resolution probability $P$, tolerance $\varepsilon$
+\ENSURE the least $N$ meeting $\varepsilon$ for deciding and for recovering
+\STATE working precision $\leftarrow 120+\lceil K\log_{10}2\rceil+40$ significant digits
+       \COMMENT{the recovery sum alternates with binomial weights and loses about $K$ bits;
+       a fixed precision returns noise at the top of the grid}
+\STATE $R_{\mathrm{dec}}(N)\leftarrow\tfrac12(1-P)^{N}$ \COMMENT{exact rationals; $K$ does
+       not appear}
+\STATE $R_{\mathrm{rec}}(N)\leftarrow1-\sum_{k=0}^{K}\binom{K}{k}\bigl(-\tfrac12\bigr)^{k}
+       \bigl(1-\tfrac{kP}{K}\bigr)^{N}$
+\FOR{each of the two risks}
+  \STATE double $N$ from $1$ until the risk falls below $\varepsilon$, then bisect
+         \COMMENT{a true threshold, not a rounded logarithm}
+\ENDFOR
+\STATE \textbf{self-check:} $R_{\mathrm{rec}}$ at $K=1$ must equal $R_{\mathrm{dec}}$ in
+       rational arithmetic; the high-precision and exact evaluations must agree; and
+       $\tfrac12\Pr(U>0)\le R_{\mathrm{rec}}\le\Pr(U>0)$ must hold
+\end{algorithmic}
+\end{algorithm}
+
 \subsection{E2: The Recovery Identity Against the Process}
 \label{sec:e2}
 

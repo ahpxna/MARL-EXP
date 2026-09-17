@@ -337,6 +337,21 @@ unit per arm over a subset of that size; every count then lies between
 $\lfloor t\,w_{i}\rfloor$ and $\lfloor t\,w_{i}\rfloor+1$.
 \end{proof}
 
+\begin{algorithm}[htbp]
+\caption{Offline allocation meeting the quota bound at a fixed horizon}
+\label{alg:offline}
+\begin{algorithmic}[1]
+\REQUIRE target $w$ with $\sum_{i}w_{i}=1$, horizon $t$
+\ENSURE counts $N$ with $\sum_{i}N_{i}=t$ and $|N_{i}-t\,w_{i}|\le1$ for every $i$
+\STATE $N_{i}\leftarrow\lfloor t\,w_{i}\rfloor$ for every $i$
+\STATE $r\leftarrow t-\sum_{i}N_{i}$ \COMMENT{$0\le r<K$: each floor loses less than one}
+\STATE let $\pi$ order the arms by decreasing remainder $t\,w_{i}-\lfloor t\,w_{i}\rfloor$
+\FOR{$\ell=1,\dots,r$}
+  \STATE $N_{\pi(\ell)}\leftarrow N_{\pi(\ell)}+1$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
 \leanbox{\lean{tracking\_bound}, \lean{tracking\_exists} in \lean{LeanAdaptiveTrackingV1}}
 
 The construction uses floors and a correction set and nothing else, so the allocation can be
@@ -621,6 +636,35 @@ therefore cannot support a claim about every rule, and both are recorded.
 
 \emph{Self-check.} On the paper's own witness the largest-deficit rule must first exceed the
 bound at $t=11$, which is the published statement; the sweep is not reported otherwise.
+
+\begin{algorithm}[htbp]
+\caption{Online serving, with the rule as the only pluggable step}
+\label{alg:online}
+\begin{algorithmic}[1]
+\REQUIRE target $w$, horizon $T$, a selection rule \textsc{Pick}
+\ENSURE the worst deficit and the worst surplus reached, and the first step at which each
+        exceeds one
+\STATE $N_{i}\leftarrow0$ for every $i$; $\;D^{\max}\leftarrow0$; $\;S^{\max}\leftarrow0$
+\FOR{$t=0,1,\dots,T$}
+  \STATE $D_{i}\leftarrow t\,w_{i}-N_{i}$ for every $i$
+  \STATE $D^{\max}\leftarrow\max(D^{\max},\max_{i}D_{i})$;
+         $\;S^{\max}\leftarrow\max(S^{\max},\max_{i}(-D_{i}))$
+  \STATE record the first $t$ at which either exceeds $1$
+  \IF{$t<T$}
+    \STATE $N_{\textsc{Pick}(w,N,t)}\leftarrow N_{\textsc{Pick}(w,N,t)}+1$
+  \ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\noindent The seven rules of Section~\ref{sec:e2} differ only in line~6, which is the point:
+they are the same procedure with a different $\arg\max$. Largest-deficit-first takes
+$\arg\max_{i}D_{i}$; largest relative deficit, $\arg\max_{i}D_{i}/w_{i}$; smallest served
+share, $\arg\min_{i}N_{i}/w_{i}$; and the three divisor methods take
+$\arg\max_{i}w_{i}/(N_{i}+\delta)$ with $\delta=1$ for Jefferson, $\tfrac12$ for Webster and
+$0$ for Adams. Every target here has a common denominator $d$, so $D_{i}$ never needs to be
+formed as a rational: comparing $t\,p_{i}-N_{i}d$ decides line~6 and exceeding $d$ decides
+line~5, in integers.
 
 \subsection{Metrics}
 

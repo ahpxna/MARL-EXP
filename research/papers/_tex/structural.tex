@@ -411,6 +411,29 @@ immediately restores the invariant using the opposite-sign big element. The coun
 $m\ge5$ is used.
 \end{proof}
 
+\begin{algorithm}[htbp]
+\caption{One-defect schedule for a designated budget $j$}
+\label{alg:menu}
+\begin{algorithmic}[1]
+\REQUIRE population size $m\ge5$, budget $j\in\{1,\dots,m-1\}$
+\ENSURE an ordering of $g_{m}$ whose defect is $0$ at every budget but $j$, and $2$ at $j$
+\STATE $s\leftarrow0$; let $a,b$ count the unused $+1$ and $-1$ elements, and
+       $p,q$ the unused $+3$ and $-3$
+\FOR{$k=1,\dots,m$}
+  \IF{$k=j$}
+    \STATE emit the big element whose sign is that of $-s$ \COMMENT{$|s|\le1$, so this
+           reaches $|s|\ge2$ and pays exactly $2$ by Cor.~\ref{cor:nocheap}}
+  \ELSIF{$k=j+1$}
+    \STATE emit the remaining big element \COMMENT{opposite sign; restores $|s|\le1$}
+  \ELSE
+    \STATE emit a unit element of sign $-\operatorname{sgn}(s)$, or either sign if $s=0$,
+           choosing so that both parts of \eqref{eq:invariant} still hold
+  \ENDIF
+  \STATE $s\leftarrow s+(\text{emitted element})$; decrement its counter
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
 \leanbox{\lean{exists\_one\_defect}, \lean{altFrom\_defects} in
 \lean{LeanStructuralFamilyUpperV1}}
 
@@ -1235,6 +1258,34 @@ the least among families that also cover every budget with a single defect of tw
 The self-check requires $g_{m}$ itself, passed through the general evaluator, to
 reproduce the main sweep's answer at every $m$; the run reports nothing if it does
 not.
+
+\begin{algorithm}[htbp]
+\caption{Exhaustive defect statistics without enumerating orderings}
+\label{alg:dp}
+\begin{algorithmic}[1]
+\REQUIRE multiplicities $(c_{-3},c_{-1},c_{1},c_{3})$ of the four values, $m=\sum c_{v}$
+\ENSURE minimum total defect, minimum path defect, the census of orderings by total
+        defect, and the budgets a single defect of $2$ can cover
+\STATE a partial ordering is summarised by how many copies of each value it has used;
+       write $u=(u_{-3},u_{-1},u_{1},u_{3})$, so $k=\sum u_{v}$ and
+       $s(u)=\sum_{v} v\,u_{v}$ are both determined
+\STATE $d(u)\leftarrow|s(u)|-(k\bmod 2)$ \COMMENT{every value is odd, so this is a
+       non-negative \emph{even} integer}
+\FORALL{$k=1,\dots,m$ and every reachable $u$ at step $k$}
+  \STATE $\textsc{Min}[u]\leftarrow\min_{u'\to u}\textsc{Min}[u']+d(u)$
+         \COMMENT{shortest path}
+  \STATE $\textsc{Path}[u]\leftarrow\min_{u'\to u}\max\bigl(\textsc{Path}[u'],d(u)\bigr)$
+         \COMMENT{bottleneck path}
+  \STATE $\textsc{Count}[u]\leftarrow$ the multiset union of
+         $\{\,t+d(u):t\in\textsc{Count}[u']\,\}$ over predecessors
+         \COMMENT{exact integers}
+\ENDFOR
+\FOR{each budget $j=1,\dots,m-1$}
+  \STATE mark $j$ covered if the full multiset is reachable under the constraint
+         $d(u)=2$ at $k=j$ and $d(u)=0$ at every other $k<m$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
 
 \subsection{Metrics}
 

@@ -1145,6 +1145,31 @@ are randomised per instance without disturbing the order. Off the block, $g$ is 
 random and cancels identically, because those indices sit in the same level in both worlds.
 Designed orders $r=1,2,3$ are used.
 
+\begin{algorithm}[htbp]
+\caption{An instance with a designed leakage order $r$}
+\label{alg:instance}
+\begin{algorithmic}[1]
+\REQUIRE order $r$, level count, level size, noise scale $\sigma$
+\ENSURE two worlds sharing a level set with equal level masses, and a perturbation $g$ whose
+        leakage order is $r$
+\STATE $A\leftarrow\{k<2^{r}:\text{binary digit sum of }k\text{ even}\}$,
+       $B\leftarrow\{k<2^{r}:\text{odd}\}$
+       \COMMENT{Prouhet: $\sum_{A}k^{\,\ell}=\sum_{B}k^{\,\ell}$ for every $\ell<r$, and
+       they differ at $\ell=r$}
+\STATE normalise $A,B$ to $[0,1]$ \COMMENT{the identity is affine-invariant; the raw values
+       reach $2^{r}-1$ and would push mixture components out of any fixed quadrature window}
+\STATE choose two levels and a block of $|A|$ indices in each; give every block index the
+       same weight, so exchanging the blocks preserves each level's mass exactly
+\STATE $g\leftarrow\alpha A+\beta$ on the first block, $\alpha B+\beta$ on the second, with
+       $\alpha,\beta$ drawn; draw $g$ at random off the block
+       \COMMENT{off-block indices sit in the same level in both worlds and cancel}
+\STATE world~$1$ is world~$0$ with the two blocks exchanged
+\STATE \textbf{verify:} recompute $M^{(0)}_{\ell}(v)-M^{(1)}_{\ell}(v)$ for
+       $\ell=1,2,\dots$ and report the least $\ell$ at which it is non-zero; a tie at the top
+       level is reported as undetermined rather than counted
+\end{algorithmic}
+\end{algorithm}
+
 \emph{Verification, not assumption.} The order is then recomputed from the level coefficients
 by the procedure of Section~\ref{sec:procedure} and compared with the designed one; a cell
 whose top level is tied is reported as undetermined rather than counted. A self-check runs
