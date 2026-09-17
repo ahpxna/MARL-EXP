@@ -6,9 +6,12 @@ says whether that family is special. Two questions follow, and the paper answers
 neither:
 
   1. Among all families in the same setting, how many force a defect at all?
-     Most do not -- an alternating family stays inside the free band forever --
-     so "every ordering pays" is a property of the family, not of the setting,
-     and it is worth knowing how rare it is.
+     The guess behind this question was that most do not, since an alternating
+     family stays inside the free band forever. The sweep says the opposite:
+     once the total is as balanced as parity allows, 98 to 100 per cent of
+     families force a defect, and the alternating ones are the rare exception.
+     What is rare is covering every budget, which one or two families per size
+     manage.
 
   2. Is the paper's family minimal? It has total variation D = sum |g_i| = m + 4.
      If some family with smaller D also forces a defect of two, the construction

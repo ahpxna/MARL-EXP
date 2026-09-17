@@ -1212,6 +1212,30 @@ The sweep runs $5\le m\le120$ and so accounts for $6.9\times10^{38}$ orderings. 
 enumeration reached is recomputed by the dynamic programme and the two agree in every
 column, which is what licenses the rows beyond it.
 
+\subsection{E3: Every Family in the Same Setting}
+\label{sec:e3}
+
+The sweep above varies the ordering and holds the family fixed. This one varies
+the family. The scope is set by the parity argument: it is what makes the defect a
+non-negative even integer, and it needs every entry odd, so the space is multisets
+of odd integers drawn from $\{-7,\dots,7\}$ of size $m$. A family with an even
+entry is a different problem and is excluded rather than silently included.
+
+The total is held as balanced as parity allows---exactly zero for even $m$ and one
+away for odd $m$, which is what $g_{m}$ itself does. That constraint is not
+cosmetic. A family with a large total is driven into a large prefix sum near the
+end whatever its ordering, so it would count as defect-forcing for a reason that
+has nothing to do with the mechanism under study, and admitting such families
+would inflate the answer to the first question below while telling us nothing.
+
+Each family is evaluated by the same dynamic programme, imported rather than
+reimplemented so the two cannot drift apart, and two quantities are read off: the
+least total variation $D=\sum_{i}|g_{i}|$ among families that force a defect, and
+the least among families that also cover every budget with a single defect of two.
+The self-check requires $g_{m}$ itself, passed through the general evaluator, to
+reproduce the main sweep's answer at every $m$; the run reports nothing if it does
+not.
+
 \subsection{Metrics}
 
 Four aggregates are recorded per $m$: the minimum total defect over all orderings; the
@@ -1374,6 +1398,57 @@ What does translate is the menu size. At every $m\ge5$, achieving $V_{\mathrm{av
 than $V_{\mathrm{path}}$ requires $m-1$ schedules rather than one, and that cost is paid in
 full whatever the tolerance. The correct summary is not ``the gap grows'' but ``the gap is
 exactly the menu size, at every population size''.
+
+\subsection{Is the Family Special, or Is the Setting?}
+\label{sec:families}
+
+Everything above concerns one family. Whether that family is special, and in what
+sense, the theorems do not say, and a construction that is merely \emph{a} witness
+is worth less than one that is the cheapest witness. Experiment~E3 of
+Section~\ref{sec:e3} evaluates every family in the same setting---every multiset of
+odd integers drawn from $\{-7,\dots,7\}$, of size $m$, with a total as balanced as
+parity allows---by the same dynamic programme, and asks two questions the
+theorems leave open.
+
+The first answer overturned the guess behind the question. Forcing a defect looked
+like it ought to be rare, since an alternating family walks inside the free band
+forever and pays nothing. It is not rare: between $98\%$ and $100\%$ of families
+force a defect at every size from $5$ to $13$, and the proportion rises with $m$.
+Once the total is balanced and every entry is odd, escaping the band costs
+something for almost any multiset, and the alternating families are the exception
+rather than the rule. Theorem~\ref{thm:everyorderpays} is therefore not surprising
+in its own right; the content is elsewhere. \NUM{}
+
+The second answer is sharper, and it is the one that bears on the construction.
+Covering \emph{every} budget with a single defect of two is rare: exactly one
+family manages it at each even $m$ and exactly two at each odd $m$, out of
+thousands. And the paper's $g_{m}$ is minimal among them. Writing
+$D=\sum_{i}|g_{i}|$ for a family's total variation, the least $D$ that forces a
+defect at all is $m+2$---strictly cheaper than $g_{m}$, so $g_{m}$ is \emph{not}
+the cheapest witness to Theorem~\ref{thm:everyorderpays}---while the least $D$
+that also covers every budget is exactly $m+4$, which is $g_{m}$'s own. That holds
+at every $m$ from $5$ to $13$ without exception. Figure~\ref{fig:families} shows
+the two curves and the gap of two between them. \NUM{}
+
+The distinction matters for how the construction should be read. A reader who
+takes $g_{m}$ to be the cheapest family exhibiting a defect is wrong by two units
+of total variation. A reader who takes it to be the cheapest family realising the
+\emph{menu} of Theorem~\ref{thm:construction}---which is what the menu result
+needs---is right, and the sweep says so exhaustively rather than by construction.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{struct_fig7_families.png}
+\caption{How cheap a family can be, against what is asked of it. For each $m$,
+every multiset of odd integers in $\{-7,\dots,7\}$ with a total as balanced as
+parity allows is evaluated by the dynamic programme of Section~\ref{sec:expdesign}.
+The lower curve is the least total variation among families that merely force a
+defect; the upper curve is the least among families that also cover every budget
+with a single defect of two. The dotted line is the paper's own $g_{m}$, and it
+lies on the upper curve at every size: $g_{m}$ is not the cheapest witness, but it
+is the cheapest menu. The two curves stay exactly two apart. \NUM{}}
+\label{fig:families}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}

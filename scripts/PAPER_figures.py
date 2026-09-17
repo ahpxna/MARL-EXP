@@ -636,3 +636,143 @@ if __name__ == '__main__':
     print('D6');         d6_threshold(); d6_affine(); d6_reference()
     print('SUPPORT');    support_risk(); support_counts(); support_threeworld()
     print('ADAPTIVE');   adaptive_trace(); adaptive_search(); adaptive_existence()
+
+
+# ====================== NEW EXPERIMENTS (2026-09-16) ======================
+def d6_wide():
+    """Measured: research/paper_exp_20260916/d6_reference_wide.json."""
+    from fractions import Fraction as _F
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'd6_reference_wide.json').read_text())
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    cols = [CRAN, AMBER, GREEN]
+    for (n, k), col in zip(d['balanced_sizes'], cols):
+        xs, ys = [], []
+        for rho in d['rhos']:
+            v = d['onsets'][f'{n}|{k}|{rho}']
+            if v is not None:
+                xs.append(float(_F(rho))); ys.append(float(_F(v)))
+        ax.plot(xs, ys, 'o-', ms=3.4, color=col, lw=1.2, label=f'$n={n}$, $|A|={k}$')
+        last = float(_F(d['rhos'][-1]))
+        ax.plot([last], [0.52], 'x', ms=5, color=col, mew=1.3)
+    ax.axhline(0.5, color=GREY, ls=':', lw=1.0)
+    ax.set_ylim(0, 0.58)
+    ax.set_xlabel(r'margin  $\mu$')
+    ax.set_ylabel(r'breakdown point  $t^{\star}$')
+    ax.legend(frameon=False, loc='upper left', fontsize=6.2)
+    ax.text(0.97, 0.06, r'$\times$ at $\mu=2$: no breakdown on the grid',
+            transform=ax.transAxes, ha='right', fontsize=6.0, color=GREY)
+    fin(fig, 'd6_fig6_wide.png')
+
+
+def query_highorder():
+    """Measured: research/paper_exp_20260916/query_highorder.json."""
+    import collections
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'query_highorder.json').read_text())
+    rows = [r for r in d['rows'] if r.get('built')]
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ok = collections.defaultdict(list); bad = collections.defaultdict(list)
+    for r in rows:
+        (ok if r['reliable'] else bad)[r['verified_order']].append(r['dev_tail'])
+    for o in sorted(set(list(ok) + list(bad))):
+        if ok[o]:
+            ax.plot([o - 0.12] * len(ok[o]), ok[o], 'o', ms=2.2, color=CRAN,
+                    alpha=0.35, mew=0, label='within tolerance' if o == 1 else None)
+        if bad[o]:
+            ax.plot([o + 0.12] * len(bad[o]), bad[o], 'x', ms=3.4, color=BLUE,
+                    mew=0.9, label='flagged unreliable' if bad[o] and o == max(bad) else None)
+    ax.axhline(0.0, color=INK, lw=0.9)
+    ax.set_xticks(sorted(set(list(ok) + list(bad))))
+    ax.set_xlabel('verified leakage order  $r$')
+    ax.set_ylabel(r'fitted slope  $-\;2r$')
+    ax.legend(frameon=False, loc='lower left', fontsize=6.2)
+    fin(fig, 'query_fig7_highorder.png')
+
+
+def func_proxy():
+    """Measured: research/paper_exp_20260916/functional_proxy.json."""
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'functional_proxy.json').read_text())
+    rows = d['rows']
+    moved = [r['ratio'] for r in rows if r['extremum_moves']]
+    fixed = [r['ratio'] for r in rows if not r['extremum_moves']]
+    import numpy as np
+    bins = np.logspace(-2, 1.7, 46)
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ax.hist(fixed, bins=bins, color=GREY, alpha=0.55, lw=0,
+            label=f'extrema fixed ({len(fixed)})')
+    ax.hist(moved, bins=bins, color=CRAN, alpha=0.75, lw=0,
+            label=f'an extremum moves ({len(moved)})')
+    ax.axvline(1.0, color=INK, lw=0.9)
+    ax.set_xscale('log')
+    ax.set_xlabel(r'$J_{\mathrm{full}}/J_{\mathrm{scalar}}$')
+    ax.set_ylabel('instances')
+    ax.legend(frameon=False, loc='upper left', fontsize=6.2)
+    fin(fig, 'func_fig6_proxy.png')
+
+
+def adaptive_rules():
+    """Measured: research/paper_exp_20260916/adaptive_rules.json."""
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'adaptive_rules.json').read_text())
+    rules = [r for r in d['rules'] if r != 'randomized']
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    for r in rules:
+        s = d['per_rule'][r]
+        x, y = 100 * s['fraction'], 100 * s['fraction_surplus']
+        ax.plot([x], [y], 'o', ms=5, mfc='white', mec=CRAN, mew=1.4, zorder=5)
+        ax.annotate(r.replace('_', ' '), (x, y), fontsize=5.8, color=INK,
+                    xytext=(4, 4), textcoords='offset points')
+    ax.set_xlim(-6, 106); ax.set_ylim(-6, 106)
+    ax.plot([0, 100], [0, 0], color=GREY, lw=0.7, ls=':')
+    ax.plot([0, 0], [0, 100], color=GREY, lw=0.7, ls=':')
+    ax.set_xlabel(r'targets violating the deficit bound  (\%)')
+    ax.set_ylabel(r'targets violating the surplus bound  (\%)')
+    ax.text(0.5, 0.5, 'the origin is empty', transform=ax.transAxes,
+            ha='center', fontsize=6.4, color=GREY)
+    fin(fig, 'adaptive_fig6_rules.png')
+
+
+def master_misspec():
+    """Measured: research/paper_exp_20260916/master_misspec.json."""
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'master_misspec.json').read_text())
+    order = ['gaussian', 'heavy_tail_t10', 'heavy_tail_t5', 'heavy_tail_t3',
+             'nuisance_t3', 'hetero', 'contaminated_1pct', 'contaminated_5pct',
+             'delta_0.75', 'delta_1.25', 'delta_0.5', 'delta_2.0']
+    lab = {'gaussian': 'model correct', 'heavy_tail_t10': 'noise $t_{10}$',
+           'heavy_tail_t5': 'noise $t_{5}$', 'heavy_tail_t3': 'noise $t_{3}$',
+           'nuisance_t3': 'offset $t_{3}$', 'hetero': 'variances $9\\times$ apart',
+           'contaminated_1pct': 'anchors 1\\% bad', 'contaminated_5pct': 'anchors 5\\% bad',
+           'delta_0.75': r'$\Delta\times0.75$', 'delta_1.25': r'$\Delta\times1.25$',
+           'delta_0.5': r'$\Delta\times0.5$', 'delta_2.0': r'$\Delta\times2$'}
+    fig, ax = plt.subplots(figsize=(W, H * 1.15), layout='constrained')
+    ys = range(len(order))
+    vals = [d['summary'][a]['mean_deviation'] for a in order]
+    cols = [GREEN if v < 0.005 else (AMBER if v < 0.05 else CRAN) for v in vals]
+    ax.barh(list(ys), vals, color=cols, height=0.66)
+    ax.axvline(0.0, color=INK, lw=0.8)
+    ax.set_yticks(list(ys)); ax.set_yticklabels([lab[a] for a in order], fontsize=6.0)
+    ax.invert_yaxis()
+    ax.set_xlabel('mean (realised error $-$ predicted)')
+    fin(fig, 'master_fig10_misspec.png')
+
+
+def struct_families():
+    """Measured: research/paper_exp_20260916/struct_families.json."""
+    d = json.loads(Path('research/paper_exp_20260916/'
+                        'struct_families.json').read_text())
+    rows = d['rows']
+    ms = [r['m'] for r in rows]
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ax.plot(ms, [r['min_D_forcing'] for r in rows], 'o-', ms=3.2, color=AMBER,
+            label='least $D$ forcing a defect')
+    ax.plot(ms, [r['min_D_covering'] for r in rows], 's-', ms=3.2, color=CRAN,
+            label='least $D$ also covering')
+    ax.plot(ms, [r['paper_D'] for r in rows], ':', color=INK, lw=1.4,
+            label=r"the paper's $g_{m}$,  $D=m+4$")
+    ax.set_xlabel('population size  $m$')
+    ax.set_ylabel(r'total variation  $D=\sum_{i}|g_{i}|$')
+    ax.legend(frameon=False, loc='upper left', fontsize=6.2)
+    fin(fig, 'struct_fig7_families.png')

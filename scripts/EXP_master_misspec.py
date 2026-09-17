@@ -63,8 +63,30 @@ def draw_noise(rng, arm, scale, size):
     return rng.normal(0.0, scale, size=size)
 
 
+REPLICATE_ARMS = ('heavy_tail_t10', 'heavy_tail_t5', 'heavy_tail_t3',
+                  'contaminated_1pct', 'contaminated_5pct')
+
+
 def realised(rng, arm, K, D, v, nu, nx, nz, reps):
-    """Error rate of the plug-in profiled test under one misspecification."""
+    """Error rate of the plug-in profiled test under one misspecification.
+
+    Two code paths, and which one is correct depends on the arm.
+
+    For an arm whose data really are Gaussian with the variance the test is
+    estimating -- the baseline, the heterogeneous-variance arm, the heavy-tailed
+    OFFSET arm (the offset cancels in the contrast and never enters the
+    replicate spread), and every wrong-Delta arm -- the sample variance has the
+    exact sampling law v * chi^2_{n-1} / (n-1), so it can be drawn directly and
+    the per-observation draws are unnecessary.
+
+    For an arm that breaks the shape of the observation noise, that law no
+    longer holds: Student-t replicates have a far more dispersed sample variance
+    than Gaussian ones, and contaminated anchors have an inflated one. Drawing
+    the sample variance from the Gaussian law there would simulate an analyst
+    who somehow still gets clean variance estimates from dirty data, which is
+    not the situation being studied. Those arms therefore draw every replicate
+    and compute the mean and variance from them.
+    """
     v_g = np.full(K, v)
     if arm == 'hetero':
         v_g = v * np.exp(rng.uniform(-math.log(3), math.log(3), size=K))
@@ -75,19 +97,32 @@ def realised(rng, arm, K, D, v, nu, nx, nz, reps):
     w = rng.integers(0, 2, size=reps)
     b = (rng.standard_t(3, size=(reps, K)) / math.sqrt(3.0)
          if arm == 'nuisance_t3' else rng.normal(0.0, 1.0, size=(reps, K)))
-    ybar = D * w[:, None] + b
-    for g in range(K):
-        ybar[:, g] += draw_noise(rng, arm, math.sqrt(v_g[g] / nx), reps)
-    cbar = b + draw_noise(rng, 'gaussian', math.sqrt(nu / nz), size=(reps, K))
-    if arm.startswith('contaminated_'):
-        frac = float(arm.split('_')[1].replace('pct', '')) / 100.0
-        hit = rng.random((reps, K)) < frac
-        cbar = np.where(hit, cbar + 10.0 * math.sqrt(nu), cbar)
 
-    sy = np.empty((reps, K)); sc = np.empty((reps, K))
-    for g in range(K):
-        sy[:, g] = v_g[g] * rng.chisquare(nx - 1, size=reps) / (nx - 1)
-    sc[:] = nu * rng.chisquare(nz - 1, size=(reps, K)) / (nz - 1)
+    if arm in REPLICATE_ARMS:
+        ybar = np.empty((reps, K)); sy = np.empty((reps, K))
+        cbar = np.empty((reps, K)); sc = np.empty((reps, K))
+        frac = (float(arm.split('_')[1].replace('pct', '')) / 100.0
+                if arm.startswith('contaminated_') else 0.0)
+        for g in range(K):
+            yg = draw_noise(rng, arm, math.sqrt(v_g[g]), size=(reps, nx))
+            ybar[:, g] = D * w + b[:, g] + yg.mean(axis=1)
+            sy[:, g] = yg.var(axis=1, ddof=1)
+            cg = rng.normal(0.0, math.sqrt(nu), size=(reps, nz))
+            if frac:
+                hit = rng.random((reps, nz)) < frac
+                cg = np.where(hit, cg + 10.0 * math.sqrt(nu), cg)
+            cbar[:, g] = b[:, g] + cg.mean(axis=1)
+            sc[:, g] = cg.var(axis=1, ddof=1)
+    else:
+        ybar = D * w[:, None] + b
+        for g in range(K):
+            ybar[:, g] += rng.normal(0.0, math.sqrt(v_g[g] / nx), size=reps)
+        cbar = b + rng.normal(0.0, math.sqrt(nu / nz), size=(reps, K))
+        sy = np.empty((reps, K))
+        for g in range(K):
+            sy[:, g] = v_g[g] * rng.chisquare(nx - 1, size=reps) / (nx - 1)
+        sc = nu * rng.chisquare(nz - 1, size=(reps, K)) / (nz - 1)
+
     Ih = 1.0 / (sy / nx + sc / nz)
     S = D_test * (Ih * (ybar - cbar)).sum(axis=1)
     T = 0.5 * D_test * D_test * Ih.sum(axis=1)
@@ -98,6 +133,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--out', required=True)
     ap.add_argument('--instances', type=int, default=150)
+    ap.add_argument('--replicate-nmax', type=int, default=64)
+    ap.add_argument('--replicate-reps', type=int, default=8000)
     a = ap.parse_args()
     rng = np.random.default_rng(MASTER_SEED)
     t0 = time.time()
@@ -156,18 +193,31 @@ def main():
                         lam=lam, n_ordinary=nx, n_anchor=nz,
                         predicted=pred, price_law=law)
             for arm in ARMS:
+                rep = REPS
+                if arm in REPLICATE_ARMS:
+                    if max(nx, nz) > a.replicate_nmax:
+                        cell[arm] = dict(skipped=True, reason='counts above the '
+                                         'replicate-level budget')
+                        continue
+                    rep = a.replicate_reps
                 e = [realised(np.random.default_rng(s + 7919 * inst + int(1e5 * lam)),
-                              arm, K, D, v, nu, nx, nz, REPS) for s in SEEDS]
+                              arm, K, D, v, nu, nx, nz, rep) for s in SEEDS]
                 cell[arm] = dict(error=float(np.mean(e)), sd=float(np.std(e, ddof=1)),
-                                 deviation=float(np.mean(e)) - pred)
+                                 deviation=float(np.mean(e)) - pred, reps=rep,
+                                 replicate_level=(arm in REPLICATE_ARMS))
             rows.append(cell)
         if (inst + 1) % 10 == 0:
             print(f'{inst+1}/{a.instances}  {time.time()-t0:.0f}s', flush=True)
 
     summary = {}
     for arm in ARMS:
-        d = [r[arm]['deviation'] for r in rows]
-        summary[arm] = dict(cells=len(d), mean_deviation=float(np.mean(d)),
+        d = [r[arm]['deviation'] for r in rows if not r[arm].get('skipped')]
+        if not d:
+            summary[arm] = dict(cells=0)
+            continue
+        summary[arm] = dict(cells=len(d),
+                            replicate_level=(arm in REPLICATE_ARMS),
+                            mean_deviation=float(np.mean(d)),
                             median_deviation=float(np.median(d)),
                             max_abs_deviation=float(np.max(np.abs(d))),
                             rms_deviation=float(np.sqrt(np.mean(np.square(d)))),
@@ -179,7 +229,9 @@ def main():
                       'baseline arm is checked against the finite-count prediction of the '
                       'main finite-sample experiment before anything else is reported',
                master_seed=MASTER_SEED, seeds=SEEDS, reps=REPS, lambdas=LAMBDAS,
-               arms=list(ARMS), instances=a.instances,
+               arms=list(ARMS), replicate_arms=list(REPLICATE_ARMS),
+               replicate_nmax=a.replicate_nmax, replicate_reps=a.replicate_reps,
+               instances=a.instances,
                self_check=dict(baseline_worst_gap=worst, cells_checked=checked,
                                min_n_ordinary=64, passed=bool(ok)),
                summary=summary, rows=rows, cells=len(rows),
@@ -188,6 +240,8 @@ def main():
     print('wrote', a.out, 'cells', len(rows))
     for arm in ARMS:
         s = summary[arm]
+        if not s['cells']:
+            print(f'  {arm:20s} no cells within the replicate-level budget'); continue
         print(f"  {arm:20s} mean dev {s['mean_deviation']:+.4f}  "
               f"rms {s['rms_deviation']:.4f}  max {s['max_abs_deviation']:.4f}")
 

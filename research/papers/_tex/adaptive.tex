@@ -594,6 +594,29 @@ pass suggested were the dangerous ones; and raising the horizon matters because 
 only be found by running long enough to accumulate it, so a short horizon systematically
 understates both the violation rate and the worst deficit.
 
+\subsection{E2: Seven Rules, Not One}
+\label{sec:e2}
+
+Section~\ref{sec:reading} asserts something the search above cannot support: that any rule
+serving whole samples and never revoking them faces the same arithmetic. That sentence
+generalises from one rule and leans on a citation. E2 tests it.
+
+\emph{Rules.} Seven, run on the same targets. Besides largest-deficit-first and two obvious
+variants---largest deficit per unit entitlement, and smallest served share---four are the
+classical apportionment divisor methods, which is what makes the citation concrete rather
+than decorative: Jefferson serves $\arg\max_{i} w_{i}/(N_{i}+1)$, Webster
+$\arg\max_{i} w_{i}/(N_{i}+\tfrac12)$, Adams $\arg\max_{i} w_{i}/N_{i}$, and a randomised
+rule serves $i$ with probability $w_{i}$. Only the last draws, and it is seeded.
+
+\emph{Both directions.} The bound in Theorem~\ref{thm:quotafails} is on the \emph{deficit},
+$t w_{i}-N_{i}$: an arm served less than its entitlement. The opposite direction, the
+surplus $N_{i}-t w_{i}$, is a separate bound, and apportionment theory keeps them separate
+precisely because a method can respect one and violate the other. Measuring only the deficit
+therefore cannot support a claim about every rule, and both are recorded.
+
+\emph{Self-check.} On the paper's own witness the largest-deficit rule must first exceed the
+bound at $t=11$, which is the published statement; the sweep is not reported otherwise.
+
 \subsection{Metrics}
 
 Per target: the maximum deficit over the run and the first horizon at which it exceeds one.
@@ -718,11 +741,58 @@ shortfall crosses one.
 The failure is therefore a property of integrality rather than of greed. The rule always serves
 an arm with maximal deficit, which is the locally correct action; the problem is that the unit
 of service is one whole sample while the entitlements being balanced are fractions much smaller
-than one. Any rule serving whole samples and never revoking them faces the same arithmetic,
-which is the content of the apportionment impossibility \cite{balinski1982}. It also explains
+than one. It is tempting to conclude that any rule serving whole samples and never revoking
+them faces the same arithmetic. That conclusion is too strong, and
+Section~\ref{sec:e2results} refutes it: Jefferson's rule never violates this bound at all.
+What the apportionment impossibility gives \cite{balinski1982}, and what the experiment
+confirms, is the weaker and still sufficient statement---no rule respects the deficit and the
+surplus bounds together, so the failure can be moved between the two directions but not
+removed. It also explains
 the pattern in the search: the worst targets all have several very small components alongside
 one dominant one, exactly the configuration in which a small arm's occasional service is most
 expensive relative to its entitlement.
+
+\subsection{What Every Rule Cannot Do, and What One Rule Can}
+\label{sec:e2results}
+
+Experiment~E2 ran seven rules over $32{,}018$ rational targets. It refutes the sentence this
+paper used to carry, and replaces it with a sharper one.
+
+The refuted claim first. Jefferson's rule violates the deficit bound on \emph{zero} of the
+$32{,}018$ targets. Not rarely---never. So it is not the case that every rule serving whole
+samples faces the same arithmetic in the direction Theorem~\ref{thm:quotafails} measures, and
+the earlier assertion to that effect was wrong. Adams's rule is its mirror image: it violates
+the deficit bound on $95.6\%$ of targets and the surplus bound on none. Largest-deficit-first,
+the rule the theorem is about, violates the deficit bound on $26.4\%$ and the surplus bound on
+none. \NUM{}
+
+The replacement is the statement apportionment theory actually supports, and the sweep
+confirms it without exception: \emph{no rule respects both bounds}. Figure~\ref{fig:rules}
+places each rule by its two violation rates, and the origin---the corner a rule would occupy
+if it respected both---is empty. Jefferson buys its perfect deficit record with a $69.4\%$
+surplus-violation rate and a worst surplus of $4.25$; Adams buys the mirror of that; Webster,
+sitting between them, violates both at lower rates, $21.7\%$ and $12.0\%$. The randomised
+rule violates both on every target and reaches a deficit of $31.2$, which is what a rule with
+no memory of its own history looks like.
+
+This sharpens rather than weakens the paper's position. Theorem~\ref{thm:quotafails} refutes
+the per-horizon bound for the rule an analysis would naturally assume, and E2 shows that the
+refutation cannot be evaded by changing rules---only \emph{relocated}, from one bound to the
+other. An analysis that needs both directions, which any two-sided concentration argument
+does, has no rule to appeal to. An analysis needing only the surplus direction may safely use
+Jefferson's rule, and that is a usable finding the theorem alone does not give.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig6_rules.png}
+\caption{Seven online rules by how often each violates the two quota bounds over $32{,}018$
+rational targets, in exact arithmetic. The randomised rule is omitted: it violates both on
+every target. The origin is where a rule respecting both bounds would sit, and it is empty---
+which is the claim this paper can support. What it cannot support, and previously asserted,
+is that every rule fails in the deficit direction: Jefferson's rule sits exactly on the
+vertical axis, having never violated it. The axes are traded, not escaped. \NUM{}}
+\label{fig:rules}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}

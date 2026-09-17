@@ -32,9 +32,9 @@ with every rule being bad. Flatness is itself discharged from symmetry rather th
 Finally the decide risk is exactly $\tfrac12(1-P)^{N}$, independent of $K$, while recovery
 grows: the separation is an identity against a growth rate, not a comparison of two
 estimates. Each displayed theorem is machine-checked in Lean~4 with no \texttt{sorry}. Over a
-$392$-cell grid reaching $128$ classes, evaluated at $240$ digits because the recovery sum
-loses about $K$ bits to cancellation, recovery costs up to $373$ times what deciding costs and
-follows a coupon-collector shape with constant $0.89$--$0.94$; simulating the process the
+$1{,}080$-cell grid reaching $1024$ classes, at a precision set from $K$ because the recovery
+sum loses about $K$ bits to cancellation, recovery costs up to $3{,}699$ times what deciding
+costs and follows a coupon-collector shape with constant $0.92$--$0.97$; simulating the process the
 recovery identity is derived for---an inclusion--exclusion over events that are not
 independent---reproduces it in every cell to within two standard errors.
 \end{abstract}
@@ -1047,16 +1047,18 @@ compares.
 
 \subsection{Setup}
 
-The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128\}$,
-$P\in\{\tfrac{1}{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34\}$ and
-$\varepsilon\in\{\tfrac1{10},\tfrac1{20},\tfrac1{100},\tfrac1{1000}\}$, giving $392$ cells on
-the model $a_{i}=b_{i}=1$, $p_{i}=P/K$.
+The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128,192,256,384,512,768,1024\}$,
+$P\in\{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\}$
+and $\varepsilon$ from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the model
+$a_{i}=b_{i}=1$, $p_{i}=P/K$.
 
 The recovery sum alternates in sign with binomial weights, so it loses roughly $K$ bits to
-cancellation and cannot be evaluated in double precision at the top of this grid: at $K=128$
-the largest term exceeds the answer by about eighteen orders of magnitude. It is therefore
-evaluated at $240$ significant digits, and checked against exact rational arithmetic wherever
-the exact computation is affordable.
+cancellation and cannot be evaluated in double precision anywhere near the top of this grid:
+at $K=128$ the largest term already exceeds the answer by about eighteen orders of magnitude.
+The working precision is therefore set from $K$ itself, at
+$120+\lceil K\log_{10}2\rceil+40$ significant digits---$469$ at $K=1024$---and checked
+against exact rational arithmetic wherever the exact computation is affordable. A fixed
+precision would have returned noise at the largest sizes rather than an answer.
 
 \subsection{E2: The Recovery Identity Against the Process}
 \label{sec:e2}
@@ -1065,8 +1067,9 @@ Each observation picks a class uniformly and resolves it with probability $P$; a
 them, every class still unresolved is guessed with a fair coin. The quantity to measure is
 therefore $\mathbb{E}[2^{-U}]$, where $U$ counts the unresolved classes---not
 $\Pr(U=0)$, because a report can be correct by luck---and that expectation is exactly
-$1-R_{\mathrm{rec}}$. Sixty cells are simulated at the recovery threshold itself, with up to
-$200{,}000$ replications each, and the standard error is retained per cell.
+$1-R_{\mathrm{rec}}$. Two hundred cells are simulated at the recovery threshold itself, with up to
+$400{,}000$ replications each---traded against the horizon, since a long horizon costs
+proportionally more per replication---and the standard error is retained per cell.
 
 \subsection{Metrics}
 
@@ -1176,29 +1179,31 @@ inside a single class. A recovery must resolve every class.
 
 \subsection{The Separation Over the Whole Grid}
 
-Figure~\ref{fig:counts} puts the two thresholds on one pair of axes over seven doublings of
+Figure~\ref{fig:counts} puts the two thresholds on one pair of axes over ten doublings of
 $K$ and four values of $P$. The decide lines are flat by construction---$K$ does not appear in
 \eqref{eq:decide}---while the recover curves climb steadily on a logarithmic $K$ axis. The
 ratio is what an experimenter feels: at $P=\tfrac12$ and $\varepsilon=\tfrac1{100}$ recovery
 costs the same $6$ samples as deciding when there is one class, $17$ at two classes, and
-$2{,}238$ at a hundred and twenty-eight---a factor of $373$. At $P=\tfrac1{10}$ the same
-comparison runs from $38$ to $11{,}208$. The separation is not a constant overhead that a
+$22{,}192$ at a thousand and twenty-four---a factor of $3{,}699$. At $P=\tfrac1{10}$ the same
+comparison runs from $38$ to $110{,}981$. The separation is not a constant overhead that a
 larger budget absorbs; it widens without bound. \NUM{}
 
 The growth has a shape, and it is the coupon-collector one. Fitting
-$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ over each of the $28$
-$(P,\varepsilon)$ slices gives $c$ between $0.889$ and $0.939$ with $R^{2}$ at least
-$0.9998$ in every slice. The scale quoted for orientation in Section~\ref{sec:separation} is
+$N_{\mathrm{rec}}\approx c\,(K/P)(\ln K+\ln\tfrac1\varepsilon)$ over each of the $54$
+$(P,\varepsilon)$ slices gives $c$ between $0.916$ and $0.966$ with $R^{2}$ at least
+$0.99996$ in every slice. The scale quoted for orientation in Section~\ref{sec:separation} is
 therefore the right one, with a constant slightly below one; the largest relative departure,
-$0.42$, is at the smallest $K$, where an asymptotic form has no reason to hold. \NUM{}
+$0.53$, is at the smallest $K$, where an asymptotic form has no reason to hold. \NUM{}
 
 \subsection{The Recovery Identity Against the Process It Describes}
 
 Equation~\eqref{eq:recover} is the part of the separation that could be wrong without anyone
 noticing, because it is an inclusion--exclusion over dependent events and is derived rather
-than measured. Experiment~E2 simulates the process and compares. Over $60$ cells at the
+than measured. Experiment~E2 simulates the process and compares. Over $200$ cells at the
 recovery threshold itself, the measured $\mathbb{E}[2^{-U}]$ differs from the identity by at
-most $0.0028$ in absolute terms and by at most $1.85$ standard errors---no cell is off by two.
+most $0.0043$ in absolute terms and by at most $2.98$ standard errors, which over two hundred
+cells is what the null predicts---about half a cell beyond $2.98$ is expected, and one is
+seen.
 Figure~\ref{fig:identity} shows every cell against the diagonal. \NUM{}
 
 Two exact checks sit behind that. The identity at $K=1$ reduces to the decide risk, in

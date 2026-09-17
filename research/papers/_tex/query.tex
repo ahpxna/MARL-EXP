@@ -1143,6 +1143,33 @@ estimated by least squares on the asymptotic tail only, $h\le0.023$; the full-gr
 reported next to it rather than the pre-asymptotic points being dropped silently, because the
 difference between the two is itself informative about where the asymptotic regime begins.
 
+\subsection{E3: Orders Four and Five, and the Arithmetic Floor}
+\label{sec:e3}
+
+Theorem~\ref{thm:sandwich} is stated for every $r$, so the sweep should not stop at three. It
+cannot simply continue on the same grid, for a reason worth stating rather than discovering.
+$H^{2}$ falls like $h^{2r}$, so at order five and $h=6.5\times10^{-4}$ the true value is
+about $10^{-32}$, while it is computed as an integral of
+$(\sqrt{p}-\sqrt{q})^{2}$ with $p$ and $q$ both of order one. Double precision resolves their
+difference to about $10^{-16}$ in absolute terms, so everything below roughly $10^{-24}$ in
+$H^{2}$ is rounding, and a slope fitted through it would be a fit to arithmetic noise.
+
+The grid is therefore chosen per order: it runs from $h=0.5$ down to where the predicted
+$H^{2}$ reaches $10^{-18}$, which keeps every evaluated value inside the range double
+precision represents while still spanning enough decades to fit a slope. The floor is
+declared in advance, not tuned after seeing the answer, and each cell carries a reliability
+flag---the coefficient of determination of its tail fit---so a cell that drifts into the
+noise is visible rather than averaged in.
+
+Two adjustments to the construction were needed. The Prouhet block has $2^{r-1}$ cells on
+each side, so orders four and five need eight and sixteen cells per level rather than the
+main sweep's four to six. And the raw Prouhet values run up to $2^{r}-1$, which is $31$ at
+order five; scaled by $h$ and by the random $\alpha$, they would push mixture components
+outside any fixed quadrature window, which a first run duly did---the quadrature self-check
+reported an eighteen per cent disagreement. The identity is invariant under affine maps, so
+the block is normalised to $[0,1]$ and $\alpha,\beta$ supply the randomisation; the
+disagreement fell to $3\times10^{-11}$.
+
 \subsection{Baselines and Comparison}
 
 The comparison is between the two measurements, not against an external baseline: the point
@@ -1382,6 +1409,45 @@ controls the rate at which $H^{2}$ vanishes as $h\to0$, and at a fixed moderate 
 constant still dominates. Instances differ across the three columns, so this is a
 distributional comparison and not a paired one. \NUM{}}
 \label{fig:samples}
+\end{figure}
+
+\subsection{The Exponent at Orders Four and Five}
+\label{sec:e3results}
+
+Six hundred further cells, one hundred and twenty instances at each of five orders, with the
+order verified from the level coefficients in every one. Orders one through three are
+reproduced exactly as before---mean deviation $0.0000$, $-0.0000$ and $-0.0002$ from the
+predicted $2r$. Order four is as clean: mean $-0.0003$, with every one of its
+$120$ cells inside the reliability criterion. \NUM{}
+
+Order five is where the measurement, not the law, gives out. The mean deviation is $-0.0136$
+and the worst cell reaches $-0.21$. Figure~\ref{fig:highorder} shows why that is a statement
+about arithmetic: the flagged cells are almost all at order five, and they are flagged by a
+criterion fixed before the run---a tail fit whose $R^{2}$ falls below $0.999$---rather than
+by their disagreement with the prediction. At order five the usable window in $h$ is barely
+one and a half decades wide, because $H^{2}$ must stay above the floor where double precision
+still resolves it, and a slope fitted over that span with any curvature left in it is biased
+low. Raising the floor from $10^{-22}$ to $10^{-18}$ between two runs of this experiment
+moved order five's mean deviation from $-0.061$ to $-0.014$ and its reliable count from
+$62$ of $120$ cells to $118$, which is the signature of a numerical limit rather than a
+failing law.
+\NUM{}
+
+The honest summary is that the exponent $2r$ is confirmed on drawn instances for
+$r\le4$, and that order five is consistent with it but measured at the edge of what
+double-precision quadrature supports. Confirming order five properly needs extended-precision
+quadrature, which is a different experiment and is not claimed here.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{query_fig7_highorder.png}
+\caption{Fitted exponent minus the predicted $2r$ at five leakage orders, one hundred and
+twenty instances each. Circles are cells whose tail fit meets the reliability criterion;
+crosses are cells the criterion rejects, and they concentrate at order five, where the window
+in $h$ left by double precision is narrowest. The rejection criterion is the quality of the
+fit, fixed before the run, not the size of the disagreement---so the flagged cells were not
+chosen for being inconvenient. \NUM{}}
+\label{fig:highorder}
 \end{figure}
 
 \section{Discussion}

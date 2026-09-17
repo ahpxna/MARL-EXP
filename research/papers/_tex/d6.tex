@@ -1026,6 +1026,34 @@ nine validation configurations and all ten corner cells. A sweep whose code does
 reproduce the theorems at the one point where the theorems apply is measuring something else,
 and this check is what rules that out.
 
+\subsection{E3: Four Axes Instead of One}
+\label{sec:e3}
+
+E2 moves the reference along a single symmetric path. That leaves the obvious objection
+unanswered: the path is symmetric, the construction is symmetric, and a symmetric
+perturbation may be the one direction in which nothing happens. E3 widens the sweep on four
+axes at once.
+
+\emph{Dimension.} $n\in\{6,8,10\}$ with $|A|=n/2$. The balance is not a convenience: the
+exchange equality carries the hypothesis $|A^{\complement}|=|A|$, so these are the
+configurations the theorems speak about. Twelve unbalanced configurations are swept as well,
+in a separate arm, precisely because the theorem does not cover them---and nothing there is
+checked against it.
+
+\emph{Margin and resolution.} Nine margins from $1$ to $2$ rather than five, on a
+sixty-five-point grid in $t$, so the breakdown point is located to $1/64$ and can be traced
+against the margin rather than sampled.
+
+\emph{Direction.} This is the axis that answers the objection. Besides the symmetric path,
+four structured directions perturb only $A$, only its complement, only the steered coordinate
+$j$, or everything but $j$; and two hundred references per configuration are drawn with an
+independent $t_{i}$ in each coordinate. If the finding survives an asymmetric reference it is
+not an artefact of the symmetric one.
+
+Responses of the steered world do not depend on the reference, so they are tabulated once per
+configuration and reused, which is what makes the wider sweep affordable. Both self-checks of
+Section~\ref{sec:e2} are re-run at every configuration.
+
 \subsection{Metrics}
 
 For the design experiment: the two derived weights, the budget residual
@@ -1201,6 +1229,49 @@ move right as the margin grows and are absent at $\rho=2$, where the set stays T
 throughout and the regret is non-positive at every $t>0$. The construction degrades with the
 reference; it does not fail at the first perturbation. \NUM{}}
 \label{fig:reference}
+\end{figure}
+
+\subsection{The Finding Is Not an Artefact of the Symmetric Path}
+\label{sec:e3results}
+
+Three results from the wider sweep of Section~\ref{sec:e3}, in order of what they rule out.
+
+\emph{The breakdown point is a real function of the margin.} At every one of the three sizes,
+the first $t$ at which $A$ ceases to be the Top-$C$ set rises monotonically with the margin,
+with no exception and no reversal: at $n=6$ it runs from $13/64$ at $\mu=1$ to $15/32$ at
+$\mu=7/4$, at $n=8$ from $5/32$ to $7/16$, and at $n=10$ from $1/8$ to $23/64$.
+Figure~\ref{fig:wide} plots all three. The curves also fall with $n$, so the construction
+tolerates less perturbation as the space grows---which is worth knowing and which the
+single-path sweep could only hint at from two points. The transition is a threshold, not an
+oscillation: once a cell flips it stays flipped, at every configuration. \NUM{}
+
+\emph{It is not the symmetric path.} Asymmetric references drawn with an independent $t_{i}$
+per coordinate flip the Top-$C$ set at a \emph{higher} rate than the symmetric path,
+$49.6\%$ against $41.2\%$, and the four structured directions at a lower one, $18.0\%$. The
+symmetric path is therefore neither the most nor the least favourable direction; it sits
+inside the range the other directions span, which is what licenses reading it as
+representative rather than as special.
+
+\emph{Sufficiency survives everything tested.} At $\mu=2$, $A$ remains a Top-$C$ set at every
+reference in the sweep---$99$ symmetric, $204$ structured and $600$ asymmetric, $903$ in
+all---and the doubled regret is non-positive at every one of them.
+Theorem~\ref{thm:sufficient} is proved for an arbitrary product reference, so this cannot
+confirm it in the logical sense; what it does is exercise the theorem on nine hundred
+references outside the corner where the necessity construction lives, including directions
+chosen to be awkward, and find no violation. Sufficiency and necessity behave differently off
+the corner in exactly the direction the proofs predict. \NUM{}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{d6_fig6_wide.png}
+\caption{Where the necessity construction breaks, as a function of the margin, at the three
+balanced configurations. Each point is the first $t$ on a sixty-five-point exact grid at
+which $A$ stops being a Top-$C$ set, so the hypothesis of
+Theorem~\ref{thm:subthreshold} stops holding. The curves rise monotonically with the margin
+at every size and fall with the size; the crosses at $\mu=2$ mark that no breakdown occurs
+anywhere on the grid there, which is the sufficiency theorem exercised rather than assumed.
+Exact rational arithmetic throughout. \NUM{}}
+\label{fig:wide}
 \end{figure}
 
 \section{Discussion}

@@ -1031,6 +1031,37 @@ Monte Carlo standard error of about $0.0016$. A cell whose design buys fewer tha
 observations of a type it needs is excluded and counted, because a variance cannot be
 estimated from fewer: $6{,}675$ cells are simulated and $2{,}925$ excluded.
 
+\subsection{E3: The Law When the Model Is Wrong}
+\label{sec:e3}
+
+E2 tests the law against an estimator that must work for its answer, but inside a world that
+matches the model exactly. A design sheet is used under no such conditions. E3 breaks one
+assumption at a time and measures what the prediction costs.
+
+\emph{Arms.} Twelve generators are applied to the price-law optimal design. One matches the
+model. Three replace the observation noise with a Student-$t$ at $10$, $5$ and $3$ degrees of
+freedom, rescaled to the same variance so the law's input is unchanged and only the shape is
+wrong. One draws per-group variances over a ninefold range while the analyst pools them. One
+makes the group offset itself heavy-tailed. Four run the test at a separation
+$c\Delta$ while the truth is $\Delta$, for $c\in\{\tfrac12,\tfrac34,\tfrac54,2\}$. Two
+replace one and five per cent of anchor observations with an outlier at ten standard
+deviations.
+
+\emph{Two code paths, and why.} Where the data really are Gaussian with the variance the test
+estimates, the sample variance has the exact law $v\chi^{2}_{n-1}/(n-1)$ and is drawn
+directly. Where the arm breaks the shape of the observation noise, that law no longer holds:
+Student-$t$ replicates have a far more dispersed sample variance, and contaminated anchors an
+inflated one. Drawing from the Gaussian law there would simulate an analyst who somehow still
+obtains clean variance estimates from dirty data. Those five arms therefore draw every
+replicate and compute the mean and the variance from them, which costs enough that they are
+restricted to cells with at most $64$ observations of each type. A first version of this
+experiment did not make that distinction and understated the damage from contamination by a
+factor of nearly three.
+
+\emph{Self-check.} The matched arm must agree with E2's finite-count prediction where that
+prediction is sharp---at least $64$ ordinary observations per group, where E2 measured the
+residual at $0.0006$ or less. It agrees to $0.0011$, and the sweep is not reported otherwise.
+
 \subsection{Metrics}
 
 The reported quantities are: the closed-form value \eqref{eq:pricelaw}; the optimiser's
@@ -1269,6 +1300,57 @@ $10^{-4}$ beyond five hundred. The two designs that reach the axis at large $n_{
 because their bins contain a handful of cells where the deviation turns slightly negative,
 which is within the Monte Carlo standard error of $0.0016$. \NUM{}}
 \label{fig:plugin}
+\end{figure}
+
+\subsection{Which Assumption the Law Actually Needs}
+\label{sec:e3results}
+
+Figure~\ref{fig:misspec} orders the twelve generators of Section~\ref{sec:e3} by how far the
+realised error departs from the prediction. The ordering is the finding, and it is not the
+one an intuition about robustness would produce.
+
+\emph{Shape barely matters.} Replacing Gaussian observation noise with a Student-$t$ leaves
+the prediction intact: $+0.0065$ at ten degrees of freedom, $+0.0025$ at five, and
+$-0.0086$ at three---that is, at the heaviest tails the test is \emph{better} than predicted,
+on $83\%$ of cells. The reason is visible in the mechanism rather than mysterious: with
+$t_{3}$ replicates the sample variance is wildly dispersed, and a group that happens to draw
+a large spread is down-weighted by its own estimated information, which is adaptive. A
+heavy-tailed group offset is equally harmless at $+0.0059$, because the offset cancels in the
+contrast and never enters the replicate spread. Variances differing ninefold across groups,
+pooled by the analyst, cost $+0.0066$. None of these is larger than the plug-in penalty the
+matched arm already carries. \NUM{}
+
+\emph{Getting the separation wrong is an order of magnitude worse.} Running the test at
+$2\Delta$ when the truth is $\Delta$ costs $+0.1572$, and at $\tfrac12\Delta$, $+0.0470$; even
+a twenty-five per cent error in either direction costs $+0.0162$. And unlike the shape arms,
+these are not occasional: the realised error exceeds the prediction on $100\%$ of cells at
+every wrong-$\Delta$ arm. Contaminating anchors is comparably serious---$+0.0311$ at one per
+cent and $+0.1760$ at five, again on every cell. \NUM{}
+
+The practical reading is specific. $\Gamma^{*}$ is a robust predictor of realised error
+against everything about the noise except its scale, and a fragile one against the two
+quantities the experimenter supplies rather than observes: the separation the design is sized
+for, and the integrity of the anchor channel. A design sheet built on \eqref{eq:upper} is
+therefore safe to use under noise whose distribution is unknown, and unsafe to use with a
+guessed effect size---which is the opposite of how such sheets are usually hedged.
+
+One caution on reading the figure. The matched arm is not at zero; it sits at $+0.0059$,
+which is the plug-in penalty of Section~\ref{sec:e2results} at the sample sizes this grid
+reaches, not a bias of the generator. Every bar should be read against that baseline rather
+than against zero, and the three shape arms are indistinguishable from it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{master_fig10_misspec.png}
+\caption{What each broken assumption costs. Bars are the mean of (realised error $-$
+prediction) over the cells of Section~\ref{sec:e3}, with the matched arm at the top for
+reference; it is at $+0.0059$ rather than zero because of the plug-in penalty, so the bars
+below it should be read against that. Misspecifying the shape of the noise---heavier tails, a
+heavy-tailed offset, variances differing ninefold---costs no more than the penalty already
+present, and the heaviest tails cost less than nothing. Misspecifying the separation, or
+contaminating the anchors, costs an order of magnitude more, and does so on every cell rather
+than on average. \NUM{}}
+\label{fig:misspec}
 \end{figure}
 
 \section{Discussion}

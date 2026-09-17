@@ -1320,9 +1320,44 @@ closed forms and the proxy is one of them evaluated at the wrong index.
 
 \subsection{Experimental Objectives}
 
-The two families are proved, so no experiment bears on them. The empirical work has one
-objective: to establish which existing allocator is the baseline that any new one---including
-one built on Algorithm~\ref{alg:oracle}---must beat.
+The two families are proved, so no experiment bears on them. The empirical work has two
+objectives. The first is to establish which existing allocator is the baseline that any new
+one---including one built on Algorithm~\ref{alg:oracle}---must beat. The second concerns the
+separation itself. Theorems~\ref{thm:family1} and \ref{thm:family2} are enough to refute any
+constant correction factor, and they are hand-built to do exactly that. They leave the
+practitioner's question open: on an instance nobody designed, how often is the scalar proxy
+wrong, by how much, and in which direction? Experiment~E2 answers it.
+
+\subsection{E2: The Proxy on Instances Nobody Built}
+\label{sec:e2}
+
+\emph{Instances.} Six thousand are drawn from declared ranges: three to eight actions per
+relation, responses uniform on $[0,1]$, and precisions log-uniform over three decades. The
+relation with the larger capacity is taken as the claimed top, so the comparison is always in
+the direction the proxy is used.
+
+\emph{Computing the true value.} $J_{\mathrm{full}}$ is not estimated. Fix a target width
+$z$: relation $i$ must fit inside a window of that width, costing $S_{i}(z)$, and relation
+$j$ must open some pair to at least that width, costing $E_{j}(z)$. Both are convex in $z$
+for a fixed pair, so $J_{\mathrm{full}}=\min_{z}\min_{(c,d)}[S_{i}(z)+E^{(c,d)}_{j}(z)]$ is
+computed exactly. $S_{i}(z)$ has its own closed form: its derivative in the window position
+is piecewise linear, so the optimal position is a root on one of the intervals between
+breakpoints---and, as it happens, generally interior rather than at a breakpoint, which is
+where a first implementation of this experiment went wrong and over-estimated the value.
+
+\emph{Checking the solver rather than trusting it.} The decomposition is cross-checked
+against SLSQP running on the raw variables, which uses none of it. A local optimiser can only
+land at or above the true minimum, so a cell where it lands \emph{below} would expose a
+defect; those cells are counted rather than averaged away.
+
+\emph{Self-check.} On the two proved families the implementation must reproduce the proved
+numbers before the sweep is reported: $J_{\mathrm{scalar}}=\tfrac1{32}$ and
+$J_{\mathrm{full}}\le 9\eta/32$ for family~1, and
+$J_{\mathrm{scalar}}=\eta/(8(1+3\eta))$ and $J_{\mathrm{full}}\ge\tfrac1{128}$ for family~2.
+
+\emph{Mechanism.} Each instance also records whether the cheapest alternative opens a pair of
+$j$ other than its current extrema. That is the mechanism family~1 exploits, and recording it
+turns ``the proxy is sometimes wrong'' into a statement about \emph{when}.
 
 \subsection{Setup}
 
@@ -1497,6 +1532,56 @@ analysis is a property of these instances rather than a proof that $\mathrm{C\_l
 never slower. It is not evidence for this paper's oracle, since no allocator built on
 Algorithm~\ref{alg:oracle} appears in it. And censoring is substantial at $29.1\%$, which is
 why both columns are reported.
+
+\subsection{How Often the Proxy Misleads, and When}
+\label{sec:e2results}
+
+Across six thousand instances the scalar proxy is usually close and occasionally far. The
+median ratio $J_{\mathrm{full}}/J_{\mathrm{scalar}}$ is $1.000$, so an analyst who uses
+\eqref{eq:scalar} on a typical instance is not systematically misled. The tails are another
+matter: the fifth percentile is $0.318$ and the ninety-fifth is $1.658$, the extremes reach
+$0.018$ and $41.7$, and the proxy is wrong by more than a factor of two on $3.3\%$ of
+instances and by more than a factor of two in the optimistic direction---reporting a value
+the true problem cannot deliver---on $9.0\%$. \NUM{}
+
+The interesting result is not the spread but its cause, and it is the one the families
+predict. Figure~\ref{fig:proxy} splits the instances by whether the cheapest
+capacity-inverting alternative opens a pair of $j$ other than its current extrema. It does on
+$26.6\%$ of instances, and those are a different population: their median ratio is $0.657$
+against $1.000$ for the rest. The relationship is not statistical but exact. Of the $1{,}367$
+instances on which the proxy overstates---any ratio below one---every single one has a moving
+extremum, and so do all $542$ on which it overstates by more than a factor of two. Not one
+instance with its extrema fixed produced a ratio below one. The converse fails, as it should:
+$1{,}597$ instances have a moving extremum and $230$ of those are still exact, so a moving
+extremum is necessary for the proxy to overstate and not sufficient. \NUM{}
+
+That turns the separation from a warning into a test. The mechanism family~1 was built to
+exhibit is not a curiosity of a constructed instance---it is what a quarter of random
+instances do---and whether it is present can be checked on the instance in hand, before
+\eqref{eq:scalar} is trusted, by asking whether the cheapest alternative opens a
+currently-extremal pair. Where it does not, the proxy was exact on every instance drawn here.
+
+Two cautions about the computation. First, the exact solver agrees with SLSQP to
+$8\times10^{-11}$ on most of the $113$ cross-checked cells, but on a handful the optimiser
+comes in far above---up to a factor of six---because the constraint is not smooth and it
+stalls. That is a statement about SLSQP, not about the decomposition, and the reason it can
+be read that way is the direction: on \emph{no} cell did SLSQP land below the decomposition,
+which is the only outcome that would have indicated an error. Second, an earlier
+implementation searched only the breakpoints for the optimal window position and therefore
+over-estimated $J_{\mathrm{full}}$; it was caught by exactly this cross-check, and the closed
+form of Section~\ref{sec:e2} replaced it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig6_proxy.png}
+\caption{The scalar proxy against the true value on six thousand random instances, split by
+mechanism. The vertical line is exact agreement. Instances where the cheapest alternative
+opens a pair that is \emph{not} currently extremal---the mechanism family~1 exploits---carry
+almost the whole optimistic tail, with median ratio $0.657$; the rest sit on the line, with
+median $1.000$. The proxy's failure is therefore predictable from a property of the instance
+rather than being spread uniformly over it. \NUM{}}
+\label{fig:proxy}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}
