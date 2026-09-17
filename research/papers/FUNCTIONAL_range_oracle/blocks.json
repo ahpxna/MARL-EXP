@@ -8,8 +8,13 @@
  {
   "kind": "prose",
   "lines": [
-   "A design buys observations to certify the Top-k of a set of relations ranked by CAPACITY \u2014 the range max_a \u03b8_ra \u2212 min_a \u03b8_ra. Certifying means excluding every alternative that would change the answer, so the design's value is the cheapest such alternative.",
-   "Three quantities must be kept distinct. J_scalar is the pair-flip value computed at the CURRENT extrema with ordering constraints dropped; J_old is the quadratic programme inside the current-extrema region; J_full is the infimum over the whole alternative set, with the extrema free in either relation. By inclusion of feasible sets:"
+   "A design buys observations to certify the Top-k of a set of relations ranked by CAPACITY \u2014 the range max_a \u03b8_ra \u2212 min_a \u03b8_ra. Certifying means excluding every alternative that would change the answer, so the design's value is the cheapest such alternative. Three quantities must be kept distinct."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "J_scalar is the pair-flip value computed at the CURRENT extrema with ordering constraints dropped; J_old is the quadratic programme inside the current-extrema region; J_full is the infimum over the whole alternative set, with the extrema free in either relation. By inclusion of feasible sets:"
   ]
  },
  {
@@ -21,6 +26,24 @@
   "kind": "prose",
   "lines": [
    "and there is NO general order between J_scalar and J_full. Allocators are routinely built on J_scalar because it is cheap. This work asks what that costs when the extrema can move \u2014 and the answer is that it costs everything, in both directions."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "What the literature leaves open"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The literature therefore leaves a specific opening."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "No existing work simultaneously: (i) exhibits that the proxy errs in both directions by no constant; (ii) characterises the true alternative set on the range target with free extrema; (iii) reduces the resulting oracle to a finite conjunction of closed forms; and (iv) certifies optimality under positive semidefiniteness alone."
   ]
  },
  {
@@ -75,8 +98,7 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW THEY ARE CLOSED. Shrink: the clamp into the interval is at least as close to the target as any feasible point, proved by cases on where the target lies, and the per-cell costs then sum. Expand: minimising a separable quadratic under ONE linear constraint, with the minimiser exhibited so the value is exact.",
-   "STEP 5 \u2014 THE INNER QP IN CLOSED FORM."
+   "HOW THEY ARE CLOSED. Shrink: the clamp into the interval is at least as close to the target as any feasible point, proved by cases on where the target lies, and the per-cell costs then sum. Expand: minimising a separable quadratic under ONE linear constraint, with the minimiser exhibited so the value is exact."
   ]
  },
  {
@@ -109,8 +131,7 @@
  {
   "kind": "prose",
   "lines": [
-   "STEP 8 \u2014 FAMILY 2: THE PROXY UNDERSTATES  (C1).",
-   "\u03b8_i = (0, 1, \u00be), \u03b1_i = (1, \u03b7, 1); \u03b8_j = (0, \u00bd, \u00bc), \u03b1_j = (1, 1, 1). For ANY capacity-inverting alternative pick z between the two new capacities. Shrinking i below z costs at least [\u00be\u2212z]\u208a\u00b2/4, opening j above z at least [z\u2212\u00bd]\u208a\u00b2/4, and the two positive parts always sum to at least \u00bc:"
+   "STEP 8 \u2014 FAMILY 2: THE PROXY UNDERSTATES  (C1). \u03b8_i = (0, 1, \u00be), \u03b1_i = (1, \u03b7, 1); \u03b8_j = (0, \u00bd, \u00bc), \u03b1_j = (1, 1, 1). For ANY capacity-inverting alternative pick z between the two new capacities."
   ]
  },
  {
@@ -157,7 +178,7 @@
  {
   "kind": "prose",
   "lines": [
-   "THE TWO FAMILIES SEPARATE WITHOUT LIMIT. As \u03b7 \u2192 0 one family drives the ratio to zero and the other to infinity \u2014 PROVED bounds in exact arithmetic, not sampled points. ON RANDOM INSTANCES THE FAILURE IS PREDICTABLE. Over 6000 drawn instances, all 1367 on which the proxy overstates have a moving extremum, and none with fixed extrema does. ON THE MAIN PANEL, C_lucb IS THE BASELINE TO BEAT: 797 worlds certified at median 20,996 queries against 749 and 605. A result on this panel, not a domination theorem."
+   "THE TWO FAMILIES SEPARATE WITHOUT LIMIT. As \u03b7 \u2192 0 one family drives the ratio to zero and the other to infinity \u2014 PROVED bounds in exact arithmetic, not sampled points. ON RANDOM INSTANCES THE FAILURE IS PREDICTABLE."
   ]
  },
  {
@@ -172,14 +193,15 @@
   ]
  },
  {
-  "kind": "fig",
-  "path": "research/papers/_figures/poster/func_fig4_ratio.png",
-  "width": 14.44
+  "kind": "prose",
+  "lines": [
+   "Median query counts are medians over certified runs only, and the certification fraction carries the remaining information. The Two Families Separate Without Limit As \u03b70 family~1 drives J_full/J_scalar to zero and family~2 drives it to infinity."
+  ]
  },
  {
-  "kind": "caption",
+  "kind": "prose",
   "lines": [
-   "Fig. 2.  The two families on one axis. Any constant correction factor is a horizontal line, and both curves cross every such line."
+   "Both are proved bounds in exact arithmetic, not sampled points, so the failure of the proxy is a theorem rather than an observation. On the Main Panel, C_lucb Is the Baseline to Beat C_lucb certifies 797 of 1,000 worlds at median 20,996 queries; C_anytime certifies 749 at 29,884; uniform certifies 605 at 74,252."
   ]
  },
  {
@@ -191,7 +213,84 @@
  {
   "kind": "prose",
   "lines": [
-   "THE PROXY'S FAILURE IS PREDICTABLE, NOT DIFFUSE. On 6000 random instances the median ratio J_full/J_scalar is 1.000, but the tails run from 0.018 to 41.7. The cause is exact rather than statistical: of the 1367 instances on which the proxy OVERSTATES, every single one has a cheapest alternative that opens a pair which is not currently extremal \u2014 the mechanism family 1 was built to exhibit \u2014 and not one instance with its extrema fixed produced a ratio below one. The converse fails, as it should: 1597 instances have a moving extremum and 230 of those are still exact. So a moving extremum is necessary and not sufficient, and it is CHECKABLE on the instance in hand before \u2014(5) is trusted. STRONG DUALITY: A SEARCH, NOT A PROOF. The certificate assumes only semidefiniteness, which is why duality is left open. A search over 1054 instances \u2014 including a family built with M singular and its null space aligned to the constraint normals, the only structural route to a gap \u2014 found none above machine precision, and the adversarial family had the SMALLEST gaps. One counterexample would have settled it; a thousand instances without one settle nothing, and the poster says so."
+   "THE PROXY'S FAILURE IS PREDICTABLE, NOT DIFFUSE. On 6000 random instances the median ratio J_full/J_scalar is 1.000, but the tails run from 0.018 to 41.7."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The converse fails, as it should: 1597 instances have a moving extremum and 230 of those are still exact. So a moving extremum is necessary and not sufficient, and it is CHECKABLE on the instance in hand before \u2014(5) is trusted. STRONG DUALITY: A SEARCH, NOT A PROOF."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "A search over 1054 instances \u2014 including a family built with M singular and its null space aligned to the constraint normals, the only structural route to a gap \u2014 found none above machine precision, and the adversarial family had the SMALLEST gaps."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "Limitations \u2014 what is not established"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The decomposition step is not formalised, so the oracle equality is not claimed."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Each component of the chain is proved, and the inequalities the equation above are proved; what is missing is precisely the separability step. Stating this plainly costs the paper a headline, and the alternative \u2014 presenting the chain as though it closed \u2014 would forfeit the discipline the rest of the paper rests on."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The certificate is sufficiency only. Theorem says a point with a certificate is optimal. It does not say every optimal point has one, and only weak duality is proved, so a duality gap is not excluded. Standing model assumptions. Free response table, known variance, positive precision."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The paper establishes that the exact oracle is computable and that the proxy is unusable; it does not establish that the exact oracle pays for itself. The families are extremal by construction."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "V.  Conclusions"
+  ]
+ },
+ {
+  "kind": "fig",
+  "path": "research/papers/_figures/poster/func_fig4_ratio.png",
+  "width": 14.44
+ },
+ {
+  "kind": "caption",
+  "lines": [
+   "Fig. 2.  The two families on one axis. Any constant correction factor is a horizontal line, and both curves cross every such line."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "When the extrema can move, the scalar proxy is a bound in neither direction and no constant repairs it."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The failure is also diagnosable: on 6000 random instances the proxy overstated only when an extremum moves, which can be checked before it is trusted."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "How the numbers were produced"
   ]
  },
  {
@@ -206,27 +305,15 @@
   ]
  },
  {
-  "kind": "header",
+  "kind": "prose",
   "lines": [
-   "V.  Conclusions"
+   "THE TRUE VALUE IS COMPUTED, NOT ESTIMATED. J_full is solved exactly by the shrink\u2013expand decomposition, with the window position obtained in closed form rather than searched \u2014 an earlier version scanned only the breakpoints and over-estimated, because the optimum is generally interior."
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "When the extrema can move, the scalar proxy is a bound in neither direction and no constant repairs it. The true alternative set is a finite union of convex pair regions on the real range target, its oracle is a finite conjunction of convex problems, the inner problem has a closed form, and the certificate needs no matrix inverse \u2014 so a singular information matrix, which is what a working allocator produces, costs nothing extra. The failure is also diagnosable: on 6000 random instances the proxy overstated only when an extremum moves, which can be checked before it is trusted."
-  ]
- },
- {
-  "kind": "header",
-  "lines": [
-   "How the numbers were produced"
-  ]
- },
- {
-  "kind": "prose",
-  "lines": [
-   "THE TRUE VALUE IS COMPUTED, NOT ESTIMATED. J_full is solved exactly by the shrink\u2013expand decomposition, with the window position obtained in closed form rather than searched \u2014 an earlier version scanned only the breakpoints and over-estimated, because the optimum is generally interior. AND IT IS CHECKED AGAINST A SOLVER THAT SHARES NONE OF ITS STRUCTURE. SLSQP is run on the raw variables. A local optimiser can only land at or above the true minimum, so a cell where it lands BELOW would expose a defect; across the cross-checked cells, none did. THE PROVED FAMILIES ARE THE SELF-CHECK. Before any random instance is reported the code must reproduce the published numbers on both families \u2014 J_scalar = 1/32 and J_full \u2264 9\u03b7/32 on the first, J_scalar = \u03b7/(8(1+3\u03b7)) and J_full \u2265 1/128 on the second."
+   "A local optimiser can only land at or above the true minimum, so a cell where it lands BELOW would expose a defect; across the cross-checked cells, none did. THE PROVED FAMILIES ARE THE SELF-CHECK."
   ]
  },
  {
@@ -238,7 +325,7 @@
  {
   "kind": "caption",
   "lines": [
-   "[1] M. Jourdan, R. Degenne and E. Kaufmann, \u201cDealing with unknown variances in best-arm identification,\u201d in Proc. COLT, 2023. [2] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. COLT, 2016. [3] S. Boyd and L. Vandenberghe, Convex Optimization. Cambridge, U.K.: Cambridge Univ. Press, 2004."
+   "[1] A. Garivier and E. Kaufmann, \u201cOptimal best arm identification with fixed confidence,\u201d in Proc. 29th Annu. Conf. Learning Theory (COLT), 2016. [2] E. Kaufmann, O. Capp\\'e, and A. Garivier, \u201cOn the complexity of best-arm identification in multi-armed bandit models,\u201d J. Mach. Learn. Res., vol.~17, pp.~1\u201342, 2016. [3] M. Jourdan, R. Degenne, and E. Kaufmann, \u201cDealing with unknown variances in best-arm identification,\u201d in Proc. 34th Int. Conf. Algorithmic Learning Theory (ALT), 2023. [4] S. Boyd and L. Vandenberghe, Convex Optimization. Cambridge, U.K.: Cambridge Univ. Press, 2004. [5] R. T. Rockafellar, Convex Analysis. Princeton, NJ: Princeton Univ. Press, 1970. [6] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP), 2020, pp.~367\u2013381. [7] L. de Moura and S. Ullrich, \u201cThe Lean 4 theorem prover and programming language,\u201d in Proc. 28th Int. Conf. Automated Deduction (CADE), 2021, pp.~625\u2013635."
   ]
  }
 ]
