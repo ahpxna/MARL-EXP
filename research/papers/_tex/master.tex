@@ -24,17 +24,17 @@ configurations, exhibited in exact rational arithmetic, on which every ordinary 
 identical means in two worlds whose answers differ, so the attainable value is exactly zero
 and no quantity of ordinary sampling recovers it. Second, an exact price law: once a
 calibration query is admitted, the optimal value under a unit budget is
-$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$, proved as a lower bound
+$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{vm}+\sqrt{\nu\kappa})^{2}\bigr)$, proved as a lower bound
 on every group, as an upper bound quantified over every unit-budget design rather than over
 a parametric family, and as attained by an explicit symmetric design. The two prices
-combine through their square roots, which yields the operational crossover $\kappa=m$ at
+combine through their square roots, which yields the operational crossover $\nu\kappa=vm$ at
 which the two query types consume equal shares of each group's budget. A third result
 certifies, on one explicit instance in exact rationals, that no anchor-free design matches
 an anchored one. Every displayed theorem is machine-checked in Lean~4 with no
 \texttt{sorry} and with axioms confined to
 $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$. Numerical sweeps over
 $32$ parameter cells reproduce the closed form to a worst relative gap of
-$2.5\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
+$2.2\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
 calibration query returns exactly zero, while a merely uniform allocation still reaches
 $73.5$--$100\%$ of the optimum. A separate simulation asks whether the law predicts a
 decision and not only a design: over $240$ randomly drawn instances the realised error of a
@@ -74,12 +74,16 @@ argued in a limit, so the failure can be reproduced and tested against.
 
 Having established that the query is sometimes mandatory, the paper computes what it costs.
 Writing $\Delta$ for the separation between the two worlds to be distinguished, $m$ for the
-group size and $\kappa$ for the price of a calibration query in units of an ordinary one,
-the optimal value under a unit budget is
+group size, $\kappa$ for the price of a calibration query in units of an ordinary one, and
+$v,\nu$ for the two observation variances, the optimal value under a unit budget is
 \begin{equation}
-\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(\sqrt{m}+\sqrt{\kappa})^{2}} .
+\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(s_{m}+s_{\kappa})^{2}},
+\qquad s_{m}=\sqrt{vm},\quad s_{\kappa}=\sqrt{\nu\kappa} .
 \label{eq:pricelaw}
 \end{equation}
+The prices that enter are noise-weighted, because what a budget buys is precision and a
+noisier channel buys less of it per unit spent. Writing the law in $\sqrt{m}$ and
+$\sqrt{\kappa}$ alone is the special case $v=\nu=1$.
 This is an identity rather than an order of magnitude: it is matched by a lower bound on
 every group, by an upper bound quantified over \emph{every} unit-budget design rather than
 over a parametric family, and by an explicit design that attains it. The two query prices
@@ -89,9 +93,9 @@ trade-off, and neither type can be dropped without losing the group entirely.
 The paper makes four contributions. First, it exhibits a necessity dichotomy with an exact
 witness, showing that an additional \emph{type} of measurement can be a precondition rather
 than an optimisation. Second, it computes the exact price of one unit of information in a
-group, $(\sqrt{m}+\sqrt{\kappa})^{2}$, and the split that attains it. Third, it proves the
+group, $(s_{m}+s_{\kappa})^{2}$, and the split that attains it. Third, it proves the
 price law \eqref{eq:pricelaw} on both sides and exhibits the attaining design, from which
-the operational crossover $\kappa=m$ follows. Fourth, it certifies on an explicit instance
+the operational crossover $\nu\kappa=vm$ follows. Fourth, it certifies on an explicit instance
 that no anchor-free design matches an anchored one, with both sides in exact rationals.
 
 The scope of the claim is deliberately bounded. This paper does not solve the heterogeneous
@@ -212,7 +216,7 @@ the query type entirely?
 \item \textbf{H1.} A configuration exists in which two worlds with different answers induce
 identical means for every ordinary query, so no ordinary sampling rule separates them.
 \item \textbf{H2.} The exact price of one unit of profiled information in a group is
-$(\sqrt{m}+\sqrt{\kappa})^{2}$, so the two prices combine through their square roots rather
+$(s_{m}+s_{\kappa})^{2}$, so the two prices combine through their square roots rather
 than additively.
 \item \textbf{H3.} The resulting bound is attained by a symmetric design that saturates the
 budget, making \eqref{eq:pricelaw} an identity.
@@ -417,7 +421,15 @@ next subsection into a statement about cost rather than about information.
 \label{sec:groupcost}
 
 A group required to deliver profiled information $h$ must satisfy $h(x+z)\le xz$, which is
-\eqref{eq:profile} rearranged. Its cost at prices $m$ and $\kappa$ is $m\,x+\kappa\,z$. We
+\eqref{eq:profile} rearranged in the precisions $x=n_{\mathrm{ord}}/v$ and
+$z=n_{\mathrm{cal}}/\nu$. Its cost is therefore not $m\,x+\kappa\,z$: a unit of precision on
+the ordinary channel takes $v$ observations and each costs $m$, so the group's spend is
+\begin{equation}
+s_{m}^{2}\,x + s_{\kappa}^{2}\,z, \qquad s_{m}^{2}=vm,\quad s_{\kappa}^{2}=\nu\kappa .
+\label{eq:groupcost}
+\end{equation}
+Reading $x$ and $z$ as counts rather than precisions is what turns \eqref{eq:pricelaw} into
+its $v=\nu=1$ special case, and it is the one substitution the development does not make. We
 bound that cost below, and then exhibit the allocation that meets the bound.
 
 \begin{theorem}[Group cost, lower bound]
@@ -474,14 +486,14 @@ former by $h$ gives the latter.
 The split \eqref{eq:groupsplit} takes this form because the two channels must be bought in
 inverse proportion to the square roots of their prices: substituting anything else into
 \eqref{eq:cs} leaves slack. Writing $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$, the
-exact price of one unit of profiled information in a group is $(\sqrt{m}+\sqrt{\kappa})^{2}$
+exact price of one unit of profiled information in a group is $(s_{m}+s_{\kappa})^{2}$
 and the optimal split satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{master_fig7_unitprice.png}
 \caption{The price of one unit of profiled information in a group,
-$(\sqrt{m}+\sqrt{\kappa})^{2}$ from Theorem~\ref{thm:groupattained}, against the additive
+$(s_{m}+s_{\kappa})^{2}$ from Theorem~\ref{thm:groupattained}, against the additive
 price $m+\kappa$ that treats the two query types as separate purchases (dotted). The two
 differ by exactly the cross term $2\sqrt{m\kappa}$, which is the part of the cost that
 arises because neither type is useful without the other. An additive accounting therefore
@@ -494,7 +506,7 @@ the two prices are equal. Exact evaluation of \eqref{eq:groupsplit}; nothing is 
 \centering
 \includegraphics[width=\columnwidth]{master_fig5_crossover.png}
 \caption{The optimal split $z^{\star}/x^{\star}=\sqrt{m/\kappa}$ at three group sizes.
-Open circles mark $\kappa=m$, the only price at which the two query types are bought in
+Open circles mark $\nu\kappa=vm$, the only price at which the two query types are bought in
 equal numbers. To the left of its circle a group should buy \emph{more} calibration than
 ordinary observations, and to the right fewer; the ratio is a square root, so it moves an
 order of magnitude for every two orders of magnitude in price. Exact evaluation of
@@ -614,7 +626,7 @@ $V=h\Delta^{2}/2$, the right-hand side of \eqref{eq:upper}.
 Three readings of \eqref{eq:pricelaw} follow immediately and carry its practical content.
 As $\kappa\to0$ the value tends to $\Delta^{2}/(2Km)$, the cost of the ordinary queries
 alone. As $\kappa\to\infty$ it behaves as $\Delta^{2}/(2K\kappa)$, so the calibration query
-dominates the budget and the group size becomes irrelevant. At $\kappa=m$ the two square
+dominates the budget and the group size becomes irrelevant. At $\nu\kappa=vm$ the two square
 roots are equal and, by \eqref{eq:groupsplit}, $z^{\star}=x^{\star}$: each query type
 consumes exactly half of each group's budget. That crossover is the operational form of the
 law. Below it, ordinary sampling dominates the budget and calibration is cheap insurance;
@@ -626,7 +638,7 @@ reconsidered.
 \includegraphics[width=\columnwidth]{master_fig1_rate.png}
 \caption{The closed form \eqref{eq:pricelaw} against an independent bisection optimiser over
 the same feasible set. The curves coincide to floating-point precision at every cell; the
-decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted rate.}
+decay in $\kappa$ is the $1/(s_{m}+s_{\kappa})^{2}$ envelope, not a fitted rate.}
 \label{fig:rate}
 \end{figure}
 
@@ -637,7 +649,7 @@ decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted
 $m=4$, $\Delta=1$, with the two one-channel readings it is often replaced by: the cheap-%
 calibration limit $\Delta^{2}/(2Km)$ and the expensive-calibration limit
 $\Delta^{2}/(2K\kappa)$. The exact value lies strictly below both at every price, and
-furthest below at $\kappa=m$, where it is a factor of four under either. The regime in
+furthest below at $\nu\kappa=vm$, where it is a factor of four under either. The regime in
 which a one-channel rule of thumb is least safe is therefore the balanced one, not an
 extreme. Exact evaluation of the proved formula.}
 \label{fig:limits}
@@ -802,7 +814,9 @@ open.
 \subsection{Parameter Grid}
 
 The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
-$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$, giving $32$ cells. The $\kappa$ values
+$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$ and $v=\nu=1$, giving $32$ cells. The
+two noise levels are stated because \eqref{eq:pricelaw} is written in the noise-weighted
+prices, so a grid that leaves them implicit does not determine the tabulated values. The $\kappa$ values
 straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
 the law predicts to be qualitatively different.
 
@@ -840,9 +854,7 @@ noise-weighted ones, $s_{m}=\sqrt{vm}$ and $s_{\kappa}=\sqrt{\nu\kappa}$.
 \emph{Budget.} The budget is not swept in absolute units, which would make every instance
 a separate curve. It is set from the dimensionless product the law itself identifies,
 \begin{equation}
-\lambda \;=\; \Gamma^{*}B,
-\qquad
-\Gamma^{*}=\frac{\Delta^{2}}{4\,(s_{m}+s_{\kappa})^{2}},
+\lambda \;=\; \tfrac12 K\,\Gamma^{*}B \;=\; \frac{\Delta^{2}B}{4\,(s_{m}+s_{\kappa})^{2}},
 \label{eq:lambda}
 \end{equation}
 on the grid $\lambda\in\{0.05,0.1,0.2,0.4,0.7,1,1.5,2.25,3,4\}$, so that
@@ -991,7 +1003,7 @@ All $32$ cells are reported, with none excluded.
 \subsection{The Closed Form Against an Independent Optimiser}
 
 The closed form and the bisection optimiser agree in all $32$ cells. The largest relative
-gap anywhere in the sweep is $2.5\times10^{-16}$, which is floating-point agreement, and in
+gap anywhere in the sweep is $2.2\times10^{-16}$, which is floating-point agreement, and in
 no cell does the optimiser exceed the closed form.
 
 \begin{table}[htbp]
@@ -1004,7 +1016,7 @@ Quantity & Value \\
 \midrule
 Parameter cells                            & 32 \\
 Cells in which the two agree               & 32 \\
-Largest relative gap                       & $2.5\times10^{-16}$ \\
+Largest relative gap                       & $2.2\times10^{-16}$ \\
 Cells where the optimiser exceeds the form & 0 \\
 \bottomrule
 \end{tabular}
@@ -1201,7 +1213,7 @@ than on average. \NUM{}}
 Section~\ref{sec:opens} names the heterogeneous law as the first thing to settle, and observes
 that the per-group argument survives unchanged while the summation step does not. Writing
 $s_{g}^{2}=(\sqrt{v_{g}m_{g}}+\sqrt{\nu_{g}\kappa_{g}})^{2}$ for group $g$'s price of one unit
-of profiled information, the natural candidate replaces $K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the
+of profiled information, the natural candidate replaces $K(s_{m}+s_{\kappa})^{2}$ by the
 \emph{sum} $\sum_{g}s_{g}^{2}$ rather than by any average. Experiment~E4 puts that candidate
 in front of two tests it could fail separately, on instances whose groups differ by a median
 factor of $3.9$ and up to $24.5$ in price.
@@ -1286,7 +1298,7 @@ what happens when the additive-offset assumption fails.
 \label{sec:opens}
 
 The heterogeneous law is the obvious next step: replacing
-$K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the corresponding weighted quantity and determining
+$K(s_{m}+s_{\kappa})^{2}$ by the corresponding weighted quantity and determining
 whether it remains exactly attainable. Section~\ref{sec:e4results} narrows the target---the
 quantity is the \emph{sum} $\sum_{g}s_{g}^{2}$ and not an average, it was not beaten by an
 independent optimiser on any of $250$ instances, and it predicts a realised error as well as
@@ -1311,7 +1323,7 @@ query types, and its price is not computed here.
 An additional \emph{type} of measurement can be a precondition rather than an optimisation.
 This paper exhibits a configuration in exact rationals where that is so, and computes the
 exact price of the measurement once it is admitted. The price law
-$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$ is an identity: matched
+$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{vm}+\sqrt{\nu\kappa})^{2}\bigr)$ is an identity: matched
 on both sides and attained by an explicit design. For a practitioner the finding reduces to
 a check that costs nothing to perform. Ask whether the observation model sees the quantity
 of interest only in combination with something unknown; if it does, ask whether any pair of

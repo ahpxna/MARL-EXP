@@ -140,7 +140,7 @@ def master_unitprice():
                 label=f'$m={m}$')
         ax.plot(ks, [m + k for k in ks], color=col, ls=':', lw=0.8)
     ax.set_xlabel(r'calibration price  $\kappa$')
-    ax.set_ylabel(r'price of one unit,  $(\sqrt{m}+\sqrt{\kappa})^{2}$')
+    ax.set_ylabel(r'price of one unit,  $(s_{m}+s_{\kappa})^{2}$')
     ax.legend(frameon=False, loc='upper left', ncol=2)
     ax.text(0.97, 0.05, 'dotted: additive $m+\\kappa$', transform=ax.transAxes,
             ha='right', fontsize=6.2, color=GREY)

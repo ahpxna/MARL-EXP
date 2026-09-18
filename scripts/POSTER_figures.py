@@ -103,7 +103,7 @@ def master_rate():
                 'o' if m == 2 else 's', ms=20, mfc='white', mec=col, mew=4.0,
                 zorder=3, ls='none', label=f'numerical optimum, m = {m}')
         ax.axvline(m, color=GREEN, lw=1.8, ls=':', zorder=1)
-        ax.annotate(f'κ = m = {m}', xy=(m - 0.06, 0.0028),
+        ax.annotate(f'νκ = vm = {m}', xy=(m - 0.06, 0.0028),
                     color=GREEN, fontsize=22, fontweight='bold', ha='right')
     ax.set_xlabel('control price  κ    (an ordinary query costs 1)', fontsize=25, labelpad=10)
     ax.set_ylabel('Γ*      (Δ = 0.5,  K = 1)', fontsize=25, labelpad=10)
@@ -237,8 +237,8 @@ def query_regret():
         ax.plot([m], [y], 'o', ms=20, color=GREEN, zorder=5)
         ax.text(m, y + .30, f'{m:.5f}', ha='center', fontsize=24,
                 color=GREEN, fontweight='bold')
-        ax.text(lo, y - .34, f'γρ²ᴺ/4 = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
-        ax.text(hi, y - .34, f'L_max ρᴺ/2 = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
+        ax.text(lo, y - .34, rf'$\\gamma\\rho^{{2N}}/4$ = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
+        ax.text(hi, y - .34, rf'$L_{{\\max}}\\rho^{{N}}/2$ = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
     ax.set_yticks(ys)
     ax.set_yticklabels([f"{r['measurement']}\nN = {r['N']:,},  h = {r['h']}" for r in rows],
                        fontsize=23)

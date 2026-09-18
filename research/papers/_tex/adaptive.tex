@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\title{House Monotonicity and Quota Cannot Both Hold:\\
-Closing the Probabilistic Inputs of an\\
-Adaptive Stopping Analysis}
+\title{Largest-Deficit Tracking Does Not Achieve\\
+Unit Quota Error: A Witness, a Census, and the\\
+Probabilistic Inputs of an Adaptive Stopping Analysis}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -21,10 +21,11 @@ in three different ways. The per-arm concentration inequality appeared as a hypo
 enclosing lemma, so a reader could see it but nothing established that anything satisfies it.
 The step from a tail bound to a bound on the \emph{expected} stopping time was cited in a
 comment as standard, which is weaker, since a comment does not appear in the statement. And
-the tracking bound was taken for granted in prose describing what the sampling rule does,
-which is the worst position of the three: an assumption nobody wrote down is one nobody
-checked. This paper closes all three, and the third has a negative answer that is itself the
-result. We prove the layer-cake identity for an $\mathbb{N}$-valued stopping time, so a
+the tracking bound was carried in prose at a strength the literature does not supply:
+Garivier and Kaufmann prove that the largest-deficit rule keeps every arm within $K-1$ of its
+entitlement, while an analysis that wants a per-arm error of one unit needs a constant that
+does not grow with the number of arms. This paper closes all three, and the third has a
+negative answer that is itself the result. We prove the layer-cake identity for an $\mathbb{N}$-valued stopping time, so a
 geometric tail bounds the expected stopping time rather than merely the tail sum. We discharge
 the concentration input from a sub-Gaussian hypothesis at an explicit threshold. We prove by
 construction that for every target and every horizon there \emph{exists} an integer allocation
@@ -35,9 +36,13 @@ horizon eleven. An exhaustive search over $1{,}228{,}079$ rational targets finds
 $375{,}239$ that violate the bound, the worst reaching $\tfrac74$ and the earliest at $t=3$.
 Seven online rules are then compared, four of them classical apportionment divisor methods,
 and the comparison corrects a claim this paper previously made: Jefferson's rule violates the
-deficit bound on none of the targets, so the failure is not common to every rule. What no
-rule escapes is both bounds at once---the deficit and the surplus---so the failure can be
-moved between the two directions but not removed.
+deficit bound on none of the targets, so the failure is not common to every rule. None of
+the seven escapes both bounds at once---the deficit and the surplus---so within this family
+the failure can be moved between the two directions but not removed. The census also locates
+the constant: the worst deficit rises monotonically with the number of arms and is still
+rising where the search stops, so the true constant for this rule lies somewhere between the
+$\tfrac74$ exhibited here and the $K-1$ already proved, and the data do not yet say whether
+it is bounded.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -98,17 +103,32 @@ in that framework is the direct source of the question
 Sections~\ref{sec:exists}--\ref{sec:fails} answer, and the concentration inputs are the ones
 Section~\ref{sec:subgauss} discharges.
 
-Nothing here improves their bounds. What is contributed is that two of the analysis's inputs
-become theorems in this development, and that the tracking assumption is shown to be
-unavailable in the form an analysis would most like to use.
+Their Appendix~B is the precise point of contact, and it is closer than a framework
+reference. Lemma~15 there analyses exactly the rule studied below---serve the arm maximising
+$P_{i}(k{+}1)-N_{i}(k)$---and proves $\max_{i}|N_{i}(n)-P_{i}(n)|\le K-1$. So a deficit bound
+for largest-deficit tracking exists in the literature, and its constant grows with the number
+of arms.
+
+Nothing here improves that bound, and nothing here contradicts it: every violation the census
+below reports is comfortably inside $K-1$. What is contributed is that two of the analysis's
+inputs become theorems in this development, and that the tracking bound is shown to be
+unavailable at the constant an analysis would most like to use---one, independent of $K$---so
+the true constant for this rule lies in $[\tfrac74,K-1]$ and the lower end is established by
+exhibition rather than assumed.
 
 \subsection{Apportionment}
 
-Balinski and Young prove the impossibility at the heart of the negative result: no
-apportionment method satisfies both house monotonicity and quota, so divisor methods are
-house-monotone and violate quota while quota methods violate house monotonicity
-\cite{balinski1982}. That result is stated in the language of seats and states, for
-apportionment methods in general.
+The apportionment literature settles what is and is not compatible here, and it is worth
+stating precisely because the compatible direction is the one that matters for this paper.
+House monotonicity and quota are \emph{not} in conflict: Balinski and Young construct a
+method satisfying both \cite{balinski1975}, and later characterise the whole family of
+house-monotone methods that stay within quota \cite{balinski1979}. The impossibility in that
+literature is a different pairing---no method is both population-monotone and within
+quota---and divisor methods sit on the other side of it, being population-monotone and
+violating quota \cite{balinski1982}. Nothing below contradicts any of this. The bound at
+issue here is not quota in the apportionment sense but the stronger per-arm requirement
+$|N_{i}(t)-t w_{i}|\le 1$, and the negative result concerns one online rule, not a class of
+methods.
 
 Theorem~\ref{thm:quotafails} is not a restatement of it, and the difference is what makes it
 usable. The general impossibility says \emph{some} violation exists for any house-monotone
@@ -648,8 +668,8 @@ Transfer, Thm~\ref{thm:freq}          & \lean{LeanAdaptiveTrackingV1}          &
 \subsection{Scope of the Formalisation}
 
 The Adaptive strand contains $13$ Lean source files with $50$ theorem and lemma statements,
-of which $6$ modules carry an acceptance receipt covering $27$ audited declarations. Across the
-programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $6$ modules carry an acceptance receipt covering $26$ audited declarations. Across the
+programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 Three formulations were withdrawn under the prover, and the third is this paper's main result.
@@ -815,7 +835,7 @@ not unreachable in principle, so a rule failing to meet it fails for reasons of 
 rather than of arithmetic.
 
 Three replacements are available to an implementer, in increasing order of cost. Keep
-largest-deficit-first with a larger constant, which must exceed $\tfrac32$ on the searched
+largest-deficit-first with a larger constant, which must be at least $\tfrac74$ on the searched
 family and is not bounded by anything proved here. Use a divisor method, which is
 house-monotone with a characterised violation \cite{balinski1982}, at the cost of no longer
 serving the largest deficit. Or recompute the allocation from scratch at each horizon using
@@ -833,8 +853,8 @@ and the constant for a divisor method is not computed here.
 arithmetic of the violation is proved and the identification of $N$ as the greedy trajectory
 rests on an exact recomputation reported here.
 
-\emph{The search covers a finite family.} Rational targets on three to five arms with
-denominators to $30$, run to horizon $40$. Nothing here bounds the worst deficit over all
+\emph{The search covers a finite family.} Rational targets on three to eight arms with
+denominators to $64$, run to horizon $240$. Nothing here bounds the worst deficit over all
 targets, arm counts and horizons, and such a bound---an impossibility with a matching
 constant---is the natural companion this paper does not supply.
 
@@ -877,7 +897,7 @@ The two probabilistic inputs of the stopping analysis are now theorems: the laye
 is proved, so a geometric tail bounds the expected stopping time, and the per-arm concentration
 inequality is discharged from a sub-Gaussian hypothesis. The tracking question is settled and
 the answer is negative: an allocation with deficit at most one exists at every horizon, but the
-natural online monotone rule cannot achieve it, and the failure occurs on nearly a quarter of
+natural online monotone rule cannot achieve it, and the failure occurs on $30.6\%$ of
 the targets searched, as early as the third sample, and most severely on exactly the skewed
 targets that best-arm identification produces. The broader lesson concerns which parts of an
 analysis deserve scrutiny. Of the three inputs closed here, two were true and merely uncited,
@@ -896,6 +916,12 @@ fixed confidence,'' in \emph{Proc. 29th Annu. Conf. Learning Theory (COLT)}, 201
 \bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
 best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.},
 vol.~17, pp.~1--42, 2016.
+
+\bibitem{balinski1975} M. L. Balinski and H. P. Young, ``The quota method of
+apportionment,'' \emph{Amer. Math. Monthly}, vol.~82, no.~7, pp.~701--730, 1975.
+
+\bibitem{balinski1979} M. L. Balinski and H. P. Young, ``Quotatone apportionment methods,''
+\emph{Math. Oper. Res.}, vol.~4, no.~1, pp.~31--38, 1979.
 
 \bibitem{balinski1982} M. L. Balinski and H. P. Young, \emph{Fair Representation: Meeting the
 Ideal of One Man, One Vote}. New Haven, CT: Yale Univ. Press, 1982.

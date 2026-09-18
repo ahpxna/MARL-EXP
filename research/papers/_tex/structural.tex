@@ -99,6 +99,18 @@ it in the same direction. The results below are therefore not improvements of
 \cite{bernstein2017,disser2023} inside their model; they are statements about a family that
 model excludes.
 
+The same exclusion applies to the most recent work in that line. Disser, Klimm, Lutz and
+Strubberg allow an incremental solution to be transformed element by element in both
+directions, scoring an intermediate state by the utilities of its transformed and
+untransformed parts, and obtain competitive guarantees under bounded curvature, a
+submodularity ratio, submodularity, or gross substitutes \cite{disser2025}. Relaxing
+monotonicity in that sense is not the same as admitting a signed objective: their utilities
+remain non-negative set functions, so Lemma~\ref{lem:nobigstep} is still unavailable there.
+A second obstruction is that the quantity those papers bound is a ratio, and the ratio is
+ill-defined here: the offline optimum of \eqref{eq:regret} is the parity floor
+$k\bmod 2$, which is zero at every even budget. The menu law below is therefore stated as an
+absolute defect, and it neither follows from nor contradicts a competitive bound.
+
 \subsection{K-Adaptability and the Number of Policies}
 
 Closer to the present question is the K-adaptability literature, which asks how many
@@ -719,8 +731,11 @@ witness.
 For the seven-relation scalar witness $F_{7}$, dividing the component functions by $57$ so
 that $\sum_{j}\mathrm{osc}(f_{j})/2=1$ gives
 \begin{equation}
-\widetilde{L}(S)\;=\;\frac{\mathrm{selectedRadius}(F_{7},S)}{57}
-\;=\;\frac{\bigl|\,\mathrm{complementAbs}_{7}(S)\,\bigr|}{114}.
+\begin{aligned}
+\widetilde{L}(S)
+&\;=\;\frac{\mathrm{selectedRadius}(F_{7},S)}{57}\\
+&\;=\;\frac{\bigl|\mathrm{complementAbs}_{7}(S)\bigr|}{114}.
+\end{aligned}
 \label{eq:normform}
 \end{equation}
 \end{proposition}
@@ -1035,9 +1050,9 @@ Marginal, Thms~\ref{thm:colsum}--\ref{thm:cyclic} & \lean{LeanStructuralRetained
 \subsection{Scope of the Formalisation}
 
 The Structural strand contains $77$ Lean source files with $959$ theorem and lemma
-statements, of which $13$ modules carry an acceptance receipt covering $171$ audited
+statements, of which $13$ modules carry an acceptance receipt covering $155$ audited
 declarations. Across the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules,
-$875$ audited declarations.
+$857$ audited declarations.
 
 One join is supplied by the paper rather than by a Lean name, and it is flagged here.
 \lean{no\_big\_step} and \lean{two\_le\_totalDefect} are stated for an arbitrary
@@ -1263,11 +1278,16 @@ The formal development uses the Lean~4 theorem prover and the mathlib library.
 \begin{thebibliography}{00}
 
 \bibitem{bernstein2017} A. Bernstein, Y. Disser, M. Gro\ss{}, and S. Himburg, ``General
-bounds for incremental maximization,'' in \emph{Proc. 44th Int. Colloq. Automata, Languages,
-and Programming (ICALP)}, 2017.
+bounds for incremental maximization,'' \emph{Math. Program.}, vol.~191, pp.~953--979, 2022.
+Conference version: A. Bernstein, Y. Disser and M. Gro\ss{}, in \emph{Proc. 44th Int. Colloq.
+Automata, Languages, and Programming (ICALP)}, 2017.
 
 \bibitem{disser2023} Y. Disser, M. Klimm, K. Schewior, and D. Weckbecker, ``Incremental
-maximization,'' arXiv:2305.01310, 2023.
+maximization via continuization,'' in \emph{Proc. 50th Int. Colloq. Automata, Languages, and
+Programming (ICALP)}, 2023; arXiv:2305.01310.
+
+\bibitem{disser2025} Y. Disser, M. Klimm, A. Lutz, and L. Strubberg,
+``Incremental-decremental maximization,'' arXiv:2508.14516, 2025.
 
 \bibitem{kurtz2026} J. Kurtz, ``Bounding the optimal number of policies for robust
 K-adaptability,'' \emph{Math. Program.}, 2026.

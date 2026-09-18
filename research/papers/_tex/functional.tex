@@ -3,8 +3,8 @@
 \begin{document}
 
 \title{When the Extrema Move, the Scalar Proxy Fails\\
-in Both Directions: Solving the Group-Range\\
-Alternative Exactly}
+in Both Directions: Exact Components for the\\
+Group-Range Alternative}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -31,10 +31,11 @@ has a closed form with a four-term harmonic denominator; and the optimality cert
 proved from primal feasibility, dual non-negativity, stationarity and complementary slackness
 using only symmetry and positive \emph{semi}definiteness, so a singular information matrix
 costs no extra hypothesis and no pseudoinverse. Each displayed theorem is machine-checked in
-Lean~4 with no \texttt{sorry}. On a confirmatory panel of $1000$ paired instances drawn from
-a run of $80{,}000$ policy executions and $5{,}042{,}978{,}194$ samples,
-$\mathrm{C\_lucb}$ certifies $797$ worlds at median $20{,}996$ queries against $605$ at
-$74{,}252$ for uniform.
+Lean~4 with no \texttt{sorry}. Over $6{,}000$ random instances the scalar proxy is wrong by
+more than a factor of two on $12.3\%$---$9.0\%$ of them optimistically---and the cause is
+exactly the one the two families isolate: on all $1{,}367$ instances where the proxy
+overstates, the cheapest capacity-inverting alternative moves an extremum, and no instance
+with its extrema fixed ever produced a ratio below one.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -1102,7 +1103,7 @@ Break-even, Thm~\ref{thm:breakeven}     & \lean{...DesignDualityV1}          & 1
 The Functional strand contains $49$ Lean source files with $430$ theorem and lemma
 statements, of which $21$ modules carry an acceptance receipt covering $162$ audited
 declarations. Across the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules,
-$875$ audited declarations.
+$857$ audited declarations.
 
 Three formulations were withdrawn under the prover. The first version of the union identity
 froze the extrema at the truth, so the forward direction of Theorem~\ref{thm:union} fails---
@@ -1212,9 +1213,11 @@ Across six thousand instances the scalar proxy is usually close and occasionally
 median ratio $J_{\mathrm{full}}/J_{\mathrm{scalar}}$ is $1.000$, so an analyst who uses
 \eqref{eq:scalar} on a typical instance is not systematically misled. The tails are another
 matter: the fifth percentile is $0.318$ and the ninety-fifth is $1.658$, the extremes reach
-$0.018$ and $41.7$, and the proxy is wrong by more than a factor of two on $3.3\%$ of
-instances and by more than a factor of two in the optimistic direction---reporting a value
-the true problem cannot deliver---on $9.0\%$. \NUM{}
+$0.018$ and $41.7$, and the proxy is wrong by more than a factor of two on $12.3\%$ of
+instances. That figure splits by direction, and the split is the informative part: on
+$9.0\%$ the proxy errs optimistically---reporting a value the true problem cannot
+deliver---and on the remaining $3.3\%$ it errs conservatively. The two tails are disjoint by
+construction, and the optimistic one is nearly three times the size of the other. \NUM{}
 
 The interesting result is not the spread but its cause, and it is the one the families
 predict. Figure~\ref{fig:proxy} splits the instances by whether the cheapest

@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\title{Deciding Without Identifying:\\
-An Equivariant Decoder That Is Minimax\\
-Over All Decision Rules}
+\title{Exact Minimax Decision Risk Under\\
+One-Sided Revelation: A Separation Between\\
+Deciding and Recovering}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -84,7 +84,8 @@ throughout. And the observation process is given: nothing here designs the sampl
 
 \subsection{Decision Region Determination}
 
-The closest prior work asks precisely the question this paper's title names. Javdani, Chen,
+The closest prior work asks the question this paper's results are about, and asks it first.
+Javdani, Chen,
 Karbasi, Krause, Bagnell and Srinivasa formulate near-optimal Bayesian active learning for
 decision making, where the goal is to choose well rather than to learn the hypothesis, and
 their Hyperedge Cutting algorithm handles overlapping decision regions with an approximation
@@ -783,10 +784,14 @@ compares.
 
 \subsection{Setup}
 
-The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128,192,256,384,512,768,1024\}$,
-$P\in\{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\}$
-and $\varepsilon$ from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the model
-$a_{i}=b_{i}=1$, $p_{i}=P/K$.
+The grid is
+\begin{align*}
+K &\in \{1,2,3,4,6,8,12,16,24,32,48,\\
+  &\qquad 64,96,128,192,256,384,512,768,1024\},\\
+P &\in \{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\},
+\end{align*}
+and $\varepsilon$ runs from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the
+model $a_{i}=b_{i}=1$, $p_{i}=P/K$.
 
 The recovery sum alternates in sign with binomial weights, so it loses roughly $K$ bits to
 cancellation and cannot be evaluated in double precision anywhere near the top of this grid:
@@ -900,8 +905,8 @@ Separation, Thm~\ref{thm:separation}  & \lean{LeanSupportDecideRecoverV1}      &
 \subsection{Scope of the Formalisation}
 
 The Support strand contains $50$ Lean source files with $870$ theorem and lemma statements,
-of which $22$ modules carry an acceptance receipt covering $189$ audited declarations. Across
-the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $21$ modules carry an acceptance receipt covering $183$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 Two formulations were withdrawn under the prover. The original minimax statement took constant

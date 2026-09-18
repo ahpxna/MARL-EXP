@@ -23,7 +23,7 @@ non-negative solution in $24$ of $24$ cells is evidence rather than a derivation
 supplies an argument for each. We define the general alternative as an arbitrary shift
 vector, show the $(d,x)$ formula is exactly the general information evaluated on the slice,
 and prove that every alternative in the class costs at least the slice value, with equality
-precisely on the slice---so the reduction loses nothing and gains nothing. The same
+attained on the slice---so the reduction loses nothing and gains nothing. The same
 computation shows the general information vanishes only at the zero shift, so the scalar
 query is blind in no direction. We then prove that the budget constraint together with the
 split \emph{forces} the two weights, which depend on the split and the price alone and not on
@@ -273,7 +273,8 @@ expression written two ways.
 
 \begin{theorem}[Every alternative costs at least the slice value]
 \label{thm:reduction}
-If $|v_{i}|\ge\mu$ for $i\in S$, $|v_{i}|\ge x$ for $i\notin S$, and $|S|=d$, then
+If $\mu\ge0$, $x\ge0$, $|v_{i}|\ge\mu$ for $i\in S$, $|v_{i}|\ge x$ for $i\notin S$, and
+$|S|=d$, then
 \begin{equation}
 I_{B}(d,x)\;\leq\;I(v).
 \label{eq:reduction}
@@ -289,21 +290,41 @@ $S$ and its complement and dividing by the positive normaliser $2q$ gives
 
 \leanbox{\lean{IB\_le\_general} in \lean{LeanD6GeneralFamilyV1}}
 
+The two sign hypotheses are what make the statement true rather than tidy. With $\mu<0$ the
+constraint $|v_{i}|\ge\mu$ holds for every $v$, so $v=0$ would be admissible and give
+$I(v)=0<I_{B}(d,x)$. They appear in \lean{IB\_le\_general} for that reason.
+
 The proof is coordinate-wise and the sum is finite, so no optimiser and no rearrangement
 argument is needed. This is worth noting because a reduction of this kind is often attempted
 by an exchange argument, which requires care about which coordinate is moved and in what
 order; here the monotonicity of the square does all the work, and it does so because
 assumption 1 cuts the class out by \emph{lower} bounds while the objective \emph{increases}
-in each magnitude. A minimiser therefore sits where every constraint is active, and that set
-is exactly the slice.
+in each magnitude. A minimiser therefore sits where every constraint is active. That set is the magnitude
+boundary
+\begin{equation}
+\mathcal{B}=\{v:\ |v_{i}|=\mu\ (i\in S),\ |v_{i}|=x\ (i\notin S)\},
+\label{eq:boundary}
+\end{equation}
+and the slice is one of its $2^{q}$ sign orthants: $I$ depends on $v$ only through
+$|v_{i}|$, so every sign pattern on $\mathcal{B}$ attains the same value.
 
-\begin{corollary}[The slice is exactly tight]
+\begin{corollary}[The slice attains the bound]
 \label{cor:tight}
-Equality holds in \eqref{eq:reduction} precisely when $|v_{i}|=\mu$ on $S$ and $|v_{i}|=x$
-off it, that is, precisely on the slice.
+Every $v\in\mathcal{B}$ attains equality in \eqref{eq:reduction}, and the slice is a subset
+of $\mathcal{B}$. The bound is therefore attained within the class, which is what
+Corollary~\ref{cor:upgrade} consumes.
 \end{corollary}
 
 \leanbox{\lean{slice\_is\_tight} in \lean{LeanD6GeneralFamilyV1}}
+
+The machine-checked statement is the sufficient direction on the signed slice: given
+$v_{i}=\mu$ on $S$ and $v_{i}=x$ off it, $I(v)=I_{B}(d,x)$. The extension to all of
+$\mathcal{B}$ is immediate because $I$ sees only $|v_{i}|$, but it is arithmetic done here
+and not in Lean. The converse---that equality forces $v\in\mathcal{B}$---is true by the same
+coordinate-wise argument and is likewise not formalised, and no result below uses it: what
+the quantifier upgrade needs is attainment, not uniqueness. An earlier version of this
+corollary claimed equality holds \emph{precisely} on the slice, which is false as stated,
+since flipping the sign of one coordinate leaves $I$ unchanged and leaves the slice.
 
 \begin{corollary}[Quantifier upgrade]
 \label{cor:upgrade}
@@ -936,8 +957,8 @@ Separation, Thm~\ref{thm:modulus}               & \lean{LeanD6AlternativeReducti
 \subsection{Scope of the Formalisation}
 
 The D6 strand contains $444$ Lean source files with $4{,}087$ theorem and lemma statements,
-of which $30$ modules carry an acceptance receipt covering $181$ audited declarations. Across
-the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $30$ modules carry an acceptance receipt covering $187$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 The ratio of strand size to displayed equations invites the question of what the rest is doing,
@@ -1172,7 +1193,7 @@ without settling it.
 \section{Conclusion}
 
 The two-parameter alternative family is not a restriction: every alternative in its class
-costs at least the slice value, and the bound is attained exactly on the slice. The design
+costs at least the slice value, and the bound is attained on the slice. The design
 that reproduces the corpus's coefficients is not fitted: it is forced by the budget constraint
 and the split, depends only on the split and the price, and makes the delivered information
 affine, so the optimal design is pure except on an explicitly computable threshold. And the
