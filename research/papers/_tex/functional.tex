@@ -135,6 +135,16 @@ at the truth---is the same error the families of Section~\ref{sec:families} expl
 in the development rather than in the analysis.
 
 \subsection{The Gap}
+\TODOPAR{Prior work that needs checking and is not yet cited. The shape of this
+paper---a non-mean statistic, an alternative set that is a finite union of convex regions,
+an exact decomposition, an outer search---is an established paradigm in pure exploration, not
+a new one. \emph{Check at least} Agrawal, Koolen and Juneja on CVaR/VaR best-arm
+identification (arXiv:2008.07606), which solves a non-convex problem over measures optimally;
+Ahmadipour and Garivier on EVaR (arXiv:2510.04728); and Ariu et al.\ on policy testing in
+MDPs (arXiv:2505.15342), which decomposes into product-box subproblems and combines them
+through an outer budget search---the same manoeuvre as Theorem~\ref{thm:union} plus the
+outer minimum. Positioning should be ``the range statistic, with a closed form, and here is
+why it is harder than CVaR'', not ``we formulate an oracle''.}
 
 The literature therefore leaves a specific opening. Fixed-confidence design gives an exact
 inner problem for mean comparisons but not for range comparisons; convex duality gives an
@@ -1220,6 +1230,11 @@ instances. That figure splits by direction, and the split is the informative par
 $9.0\%$ the proxy errs optimistically---reporting a value the true problem cannot
 deliver---and on the remaining $3.3\%$ it errs conservatively. The two tails are disjoint by
 construction, and the optimistic one is nearly three times the size of the other. \NUM{}
+\NOTEPAR{An earlier draft reported this as ``wrong by more than a factor of two on
+$3.3\%$ \dots and in the optimistic direction on $9.0\%$'', which makes a subset larger than
+its superset. The raw rows give $198$ instances above $2\times$ and $542$ below $\tfrac12
+\times$, disjoint, $740$ of $6{,}000$ together. The fields are \texttt{frac\_over\_2x} and
+\texttt{frac\_under\_half} in \texttt{functional\_proxy.json}.}
 
 The interesting result is not the spread but its cause, and it is the one the families
 predict. Figure~\ref{fig:proxy} splits the instances by whether the cheapest
@@ -1323,6 +1338,14 @@ easier to prove: a one-sided result would leave open that the proxy is conservat
 safe if wasteful.
 
 \subsection{Shortcomings and Limitations}
+\TODOPAR{The title was narrowed from ``Solving the Group-Range Alternative Exactly'' to
+``Exact Components for\dots'' because Section~IV-A says $J_{\mathrm{full}}$ is not formalised
+as an infimum and the separability step that assembles the components into an equality is not
+proved. \emph{Two ways forward:} prove the separability theorem, which earns the original
+title; or keep the current proof and sell the paper as an exact negative result plus exact
+components. The second is the shorter path. The abstract's one empirical sentence used to
+compare \texttt{C\_lucb} with uniform---neither of them this paper's allocator, as
+Section~VII-D says---and now reports the E2 measurement instead.}
 
 \emph{The decomposition step is not formalised, so the oracle equality is not claimed.} The
 chain of Sections~\ref{sec:union}--\ref{sec:kkt} would become an equality

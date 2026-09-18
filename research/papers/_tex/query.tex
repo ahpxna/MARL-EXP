@@ -76,6 +76,12 @@ sides. The \emph{leakage order} is
 r \;=\; \min\{\, j : \Delta_{j}\not\equiv 0 \,\}.
 \label{eq:order}
 \end{equation}
+\NOTEPAR{$\Delta_{j}$ is the $j$-th derivative, matching \lean{iteratedDeriv\_mixture},
+not the Taylor coefficient. The distinction is invisible in the order statements and not
+invisible in the constants: the leading difference is $h^{r}\Delta_{r}/r!$, so
+Theorem~\ref{thm:sandwich} and Theorem~\ref{thm:limit} carry $1/(r!)^{2}$. An earlier draft
+omitted it while claiming to write every constant down. It cancels in the ratio of the two
+sides, so the width of the window is unaffected.}
 
 Definition \eqref{eq:order} requires two facts of very unequal difficulty. That the
 coefficients below order $r$ cancel is a computation. That $\Delta_{r}$ does \emph{not}
@@ -169,6 +175,15 @@ numerical check cannot detect, and one was a hypothesis that had been assumed ra
 derived.
 
 \subsection{The Gap}
+\TODOPAR{Positioning, and the most likely source of a reject. Theorem~\ref{thm:nonvanish}
+---that $\sum_{v}c_{v}H_{r}(y-v)\varepsilon_{\sigma}(y-v)\not\equiv0$ when $c\neq0$---is close
+to the linear independence of distinct shifted Gaussians, i.e.\ identifiability of finite
+Gaussian location mixtures. \emph{Check Teicher (1963) and state the relationship explicitly}
+before calling this the technical core. The defensible novelty is the other three: order as a
+property of the admissible \emph{query} rather than of the parameter space; a two-sided
+sandwich whose sides share the exponent with the constants written out; and the
+formalisation. Related work now cites Ho--Nguyen, Wei--Nguyen and Dwivedi et al., which are
+nearer than Chen 1995 and were absent from an earlier draft.}
 
 The literature therefore leaves a specific opening. Divergence-to-samples transfer is
 available but is stated asymptotically; mixture-rate theory determines orders but fixes the
@@ -410,6 +425,16 @@ Theorem~\ref{thm:hermite}---a contradiction.
 \lean{mixture\_coeff\_ne\_zero} in \lean{LeanQueryMixtureDerivativeV1}}
 
 \noindent\emph{Supporting results in \lean{LeanQueryGaussianLevelV1}.}~These build the Gaussian derivatives and prove the one fact the crux argument consumes. The first group establishes the product form \eqref{eq:hermite} and the positivity and shift properties the factorisation in \eqref{eq:nonvanish} needs. The degree bound and the leading coefficient are separate statements because the contradiction in Theorem~\ref{thm:nonvanish} uses the coefficient specifically: a polynomial tending to zero at $+\infty$ must have it vanish, and here it cannot. They are reproduced as the prover has them; a further $2$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+\TODOPAR{Formalisation gap worth closing, and it is small. \lean{levelSum\_ne\_zero}
+takes $S:\mathsf{Finset}\ \mathbb{R}$ with $v^{*}$ strictly greatest and $c_{v^{*}}\neq0$.
+Since a finite set of reals always has a unique maximum, the strictness hypothesis restricts
+nothing; the only real hypothesis is $c_{v^{*}}\neq0$. The uncovered case is therefore a
+vanishing top coefficient, and it is closed by restricting the sum to
+$S.\mathrm{filter}\,(c\neq0)$ and applying the same theorem at the largest surviving level---a
+few lines with \lean{Finset.max'} and \lean{Finset.filter\_nonempty\_iff}. Doing it would
+strengthen Theorem~\ref{thm:nonvanish} to ``$\Delta_{r}\not\equiv0$ iff the level-coefficient
+vector is not identically zero'', remove the \textsc{undetermined} branch from
+Algorithm~\ref{alg:order}, and delete an open problem that does not exist.}
 
 \noindent\textbf{S\,1}\quad\lean{gauss\_shift}
 {\footnotesize\[ \begin{aligned}[t]
@@ -1287,6 +1312,12 @@ constant in front of the rate is real, so the comparison is between two genuine 
 terms.
 
 \subsection{Shortcomings and Limitations}
+\NOTEPAR{An earlier draft listed ``ties at the top'' as the most likely place for the
+result to fail. That configuration does not exist: levels are distinct reals, and two that
+coincide are one level carrying the sum of their coefficients. E4 (Fig.~\ref{fig:tiedtop}) was
+therefore measuring the approach to a \emph{vanishing} top coefficient---the exchanged levels
+carry equal and opposite coefficients, so closing their separation drives the merged
+coefficient to zero---which is a different and more useful thing to have measured.}
 \label{sec:limits}
 
 \emph{A vanishing top coefficient is not formalised.} Theorem~\ref{thm:nonvanish} asks that

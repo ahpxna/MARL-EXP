@@ -1,0 +1,1438 @@
+\input{preamble}
+
+\begin{document}
+
+\title{When the Extrema Move, the Scalar Proxy Fails\\
+in Both Directions: Exact Components for the\\
+Group-Range Alternative}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A design buys observations to certify the Top-$k$ of a set of relations ranked by
+\emph{capacity}---the range $\max_{a}\theta_{ra}-\min_{a}\theta_{ra}$. Certifying means
+excluding every alternative that would change the answer, so the design's value is the energy
+of the cheapest such alternative. Allocators are routinely built on a scalar pair-flip proxy
+computed at the \emph{current} extrema with ordering constraints dropped, because it is
+cheap. This paper shows what that costs when the extrema can move, and the answer is that it
+costs everything: we construct two explicit two-relation, three-action families in exact
+arithmetic, one driving the ratio of the true value to the proxy to $0$ and the other driving
+it to $+\infty$, so the proxy is a bound in neither direction and no constant correction
+repairs it. We then solve the true problem. The relevant alternative set is a finite union of
+convex pair regions on the real range target, with the extrema chosen from the alternative
+and never frozen at truth; a number lower-bounds the energy over the whole set if and only if
+it does so on every region, so certifying is a finite conjunction of convex problems; the
+range constraints admit exact shrink and expand equivalences; the inner quadratic programme
+has a closed form with a four-term harmonic denominator; and the optimality certificate is
+proved from primal feasibility, dual non-negativity, stationarity and complementary slackness
+using only symmetry and positive \emph{semi}definiteness, so a singular information matrix
+costs no extra hypothesis and no pseudoinverse. Each displayed theorem is machine-checked in
+Lean~4 with no \texttt{sorry}. Over $6{,}000$ random instances the scalar proxy is wrong by
+more than a factor of two on $12.3\%$---$9.0\%$ of them optimistically---and the cause is
+exactly the one the two families isolate: on all $1{,}367$ instances where the proxy
+overstates, the cheapest capacity-inverting alternative moves an extremum, and no instance
+with its extrema fixed ever produced a ratio below one.
+\end{abstract}
+
+\begin{IEEEkeywords}
+best-arm identification, experimental design, convex optimisation, KKT conditions,
+counterexamples, formal verification, interactive theorem proving
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+A design buys observations in order to \emph{certify} an answer, not merely to estimate a
+parameter. The answer here is the Top-$k$ of a set of relations ranked by their capacity,
+\begin{equation}
+C_{r}(\theta)\;=\;\max_{a}\theta_{ra}\;-\;\min_{a}\theta_{ra},
+\label{eq:capacity}
+\end{equation}
+and certifying means excluding every alternative parameter that would change the answer. The
+design's value is therefore the energy of the cheapest such alternative---an infimum over a
+set, not a variance at a point.
+
+Three related numbers appear in this problem and are easily conflated.
+$J_{\mathrm{scalar}}$ is the pair-flip value computed at the \emph{current} extrema with the
+ordering constraints dropped. $J_{\mathrm{old}}$ is the quadratic programme inside the
+current-extrema region. $J_{\mathrm{full}}$ is the infimum over the whole alternative set,
+with the extrema free in either relation. By inclusion of feasible sets,
+\begin{equation}
+J_{\mathrm{scalar}}\;\leq\;J_{\mathrm{old}},
+\qquad
+J_{\mathrm{full}}\;\leq\;J_{\mathrm{old}},
+\label{eq:order}
+\end{equation}
+and---this is the paper's first point---there is \emph{no} general order between
+$J_{\mathrm{scalar}}$ and $J_{\mathrm{full}}$.
+
+Allocators are routinely built on $J_{\mathrm{scalar}}$ because it is a one-dimensional
+computation at four fixed cells. This paper asks what that costs when the extrema can move,
+and answers with two explicit families in exact rational arithmetic rather than with a
+sampled counterexample. On the first the true value collapses while the proxy does not move;
+on the second the proxy collapses while the true value cannot. No constant correction can
+therefore repair the proxy in either direction.
+
+The paper makes six contributions. First, it shows the scalar proxy is wrong in both
+directions by no constant, with explicit feasible alternatives and elementary lower bounds
+rather than an optimiser. Second, it proves the true alternative set is a finite union of
+convex pair regions on the real range target, with the extrema chosen from the alternative.
+Third, it shows the energy oracle reduces to a finite conjunction of convex problems. Fourth,
+it gives shrink and expand as \emph{equivalences}, so nothing is relaxed. Fifth, it proves an
+optimality certificate that needs no matrix inverse. Sixth, it derives the setup-cost
+crossing and proves that when the two rates are only bracketed the honest output is
+\textsc{undecided}.
+
+The scope is bounded, and unusually so. The decomposition step that would assemble these
+components into a single oracle \emph{equality} is a model statement and is not formalised
+here, so the equality is not claimed. Section~\ref{sec:discussion} states exactly what is
+missing and why the negative results do not depend on it.
+
+\section{Background}
+
+\subsection{Best-Arm Identification with Unknown Variances}
+
+The fixed-confidence framework in which this design problem sits was developed by Garivier
+and Kaufmann, whose Track-and-Stop couples a generalised likelihood-ratio stopping rule with
+a sampling rule tracking the optimal-allocation weights, and who prove asymptotic optimality
+against a matching lower bound \cite{garivier2016}. Kaufmann, Capp\'e and Garivier give the
+complexity of best-arm identification in the general bandit model \cite{kaufmann2016}, and
+Jourdan, Degenne and Kaufmann extend the framework to unknown variances \cite{jourdan2023}.
+The alternative set in that literature is $\{\lambda:\text{some arm }j\text{ beats arm }i\}$
+with the comparison on the arm \emph{means}, and the resulting inner problem is a
+one-dimensional convex programme with the familiar two-term harmonic denominator.
+
+However, the object being compared here is different in a way that changes the geometry.
+Capacity \eqref{eq:capacity} is a range, so the comparison $C_{j}(\lambda)\ge C_{i}(\lambda)$
+involves a maximum and a minimum over actions in \emph{each} relation, and the cells
+attaining them depend on $\lambda$. The alternative set is consequently not a half-space but
+a union of polyhedra, and the literature's inner problem is recovered only on one piece of
+that union with the extrema frozen. Section~\ref{sec:families} quantifies the error made by
+freezing them.
+
+\subsection{Convex Optimisation and Optimality Certificates}
+
+The certificate of Section~\ref{sec:kkt} is a sufficiency argument for a convex quadratic
+programme, and the KKT machinery is standard \cite{boyd2004}, as is the underlying convex
+analysis \cite{rockafellar1970}.
+
+What is not standard is carrying it through without assuming the information matrix
+invertible. The textbook derivation of the dual eliminates the primal variable using
+$M^{-1}$, and at a sparse allocation---which is exactly where a design algorithm operates
+once it has learned something---$M$ is singular. A certificate requiring $M^{-1}$ therefore
+fails precisely when the allocator is working well. Theorem~\ref{thm:kkt} is stated so that
+positive semidefiniteness suffices, and the proof is no longer for it.
+
+\subsection{Machine-Checked Mathematics}
+
+Lean~4 and mathlib are used as a checking discipline \cite{demoura2021,mathlib2020}. Three
+formulations were withdrawn under the prover and are reported in
+Section~\ref{sec:verification}. One of them---an early union identity that froze the extrema
+at the truth---is the same error the families of Section~\ref{sec:families} exploit, caught
+in the development rather than in the analysis.
+
+\subsection{The Gap}
+\TODOPAR{Prior work that needs checking and is not yet cited. The shape of this
+paper---a non-mean statistic, an alternative set that is a finite union of convex regions,
+an exact decomposition, an outer search---is an established paradigm in pure exploration, not
+a new one. \emph{Check at least} Agrawal, Koolen and Juneja on CVaR/VaR best-arm
+identification (arXiv:2008.07606), which solves a non-convex problem over measures optimally;
+Ahmadipour and Garivier on EVaR (arXiv:2510.04728); and Ariu et al.\ on policy testing in
+MDPs (arXiv:2505.15342), which decomposes into product-box subproblems and combines them
+through an outer budget search---the same manoeuvre as Theorem~\ref{thm:union} plus the
+outer minimum. Positioning should be ``the range statistic, with a closed form, and here is
+why it is harder than CVaR'', not ``we formulate an oracle''.}
+
+The literature therefore leaves a specific opening. Fixed-confidence design gives an exact
+inner problem for mean comparisons but not for range comparisons; convex duality gives an
+optimality certificate but one that assumes invertibility; and no treatment quantifies the
+error of the frozen-extrema proxy that implementations actually use. No existing work
+simultaneously: (i) exhibits that the proxy errs in \emph{both} directions by no constant;
+(ii) characterises the true alternative set on the range target with free extrema;
+(iii) reduces the resulting oracle to a finite conjunction of closed forms; and
+(iv) certifies optimality under positive semidefiniteness alone.
+
+\section{Research Aims, Questions, and Hypotheses}
+
+\subsection{Research Aim}
+
+The aim of this work is to determine whether the scalar pair-flip proxy is a usable surrogate
+for the true certification energy when the extrema can move, and if it is not, to solve the
+true problem exactly.
+
+\subsection{Research Questions}
+
+\begin{itemize}
+\item \textbf{RQ1.} Is there a constant $c$ with $J_{\mathrm{full}}\le c\,J_{\mathrm{scalar}}$
+on all instances, or with the reverse?
+\item \textbf{RQ2.} What is the true alternative set for a range comparison when the extrema
+are free, and is it tractable?
+\item \textbf{RQ3.} Can the resulting energy oracle be certified without inverting the
+information matrix?
+\item \textbf{RQ4.} Which existing allocator is the baseline a new one must beat?
+\end{itemize}
+
+\subsection{Hypotheses}
+
+\begin{itemize}
+\item \textbf{H1.} No such constant exists in either direction, and two families with a single
+parameter $\eta$ suffice to show it.
+\item \textbf{H2.} The alternative set is a finite union of convex regions indexed by ordered
+action pairs, each convex without any definiteness assumption.
+\item \textbf{H3.} A certificate from stationarity, dual non-negativity and complementary
+slackness is sufficient under positive semidefiniteness alone.
+\item \textbf{H4.} On the confirmatory panel, $\mathrm{C\_lucb}$ rather than uniform is the
+baseline to beat.
+\end{itemize}
+
+\section{Methodology}
+\label{sec:setting}
+
+\subsection{Framework Overview}
+
+The design buys precision $\alpha_{ra}$ at each cell $(r,a)$, and the energy of an
+alternative $\lambda$ is the quadratic form
+$\tfrac12(\lambda-\mu)^{\top}M(x)(\lambda-\mu)$. An alternative is \emph{relevant} if it
+would change the Top-$k$ answer, that is, if some $j\notin T$ overtakes some $i\in T$ in
+capacity.
+
+A distinction is maintained throughout. $J_{\mathrm{full}}$ is a normative quantity---the
+infimum of the energy over the relevant alternative set. The development below proves each
+component of a computation for it and proves the inequalities \eqref{eq:order} between the
+three quantities, but it does not define $J_{\mathrm{full}}$ as a formalised infimum, and it
+does not claim the components assemble into an equality. That distinction is carried into
+Section~\ref{sec:discussion} rather than elided.
+
+\subsection{What the Scalar Proxy Is, Exactly}
+\label{sec:proxydef}
+
+Since the paper's first claim is that a particular approximation fails, the approximation
+must be pinned down. Given the truth $\mu$, a claimed top relation $i$ and a challenger $j$,
+let $a^{\circ},b^{\circ}$ be the cells attaining $i$'s current max and min, and
+$c^{\circ},d^{\circ}$ those attaining $j$'s. The scalar proxy is the value of the inner
+problem at those four cells with the ordering constraints dropped:
+\begin{equation}
+J_{\mathrm{scalar}}
+\;=\;
+\frac{\bigl(C_{i}(\mu)-C_{j}(\mu)\bigr)^{2}}
+     {2\Bigl(\frac{1}{\alpha_{ia^{\circ}}}+\frac{1}{\alpha_{ib^{\circ}}}
+            +\frac{1}{\alpha_{jc^{\circ}}}+\frac{1}{\alpha_{jd^{\circ}}}\Bigr)} .
+\label{eq:scalar}
+\end{equation}
+
+Two approximations are folded into \eqref{eq:scalar} and they fail independently. The first
+is that the extrema stay where they are: the four cells are read off $\mu$ and never
+revisited, so an alternative that changes which cell is extremal is invisible. The second is
+that the ordering constraints defining a pair region are dropped, so an alternative that
+would have to satisfy them is charged too little. Family~1 below exploits the first, family~2
+the second.
+
+Equation \eqref{eq:scalar} is not a strawman. It is the natural transport of the
+fixed-confidence inner problem to this setting, it is cheap---four lookups and an arithmetic
+expression---and it agrees with $J_{\mathrm{full}}$ whenever the extrema happen not to move.
+The question is whether that agreement can be relied on.
+
+\subsection{Simplifying Assumptions}
+
+\begin{enumerate}
+\item[1)] \textbf{Free response table.} Every cell $(r,a)$ may take any real value; no
+parametric form links cells within a relation. This is what makes the alternative set a
+polyhedral union rather than a curved manifold.
+
+\item[2)] \textbf{Known variance, positive precision.} Precisions $\alpha_{ra}$ are known and
+strictly positive wherever they appear in a denominator. Under realizability coupling---where
+the precision at one cell constrains another---the cost does not separate, and nothing here
+covers that case.
+
+\item[3)] \textbf{Quadratic energy.} The energy is $\tfrac12(\lambda-\mu)^{\top}M(\lambda-\mu)$
+with $M$ symmetric positive semidefinite. Semidefiniteness rather than definiteness is
+assumed deliberately, for the reason given in the Background.
+
+\item[4)] \textbf{Finite action set.} Each relation has finitely many actions, so the union in
+\eqref{eq:J} is over a finite index set and step 1 of the procedure terminates.
+\end{enumerate}
+
+\subsection{Why a Range Target Is Not a Mean Target}
+
+The difficulty is specific to ranking by a range, and isolating it explains why the rest of
+the development takes the form it does.
+
+When relations are ranked by a mean, the comparison $\mu_{j}\ge\mu_{i}$ is a single linear
+inequality, so the relevant alternative set is a half-space---convex, with one facet, and
+with a closed-form nearest point under any quadratic energy. There is nothing further to
+decide.
+
+When relations are ranked by a range, the comparison hides four extremal choices, and which
+cells attain them depends on $\lambda$. The set $\{\lambda:C_{j}(\lambda)\ge C_{i}(\lambda)\}$
+is not convex: it is a union of polyhedra, one per choice of attaining pair, and the
+minimiser may sit in a piece whose attaining cells differ from the truth's. Any procedure
+that fixes the attaining cells in advance is therefore solving a \emph{restriction} of the
+problem, and a restriction can have a strictly larger value. That last sentence is the entire
+mechanism behind family~1.
+
+\subsection{The Finite Max/Min Set Identity}
+\label{sec:union}
+
+\begin{theorem}[Union identity]
+\label{thm:union}
+For relations $i,j$ and any alternative $\lambda$,
+\begin{multline}
+C_{j}(\lambda)\geq C_{i}(\lambda)
+\;\;\Longleftrightarrow\;\;
+\exists\,a,b\;\;\forall\,u,v:\\
+\lambda_{ja}-\lambda_{jb}\;\geq\;\lambda_{iu}-\lambda_{iv}.
+\label{eq:union}
+\end{multline}
+\end{theorem}
+
+\begin{proof}
+($\Rightarrow$) Choose $a$ attaining $\max_{a}\lambda_{ja}$ and $b$ attaining
+$\min_{b}\lambda_{jb}$, so $\lambda_{ja}-\lambda_{jb}=C_{j}(\lambda)$. For any $u,v$,
+$\lambda_{iu}-\lambda_{iv}\le C_{i}(\lambda)\le C_{j}(\lambda)$.
+
+($\Leftarrow$) Given such $a,b$, the range of $j$ is at least $\lambda_{ja}-\lambda_{jb}$,
+which dominates every pair difference in $i$; taking the maximum over $i$'s pairs gives
+$C_{j}(\lambda)\ge C_{i}(\lambda)$.
+\end{proof}
+
+\leanbox{\lean{range\_ge\_iff\_exists\_pair} in
+\lean{LeanFunctionalRangeAlternativeUnionV1}}
+
+This is the model bridge and the step that makes everything else possible. It converts a
+statement about extrema---objects that move with $\lambda$---into a statement about a
+\emph{fixed} pair $(a,b)$, at the cost of an existential over finitely many pairs. The
+quantifier in \eqref{eq:union} ranges over the \emph{alternative's} extrema, never the
+truth's; freezing them there is exactly the error the families quantify.
+
+\begin{definition}[Pair region]
+\begin{equation}
+\mathcal{P}_{ijab}=\bigl\{\lambda:\;
+\lambda_{iu}-\lambda_{iv}-\lambda_{ja}+\lambda_{jb}\leq 0
+\;\;\forall u,v\bigr\}.
+\label{eq:polyhedron}
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Convexity, unconditionally]
+\label{prop:convex}
+Each $\mathcal{P}_{ijab}$ is convex, with no assumption on $M$.
+\end{proposition}
+
+\begin{proof}
+Each constraint in \eqref{eq:polyhedron} is linear in $\lambda$, so the region is an
+intersection of half-spaces.
+\end{proof}
+
+\leanbox{\lean{alternative\_union\_polyhedra}, \lean{pairRegion\_convex} in
+\lean{LeanFunctionalRangeAlternativeUnionV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeAlternativeUnionV1}.}~These establish the geometry. The pair characterisation is the model bridge: it replaces the moving extrema by a fixed ordered pair at the cost of an existential over finitely many pairs. Convexity is proved with no assumption on the information matrix, which matters because the certificate later admits singular matrices, and the energy rewrites are what let the infimum be taken region by region. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,1}\quad\lean{alternative\_union\_polyhedra}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{ClosedAlternative} \mathit{T} \mathit{Q} \leftrightarrow \exists \mathit{i} \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{S\,2}\quad\lean{energy\_inf\_rewrite}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} )\\
+\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\} = \mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{i}\\
+&\quad \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+\end{aligned} \]}
+
+\noindent\textbf{S\,3}\quad\lean{energy\_sets\_equal}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} )\\
+\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\} = \{ \mathit{z} : \mathbb{R} | \exists \mathit{i} \in \mathit{T}, \exists \mathit{j},\\
+&\quad \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+\end{aligned} \]}
+
+\noindent\textbf{S\,4}\quad\lean{not\_strictTopK\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} = \mathit{k}),\\
+&\quad \; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\neg \mathit{StrictTopK} (\mathbf{fun} \mathit{r} => \mathit{capacity} (\mathit{Q} \mathit{r})) \mathit{T} \mathit{k} \leftrightarrow \mathit{ClosedAlternative}\\
+&\quad \mathit{T} \mathit{Q}
+\end{aligned} \]}
+
+\noindent\textbf{S\,5}\quad\lean{pairRegion\_convex}
+{\footnotesize\[ (\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A}) \;\vdash\; \mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} | \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}\} \]}
+
+\noindent\textbf{S\,6}\quad\lean{pair\_le\_capacity}
+{\footnotesize\[ (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} : \mathit{A}) \;\vdash\; \mathit{f} \mathit{a} - \mathit{f} \mathit{b} \leq \mathit{capacity} \mathit{f} \]}
+
+\noindent\textbf{S\,7}\quad\lean{range\_ge\_iff\_exists\_pair}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity} \mathit{g} \leftrightarrow \exists \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v} : \mathit{A}, \mathit{f} \mathit{u} - \mathit{f} \mathit{v} \leq \mathit{g} \mathit{a} - \mathit{g} \mathit{b}
+\end{aligned} \]}
+
+
+By Theorem~\ref{thm:union} the relevant alternative set is the finite union
+$\bigcup_{i,j,a,b}\mathcal{P}_{ijab}$, so the oracle is
+\begin{equation}
+J_\mu(x)\;=\;\min_{i\in T,\,j\notin T,\,a,b}\;
+\inf_{\lambda\in\mathcal{P}_{ijab}}\;
+\tfrac{1}{2}(\lambda-\mu)^{\top}M(x)(\lambda-\mu).
+\label{eq:J}
+\end{equation}
+
+\subsection{The Oracle Is a Finite Check}
+\label{sec:oracle}
+
+\begin{theorem}[Finite check]
+\label{thm:oracle}
+A number $c$ lower-bounds the energy over the whole alternative set if and only if it
+lower-bounds it on every pair region.
+\end{theorem}
+
+\begin{proof}
+($\Leftarrow$) Any $\lambda$ in the union lies in some region by Theorem~\ref{thm:union}.
+($\Rightarrow$) Each region is a subset of the union.
+\end{proof}
+
+\leanbox{\lean{energy\_lower\_bound\_iff}, \lean{energy\_ge\_of\_pairwise} in
+\lean{LeanFunctionalRangeEnergyOracleV1}}
+
+The index set in \eqref{eq:J} is finite, so certifying reduces to a finite conjunction of
+convex problems and no infimum over an infinite-dimensional set is ever taken. One
+bookkeeping rule is maintained throughout and is worth stating because it is easy to violate:
+a lower bound valid for \emph{every} region, and then their minimum, lower-bounds $J$; a
+single feasible alternative only \emph{upper}-bounds it. Nothing in the development derives a
+lower bound from an exhibited point.
+
+\subsection{Shrink and Expand as Equivalences}
+\label{sec:shrink}
+
+Certifying against a pair region reduces to two one-sided problems: shrinking the incumbent
+$i$'s range below a level $z$ and expanding the challenger $j$'s above it. Both are stated as
+equivalences rather than bounds, so that composing them relaxes nothing.
+
+\begin{theorem}[Shrink]
+\label{thm:shrink}
+$\mathrm{range}(\theta_{i})\le z$ if and only if all cells of $i$ lie in a common interval of
+length $z$, and the cheapest such placement is coordinate-wise the clamp:
+\begin{equation}
+S_{i}(z)=\min_{\ell}\,\frac{1}{2}\sum_{a}\alpha_{ia}\;
+\mathrm{dist}\bigl(\theta_{ia},\,[\ell,\ell+z]\bigr)^{2}.
+\label{eq:shrink}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+The equivalence is immediate from the definition of range. For the cost, fix $\ell$; for each
+cell independently the closest point of $[\ell,\ell+z]$ is the clamp, proved by cases on
+whether $\theta_{ia}$ lies below, inside or above the interval. The per-cell costs then sum
+because the objective is separable given $\ell$.
+\end{proof}
+
+\leanbox{\lean{range\_le\_iff\_exists\_interval}, \lean{clamp\_dist\_le},
+\lean{shrink\_lower} in \lean{LeanFunctionalShrinkExpandV1}}
+
+\begin{theorem}[Expand]
+\label{thm:expand}
+$\mathrm{range}(\theta_{j})\ge z$ if and only if some \emph{ordered} pair is separated by at
+least $z$, and
+\begin{equation}
+E_{j}(z)=\min_{a\neq b}\;
+\frac{\bigl[\,z-(\theta_{ja}-\theta_{jb})\,\bigr]_{+}^{2}}
+     {2\bigl(\frac{1}{\alpha_{ja}}+\frac{1}{\alpha_{jb}}\bigr)}.
+\label{eq:expand}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Again the equivalence is immediate. For the cost, the problem minimises a separable quadratic
+subject to \emph{one} linear constraint $\lambda_{ja}-\lambda_{jb}\ge z$; the minimiser is
+exhibited explicitly and the value computed by substitution, so \eqref{eq:expand} is exact
+rather than bounded.
+\end{proof}
+
+\leanbox{\lean{range\_ge\_iff\_exists\_pair\_ge}, \lean{expand\_lower} in
+\lean{LeanFunctionalShrinkExpandV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalShrinkExpandV1}.}~These are the two one-sided problems. Each is stated as an equivalence and then given a cost, and each cost is proved both as a lower bound and as attained, so composing them relaxes nothing. The clamp lemmas carry the coordinate-wise argument that makes the shrink cost separable once the interval is fixed. They are reproduced as the prover has them; a further $7$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,12}\quad\lean{range\_ge\_iff\_exists\_pair\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam} \leftrightarrow \exists \mathit{a} \mathit{b} : \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} - \mathit{lam} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{S\,13}\quad\lean{range\_le\_iff\_exists\_interval}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z} \leftrightarrow \exists \mathit{l} : \mathbb{R} , \forall \mathit{a} : \mathit{A}, \mathit{l} \leq \mathit{lam} \mathit{a} \wedge \mathit{lam} \mathit{a} \leq \mathit{l} + \mathit{z}
+\end{aligned} \]}
+
+
+The word \emph{ordered} in Theorem~\ref{thm:expand} is load-bearing and was not in an earlier
+version. Requiring an ordered pair means only two cells move; an unordered formulation forces
+a third cell to accommodate the separation and overstates the cost, which would make the
+oracle report alternatives as more expensive than they are.
+
+\subsection{The Inner Problem in Closed Form}
+\label{sec:innerqp}
+
+\begin{theorem}[Inner quadratic programme]
+\label{thm:innerqp}
+For weights $w_{i}>0$ and $g\in\mathbb{R}$,
+\begin{equation}
+\min\;\frac{1}{2}\sum_{i=1}^{4}w_{i}x_{i}^{2}
+\;\;\text{s.t.}\;\;x_{1}-x_{2}-x_{3}+x_{4}\geq g
+\;=\;
+\frac{g^{2}}{2\sum_{i=1}^{4}\frac{1}{w_{i}}} .
+\label{eq:innerqp}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Completing the square against the explicit minimiser
+$x_{i}^{*}=\pm g/(w_{i}\sum_{k}w_{k}^{-1})$ with signs matching the constraint's
+coefficients. No optimiser and no multiplier theorem is invoked: the identity is verified by
+substitution and the inequality by the square-completion residual.
+\end{proof}
+
+\leanbox{\lean{inner\_qp\_lower}, \lean{inner\_qp\_attained}, \lean{harm\_pos} in
+\lean{LeanFunctionalRangeEnergyOracleV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeEnergyOracleV1}.}~These reduce the oracle to a finite check and give the inner problem in closed form. The equivalence and the pairwise bound are stated in both directions because the development must never derive a lower bound from an exhibited point; the harmonic positivity is what keeps \eqref{eq:innerqp} finite. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,8}\quad\lean{energy\_ge\_of\_pairwise}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} ),\\
+&\quad \; (\mathit{hpair} : \forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} ,\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E} \mathit{Q})\\
+\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}
+\end{aligned} \]}
+
+\noindent\textbf{S\,9}\quad\lean{energy\_lower\_bound\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} )\\
+\vdash\;&(\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}) \leftrightarrow\\
+&\quad (\forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{PairRegion} \mathit{Q} \mathit{i}\\
+&\quad \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E} \mathit{Q})
+\end{aligned} \]}
+
+\noindent\textbf{S\,10}\quad\lean{inner\_qp\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\\
+&\quad \; (\mathit{h4} : 0 < \mathit{w4}),\; (\mathit{g} : \mathbb{R} )\\
+\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R} , \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} + \mathit{x4} \wedge (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2}\\
+&\quad + \mathit{w3}*\mathit{x3}^{2} + \mathit{w4}*\mathit{x4}^{2}) / 2 = \mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4})
+\end{aligned} \]}
+
+\noindent\textbf{S\,11}\quad\lean{inner\_qp\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\\
+&\quad \; (\mathit{h4} : 0 < \mathit{w4}),\; (\mathit{g} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} + \mathit{x4})\\
+\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4}) \leq (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
+&\quad \mathit{w4}*\mathit{x4}^{2}) / 2
+\end{aligned} \]}
+
+
+The harmonic denominator is the same shape that appears in the fixed-confidence literature,
+but it is derived here for the range target rather than transported from a mean surrogate,
+and the difference is the number of terms. A range comparison moves two cells in each of two
+relations, so the harmonic sum runs over four precisions rather than two.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig3_shrinkexpand.png}
+\caption{Why the inner problem has an interior optimum. Moving the target range costs energy
+in two opposing ways: shrinking it below a coordinate's current reach charges $S_{i}(z)$,
+which is flat once the range already exceeds $C_{i}$ and then grows quadratically; expanding
+it past another coordinate charges $E_{j}(z)$, flat until $C_{j}$ is passed and quadratic
+thereafter. Neither term alone has an interior minimum---each is monotone where it is not
+flat---but their sum does, marked, because the flat regions do not overlap. This is the
+mechanism behind the closed form of Section~\ref{sec:innerqp}, and the reason the optimum is
+not simply one of the two endpoints. Exact evaluation of the two energies at
+$C_{i}=1$, $C_{j}=\tfrac12$.}
+\label{fig:shrinkexpand}
+\end{figure}
+
+\subsection{The Certificate, Without an Inverse}
+\label{sec:kkt}
+
+\begin{theorem}[KKT sufficiency under semidefiniteness]
+\label{thm:kkt}
+Let $M$ be symmetric positive semidefinite, $A$ the constraint matrix of a pair region, and
+suppose $\lambda^{*}$ and $y$ satisfy
+\begin{equation}
+M(\lambda^{*}-\mu)+A^{\top}y=0,\quad
+y\geq 0,\quad
+A\lambda^{*}\leq 0,\quad
+y^{\top}A\lambda^{*}=0 .
+\label{eq:kkt}
+\end{equation}
+Then $\lambda^{*}$ minimises the energy over the region.
+\end{theorem}
+
+\begin{proof}
+Let $\lambda$ be feasible and $d=\lambda-\lambda^{*}$. Expanding,
+\begin{align}
+&\tfrac12(\lambda-\mu)^{\top}M(\lambda-\mu)
+ -\tfrac12(\lambda^{*}-\mu)^{\top}M(\lambda^{*}-\mu) \notag\\
+&\qquad=\;d^{\top}M(\lambda^{*}-\mu)\;+\;\tfrac12 d^{\top}Md .
+\end{align}
+By stationarity $M(\lambda^{*}-\mu)=-A^{\top}y$, so the cross term is
+$-y^{\top}A\lambda+y^{\top}A\lambda^{*}=-y^{\top}A\lambda$ using complementary slackness,
+which is non-negative since $A\lambda\le0$ and $y\ge0$. The remaining term is non-negative by
+positive semidefiniteness.
+\end{proof}
+
+\leanbox{\lean{kkt\_certificate}, \lean{certificate\_gives\_lower\_bound} in
+\lean{LeanFunctionalRangeDesignCertificateV1}}
+
+No inverse appears anywhere in the proof, and this is why the statement is arranged as
+sufficiency rather than as a dual. It matters operationally: an allocator that has learned
+something concentrates its budget, so its information matrix loses rank, and a certificate
+requiring $M^{-1}$ fails exactly when the allocator is working well.
+
+\subsection{The Two Families}
+\label{sec:families}
+
+Both families have two relations and three actions, with Top-1 claimed for relation $i$ and a
+parameter $0<\eta\le1$. They share the same capacities $C_{i}=1$, $C_{j}=\tfrac12$ and hence
+the same gap; they differ only in which cell carries the small precision $\eta$ and whether
+that cell is currently extremal.
+
+\begin{theorem}[Family 1: the proxy overstates]
+\label{thm:family1}
+Take
+\begin{align}
+\theta_{i}=(0,1,\tfrac12),\;\alpha_{i}=(1,1,1);\\
+\theta_{j}=(0,\tfrac12,\tfrac14),\;\alpha_{j}=(1,1,\eta).
+\end{align}
+Then $J_{\mathrm{scalar}}=\tfrac{1}{32}$ while
+\begin{equation}
+0\;\leq\;\frac{J_{\mathrm{full}}}{J_{\mathrm{scalar}}}\;\leq\;9\eta
+\;\xrightarrow[\eta\to0]{}\;0 .
+\label{eq:family1}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Raising \emph{only} the third cell of $j$ from $\tfrac14$ to $1$ equalises the capacities:
+$C_{j}$ becomes $1-0=1=C_{i}$. That move costs
+$\tfrac12\eta(1-\tfrac14)^{2}=\tfrac{9\eta}{32}$, so
+$J_{\mathrm{full}}\le\tfrac{9\eta}{32}$. The proxy, computed at $j$'s current extrema---cells
+$2$ and $1$, both at precision $1$---reports $\tfrac{1}{32}$.
+\end{proof}
+
+\leanbox{\lean{scalar\_not\_upper\_to\_any\_constant} in
+\lean{LeanFunctionalScalarProxyFailsV1}}
+
+The mechanism is that the cheap route to raising $j$'s capacity runs through a cell that is
+\emph{not} currently an extremum, and \eqref{eq:scalar} cannot see it because it has frozen
+the extrema. As $\eta\to0$ that cell becomes arbitrarily cheap and the true value collapses
+while the proxy does not move at all.
+
+\begin{theorem}[Family 2: the proxy understates]
+\label{thm:family2}
+Take
+\begin{align}
+\theta_{i}=(0,1,\tfrac34),\;\alpha_{i}=(1,\eta,1);\\
+\theta_{j}=(0,\tfrac12,\tfrac14),\;\alpha_{j}=(1,1,1).
+\end{align}
+Then $J_{\mathrm{full}}\ge\tfrac{1}{128}$ while
+\begin{equation}
+\frac{J_{\mathrm{full}}}{J_{\mathrm{scalar}}}
+\;\geq\;\frac{1+3\eta}{16\eta}
+\;\xrightarrow[\eta\to0]{}\;+\infty .
+\label{eq:family2}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Let $\lambda$ be \emph{any} capacity-inverting alternative and pick $z$ strictly between the
+two new capacities. Shrinking $i$ below $z$ costs at least $[\tfrac34-z]_{+}^{2}/4$ by
+Theorem~\ref{thm:shrink}; opening $j$ above $z$ costs at least $[z-\tfrac12]_{+}^{2}/4$ by
+Theorem~\ref{thm:expand}. By Lemma~\ref{lem:posparts} the two positive parts sum to at least
+$\tfrac14$, so $J_{\mathrm{full}}\ge\tfrac14\cdot\tfrac{1}{32}=\tfrac{1}{128}$. The proxy,
+seeing $i$'s cheap cell at precision $\eta$, reports $\eta/(8(1+3\eta))$.
+\end{proof}
+
+\leanbox{\lean{scalar\_not\_lower\_to\_any\_constant}, \lean{family2\_full\_ge} in
+\lean{LeanFunctionalScalarProxyFailsV1}}
+
+\begin{lemma}[Positive parts]
+\label{lem:posparts}
+For every $z\in\mathbb{R}$,
+$\bigl[\tfrac34-z\bigr]_{+}+\bigl[z-\tfrac12\bigr]_{+}\ge\tfrac14$.
+\end{lemma}
+
+\begin{proof}
+Three cases. If $z\le\tfrac12$ the first part is at least $\tfrac14$; if $z\ge\tfrac34$ the
+second is; and in between both are positive and sum to exactly $\tfrac14$.
+\end{proof}
+
+\leanbox{\lean{positive\_parts\_sum} in \lean{LeanFunctionalScalarProxyFailsV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalScalarProxyFailsV1}.}~These are the two counterexamples, and the division of labour matters. The capacity and cost statements evaluate the instances exactly; the two \lean{\_full} statements bound the true value, one above by an exhibited alternative and one below by the positive-parts inequality; the two \lean{\_scalar\_value} statements evaluate \eqref{eq:scalar}; and the two ratio statements combine them. Only then do the two \lean{\_to\_any\_constant} theorems quantify over every positive constant. They are reproduced as the prover has them; a further $4$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,22}\quad\lean{cap\_i1}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 1 (1/2) = 1 \]}
+
+\noindent\textbf{S\,23}\quad\lean{cap\_j1}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 (1/2) (1/4) = 1/2 \]}
+
+\noindent\textbf{S\,24}\quad\lean{family1\_alt\_cost}
+{\footnotesize\[ (\mathit{eta} : \mathbb{R} ) \;\vdash\; (1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 * \mathit{eta} / 32 \]}
+
+\noindent\textbf{S\,25}\quad\lean{family1\_alt\_ties}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 (1/2) 1 = \mathit{cap3} 0 1 (1/2) \]}
+
+\noindent\textbf{S\,26}\quad\lean{family1\_full\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{halt} : \mathit{Jfull} \leq (1/2) * \mathit{eta} * (1 - 1/4) ^{2})\\
+\vdash\;&\mathit{Jfull} \leq 9 * \mathit{eta} / 32
+\end{aligned} \]}
+
+\noindent\textbf{S\,27}\quad\lean{family1\_scalar\_value}
+{\footnotesize\[ \vdash\; (1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1)) = 1 / 32 \]}
+
+\noindent\textbf{S\,28}\quad\lean{family2\_full\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{z} : \mathbb{R} )\\
+\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z}) 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2) 0) ^{2} / 4
+\end{aligned} \]}
+
+\noindent\textbf{S\,29}\quad\lean{positive\_parts\_sum}
+{\footnotesize\[ (\mathit{z} : \mathbb{R} ) \;\vdash\; (1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 - \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2) 0 \]}
+
+\noindent\textbf{S\,30}\quad\lean{scalar\_not\_lower\_to\_any\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})\\
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta} \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} / (8 * (1 + 3 * \mathit{eta}))\\
+&\quad ) < (1 / 128 : \mathbb{R} )
+\end{aligned} \]}
+
+\noindent\textbf{S\,31}\quad\lean{scalar\_not\_upper\_to\_any\_constant}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})\\
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta} \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32 <\\
+&\quad (1 / 32 : \mathbb{R} ) / \mathit{C}
+\end{aligned} \]}
+
+
+Lemma~\ref{lem:posparts} is what closes the quantifier. Without it one could only say that
+\emph{some} alternatives are expensive; with it, \emph{every} capacity-inverting alternative
+is, whatever $z$ it chooses, so the bound is a property of the instance rather than of a
+competitor. Here the mechanism is the reverse of family~1: the proxy sees a cheap route---move
+$i$'s second cell at precision $\eta$---and concludes the alternative is nearly free, but
+moving that cell alone does not invert the capacities, because $i$'s range is pinned by its
+first and third cells.
+
+\begin{corollary}[No constant repairs the proxy]
+\label{cor:noconstant}
+There is no constant $c$ with $J_{\mathrm{full}}\le c\,J_{\mathrm{scalar}}$ for all
+instances, and none with $J_{\mathrm{full}}\ge c\,J_{\mathrm{scalar}}$.
+\end{corollary}
+
+\begin{proof}
+Family~2 refutes the first for every $c$, taking $\eta$ small enough that
+$(1+3\eta)/(16\eta)>c$; family~1 refutes the second.
+\end{proof}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig2_families.png}
+\caption{The two families. Family~1 forces the ratio below $9\eta$ and family~2 above
+$(1+3\eta)/(16\eta)$. Both curves are \emph{proved} bounds in exact arithmetic, not sampled
+points, so Corollary~\ref{cor:noconstant} follows from the two envelopes crossing every
+horizontal line.}
+\label{fig:families}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig4_ratio.png}
+\caption{The two families, on one axis. Family~1 has the full objective within $9\eta$ of the
+scalar one, so its ratio to the scalar value goes to $1$ as $\eta\to0$; family~2 has the full
+objective at least $(1+3\eta)/(16\eta)$ times the scalar one, so its ratio diverges. Any
+proposed correction factor---any constant $c$ claimed to relate the two objectives---is a
+horizontal line on this plot, and both curves cross every such line. That is the content of
+the separation: the two objectives are not related by a bound in either direction, and no
+single-scalar surrogate can be repaired by a constant. Exact evaluation of the two proved
+bounds.}
+\label{fig:ratio}
+\end{figure}
+
+\subsection{Setup Cost and Its Crossing}
+\label{sec:setup}
+
+A design that switches support pays a setup cost, and comparing two supports requires knowing
+where their budgets cross. A design on support $S$ pays $\kappa|S|$ once and then accrues
+value at rate $\Gamma$ per unit of remaining budget, so at total budget $B$ it delivers
+$\Gamma(B-\kappa|S|)$, valid while $B\ge\kappa|S|$ and undefined below it.
+
+\begin{theorem}[Crossing budget]
+\label{thm:crossing}
+With rates $\Gamma_{1}\neq\Gamma_{2}$, support sizes $|S_{1}|,|S_{2}|$ and setup price
+$\kappa$,
+\begin{equation}
+B_{*}\;=\;\kappa\,\frac{|S_{2}|\,\Gamma_{2}-|S_{1}|\,\Gamma_{1}}{\Gamma_{2}-\Gamma_{1}} .
+\label{eq:crossing}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{crossing\_budget}, \lean{infeasible\_iff} in
+\lean{LeanFunctionalDesignDualityV1} and
+\lean{LeanFunctionalRangeDesignCertificateV1}}
+
+Below $B_{*}$ the support with the smaller setup wins even though its rate is worse; above it
+the higher rate wins; and the crossing moves linearly in $\kappa$.
+
+\begin{theorem}[Undetermined sign]
+\label{thm:undecided}
+If $\Gamma_{1}$ and $\Gamma_{2}$ are known only within overlapping brackets, both orders
+remain consistent with the data, so the sign of the denominator in \eqref{eq:crossing} is
+undetermined and no crossing may be reported.
+\end{theorem}
+
+\leanbox{\lean{crossing\_sign\_undetermined} in
+\lean{LeanFunctionalRangeDesignCertificateV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalRangeDesignCertificateV1}.}~These carry the certificate and the setup-cost law. The bilinear and quadratic algebra is separated out so that Theorem~\ref{thm:kkt} uses only symmetry and positive semidefiniteness; the region and single-alternative bounds keep the two directions apart; and the crossing statements include the undetermined-sign result, which is a negative result reported rather than a case left to an implementation. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,14}\quad\lean{bil\_symm}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R} )\\
+\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y} = \mathit{bil} \mathit{M} \mathit{y} \mathit{x}
+\end{aligned} \]}
+
+\noindent\textbf{S\,15}\quad\lean{certificate\_gives\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R} ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\\
+&\quad \; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M} \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\\
+&\quad \; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q}\\
+&\quad - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) = 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c}\\
+&\quad = 0),\; (\mathit{hval} : \mathit{V} = (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu} \mathit{p}))\\
+\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R} , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0) \to \mathit{V} \leq\\
+&\quad (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu} \mathit{p})
+\end{aligned} \]}
+
+\noindent\textbf{S\,16}\quad\lean{crossing\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R} ),\; (\mathit{n1} \mathit{n2} : \mathbb{N} ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1} \neq 0)\\
+\vdash\;&\mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2}\\
+&\quad - \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1} = \mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\\
+&\quad \mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} - \mathit{G1})) \mathit{kappa} \mathit{n2} \mathit{G2}
+\end{aligned} \]}
+
+\noindent\textbf{S\,17}\quad\lean{crossing\_sign\_undetermined}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} : \mathbb{R} ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\\
+&\quad \; (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\; (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\; (\mathit{hov2} : \mathit{G1lo} \leq\\
+&\quad \mathit{G2hi})\\
+\vdash\;&(\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq\\
+&\quad \mathit{G2hi} \wedge \mathit{g2} \leq \mathit{g1}) \wedge (\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge\\
+&\quad \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi} \wedge \mathit{g1} \leq \mathit{g2})
+\end{aligned} \]}
+
+\noindent\textbf{S\,18}\quad\lean{kkt\_certificate}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R} ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0\\
+&\quad \leq \mathit{quad} \mathit{M} \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq\\
+&\quad 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p})\\
+&\quad = 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} = 0),\; (\mathit{lam'} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{hfeas'} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)\\
+\vdash\;&(1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu} \mathit{p}) \leq (1/2) * \mathit{quad} \mathit{M} (\\
+&\quad \mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu} \mathit{p})
+\end{aligned} \]}
+
+\noindent\textbf{S\,19}\quad\lean{quad\_add}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R} )\\
+\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d}) = \mathit{quad} \mathit{M} \mathit{a} + 2 * \mathit{bil} \mathit{M} \mathit{d} \mathit{a} + \mathit{quad} \mathit{M} \mathit{d}
+\end{aligned} \]}
+
+\noindent\textbf{S\,20}\quad\lean{region\_min\_lower\_bounds\_J}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R} ),\; (\mathit{J} : \mathbb{R} ),\\
+&\quad \; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR} \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R} ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R}, \mathit{b} \mathit{r} \leq\\
+&\quad \mathit{cost} \mathit{r})\\
+\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b} \leq \mathit{J}
+\end{aligned} \]}
+
+\noindent\textbf{S\,21}\quad\lean{single\_alt\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R} ),\; (\mathit{J} : \mathbb{R} ),\\
+&\quad \; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR} \mathit{cost}),\; \{ \mathit{r} : \rho \},\; (\mathit{hr} : \mathit{r} \in \mathit{R})\\
+\vdash\;&\mathit{J} \leq \mathit{cost} \mathit{r}
+\end{aligned} \]}
+
+
+This negative result is stated deliberately. A procedure that substitutes bracket midpoints
+into \eqref{eq:crossing} will report not merely an imprecise crossing but one pointing the
+wrong way; the failure is qualitative. The same discipline governs infeasibility: a
+configuration in which no alternative inverts the capacities has \emph{no} finite value, and
+returning a small number for it would tell an allocator the answer is about to flip when it
+cannot. Three outcomes---a value, \textsc{infeasible}, \textsc{undecided}---are therefore
+distinguished throughout rather than encoded in a sentinel number.
+
+\begin{theorem}[Break-even, without the folklore 4]
+\label{thm:breakeven}
+$\min_{p}\bigl[\sigma_{a}^{2}/p+\sigma_{b}^{2}/(1-p)\bigr]=(\sigma_{a}+\sigma_{b})^{2}$, so
+break-even occurs at $c_{c}\nu_{c}=(\sigma_{a}+\sigma_{b})^{2}$.
+\end{theorem}
+
+\leanbox{\lean{scalar\_split\_optimal}, \lean{breakeven\_iff}, \lean{breakeven\_not\_four}
+in \lean{LeanFunctionalDesignDualityV1}}
+
+\noindent\emph{Supporting results in \lean{LeanFunctionalDesignDualityV1}.}~These are the duality side. Weak duality and the dual certificate are proved, and the infeasibility characterisation is stated so that an empty feasible set returns \textsc{infeasible} rather than a small number. The break-even group is included because the constant $4$ that circulates as a threshold is the value of $(\sigma_{a}+\sigma_{b})^{2}$ at unit variances and nothing more. They are reproduced as the prover has them; a further $6$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
+
+\noindent\textbf{S\,32}\quad\lean{design\_value\_ge}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\; (\mathit{w} : \mathit{W}),\\
+&\quad \; (\mathit{c} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q}, \mathit{c} \leq \mathit{f} \mathit{q} \mathit{w})\\
+\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}
+\end{aligned} \]}
+
+\noindent\textbf{S\,33}\quad\lean{design\_value\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\; (\mathit{w} : \mathit{W}),\\
+&\quad \; \{ \mathit{q} : \iota \},\; (\mathit{hq} : \mathit{q} \in \mathit{Q})\\
+\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w} \leq \mathit{f} \mathit{q} \mathit{w}
+\end{aligned} \]}
+
+\noindent\textbf{S\,34}\quad\lean{dual\_gap\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\\
+&\quad \; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam} \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q},\\
+&\quad \mathit{lam} \mathit{q} = 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} : \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q},\\
+&\quad \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U}),\; (\mathit{hattain} : \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀} = \mathit{U})\\
+\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w} : \mathit{W}, \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\} \mathit{U}
+\end{aligned} \]}
+
+\noindent\textbf{S\,35}\quad\lean{infeasible\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} )\\
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels} = \mathit{none} \leftrightarrow \mathit{total} <\\
+&\quad \mathit{setup} * (\mathit{channels} : \mathbb{R} )
+\end{aligned} \]}
+
+\noindent\textbf{S\,36}\quad\lean{information\_of\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\\
+&\quad \mathit{channels} : \mathbb{R} ) \leq \mathit{total}),\; (\mathit{hsetup} : 0 \leq \mathit{setup}),\; (\mathit{hunit} : 0 \leq\\
+&\quad \mathit{unit})\\
+\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit} \wedge\\
+&\quad (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit} \leq \mathit{total} * \mathit{unit}
+\end{aligned} \]}
+
+\noindent\textbf{S\,37}\quad\lean{value\_of\_feasible}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} :\\
+&\quad \mathbb{R} ) \leq \mathit{total})\\
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels} = \mathit{some} (\mathit{total} - \mathit{setup} * (\\
+&\quad \mathit{channels} : \mathbb{R} ))
+\end{aligned} \]}
+
+
+The number $4$ that circulates as a break-even threshold is the value of
+$(\sigma_{a}+\sigma_{b})^{2}$ at unit variances and nothing more. With several alternatives
+the scalar design shares cells and the pairwise threshold does not transfer.
+
+\subsection{The Oracle as a Procedure}
+\label{sec:procedure}
+
+\begin{algorithm}[htbp]
+\caption{Exact certification energy}
+\label{alg:oracle}
+\begin{algorithmic}[1]
+\FOR{each $i\in T$, $j\notin T$, ordered pair $(a,b)$ of $j$'s actions}
+  \STATE Form the region $\mathcal{P}_{ijab}$ of \eqref{eq:polyhedron}
+         \COMMENT{covers the alternative set exactly, Thm~\ref{thm:union}}
+  \STATE Evaluate $\inf_{z\ge0}\bigl[S_{i}(z)+E_{j}(z)\bigr]$ using
+         \eqref{eq:shrink} and \eqref{eq:expand}
+  \STATE Where one cell pair moves per relation, read the value from
+         \eqref{eq:innerqp} directly
+  \STATE Certify the minimiser by \eqref{eq:kkt} \COMMENT{valid for singular $M$}
+\ENDFOR
+\STATE \textbf{return} the minimum over the index set
+       \COMMENT{is the oracle value, Thm~\ref{thm:oracle}}
+\end{algorithmic}
+\end{algorithm}
+
+The index set has size $|T|\cdot|T^{c}|\cdot|A|(|A|-1)$, polynomial in the problem size and
+independent of any discretisation, and each piece is either a closed form or a
+one-dimensional minimisation over $z$ whose integrand is a sum of two explicit convex
+functions. The contrast with \eqref{eq:scalar} is therefore not that the exact oracle is
+intractable and the proxy cheap; it is that the exact oracle is a finite enumeration of
+closed forms and the proxy is one of them evaluated at the wrong index.
+
+\section{Experimental Design}
+\label{sec:expdesign}
+
+\subsection{Experimental Objectives}
+
+The two families are proved, so no experiment bears on them. The empirical work has two
+objectives. The first is to establish which existing allocator is the baseline that any new
+one---including one built on Algorithm~\ref{alg:oracle}---must beat. The second concerns the
+separation itself. Theorems~\ref{thm:family1} and \ref{thm:family2} are enough to refute any
+constant correction factor, and they are hand-built to do exactly that. They leave the
+practitioner's question open: on an instance nobody designed, how often is the scalar proxy
+wrong, by how much, and in which direction? Experiment~E2 answers it.
+
+\subsection{E2: The Proxy on Instances Nobody Built}
+\label{sec:e2}
+
+\emph{Instances.} Six thousand are drawn from declared ranges: three to eight actions per
+relation, responses uniform on $[0,1]$, and precisions log-uniform over three decades. The
+relation with the larger capacity is taken as the claimed top, so the comparison is always in
+the direction the proxy is used.
+
+\emph{Computing the true value.} $J_{\mathrm{full}}$ is not estimated. Fix a target width
+$z$: relation $i$ must fit inside a window of that width, costing $S_{i}(z)$, and relation
+$j$ must open some pair to at least that width, costing $E_{j}(z)$. Both are convex in $z$
+for a fixed pair, so $J_{\mathrm{full}}=\min_{z}\min_{(c,d)}[S_{i}(z)+E^{(c,d)}_{j}(z)]$ is
+computed exactly. $S_{i}(z)$ has its own closed form: its derivative in the window position
+is piecewise linear, so the optimal position is a root on one of the intervals between
+breakpoints---and, as it happens, generally interior rather than at a breakpoint, which is
+where a first implementation of this experiment went wrong and over-estimated the value.
+
+\begin{algorithm}[htbp]
+\caption{Exact least energy of a capacity-inverting alternative}
+\label{alg:jfull}
+\begin{algorithmic}[1]
+\REQUIRE responses $\theta_{i},\theta_{j}$ and precisions $\alpha_{i},\alpha_{j}$
+\ENSURE $J_{\mathrm{full}}=\min\{\text{energy}:C_{i}(\lambda)\le C_{j}(\lambda)\}$, exactly
+\STATE for a target width $z$, relation $i$ must fit inside a window of width $z$ and
+       relation $j$ must open some ordered pair to at least $z$; write $z=C_{i}(\lambda)$
+\STATE \textbf{shrink cost } $S_{i}(z)$: the optimal row is $\theta_{i}$ clipped into
+       $[l,l+z]$, so the cost is a sum of one-sided squared hinges and is convex in $l$; its
+       derivative is piecewise linear with breakpoints at $\theta_{i}$ and $\theta_{i}-z$,
+       so solve $D(l)=0$ on each interval and keep the root inside it
+       \COMMENT{the minimiser is generally \emph{interior}; scanning breakpoints alone
+       over-estimates}
+\STATE \textbf{expand cost } $E^{(c,d)}_{j}(z)=\tfrac12\bigl[z-(\theta_{jc}-\theta_{jd})\bigr]_{+}^{2}
+       \dfrac{\alpha_{jc}\alpha_{jd}}{\alpha_{jc}+\alpha_{jd}}$
+       \COMMENT{split the move between the two cells in inverse proportion to precision}
+\STATE $S_{i}$ does not depend on the pair, so evaluate it once on a grid of $z$ and add the
+       pair costs vectorised
+\FORALL{ordered pairs $(c,d)$ of relation $j$}
+  \STATE $S_{i}(z)+E^{(c,d)}_{j}(z)$ is convex in $z$, so refine the grid minimum by
+         golden section on the bracketing interval
+\ENDFOR
+\RETURN the least value over all pairs
+\end{algorithmic}
+\end{algorithm}
+
+\emph{Checking the solver rather than trusting it.} The decomposition is cross-checked
+against SLSQP running on the raw variables, which uses none of it. A local optimiser can only
+land at or above the true minimum, so a cell where it lands \emph{below} would expose a
+defect; those cells are counted rather than averaged away.
+
+\emph{Self-check.} On the two proved families the implementation must reproduce the proved
+numbers before the sweep is reported: $J_{\mathrm{scalar}}=\tfrac1{32}$ and
+$J_{\mathrm{full}}\le 9\eta/32$ for family~1, and
+$J_{\mathrm{scalar}}=\eta/(8(1+3\eta))$ and $J_{\mathrm{full}}\ge\tfrac1{128}$ for family~2.
+
+\emph{Mechanism.} Each instance also records whether the cheapest alternative opens a pair of
+$j$ other than its current extrema. That is the mechanism family~1 exploits, and recording it
+turns ``the proxy is sometimes wrong'' into a statement about \emph{when}.
+
+\subsection{Setup}
+
+The confirmatory panel is $10$ seeds $\times$ $1{,}000$ instances $\times$ $8$ policies
+$=80{,}000$ policy runs at horizon $131{,}072$, drawing $5{,}042{,}978{,}194$ samples in
+total, with $29.1\%$ of runs censored at the horizon. It ran as ten parallel processes for
+roughly six CPU-hours each.
+
+\subsection{Baselines}
+
+Three policies are reported: $\mathrm{C\_lucb}$, $\mathrm{C\_anytime}$, and uniform
+allocation. All three are existing allocators; no allocator built on
+Algorithm~\ref{alg:oracle} appears, and Section~\ref{sec:discussion} says so again.
+
+\subsection{Metrics}
+
+The number of instances certified, the certification fraction, and the median query count
+among certified runs. Paired per-instance comparisons are reported alongside, since the
+policies run on identical instances.
+
+\subsection{Statistical Reporting}
+
+Results are reported over $10$ seeds. Because $29.1\%$ of runs are censored at the horizon,
+both the certification fraction and the median are reported: a policy certifying fewer worlds
+but faster on those it certifies would look good on median alone.
+
+\section{Formal Verification}
+\label{sec:verification}
+
+\subsection{Acceptance Contract}
+
+A module counts as accepted only when all six of the following hold: the compiler exits zero
+with no errors; the source hash is unchanged \emph{across} the compile, so the file checked is
+the file on disk; the compiled artifact is newer than its source; at least one
+\texttt{\#print axioms} directive is present; the axiom set of every audited declaration lies
+within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
+\texttt{sorry} appears anywhere in the file.
+
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
+checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
+a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
+outside the kernel is rejected by name mismatch rather than needing to be anticipated.
+
+\subsection{Evidence per Step}
+
+\begin{table}[htbp]
+\caption{Evidence per step. All cited declarations are axiom-audited. Module names are
+prefixed \lean{LeanFunctional}, elided for width.}
+\label{tab:inventory}
+\centering\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llr@{}}
+\toprule
+Step & Module & Aud. \\
+\midrule
+Union, Thm~\ref{thm:union}              & \lean{...RangeAlternativeUnionV1}  &  7 \\
+Oracle, Thm~\ref{thm:oracle}            & \lean{...RangeEnergyOracleV1}      &  5 \\
+Shrink/expand, Thms~\ref{thm:shrink}--\ref{thm:expand} & \lean{...ShrinkExpandV1} & 9 \\
+Inner QP, Thm~\ref{thm:innerqp}         & \lean{...RangeEnergyOracleV1}      &  5 \\
+Certificate, Thm~\ref{thm:kkt}          & \lean{...RangeDesignCertificateV1} &  9 \\
+Families, Thms~\ref{thm:family1}--\ref{thm:family2} & \lean{...ScalarProxyFailsV1} & 14 \\
+Setup cost, Thms~\ref{thm:crossing}--\ref{thm:undecided} & \lean{...DesignDualityV1} & 21 \\
+Break-even, Thm~\ref{thm:breakeven}     & \lean{...DesignDualityV1}          & 12 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scope of the Formalisation}
+
+The Functional strand contains $49$ Lean source files with $430$ theorem and lemma
+statements, of which $21$ modules carry an acceptance receipt covering $162$ audited
+declarations. Across the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules,
+$857$ audited declarations.
+
+Three formulations were withdrawn under the prover. The first version of the union identity
+froze the extrema at the truth, so the forward direction of Theorem~\ref{thm:union} fails---
+precisely the phenomenon family~1 exploits. The expand cost initially minimised over unordered
+pairs, which overstates $E_{j}$ by forcing a third cell to move. And the certificate initially
+followed the textbook route through $M^{-1}$, which would have propagated an invertibility
+hypothesis into every downstream statement. Every audited statement of every module this paper cites is displayed in Section~
+ef{sec:setting}, attached to the step that uses it; only positivity checks and measurability side conditions are omitted, and their count is given at each block. The strand contains a further $15$ accepted modules carrying $106$ audited declarations that no step of this paper uses; they belong to other results of the programme. Appendix~\ref{app:inventory} reproduces the complete chain: all $162$ audited statements of the strand across its $21$ accepted modules, grouped by module.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Reporting Protocol}
+
+All $1{,}000$ paired instances are reported. Median query counts are medians over certified
+runs only, and the certification fraction carries the remaining information.
+
+\subsection{The Two Families Separate Without Limit}
+
+As $\eta\to0$ family~1 drives $J_{\mathrm{full}}/J_{\mathrm{scalar}}$ to zero and family~2
+drives it to infinity. At $\eta=1$ the two envelopes are $9$ and $0.25$; at $\eta=0.01$ they
+are $0.09$ and $6.44$. Both are proved bounds in exact arithmetic, not sampled points, so the
+failure of the proxy is a theorem rather than an observation.
+
+\begin{table}[htbp]
+\caption{The two families evaluated along the $\eta$ grid. Family~1's column is the proved
+upper envelope $9\eta$; family~2's is the proved lower envelope $(1+3\eta)/(16\eta)$. They
+move in opposite directions, which is Corollary~\ref{cor:noconstant}.}
+\label{tab:families}
+\centering
+\footnotesize
+\begin{tabular}{@{}rrr@{}}
+\toprule
+$\eta$ & Family 1 ratio $\le$ & Family 2 ratio $\ge$ \\
+\midrule
+$1.00$ & $9.0000$ & $0.2500$ \\
+$0.50$ & $4.5000$ & $0.3125$ \\
+$0.20$ & $1.8000$ & $0.5000$ \\
+$0.10$ & $0.9000$ & $0.8125$ \\
+$0.05$ & $0.4500$ & $1.4375$ \\
+$0.02$ & $0.1800$ & $3.3125$ \\
+$0.01$ & $0.0900$ & $6.4375$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{On the Main Panel, $\mathrm{C\_lucb}$ Is the Baseline to Beat}
+
+$\mathrm{C\_lucb}$ certifies $797$ of $1{,}000$ worlds at median $20{,}996$ queries;
+$\mathrm{C\_anytime}$ certifies $749$ at $29{,}884$; uniform certifies $605$ at $74{,}252$.
+Where both certify---$749$ instances---$\mathrm{C\_lucb}$ is strictly faster in $748$, ties
+in $1$ and loses in $0$, with a further $48$ worlds it certifies alone and $0$ that
+$\mathrm{C\_anytime}$ certifies alone.
+
+\begin{table}[htbp]
+\caption{Confirmatory panel, $1000$ paired instances. A result on this panel under this
+generator, not a domination theorem.}
+\label{tab:panel}
+\centering
+\footnotesize
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Policy & certified & fraction & median $N$ \\
+\midrule
+$\mathrm{C\_lucb}$    & $797$ & $0.797$ & $20{,}996$ \\
+$\mathrm{C\_anytime}$ & $749$ & $0.749$ & $29{,}884$ \\
+uniform               & $605$ & $0.605$ & $74{,}252$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig1_panel.png}
+\caption{The confirmatory panel, $1000$ paired instances at horizon $131{,}072$.
+$\mathrm{C\_lucb}$ is the baseline any new allocator must beat, not a method this paper
+defends.}
+\label{fig:panel}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig5_panel_detail.png}
+\caption{The panel on the two axes that matter jointly. A policy is described by two numbers
+at once---how often it certifies, and how many queries it spends when it does---and either
+alone can be made to look good at the other's expense. Plotting them together shows that the
+ordering here is not a trade-off: $\mathrm{C\_lucb}$ certifies the most worlds \emph{and}
+spends the fewest queries doing it, so it dominates on the panel rather than occupying a
+different point on a frontier. Uniform allocation sits at the opposite corner on both axes.
+This is a panel result under a fixed generator, not a domination theorem. \NUM{}}
+\label{fig:paneldetail}
+\end{figure}
+
+\subsection{Reading the Panel}
+
+Three things about Table~\ref{tab:panel} should be stated rather than left to inference. It is
+a panel result: the generator, horizon and instance distribution are fixed, and the paired
+analysis is a property of these instances rather than a proof that $\mathrm{C\_lucb}$ is
+never slower. It is not evidence for this paper's oracle, since no allocator built on
+Algorithm~\ref{alg:oracle} appears in it. And censoring is substantial at $29.1\%$, which is
+why both columns are reported.
+
+\subsection{How Often the Proxy Misleads, and When}
+\label{sec:e2results}
+
+Across six thousand instances the scalar proxy is usually close and occasionally far. The
+median ratio $J_{\mathrm{full}}/J_{\mathrm{scalar}}$ is $1.000$, so an analyst who uses
+\eqref{eq:scalar} on a typical instance is not systematically misled. The tails are another
+matter: the fifth percentile is $0.318$ and the ninety-fifth is $1.658$, the extremes reach
+$0.018$ and $41.7$, and the proxy is wrong by more than a factor of two on $12.3\%$ of
+instances. That figure splits by direction, and the split is the informative part: on
+$9.0\%$ the proxy errs optimistically---reporting a value the true problem cannot
+deliver---and on the remaining $3.3\%$ it errs conservatively. The two tails are disjoint by
+construction, and the optimistic one is nearly three times the size of the other. \NUM{}
+\NOTEPAR{An earlier draft reported this as ``wrong by more than a factor of two on
+$3.3\%$ \dots and in the optimistic direction on $9.0\%$'', which makes a subset larger than
+its superset. The raw rows give $198$ instances above $2\times$ and $542$ below $\tfrac12
+\times$, disjoint, $740$ of $6{,}000$ together. The fields are \texttt{frac\_over\_2x} and
+\texttt{frac\_under\_half} in \texttt{functional\_proxy.json}.}
+
+The interesting result is not the spread but its cause, and it is the one the families
+predict. Figure~\ref{fig:proxy} splits the instances by whether the cheapest
+capacity-inverting alternative opens a pair of $j$ other than its current extrema. It does on
+$26.6\%$ of instances, and those are a different population: their median ratio is $0.657$
+against $1.000$ for the rest. The relationship is not statistical but exact. Of the $1{,}367$
+instances on which the proxy overstates---any ratio below one---every single one has a moving
+extremum, and so do all $542$ on which it overstates by more than a factor of two. Not one
+instance with its extrema fixed produced a ratio below one. The converse fails, as it should:
+$1{,}597$ instances have a moving extremum and $230$ of those are still exact, so a moving
+extremum is necessary for the proxy to overstate and not sufficient. \NUM{}
+
+That turns the separation from a warning into a test. The mechanism family~1 was built to
+exhibit is not a curiosity of a constructed instance---it is what a quarter of random
+instances do---and whether it is present can be checked on the instance in hand, before
+\eqref{eq:scalar} is trusted, by asking whether the cheapest alternative opens a
+currently-extremal pair. Where it does not, the proxy was exact on every instance drawn here.
+
+Two cautions about the computation. First, the exact solver agrees with SLSQP to
+$8\times10^{-11}$ on most of the $113$ cross-checked cells, but on a handful the optimiser
+comes in far above---up to a factor of six---because the constraint is not smooth and it
+stalls. That is a statement about SLSQP, not about the decomposition, and the reason it can
+be read that way is the direction: on \emph{no} cell did SLSQP land below the decomposition,
+which is the only outcome that would have indicated an error. Second, an earlier
+implementation searched only the breakpoints for the optimal window position and therefore
+over-estimated $J_{\mathrm{full}}$; it was caught by exactly this cross-check, and the closed
+form of Section~\ref{sec:e2} replaced it.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig6_proxy.png}
+\caption{The scalar proxy against the true value on six thousand random instances, split by
+mechanism. The vertical line is exact agreement. Instances where the cheapest alternative
+opens a pair that is \emph{not} currently extremal---the mechanism family~1 exploits---carry
+almost the whole optimistic tail, with median ratio $0.657$; the rest sit on the line, with
+median $1.000$. The proxy's failure is therefore predictable from a property of the instance
+rather than being spread uniformly over it. \NUM{}}
+\label{fig:proxy}
+\end{figure}
+
+\subsection{A Search for a Duality Gap}
+\label{sec:e3results}
+
+Theorem~\ref{thm:kkt} is deliberately arranged as sufficiency and deliberately assumes only
+semidefiniteness, because an allocator that has learned something loses rank and a certificate
+needing $M^{-1}$ fails exactly then. The price of that arrangement is that strong duality is
+left open, and it is left open for a reason: the textbook statements are usually quoted under
+definiteness or a Slater condition, neither of which is available here.
+
+The question has a sharp refutable form---one instance with a gap settles it---so
+Experiment~E3 is run as a search for a counterexample over three families of increasing
+awkwardness: $M$ definite, where duality is classical and which therefore serves as the
+self-check; $M$ singular; and $M$ singular with its null space deliberately aligned to the
+constraint normals, which is the only structural route by which a semidefinite programme can
+lose its dual. Over $1{,}054$ solved instances the largest relative gap found is
+$1.5\times10^{-11}$ on the definite family, $2.0\times10^{-13}$ on the singular one and
+$1.7\times10^{-14}$ on the aligned one---machine precision in every case, and smallest
+precisely on the family built to break it. No instance survived re-solution with a gap.
+\NUM{}
+
+That is evidence and not a proof, and the asymmetry is worth stating plainly: a single
+counterexample would have settled the question, and a thousand instances without one settles
+nothing. What the search does establish is narrower and still useful---the mechanism one would
+suspect does not produce a gap, so an attempt at the theorem need not work around it.
+
+Two false alarms along the way are worth recording, because both would have been reported as
+findings by a less suspicious run. The first was a sign error in the dual objective, caught by
+the definite family's self-check, which returned a relative gap of $7\times10^{9}$ rather than
+zero. The second was subtler and nearly survived: $\lambda=0$ is always feasible, so the
+optimum is frequently zero, and a gap normalised by $|J_{\mathrm{full}}|$ turns a difference of
+$10^{-15}$ into an apparent gap of $10^{-2}$. Three instances were flagged that way; the flag
+disappeared when the gap was measured against the scale the problem supplies---the objective at
+the feasible point $\lambda=0$---rather than against a vanishing optimum. A gap contradicting
+classical convex duality is a reason to suspect the measurement first, and here the suspicion
+was right twice.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{func_fig7_duality.png}
+\caption{The search for a duality gap on the pair-region programme. Distribution of the
+relative gap over three families; the dashed line is the threshold above which an instance is
+re-solved from many starts on both sides and re-checked. Nothing reaches it. The family built
+to be adversarial---$M$ singular with its null space aligned to the constraint normals---has
+the \emph{smallest} gaps of the three, which is the opposite of what a real obstruction would
+look like. \NUM{}}
+\label{fig:duality}
+\end{figure}
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What the Families Settle}
+
+The two families settle a methodological question rather than a numerical one. Because the
+proxy errs in both directions without a constant, no calibration of it can be safe: an
+allocator that trusts it may either waste budget excluding an alternative that is already
+cheap (family~1), or stop early against one that is far cheaper than it believes (family~2).
+The second is a correctness failure and the first only an efficiency failure, which is why
+Corollary~\ref{cor:noconstant} is stated in both directions rather than in the one that is
+easier to prove: a one-sided result would leave open that the proxy is conservative, hence
+safe if wasteful.
+
+\subsection{Shortcomings and Limitations}
+\TODOPAR{The title was narrowed from ``Solving the Group-Range Alternative Exactly'' to
+``Exact Components for\dots'' because Section~IV-A says $J_{\mathrm{full}}$ is not formalised
+as an infimum and the separability step that assembles the components into an equality is not
+proved. \emph{Two ways forward:} prove the separability theorem, which earns the original
+title; or keep the current proof and sell the paper as an exact negative result plus exact
+components. The second is the shorter path. The abstract's one empirical sentence used to
+compare \texttt{C\_lucb} with uniform---neither of them this paper's allocator, as
+Section~VII-D says---and now reports the E2 measurement instead.}
+
+\emph{The decomposition step is not formalised, so the oracle equality is not claimed.} The
+chain of Sections~\ref{sec:union}--\ref{sec:kkt} would become an equality
+$J_{\mu}(x)=\min_{i,j}\inf_{z\ge0}[S_{i}(z)+E_{j}(z)]$ given one further statement: that in
+the observation model the two relations occupy disjoint blocks of the information matrix
+while every other relation contributes zero cost. That is a \emph{model} statement, not an
+optimisation one, and it is not proved here. Each component of the chain is proved, and the
+inequalities \eqref{eq:order} are proved; what is missing is precisely the separability step.
+Stating this plainly costs the paper a headline, and the alternative---presenting the chain as
+though it closed---would forfeit the discipline the rest of the paper rests on. The negative
+results do not depend on the assembly: they compare $J_{\mathrm{full}}$ against
+$J_{\mathrm{scalar}}$ directly, bounded above by an exhibited alternative in family~1 and
+below by Lemma~\ref{lem:posparts} in family~2.
+
+\emph{The certificate is sufficiency only.} Theorem~\ref{thm:kkt} says a point with a
+certificate is optimal. It does not say every optimal point has one, and only weak duality is
+proved, so a duality gap is not excluded.
+
+\emph{Standing model assumptions.} Free response table, known variance, positive precision.
+Under realizability coupling the cost does not separate and nothing here applies.
+
+\emph{No allocator has been built.} Table~\ref{tab:panel} is a statement about existing
+policies and not evidence for the oracle. The paper establishes that the exact oracle is
+computable and that the proxy is unusable; it does not establish that the exact oracle pays
+for itself.
+
+\emph{The families are extremal by construction.} What happens on ordinary instances is not
+measured, and deliberately so: the error depends on how far the cheapest alternative's
+attaining cells are from the truth's, which is an instance property with no natural
+distribution attached, so a sweep would report a property of the generator.
+
+\subsection{Open Problems}
+
+Assembling the full oracle equality is first, and it requires the separability statement named
+above rather than more optimisation. Building an allocator on the exact oracle and comparing
+it against $\mathrm{C\_lucb}$ on the same panel is second. Whether strong duality holds for
+the pair-region programme is third; Section~\ref{sec:e3results} searched $1{,}054$ instances
+for a gap, including a family built to produce one, and found none above machine precision,
+which locates the question without answering it. Finally, the families are two-relation and three-action;
+whether the failure ratios can be driven to their limits with fewer actions, or must worsen
+with more relations, is not known.
+
+\section{Conclusion}
+
+When the extrema can move, the scalar pair-flip proxy is a bound in neither direction, and no
+constant repairs it. The true alternative set is a finite union of convex pair regions on the
+real range target; its energy oracle is a finite conjunction of convex problems; the inner
+problem has a closed form; and its optimality certificate needs no matrix inverse, so a
+singular information matrix costs nothing extra. For a practitioner the guidance is concrete.
+If relations are ranked by a mean, the pair-flip value is exact and nothing here applies. If
+they are ranked by a range, or by any statistic whose attaining cells can move, do not compute
+the value at the current extrema: enumerate the ordered pairs, evaluate the shrink and expand
+costs on each, and take the minimum.
+
+\section*{Acknowledgment}
+
+The formal development uses the Lean~4 theorem prover and the mathlib library.
+
+\begin{thebibliography}{00}
+
+\bibitem{garivier2016} A. Garivier and E. Kaufmann, ``Optimal best arm identification with
+fixed confidence,'' in \emph{Proc. 29th Annu. Conf. Learning Theory (COLT)}, 2016.
+
+\bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
+best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.},
+vol.~17, pp.~1--42, 2016.
+
+\bibitem{jourdan2023} M. Jourdan, R. Degenne, and E. Kaufmann, ``Dealing with unknown
+variances in best-arm identification,'' in \emph{Proc. 34th Int. Conf. Algorithmic Learning
+Theory (ALT)}, 2023.
+
+\bibitem{boyd2004} S. Boyd and L. Vandenberghe, \emph{Convex Optimization}. Cambridge,
+U.K.: Cambridge Univ. Press, 2004.
+
+\bibitem{rockafellar1970} R. T. Rockafellar, \emph{Convex Analysis}. Princeton, NJ:
+Princeton Univ. Press, 1970.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\input{functional_appendix}
+
+\end{document}

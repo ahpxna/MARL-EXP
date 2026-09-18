@@ -213,6 +213,10 @@ sampling model. The paper's subject is what can be concluded \emph{from} them, a
 who disputes them disputes the premises rather than the argument.
 
 \subsection{Simplifying Assumptions}
+\NOTEPAR{$I_{B}$ and $I_{\mathrm{pair}}$ are taken as given from the corpus and are not
+re-derived from the sampling model. A reviewer cannot check a premise they cannot see, so the
+final version should either derive them or state precisely which external artifact supplies
+them and how it was checked.}
 
 \begin{enumerate}
 \item[1)] \textbf{Magnitude-constrained class.} The alternative set is cut out by
@@ -293,6 +297,10 @@ $S$ and its complement and dividing by the positive normaliser $2q$ gives
 The two sign hypotheses are what make the statement true rather than tidy. With $\mu<0$ the
 constraint $|v_{i}|\ge\mu$ holds for every $v$, so $v=0$ would be admissible and give
 $I(v)=0<I_{B}(d,x)$. They appear in \lean{IB\_le\_general} for that reason.
+\NOTEPAR{An earlier draft printed Theorem~\ref{thm:reduction} without $\mu\ge0$ and
+$x\ge0$. That is not a cosmetic omission---the statement is false without them---and the Lean
+version had them all along, so this is a case of the prose being weaker than the artifact
+rather than stronger.}
 
 The proof is coordinate-wise and the sum is finite, so no optimiser and no rearrangement
 argument is needed. This is worth noting because a reduction of this kind is often attempted
@@ -305,6 +313,14 @@ boundary
 \mathcal{B}=\{v:\ |v_{i}|=\mu\ (i\in S),\ |v_{i}|=x\ (i\notin S)\},
 \label{eq:boundary}
 \end{equation}
+\TODOPAR{What is and is not machine-checked here. \lean{slice\_is\_tight} is
+character-for-character identical to \lean{IB\_eq\_of\_slice}: same hypotheses
+($v_{i}=\mu$ on $S$, $v_{i}=x$ off it---\emph{signed}, not magnitudes), same conclusion. So
+the Lean development contains the sufficient direction on the signed slice and nothing else.
+The extension to all of $\mathcal{B}$ and the converse are both true by the same
+coordinate-wise argument and are done in prose here. \emph{If the word ``precisely'' is wanted
+back in Corollary~\ref{cor:tight}, the converse has to be formalised}; nothing below needs it,
+because the quantifier upgrade consumes attainment only.}
 and the slice is one of its $2^{q}$ sign orthants: $I$ depends on $v$ only through
 $|v_{i}|$, so every sign pattern on $\mathcal{B}$ attains the same value.
 
@@ -1151,6 +1167,15 @@ into a derivation. Theorem~\ref{thm:affine} says the optimum is at an endpoint, 
 as a degenerate answer but is what removes the need to search.
 
 \subsection{Shortcomings and Limitations}
+\TODOPAR{Two structural things to settle for the final version. (i) Notation:
+$\mu$ denotes both the displacement of the $d$ coordinates in the alternative family
+(Sections~I and IV-A) and the margin in the exchange bound (Theorem~\ref{thm:exchange}),
+and Theorems~\ref{thm:sufficient}--\ref{thm:subthreshold} then switch to $\rho$ for the same margin while
+Section~VII-F switches back. Pick one. (ii) The title carries three propositions and the
+margin threshold has nothing to do with the slice or the design; the margin half is a
+self-contained result on Top-$C$ selection under approximate modularity and would stand as a
+short paper on its own, positioned against Feige--Feldman--Talgam-Cohen on the three axes
+Section~II-C already identifies.}
 
 \emph{The reduction is for the scalar query only.} The pair query has a blind direction, so
 the coordinate-wise argument of Theorem~\ref{thm:reduction} cannot start: there are non-zero

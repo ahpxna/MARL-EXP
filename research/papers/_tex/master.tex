@@ -81,6 +81,12 @@ $v,\nu$ for the two observation variances, the optimal value under a unit budget
 \qquad s_{m}=\sqrt{vm},\quad s_{\kappa}=\sqrt{\nu\kappa} .
 \label{eq:pricelaw}
 \end{equation}
+\NOTEPAR{The law is written in the noise-weighted prices because that is what the Lean
+theorem proves: \lean{calibration\_rate\_upper} is stated in free $s_{m},s_{\kappa}$ and the
+budget it carries is $\sum_{g}(s_{m}^{2}x_{g}+s_{\kappa}^{2}z_{g})\le1$ with $x,z$
+\emph{precisions}. Writing $\sqrt{m},\sqrt{\kappa}$ instead is the $v=\nu=1$ special case. An
+earlier draft printed the special case as the general law, and Section~IV-F compounded it by
+giving the cost as $mx+\kappa z$; both are corrected here.}
 The prices that enter are noise-weighted, because what a budget buys is precision and a
 noisier channel buys less of it per unit spent. Writing the law in $\sqrt{m}$ and
 $\sqrt{\kappa}$ alone is the special case $v=\nu=1$.
@@ -180,6 +186,14 @@ matching incorrect implementation agree perfectly. That guarantee is why the num
 in Section~\ref{sec:results} is deliberately narrow.
 
 \subsection{The Gap}
+\NOTEPAR{Positioning, for the final version. Square-root allocation under unequal
+sampling costs is classical---Neyman allocation with costs---so the price
+$(s_{m}+s_{\kappa})^{2}$ should not be sold as the novelty; a reviewer will say so
+immediately, and Section~II-B already concedes that cost-constrained design is standard. The
+part with no clear precedent is the \emph{dichotomy}: an unknown shared offset makes the
+ordinary channel non-identifiable, so the attainable value is exactly zero rather than merely
+small, and the query type becomes a precondition rather than an object of optimisation. The
+title and the abstract should lead with that.}
 
 The literature therefore leaves a specific opening. Discrimination design prices allocations
 but not query types; cost-constrained design prices support points but admits no zero-value
@@ -817,6 +831,14 @@ The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
 $\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$ and $v=\nu=1$, giving $32$ cells. The
 two noise levels are stated because \eqref{eq:pricelaw} is written in the noise-weighted
 prices, so a grid that leaves them implicit does not determine the tabulated values. The $\kappa$ values
+\TODOPAR{Table~\ref{tab:cells} was regenerated for this draft by
+\texttt{EXP\_master\_cells.py} at $v=\nu=1$. The previous table matched
+$\Delta^{2}/\bigl(2K(\sqrt{4m}+\sqrt{4\kappa})^{2}\bigr)$ on all 32 cells to five digits,
+i.e.\ it was computed at $v=\nu=4$ without saying so---or, indistinguishably from the numbers
+alone, at $v=\nu=1$ with an effective separation $\Delta/2$. The generating script was not in
+the repository, so the ambiguity could not be resolved by reading and was removed by
+regenerating instead. \emph{Decide before submission} which convention the original sweep
+intended, in case a figure elsewhere still assumes the old one.}
 straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
 the law predicts to be qualitatively different.
 
@@ -857,6 +879,11 @@ a separate curve. It is set from the dimensionless product the law itself identi
 \lambda \;=\; \tfrac12 K\,\Gamma^{*}B \;=\; \frac{\Delta^{2}B}{4\,(s_{m}+s_{\kappa})^{2}},
 \label{eq:lambda}
 \end{equation}
+\NOTEPAR{$\lambda$ and $\Gamma^{*}$ are different objects and an earlier draft used one
+symbol for both. $\Gamma^{*}$ is the per-group value under a unit budget, which is what the
+Lean theorem bounds. $\lambda$ is the dimensionless error exponent, and the relation is
+$\lambda=\tfrac12K\Gamma^{*}B$. The finite-sample experiment uses $\lambda$; the design
+experiment uses $\Gamma^{*}$.}
 on the grid $\lambda\in\{0.05,0.1,0.2,0.4,0.7,1,1.5,2.25,3,4\}$, so that
 \eqref{eq:upper} predicts one curve, $\Phi(-\sqrt{\lambda})$, for every instance at once.
 A collapse onto a single curve is a strong prediction and an easy one to falsify. Drawing

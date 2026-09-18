@@ -111,6 +111,11 @@ Section~\ref{sec:subgauss} discharges.
 Their Appendix~B is the precise point of contact, and it is closer than a framework
 reference. Lemma~15 there analyses exactly the rule studied below---serve the arm maximising
 $P_{i}(k{+}1)-N_{i}(k)$---and proves $\max_{i}|N_{i}(n)-P_{i}(n)|\le K-1$. So a deficit bound
+\NOTEPAR{This was read from the primary source for this draft (arXiv:1602.04589v2,
+Appendix~B). Lemma~15 is the deterministic core behind their Lemmas 7 and 8, and its rule is
+literally the one studied here. An earlier draft's abstract said the tracking bound was ``an
+assumption nobody wrote down''; it was written down, proved, and the constant is $K-1$. The
+contribution is that the constant $1$ is unavailable, not that no constant was known.}
 for largest-deficit tracking exists in the literature, and its constant grows with the number
 of arms.
 
@@ -122,6 +127,13 @@ the true constant for this rule lies in $[\tfrac{321}{160},K-1]$, with the lower
 established by exhibition in Section~\ref{sec:frontier} rather than assumed.
 
 \subsection{Apportionment}
+\NOTEPAR{An earlier draft asserted here that no apportionment method satisfies both
+house monotonicity and quota, citing \cite{balinski1982}---the book containing the theorem
+that characterises the family which does. The compatible direction is what matters for this
+paper, and Section~\ref{sec:bny} now exhibits a rule holding both. \emph{The 1975 and 1979
+papers were cited from secondary sources and metadata; verify both against the originals
+before submission}, since this is a positive claim about prior work and it is the kind a
+social-choice reviewer checks first.}
 
 The apportionment literature settles what is and is not compatible here, and it is worth
 stating precisely because the compatible direction is the one that matters for this paper.
@@ -856,6 +868,12 @@ The three exhaust what the obstruction permits.
 
 \subsection{How Far the Deficit Goes, and What the Search Limit Was Hiding}
 \label{sec:frontier}
+\NOTEPAR{Three searches now bear on this, and they should not be conflated in the final
+version. (i) Exhaustive, $K\le8$, $d\le64$, horizon $240$: $1{,}228{,}079$ targets, worst
+$\tfrac74$---this is the one the earlier draft reported. (ii) Exhaustive, $d\le96$:
+$17{,}513{,}610$ targets, worst $\tfrac{59}{32}$, violation rate $33.8\%$. (iii) Restricted
+shape, $K\le20$, $d\le160$, horizon $400$: worst $\tfrac{321}{160}$. Each time the box grew
+the answer grew, and in (i) and (ii) the worst target sat at both limits of its own box.}
 
 The census of Section~\ref{sec:results} answers how \emph{often} the rule exceeds a deficit of
 one. It does not answer how far, and the number it reports for that---$\tfrac74$---is a
@@ -921,6 +939,14 @@ $\tfrac32$, and $\tfrac{321}{160}$ is exhibited.
 
 \subsection{A Rule That Holds Both Bounds}
 \label{sec:bny}
+\TODOPAR{This is the result most worth developing. The quota method holds both bounds on
+all $32{,}018$ targets, and \texttt{EXP\_adaptive\_quotacheck.py} shows why: it satisfies
+quota in the apportionment sense, which is strictly stronger and implies both bounds. So the
+sweep confirms a consequence rather than a coincidence. \emph{What is missing is a proof for
+this setting}---that the quota method's eligibility rule keeps $|N_{i}(t)-tw_{i}|<1$ at every
+horizon---which should follow from the upper-quota restriction plus $\sum_{i}\lceil
+hw_{i}\rceil\ge h$ and would turn the strongest empirical claim in the paper into a theorem.
+It would also give the downstream analysis a rule it can actually appeal to.}
 
 The comparison in Section~\ref{sec:e2results} covered seven rules and found none holding the
 deficit and the surplus bound together. That was the wrong family to stop at, and the
@@ -963,6 +989,13 @@ A constant \emph{is} now available for one alternative---the quota method holds 
 Section~\ref{sec:bny}---but none is computed for the divisor methods.
 
 \emph{The rule-to-counts link is not machine-checked.} As Section~\ref{sec:gap} states, the
+\TODOPAR{\lean{greedy\_steps} concludes \textsf{True}: its eleven comparisons are checked
+inside the proof and do not escape it. The paper is candid about this and a reviewer will
+credit that, but the abstract still calls the witness ``exact'' without the caveat, and
+Theorem~\ref{thm:quotafails} is stated as a proposition about a rule. Closing it is cheap---
+define \texttt{greedyCount} as a \lean{Nat.rec} over a \lean{Finset.argmax} and prove
+$\texttt{greedyCount}(w,11)=N$ by \lean{decide}---and it removes the one place where this
+paper's prose is broader than its artifact.}
 arithmetic of the violation is proved and the identification of $N$ as the greedy trajectory
 rests on an exact recomputation reported here.
 
