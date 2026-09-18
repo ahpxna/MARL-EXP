@@ -11,84 +11,37 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,1}\quad\lean{avg\_le\_path}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{pi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{avgVal} \mathit{r} \mathit{P}\\
-&\quad \leq \mathit{pathVal} \mathit{r}\\
-&\quad \mathit{P}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi})\\
+\vdash\;&\mathit{avgVal} \mathit{r} \mathit{P} \leq \mathit{pathVal} \mathit{r} \mathit{P}
 \end{aligned} \]}
 
 \noindent\textbf{A\,2}\quad\lean{eps\_le\_card\_avg}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0\\
-&\quad \leq \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P} \mathit{pi}),\; (\mathit{hP1} :\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{epsNest} \mathit{r} \leq (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} ) *\\
-&\quad \mathit{avgVal} \mathit{r} \mathit{P}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k})\\
+&\quad ,\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hP1} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} = 1)\\
+\vdash\;&\mathit{epsNest} \mathit{r} \leq (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) * \mathit{avgVal} \mathit{r} \mathit{P}
 \end{aligned} \]}
 
 \noindent\textbf{A\,3}\quad\lean{eps\_le\_path}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hP1} : \textstyle\sum \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} = 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{epsNest} \mathit{r} \leq \mathit{pathVal}\\
-&\quad \mathit{r} \mathit{P}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\\
+&\quad \; (\mathit{hP1} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} = 1)\\
+\vdash\;&\mathit{epsNest} \mathit{r} \leq \mathit{pathVal} \mathit{r} \mathit{P}
 \end{aligned} \]}
 
 \noindent\textbf{A\,4}\quad\lean{gap\_exactly\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0\\
-&\quad \leq \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P} \mathit{pi}),\; (\mathit{hP1} :\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
-&\quad 1),\; (\mathit{hsat} : (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} ) * \mathit{avgVal}\\
-&\quad \mathit{r} \mathit{P} = \mathit{epsNest}\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pathVal} \mathit{r} \mathit{P}\\
-&\quad = (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} ) * \mathit{avgVal}\\
-&\quad \mathit{r} \mathit{P}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k})\\
+&\quad ,\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hP1} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} = 1),\; (\mathit{hsat} : (\mathit{Fintype}\\
+&\quad .\mathit{card} \mathit{Bud} : \mathbb{R} ) * \mathit{avgVal} \mathit{r} \mathit{P} = \mathit{epsNest} \mathit{r})\\
+\vdash\;&\mathit{pathVal} \mathit{r} \mathit{P} = (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) * \mathit{avgVal} \mathit{r} \mathit{P}
 \end{aligned} \]}
 
 \noindent\textbf{A\,5}\quad\lean{path\_le\_card\_avg}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0\\
-&\quad \leq \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P} \mathit{pi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pathVal} \mathit{r} \mathit{P}\\
-&\quad \leq (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} ) * \mathit{avgVal}\\
-&\quad \mathit{r} \mathit{P}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k})\\
+&\quad ,\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi})\\
+\vdash\;&\mathit{pathVal} \mathit{r} \mathit{P} \leq (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) * \mathit{avgVal} \mathit{r} \mathit{P}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -96,89 +49,42 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,6}\quad\lean{deletion\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{u} : \mathit{Fin}\\
-&\quad \mathit{r}),\; (\mathit{hne} : \mathit{t}\\
-&\quad \neq \mathit{u})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{staircaseSelected} \mathit{t} \\\
-&\quad \mathit{staircaseSelected}\\
-&\quad \mathit{u}).\mathit{card} =\\
+&(\mathit{t} \mathit{u} : \mathit{Fin} \mathit{r}),\; (\mathit{hne} : \mathit{t} \neq \mathit{u})\\
+\vdash\;&(\mathit{staircaseSelected} \mathit{t} \ \mathit{staircaseSelected} \mathit{u}).\mathit{card} =\\
 &\quad \mathit{u}.\mathit{val}-\mathit{t}.\mathit{val}+1
 \end{aligned} \]}
 
 \noindent\textbf{A\,7}\quad\lean{good\_decision\_forced}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hr} : 0 < \mathit{r}),\; (\mathit{eps} :\\
-&\quad \mathbb{R} ),\; (\mathit{heps} :\\
-&\quad 2*(\mathit{r}:\mathbb{R} )*\mathit{eps} <\\
-&\quad 1),\; (\mathit{t} : \mathit{Fin}\\
-&\quad \mathit{r}),\; (\mathit{S} : \mathit{Finset}\\
-&\quad (\mathit{StairRel} \mathit{r})),\; (\mathit{hS} :\\
-&\quad \mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} =>\\
-&\quad \mathit{selectedRadius} \mathit{staircaseF}\\
-&\quad \mathit{T}/(\mathit{r}:\mathbb{R} )) \mathit{eps}\\
-&\quad (\mathit{staircaseSelected} \mathit{t}).\mathit{card}\\
-&\quad \mathit{S})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{S}=\mathit{staircaseSelected}\\
-&\quad \mathit{t}
+&(\mathit{hr} : 0 < \mathit{r}),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : 2*(\mathit{r}:\mathbb{R} )*\mathit{eps} < 1),\\
+&\quad \; (\mathit{t} : \mathit{Fin} \mathit{r}),\; (\mathit{S} : \mathit{Finset} (\mathit{StairRel} \mathit{r})),\; (\mathit{hS} : \mathit{EpsilonOptimalAt} (\\
+&\quad \mathbf{fun} \mathit{T} => \mathit{selectedRadius} \mathit{staircaseF} \mathit{T}/(\mathit{r}:\mathbb{R} )) \mathit{eps} (\\
+&\quad \mathit{staircaseSelected} \mathit{t}).\mathit{card} \mathit{S})\\
+\vdash\;&\mathit{S}=\mathit{staircaseSelected} \mathit{t}
 \end{aligned} \]}
 
 \noindent\textbf{A\,8}\quad\lean{policy\_total}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hr} : 0 < \mathit{r}),\; (\mathit{eps} :\\
-&\quad \mathbb{R} ),\; (\mathit{heps} :\\
-&\quad 2*(\mathit{r}:\mathbb{R} )*\mathit{eps} <\\
-&\quad 1),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{t} :\\
-&\quad \mathbb{N} \to \mathit{Fin}\\
-&\quad \mathit{r}),\; (\mathit{S} : \mathbb{N}\\
-&\quad \to \mathit{Finset}\\
-&\quad (\mathit{StairRel} \mathit{r})),\; (\mathit{hS} :\\
-&\quad \forall \mathit{i} \leq \mathit{n},\mathit{EpsilonOptimalAt}\\
-&\quad (\mathbf{fun} \mathit{T} => \mathit{selectedRadius}\\
-&\quad \mathit{staircaseF} \mathit{T}/(\mathit{r}:\mathbb{R}\\
-&\quad )) \mathit{eps} (\mathit{staircaseSelected}\\
-&\quad (\mathit{t} \mathit{i})).\mathit{card} (\mathit{S}\\
-&\quad \mathit{i}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{i} \in \mathit{range}\\
-&\quad \mathit{n},\mathit{recourse} (\mathit{S} \mathit{i})\\
-&\quad (\mathit{S} (\mathit{i}+1))) =\\
-&\quad \textstyle\sum \mathit{i} \in \mathit{range}\\
-&\quad \mathit{n},\mathbf{if} \mathit{t}\\
-&\quad \mathit{i}=\mathit{t} (\mathit{i}+1)\\
-&\quad \mathbf{then} 0 \mathbf{else} 1
+&(\mathit{hr} : 0 < \mathit{r}),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : 2*(\mathit{r}:\mathbb{R} )*\mathit{eps} < 1),\\
+&\quad \; (\mathit{n} : \mathbb{N} ),\; (\mathit{t} : \mathbb{N} \to \mathit{Fin} \mathit{r}),\; (\mathit{S} : \mathbb{N} \to \mathit{Finset} (\mathit{StairRel} \mathit{r})),\\
+&\quad \; (\mathit{hS} : \forall \mathit{i} \leq \mathit{n},\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => \mathit{selectedRadius}\\
+&\quad \mathit{staircaseF} \mathit{T}/(\mathit{r}:\mathbb{R} )) \mathit{eps} (\mathit{staircaseSelected} (\mathit{t} \mathit{i})).\mathit{card} (\mathit{S} \mathit{i}))\\
+\vdash\;&(\textstyle\sum \mathit{i} \in \mathit{range} \mathit{n},\mathit{recourse} (\mathit{S} \mathit{i}) (\mathit{S} (\mathit{i}+1))) = \textstyle\sum \mathit{i} \in \mathit{range} \mathit{n},\\
+&\quad \mathbf{if} \mathit{t} \mathit{i}=\mathit{t} (\mathit{i}+1) \mathbf{then} 0 \mathbf{else} 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,9}\quad\lean{selected\_difference}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{u} : \mathit{Fin}\\
-&\quad \mathit{r}),\; (\mathit{hne} : \mathit{t}\\
-&\quad \neq \mathit{u})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{staircaseSelected} \mathit{t} \\\
-&\quad \mathit{staircaseSelected} \mathit{u}\\
-&\quad = \mathit{insert}\\
-&\quad (\mathit{u},\mathit{true}) ((\mathit{Ioc} \mathit{t}\\
-&\quad \mathit{u}).\mathit{image} (\mathbf{fun} \mathit{i} =>\\
-&\quad (\mathit{i},\mathit{false})))
+&(\mathit{t} \mathit{u} : \mathit{Fin} \mathit{r}),\; (\mathit{hne} : \mathit{t} \neq \mathit{u})\\
+\vdash\;&\mathit{staircaseSelected} \mathit{t} \ \mathit{staircaseSelected} \mathit{u} = \mathit{insert} (\mathit{u},\mathit{true}) ((\\
+&\quad \mathit{Ioc} \mathit{t} \mathit{u}).\mathit{image} (\mathbf{fun} \mathit{i} => (\mathit{i},\mathit{false})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,10}\quad\lean{transition\_law}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{u} : \mathit{Fin}\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{recourse} (\mathit{staircaseSelected}\\
-&\quad \mathit{t}) (\mathit{staircaseSelected}\\
-&\quad \mathit{u}) = \mathbf{if}\\
-&\quad \mathit{t}=\mathit{u} \mathbf{then} 0\\
-&\quad \mathbf{else} 1
+&(\mathit{t} \mathit{u} : \mathit{Fin} \mathit{r})\\
+\vdash\;&\mathit{recourse} (\mathit{staircaseSelected} \mathit{t}) (\mathit{staircaseSelected} \mathit{u}) = \mathbf{if} \mathit{t}=\\
+&\quad \mathit{u} \mathbf{then} 0 \mathbf{else} 1
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -186,72 +92,32 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,11}\quad\lean{constrained\_eq\_free}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} \mathit{C} : (\mathit{Ord} \to \mathbb{R}\\
-&\quad ) \to \mathit{Prop}),\; (\mathit{V} : \mathbb{R}\\
-&\quad ),\; (\mathit{P₀} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hfree} : \forall \mathit{P},\\
-&\quad \mathit{Feasible} \mathit{P} \to \mathit{V}\\
-&\quad \leq \mathit{val}\\
-&\quad \mathit{P}),\; (\mathit{hF₀} : \mathit{Feasible}\\
-&\quad \mathit{P₀}),\; (\mathit{hC₀} : \mathit{C}\\
-&\quad \mathit{P₀}),\; (\mathit{hval} : \mathit{val}\\
-&\quad \mathit{P₀} = \mathit{V})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} \{ \mathit{v} |\\
-&\quad \exists \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \wedge \mathit{C} \mathit{P}\\
-&\quad \wedge \mathit{val} \mathit{P} =\\
-&\quad \mathit{v}\} \mathit{V}
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{Feasible} \mathit{C} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\\
+&\quad \; (\mathit{V} : \mathbb{R} ),\; (\mathit{P₀} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val}\\
+&\quad \mathit{P}),\; (\mathit{hF₀} : \mathit{Feasible} \mathit{P₀}),\; (\mathit{hC₀} : \mathit{C} \mathit{P₀}),\; (\mathit{hval} : \mathit{val} \mathit{P₀} = \mathit{V})\\
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{P}, \mathit{Feasible} \mathit{P} \wedge \mathit{C} \mathit{P} \wedge \mathit{val} \mathit{P} = \mathit{v}\} \mathit{V}
 \end{aligned} \]}
 
 \noindent\textbf{A\,12}\quad\lean{free\_bound\_transfers}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} \mathit{C} : (\mathit{Ord} \to \mathbb{R}\\
-&\quad ) \to \mathit{Prop}),\; (\mathit{V} : \mathbb{R}\\
-&\quad ),\; (\mathit{hfree} : \forall \mathit{P},\\
-&\quad \mathit{Feasible} \mathit{P} \to \mathit{V}\\
-&\quad \leq \mathit{val}\\
-&\quad \mathit{P})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \to \mathit{C} \mathit{P}\\
-&\quad \to \mathit{V} \leq \mathit{val}\\
-&\quad \mathit{P}
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{Feasible} \mathit{C} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\\
+&\quad \; (\mathit{V} : \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val} \mathit{P})\\
+\vdash\;&\forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{C} \mathit{P} \to \mathit{V} \leq \mathit{val} \mathit{P}
 \end{aligned} \]}
 
 \noindent\textbf{A\,13}\quad\lean{witness\_balanced}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathbb{R} ),\; (\mathit{k} :\\
-&\quad \mathit{Bud})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 /\\
-&\quad (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j}\\
-&\quad \mathbf{then} \mathit{c} \mathbf{else}\\
-&\quad 0)) = \mathit{c} / (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} )
+&(\mathit{c} : \mathbb{R} ),\; (\mathit{k} : \mathit{Bud})\\
+\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j} \mathbf{then} \mathit{c} \mathbf{else} 0)\\
+&\quad ) = \mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,14}\quad\lean{witness\_marginal\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{c} : \mathbb{R} ),\; (\mathit{k} \mathit{k'}\\
-&\quad : \mathit{Bud})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 /\\
-&\quad (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j}\\
-&\quad \mathbf{then} \mathit{c} \mathbf{else}\\
-&\quad 0)) = \textstyle\sum \mathit{j} :\\
-&\quad \mathit{Bud}, (1 / (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} )) * (\mathbf{if}\\
-&\quad \mathit{k'} = \mathit{j} \mathbf{then} \mathit{c}\\
-&\quad \mathbf{else} 0)
+&(\mathit{c} : \mathbb{R} ),\; (\mathit{k} \mathit{k'} : \mathit{Bud})\\
+\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j} \mathbf{then} \mathit{c} \mathbf{else} 0)\\
+&\quad ) = \textstyle\sum \mathit{j} : \mathit{Bud}, (1 / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )) * (\mathbf{if} \mathit{k'} =\\
+&\quad \mathit{j} \mathbf{then} \mathit{c} \mathbf{else} 0)
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -259,213 +125,91 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,15}\quad\lean{avg\_achieved}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{c} :\\
-&\quad \mathbb{R} ),\; (\mathit{hc} : 0 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \textstyle\sum \mathit{j} : \mathit{Bud}, (1 /\\
-&\quad (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j}\\
-&\quad \mathbf{then} \mathit{c} \mathbf{else}\\
-&\quad 0)) = \mathit{c} / (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} )
+&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{c} : \mathbb{R} ),\; (\mathit{hc} : 0 \leq \mathit{c})\\
+\vdash\;&(\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{j} : \mathit{Bud}, (1\\
+&\quad / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )) * (\mathbf{if} \mathit{k} = \mathit{j} \mathbf{then} \mathit{c} \mathbf{else} 0)) =\\
+&\quad \mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,16}\quad\lean{avg\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{hr} :\\
-&\quad \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r}\\
-&\quad \mathit{pi} \mathit{k}),\; (\mathit{hP} :\\
-&\quad \forall \mathit{pi},\\
-&\quad 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hsum} :\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} =\\
-&\quad 1),\; (\mathit{hcost} : \forall \mathit{pi},\\
-&\quad \mathit{c} \leq \textstyle\sum \mathit{k}, \mathit{r}\\
-&\quad \mathit{pi} \mathit{k})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{c} / (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} ) \leq (\mathit{univ} :\\
-&\quad \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad \mathit{r} \mathit{pi} \mathit{k})
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} ),\\
+&\quad \; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi}\\
+&\quad = 1),\; (\mathit{hcost} : \forall \mathit{pi}, \mathit{c} \leq \textstyle\sum \mathit{k}, \mathit{r} \mathit{pi} \mathit{k})\\
+\vdash\;&\mathit{c} / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) \leq (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'}\\
+&\quad \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k})
 \end{aligned} \]}
 
 \noindent\textbf{A\,17}\quad\lean{defects\_append}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l₁} \mathit{l₂}\\
-&\quad : \mathit{List} \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{defects} \mathit{s} (\mathit{l₁} ++\\
-&\quad \mathit{l₂}) = \mathit{defects}\\
-&\quad \mathit{s} \mathit{l₁} ++\\
-&\quad \mathit{defects} (\mathit{s} +\\
-&\quad \mathit{l₁}.\mathit{sum}) \mathit{l₂}
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l₁} \mathit{l₂} : \mathit{List} \mathbb{Z} )\\
+\vdash\;&\mathit{defects} \mathit{s} (\mathit{l₁} ++ \mathit{l₂}) = \mathit{defects} \mathit{s} \mathit{l₁} ++ \mathit{defects} (\mathit{s} + \mathit{l₁}.\mathit{sum})\\
+&\quad \mathit{l₂}
 \end{aligned} \]}
 
 \noindent\textbf{A\,18}\quad\lean{dfc\_eq\_zero\_iff}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dfc} \mathit{s} = 0\\
-&\quad \leftrightarrow |\mathit{s}| \leq 1
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ) \;\vdash\; \mathit{dfc} \mathit{s} = 0 \leftrightarrow |\mathit{s}| \leq 1 \]}
 
 \noindent\textbf{A\,19}\quad\lean{dfc\_even}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dfc} \mathit{s} \% 2 = 0
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ) \;\vdash\; \mathit{dfc} \mathit{s} \% 2 = 0 \]}
 
 \noindent\textbf{A\,20}\quad\lean{dfc\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{dfc} \mathit{s}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ) \;\vdash\; 0 \leq \mathit{dfc} \mathit{s} \]}
 
 \noindent\textbf{A\,21}\quad\lean{no\_big\_step}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} :\\
-&\quad \mathit{List} \mathbb{Z} ),\; (\mathit{hs} :\\
-&\quad |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} +\\
-&\quad \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h0} :\\
-&\quad \mathit{totalDefect} \mathit{s} \mathit{l} =\\
-&\quad 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{x} \in \mathit{l},\\
-&\quad |\mathit{x}| \leq 2
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z} ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1\\
+&\quad ),\; (\mathit{h0} : \mathit{totalDefect} \mathit{s} \mathit{l} = 0)\\
+\vdash\;&\forall \mathit{x} \in \mathit{l}, |\mathit{x}| \leq 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,22}\quad\lean{parity\_bridge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{k} : \mathbb{N}\\
-&\quad ),\; (\mathit{h} : \mathit{s} \% 2 = (\mathit{k} :\\
-&\quad \mathbb{Z} ) \% 2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dfc} \mathit{s} = |\mathit{s}|\\
-&\quad - (\mathit{k} : \mathbb{Z} ) \% 2
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{h} : \mathit{s} \% 2 = (\mathit{k} : \mathbb{Z} ) \% 2)\\
+\vdash\;&\mathit{dfc} \mathit{s} = |\mathit{s}| - (\mathit{k} : \mathbb{Z} ) \% 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,23}\quad\lean{path\_achieved}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{c} :\\
-&\quad \mathbb{R} ),\; (\mathit{hc} : 0 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 /\\
-&\quad (\mathit{Fintype}.\mathit{card} \mathit{Bud} :\\
-&\quad \mathbb{R} )) * ((\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{k} => \mathbf{if} \mathit{k} =\\
-&\quad \mathit{j} \mathbf{then} \mathit{c} \mathbf{else}\\
-&\quad 0))) = \mathit{c}
+&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{c} : \mathbb{R} ),\; (\mathit{hc} : 0 \leq \mathit{c})\\
+\vdash\;&(\textstyle\sum \mathit{j} : \mathit{Bud}, (1 / (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} )) * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\\
+&\quad \mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \mathbf{if} \mathit{k} = \mathit{j} \mathbf{then} \mathit{c} \mathbf{else} 0))) = \mathit{c}
 \end{aligned} \]}
 
 \noindent\textbf{A\,24}\quad\lean{path\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{hP} :\\
-&\quad \forall \mathit{pi}, 0 \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hsum} :\\
-&\quad \textstyle\sum \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} = 1),\; (\mathit{hcost} :\\
-&\quad \forall \mathit{pi}, \exists \mathit{k}, \mathit{c}\\
-&\quad \leq \mathit{r} \mathit{pi} \mathit{k})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{c} \leq \textstyle\sum \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} * ((\mathit{univ} :\\
-&\quad \mathit{Finset} \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \mathit{r} \mathit{pi} \mathit{k}))
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} ),\\
+&\quad \; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hsum} : \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} = 1),\\
+&\quad \; (\mathit{hcost} : \forall \mathit{pi}, \exists \mathit{k}, \mathit{c} \leq \mathit{r} \mathit{pi} \mathit{k})\\
+\vdash\;&\mathit{c} \leq \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k}\\
+&\quad => \mathit{r} \mathit{pi} \mathit{k}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,25}\quad\lean{ratio\_card\_concentrated\_on\_support}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{e} : \mathbb{R} ),\; (\mathit{hP} :\\
-&\quad \forall \mathit{pi}, 0 \leq \mathit{P}\\
-&\quad \mathit{pi}),\; (\mathit{hbal} : \forall \mathit{k},\\
-&\quad (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad \mathit{r} \mathit{pi} \mathit{k}) =\\
-&\quad \mathit{e}),\; (\mathit{hconc} : \forall \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} \neq 0 \to (\textstyle\sum \mathit{k},\\
-&\quad \mathit{r} \mathit{pi} \mathit{k}) = (\mathit{univ} :\\
-&\quad \mathit{Finset} \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \mathit{r} \mathit{pi} \mathit{k}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad ((\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}))) = (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} ) * (\mathit{univ} :\\
-&\quad \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad \mathit{r} \mathit{pi} \mathit{k})
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{e} : \mathbb{R} ),\\
+&\quad \; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hbal} : \forall \mathit{k}, (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}) = \mathit{e}),\\
+&\quad \; (\mathit{hconc} : \forall \mathit{pi}, \mathit{P} \mathit{pi} \neq 0 \to (\textstyle\sum \mathit{k}, \mathit{r} \mathit{pi} \mathit{k}) = (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\\
+&\quad \mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi} \mathit{k}))\\
+\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} =\\
+&\quad > \mathit{r} \mathit{pi} \mathit{k}))) = (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) * (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\\
+&\quad \mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k})
 \end{aligned} \]}
 
 \noindent\textbf{A\,26}\quad\lean{totalDefect\_even}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} :\\
-&\quad \mathit{List} \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{totalDefect} \mathit{s}\\
-&\quad \mathit{l} \% 2 = 0
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z} ) \;\vdash\; \mathit{totalDefect} \mathit{s} \mathit{l} \% 2 = 0 \]}
 
 \noindent\textbf{A\,27}\quad\lean{totalDefect\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} :\\
-&\quad \mathit{List} \mathbb{Z} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{totalDefect} \mathit{s}\\
-&\quad \mathit{l}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z} ) \;\vdash\; 0 \leq \mathit{totalDefect} \mathit{s} \mathit{l} \]}
 
 \noindent\textbf{A\,28}\quad\lean{two\_le\_dfc}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{h} : 2 \leq |\mathit{s}|)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 \leq \mathit{dfc} \mathit{s}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{s} : \mathbb{Z} ),\; (\mathit{h} : 2 \leq |\mathit{s}|) \;\vdash\; 2 \leq \mathit{dfc} \mathit{s} \]}
 
 \noindent\textbf{A\,29}\quad\lean{two\_le\_totalDefect}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} :\\
-&\quad \mathit{List} \mathbb{Z} ),\; (\mathit{hs} :\\
-&\quad |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} +\\
-&\quad \mathit{l}.\mathit{sum}| \leq 1),\; (\mathit{h3} :\\
-&\quad \exists \mathit{x} \in \mathit{l}, 2 <\\
-&\quad |\mathit{x}|)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 \leq \mathit{totalDefect} \mathit{s}\\
-&\quad \mathit{l}
+&(\mathit{s} : \mathbb{Z} ),\; (\mathit{l} : \mathit{List} \mathbb{Z} ),\; (\mathit{hs} : |\mathit{s}| \leq 1),\; (\mathit{he} : |\mathit{s} + \mathit{l}.\mathit{sum}| \leq 1\\
+&\quad ),\; (\mathit{h3} : \exists \mathit{x} \in \mathit{l}, 2 < |\mathit{x}|)\\
+\vdash\;&2 \leq \mathit{totalDefect} \mathit{s} \mathit{l}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -473,176 +217,81 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,30}\quad\lean{altFrom\_defects}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} :\\
-&\quad \mathbb{Z} ) (\mathit{a} \mathit{b} : \mathbb{N}\\
-&\quad ), \mathit{n} = \mathit{a} + \mathit{b}\\
-&\quad \to |\mathit{s}| \leq 1 \to |\mathit{s}\\
-&\quad - (\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z}\\
-&\quad )| \leq 1 \to \mathit{defects}\\
-&\quad \mathit{s} (\mathit{altFrom} \mathit{n} \mathit{s}\\
-&\quad \mathit{a} \mathit{b}) =\\
-&\quad \mathit{List}.\mathit{replicate}\\
-&\quad \mathit{n} 0
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z} ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n} = \mathit{a} + \mathit{b} \to |\mathit{s}| \leq 1 \to\\
+&\quad |\mathit{s} - (\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z} )| \leq 1 \to \mathit{defects} \mathit{s} (\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b}) =\\
+&\quad \mathit{List}.\mathit{replicate} \mathit{n} 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,31}\quad\lean{altFrom\_length}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
-&\quad ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
-&\quad \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
-&\quad \mathit{b}).\mathit{length} =\\
-&\quad \mathit{n}
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z} ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} + \mathit{b})\\
+\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b}).\mathit{length} = \mathit{n}
 \end{aligned} \]}
 
 \noindent\textbf{A\,32}\quad\lean{altFrom\_multiset}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} :\\
-&\quad \mathbb{Z} ) (\mathit{a} \mathit{b} : \mathbb{N}\\
-&\quad ), \mathit{n} = \mathit{a} + \mathit{b}\\
-&\quad \to ((\mathit{altFrom} \mathit{n} \mathit{s}\\
-&\quad \mathit{a} \mathit{b} : \mathit{List} \mathbb{Z} ) :\\
-&\quad \mathit{Multiset} \mathbb{Z} ) =\\
-&\quad \mathit{Multiset}.\mathit{replicate}\\
-&\quad \mathit{a} (-1) +\\
-&\quad \mathit{Multiset}.\mathit{replicate}\\
-&\quad \mathit{b} 1
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{s} : \mathbb{Z} ) (\mathit{a} \mathit{b} : \mathbb{N} ), \mathit{n} = \mathit{a} + \mathit{b} \to ((\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b} : \mathit{List} \mathbb{Z} )\\
+&\quad : \mathit{Multiset} \mathbb{Z} ) = \mathit{Multiset}.\mathit{replicate} \mathit{a} (-1) + \mathit{Multiset}.\\
+&\quad \mathit{replicate} \mathit{b} 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,33}\quad\lean{altFrom\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z}\\
-&\quad ),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
-&\quad ),\; (\mathit{hn} : \mathit{n} = \mathit{a} +\\
-&\quad \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a}\\
-&\quad \mathit{b}).\mathit{sum} = -(\mathit{a}:\mathbb{Z}\\
-&\quad ) + (\mathit{b}:\mathbb{Z} )
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{s} : \mathbb{Z} ),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hn} : \mathit{n} = \mathit{a} + \mathit{b})\\
+\vdash\;&(\mathit{altFrom} \mathit{n} \mathit{s} \mathit{a} \mathit{b}).\mathit{sum} = -(\mathit{a}:\mathbb{Z} ) + (\mathit{b}:\mathbb{Z} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,34}\quad\lean{exists\_one\_defect}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} \mathit{j} : \mathbb{N}\\
-&\quad ),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
-&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hj1} : 1 \leq \mathit{j}),\;\\
-&\quad (\mathit{hjm} : \mathit{j} \leq \mathit{p} +\\
-&\quad \mathit{q} + 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{l} : \mathit{List}\\
-&\quad \mathbb{Z} , ((\mathit{l} : \mathit{List} \mathbb{Z} )\\
-&\quad : \mathit{Multiset} \mathbb{Z} ) = ((\mathit{gList}\\
-&\quad \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) :\\
-&\quad \mathit{Multiset} \mathbb{Z} )\\
-&\quad \wedge \mathit{defects} 0 \mathit{l}\\
-&\quad = \mathit{List}.\mathit{replicate} (\mathit{j} -\\
-&\quad 1) 0 ++ (2 : \mathbb{Z} ) ::\\
-&\quad \mathit{List}.\mathit{replicate} (\mathit{p} +\\
-&\quad \mathit{q} + 2 - \mathit{j}) 0
+&(\mathit{p} \mathit{q} \mathit{j} : \mathbb{N} ),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} + 1),\; (\mathit{hj1} : 1 \leq \mathit{j}),\\
+&\quad \; (\mathit{hjm} : \mathit{j} \leq \mathit{p} + \mathit{q} + 1)\\
+\vdash\;&\exists \mathit{l} : \mathit{List} \mathbb{Z} , ((\mathit{l} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z} ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} )\\
+&\quad : \mathit{Multiset} \mathbb{Z} ) \wedge \mathit{defects} 0 \mathit{l} = \mathit{List}.\mathit{replicate} (\mathit{j} - 1) 0 ++ (2\\
+&\quad : \mathbb{Z} ) :: \mathit{List}.\mathit{replicate} (\mathit{p} + \mathit{q} + 2 - \mathit{j}) 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,35}\quad\lean{orderEven\_defects}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
-&\quad (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
-&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{defects} 0 (\mathit{orderEven} \mathit{t}\\
-&\quad \mathit{p} \mathit{q}) =\\
-&\quad \mathit{List}.\mathit{replicate} (\mathit{t} +\\
-&\quad (\mathit{t} - 1)) 0 ++ (2 : \mathbb{Z}\\
-&\quad ) :: \mathit{List}.\mathit{replicate} ((\mathit{p} -\\
-&\quad \mathit{t}) + (\mathit{q} + 1 - \mathit{t}) +\\
-&\quad 1) 0
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} + 1),\\
+&\quad \; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} + 1)\\
+\vdash\;&\mathit{defects} 0 (\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} + (\mathit{t} - 1)) 0 ++\\
+&\quad (2 : \mathbb{Z} ) :: \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} + 1 - \mathit{t}) + 1) 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,36}\quad\lean{orderEven\_multiset}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
-&\quad (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q}\\
-&\quad : \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
-&\quad \mathbb{Z} ) = ((\mathit{gList} \mathit{p} \mathit{q}\\
-&\quad : \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
-&\quad \mathbb{Z} )
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} + 1)\\
+\vdash\;&((\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z} ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} )\\
+&\quad : \mathit{Multiset} \mathbb{Z} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,37}\quad\lean{orderOdd\_defects}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q}),\;\\
-&\quad (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
-&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{defects} 0 (\mathit{orderOdd} \mathit{t}\\
-&\quad \mathit{p} \mathit{q}) =\\
-&\quad \mathit{List}.\mathit{replicate} (\mathit{t} +\\
-&\quad \mathit{t}) 0 ++ (2 : \mathbb{Z} ) ::\\
-&\quad \mathit{List}.\mathit{replicate} ((\mathit{p} -\\
-&\quad \mathit{t}) + (\mathit{q} - \mathit{t}) +\\
-&\quad 1) 0
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\\
+&\quad \; (\mathit{hqp} : \mathit{p} \leq \mathit{q} + 1)\\
+\vdash\;&\mathit{defects} 0 (\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q}) = \mathit{List}.\mathit{replicate} (\mathit{t} + \mathit{t}) 0 ++ (2 : \mathbb{Z}\\
+&\quad ) :: \mathit{List}.\mathit{replicate} ((\mathit{p} - \mathit{t}) + (\mathit{q} - \mathit{t}) + 1) 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,38}\quad\lean{orderOdd\_multiset}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q} :\\
-&\quad \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
-&\quad \mathbb{Z} ) = ((\mathit{gList} \mathit{p} \mathit{q}\\
-&\quad : \mathit{List} \mathbb{Z} ) : \mathit{Multiset}\\
-&\quad \mathbb{Z} )
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q})\\
+\vdash\;&((\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) : \mathit{Multiset} \mathbb{Z} ) = ((\mathit{gList} \mathit{p} \mathit{q} : \mathit{List} \mathbb{Z} ) :\\
+&\quad \mathit{Multiset} \mathbb{Z} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,39}\quad\lean{totalDefect\_orderEven}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{ht} : 1 \leq \mathit{t}),\;\\
-&\quad (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q} +\\
-&\quad 1),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
-&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{totalDefect} 0 (\mathit{orderEven} \mathit{t}\\
-&\quad \mathit{p} \mathit{q}) = 2
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{ht} : 1 \leq \mathit{t}),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q} + 1),\\
+&\quad \; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\; (\mathit{hqp} : \mathit{p} \leq \mathit{q} + 1)\\
+\vdash\;&\mathit{totalDefect} 0 (\mathit{orderEven} \mathit{t} \mathit{p} \mathit{q}) = 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,40}\quad\lean{totalDefect\_orderOdd}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N}\\
-&\quad ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\;\\
-&\quad (\mathit{htq} : \mathit{t} \leq \mathit{q}),\;\\
-&\quad (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\;\\
-&\quad (\mathit{hqp} : \mathit{p} \leq \mathit{q} +\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{totalDefect} 0 (\mathit{orderOdd} \mathit{t}\\
-&\quad \mathit{p} \mathit{q}) = 2
+&(\mathit{t} \mathit{p} \mathit{q} : \mathbb{N} ),\; (\mathit{htp} : \mathit{t} \leq \mathit{p}),\; (\mathit{htq} : \mathit{t} \leq \mathit{q}),\; (\mathit{hpq} : \mathit{q} \leq \mathit{p}),\\
+&\quad \; (\mathit{hqp} : \mathit{p} \leq \mathit{q} + 1)\\
+\vdash\;&\mathit{totalDefect} 0 (\mathit{orderOdd} \mathit{t} \mathit{p} \mathit{q}) = 2
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -650,854 +299,402 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,41}\quad\lean{epsilonOptimal\_on\_grid}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{cost} : \mathit{Finset} \mathit{I} \to \mathbb{N}\\
-&\quad ),\; (\mathit{scale} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{hscale} : 0 <\\
-&\quad \mathit{scale}),\; (\mathit{heps} : \mathit{scale} *\\
-&\quad \mathit{eps} < 1),\; (\mathit{k} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset}\\
-&\quad \mathit{I}),\; (\mathit{h} : \mathit{EpsilonOptimalAt}\\
-&\quad (\mathbf{fun} \mathit{T} => (\mathit{cost}\\
-&\quad \mathit{T}:\mathbb{R} )/\mathit{scale}) \mathit{eps}\\
-&\quad \mathit{k} \mathit{S})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} =>\\
-&\quad (\mathit{cost} \mathit{T}:\mathbb{R}\\
-&\quad )/\mathit{scale}) 0 \mathit{k}\\
-&\quad \mathit{S}
+&(\mathit{cost} : \mathit{Finset} \mathit{I} \to \mathbb{N} ),\; (\mathit{scale} \mathit{eps} : \mathbb{R} ),\; (\mathit{hscale} : 0 < \mathit{scale})\\
+&\quad ,\; (\mathit{heps} : \mathit{scale} * \mathit{eps} < 1),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathit{I}),\\
+&\quad \; (\mathit{h} : \mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R} )/\mathit{scale}) \mathit{eps} \mathit{k} \mathit{S})\\
+\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => (\mathit{cost} \mathit{T}:\mathbb{R} )/\mathit{scale}) 0 \mathit{k} \mathit{S}
 \end{aligned} \]}
 
 \noindent\textbf{A\,42}\quad\lean{normalized\_chi\_at\_least\_five}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} :\\
-&\quad \mathit{eps} < 1/114)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\neg \mathit{PrefixCoverDimensionAtMost}\\
-&\quad \mathit{normalizedScalarObjective}\\
-&\quad \mathit{eps} 4
+&(\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : \mathit{eps} < 1/114)\\
+\vdash\;&\neg \mathit{PrefixCoverDimensionAtMost} \mathit{normalizedScalarObjective} \mathit{eps} 4
 \end{aligned} \]}
 
 \noindent\textbf{A\,43}\quad\lean{normalized\_formula}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 7))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{normalizedScalarObjective}\\
-&\quad \mathit{S} = (\mathit{complementAbs7}\\
-&\quad \mathit{S}:\mathbb{R} )/114
+&(\mathit{S} : \mathit{Finset} (\mathit{Fin} 7))\\
+\vdash\;&\mathit{normalizedScalarObjective} \mathit{S} = (\mathit{complementAbs7} \mathit{S}:\mathbb{R} )/114
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
 \noindent\textbf{Module \lean{LeanStructuralNestingThresholdV1}}\par\vspace{3pt}
 
 \noindent\textbf{A\,44}\quad\lean{dead\_chain\_half}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad \mathit{deadF}) (1 / 2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{OnePrefixChain} (\mathit{selectedRadius} \mathit{deadF}) (1 / 2) \]}
 
 \noindent\textbf{A\,45}\quad\lean{dead\_full}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsFullRanking}\\
-&\quad \mathit{deadRanking}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{IsFullRanking} \mathit{deadRanking} \]}
 
 \noindent\textbf{A\,46}\quad\lean{dead\_modularSpan}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{deadF} = 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{modularSpan} \mathit{Finset}.\mathit{univ} \mathit{deadF} = 2 \]}
 
 \noindent\textbf{A\,47}\quad\lean{dead\_no\_chain\_below\_half}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{e} : \mathbb{R} ),\; (\mathit{he} :\\
-&\quad \mathit{e} < 1 / 2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad \mathit{deadF}) \mathit{e}
+&(\mathit{e} : \mathbb{R} ),\; (\mathit{he} : \mathit{e} < 1 / 2)\\
+\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius} \mathit{deadF}) \mathit{e}
 \end{aligned} \]}
 
 \noindent\textbf{A\,48}\quad\lean{dead\_normalized\_threshold}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NormalizedNestingThreshold}\\
-&\quad \mathit{deadF} (1 / 2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{NormalizedNestingThreshold} \mathit{deadF} (1 / 2) \]}
 
 \noindent\textbf{A\,49}\quad\lean{dead\_prefix0}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{deadRanking}\\
-&\quad 0 = (\emptyset : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{deadRanking} 0 = (\emptyset : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,50}\quad\lean{dead\_prefix1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{deadRanking}\\
-&\quad 1 = (\{ 1\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{deadRanking} 1 = (\{ 1\} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,51}\quad\lean{dead\_prefix2}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{deadRanking}\\
-&\quad 2 = (\{ 1,2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{deadRanking} 2 = (\{ 1,2\} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,52}\quad\lean{dead\_prefix3}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{deadRanking}\\
-&\quad 3 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset}\\
-&\quad (\mathit{Fin} 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{deadRanking} 3 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,53}\quad\lean{dead\_r0}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 0\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 0\} : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2 \]}
 
 \noindent\textbf{A\,54}\quad\lean{dead\_r01}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 0,1\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 0,1\} : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2 \]}
 
 \noindent\textbf{A\,55}\quad\lean{dead\_r02}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 0,2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 0,2\} : \mathit{Finset} (\mathit{Fin} 3)) = 0 \]}
 
 \noindent\textbf{A\,56}\quad\lean{dead\_r1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 1\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 1\} : \mathit{Finset} (\mathit{Fin} 3)) = 0 \]}
 
 \noindent\textbf{A\,57}\quad\lean{dead\_r12}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 1,2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 1,2\} : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2 \]}
 
 \noindent\textbf{A\,58}\quad\lean{dead\_r2}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\{ 2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\{ 2\} : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2 \]}
 
 \noindent\textbf{A\,59}\quad\lean{dead\_r\_empty}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF} (\emptyset :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\emptyset : \mathit{Finset} (\mathit{Fin} 3)) = 0 \]}
 
 \noindent\textbf{A\,60}\quad\lean{dead\_runiv}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{deadF}\\
-&\quad (\mathit{Finset}.\mathit{univ} : \mathit{Finset}\\
-&\quad (\mathit{Fin} 3)) = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{deadF} (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 3)) = 0 \]}
 
 \noindent\textbf{A\,61}\quad\lean{dead\_threshold}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NestingThreshold}\\
-&\quad \mathit{deadF} (1 / 2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{NestingThreshold} \mathit{deadF} (1 / 2) \]}
 
 \noindent\textbf{A\,62}\quad\lean{epsilonOptimalAt\_div}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{I}],\; [\mathit{DecidableEq}\\
-&\quad \mathit{I}],\; (\mathit{obj} : \mathit{Finset}\\
-&\quad \mathit{I} \to \mathbb{R} ),\; (\mathit{c} \mathit{e}\\
-&\quad : \mathbb{R} ),\; (\mathit{hc} : 0 <\\
-&\quad \mathit{c}),\; (\mathit{k} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset}\\
-&\quad \mathit{I})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} =>\\
-&\quad \mathit{obj} \mathit{T} / \mathit{c})\\
-&\quad \mathit{e} \mathit{k} \mathit{S}\\
-&\quad \leftrightarrow \mathit{EpsilonOptimalAt}\\
-&\quad \mathit{obj} (\mathit{c} * \mathit{e})\\
-&\quad \mathit{k} \mathit{S}
+&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{I}],\; [\mathit{DecidableEq} \mathit{I}],\; (\mathit{obj} : \mathit{Finset} \mathit{I} \to\\
+&\quad \mathbb{R} ),\; (\mathit{c} \mathit{e} : \mathbb{R} ),\; (\mathit{hc} : 0 < \mathit{c}),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathit{I})\\
+\vdash\;&\mathit{EpsilonOptimalAt} (\mathbf{fun} \mathit{T} => \mathit{obj} \mathit{T} / \mathit{c}) \mathit{e} \mathit{k} \mathit{S} \leftrightarrow\\
+&\quad \mathit{EpsilonOptimalAt} \mathit{obj} (\mathit{c} * \mathit{e}) \mathit{k} \mathit{S}
 \end{aligned} \]}
 
 \noindent\textbf{A\,63}\quad\lean{fin3\_card\_one}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3), \mathit{S}.\mathit{card} = 1\\
-&\quad \to \mathit{S} = \{ 0\} \vee \mathit{S}\\
-&\quad = \{ 1\} \vee \mathit{S} = \{ 2\}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \forall \mathit{S} : \mathit{Finset} (\mathit{Fin} 3), \mathit{S}.\mathit{card} = 1 \to \mathit{S} = \{ 0\} \vee \mathit{S} = \{ 1\} \vee \mathit{S} = \{ 2\} \]}
 
 \noindent\textbf{A\,64}\quad\lean{fin3\_card\_two}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3), \mathit{S}.\mathit{card} = 2\\
-&\quad \to \mathit{S} = \{ 0,1\} \vee \mathit{S}\\
-&\quad = \{ 0,2\} \vee \mathit{S} = \{ 1,2\}
+\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin} 3), \mathit{S}.\mathit{card} = 2 \to \mathit{S} = \{ 0,1\} \vee \mathit{S} = \{ 0,2\} \vee \mathit{S} =\\
+&\quad \{ 1,2\}
 \end{aligned} \]}
 
 \noindent\textbf{A\,65}\quad\lean{fin4\_card\_one}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4), \mathit{S}.\mathit{card} = 1\\
-&\quad \to \mathit{S} = \{ 0\} \vee \mathit{S}\\
-&\quad = \{ 1\} \vee \mathit{S} = \{ 2\}\\
-&\quad \vee \mathit{S} = \{ 3\}
+\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin} 4), \mathit{S}.\mathit{card} = 1 \to \mathit{S} = \{ 0\} \vee \mathit{S} = \{ 1\} \vee \mathit{S} =\\
+&\quad \{ 2\} \vee \mathit{S} = \{ 3\}
 \end{aligned} \]}
 
 \noindent\textbf{A\,66}\quad\lean{fin4\_card\_two}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4), \mathit{S}.\mathit{card} = 2\\
-&\quad \to \mathit{S} = \{ 0,1\} \vee \mathit{S}\\
-&\quad = \{ 0,2\} \vee \mathit{S} = \{ 0,3\}\\
-&\quad \vee \mathit{S} = \{ 1,2\} \vee \mathit{S}\\
-&\quad = \{ 1,3\} \vee \mathit{S} = \{ 2,3\}
+\vdash\;&\forall \mathit{S} : \mathit{Finset} (\mathit{Fin} 4), \mathit{S}.\mathit{card} = 2 \to \mathit{S} = \{ 0,1\} \vee \mathit{S} = \{ 0,2\} \vee \mathit{S} =\\
+&\quad \{ 0,3\} \vee \mathit{S} = \{ 1,2\} \vee \mathit{S} = \{ 1,3\} \vee \mathit{S} = \{ 2,3\}
 \end{aligned} \]}
 
 \noindent\textbf{A\,67}\quad\lean{gap\_all\_components\_nonconstant}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c}),\; (\mathit{j} :\\
-&\quad \mathit{Fin} 3)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < \mathit{componentSpan} (\mathit{gapF}\\
-&\quad \mathit{c}) \mathit{j}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{hc} : 1 \leq \mathit{c}),\; (\mathit{j} : \mathit{Fin} 3) \;\vdash\; 0 < \mathit{componentSpan} (\mathit{gapF} \mathit{c}) \mathit{j} \]}
 
 \noindent\textbf{A\,68}\quad\lean{gap\_chain}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad (\mathit{gapF} \mathit{c})) ((\mathit{c} - 1) /\\
-&\quad 2)
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{OnePrefixChain} (\mathit{selectedRadius} (\mathit{gapF} \mathit{c})) ((\mathit{c} - 1) / 2)
 \end{aligned} \]}
 
 \noindent\textbf{A\,69}\quad\lean{gap\_full}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsFullRanking}\\
-&\quad \mathit{gapRanking}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{IsFullRanking} \mathit{gapRanking} \]}
 
 \noindent\textbf{A\,70}\quad\lean{gap\_modularSpan}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ} (\mathit{gapF}\\
-&\quad \mathit{c}) = 2 * \mathit{c} + 1
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{hc} : 1 \leq \mathit{c}) \;\vdash\; \mathit{modularSpan} \mathit{Finset}.\mathit{univ} (\mathit{gapF} \mathit{c}) = 2 * \mathit{c} + 1 \]}
 
 \noindent\textbf{A\,71}\quad\lean{gap\_no\_chain\_below}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c}),\; (\mathit{e} :\\
-&\quad \mathbb{R} ),\; (\mathit{he} : \mathit{e} <\\
-&\quad (\mathit{c} - 1) / 2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad (\mathit{gapF} \mathit{c})) \mathit{e}
+&(\mathit{hc} : 1 \leq \mathit{c}),\; (\mathit{e} : \mathbb{R} ),\; (\mathit{he} : \mathit{e} < (\mathit{c} - 1) / 2)\\
+\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius} (\mathit{gapF} \mathit{c})) \mathit{e}
 \end{aligned} \]}
 
 \noindent\textbf{A\,72}\quad\lean{gap\_normalized\_threshold}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NormalizedNestingThreshold} (\mathit{gapF}\\
-&\quad \mathit{c}) ((\mathit{c} - 1) / (2 * \mathit{c} +\\
-&\quad 1))
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{NormalizedNestingThreshold} (\mathit{gapF} \mathit{c}) ((\mathit{c} - 1) / (2 * \mathit{c} + 1))
 \end{aligned} \]}
 
 \noindent\textbf{A\,73}\quad\lean{gap\_prefix0}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{gapRanking}\\
-&\quad 0 = (\emptyset : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{gapRanking} 0 = (\emptyset : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,74}\quad\lean{gap\_prefix1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{gapRanking}\\
-&\quad 1 = (\{ 2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{gapRanking} 1 = (\{ 2\} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,75}\quad\lean{gap\_prefix2}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{gapRanking}\\
-&\quad 2 = (\{ 0,2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{gapRanking} 2 = (\{ 0,2\} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,76}\quad\lean{gap\_prefix3}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{gapRanking}\\
-&\quad 3 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset}\\
-&\quad (\mathit{Fin} 3))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{gapRanking} 3 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 3)) \]}
 
 \noindent\textbf{A\,77}\quad\lean{gap\_r0}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 0\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = (\mathit{c} + 1) / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 0\} : \mathit{Finset} (\mathit{Fin} 3)) = (\mathit{c} + 1) / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,78}\quad\lean{gap\_r01}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 0,1\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = \mathit{c} / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 0,1\} : \mathit{Finset} (\mathit{Fin} 3)) = \mathit{c} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,79}\quad\lean{gap\_r02}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 0,2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = 1 / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 0,2\} : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,80}\quad\lean{gap\_r1}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 1\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = 0
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{hc} : 1 \leq \mathit{c}) \;\vdash\; \mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 1\} : \mathit{Finset} (\mathit{Fin} 3)) = 0 \]}
 
 \noindent\textbf{A\,81}\quad\lean{gap\_r12}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 1,2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = \mathit{c} / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 1,2\} : \mathit{Finset} (\mathit{Fin} 3)) = \mathit{c} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,82}\quad\lean{gap\_r2}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\{ 2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = (\mathit{c} - 1) / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\{ 2\} : \mathit{Finset} (\mathit{Fin} 3)) = (\mathit{c} - 1) / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,83}\quad\lean{gap\_r\_empty}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\emptyset : \mathit{Finset} (\mathit{Fin}\\
-&\quad 3)) = 1 / 2
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\emptyset : \mathit{Finset} (\mathit{Fin} 3)) = 1 / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,84}\quad\lean{gap\_runiv}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} (\mathit{gapF}\\
-&\quad \mathit{c}) (\mathit{Finset}.\mathit{univ} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 3))\\
-&\quad = 0
+&(\mathit{hc} : 1 \leq \mathit{c})\\
+\vdash\;&\mathit{selectedRadius} (\mathit{gapF} \mathit{c}) (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 3)) = 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,85}\quad\lean{gap\_sup\_half}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{delta} : \mathbb{R} ),\; (\mathit{hdelta} : 0\\
-&\quad < \mathit{delta})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{c} : \mathbb{R} , 1\\
-&\quad \leq \mathit{c} \wedge (\forall \mathit{j} :\\
-&\quad \mathit{Fin} 3, 0 < \mathit{componentSpan}\\
-&\quad (\mathit{gapF} \mathit{c}) \mathit{j})\\
-&\quad \wedge 1 / 2 - \mathit{delta} < (\mathit{c} -\\
-&\quad 1) / (2 * \mathit{c} + 1) \wedge \mathit{NormalizedNestingThreshold}\\
-&\quad (\mathit{gapF} \mathit{c}) ((\mathit{c} - 1) / (2 *\\
-&\quad \mathit{c} + 1))
+&(\mathit{delta} : \mathbb{R} ),\; (\mathit{hdelta} : 0 < \mathit{delta})\\
+\vdash\;&\exists \mathit{c} : \mathbb{R} , 1 \leq \mathit{c} \wedge (\forall \mathit{j} : \mathit{Fin} 3, 0 < \mathit{componentSpan} (\mathit{gapF} \mathit{c}) \mathit{j}) \wedge\\
+&\quad 1 / 2 - \mathit{delta} < (\mathit{c} - 1) / (2 * \mathit{c} + 1) \wedge\\
+&\quad \mathit{NormalizedNestingThreshold} (\mathit{gapF} \mathit{c}) ((\mathit{c} - 1) / (2 * \mathit{c} + 1))
 \end{aligned} \]}
 
 \noindent\textbf{A\,86}\quad\lean{gap\_threshold}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hc} : 1 \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NestingThreshold} (\mathit{gapF}\\
-&\quad \mathit{c}) ((\mathit{c} - 1) / 2)
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{hc} : 1 \leq \mathit{c}) \;\vdash\; \mathit{NestingThreshold} (\mathit{gapF} \mathit{c}) ((\mathit{c} - 1) / 2) \]}
 
 \noindent\textbf{A\,87}\quad\lean{nest\_chain\_half}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad \mathit{nestF}) (1 / 2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{OnePrefixChain} (\mathit{selectedRadius} \mathit{nestF}) (1 / 2) \]}
 
 \noindent\textbf{A\,88}\quad\lean{nest\_full}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsFullRanking}\\
-&\quad \mathit{nestRanking}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{IsFullRanking} \mathit{nestRanking} \]}
 
 \noindent\textbf{A\,89}\quad\lean{nest\_modularSpan}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{nestF} = 4
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{modularSpan} \mathit{Finset}.\mathit{univ} \mathit{nestF} = 4 \]}
 
 \noindent\textbf{A\,90}\quad\lean{nest\_no\_chain\_below\_half}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{e} : \mathbb{R} ),\; (\mathit{he} :\\
-&\quad \mathit{e} < 1 / 2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius}\\
-&\quad \mathit{nestF}) \mathit{e}
+&(\mathit{e} : \mathbb{R} ),\; (\mathit{he} : \mathit{e} < 1 / 2)\\
+\vdash\;&\neg \mathit{OnePrefixChain} (\mathit{selectedRadius} \mathit{nestF}) \mathit{e}
 \end{aligned} \]}
 
 \noindent\textbf{A\,91}\quad\lean{nest\_normalized\_threshold}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NormalizedNestingThreshold}\\
-&\quad \mathit{nestF} (1 / 4)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{NormalizedNestingThreshold} \mathit{nestF} (1 / 4) \]}
 
 \noindent\textbf{A\,92}\quad\lean{nest\_prefix0}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{nestRanking}\\
-&\quad 0 = (\emptyset : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{nestRanking} 0 = (\emptyset : \mathit{Finset} (\mathit{Fin} 4)) \]}
 
 \noindent\textbf{A\,93}\quad\lean{nest\_prefix1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{nestRanking}\\
-&\quad 1 = (\{ 1\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{nestRanking} 1 = (\{ 1\} : \mathit{Finset} (\mathit{Fin} 4)) \]}
 
 \noindent\textbf{A\,94}\quad\lean{nest\_prefix2}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{nestRanking}\\
-&\quad 2 = (\{ 0,1\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{nestRanking} 2 = (\{ 0,1\} : \mathit{Finset} (\mathit{Fin} 4)) \]}
 
 \noindent\textbf{A\,95}\quad\lean{nest\_prefix3}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{nestRanking}\\
-&\quad 3 = (\{ 0,1,2\} : \mathit{Finset} (\mathit{Fin}\\
-&\quad 4))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{nestRanking} 3 = (\{ 0,1,2\} : \mathit{Finset} (\mathit{Fin} 4)) \]}
 
 \noindent\textbf{A\,96}\quad\lean{nest\_prefix4}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{prefixSet} \mathit{nestRanking}\\
-&\quad 4 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset}\\
-&\quad (\mathit{Fin} 4))
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{prefixSet} \mathit{nestRanking} 4 = (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 4)) \]}
 
 \noindent\textbf{A\,97}\quad\lean{nest\_r0}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 0\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 0\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 \]}
 
 \noindent\textbf{A\,98}\quad\lean{nest\_r01}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 0,1\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 0,1\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,99}\quad\lean{nest\_r012}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 0,1,2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 0,1,2\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,100}\quad\lean{nest\_r02}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 0,2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 0,2\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 \]}
 
 \noindent\textbf{A\,101}\quad\lean{nest\_r03}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 0,3\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 0,3\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 \]}
 
 \noindent\textbf{A\,102}\quad\lean{nest\_r1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 1\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 1\} : \mathit{Finset} (\mathit{Fin} 4)) = 0 \]}
 
 \noindent\textbf{A\,103}\quad\lean{nest\_r12}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 1,2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 1,2\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,104}\quad\lean{nest\_r13}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 1,3\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 1,3\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,105}\quad\lean{nest\_r2}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 2\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 2\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,106}\quad\lean{nest\_r23}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 2,3\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 2,3\} : \mathit{Finset} (\mathit{Fin} 4)) = 0 \]}
 
 \noindent\textbf{A\,107}\quad\lean{nest\_r3}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\{ 3\} :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\{ 3\} : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,108}\quad\lean{nest\_r\_empty}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF} (\emptyset :\\
-&\quad \mathit{Finset} (\mathit{Fin} 4))\\
-&\quad = 1 / 2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\emptyset : \mathit{Finset} (\mathit{Fin} 4)) = 1 / 2 \]}
 
 \noindent\textbf{A\,109}\quad\lean{nest\_runiv}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{selectedRadius} \mathit{nestF}\\
-&\quad (\mathit{Finset}.\mathit{univ} : \mathit{Finset}\\
-&\quad (\mathit{Fin} 4)) = 0
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{selectedRadius} \mathit{nestF} (\mathit{Finset}.\mathit{univ} : \mathit{Finset} (\mathit{Fin} 4)) = 0 \]}
 
 \noindent\textbf{A\,110}\quad\lean{nest\_threshold}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NestingThreshold}\\
-&\quad \mathit{nestF} (1 / 2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{NestingThreshold} \mathit{nestF} (1 / 2) \]}
 
 \noindent\textbf{A\,111}\quad\lean{normalizedRadius\_eq\_selectedRadius\_div}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{normalizedRadius} \mathit{f}\\
-&\quad \mathit{S} = \mathit{selectedRadius}\\
-&\quad \mathit{f} \mathit{S} / (\mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ} \mathit{f} /\\
-&\quad 2)
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{normalizedRadius} \mathit{f} \mathit{S} = \mathit{selectedRadius} \mathit{f} \mathit{S} / (\mathit{modularSpan}\\
+&\quad \mathit{Finset}.\mathit{univ} \mathit{f} / 2)
 \end{aligned} \]}
 
 \noindent\textbf{A\,112}\quad\lean{normalized\_threshold\_of\_selected}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{D} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{hD} : 0 < \mathit{D}),\; (\mathit{hspan}\\
-&\quad : \mathit{modularSpan} \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f} = \mathit{D}),\; (\mathit{h} :\\
-&\quad \mathit{NestingThreshold} \mathit{f}\\
-&\quad \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{NormalizedNestingThreshold}\\
-&\quad \mathit{f} (2 * \mathit{t} /\\
-&\quad \mathit{D})
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{D} \mathit{t} : \mathbb{R} ),\; (\mathit{hD} : 0 < \mathit{D}),\; (\mathit{hspan} :\\
+&\quad \mathit{modularSpan} \mathit{Finset}.\mathit{univ} \mathit{f} = \mathit{D}),\; (\mathit{h} : \mathit{NestingThreshold} \mathit{f} \mathit{t})\\
+\vdash\;&\mathit{NormalizedNestingThreshold} \mathit{f} (2 * \mathit{t} / \mathit{D})
 \end{aligned} \]}
 
 \noindent\textbf{A\,113}\quad\lean{scale\_ineq}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{b} \mathit{c} \mathit{e} :\\
-&\quad \mathbb{R} ),\; (\mathit{hc} : 0 <\\
-&\quad \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{a} / \mathit{c} \leq \mathit{b}\\
-&\quad / \mathit{c} + \mathit{e}\\
-&\quad \leftrightarrow \mathit{a} \leq \mathit{b}\\
-&\quad + \mathit{c} * \mathit{e}
+&(\mathit{a} \mathit{b} \mathit{c} \mathit{e} : \mathbb{R} ),\; (\mathit{hc} : 0 < \mathit{c})\\
+\vdash\;&\mathit{a} / \mathit{c} \leq \mathit{b} / \mathit{c} + \mathit{e} \leftrightarrow \mathit{a} \leq \mathit{b} + \mathit{c} * \mathit{e}
 \end{aligned} \]}
 
 \noindent\textbf{A\,114}\quad\lean{selectedRadius\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{selectedRadius}\\
-&\quad \mathit{f} \mathit{S}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota ) \;\vdash\; 0 \leq \mathit{selectedRadius} \mathit{f} \mathit{S} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
 \noindent\textbf{Module \lean{LeanStructuralRandomMenuExactV1}}\par\vspace{3pt}
 
 \noindent\textbf{A\,115}\quad\lean{exact\_random\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \Omega : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \Omega ],\; (\mathit{hr} :\\
-&\quad 0<\mathit{r}),\; (\mathit{eps} \mathit{delta} :\\
-&\quad \mathbb{R} ),\; (\mathit{heps} : 2*(\mathit{r} :\\
-&\quad \mathbb{R} )*\mathit{eps}<1),\; (\mathit{p} :\\
-&\quad \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{o},0 \leq \mathit{p}\\
-&\quad \mathit{o}),\; (\mathit{hpsum} :\\
-&\quad \textstyle\sum \mathit{o},\mathit{p}\\
-&\quad \mathit{o}=1),\; (\mathit{menu} : \Omega \to \mathit{Finset}\\
-&\quad (\mathit{List} (\mathit{StairRel}\\
-&\quad \mathit{r}))),\; (\mathit{K} : \mathbb{N}\\
-&\quad ),\; (\mathit{hK} : \forall \mathit{o},(\mathit{menu}\\
-&\quad \mathit{o}).\mathit{card} \leq \mathit{K}),\;\\
-&\quad (\mathit{hs} : \forall \mathit{t} : \mathit{Fin}\\
-&\quad \mathit{r},1-\mathit{delta} \leq \textstyle\sum \mathit{o},\mathit{p}\\
-&\quad \mathit{o}*(\mathbf{if} \mathit{t} \in \mathit{hitSet}\\
-&\quad \mathit{eps} (\mathit{menu} \mathit{o}) \mathbf{then}\\
-&\quad 1 \mathbf{else} 0))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{targetSize} \mathit{r}\\
-&\quad \mathit{delta} \leq \mathit{K}
+&\{ \Omega : \mathit{Type}*\},\; [\mathit{Fintype} \Omega ],\; (\mathit{hr} : 0<\mathit{r}),\; (\mathit{eps} \mathit{delta} : \mathbb{R} ),\\
+&\quad \; (\mathit{heps} : 2*(\mathit{r} : \mathbb{R} )*\mathit{eps}<1),\; (\mathit{p} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{o},0 \leq \mathit{p} \mathit{o}),\; (\mathit{hpsum} : \textstyle\sum \mathit{o},\mathit{p} \mathit{o}=1),\; (\mathit{menu} : \Omega \to\\
+&\quad \mathit{Finset} (\mathit{List} (\mathit{StairRel} \mathit{r}))),\; (\mathit{K} : \mathbb{N} ),\; (\mathit{hK} : \forall \mathit{o},\\
+&\quad (\mathit{menu} \mathit{o}).\mathit{card} \leq \mathit{K}),\; (\mathit{hs} : \forall \mathit{t} : \mathit{Fin} \mathit{r},1-\mathit{delta} \leq \textstyle\sum \mathit{o},\\
+&\quad \mathit{p} \mathit{o}*(\mathbf{if} \mathit{t} \in \mathit{hitSet} \mathit{eps} (\mathit{menu} \mathit{o}) \mathbf{then} 1 \mathbf{else} 0))\\
+\vdash\;&\mathit{targetSize} \mathit{r} \mathit{delta} \leq \mathit{K}
 \end{aligned} \]}
 
 \noindent\textbf{A\,116}\quad\lean{exact\_random\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{eps}\\
-&\quad \mathit{delta} : \mathbb{R} ),\; (\mathit{he}\\
-&\quad : 0 \leq \mathit{eps}),\;\\
-&\quad (\mathit{h0} : 0 \leq \mathit{delta}),\; (\mathit{h1}\\
-&\quad : \mathit{delta}<1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{eps} \mathit{delta} : \mathbb{R} ),\; (\mathit{he} : 0 \leq \mathit{eps}),\\
+&\quad \; (\mathit{h0} : 0 \leq \mathit{delta}),\; (\mathit{h1} : \mathit{delta}<1)\\
 \vdash\;&\mathbf{let} \mathit{C}
 \end{aligned} \]}
 
 \noindent\textbf{A\,117}\quad\lean{random\_menu\_exact}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{eps}\\
-&\quad \mathit{delta} : \mathbb{R} ),\; (\mathit{he}\\
-&\quad : 0 \leq \mathit{eps}),\;\\
-&\quad (\mathit{heps} : 2*(\mathit{r} : \mathbb{R}\\
-&\quad )*\mathit{eps}<1),\; (\mathit{h0} : 0\\
-&\quad \leq \mathit{delta}),\;\\
-&\quad (\mathit{h1} : \mathit{delta}<1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall (\Omega : \mathit{Type}) [\mathit{Fintype}\\
-&\quad \Omega ] (\mathit{p} : \Omega \to \mathbb{R} )\\
-&\quad (\mathit{menu} : \Omega \to \mathit{Finset}\\
-&\quad (\mathit{List} (\mathit{StairRel} \mathit{r})))\\
-&\quad (\mathit{K} : \mathbb{N} ), (\forall \mathit{o},0 \leq \mathit{p}\\
-&\quad \mathit{o}) \to (\textstyle\sum \mathit{o},\mathit{p}\\
-&\quad \mathit{o})=1 \to (\forall \mathit{o},(\mathit{menu}\\
-&\quad \mathit{o}).\mathit{card} \leq \mathit{K})\\
-&\quad \to (\forall \mathit{t}\\
-&\quad : \mathit{Fin} \mathit{r},1-\mathit{delta}\\
-&\quad \leq \textstyle\sum \mathit{o},\mathit{p}\\
-&\quad \mathit{o}*(\mathbf{if} \mathit{t} \in \mathit{hitSet}\\
-&\quad \mathit{eps} (\mathit{menu} \mathit{o}) \mathbf{then}\\
-&\quad 1 \mathbf{else} 0)) \to \mathit{targetSize} \mathit{r}\\
-&\quad \mathit{delta} \leq \mathit{K})\\
-&\quad \wedge (\mathbf{let} \mathit{C}
+&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{eps} \mathit{delta} : \mathbb{R} ),\; (\mathit{he} : 0 \leq \mathit{eps}),\\
+&\quad \; (\mathit{heps} : 2*(\mathit{r} : \mathbb{R} )*\mathit{eps}<1),\; (\mathit{h0} : 0 \leq \mathit{delta}),\\
+&\quad \; (\mathit{h1} : \mathit{delta}<1)\\
+\vdash\;&(\forall (\Omega : \mathit{Type}) [\mathit{Fintype} \Omega ] (\mathit{p} : \Omega \to \mathbb{R} ) (\mathit{menu} : \Omega \to \mathit{Finset} (\mathit{List} (\\
+&\quad \mathit{StairRel} \mathit{r}))) (\mathit{K} : \mathbb{N} ), (\forall \mathit{o},0 \leq \mathit{p} \mathit{o}) \to (\textstyle\sum \mathit{o},\mathit{p} \mathit{o})=1 \to (\forall \mathit{o},\\
+&\quad (\mathit{menu} \mathit{o}).\mathit{card} \leq \mathit{K}) \to (\forall \mathit{t} : \mathit{Fin} \mathit{r},1-\mathit{delta} \leq \textstyle\sum \mathit{o},\\
+&\quad \mathit{p} \mathit{o}*(\mathbf{if} \mathit{t} \in \mathit{hitSet} \mathit{eps} (\mathit{menu} \mathit{o}) \mathbf{then} 1 \mathbf{else} 0)) \to\\
+&\quad \mathit{targetSize} \mathit{r} \mathit{delta} \leq \mathit{K}) \wedge (\mathbf{let} \mathit{C}
 \end{aligned} \]}
 
 \noindent\textbf{A\,118}\quad\lean{targetSize\_bounds}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{delta} :\\
-&\quad \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{delta}),\;\\
-&\quad (\mathit{h1} : \mathit{delta}<1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < \mathit{targetSize} \mathit{r}\\
-&\quad \mathit{delta} \wedge \mathit{targetSize}\\
-&\quad \mathit{r} \mathit{delta} \leq \mathit{r}\\
-&\quad \wedge 1-\mathit{delta} \leq (\mathit{targetSize}\\
-&\quad \mathit{r} \mathit{delta} : \mathbb{R}\\
-&\quad )/\mathit{r}
+&(\mathit{hr} : 0<\mathit{r}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{delta}),\\
+&\quad \; (\mathit{h1} : \mathit{delta}<1)\\
+\vdash\;&0 < \mathit{targetSize} \mathit{r} \mathit{delta} \wedge \mathit{targetSize} \mathit{r} \mathit{delta} \leq \mathit{r} \wedge\\
+&\quad 1-\mathit{delta} \leq (\mathit{targetSize} \mathit{r} \mathit{delta} : \mathbb{R} )/\mathit{r}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
 \noindent\textbf{Module \lean{LeanStructuralRecourseUniformNestingV1}}\par\vspace{3pt}
 
 \noindent\textbf{A\,119}\quad\lean{componentSpan\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{j} : \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{componentSpan}\\
-&\quad \mathit{f} \mathit{j}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{j} : \iota ) \;\vdash\; 0 \leq \mathit{componentSpan} \mathit{f} \mathit{j} \]}
 
 \noindent\textbf{A\,120}\quad\lean{excess\_le\_min}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} \mathit{T} : \mathit{Finset} \iota ),\;\\
-&\quad (\mathit{hmass} : \mathit{modularSpan} \mathit{T}\\
-&\quad \mathit{f} \leq \mathit{modularSpan} \mathit{S}\\
-&\quad \mathit{f})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{supportOsc} \mathit{Sᶜ}\\
-&\quad \mathit{f} \leq \mathit{supportOsc}\\
-&\quad \mathit{Tᶜ} \mathit{f} + \mathit{min}\\
-&\quad (\mathit{modularSpan} \mathit{Sᶜ}\\
-&\quad \mathit{f}) (2 * \mathit{modularSpan} \mathit{S}\\
-&\quad \mathit{f})
+&(\mathit{S} \mathit{T} : \mathit{Finset} \iota ),\; (\mathit{hmass} : \mathit{modularSpan} \mathit{T} \mathit{f} \leq \mathit{modularSpan} \mathit{S} \mathit{f})\\
+\vdash\;&\mathit{supportOsc} \mathit{Sᶜ} \mathit{f} \leq \mathit{supportOsc} \mathit{Tᶜ} \mathit{f} + \mathit{min} (\mathit{modularSpan} \mathit{Sᶜ} \mathit{f}) (2 *\\
+&\quad \mathit{modularSpan} \mathit{S} \mathit{f})
 \end{aligned} \]}
 
 \noindent\textbf{A\,121}\quad\lean{excess\_le\_two\_thirds}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} \mathit{T} : \mathit{Finset} \iota ),\;\\
-&\quad (\mathit{hmass} : \mathit{modularSpan} \mathit{T}\\
-&\quad \mathit{f} \leq \mathit{modularSpan} \mathit{S}\\
-&\quad \mathit{f})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{supportOsc} \mathit{Sᶜ}\\
-&\quad \mathit{f} \leq \mathit{supportOsc}\\
-&\quad \mathit{Tᶜ} \mathit{f} + 2 / 3 *\\
-&\quad \mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f}
+&(\mathit{S} \mathit{T} : \mathit{Finset} \iota ),\; (\mathit{hmass} : \mathit{modularSpan} \mathit{T} \mathit{f} \leq \mathit{modularSpan} \mathit{S} \mathit{f})\\
+\vdash\;&\mathit{supportOsc} \mathit{Sᶜ} \mathit{f} \leq \mathit{supportOsc} \mathit{Tᶜ} \mathit{f} + 2 / 3 * \mathit{modularSpan} \mathit{Finset}\\
+&\quad .\mathit{univ} \mathit{f}
 \end{aligned} \]}
 
 \noindent\textbf{A\,122}\quad\lean{modularSpan\_compl}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{modularSpan} \mathit{S}\\
-&\quad \mathit{f} + \mathit{modularSpan}\\
-&\quad \mathit{Sᶜ} \mathit{f} =\\
-&\quad \mathit{modularSpan}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f}
+&(\mathit{S} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{modularSpan} \mathit{S} \mathit{f} + \mathit{modularSpan} \mathit{Sᶜ} \mathit{f} = \mathit{modularSpan} \mathit{Finset}.\mathit{univ} \mathit{f}
 \end{aligned} \]}
 
 \noindent\textbf{A\,123}\quad\lean{modularSpan\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{modularSpan} \mathit{T}\\
-&\quad \mathit{f}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{T} : \mathit{Finset} \iota ) \;\vdash\; 0 \leq \mathit{modularSpan} \mathit{T} \mathit{f} \]}
 
 \noindent\textbf{A\,124}\quad\lean{normalizedRadius\_eq}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{normalizedRadius} \mathit{f}\\
-&\quad \mathit{S} = \mathit{selectedRadius}\\
-&\quad \mathit{f} \mathit{S} / (\textstyle\sum \mathit{j} :\\
-&\quad \iota , \mathit{osc} (\mathit{f} \mathit{j}) /\\
-&\quad 2)
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{normalizedRadius} \mathit{f} \mathit{S} = \mathit{selectedRadius} \mathit{f} \mathit{S} / (\textstyle\sum \mathit{j} : \iota , \mathit{osc} (\mathit{f} \mathit{j}) / 2)
 \end{aligned} \]}
 
 \noindent\textbf{A\,125}\quad\lean{osc\_sub\_le}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{g} \mathit{h} : \Omega \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{osc} (\mathbf{fun} \mathit{a} => \mathit{g}\\
-&\quad \mathit{a} - \mathit{h} \mathit{a})\\
-&\quad \leq \mathit{osc} \mathit{g} +\\
-&\quad \mathit{osc} \mathit{h}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{g} \mathit{h} : \Omega \to \mathbb{R} ) \;\vdash\; \mathit{osc} (\mathbf{fun} \mathit{a} => \mathit{g} \mathit{a} - \mathit{h} \mathit{a}) \leq \mathit{osc} \mathit{g} + \mathit{osc} \mathit{h} \]}
 
 \noindent\textbf{A\,126}\quad\lean{sumComponent\_compl}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} : \mathit{Finset} \iota ),\; (\mathit{a} :\\
-&\quad \Omega )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sumComponent} \mathit{Sᶜ}\\
-&\quad \mathit{f} \mathit{a} =\\
-&\quad \mathit{sumComponent}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f} \mathit{a} -\\
-&\quad \mathit{sumComponent} \mathit{S}\\
-&\quad \mathit{f} \mathit{a}
+&(\mathit{S} : \mathit{Finset} \iota ),\; (\mathit{a} : \Omega )\\
+\vdash\;&\mathit{sumComponent} \mathit{Sᶜ} \mathit{f} \mathit{a} = \mathit{sumComponent} \mathit{Finset}.\mathit{univ} \mathit{f} \mathit{a} -\\
+&\quad \mathit{sumComponent} \mathit{S} \mathit{f} \mathit{a}
 \end{aligned} \]}
 
 \noindent\textbf{A\,127}\quad\lean{supportOsc\_compl\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{supportOsc} \mathit{Sᶜ}\\
-&\quad \mathit{f} \leq \mathit{supportOsc}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f} + \mathit{modularSpan}\\
-&\quad \mathit{S} \mathit{f}
+&(\mathit{S} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{supportOsc} \mathit{Sᶜ} \mathit{f} \leq \mathit{supportOsc} \mathit{Finset}.\mathit{univ} \mathit{f} + \mathit{modularSpan} \mathit{S} \mathit{f}
 \end{aligned} \]}
 
 \noindent\textbf{A\,128}\quad\lean{supportOsc\_univ\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{supportOsc}\\
-&\quad \mathit{Finset}.\mathit{univ}\\
-&\quad \mathit{f} \leq \mathit{supportOsc}\\
-&\quad \mathit{Tᶜ} \mathit{f} +\\
-&\quad \mathit{modularSpan} \mathit{T}\\
-&\quad \mathit{f}
+&(\mathit{T} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{supportOsc} \mathit{Finset}.\mathit{univ} \mathit{f} \leq \mathit{supportOsc} \mathit{Tᶜ} \mathit{f} + \mathit{modularSpan} \mathit{T} \mathit{f}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1505,132 +702,52 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,129}\quad\lean{card\_prefixSet}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pos} : \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{h} : \mathit{IsRanking}\\
-&\quad \mathit{pos}),\; (\mathit{k} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{prefixSet} \mathit{pos}\\
-&\quad \mathit{k}).\mathit{card} =\\
-&\quad \mathit{min} \mathit{k}\\
-&\quad (\mathit{Fintype}.\mathit{card} \alpha )
+&(\mathit{pos} : \alpha \to \mathbb{N} ),\; (\mathit{h} : \mathit{IsRanking} \mathit{pos}),\; (\mathit{k} : \mathbb{N} )\\
+\vdash\;&(\mathit{prefixSet} \mathit{pos} \mathit{k}).\mathit{card} = \mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha )
 \end{aligned} \]}
 
 \noindent\textbf{A\,130}\quad\lean{cyclic\_retained}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{i} : \mathit{ZMod}\\
-&\quad \mathit{m}),\; (\mathit{k} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{retained} (\alpha
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{i} : \mathit{ZMod} \mathit{m}),\; (\mathit{k} : \mathbb{N} ) \;\vdash\; \mathit{retained} (\alpha \]}
 
 \noindent\textbf{A\,131}\quad\lean{retained\_col\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} :\\
-&\quad \mathit{J} \to \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{hpos} : \forall \mathit{j},\\
-&\quad \mathit{IsRanking} (\mathit{pos}\\
-&\quad \mathit{j})),\; (\mathit{k} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{i} : \alpha ,\\
-&\quad \mathit{retained} \mathit{pos}\\
-&\quad \mathit{i} \mathit{k} = ((\mathit{min} \mathit{k}\\
-&\quad (\mathit{Fintype}.\mathit{card} \alpha ) : \mathbb{N}\\
-&\quad ) : \mathbb{R} )
+&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N} ),\; (\mathit{hpos} : \forall \mathit{j}, \mathit{IsRanking} (\mathit{pos} \mathit{j})\\
+&\quad ),\; (\mathit{k} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{i} : \alpha , \mathit{retained} \mathit{pos} \mathit{i} \mathit{k} = ((\mathit{min} \mathit{k} (\mathit{Fintype}.\mathit{card} \alpha ) : \mathbb{N} ) : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,132}\quad\lean{retained\_constrained\_eq\_free}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R}\\
-&\quad ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord}\\
-&\quad \to \mathbb{R} ) \to \alpha \to \mathbb{N}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{P₀} :\\
-&\quad \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hfree} :\\
-&\quad \forall \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \to \mathit{V}\\
-&\quad \leq \mathit{val} \mathit{P}),\; (\mathit{hF₀} :\\
-&\quad \mathit{Feasible} \mathit{P₀}),\; (\mathit{hT₀} :\\
-&\quad \forall \mathit{i} \mathit{k}, \mathit{traj}\\
-&\quad \mathit{P₀} \mathit{i} \mathit{k} = \mathit{target}\\
-&\quad \mathit{i} \mathit{k}),\; (\mathit{hval} :\\
-&\quad \mathit{val} \mathit{P₀} = \mathit{V})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} \{ \mathit{v} |\\
-&\quad \exists \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \wedge (\forall \mathit{i} \mathit{k},\\
-&\quad \mathit{traj} \mathit{P} \mathit{i} \mathit{k} =\\
-&\quad \mathit{target} \mathit{i} \mathit{k})\\
-&\quad \wedge \mathit{val} \mathit{P} =\\
-&\quad \mathit{v}\} \mathit{V}
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\\
+&\quad \; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R} ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R} )\\
+&\quad ,\; (\mathit{V} : \mathbb{R} ),\; (\mathit{P₀} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq\\
+&\quad \mathit{val} \mathit{P}),\; (\mathit{hF₀} : \mathit{Feasible} \mathit{P₀}),\; (\mathit{hT₀} : \forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P₀} \mathit{i} \mathit{k} =\\
+&\quad \mathit{target} \mathit{i} \mathit{k}),\; (\mathit{hval} : \mathit{val} \mathit{P₀} = \mathit{V})\\
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} | \exists \mathit{P}, \mathit{Feasible} \mathit{P} \wedge (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i} \mathit{k}) \wedge\\
+&\quad \mathit{val} \mathit{P} = \mathit{v}\} \mathit{V}
 \end{aligned} \]}
 
 \noindent\textbf{A\,133}\quad\lean{retained\_le\_one}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} :\\
-&\quad \mathit{J} \to \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{i} : \alpha ),\; (\mathit{k} :\\
-&\quad \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{retained} \mathit{pos}\\
-&\quad \mathit{i} \mathit{k} \leq 1
+&[\mathit{Nonempty} \mathit{J}],\; (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N} ),\; (\mathit{i} : \alpha ),\; (\mathit{k} : \mathbb{N} )\\
+\vdash\;&\mathit{retained} \mathit{pos} \mathit{i} \mathit{k} \leq 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,134}\quad\lean{retained\_mono}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{i} : \alpha ),\; \{\\
-&\quad \mathit{k} \mathit{l} : \mathbb{N}\\
-&\quad \},\; (\mathit{hkl} : \mathit{k} \leq \mathit{l})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{retained} \mathit{pos}\\
-&\quad \mathit{i} \mathit{k} \leq \mathit{retained}\\
-&\quad \mathit{pos} \mathit{i} \mathit{l}
+&(\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N} ),\; (\mathit{i} : \alpha ),\; \{ \mathit{k} \mathit{l} : \mathbb{N} \},\; (\mathit{hkl} : \mathit{k} \leq \mathit{l})\\
+\vdash\;&\mathit{retained} \mathit{pos} \mathit{i} \mathit{k} \leq \mathit{retained} \mathit{pos} \mathit{i} \mathit{l}
 \end{aligned} \]}
 
 \noindent\textbf{A\,135}\quad\lean{retained\_nonneg}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N}\\
-&\quad ),\; (\mathit{i} : \alpha ),\; (\mathit{k} :\\
-&\quad \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{retained} \mathit{pos}\\
-&\quad \mathit{i} \mathit{k}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{pos} : \mathit{J} \to \alpha \to \mathbb{N} ),\; (\mathit{i} : \alpha ),\; (\mathit{k} : \mathbb{N} ) \;\vdash\; 0 \leq \mathit{retained} \mathit{pos} \mathit{i} \mathit{k} \]}
 
 \noindent\textbf{A\,136}\quad\lean{retained\_transfer}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R}\\
-&\quad ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R}\\
-&\quad ) \to \mathit{Prop}),\; (\mathit{traj} : (\mathit{Ord}\\
-&\quad \to \mathbb{R} ) \to \alpha \to \mathbb{N}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{target} : \alpha \to \mathbb{N}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hfree} :\\
-&\quad \forall \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \to \mathit{V}\\
-&\quad \leq \mathit{val} \mathit{P})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{P}, \mathit{Feasible}\\
-&\quad \mathit{P} \to (\forall \mathit{i} \mathit{k},\\
-&\quad \mathit{traj} \mathit{P} \mathit{i} \mathit{k} =\\
-&\quad \mathit{target} \mathit{i} \mathit{k})\\
-&\quad \to \mathit{V} \leq \mathit{val}\\
-&\quad \mathit{P}
+&(\mathit{val} : (\mathit{Ord} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{Feasible} : (\mathit{Ord} \to \mathbb{R} ) \to \mathit{Prop}),\\
+&\quad \; (\mathit{traj} : (\mathit{Ord} \to \mathbb{R} ) \to \alpha \to \mathbb{N} \to \mathbb{R} ),\; (\mathit{target} : \alpha \to \mathbb{N} \to \mathbb{R} )\\
+&\quad ,\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hfree} : \forall \mathit{P}, \mathit{Feasible} \mathit{P} \to \mathit{V} \leq \mathit{val} \mathit{P})\\
+\vdash\;&\forall \mathit{P}, \mathit{Feasible} \mathit{P} \to (\forall \mathit{i} \mathit{k}, \mathit{traj} \mathit{P} \mathit{i} \mathit{k} = \mathit{target} \mathit{i} \mathit{k}) \to \mathit{V} \leq \mathit{val} \mathit{P}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1638,227 +755,87 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,137}\quad\lean{relaxed\_value\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Dual}\\
-&\quad \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix}\\
-&\quad \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix}\\
-&\quad \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hfeas} : \mathit{Feasible} \mathit{D}\\
-&\quad \mathit{a} \mathit{c}),\; (\mathit{x} :\\
-&\quad \mathit{M} \to \mathbb{Q}\\
-&\quad ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0\\
-&\quad \leq \tau ),\;\\
-&\quad (\mathit{v} : \mathbb{Q} ),\; (\mathit{P} :\\
-&\quad \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{hP0} :\\
-&\quad \forall \mathit{p}, 0 \leq \mathit{P}\\
-&\quad \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} = 1),\; (\mathit{hmarg} :\\
-&\quad \forall \mathit{i}, |(\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{a} \mathit{i}\\
-&\quad \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\;\\
-&\quad (\mathit{hv} : \textstyle\sum \mathit{p}, \mathit{P}\\
-&\quad \mathit{p} * \mathit{c} \mathit{p} \leq \mathit{v})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dualObj} \mathit{D} \mathit{x}\\
-&\quad - \mathit{l1} \mathit{D} * \tau \leq \mathit{v}
+&(\mathit{D} : \mathit{Dual} \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix} \to \mathbb{Q} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{Feasible} \mathit{D} \mathit{a} \mathit{c}),\; (\mathit{x} : \mathit{M} \to \mathbb{Q} ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0 \leq \tau ),\\
+&\quad \; (\mathit{v} : \mathbb{Q} ),\; (\mathit{P} : \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{hP0} : \forall \mathit{p}, 0 \leq \mathit{P} \mathit{p}),\\
+&\quad \; (\mathit{hP1} : \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} = 1),\; (\mathit{hmarg} : \forall \mathit{i}, |(\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{a} \mathit{i} \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\\
+&\quad \; (\mathit{hv} : \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{c} \mathit{p} \leq \mathit{v})\\
+\vdash\;&\mathit{dualObj} \mathit{D} \mathit{x} - \mathit{l1} \mathit{D} * \tau \leq \mathit{v}
 \end{aligned} \]}
 
 \noindent\textbf{A\,138}\quad\lean{relaxed\_weak\_duality}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Dual}\\
-&\quad \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix}\\
-&\quad \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix}\\
-&\quad \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hfeas} : \mathit{Feasible} \mathit{D}\\
-&\quad \mathit{a} \mathit{c}),\; (\mathit{x} :\\
-&\quad \mathit{M} \to \mathbb{Q}\\
-&\quad ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0\\
-&\quad \leq \tau ),\;\\
-&\quad (\mathit{P} : \mathit{Ix} \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hP0} : \forall \mathit{p}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} = 1),\; (\mathit{hmarg} :\\
-&\quad \forall \mathit{i}, |(\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{a} \mathit{i}\\
-&\quad \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{dualObj} \mathit{D} \mathit{x}\\
-&\quad - \mathit{l1} \mathit{D} * \tau \leq \textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{c}\\
-&\quad \mathit{p}
+&(\mathit{D} : \mathit{Dual} \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix} \to \mathbb{Q} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{Feasible} \mathit{D} \mathit{a} \mathit{c}),\; (\mathit{x} : \mathit{M} \to \mathbb{Q} ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0 \leq \tau ),\\
+&\quad \; (\mathit{P} : \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{hP0} : \forall \mathit{p}, 0 \leq \mathit{P} \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} = 1),\\
+&\quad \; (\mathit{hmarg} : \forall \mathit{i}, |(\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{a} \mathit{i} \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau )\\
+\vdash\;&\mathit{dualObj} \mathit{D} \mathit{x} - \mathit{l1} \mathit{D} * \tau \leq \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{c} \mathit{p}
 \end{aligned} \]}
 
 \noindent\textbf{A\,139}\quad\lean{robust\_separation}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Dual}\\
-&\quad \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix}\\
-&\quad \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix}\\
-&\quad \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hfeas} : \mathit{Feasible} \mathit{D}\\
-&\quad \mathit{a} \mathit{c}),\; (\mathit{x} :\\
-&\quad \mathit{M} \to \mathbb{Q}\\
-&\quad ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0\\
-&\quad \leq \tau ),\;\\
-&\quad (\mathit{P} : \mathit{Ix} \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hP0} : \forall \mathit{p}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} = 1),\; (\mathit{hmarg} :\\
-&\quad \forall \mathit{i}, |(\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{a} \mathit{i}\\
-&\quad \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\;\\
-&\quad (\mathit{avgVal} : \mathbb{Q} ),\; (\mathit{havg} :\\
-&\quad \mathit{avgVal} \leq \mathit{dualObj} \mathit{D}\\
-&\quad \mathit{x})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{dualObj} \mathit{D} \mathit{x} -\\
-&\quad \mathit{avgVal}) - \mathit{l1}\\
-&\quad \mathit{D} * \tau \leq (\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{c}\\
-&\quad \mathit{p}) - \mathit{avgVal}
+&(\mathit{D} : \mathit{Dual} \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix} \to \mathbb{Q} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{Feasible} \mathit{D} \mathit{a} \mathit{c}),\; (\mathit{x} : \mathit{M} \to \mathbb{Q} ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0 \leq \tau ),\\
+&\quad \; (\mathit{P} : \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{hP0} : \forall \mathit{p}, 0 \leq \mathit{P} \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} = 1),\\
+&\quad \; (\mathit{hmarg} : \forall \mathit{i}, |(\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{a} \mathit{i} \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\; (\mathit{avgVal} : \mathbb{Q} ),\\
+&\quad \; (\mathit{havg} : \mathit{avgVal} \leq \mathit{dualObj} \mathit{D} \mathit{x})\\
+\vdash\;&(\mathit{dualObj} \mathit{D} \mathit{x} - \mathit{avgVal}) - \mathit{l1} \mathit{D} * \tau \leq (\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{c} \mathit{p}) - \mathit{avgVal}
 \end{aligned} \]}
 
 \noindent\textbf{A\,140}\quad\lean{separation\_instance}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Dual}\\
-&\quad \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix}\\
-&\quad \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix}\\
-&\quad \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hfeas} : \mathit{Feasible} \mathit{D}\\
-&\quad \mathit{a} \mathit{c}),\; (\mathit{x} :\\
-&\quad \mathit{M} \to \mathbb{Q}\\
-&\quad ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0\\
-&\quad \leq \tau ),\;\\
-&\quad (\mathit{P} : \mathit{Ix} \to \mathbb{Q}\\
-&\quad ),\; (\mathit{hP0} : \forall \mathit{p}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} = 1),\; (\mathit{hmarg} :\\
-&\quad \forall \mathit{i}, |(\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{a} \mathit{i}\\
-&\quad \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\;\\
-&\quad (\mathit{hobj} : \mathit{dualObj} \mathit{D}\\
-&\quad \mathit{x} = 7/15),\; (\mathit{hl1} : \mathit{l1}\\
-&\quad \mathit{D} = 17/5)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1:\mathbb{Q} )/5 - (17/5) * \tau \leq (\textstyle\sum \mathit{p},\\
-&\quad \mathit{P} \mathit{p} * \mathit{c}\\
-&\quad \mathit{p}) - 4/15
+&(\mathit{D} : \mathit{Dual} \mathit{M}),\; (\mathit{a} : \mathit{M} \to \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{c} : \mathit{Ix} \to \mathbb{Q} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{Feasible} \mathit{D} \mathit{a} \mathit{c}),\; (\mathit{x} : \mathit{M} \to \mathbb{Q} ),\; (\tau : \mathbb{Q} ),\; (\mathit{hτ} : 0 \leq \tau ),\\
+&\quad \; (\mathit{P} : \mathit{Ix} \to \mathbb{Q} ),\; (\mathit{hP0} : \forall \mathit{p}, 0 \leq \mathit{P} \mathit{p}),\; (\mathit{hP1} : \textstyle\sum \mathit{p}, \mathit{P} \mathit{p} = 1),\\
+&\quad \; (\mathit{hmarg} : \forall \mathit{i}, |(\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{a} \mathit{i} \mathit{p}) - \mathit{x} \mathit{i}| \leq \tau ),\; (\mathit{hobj} : \mathit{dualObj} \mathit{D} \mathit{x} =\\
+&\quad 7/15),\; (\mathit{hl1} : \mathit{l1} \mathit{D} = 17/5)\\
+\vdash\;&(1:\mathbb{Q} )/5 - (17/5) * \tau \leq (\textstyle\sum \mathit{p}, \mathit{P} \mathit{p} * \mathit{c} \mathit{p}) - 4/15
 \end{aligned} \]}
 
 \noindent\textbf{A\,141}\quad\lean{separation\_positive}
-{\footnotesize\[ \begin{aligned}[t]
-&(\tau : \mathbb{Q} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < (1:\mathbb{Q} )/5 - (17/5) * \tau \leftrightarrow \tau <\\
-&\quad 1/17
-\end{aligned} \]}
+{\footnotesize\[ (\tau : \mathbb{Q} ) \;\vdash\; 0 < (1:\mathbb{Q} )/5 - (17/5) * \tau \leftrightarrow \tau < 1/17 \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
 \noindent\textbf{Module \lean{LeanStructuralSaturationV1}}\par\vspace{3pt}
 
 \noindent\textbf{A\,142}\quad\lean{avg\_eq\_of\_balanced}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{e} : \mathbb{R} ),\; (\mathit{hbal} :\\
-&\quad \forall \mathit{k}, (\textstyle\sum \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}) = \mathit{e})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad \mathit{r} \mathit{pi} \mathit{k})\\
-&\quad = \mathit{e}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{e} : \mathbb{R} ),\\
+&\quad \; (\mathit{hbal} : \forall \mathit{k}, (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}) = \mathit{e})\\
+\vdash\;&(\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r}\\
+&\quad \mathit{pi} \mathit{k}) = \mathit{e}
 \end{aligned} \]}
 
 \noindent\textbf{A\,143}\quad\lean{max\_le\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{k}, 0\\
-&\quad \leq \mathit{r}\\
-&\quad \mathit{k})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} \mathit{r}\\
-&\quad \leq \textstyle\sum \mathit{k},\\
-&\quad \mathit{r} \mathit{k}
+&(\mathit{r} : \mathit{Bud} \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{k}, 0 \leq \mathit{r} \mathit{k})\\
+\vdash\;&(\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} \mathit{r} \leq \textstyle\sum \mathit{k}, \mathit{r} \mathit{k}
 \end{aligned} \]}
 
 \noindent\textbf{A\,144}\quad\lean{path\_le\_sum\_expect}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0\\
-&\quad \leq \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0\\
-&\quad \leq \mathit{P} \mathit{pi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad ((\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}))) \leq \textstyle\sum \mathit{k},\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P}\\
-&\quad \mathit{pi} * \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k})\\
+&\quad ,\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi})\\
+\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} =\\
+&\quad > \mathit{r} \mathit{pi} \mathit{k}))) \leq \textstyle\sum \mathit{k}, \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}
 \end{aligned} \]}
 
 \noindent\textbf{A\,145}\quad\lean{ratio\_card\_of\_concentrated\_and\_balanced}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R}\\
-&\quad ),\; (\mathit{e} : \mathbb{R} ),\; (\mathit{hr} :\\
-&\quad \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r}\\
-&\quad \mathit{pi} \mathit{k}),\; (\mathit{hP} :\\
-&\quad \forall \mathit{pi},\\
-&\quad 0 \leq \mathit{P} \mathit{pi}),\; (\mathit{hbal} :\\
-&\quad \forall \mathit{k}, (\textstyle\sum \mathit{pi},\\
-&\quad \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}) = \mathit{e}),\; (\mathit{hconc} :\\
-&\quad \forall \mathit{pi},\\
-&\quad (\textstyle\sum \mathit{k}, \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}) = (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad ((\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi}\\
-&\quad \mathit{k}))) = (\mathit{Fintype}.\mathit{card}\\
-&\quad \mathit{Bud} : \mathbb{R} ) * (\mathit{univ} :\\
-&\quad \mathit{Finset}\\
-&\quad \mathit{Bud}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathbf{fun} \mathit{k} =>\\
-&\quad \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} *\\
-&\quad \mathit{r} \mathit{pi} \mathit{k})
+&(\mathit{r} : \mathit{Ord} \to \mathit{Bud} \to \mathbb{R} ),\; (\mathit{P} : \mathit{Ord} \to \mathbb{R} ),\; (\mathit{e} : \mathbb{R} ),\\
+&\quad \; (\mathit{hr} : \forall \mathit{pi} \mathit{k}, 0 \leq \mathit{r} \mathit{pi} \mathit{k}),\; (\mathit{hP} : \forall \mathit{pi}, 0 \leq \mathit{P} \mathit{pi}),\\
+&\quad \; (\mathit{hbal} : \forall \mathit{k}, (\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k}) = \mathit{e}),\; (\mathit{hconc} : \forall \mathit{pi}, (\textstyle\sum \mathit{k}, \mathit{r} \mathit{pi} \mathit{k})\\
+&\quad = (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \mathit{r} \mathit{pi} \mathit{k}))\\
+\vdash\;&(\textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * ((\mathit{univ} : \mathit{Finset} \mathit{Bud}).\mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} =\\
+&\quad > \mathit{r} \mathit{pi} \mathit{k}))) = (\mathit{Fintype}.\mathit{card} \mathit{Bud} : \mathbb{R} ) * (\mathit{univ} : \mathit{Finset} \mathit{Bud}).\\
+&\quad \mathit{sup'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{k} => \textstyle\sum \mathit{pi}, \mathit{P} \mathit{pi} * \mathit{r} \mathit{pi} \mathit{k})
 \end{aligned} \]}
 
 \noindent\textbf{A\,146}\quad\lean{sum\_eq\_max\_of\_concentrated}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{r} :\\
-&\quad \mathit{Bud} \to \mathbb{R} ),\; (\mathit{k₀} :\\
-&\quad \mathit{Bud}),\; (\mathit{hzero} : \forall \mathit{k},\\
-&\quad \mathit{k} \neq \mathit{k₀} \to \mathit{r} \mathit{k}\\
-&\quad = 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{k}, \mathit{r}\\
-&\quad \mathit{k} = \mathit{r} \mathit{k₀}
+&[\mathit{DecidableEq} \mathit{Bud}],\; (\mathit{r} : \mathit{Bud} \to \mathbb{R} ),\; (\mathit{k₀} : \mathit{Bud}),\\
+&\quad \; (\mathit{hzero} : \forall \mathit{k}, \mathit{k} \neq \mathit{k₀} \to \mathit{r} \mathit{k} = 0)\\
+\vdash\;&\textstyle\sum \mathit{k}, \mathit{r} \mathit{k} = \mathit{r} \mathit{k₀}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1866,116 +843,48 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,147}\quad\lean{chain\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{chain} \mathit{f}\\
-&\quad \mathit{j}).\mathit{card} =\\
-&\quad \mathit{Fintype}.\mathit{card} \iota -\\
-&\quad \mathit{j}
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{j} : \mathbb{N} )\\
+\vdash\;&(\mathit{chain} \mathit{f} \mathit{j}).\mathit{card} = \mathit{Fintype}.\mathit{card} \iota - \mathit{j}
 \end{aligned} \]}
 
 \noindent\textbf{A\,148}\quad\lean{chain\_maximal}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{SpanMaximal} \mathit{f} (\mathit{chain}\\
-&\quad \mathit{f} \mathit{j})
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{j} : \mathbb{N} ) \;\vdash\; \mathit{SpanMaximal} \mathit{f} (\mathit{chain} \mathit{f} \mathit{j}) \]}
 
 \noindent\textbf{A\,149}\quad\lean{chain\_subset}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{chain} \mathit{f}\\
-&\quad (\mathit{j}+1) \subseteq \mathit{chain}\\
-&\quad \mathit{f} \mathit{j}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{j} : \mathbb{N} ) \;\vdash\; \mathit{chain} \mathit{f} (\mathit{j}+1) \subseteq \mathit{chain} \mathit{f} \mathit{j} \]}
 
 \noindent\textbf{A\,150}\quad\lean{one\_prefix\_chain}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{S} : \mathbb{N}\\
-&\quad \to \mathit{Finset} \iota , (\forall \mathit{k},\\
-&\quad \mathit{k} < \mathit{Fintype}.\mathit{card}\\
-&\quad \iota \to \mathit{S}\\
-&\quad \mathit{k} \subseteq \mathit{S}\\
-&\quad (\mathit{k}+1)) \wedge (\forall \mathit{k}, \mathit{k}\\
-&\quad \leq \mathit{Fintype}.\mathit{card} \iota \to (\mathit{S}\\
-&\quad \mathit{k}).\mathit{card} = \mathit{k})\\
-&\quad \wedge (\forall \mathit{k}, \mathit{k} \leq \mathit{Fintype}.\mathit{card}\\
-&\quad \iota \to \forall \mathit{T} : \mathit{Finset} \iota ,\\
-&\quad \mathit{T}.\mathit{card} = \mathit{k}\\
-&\quad \to \mathit{supportOsc}\\
-&\quad (\mathit{S} \mathit{k})ᶜ \mathit{f} \leq \mathit{supportOsc}\\
-&\quad \mathit{Tᶜ} \mathit{f} + 2/3 * \mathit{modularSpan}\\
-&\quad \mathit{univ} \mathit{f})
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} )\\
+\vdash\;&\exists \mathit{S} : \mathbb{N} \to \mathit{Finset} \iota , (\forall \mathit{k}, \mathit{k} < \mathit{Fintype}.\mathit{card} \iota \to \mathit{S} \mathit{k} \subseteq \mathit{S} (\mathit{k}+1))\\
+&\quad \wedge (\forall \mathit{k}, \mathit{k} \leq \mathit{Fintype}.\mathit{card} \iota \to (\mathit{S} \mathit{k}).\mathit{card} = \mathit{k}) \wedge\\
+&\quad (\forall \mathit{k}, \mathit{k} \leq \mathit{Fintype}.\mathit{card} \iota \to \forall \mathit{T} : \mathit{Finset} \iota , \mathit{T}.\mathit{card} = \mathit{k} \to\\
+&\quad \mathit{supportOsc} (\mathit{S} \mathit{k})ᶜ \mathit{f} \leq \mathit{supportOsc} \mathit{Tᶜ} \mathit{f} + 2/3 * \mathit{modularSpan} \mathit{univ}\\
+&\quad \mathit{f})
 \end{aligned} \]}
 
 \noindent\textbf{A\,151}\quad\lean{spanMaximal\_erase}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota ),\;\\
-&\quad (\mathit{hS} : \mathit{SpanMaximal} \mathit{f}\\
-&\quad \mathit{S}),\; (\mathit{x} : \iota ),\; (\mathit{hx} :\\
-&\quad \mathit{x} \in \mathit{S}),\; (\mathit{hmin} :\\
-&\quad \forall \mathit{y}\\
-&\quad \in \mathit{S}, \mathit{componentSpan} \mathit{f}\\
-&\quad \mathit{x} \leq \mathit{componentSpan} \mathit{f}\\
-&\quad \mathit{y})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{SpanMaximal} \mathit{f}\\
-&\quad (\mathit{S}.\mathit{erase} \mathit{x})
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota ),\; (\mathit{hS} : \mathit{SpanMaximal} \mathit{f} \mathit{S}),\\
+&\quad \; (\mathit{x} : \iota ),\; (\mathit{hx} : \mathit{x} \in \mathit{S}),\; (\mathit{hmin} : \forall \mathit{y} \in \mathit{S}, \mathit{componentSpan} \mathit{f} \mathit{x} \leq\\
+&\quad \mathit{componentSpan} \mathit{f} \mathit{y})\\
+\vdash\;&\mathit{SpanMaximal} \mathit{f} (\mathit{S}.\mathit{erase} \mathit{x})
 \end{aligned} \]}
 
 \noindent\textbf{A\,152}\quad\lean{spanMaximal\_univ}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{SpanMaximal} \mathit{f}\\
-&\quad \mathit{univ}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \iota \to \Omega \to \mathbb{R} ) \;\vdash\; \mathit{SpanMaximal} \mathit{f} \mathit{univ} \]}
 
 \noindent\textbf{A\,153}\quad\lean{step\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{step} \mathit{f}\\
-&\quad \mathit{S}).\mathit{card} =\\
-&\quad \mathit{S}.\mathit{card} - 1
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota )\\
+\vdash\;&(\mathit{step} \mathit{f} \mathit{S}).\mathit{card} = \mathit{S}.\mathit{card} - 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,154}\quad\lean{step\_maximal}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota ),\;\\
-&\quad (\mathit{hS} : \mathit{SpanMaximal} \mathit{f}\\
-&\quad \mathit{S})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{SpanMaximal} \mathit{f} (\mathit{step}\\
-&\quad \mathit{f} \mathit{S})
+&(\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota ),\; (\mathit{hS} : \mathit{SpanMaximal} \mathit{f} \mathit{S})\\
+\vdash\;&\mathit{SpanMaximal} \mathit{f} (\mathit{step} \mathit{f} \mathit{S})
 \end{aligned} \]}
 
 \noindent\textbf{A\,155}\quad\lean{step\_subset}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \iota \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{step} \mathit{f} \mathit{S}\\
-&\quad \subseteq \mathit{S}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \iota \to \Omega \to \mathbb{R} ),\; (\mathit{S} : \mathit{Finset} \iota ) \;\vdash\; \mathit{step} \mathit{f} \mathit{S} \subseteq \mathit{S} \]}

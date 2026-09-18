@@ -11,191 +11,81 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,1}\quad\lean{affinity\_enclosure}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} \mathit{hlo} \mathit{hhi} : \mathbb{R}\\
-&\quad ),\; (\mathit{hlo\_{}bound} : \mathit{hlo}\\
-&\quad \leq 1-\mathit{rho}),\;\\
-&\quad (\mathit{hhi\_{}bound} : 1-\mathit{rho} \leq \mathit{hhi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&1-\mathit{hhi} \leq \mathit{rho}\\
-&\quad \wedge \mathit{rho} \leq 1-\mathit{hlo}
+&(\mathit{rho} \mathit{hlo} \mathit{hhi} : \mathbb{R} ),\; (\mathit{hlo\_bound} : \mathit{hlo} \leq 1-\mathit{rho}),\\
+&\quad \; (\mathit{hhi\_bound} : 1-\mathit{rho} \leq \mathit{hhi})\\
+\vdash\;&1-\mathit{hhi} \leq \mathit{rho} \wedge \mathit{rho} \leq 1-\mathit{hlo}
 \end{aligned} \]}
 
 \noindent\textbf{A\,2}\quad\lean{every\_test\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p}\\
-&\quad \mathit{q} \mathit{d} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hd0} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{d}\\
-&\quad \mathit{x}),\; (\mathit{hd1} : \forall \mathit{x},\\
-&\quad \mathit{d} \mathit{x} \leq 1),\; (\mathit{imin} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{min} (\mathit{p} \mathit{x}) (\mathit{q}\\
-&\quad \mathit{x})) \mu ),\; (\mathit{iloss} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{p} \mathit{x}*\mathit{d} \mathit{x}+\mathit{q}\\
-&\quad \mathit{x}*(1-\mathit{d} \mathit{x})) \mu )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{overlap} \mu \mathit{p}\\
-&\quad \mathit{q}/2 \leq \mathit{testingError}\\
-&\quad \mu \mathit{p} \mathit{q} \mathit{d}
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p} \mathit{q} \mathit{d} : \Omega \to \mathbb{R} ),\; (\mathit{hd0} : \forall \mathit{x}, 0 \leq \mathit{d} \mathit{x}),\\
+&\quad \; (\mathit{hd1} : \forall \mathit{x}, \mathit{d} \mathit{x} \leq 1),\; (\mathit{imin} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{min} (\mathit{p} \mathit{x}) (\mathit{q} \mathit{x}\\
+&\quad )) \mu ),\; (\mathit{iloss} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{p} \mathit{x}*\mathit{d} \mathit{x}+\mathit{q} \mathit{x}*(1-\mathit{d} \mathit{x}))\\
+&\quad \mu )\\
+\vdash\;&\mathit{overlap} \mu \mathit{p} \mathit{q}/2 \leq \mathit{testingError} \mu \mathit{p} \mathit{q} \mathit{d}
 \end{aligned} \]}
 
 \noindent\textbf{A\,3}\quad\lean{iid\_affinity}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\;\\
-&\quad [\mathit{SigmaFinite} \mu ],\; (\mathit{p} \mathit{q}\\
-&\quad : \Omega \to \mathbb{R} ),\; (\mathit{hp} :\\
-&\quad \forall \mathit{x},\\
-&\quad 0 \leq \mathit{p} \mathit{x}),\; (\mathit{hq} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{q}\\
-&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{affinity} (\mathit{Measure}.\mathit{pi}\\
-&\quad (\mathbf{fun} \mathit{\_{}} : \mathit{Fin} \mathit{N}\\
-&\quad => \mu )) (\mathit{iidDensity} \mathit{p}\\
-&\quad \mathit{N}) (\mathit{iidDensity} \mathit{q}\\
-&\quad \mathit{N}) = (\mathit{affinity} \mu \mathit{p}\\
-&\quad \mathit{q})^{\mathit{N}}
+&(\mu : \mathit{Measure} \Omega ),\; [\mathit{SigmaFinite} \mu ],\; (\mathit{p} \mathit{q} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\; (\mathit{hq} : \forall \mathit{x}, 0 \leq \mathit{q} \mathit{x}),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&\mathit{affinity} (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu )) (\mathit{iidDensity} \mathit{p} \mathit{N}) (\\
+&\quad \mathit{iidDensity} \mathit{q} \mathit{N}) = (\mathit{affinity} \mu \mathit{p} \mathit{q})^{\mathit{N}}
 \end{aligned} \]}
 
 \noindent\textbf{A\,4}\quad\lean{iid\_normalized}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\;\\
-&\quad [\mathit{SigmaFinite} \mu ],\; (\mathit{p} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \int \mathit{x}, \mathit{p}\\
-&\quad \mathit{x} ∂\mu = 1),\; (\mathit{N} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\int \mathit{x}, \mathit{iidDensity} \mathit{p}\\
-&\quad \mathit{N} \mathit{x} ∂\mathit{Measure}.\mathit{pi}\\
-&\quad (\mathbf{fun} \mathit{\_{}} : \mathit{Fin} \mathit{N}\\
-&\quad => \mu )) = 1
+&(\mu : \mathit{Measure} \Omega ),\; [\mathit{SigmaFinite} \mu ],\; (\mathit{p} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \int \mathit{x}, \mathit{p} \mathit{x} ∂\mu = 1),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&(\int \mathit{x}, \mathit{iidDensity} \mathit{p} \mathit{N} \mathit{x} ∂\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu )) = 1
 \end{aligned} \]}
 
 \noindent\textbf{A\,5}\quad\lean{iid\_testing\_bracket}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\;\\
-&\quad [\mathit{SigmaFinite} \mu ],\; (\mathit{p} \mathit{q}\\
-&\quad : \Omega \to \mathbb{R} ),\; (\mathit{hp} :\\
-&\quad \forall \mathit{x},\\
-&\quad 0 \leq \mathit{p} \mathit{x}),\; (\mathit{hq} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{q}\\
-&\quad \mathit{x}),\; (\mathit{np} : \int \mathit{x},\\
-&\quad \mathit{p} \mathit{x} ∂\mu = 1),\;\\
-&\quad (\mathit{nq} : \int \mathit{x},\\
-&\quad \mathit{q} \mathit{x} ∂\mu = 1),\; (\mathit{N} :\\
-&\quad \mathbb{N} ),\; (\mathit{ip} : \mathit{Integrable}\\
-&\quad (\mathit{iidDensity} \mathit{p} \mathit{N})\\
-&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun}\\
-&\quad \mathit{\_{}} : \mathit{Fin} \mathit{N} => \mu ))),\;\\
-&\quad (\mathit{iq} : \mathit{Integrable}\\
-&\quad (\mathit{iidDensity} \mathit{q} \mathit{N})\\
-&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun}\\
-&\quad \mathit{\_{}} : \mathit{Fin} \mathit{N} => \mu ))),\;\\
-&\quad (\mathit{imin} : \mathit{Integrable} (\mathbf{fun}\\
-&\quad \mathit{x} => \mathit{min} (\mathit{iidDensity}\\
-&\quad \mathit{p} \mathit{N} \mathit{x}) (\mathit{iidDensity}\\
-&\quad \mathit{q} \mathit{N} \mathit{x}))\\
-&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun}\\
-&\quad \mathit{\_{}} : \mathit{Fin} \mathit{N} => \mu ))),\;\\
-&\quad (\mathit{iroot} : \mathit{Integrable} (\mathbf{fun}\\
-&\quad \mathit{x} => \mathit{Real}.\mathit{sqrt}\\
-&\quad (\mathit{iidDensity} \mathit{p} \mathit{N}\\
-&\quad \mathit{x}*\mathit{iidDensity} \mathit{q} \mathit{N}\\
-&\quad \mathit{x})) (\mathit{Measure}.\mathit{pi}\\
-&\quad (\mathbf{fun} \mathit{\_{}} : \mathit{Fin} \mathit{N}\\
-&\quad => \mu )))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{affinity} \mu \mathit{p}\\
-&\quad \mathit{q})^{}(2*\mathit{N})/4\\
-&\quad \leq \mathit{testingError}\\
-&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun}\\
-&\quad \mathit{\_{}} : \mathit{Fin} \mathit{N} => \mu ))\\
-&\quad (\mathit{iidDensity} \mathit{p}\\
-&\quad \mathit{N}) (\mathit{iidDensity} \mathit{q}\\
-&\quad \mathit{N}) (\mathit{likelihoodRatioTest}\\
-&\quad (\mathit{iidDensity} \mathit{p} \mathit{N})\\
-&\quad (\mathit{iidDensity} \mathit{q}\\
-&\quad \mathit{N})) \wedge \mathit{testingError}\\
-&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun}\\
-&\quad \mathit{\_{}} : \mathit{Fin} \mathit{N} => \mu ))\\
-&\quad (\mathit{iidDensity} \mathit{p}\\
-&\quad \mathit{N}) (\mathit{iidDensity} \mathit{q}\\
-&\quad \mathit{N}) (\mathit{likelihoodRatioTest}\\
-&\quad (\mathit{iidDensity} \mathit{p} \mathit{N})\\
-&\quad (\mathit{iidDensity} \mathit{q}\\
-&\quad \mathit{N})) \leq (\mathit{affinity} \mu \mathit{p}\\
-&\quad \mathit{q})^{\mathit{N}}/2
+&(\mu : \mathit{Measure} \Omega ),\; [\mathit{SigmaFinite} \mu ],\; (\mathit{p} \mathit{q} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\; (\mathit{hq} : \forall \mathit{x}, 0 \leq \mathit{q} \mathit{x}),\; (\mathit{np} : \int \mathit{x}, \mathit{p} \mathit{x} ∂\mu = 1),\\
+&\quad \; (\mathit{nq} : \int \mathit{x}, \mathit{q} \mathit{x} ∂\mu = 1),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{ip} : \mathit{Integrable} (\mathit{iidDensity} \mathit{p} \mathit{N})\\
+&\quad (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu ))),\; (\mathit{iq} : \mathit{Integrable} (\\
+&\quad \mathit{iidDensity} \mathit{q} \mathit{N}) (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu ))),\\
+&\quad \; (\mathit{imin} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{min} (\mathit{iidDensity} \mathit{p} \mathit{N} \mathit{x}) (\\
+&\quad \mathit{iidDensity} \mathit{q} \mathit{N} \mathit{x})) (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu ))),\\
+&\quad \; (\mathit{iroot} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{Real}.\mathit{sqrt} (\mathit{iidDensity} \mathit{p} \mathit{N} \mathit{x}*\\
+&\quad \mathit{iidDensity} \mathit{q} \mathit{N} \mathit{x})) (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu )))\\
+\vdash\;&(\mathit{affinity} \mu \mathit{p} \mathit{q})^{}(2*\mathit{N})/4 \leq \mathit{testingError} (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} :\\
+&\quad \mathit{Fin} \mathit{N} => \mu )) (\mathit{iidDensity} \mathit{p} \mathit{N}) (\mathit{iidDensity} \mathit{q} \mathit{N}) (\\
+&\quad \mathit{likelihoodRatioTest} (\mathit{iidDensity} \mathit{p} \mathit{N}) (\mathit{iidDensity} \mathit{q} \mathit{N})) \wedge\\
+&\quad \mathit{testingError} (\mathit{Measure}.\mathit{pi} (\mathbf{fun} \mathit{\_} : \mathit{Fin} \mathit{N} => \mu )) (\mathit{iidDensity} \mathit{p} \mathit{N})\\
+&\quad (\mathit{iidDensity} \mathit{q} \mathit{N}) (\mathit{likelihoodRatioTest} (\mathit{iidDensity} \mathit{p} \mathit{N}) (\\
+&\quad \mathit{iidDensity} \mathit{q} \mathit{N})) \leq (\mathit{affinity} \mu \mathit{p} \mathit{q})^{\mathit{N}}/2
 \end{aligned} \]}
 
 \noindent\textbf{A\,6}\quad\lean{likelihood\_ratio\_attains}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p}\\
-&\quad \mathit{q} : \Omega \to \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{testingError} \mu \mathit{p}\\
-&\quad \mathit{q} (\mathit{likelihoodRatioTest} \mathit{p}\\
-&\quad \mathit{q}) = \mathit{overlap} \mu \mathit{p}\\
-&\quad \mathit{q}/2
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p} \mathit{q} : \Omega \to \mathbb{R} )\\
+\vdash\;&\mathit{testingError} \mu \mathit{p} \mathit{q} (\mathit{likelihoodRatioTest} \mathit{p} \mathit{q}) = \mathit{overlap} \mu \mathit{p} \mathit{q}/2
 \end{aligned} \]}
 
 \noindent\textbf{A\,7}\quad\lean{min\_le\_root}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} : \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq}\\
-&\quad : 0 \leq \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{min} \mathit{p} \mathit{q}\\
-&\quad \leq \mathit{Real}.\mathit{sqrt}\\
-&\quad (\mathit{p}*\mathit{q})
+&(\mathit{p} \mathit{q} : \mathbb{R} ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq} : 0 \leq \mathit{q})\\
+\vdash\;&\mathit{min} \mathit{p} \mathit{q} \leq \mathit{Real}.\mathit{sqrt} (\mathit{p}*\mathit{q})
 \end{aligned} \]}
 
 \noindent\textbf{A\,8}\quad\lean{overlap\_bracket}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p}\\
-&\quad \mathit{q} : \Omega \to \mathbb{R} ),\; (\mathit{hp} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{p}\\
-&\quad \mathit{x}),\; (\mathit{hq} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{q} \mathit{x}),\; (\mathit{ip} :\\
-&\quad \mathit{Integrable} \mathit{p} \mu ),\; (\mathit{iq} :\\
-&\quad \mathit{Integrable} \mathit{q} \mu ),\; (\mathit{imin}\\
-&\quad : \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{min} (\mathit{p} \mathit{x}) (\mathit{q}\\
-&\quad \mathit{x})) \mu ),\; (\mathit{iroot} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{p}\\
-&\quad \mathit{x}*\mathit{q} \mathit{x})) \mu ),\;\\
-&\quad (\mathit{np} : \int \mathit{x}, \mathit{p} \mathit{x}\\
-&\quad ∂\mu = 1),\; (\mathit{nq} : \int \mathit{x},\\
-&\quad \mathit{q} \mathit{x} ∂\mu = 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{affinity} \mu \mathit{p}\\
-&\quad \mathit{q})^{2}/4 \leq \mathit{overlap}\\
-&\quad \mu \mathit{p} \mathit{q}/2 \wedge \mathit{overlap}\\
-&\quad \mu \mathit{p} \mathit{q}/2 \leq \mathit{affinity}\\
-&\quad \mu \mathit{p} \mathit{q}/2
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p} \mathit{q} : \Omega \to \mathbb{R} ),\; (\mathit{hp} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\\
+&\quad \; (\mathit{hq} : \forall \mathit{x}, 0 \leq \mathit{q} \mathit{x}),\; (\mathit{ip} : \mathit{Integrable} \mathit{p} \mu ),\; (\mathit{iq} : \mathit{Integrable} \mathit{q} \mu ),\\
+&\quad \; (\mathit{imin} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{min} (\mathit{p} \mathit{x}) (\mathit{q} \mathit{x})) \mu ),\\
+&\quad \; (\mathit{iroot} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}*\mathit{q} \mathit{x})) \mu ),\\
+&\quad \; (\mathit{np} : \int \mathit{x}, \mathit{p} \mathit{x} ∂\mu = 1),\; (\mathit{nq} : \int \mathit{x}, \mathit{q} \mathit{x} ∂\mu = 1)\\
+\vdash\;&(\mathit{affinity} \mu \mathit{p} \mathit{q})^{2}/4 \leq \mathit{overlap} \mu \mathit{p} \mathit{q}/2 \wedge \mathit{overlap} \mu \mathit{p} \mathit{q}/2 \leq\\
+&\quad \mathit{affinity} \mu \mathit{p} \mathit{q}/2
 \end{aligned} \]}
 
 \noindent\textbf{A\,9}\quad\lean{root\_young}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq}\\
-&\quad : 0 \leq \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2*\mathit{t}*\mathit{Real}.\mathit{sqrt}\\
-&\quad (\mathit{p}*\mathit{q}) \leq \mathit{min}\\
-&\quad \mathit{p} \mathit{q} +\\
-&\quad \mathit{t}^{2}*(\mathit{p}+\mathit{q})
+&(\mathit{p} \mathit{q} \mathit{t} : \mathbb{R} ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq} : 0 \leq \mathit{q})\\
+\vdash\;&2*\mathit{t}*\mathit{Real}.\mathit{sqrt} (\mathit{p}*\mathit{q}) \leq \mathit{min} \mathit{p} \mathit{q} + \mathit{t}^{2}*(\mathit{p}+\mathit{q})
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -203,85 +93,37 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,10}\quad\lean{eventually\_pos\_of\_limit\_pos}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathbb{R} ),\; (\mathit{hL} : 0 <\\
-&\quad \mathit{L}),\; (\mathit{hlim} : \mathit{Tendsto}\\
-&\quad \mathit{H2} (𝓝[>] (0:\mathbb{R} )) (𝓝\\
-&\quad \mathit{L}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R}\\
-&\quad ), 0 < \mathit{H2} \mathit{h}
+&(\mathit{H2} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{L} : \mathbb{R} ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{hlim} : \mathit{Tendsto} \mathit{H2} (𝓝[\\
+&\quad >] (0:\mathbb{R} )) (𝓝 \mathit{L}))\\
+\vdash\;&\forall  ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R} ), 0 < \mathit{H2} \mathit{h}
 \end{aligned} \]}
 
 \noindent\textbf{A\,11}\quad\lean{hellinger\_ratio\_tendsto}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{F} :\\
-&\quad \mathbb{R} \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{Dr} \mathit{p0} \mathit{bound} :\\
-&\quad \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{H2} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hmeas} : \forall ᶠ \mathit{h}\\
-&\quad \mathbf{in} 𝓝[>] (0:\mathbb{R} ),\\
-&\quad \mathit{AEStronglyMeasurable} (\mathit{F} \mathit{h})\\
-&\quad \mu ),\; (\mathit{hdom} : \forall ᶠ \mathit{h}\\
-&\quad \mathbf{in} 𝓝[>] (0:\mathbb{R} ), \forall ᵐ \mathit{x}\\
-&\quad ∂\mu , \Vert \mathit{F} \mathit{h}\\
-&\quad \mathit{x}\Vert \leq \mathit{bound}\\
-&\quad \mathit{x}),\; (\mathit{hint} : \mathit{Integrable}\\
-&\quad \mathit{bound} \mu ),\; (\mathit{hptw} : \forall ᵐ\\
-&\quad \mathit{x} ∂\mu , \mathit{Tendsto} (\mathbf{fun}\\
-&\quad \mathit{h} => \mathit{F} \mathit{h} \mathit{x}) (𝓝[>]\\
-&\quad (0:\mathbb{R} )) (𝓝 (\mathit{Dr} \mathit{x} ^{2} / (4\\
-&\quad * \mathit{p0} \mathit{x})))),\; (\mathit{hH2} :\\
-&\quad \forall \mathit{h} : \mathbb{R} , \mathit{H2}\\
-&\quad \mathit{h} = (1/2) * \int \mathit{x}, \mathit{F}\\
-&\quad \mathit{h} \mathit{x} ∂\mu )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Tendsto} \mathit{H2} (𝓝[>] (0:\mathbb{R}\\
-&\quad )) (𝓝 ((1/2) * \int \mathit{x}, \mathit{Dr} \mathit{x}\\
-&\quad ^{2} / (4 * \mathit{p0} \mathit{x}) ∂\mu ))
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{F} : \mathbb{R} \to \Omega \to \mathbb{R} ),\; (\mathit{Dr} \mathit{p0} \mathit{bound} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{H2} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{hmeas} : \forall  ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R} ),\\
+&\quad \mathit{AEStronglyMeasurable} (\mathit{F} \mathit{h}) \mu ),\; (\mathit{hdom} : \forall  ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R} ),\\
+&\quad \forall  ᵐ \mathit{x} ∂\mu , \Vert \mathit{F} \mathit{h} \mathit{x}\Vert \leq \mathit{bound} \mathit{x}),\; (\mathit{hint} : \mathit{Integrable} \mathit{bound} \mu ),\\
+&\quad \; (\mathit{hptw} : \forall  ᵐ \mathit{x} ∂\mu , \mathit{Tendsto} (\mathbf{fun} \mathit{h} => \mathit{F} \mathit{h} \mathit{x}) (𝓝[>] (0:\mathbb{R} )) (𝓝 (\mathit{Dr} \mathit{x} ^{2}\\
+&\quad / (4 * \mathit{p0} \mathit{x})))),\; (\mathit{hH2} : \forall \mathit{h} : \mathbb{R} , \mathit{H2} \mathit{h} = (1/2) * \int \mathit{x}, \mathit{F} \mathit{h} \mathit{x} ∂\mu )\\
+\vdash\;&\mathit{Tendsto} \mathit{H2} (𝓝[>] (0:\mathbb{R} )) (𝓝 ((1/2) * \int \mathit{x}, \mathit{Dr} \mathit{x} ^{2} / (4 * \mathit{p0} \mathit{x}) ∂\mu ))
 \end{aligned} \]}
 
 \noindent\textbf{A\,12}\quad\lean{limit\_pos\_of\_ae\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{g} :\\
-&\quad \Omega \to \mathbb{R} ),\; (\mathit{hnn} : 0\\
-&\quad \leq ᵐ[\mu ]\\
-&\quad \mathit{g}),\; (\mathit{hint} : \mathit{Integrable}\\
-&\quad \mathit{g} \mu ),\; (\mathit{hne} : \neg (\mathit{g}\\
-&\quad =ᵐ[\mu ] 0))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < \int \mathit{x}, \mathit{g}\\
-&\quad \mathit{x} ∂\mu
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{g} : \Omega \to \mathbb{R} ),\; (\mathit{hnn} : 0 \leq  ᵐ[\mu ] \mathit{g}),\\
+&\quad \; (\mathit{hint} : \mathit{Integrable} \mathit{g} \mu ),\; (\mathit{hne} : \neg (\mathit{g} =ᵐ[\mu ] 0))\\
+\vdash\;&0 < \int \mathit{x}, \mathit{g} \mathit{x} ∂\mu
 \end{aligned} \]}
 
 \noindent\textbf{A\,13}\quad\lean{ratio\_tendsto\_of\_dominated}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{F} :\\
-&\quad \mathbb{R} \to \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{lim} \mathit{bound} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hmeas} : \forall ᶠ \mathit{h}\\
-&\quad \mathbf{in} 𝓝[>] (0:\mathbb{R} ),\\
-&\quad \mathit{AEStronglyMeasurable} (\mathit{F} \mathit{h})\\
-&\quad \mu ),\; (\mathit{hdom} : \forall ᶠ \mathit{h}\\
-&\quad \mathbf{in} 𝓝[>] (0:\mathbb{R} ), \forall ᵐ \mathit{x}\\
-&\quad ∂\mu , \Vert \mathit{F} \mathit{h}\\
-&\quad \mathit{x}\Vert \leq \mathit{bound}\\
-&\quad \mathit{x}),\; (\mathit{hint} : \mathit{Integrable}\\
-&\quad \mathit{bound} \mu ),\; (\mathit{hptw} : \forall ᵐ\\
-&\quad \mathit{x} ∂\mu , \mathit{Tendsto} (\mathbf{fun}\\
-&\quad \mathit{h} => \mathit{F} \mathit{h} \mathit{x}) (𝓝[>]\\
-&\quad (0:\mathbb{R} )) (𝓝 (\mathit{lim}\\
-&\quad \mathit{x})))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Tendsto} (\mathbf{fun} \mathit{h} => \int \mathit{x},\\
-&\quad \mathit{F} \mathit{h} \mathit{x} ∂\mu ) (𝓝[>]\\
-&\quad (0:\mathbb{R} )) (𝓝 (\int \mathit{x}, \mathit{lim}\\
-&\quad \mathit{x} ∂\mu ))
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{F} : \mathbb{R} \to \Omega \to \mathbb{R} ),\; (\mathit{lim} \mathit{bound} : \Omega \to \mathbb{R} ),\\
+&\quad \; (\mathit{hmeas} : \forall  ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R} ), \mathit{AEStronglyMeasurable} (\mathit{F} \mathit{h}) \mu ),\\
+&\quad \; (\mathit{hdom} : \forall  ᶠ \mathit{h} \mathbf{in} 𝓝[>] (0:\mathbb{R} ), \forall  ᵐ \mathit{x} ∂\mu , \Vert \mathit{F} \mathit{h} \mathit{x}\Vert \leq \mathit{bound} \mathit{x}),\\
+&\quad \; (\mathit{hint} : \mathit{Integrable} \mathit{bound} \mu ),\; (\mathit{hptw} : \forall  ᵐ \mathit{x} ∂\mu , \mathit{Tendsto} (\mathbf{fun} \mathit{h} =>\\
+&\quad \mathit{F} \mathit{h} \mathit{x}) (𝓝[>] (0:\mathbb{R} )) (𝓝 (\mathit{lim} \mathit{x})))\\
+\vdash\;&\mathit{Tendsto} (\mathbf{fun} \mathit{h} => \int \mathit{x}, \mathit{F} \mathit{h} \mathit{x} ∂\mu ) (𝓝[>] (0:\mathbb{R} )) (𝓝 (\int \mathit{x}, \mathit{lim} \mathit{x} ∂\mu ))
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -289,261 +131,118 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,14}\quad\lean{at\_critical\_fails}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R}\\
-&\quad ),\; (\mathit{g} : \Theta \to \mathbb{R}\\
-&\quad ),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{hn} :\\
-&\quad (\mathit{badPairs} \mathit{g}\\
-&\quad \mathit{eps}).\mathit{Nonempty})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{eps} \notin \mathit{feasibleErrors}\\
-&\quad \mathit{R} \mathit{g} (\mathit{critical} \mathit{R}\\
-&\quad \mathit{g} \mathit{eps} \mathit{hn})
+&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R} ),\; (\mathit{g} : \Theta \to \mathbb{R} ),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{hn} : (\mathit{badPairs} \mathit{g}\\
+&\quad \mathit{eps}).\mathit{Nonempty})\\
+\vdash\;&\mathit{eps} \notin \mathit{feasibleErrors} \mathit{R} \mathit{g} (\mathit{critical} \mathit{R} \mathit{g} \mathit{eps} \mathit{hn})
 \end{aligned} \]}
 
 \noindent\textbf{A\,15}\quad\lean{below\_critical\_sufficient}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R}\\
-&\quad ),\; (\mathit{g} : \Theta \to \mathbb{R}\\
-&\quad ),\; (\mathit{eta} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{he} : 0 \leq \mathit{eta}),\;\\
-&\quad (\mathit{hn} : (\mathit{badPairs} \mathit{g}\\
-&\quad \mathit{eps}).\mathit{Nonempty}),\; (\mathit{hlt} :\\
-&\quad \mathit{eta}<\mathit{critical} \mathit{R} \mathit{g}\\
-&\quad \mathit{eps} \mathit{hn})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{eps} \in \mathit{feasibleErrors}\\
-&\quad \mathit{R} \mathit{g} \mathit{eta}
+&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R} ),\; (\mathit{g} : \Theta \to \mathbb{R} ),\; (\mathit{eta} \mathit{eps} : \mathbb{R} ),\\
+&\quad \; (\mathit{he} : 0 \leq \mathit{eta}),\; (\mathit{hn} : (\mathit{badPairs} \mathit{g} \mathit{eps}).\mathit{Nonempty}),\\
+&\quad \; (\mathit{hlt} : \mathit{eta}<\mathit{critical} \mathit{R} \mathit{g} \mathit{eps} \mathit{hn})\\
+\vdash\;&\mathit{eps} \in \mathit{feasibleErrors} \mathit{R} \mathit{g} \mathit{eta}
 \end{aligned} \]}
 
 \noindent\textbf{A\,16}\quad\lean{critical\_nonneg}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R}\\
-&\quad ),\; (\mathit{g} : \Theta \to \mathbb{R}\\
-&\quad ),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{hn} :\\
-&\quad (\mathit{badPairs} \mathit{g}\\
-&\quad \mathit{eps}).\mathit{Nonempty})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq \mathit{critical} \mathit{R}\\
-&\quad \mathit{g} \mathit{eps} \mathit{hn}
+&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R} ),\; (\mathit{g} : \Theta \to \mathbb{R} ),\; (\mathit{eps} : \mathbb{R} ),\; (\mathit{hn} : (\mathit{badPairs} \mathit{g}\\
+&\quad \mathit{eps}).\mathit{Nonempty})\\
+\vdash\;&0 \leq \mathit{critical} \mathit{R} \mathit{g} \mathit{eps} \mathit{hn}
 \end{aligned} \]}
 
 \noindent\textbf{A\,17}\quad\lean{feasible\_iff\_pair\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R}\\
-&\quad ),\; (\mathit{g} : \Theta \to \mathbb{R}\\
-&\quad ),\; (\mathit{eta} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{he} : 0 \leq \mathit{eta})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{eps} \in \mathit{feasibleErrors}\\
-&\quad \mathit{R} \mathit{g} \mathit{eta}\\
-&\quad \leftrightarrow \forall \mathit{x}\\
-&\quad \mathit{z},\mathit{Close} \mathit{R}\\
-&\quad \mathit{eta} \mathit{x} \mathit{z}\\
-&\quad \to |\mathit{g} \mathit{x}-\mathit{g}\\
-&\quad \mathit{z}| \leq 2*\mathit{eps}
+&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R} ),\; (\mathit{g} : \Theta \to \mathbb{R} ),\; (\mathit{eta} \mathit{eps} : \mathbb{R} ),\; (\mathit{he} : 0 \leq \mathit{eta})\\
+\vdash\;&\mathit{eps} \in \mathit{feasibleErrors} \mathit{R} \mathit{g} \mathit{eta} \leftrightarrow \forall \mathit{x} \mathit{z},\mathit{Close} \mathit{R} \mathit{eta} \mathit{x} \mathit{z} \to\\
+&\quad |\mathit{g} \mathit{x}-\mathit{g} \mathit{z}| \leq 2*\mathit{eps}
 \end{aligned} \]}
 
 \noindent\textbf{A\,18}\quad\lean{no\_bad\_pairs\_sufficient}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R}\\
-&\quad ),\; (\mathit{g} : \Theta \to \mathbb{R}\\
-&\quad ),\; (\mathit{eta} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{he} : 0 \leq \mathit{eta}),\;\\
-&\quad (\mathit{hn} : \mathit{badPairs} \mathit{g}\\
-&\quad \mathit{eps}=\emptyset )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{eps} \in \mathit{feasibleErrors}\\
-&\quad \mathit{R} \mathit{g} \mathit{eta}
+&(\mathit{R} : \Theta \to \mathit{D} \to \mathbb{R} ),\; (\mathit{g} : \Theta \to \mathbb{R} ),\; (\mathit{eta} \mathit{eps} : \mathbb{R} ),\\
+&\quad \; (\mathit{he} : 0 \leq \mathit{eta}),\; (\mathit{hn} : \mathit{badPairs} \mathit{g} \mathit{eps}=\emptyset )\\
+\vdash\;&\mathit{eps} \in \mathit{feasibleErrors} \mathit{R} \mathit{g} \mathit{eta}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
 \noindent\textbf{Module \lean{LeanQueryGaussianLevelV1}}\par\vspace{3pt}
 
 \noindent\textbf{A\,19}\quad\lean{gauss\_pos}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 < \mathit{gauss} \sigma \mathit{y}
-\end{aligned} \]}
+{\footnotesize\[ (\sigma \mathit{y} : \mathbb{R} ) \;\vdash\; 0 < \mathit{gauss} \sigma \mathit{y} \]}
 
 \noindent\textbf{A\,20}\quad\lean{gauss\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{v} \mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gauss} \sigma (\mathit{y} -\\
-&\quad \mathit{v}) = \mathit{gauss} \sigma \mathit{y}\\
-&\quad * \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y}\\
-&\quad / \sigma ^{2} - \mathit{v} ^{2} / (2 * \sigma ^{2}))
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{gauss} \sigma (\mathit{y} - \mathit{v}) = \mathit{gauss} \sigma \mathit{y} * \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y} / \sigma ^{2} - \mathit{v} ^{2} / (2 * \sigma ^{2}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,21}\quad\lean{hasDerivAt\_gauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma )\\
-&\quad (-(\mathit{y} / \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y})\\
-&\quad \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma ) (-(\mathit{y} / \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y}) \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{A\,22}\quad\lean{hasDerivAt\_hgauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{j} : \mathbb{N} ),\; (\mathit{z} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} =>\\
-&\quad (\mathit{hpoly} \sigma \mathit{j}).\mathit{eval}\\
-&\quad \mathit{w} * \mathit{gauss} \sigma \mathit{w})\\
-&\quad ((\mathit{hpoly} \sigma (\mathit{j} +\\
-&\quad 1)).\mathit{eval} \mathit{z} * \mathit{gauss}\\
-&\quad \sigma \mathit{z})\\
-&\quad \mathit{z}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} => (\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} \mathit{w} * \mathit{gauss} \sigma \mathit{w}) ((\mathit{hpoly} \sigma (\mathit{j}\\
+&\quad + 1)).\mathit{eval} \mathit{z} * \mathit{gauss} \sigma \mathit{z}) \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{A\,23}\quad\lean{hpoly\_coeff}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{n} : \mathbb{N} , (\mathit{hpoly}\\
-&\quad \sigma \mathit{n}).\mathit{coeff}\\
-&\quad \mathit{n} = (-(1 / \sigma ^{2}))\\
-&\quad ^{\mathit{n}}
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ) \;\vdash\; \forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{coeff} \mathit{n} = (-(1 / \sigma ^{2})) ^{\mathit{n}} \]}
 
 \noindent\textbf{A\,24}\quad\lean{hpoly\_natDegree\_le}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{n} : \mathbb{N} , (\mathit{hpoly}\\
-&\quad \sigma \mathit{n}).\mathit{natDegree}\\
-&\quad \leq \mathit{n}
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ) \;\vdash\; \forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{natDegree} \leq \mathit{n} \]}
 
 \noindent\textbf{A\,25}\quad\lean{hpoly\_ne\_zero}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{n} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{hpoly} \sigma \mathit{n}\\
-&\quad \neq 0
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{n} : \mathbb{N} ) \;\vdash\; \mathit{hpoly} \sigma \mathit{n} \neq 0 \]}
 
 \noindent\textbf{A\,26}\quad\lean{iteratedDeriv\_gauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{y} :\\
-&\quad \mathbb{R} ), \mathit{iteratedDeriv}\\
-&\quad \mathit{n} (\mathit{gauss} \sigma )\\
-&\quad \mathit{y} = (\mathit{hpoly} \sigma \mathit{n}).\mathit{eval}\\
-&\quad \mathit{y} * \mathit{gauss} \sigma \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0)\\
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{y} : \mathbb{R} ), \mathit{iteratedDeriv} \mathit{n} (\mathit{gauss} \sigma ) \mathit{y} = (\mathit{hpoly} \sigma \mathit{n}).\mathit{eval} \mathit{y}\\
+&\quad * \mathit{gauss} \sigma \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{A\,27}\quad\lean{iteratedDeriv\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{j} : \mathbb{N} ) (\mathit{h₀} :\\
-&\quad \mathbb{R} ), \mathit{iteratedDeriv}\\
-&\quad \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
-&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
-&\quad \mathit{h} * \mathit{g})) \mathit{h₀}\\
-&\quad = (-\mathit{g}) ^{\mathit{j}} * ((\mathit{hpoly}\\
-&\quad \sigma \mathit{j}).\mathit{eval} (\mathit{y} -\\
-&\quad \mathit{v} - \mathit{h₀} * \mathit{g}) *\\
-&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
-&\quad \mathit{h₀} * \mathit{g}))
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\forall (\mathit{j} : \mathbb{N} ) (\mathit{h₀} : \mathbb{R} ), \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v}\\
+&\quad - \mathit{h} * \mathit{g})) \mathit{h₀} = (-\mathit{g}) ^{\mathit{j}} * ((\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} (\mathit{y} - \mathit{v} - \mathit{h₀} * \mathit{g}) *\\
+&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h₀} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,28}\quad\lean{levelSum\_eq\_zero\_of\_levels\_agree}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
-&\quad ),\; (\mathit{cA} \mathit{cB} : \mathbb{R}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S},\\
-&\quad \mathit{cA} \mathit{v} = \mathit{cB}\\
-&\quad \mathit{v}),\; (\mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{levelSum} \sigma \mathit{r}\\
-&\quad \mathit{S} \mathit{cA} \mathit{y} -\\
-&\quad \mathit{levelSum} \sigma \mathit{r}\\
-&\quad \mathit{S} \mathit{cB} \mathit{y}\\
-&\quad = 0
+&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathbb{R} ),\; (\mathit{cA} \mathit{cB} : \mathbb{R} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S}, \mathit{cA} \mathit{v} = \mathit{cB} \mathit{v}),\; (\mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{cA} \mathit{y} - \mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{cB} \mathit{y} = 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,29}\quad\lean{levelSum\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{r} : \mathbb{N} ),\; (\mathit{S} :\\
-&\quad \mathit{Finset} \mathbb{R} ),\; (\mathit{c} :\\
-&\quad \mathbb{R} \to \mathbb{R} ),\; (\mathit{vstar} :\\
-&\quad \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar}\\
-&\quad \in \mathit{S}),\;\\
-&\quad (\mathit{htop} : \forall \mathit{v} \in \mathit{S},\\
-&\quad \mathit{v} \neq \mathit{vstar} \to \mathit{v} <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{c}\\
-&\quad \mathit{vstar} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{y}, \mathit{levelSum}\\
-&\quad \sigma \mathit{r} \mathit{S} \mathit{c}\\
-&\quad \mathit{y} \neq 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathbb{R} ),\\
+&\quad \; (\mathit{c} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{vstar} : \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{S}),\\
+&\quad \; (\mathit{htop} : \forall \mathit{v} \in \mathit{S}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} < \mathit{vstar}),\; (\mathit{hc} : \mathit{c} \mathit{vstar} \neq 0)\\
+\vdash\;&\exists \mathit{y}, \mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{c} \mathit{y} \neq 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,30}\quad\lean{poly\_exp\_decay}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \mathbb{R}\\
-&\quad [\mathit{X}]),\; (\mathit{v} \delta : \mathbb{R}\\
-&\quad ),\; (\mathit{hδ} : 0 < \delta )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Tendsto} (\mathbf{fun} \mathit{y} : \mathbb{R}\\
-&\quad => \mathit{p}.\mathit{eval} (\mathit{y} - \mathit{v})\\
-&\quad * \mathit{Real}.\mathit{exp} (-(\delta *\\
-&\quad \mathit{y}))) \mathit{atTop} (𝓝 0)
+&(\mathit{p} : \mathbb{R} [\mathit{X}]),\; (\mathit{v} \delta : \mathbb{R} ),\; (\mathit{hδ} : 0 < \delta )\\
+\vdash\;&\mathit{Tendsto} (\mathbf{fun} \mathit{y} : \mathbb{R} => \mathit{p}.\mathit{eval} (\mathit{y} - \mathit{v}) * \mathit{Real}.\mathit{exp} (-(\delta * \mathit{y}))\\
+&\quad ) \mathit{atTop} (𝓝 0)
 \end{aligned} \]}
 
 \noindent\textbf{A\,31}\quad\lean{sum\_by\_level}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{X}],\; [\mathit{DecidableEq}\\
-&\quad \mathit{X}],\; (\mathit{pi} \mathit{f} \mathit{w} :\\
-&\quad \mathit{X} \to \mathbb{R} ),\; (\mathit{Q} :\\
-&\quad \mathbb{R} \to \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{x} : \mathit{X},\\
-&\quad \mathit{pi} \mathit{x} * \mathit{w}\\
-&\quad \mathit{x} * \mathit{Q} (\mathit{f}\\
-&\quad \mathit{x}) = \textstyle\sum \mathit{v}\\
-&\quad \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}, (\textstyle\sum \mathit{x}\\
-&\quad \in \mathit{Finset}.\mathit{univ}.\mathit{filter}\\
-&\quad (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} =\\
-&\quad \mathit{v}), \mathit{pi} \mathit{x} * \mathit{w}\\
-&\quad \mathit{x}) * \mathit{Q} \mathit{v}
+&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{X}],\; [\mathit{DecidableEq} \mathit{X}],\; (\mathit{pi} \mathit{f} \mathit{w} : \mathit{X} \to \mathbb{R} ),\\
+&\quad \; (\mathit{Q} : \mathbb{R} \to \mathbb{R} )\\
+\vdash\;&\textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{w} \mathit{x} * \mathit{Q} (\mathit{f} \mathit{x}) = \textstyle\sum \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ},\\
+&\quad (\textstyle\sum \mathit{x} \in \mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} = \mathit{v}), \mathit{pi} \mathit{x} * \mathit{w} \mathit{x}) *\\
+&\quad \mathit{Q} \mathit{v}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -551,129 +250,61 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,32}\quad\lean{chi2\_pointwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} : \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq}\\
-&\quad : 0 < \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{Real}.\mathit{sqrt} \mathit{p} -\\
-&\quad \mathit{Real}.\mathit{sqrt} \mathit{q})\\
-&\quad ^{2} \leq (\mathit{p} - \mathit{q})\\
-&\quad ^{2} / \mathit{q}
+&(\mathit{p} \mathit{q} : \mathbb{R} ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq} : 0 < \mathit{q})\\
+\vdash\;&(\mathit{Real}.\mathit{sqrt} \mathit{p} - \mathit{Real}.\mathit{sqrt} \mathit{q}) ^{2} \leq (\mathit{p} - \mathit{q}) ^{2} / \mathit{q}
 \end{aligned} \]}
 
 \noindent\textbf{A\,33}\quad\lean{envelope\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C0} \mathit{C1} \mathit{b} : \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{y} :\\
-&\quad \mathbb{R} ),\; (\mathit{hb} : 0 <\\
-&\quad \mathit{b}),\; (\mathit{hC0} : 0 \leq \mathit{C0}),\;\\
-&\quad (\mathit{hC1} : 0 \leq \mathit{C1})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{C0} + \mathit{C1} * (\mathit{y} ^{2})\\
-&\quad ^{\mathit{r}}) *\\
-&\quad \mathit{Real}.\mathit{exp} (-(\mathit{b} * \mathit{y}\\
-&\quad ^{2})) \leq \mathit{C0} *\\
-&\quad \mathit{Real}.\mathit{exp} (-(\mathit{b} / 2 *\\
-&\quad \mathit{y} ^{2})) + \mathit{C1} * (((2 * (\mathit{r} :\\
-&\quad \mathbb{R} )) / \mathit{b}) ^{\mathit{r}} *\\
-&\quad \mathit{Real}.\mathit{exp} (-(\mathit{b} / 2 *\\
-&\quad \mathit{y} ^{2})))
+&(\mathit{C0} \mathit{C1} \mathit{b} : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{hb} : 0 < \mathit{b}),\\
+&\quad \; (\mathit{hC0} : 0 \leq \mathit{C0}),\; (\mathit{hC1} : 0 \leq \mathit{C1})\\
+\vdash\;&(\mathit{C0} + \mathit{C1} * (\mathit{y} ^{2}) ^{\mathit{r}}) * \mathit{Real}.\mathit{exp} (-(\mathit{b} * \mathit{y} ^{2})) \leq\\
+&\quad \mathit{C0} * \mathit{Real}.\mathit{exp} (-(\mathit{b} / 2 * \mathit{y} ^{2})) + \mathit{C1} * (((2 * (\mathit{r} : \mathbb{R} )) / \mathit{b}) ^{\mathit{r}}\\
+&\quad * \mathit{Real}.\mathit{exp} (-(\mathit{b} / 2 * \mathit{y} ^{2})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,34}\quad\lean{envelope\_integrable}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C0} \mathit{C1} \mathit{b} : \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{hb} : 0 <\\
-&\quad \mathit{b}),\; (\mathit{hC0} : 0 \leq \mathit{C0}),\;\\
-&\quad (\mathit{hC1} : 0 \leq \mathit{C1})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Integrable} (\mathbf{fun} \mathit{y} :\\
-&\quad \mathbb{R} => (\mathit{C0} + \mathit{C1} * (\mathit{y}\\
-&\quad ^{2}) ^{\mathit{r}}) * \mathit{Real}.\mathit{exp}\\
-&\quad (-(\mathit{b} * \mathit{y} ^{2})))
+&(\mathit{C0} \mathit{C1} \mathit{b} : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{hb} : 0 < \mathit{b}),\; (\mathit{hC0} : 0 \leq \mathit{C0}),\\
+&\quad \; (\mathit{hC1} : 0 \leq \mathit{C1})\\
+\vdash\;&\mathit{Integrable} (\mathbf{fun} \mathit{y} : \mathbb{R} => (\mathit{C0} + \mathit{C1} * (\mathit{y} ^{2}) ^{\mathit{r}}) * \mathit{Real}.\mathit{exp} (-(\\
+&\quad \mathit{b} * \mathit{y} ^{2})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,35}\quad\lean{gauss\_lower\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{M} \mathit{m} \mathit{y} : \mathbb{R}\\
-&\quad ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hm} :\\
-&\quad |\mathit{m}| \leq \mathit{M})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) / (2 *\\
-&\quad \sigma ^{2}) - \mathit{M} * |\mathit{y}| / \sigma ^{2}\\
-&\quad - \mathit{M} ^{2} / (2 * \sigma ^{2}))\\
-&\quad \leq \mathit{Real}.\mathit{exp} (-((\mathit{y} -\\
-&\quad \mathit{m}) ^{2}) / (2 * \sigma ^{2}))
+&(\sigma \mathit{M} \mathit{m} \mathit{y} : \mathbb{R} ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hm} : |\mathit{m}| \leq \mathit{M})\\
+\vdash\;&\mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) / (2 * \sigma ^{2}) - \mathit{M} * |\mathit{y}| / \sigma ^{2} - \mathit{M} ^{2} / (2 * \sigma ^{2})) \leq\\
+&\quad \mathit{Real}.\mathit{exp} (-((\mathit{y} - \mathit{m}) ^{2}) / (2 * \sigma ^{2}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,36}\quad\lean{gauss\_upper\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{M} \mathit{m} \mathit{y} : \mathbb{R}\\
-&\quad ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hm} :\\
-&\quad |\mathit{m}| \leq \mathit{M})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{exp} (-((\mathit{y} -\\
-&\quad \mathit{m}) ^{2}) / (2 * \sigma ^{2}))\\
-&\quad \leq \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) /\\
-&\quad (2 * \sigma ^{2}) + \mathit{M} * |\mathit{y}|\\
-&\quad / \sigma ^{2})
+&(\sigma \mathit{M} \mathit{m} \mathit{y} : \mathbb{R} ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hm} : |\mathit{m}| \leq \mathit{M})\\
+\vdash\;&\mathit{Real}.\mathit{exp} (-((\mathit{y} - \mathit{m}) ^{2}) / (2 * \sigma ^{2})) \leq \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) / (2 *\\
+&\quad \sigma ^{2}) + \mathit{M} * |\mathit{y}| / \sigma ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,37}\quad\lean{majorise}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{M} \mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&3 * \mathit{M} * |\mathit{y}| \leq \mathit{y}\\
-&\quad ^{2} / 4 + 9 * \mathit{M} ^{2}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{M} \mathit{y} : \mathbb{R} ) \;\vdash\; 3 * \mathit{M} * |\mathit{y}| \leq \mathit{y} ^{2} / 4 + 9 * \mathit{M} ^{2} \]}
 
 \noindent\textbf{A\,38}\quad\lean{mixture\_ge\_component}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{X}],\; [\mathit{DecidableEq}\\
-&\quad \mathit{X}],\; (\mathit{pi} \mathit{f} : \mathit{X}\\
-&\quad \to \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{x},\\
-&\quad 0 \leq \mathit{pi} \mathit{x}),\; (\mathit{hf} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{f}\\
-&\quad \mathit{x}),\; (\mathit{x₀} :\\
-&\quad \mathit{X})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{pi} \mathit{x₀} * \mathit{f}\\
-&\quad \mathit{x₀} \leq \textstyle\sum \mathit{x},\\
-&\quad \mathit{pi} \mathit{x} * \mathit{f}\\
-&\quad \mathit{x}
+&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{X}],\; [\mathit{DecidableEq} \mathit{X}],\; (\mathit{pi} \mathit{f} : \mathit{X} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hpi} : \forall \mathit{x}, 0 \leq \mathit{pi} \mathit{x}),\; (\mathit{hf} : \forall \mathit{x}, 0 \leq \mathit{f} \mathit{x}),\; (\mathit{x₀} : \mathit{X})\\
+\vdash\;&\mathit{pi} \mathit{x₀} * \mathit{f} \mathit{x₀} \leq \textstyle\sum \mathit{x}, \mathit{pi} \mathit{x} * \mathit{f} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,39}\quad\lean{pow\_le\_exp}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{n} : \mathbb{N} ),\; (\mathit{x} : \mathbb{R}\\
-&\quad ),\; (\mathit{hx} : 0 \leq \mathit{x})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{x} ^{\mathit{n}} \leq (\mathit{n} : \mathbb{R}\\
-&\quad ) ^{\mathit{n}} *\\
-&\quad \mathit{Real}.\mathit{exp} \mathit{x}
+&(\mathit{n} : \mathbb{N} ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{hx} : 0 \leq \mathit{x})\\
+\vdash\;&\mathit{x} ^{\mathit{n}} \leq (\mathit{n} : \mathbb{R} ) ^{\mathit{n}} * \mathit{Real}.\mathit{exp} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,40}\quad\lean{sq\_pow\_le\_exp}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{r} : \mathbb{N} ),\; (\mathit{a} \mathit{y} :\\
-&\quad \mathbb{R} ),\; (\mathit{ha} : 0 <\\
-&\quad \mathit{a})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{y} ^{2}) ^{\mathit{r}}\\
-&\quad \leq ((\mathit{r} : \mathbb{R} ) /\\
-&\quad \mathit{a}) ^{\mathit{r}} *\\
-&\quad \mathit{Real}.\mathit{exp} (\mathit{a} * \mathit{y}\\
-&\quad ^{2})
+&(\mathit{r} : \mathbb{N} ),\; (\mathit{a} \mathit{y} : \mathbb{R} ),\; (\mathit{ha} : 0 < \mathit{a})\\
+\vdash\;&(\mathit{y} ^{2}) ^{\mathit{r}} \leq ((\mathit{r} : \mathbb{R} ) / \mathit{a}) ^{\mathit{r}} * \mathit{Real}.\mathit{exp} (\mathit{a} * \mathit{y} ^{2})
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -681,140 +312,59 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,41}\quad\lean{factor\_pointwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} : \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq}\\
-&\quad : 0 \leq \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{p} - \mathit{q} = (\mathit{Real}.\mathit{sqrt}\\
-&\quad \mathit{p} - \mathit{Real}.\mathit{sqrt}\\
-&\quad \mathit{q}) * (\mathit{Real}.\mathit{sqrt} \mathit{p}\\
-&\quad + \mathit{Real}.\mathit{sqrt}\\
-&\quad \mathit{q})
+&(\mathit{p} \mathit{q} : \mathbb{R} ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq} : 0 \leq \mathit{q})\\
+\vdash\;&\mathit{p} - \mathit{q} = (\mathit{Real}.\mathit{sqrt} \mathit{p} - \mathit{Real}.\mathit{sqrt} \mathit{q}) * (\mathit{Real}.\mathit{sqrt} \mathit{p} + \mathit{Real}.\\
+&\quad \mathit{sqrt} \mathit{q})
 \end{aligned} \]}
 
 \noindent\textbf{A\,42}\quad\lean{gap\_le\_of\_integrals}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p}\\
-&\quad \mathit{q} \mathit{chi} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{t} \mathit{H2} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : 0 < \mathit{t}),\; (\mathit{hp} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{p}\\
-&\quad \mathit{x}),\; (\mathit{hq} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{q} \mathit{x}),\; (\mathit{hchi0} :\\
-&\quad \forall \mathit{x}, 0 \leq \mathit{chi}\\
-&\quad \mathit{x}),\; (\mathit{hchi1} : \forall \mathit{x},\\
-&\quad \mathit{chi} \mathit{x} \leq 1),\; (\mathit{hdiff} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{chi} \mathit{x} * (\mathit{p} \mathit{x} -\\
-&\quad \mathit{q} \mathit{x})) \mu ),\; (\mathit{hsq} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) -\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x}))\\
-&\quad ^{2}) \mu ),\; (\mathit{hsum} : \mathit{Integrable}\\
-&\quad (\mathbf{fun} \mathit{x} =>\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) +\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x}))\\
-&\quad ^{2}) \mu ),\; (\mathit{hH2} : \int \mathit{x},\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) -\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x}))\\
-&\quad ^{2} ∂\mu = 2 * \mathit{H2}),\; (\mathit{hS} :\\
-&\quad \int \mathit{x},\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) +\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x}))\\
-&\quad ^{2} ∂\mu = 4 - 2 * \mathit{H2})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\int \mathit{x}, \mathit{chi}\\
-&\quad \mathit{x} * (\mathit{p} \mathit{x} - \mathit{q}\\
-&\quad \mathit{x}) ∂\mu | \leq \mathit{t} *\\
-&\quad \mathit{H2} + (4 - 2 * \mathit{H2}) / (2 *\\
-&\quad \mathit{t})
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p} \mathit{q} \mathit{chi} : \Omega \to \mathbb{R} ),\; (\mathit{t} \mathit{H2} : \mathbb{R} ),\; (\mathit{ht} : 0 < \mathit{t}),\\
+&\quad \; (\mathit{hp} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\; (\mathit{hq} : \forall \mathit{x}, 0 \leq \mathit{q} \mathit{x}),\; (\mathit{hchi0} : \forall \mathit{x}, 0 \leq \mathit{chi} \mathit{x}),\\
+&\quad \; (\mathit{hchi1} : \forall \mathit{x}, \mathit{chi} \mathit{x} \leq 1),\; (\mathit{hdiff} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{chi} \mathit{x}\\
+&\quad * (\mathit{p} \mathit{x} - \mathit{q} \mathit{x})) \mu ),\; (\mathit{hsq} : \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
+&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2}) \mu ),\; (\mathit{hsum} : \mathit{Integrable} (\mathbf{fun}\\
+&\quad \mathit{x} => (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) + \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2}) \mu ),\; (\mathit{hH2} : \int \mathit{x},\\
+&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2} ∂\mu = 2 * \mathit{H2}),\; (\mathit{hS} : \int \mathit{x},\\
+&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) + \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2} ∂\mu = 4 - 2 * \mathit{H2})\\
+\vdash\;&|\int \mathit{x}, \mathit{chi} \mathit{x} * (\mathit{p} \mathit{x} - \mathit{q} \mathit{x}) ∂\mu | \leq \mathit{t} * \mathit{H2} + (4 - 2 * \mathit{H2}) / (2 * \mathit{t})
 \end{aligned} \]}
 
 \noindent\textbf{A\,43}\quad\lean{hellinger\_lower\_from\_interval}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} \mathit{aE} \mathit{hr} : \mathbb{R}\\
-&\quad ),\; (\mathit{hH} : 0 \leq \mathit{H2}),\;\\
-&\quad (\mathit{hr0} : 0 \leq \mathit{hr}),\;\\
-&\quad (\mathit{hDbound} : \forall \mathit{t} : \mathbb{R} ,\\
-&\quad 0 < \mathit{t} \to |\mathit{aE}| * \mathit{hr} / 2\\
-&\quad \leq \mathit{t} * \mathit{H2} + 2 /\\
-&\quad \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{aE} ^{2} * \mathit{hr} ^{2} /\\
-&\quad 32 \leq \mathit{H2}
+&(\mathit{H2} \mathit{aE} \mathit{hr} : \mathbb{R} ),\; (\mathit{hH} : 0 \leq \mathit{H2}),\; (\mathit{hr0} : 0 \leq \mathit{hr}),\\
+&\quad \; (\mathit{hDbound} : \forall \mathit{t} : \mathbb{R} , 0 < \mathit{t} \to |\mathit{aE}| * \mathit{hr} / 2 \leq \mathit{t} * \mathit{H2} + 2 / \mathit{t})\\
+\vdash\;&\mathit{aE} ^{2} * \mathit{hr} ^{2} / 32 \leq \mathit{H2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,44}\quad\lean{sq\_le\_of\_all\_t}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} \mathit{H2} : \mathbb{R}\\
-&\quad ),\; (\mathit{hD} : 0 \leq \mathit{D}),\; (\mathit{hH}\\
-&\quad : 0 \leq \mathit{H2}),\; (\mathit{hall} :\\
-&\quad \forall \mathit{t}\\
-&\quad : \mathbb{R} , 0 < \mathit{t} \to \mathit{D}\\
-&\quad \leq \mathit{t}\\
-&\quad * \mathit{H2} + 2 / \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{D} \mathit{H2} : \mathbb{R} ),\; (\mathit{hD} : 0 \leq \mathit{D}),\; (\mathit{hH} : 0 \leq \mathit{H2}),\; (\mathit{hall} : \forall \mathit{t} : \mathbb{R} , 0 < \mathit{t}\\
+&\quad \to \mathit{D} \leq \mathit{t} * \mathit{H2} + 2 / \mathit{t})\\
 \vdash\;&\mathit{D} ^{2} \leq 8 * \mathit{H2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,45}\quad\lean{sqrt\_sum\_sq\_identity}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} \mathit{q} : \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq}\\
-&\quad : 0 \leq \mathit{q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{Real}.\mathit{sqrt} \mathit{p} +\\
-&\quad \mathit{Real}.\mathit{sqrt} \mathit{q})\\
-&\quad ^{2} = 2 * (\mathit{p} + \mathit{q}) -\\
-&\quad (\mathit{Real}.\mathit{sqrt} \mathit{p} -\\
-&\quad \mathit{Real}.\mathit{sqrt} \mathit{q})\\
-&\quad ^{2}
+&(\mathit{p} \mathit{q} : \mathbb{R} ),\; (\mathit{hp} : 0 \leq \mathit{p}),\; (\mathit{hq} : 0 \leq \mathit{q})\\
+\vdash\;&(\mathit{Real}.\mathit{sqrt} \mathit{p} + \mathit{Real}.\mathit{sqrt} \mathit{q}) ^{2} = 2 * (\mathit{p} + \mathit{q}) - (\mathit{Real}.\mathit{sqrt} \mathit{p} -\\
+&\quad \mathit{Real}.\mathit{sqrt} \mathit{q}) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,46}\quad\lean{sum\_sq\_integral}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p}\\
-&\quad \mathit{q} : \Omega \to \mathbb{R} ),\; (\mathit{H2} :\\
-&\quad \mathbb{R} ),\; (\mathit{hp} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{p} \mathit{x}),\; (\mathit{hq} :\\
-&\quad \forall \mathit{x},\\
-&\quad 0 \leq \mathit{q} \mathit{x}),\; (\mathit{hpi} :\\
-&\quad \mathit{Integrable} \mathit{p} \mu ),\; (\mathit{hqi}\\
-&\quad : \mathit{Integrable} \mathit{q} \mu ),\;\\
-&\quad (\mathit{hsq} : \mathit{Integrable} (\mathbf{fun}\\
-&\quad \mathit{x} => (\mathit{Real}.\mathit{sqrt} (\mathit{p}\\
-&\quad \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\mathit{q}\\
-&\quad \mathit{x})) ^{2}) \mu ),\; (\mathit{hH2} :\\
-&\quad \int \mathit{x},\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) -\\
-&\quad \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x}))\\
-&\quad ^{2} ∂\mu = 2 * \mathit{H2}),\;\\
-&\quad (\mathit{hpint} : \int \mathit{x},\\
-&\quad \mathit{p} \mathit{x} ∂\mu = 1),\; (\mathit{hqint} :\\
-&\quad \int \mathit{x}, \mathit{q} \mathit{x} ∂\mu =\\
-&\quad 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\int \mathit{x}, (\mathit{Real}.\mathit{sqrt}\\
-&\quad (\mathit{p} \mathit{x}) + \mathit{Real}.\mathit{sqrt}\\
-&\quad (\mathit{q} \mathit{x})) ^{2} ∂\mu = 4\\
-&\quad - 2 * \mathit{H2}
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{p} \mathit{q} : \Omega \to \mathbb{R} ),\; (\mathit{H2} : \mathbb{R} ),\; (\mathit{hp} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\\
+&\quad \; (\mathit{hq} : \forall \mathit{x}, 0 \leq \mathit{q} \mathit{x}),\; (\mathit{hpi} : \mathit{Integrable} \mathit{p} \mu ),\; (\mathit{hqi} : \mathit{Integrable} \mathit{q} \mu )\\
+&\quad ,\; (\mathit{hsq} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\\
+&\quad \mathit{q} \mathit{x})) ^{2}) \mu ),\; (\mathit{hH2} : \int \mathit{x}, (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2} ∂\mu =\\
+&\quad 2 * \mathit{H2}),\; (\mathit{hpint} : \int \mathit{x}, \mathit{p} \mathit{x} ∂\mu = 1),\; (\mathit{hqint} : \int \mathit{x}, \mathit{q} \mathit{x} ∂\mu = 1)\\
+\vdash\;&\int \mathit{x}, (\mathit{Real}.\mathit{sqrt} (\mathit{p} \mathit{x}) + \mathit{Real}.\mathit{sqrt} (\mathit{q} \mathit{x})) ^{2} ∂\mu = 4 - 2 * \mathit{H2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,47}\quad\lean{young\_pointwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{u} \mathit{v} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : 0 < \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{u} * \mathit{v}| \leq \mathit{t}\\
-&\quad / 2 * \mathit{u} ^{2} + 1 / (2 *\\
-&\quad \mathit{t}) * \mathit{v} ^{2}
+&(\mathit{u} \mathit{v} \mathit{t} : \mathbb{R} ),\; (\mathit{ht} : 0 < \mathit{t})\\
+\vdash\;&|\mathit{u} * \mathit{v}| \leq \mathit{t} / 2 * \mathit{u} ^{2} + 1 / (2 * \mathit{t}) * \mathit{v} ^{2}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -822,82 +372,41 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,48}\quad\lean{blind\_procedure\_floor}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \Omega : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \Omega ],\; (\mathit{mu} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hmu} : \forall \mathit{o}, 0\\
-&\quad \leq \mathit{mu}\\
-&\quad \mathit{o}),\; (\mathit{hmus} : \textstyle\sum \mathit{o},\\
-&\quad \mathit{mu} \mathit{o} = 1),\; (\mathit{rule}\\
-&\quad : \Omega \to \mathit{Dec}\\
-&\quad \to \mathbb{R} ),\; (\mathit{hr} : \forall \mathit{o}\\
-&\quad \mathit{S}, 0 \leq \mathit{rule} \mathit{o}\\
-&\quad \mathit{S}),\; (\mathit{hrs} : \forall \mathit{o},\\
-&\quad \textstyle\sum \mathit{S}, \mathit{rule} \mathit{o}\\
-&\quad \mathit{S} = 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2401/8192 \leq \mathit{max} (\mathit{regretA}\\
-&\quad (\mathbf{fun} \mathit{S} => \textstyle\sum \mathit{o},\\
-&\quad \mathit{mu} \mathit{o}*\mathit{rule} \mathit{o}\\
-&\quad \mathit{S})) (\mathit{regretB} (\mathbf{fun}\\
-&\quad \mathit{S} => \textstyle\sum \mathit{o}, \mathit{mu}\\
-&\quad \mathit{o}*\mathit{rule} \mathit{o}\\
-&\quad \mathit{S}))
+&\{ \Omega : \mathit{Type}*\},\; [\mathit{Fintype} \Omega ],\; (\mathit{mu} : \Omega \to \mathbb{R} ),\; (\mathit{hmu} : \forall \mathit{o}, 0 \leq \mathit{mu} \mathit{o}),\\
+&\quad \; (\mathit{hmus} : \textstyle\sum \mathit{o}, \mathit{mu} \mathit{o} = 1),\; (\mathit{rule} : \Omega \to \mathit{Dec} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hr} : \forall \mathit{o} \mathit{S}, 0 \leq \mathit{rule} \mathit{o} \mathit{S}),\; (\mathit{hrs} : \forall \mathit{o}, \textstyle\sum \mathit{S}, \mathit{rule} \mathit{o} \mathit{S} = 1)\\
+\vdash\;&2401/8192 \leq \mathit{max} (\mathit{regretA} (\mathbf{fun} \mathit{S} => \textstyle\sum \mathit{o}, \mathit{mu} \mathit{o}*\mathit{rule} \mathit{o} \mathit{S})) (\\
+&\quad \mathit{regretB} (\mathbf{fun} \mathit{S} => \textstyle\sum \mathit{o}, \mathit{mu} \mathit{o}*\mathit{rule} \mathit{o} \mathit{S}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,49}\quad\lean{deterministic\_minimax\_is\_larger}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2401/8192 < (13983:\mathbb{R} )/32768\\
-&\quad \wedge (\forall \mathit{S} : \mathit{Dec},\\
-&\quad (13983:\mathbb{R} )/32768 \leq \mathit{max}\\
-&\quad (\mathit{lossA} \mathit{S} - \mathit{optval})\\
-&\quad (\mathit{lossB} \mathit{S} -\\
-&\quad \mathit{optval}))
+\vdash\;&2401/8192 < (13983:\mathbb{R} )/32768 \wedge (\forall \mathit{S} : \mathit{Dec}, (13983:\mathbb{R} )/32768\\
+&\quad \leq \mathit{max} (\mathit{lossA} \mathit{S} - \mathit{optval}) (\mathit{lossB} \mathit{S} - \mathit{optval}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,50}\quad\lean{optA\_eq}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} (\mathit{Set}.\mathit{range}\\
-&\quad \mathit{lossA}) \mathit{optval}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{IsLeast} (\mathit{Set}.\mathit{range} \mathit{lossA}) \mathit{optval} \]}
 
 \noindent\textbf{A\,51}\quad\lean{optB\_eq}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} (\mathit{Set}.\mathit{range}\\
-&\quad \mathit{lossB}) \mathit{optval}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{IsLeast} (\mathit{Set}.\mathit{range} \mathit{lossB}) \mathit{optval} \]}
 
 \noindent\textbf{A\,52}\quad\lean{optima\_disagree}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{lossA} 3 = \mathit{optval}\\
-&\quad \wedge \mathit{lossB} 2 =\\
-&\quad \mathit{optval} \wedge \mathit{optval}\\
-&\quad < \mathit{lossA} 2 \wedge \mathit{optval}\\
-&\quad < \mathit{lossB} 3
+\vdash\;&\mathit{lossA} 3 = \mathit{optval} \wedge \mathit{lossB} 2 = \mathit{optval} \wedge \mathit{optval} < \mathit{lossA} 2 \wedge\\
+&\quad \mathit{optval} < \mathit{lossB} 3
 \end{aligned} \]}
 
 \noindent\textbf{A\,53}\quad\lean{regret\_floor}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{P} : \mathit{Dec} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hP} : \forall \mathit{S}, 0\\
-&\quad \leq \mathit{P}\\
-&\quad \mathit{S}),\; (\mathit{hsum} : \textstyle\sum \mathit{S},\\
-&\quad \mathit{P} \mathit{S} = 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2401/8192 \leq \mathit{max} (\mathit{regretA}\\
-&\quad \mathit{P}) (\mathit{regretB}\\
-&\quad \mathit{P})
+&(\mathit{P} : \mathit{Dec} \to \mathbb{R} ),\; (\mathit{hP} : \forall \mathit{S}, 0 \leq \mathit{P} \mathit{S}),\; (\mathit{hsum} : \textstyle\sum \mathit{S}, \mathit{P} \mathit{S} = 1)\\
+\vdash\;&2401/8192 \leq \mathit{max} (\mathit{regretA} \mathit{P}) (\mathit{regretB} \mathit{P})
 \end{aligned} \]}
 
 \noindent\textbf{A\,54}\quad\lean{regret\_floor\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{P} : \mathit{Dec}\\
-&\quad \to \mathbb{R} , (\forall \mathit{S}, 0 \leq \mathit{P}\\
-&\quad \mathit{S}) \wedge (\textstyle\sum \mathit{S},\\
-&\quad \mathit{P} \mathit{S} = 1) \wedge \mathit{regretA}\\
-&\quad \mathit{P} = 2401/8192 \wedge \mathit{regretB}\\
-&\quad \mathit{P} = 2401/8192
+\vdash\;&\exists \mathit{P} : \mathit{Dec} \to \mathbb{R} , (\forall \mathit{S}, 0 \leq \mathit{P} \mathit{S}) \wedge (\textstyle\sum \mathit{S}, \mathit{P} \mathit{S} = 1) \wedge \mathit{regretA} \mathit{P} =\\
+&\quad 2401/8192 \wedge \mathit{regretB} \mathit{P} = 2401/8192
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -905,115 +414,45 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,55}\quad\lean{contDiff\_component}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g}\\
-&\quad \mathit{y} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \mathit{gauss}\\
-&\quad \sigma (\mathit{y}\\
-&\quad - \mathit{v} - \mathit{h} *\\
-&\quad \mathit{g}))
+&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g} \mathit{y} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N} )\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,56}\quad\lean{iteratedDeriv\_fun\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \iota : \mathit{Type}*\},\; \{\\
-&\quad \mathit{u} : \mathit{Finset} \iota \},\;\\
-&\quad \{ \mathit{n} : \mathbb{N} \},\; \{\\
-&\quad \mathit{F} : \iota \to \mathbb{R}\\
-&\quad \to \mathbb{R} \},\; \{ \mathit{x} :\\
-&\quad \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u},\\
-&\quad \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F}\\
-&\quad \mathit{i}) \mathit{x})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun}\\
-&\quad \mathit{z} => \textstyle\sum \mathit{i} \in \mathit{u},\\
-&\quad \mathit{F} \mathit{i} \mathit{z})\\
-&\quad \mathit{x} = \textstyle\sum \mathit{i}\\
-&\quad \in \mathit{u}, \mathit{iteratedDeriv}\\
-&\quad \mathit{n} (\mathit{F} \mathit{i})\\
-&\quad \mathit{x}
+&\{ \iota : \mathit{Type}*\},\; \{ \mathit{u} : \mathit{Finset} \iota \},\; \{ \mathit{n} : \mathbb{N} \},\; \{ \mathit{F} : \iota \to \mathbb{R} \to\\
+&\quad \mathbb{R} \},\; \{ \mathit{x} : \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u}, \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F} \mathit{i}) \mathit{x})\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun} \mathit{z} => \textstyle\sum \mathit{i} \in \mathit{u}, \mathit{F} \mathit{i} \mathit{z}) \mathit{x} = \textstyle\sum \mathit{i} \in \mathit{u},\\
+&\quad \mathit{iteratedDeriv} \mathit{n} (\mathit{F} \mathit{i}) \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,57}\quad\lean{iteratedDeriv\_mixture}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j} :\\
-&\quad \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} :\\
-&\quad \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss}\\
-&\quad \sigma (\mathit{y} - \mathit{f} \mathit{x} -\\
-&\quad \mathit{h} * \mathit{g} \mathit{x})) 0\\
-&\quad = \mathit{levelSum} \sigma \mathit{j}\\
-&\quad (\mathit{Finset}.\mathit{image} \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}) (\mathit{levelMoment}\\
-&\quad \mathit{pi} \mathit{f} \mathit{g}\\
-&\quad \mathit{j}) \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R} ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j} : \mathbb{N} )\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} - \mathit{h}\\
+&\quad * \mathit{g} \mathit{x})) 0 = \mathit{levelSum} \sigma \mathit{j} (\mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}) (\\
+&\quad \mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g} \mathit{j}) \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{A\,58}\quad\lean{mixture\_coeff\_diff\_eq\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB}\\
-&\quad \mathit{fB} \mathit{gB} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{y} :\\
-&\quad \mathbb{R} ),\; (\mathit{hS} :\\
-&\quad \mathit{Finset}.\mathit{image} \mathit{fB}\\
-&\quad \mathit{Finset}.\mathit{univ} =\\
-&\quad \mathit{Finset}.\mathit{image} \mathit{fA}\\
-&\quad \mathit{Finset}.\mathit{univ}),\; (\mathit{hagree} :\\
-&\quad \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{fA} \mathit{Finset}.\mathit{univ},\\
-&\quad \mathit{levelMoment} \mathit{piA} \mathit{fA}\\
-&\quad \mathit{gA} \mathit{j} \mathit{v} =\\
-&\quad \mathit{levelMoment} \mathit{piB} \mathit{fB}\\
-&\quad \mathit{gB} \mathit{j} \mathit{v})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} :\\
-&\quad \mathit{X}, \mathit{piA} \mathit{x} * \mathit{gauss}\\
-&\quad \sigma (\mathit{y} - \mathit{fA} \mathit{x} -\\
-&\quad \mathit{h} * \mathit{gA} \mathit{x})) 0\\
-&\quad - \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} :\\
-&\quad \mathit{X}, \mathit{piB} \mathit{x} * \mathit{gauss}\\
-&\quad \sigma (\mathit{y} - \mathit{fB} \mathit{x} -\\
-&\quad \mathit{h} * \mathit{gB} \mathit{x})) 0\\
-&\quad = 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB} \mathit{fB} \mathit{gB} : \mathit{X} \to \mathbb{R} ),\; (\mathit{j} : \mathbb{N} ),\\
+&\quad \; (\mathit{y} : \mathbb{R} ),\; (\mathit{hS} : \mathit{Finset}.\mathit{image} \mathit{fB} \mathit{Finset}.\mathit{univ} = \mathit{Finset}.\mathit{image}\\
+&\quad \mathit{fA} \mathit{Finset}.\mathit{univ}),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{fA} \mathit{Finset}.\mathit{univ}\\
+&\quad , \mathit{levelMoment} \mathit{piA} \mathit{fA} \mathit{gA} \mathit{j} \mathit{v} = \mathit{levelMoment} \mathit{piB} \mathit{fB} \mathit{gB} \mathit{j} \mathit{v})\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{piA} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fA} \mathit{x}\\
+&\quad - \mathit{h} * \mathit{gA} \mathit{x})) 0 - \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
+&\quad \mathit{piB} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fB} \mathit{x} - \mathit{h} * \mathit{gB} \mathit{x})) 0 = 0
 \end{aligned} \]}
 
 \noindent\textbf{A\,59}\quad\lean{mixture\_coeff\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{vstar} :\\
-&\quad \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar}\\
-&\quad \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}),\; (\mathit{htop} :\\
-&\quad \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f} \mathit{Finset}.\mathit{univ}, \mathit{v}\\
-&\quad \neq \mathit{vstar} \to \mathit{v} <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{levelMoment}\\
-&\quad \mathit{pi} \mathit{f} \mathit{g} \mathit{r}\\
-&\quad \mathit{vstar} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{y},\\
-&\quad \mathit{iteratedDeriv} \mathit{r} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} :\\
-&\quad \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss}\\
-&\quad \sigma (\mathit{y} - \mathit{f} \mathit{x} -\\
-&\quad \mathit{h} * \mathit{g} \mathit{x})) 0\\
-&\quad \neq 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\\
+&\quad \; (\mathit{vstar} : \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}),\\
+&\quad \; (\mathit{htop} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} <\\
+&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g} \mathit{r} \mathit{vstar} \neq 0)\\
+\vdash\;&\exists \mathit{y}, \mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x}\\
+&\quad - \mathit{h} * \mathit{g} \mathit{x})) 0 \neq 0
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1021,69 +460,34 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,60}\quad\lean{log\_ge\_self}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{H2}),\;\\
-&\quad (\mathit{h1} : \mathit{H2} < 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{H2} \leq -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2})
+&(\mathit{H2} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{H2}),\; (\mathit{h1} : \mathit{H2} < 1)\\
+\vdash\;&\mathit{H2} \leq -\mathit{Real}.\mathit{log} (1 - \mathit{H2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,61}\quad\lean{necessary\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{L} \mathit{eps} \mathit{N} : \mathbb{R}\\
-&\quad ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps}\\
-&\quad : 0 < \mathit{eps}),\; (\mathit{hbound} :\\
-&\quad \mathit{Real}.\mathit{log}\\
-&\quad (1/(4*\mathit{eps})) \leq 2*\mathit{L}*\mathit{N})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{log}\\
-&\quad (1/(4*\mathit{eps}))/(2*\mathit{L})\\
-&\quad \leq \mathit{N}
+&(\mathit{L} \mathit{eps} \mathit{N} : \mathbb{R} ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hbound} : \mathit{Real}.\mathit{log} (1/(4*\mathit{eps})) \leq 2*\mathit{L}*\mathit{N})\\
+\vdash\;&\mathit{Real}.\mathit{log} (1/(4*\mathit{eps}))/(2*\mathit{L}) \leq \mathit{N}
 \end{aligned} \]}
 
 \noindent\textbf{A\,62}\quad\lean{rate\_two\_sided}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus}\\
-&\quad \mathit{h2r} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{hcm} : 0 <\\
-&\quad \mathit{cminus}),\; (\mathit{hcp} : 0 <\\
-&\quad \mathit{cplus}),\; (\mathit{hh} : 0 <\\
-&\quad \mathit{h2r}),\; (\mathit{heps} : 0 <\\
-&\quad \mathit{eps}),\; (\mathit{hlo} : \mathit{cminus} *\\
-&\quad \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} :\\
-&\quad \mathit{H2} \leq \mathit{cplus} *\\
-&\quad \mathit{h2r}),\; (\mathit{hLlo} : \mathit{H2}\\
-&\quad \leq \mathit{L}),\;\\
-&\quad (\mathit{hLup} : \mathit{L} \leq 2*\mathit{H2}),\;\\
-&\quad (\mathit{hlog4} : 0 \leq \mathit{Real}.\mathit{log}\\
-&\quad (1/(4*\mathit{eps}))),\; (\mathit{hlog2} : 0\\
-&\quad \leq \mathit{Real}.\mathit{log}\\
-&\quad (1/(2*\mathit{eps})))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{log}\\
-&\quad (1/(4*\mathit{eps}))/(4*\mathit{cplus}*\mathit{h2r})\\
-&\quad \leq \mathit{Real}.\mathit{log}\\
-&\quad (1/(4*\mathit{eps}))/(2*\mathit{L})\\
-&\quad \wedge \mathit{Real}.\mathit{log}\\
-&\quad (1/(2*\mathit{eps}))/\mathit{L}\\
-&\quad \leq \mathit{Real}.\mathit{log}\\
-&\quad (1/(2*\mathit{eps}))/(\mathit{cminus}*\mathit{h2r})
+&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus} \mathit{h2r} \mathit{eps} : \mathbb{R} ),\; (\mathit{hcm} : 0 < \mathit{cminus}),\\
+&\quad \; (\mathit{hcp} : 0 < \mathit{cplus}),\; (\mathit{hh} : 0 < \mathit{h2r}),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hlo} : \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus} * \mathit{h2r}),\\
+&\quad \; (\mathit{hLlo} : \mathit{H2} \leq \mathit{L}),\; (\mathit{hLup} : \mathit{L} \leq 2*\mathit{H2}),\; (\mathit{hlog4} : 0 \leq \mathit{Real}.\mathit{log}\\
+&\quad (1/(4*\mathit{eps}))),\; (\mathit{hlog2} : 0 \leq \mathit{Real}.\mathit{log} (1/(2*\mathit{eps})))\\
+\vdash\;&\mathit{Real}.\mathit{log} (1/(4*\mathit{eps}))/(4*\mathit{cplus}*\mathit{h2r}) \leq\\
+&\quad \mathit{Real}.\mathit{log} (1/(4*\mathit{eps}))/(2*\mathit{L}) \wedge \mathit{Real}.\mathit{log} (1/(2*\mathit{eps}))\\
+&\quad /\mathit{L} \leq \mathit{Real}.\mathit{log} (1/(2*\mathit{eps}))/(\mathit{cminus}*\mathit{h2r})
 \end{aligned} \]}
 
 \noindent\textbf{A\,63}\quad\lean{sufficient\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{L} \mathit{eps} \mathit{N} : \mathbb{R}\\
-&\quad ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps}\\
-&\quad : 0 < \mathit{eps}),\; (\mathit{hN} :\\
-&\quad \mathit{Real}.\mathit{log}\\
-&\quad (1/(2*\mathit{eps}))/\mathit{L} \leq \mathit{N})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{log}\\
-&\quad (1/(2*\mathit{eps})) \leq \mathit{L}*\mathit{N}
+&(\mathit{L} \mathit{eps} \mathit{N} : \mathbb{R} ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hN} : \mathit{Real}.\mathit{log} (1/(2*\mathit{eps}))/\mathit{L} \leq \mathit{N})\\
+\vdash\;&\mathit{Real}.\mathit{log} (1/(2*\mathit{eps})) \leq \mathit{L}*\mathit{N}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1091,138 +495,50 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,64}\quad\lean{bayes\_regret\_window}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{gamma} \mathit{Lmax} \mathit{e} \mathit{R}\\
-&\quad \mathit{rhoN} \mathit{rho2N} : \mathbb{R}\\
-&\quad ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\;\\
-&\quad (\mathit{hL} : 0 \leq \mathit{Lmax}),\; (\mathit{hlow}\\
-&\quad : \mathit{rho2N} / 4 \leq \mathit{e}),\; (\mathit{hup}\\
-&\quad : \mathit{e} \leq \mathit{rhoN} / 2),\; (\mathit{hR1}\\
-&\quad : \mathit{gamma} * \mathit{e} \leq \mathit{R}),\;\\
-&\quad (\mathit{hR2} : \mathit{R} \leq \mathit{Lmax} *\\
-&\quad \mathit{e})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4\\
-&\quad \leq \mathit{R} \wedge \mathit{R}\\
-&\quad \leq \mathit{Lmax} * \mathit{rhoN} / 2
+&(\mathit{gamma} \mathit{Lmax} \mathit{e} \mathit{R} \mathit{rhoN} \mathit{rho2N} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\\
+&\quad \; (\mathit{hL} : 0 \leq \mathit{Lmax}),\; (\mathit{hlow} : \mathit{rho2N} / 4 \leq \mathit{e}),\; (\mathit{hup} : \mathit{e} \leq \mathit{rhoN} / 2\\
+&\quad ),\; (\mathit{hR1} : \mathit{gamma} * \mathit{e} \leq \mathit{R}),\; (\mathit{hR2} : \mathit{R} \leq \mathit{Lmax} * \mathit{e})\\
+\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4 \leq \mathit{R} \wedge \mathit{R} \leq \mathit{Lmax} * \mathit{rhoN} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,65}\quad\lean{inside\_cost}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{lB} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
-&\quad ),\; (\mathit{hdis} : \mathit{Disjoint} \mathit{GA}\\
-&\quad \mathit{GB}),\; (\mathit{hD} : \forall \mathit{a}, 0\\
-&\quad \leq \mathit{D} \mathit{a}),\; (\mathit{hlB} :\\
-&\quad \forall \mathit{a},\\
-&\quad 0 \leq \mathit{lB} \mathit{a}),\; (\mathit{hB} :\\
-&\quad \forall \mathit{a} \notin \mathit{GB}, \mathit{gamma}\\
-&\quad \leq \mathit{lB} \mathit{a})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * (\textstyle\sum \mathit{a} \in \mathit{GA},\\
-&\quad \mathit{D} \mathit{a}) \leq \textstyle\sum \mathit{a},\\
-&\quad \mathit{D} \mathit{a} * \mathit{lB}\\
-&\quad \mathit{a}
+&(\mathit{D} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{lB} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset} \mathit{Act}),\\
+&\quad \; (\mathit{gamma} : \mathbb{R} ),\; (\mathit{hdis} : \mathit{Disjoint} \mathit{GA} \mathit{GB}),\; (\mathit{hD} : \forall \mathit{a}, 0 \leq \mathit{D} \mathit{a}),\\
+&\quad \; (\mathit{hlB} : \forall \mathit{a}, 0 \leq \mathit{lB} \mathit{a}),\; (\mathit{hB} : \forall \mathit{a} \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB} \mathit{a})\\
+\vdash\;&\mathit{gamma} * (\textstyle\sum \mathit{a} \in \mathit{GA}, \mathit{D} \mathit{a}) \leq \textstyle\sum \mathit{a}, \mathit{D} \mathit{a} * \mathit{lB} \mathit{a}
 \end{aligned} \]}
 
 \noindent\textbf{A\,66}\quad\lean{lrt\_regret\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\;\\
-&\quad (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{aA} \mathit{aB} :\\
-&\quad \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R}\\
-&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PB} \mathit{h}),\; (\mathit{hA0} :\\
-&\quad \mathit{lA} \mathit{aA} = 0),\; (\mathit{hB0} :\\
-&\quad \mathit{lB} \mathit{aB} = 0),\; (\mathit{hAx} :\\
-&\quad \mathit{lA} \mathit{aB} \leq \mathit{Lmax}),\;\\
-&\quad (\mathit{hBx} : \mathit{lB} \mathit{aA} \leq \mathit{Lmax})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} *\\
-&\quad \mathit{lA} (\mathbf{if} \mathit{dec} \mathit{h}\\
-&\quad \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB}) +\\
-&\quad \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} *\\
-&\quad \mathit{lB} (\mathbf{if} \mathit{dec} \mathit{h}\\
-&\quad \mathbf{then} \mathit{aA} \mathbf{else}\\
-&\quad \mathit{aB})) / 2 \leq \mathit{Lmax} *\\
-&\quad ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} *\\
-&\quad (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then}\\
-&\quad (0:\mathbb{R} ) \mathbf{else} 1) +\\
-&\quad \textstyle\sum \mathit{h},\\
-&\quad \mathit{PB} \mathit{h} * (\mathbf{if} \mathit{dec}\\
-&\quad \mathit{h} \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
-&\quad 0)) / 2)
+&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R} ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R} ),\\
+&\quad \; (\mathit{aA} \mathit{aB} : \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R} ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq \mathit{PA} \mathit{h}),\\
+&\quad \; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB} \mathit{h}),\; (\mathit{hA0} : \mathit{lA} \mathit{aA} = 0),\; (\mathit{hB0} : \mathit{lB} \mathit{aB} = 0)\\
+&\quad ,\; (\mathit{hAx} : \mathit{lA} \mathit{aB} \leq \mathit{Lmax}),\; (\mathit{hBx} : \mathit{lB} \mathit{aA} \leq \mathit{Lmax})\\
+\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * \mathit{lA} (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * \mathit{lB} (\mathbf{if} \mathit{dec} \mathit{h}\\
+&\quad \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB})) / 2 \leq \mathit{Lmax} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (0:\\
+&\quad \mathbb{R} ) \mathbf{else} 1) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)) / 2)
 \end{aligned} \]}
 
 \noindent\textbf{A\,67}\quad\lean{outside\_cost}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{D} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{lA} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{GA} : \mathit{Finset}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
-&\quad ),\; (\mathit{hD} : \forall \mathit{a}, 0\\
-&\quad \leq \mathit{D}\\
-&\quad \mathit{a}),\; (\mathit{hlA} : \forall \mathit{a}, 0\\
-&\quad \leq \mathit{lA} \mathit{a}),\; (\mathit{hA} :\\
-&\quad \forall \mathit{a}\\
-&\quad \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
-&\quad \mathit{D} \mathit{a}) \leq \textstyle\sum \mathit{a},\\
-&\quad \mathit{D} \mathit{a} * \mathit{lA}\\
-&\quad \mathit{a}
+&(\mathit{D} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{lA} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{GA} : \mathit{Finset} \mathit{Act}),\\
+&\quad \; (\mathit{gamma} : \mathbb{R} ),\; (\mathit{hD} : \forall \mathit{a}, 0 \leq \mathit{D} \mathit{a}),\; (\mathit{hlA} : \forall \mathit{a}, 0 \leq \mathit{lA} \mathit{a}),\\
+&\quad \; (\mathit{hA} : \forall \mathit{a} \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA} \mathit{a})\\
+\vdash\;&\mathit{gamma} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ}, \mathit{D} \mathit{a}) \leq \textstyle\sum \mathit{a}, \mathit{D} \mathit{a} * \mathit{lA} \mathit{a}
 \end{aligned} \]}
 
 \noindent\textbf{A\,68}\quad\lean{regret\_ge\_gamma\_error}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{D} : \mathit{H} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{lA} \mathit{lB} : \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
-&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PB} \mathit{h}),\; (\mathit{hD} :\\
-&\quad \forall \mathit{h}\\
-&\quad \mathit{a}, 0 \leq \mathit{D} \mathit{h}\\
-&\quad \mathit{a}),\; (\mathit{hDsum} : \forall \mathit{h},\\
-&\quad \textstyle\sum \mathit{a}, \mathit{D} \mathit{h}\\
-&\quad \mathit{a} = 1),\; (\mathit{hlA} : \forall \mathit{a},\\
-&\quad 0 \leq \mathit{lA} \mathit{a}),\; (\mathit{hlB} :\\
-&\quad \forall \mathit{a}, 0 \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hA} : \forall \mathit{a}\\
-&\quad \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hB} : \forall \mathit{a}\\
-&\quad \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hdis} : \mathit{Disjoint}\\
-&\quad \mathit{GA} \mathit{GB})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h},\\
-&\quad \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}\\
-&\quad \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a}) +\\
-&\quad \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (1\\
-&\quad - \textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
-&\quad \mathit{D} \mathit{h} \mathit{a})) / 2)\\
-&\quad \leq (\textstyle\sum \mathit{h}, \mathit{PA}\\
-&\quad \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D}\\
-&\quad \mathit{h} \mathit{a} * \mathit{lA} \mathit{a}) +\\
-&\quad \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} *\\
-&\quad (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h}\\
-&\quad \mathit{a} * \mathit{lB} \mathit{a})) /\\
-&\quad 2
+&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R} ),\; (\mathit{D} : \mathit{H} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset} \mathit{Act}),\; (\mathit{gamma} : \mathbb{R} ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq\\
+&\quad \mathit{PA} \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB} \mathit{h}),\; (\mathit{hD} : \forall \mathit{h} \mathit{a}, 0 \leq \mathit{D} \mathit{h} \mathit{a}),\\
+&\quad \; (\mathit{hDsum} : \forall \mathit{h}, \textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} = 1),\; (\mathit{hlA} : \forall \mathit{a}, 0 \leq \mathit{lA} \mathit{a}),\\
+&\quad \; (\mathit{hlB} : \forall \mathit{a}, 0 \leq \mathit{lB} \mathit{a}),\; (\mathit{hA} : \forall \mathit{a} \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA} \mathit{a}),\\
+&\quad \; (\mathit{hB} : \forall \mathit{a} \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB} \mathit{a}),\; (\mathit{hdis} : \mathit{Disjoint} \mathit{GA} \mathit{GB})\\
+\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (1 - \textstyle\sum \mathit{a}\\
+&\quad \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a})) / 2) \leq (\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lA} \mathit{a}) + \textstyle\sum \mathit{h},\\
+&\quad \mathit{PB} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lB} \mathit{a})) / 2
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1230,65 +546,33 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,69}\quad\lean{mislabel\_costs}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
-&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Set}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
-&\quad ),\; (\mathit{hA} : \forall \mathit{a}, \mathit{a}\\
-&\quad \notin \mathit{GA} \to \mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hB} : \forall \mathit{a},\\
-&\quad \mathit{a} \notin \mathit{GB} \to \mathit{gamma}\\
-&\quad \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hdis} : \forall \mathit{a},\\
-&\quad \neg (\mathit{a} \in \mathit{GA} \wedge \mathit{a} \in \mathit{GB})),\;\\
-&\quad (\mathit{a} : \mathit{Act})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a} \vee \mathit{gamma}\\
-&\quad \leq \mathit{lB} \mathit{a}
+&(\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{GA} \mathit{GB} : \mathit{Set} \mathit{Act}),\; (\mathit{gamma} : \mathbb{R} ),\\
+&\quad \; (\mathit{hA} : \forall \mathit{a}, \mathit{a} \notin \mathit{GA} \to \mathit{gamma} \leq \mathit{lA} \mathit{a}),\; (\mathit{hB} : \forall \mathit{a}, \mathit{a} \notin \mathit{GB} \to\\
+&\quad \mathit{gamma} \leq \mathit{lB} \mathit{a}),\; (\mathit{hdis} : \forall \mathit{a}, \neg (\mathit{a} \in \mathit{GA} \wedge \mathit{a} \in \mathit{GB})),\\
+&\quad \; (\mathit{a} : \mathit{Act})\\
+\vdash\;&\mathit{gamma} \leq \mathit{lA} \mathit{a} \vee \mathit{gamma} \leq \mathit{lB} \mathit{a}
 \end{aligned} \]}
 
 \noindent\textbf{A\,70}\quad\lean{regret\_lower\_rate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{gamma} \mathit{e} \mathit{R} \mathit{rho2N} :\\
-&\quad \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\;\\
-&\quad (\mathit{hlow} : \mathit{rho2N}/4 \leq \mathit{e}),\;\\
-&\quad (\mathit{hR} : \mathit{gamma} * \mathit{e} \leq \mathit{R})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4\\
-&\quad \leq \mathit{R}
+&(\mathit{gamma} \mathit{e} \mathit{R} \mathit{rho2N} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\; (\mathit{hlow} : \mathit{rho2N}/4 \leq \mathit{e})\\
+&\quad ,\; (\mathit{hR} : \mathit{gamma} * \mathit{e} \leq \mathit{R})\\
+\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4 \leq \mathit{R}
 \end{aligned} \]}
 
 \noindent\textbf{A\,71}\quad\lean{regret\_upper\_rate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Lmax} \mathit{e} \mathit{R} \mathit{rhoN} :\\
-&\quad \mathbb{R} ),\; (\mathit{hL} : 0 \leq \mathit{Lmax}),\;\\
-&\quad (\mathit{hup} : \mathit{e} \leq \mathit{rhoN}/2),\;\\
-&\quad (\mathit{hR} : \mathit{R} \leq \mathit{Lmax} *\\
-&\quad \mathit{e})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{R} \leq \mathit{Lmax} *\\
-&\quad \mathit{rhoN} / 2
+&(\mathit{Lmax} \mathit{e} \mathit{R} \mathit{rhoN} : \mathbb{R} ),\; (\mathit{hL} : 0 \leq \mathit{Lmax}),\; (\mathit{hup} : \mathit{e} \leq \mathit{rhoN}/2),\\
+&\quad \; (\mathit{hR} : \mathit{R} \leq \mathit{Lmax} * \mathit{e})\\
+\vdash\;&\mathit{R} \leq \mathit{Lmax} * \mathit{rhoN} / 2
 \end{aligned} \]}
 
 \noindent\textbf{A\,72}\quad\lean{regret\_window}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{gamma} \mathit{Lmax} \mathit{e} \mathit{R}\\
-&\quad \mathit{rhoN} \mathit{rho2N} : \mathbb{R}\\
-&\quad ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\;\\
-&\quad (\mathit{hL} : 0 \leq \mathit{Lmax}),\; (\mathit{hlow}\\
-&\quad : \mathit{rho2N}/4 \leq \mathit{e}),\; (\mathit{hup} :\\
-&\quad \mathit{e} \leq \mathit{rhoN}/2),\; (\mathit{hR1} :\\
-&\quad \mathit{gamma} * \mathit{e} \leq \mathit{R}),\;\\
-&\quad (\mathit{hR2} : \mathit{R} \leq \mathit{Lmax} *\\
-&\quad \mathit{e})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4\\
-&\quad \leq \mathit{R} \wedge \mathit{R}\\
-&\quad \leq \mathit{Lmax} * \mathit{rhoN} / 2
+&(\mathit{gamma} \mathit{Lmax} \mathit{e} \mathit{R} \mathit{rhoN} \mathit{rho2N} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{gamma}),\\
+&\quad \; (\mathit{hL} : 0 \leq \mathit{Lmax}),\; (\mathit{hlow} : \mathit{rho2N}/4 \leq \mathit{e}),\; (\mathit{hup} : \mathit{e} \leq \mathit{rhoN}/2\\
+&\quad ),\; (\mathit{hR1} : \mathit{gamma} * \mathit{e} \leq \mathit{R}),\; (\mathit{hR2} : \mathit{R} \leq \mathit{Lmax} * \mathit{e})\\
+\vdash\;&\mathit{gamma} * \mathit{rho2N} / 4 \leq \mathit{R} \wedge \mathit{R} \leq \mathit{Lmax} * \mathit{rhoN} / 2
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1296,122 +580,61 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,73}\quad\lean{ceil\_suffices}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{L} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps}\\
-&\quad : 0 < \mathit{eps})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{log} (1 / (2 *\\
-&\quad \mathit{eps})) \leq ((\lceil \mathit{Real}.\mathit{log}\\
-&\quad (1 / (2 * \mathit{eps})) / \mathit{L}\rceil ₊ :\\
-&\quad \mathbb{N} ) : \mathbb{R} ) *\\
-&\quad \mathit{L}
+&(\mathit{L} \mathit{eps} : \mathbb{R} ),\; (\mathit{hL} : 0 < \mathit{L}),\; (\mathit{heps} : 0 < \mathit{eps})\\
+\vdash\;&\mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq ((\lceil \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) / \mathit{L}\rceil ₊ :\\
+&\quad \mathbb{N} ) : \mathbb{R} ) * \mathit{L}
 \end{aligned} \]}
 
 \noindent\textbf{A\,74}\quad\lean{log\_ge\_self}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{x}),\;\\
-&\quad (\mathit{h1} : \mathit{x} < 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{x} \leq -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{x})
+&(\mathit{x} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{x}),\; (\mathit{h1} : \mathit{x} < 1)\\
+\vdash\;&\mathit{x} \leq -\mathit{Real}.\mathit{log} (1 - \mathit{x})
 \end{aligned} \]}
 
 \noindent\textbf{A\,75}\quad\lean{log\_sandwich}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{H2}),\;\\
-&\quad (\mathit{h1} : \mathit{H2} \leq 1/2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{H2} \leq -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2}) \wedge -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2}) \leq 2 * \mathit{H2}
+&(\mathit{H2} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{H2}),\; (\mathit{h1} : \mathit{H2} \leq 1/2)\\
+\vdash\;&\mathit{H2} \leq -\mathit{Real}.\mathit{log} (1 - \mathit{H2}) \wedge -\mathit{Real}.\mathit{log} (1 - \mathit{H2}) \leq 2 * \mathit{H2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,76}\quad\lean{matching\_rate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus}\\
-&\quad \mathit{h2r} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hH0} : 0\\
-&\quad \leq \mathit{H2}),\; (\mathit{hH1} :\\
-&\quad \mathit{H2} \leq 1/2),\;\\
-&\quad (\mathit{hLdef} : \mathit{L} =\\
-&\quad -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2})),\; (\mathit{hlo} : \mathit{cminus} *\\
-&\quad \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} :\\
-&\quad \mathit{H2} \leq \mathit{cplus} *\\
-&\quad \mathit{h2r}),\; (\mathit{heps} : 0 <\\
-&\quad \mathit{eps}),\; (\mathit{hcm} : 0 <\\
-&\quad \mathit{cminus}),\; (\mathit{hh} : 0 <\\
-&\quad \mathit{h2r}),\; (\mathit{hsuff} :\\
-&\quad \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps}))\\
-&\quad \leq (\mathit{N} : \mathbb{R} ) * (\mathit{cminus} *\\
-&\quad \mathit{h2r}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L}\\
-&\quad \leq 2 * (\mathit{cplus} *\\
-&\quad \mathit{h2r})) \wedge \mathit{Real}.\mathit{log} (1 /\\
-&\quad (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R}\\
-&\quad ) * \mathit{L}
+&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus} \mathit{h2r} \mathit{eps} : \mathbb{R} ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hH0} : 0 \leq \mathit{H2}),\\
+&\quad \; (\mathit{hH1} : \mathit{H2} \leq 1/2),\; (\mathit{hLdef} : \mathit{L} = -\mathit{Real}.\mathit{log} (1 - \mathit{H2})),\\
+&\quad \; (\mathit{hlo} : \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus} * \mathit{h2r}),\\
+&\quad \; (\mathit{heps} : 0 < \mathit{eps}),\; (\mathit{hcm} : 0 < \mathit{cminus}),\; (\mathit{hh} : 0 < \mathit{h2r}),\\
+&\quad \; (\mathit{hsuff} : \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) * (\mathit{cminus} * \mathit{h2r})\\
+&\quad )\\
+\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L} \leq 2 * (\mathit{cplus} * \mathit{h2r})) \wedge\\
+&\quad \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) * \mathit{L}
 \end{aligned} \]}
 
 \noindent\textbf{A\,77}\quad\lean{necessary\_count}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} \mathit{L} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hr} : 0 <\\
-&\quad \mathit{rho}),\; (\mathit{heps} : 0 <\\
-&\quad \mathit{eps}),\; (\mathit{hL} : \mathit{L} =\\
-&\quad -\mathit{Real}.\mathit{log}\\
-&\quad \mathit{rho}),\; (\mathit{hLpos} : 0 <\\
-&\quad \mathit{L}),\; (\mathit{hgood} : \mathit{rho} ^{} (2 *\\
-&\quad \mathit{N}) / 4 \leq \mathit{eps})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Real}.\mathit{log} (1 / (4 *\\
-&\quad \mathit{eps})) / (2 * \mathit{L})\\
-&\quad \leq (\mathit{N} : \mathbb{R} )
+&(\mathit{rho} \mathit{L} \mathit{eps} : \mathbb{R} ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hr} : 0 < \mathit{rho}),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hL} : \mathit{L} = -\mathit{Real}.\mathit{log} \mathit{rho}),\; (\mathit{hLpos} : 0 < \mathit{L}),\\
+&\quad \; (\mathit{hgood} : \mathit{rho} ^{} (2 * \mathit{N}) / 4 \leq \mathit{eps})\\
+\vdash\;&\mathit{Real}.\mathit{log} (1 / (4 * \mathit{eps})) / (2 * \mathit{L}) \leq (\mathit{N} : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{A\,78}\quad\lean{neg\_log\_le\_two}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{x} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{x}),\;\\
-&\quad (\mathit{h1} : \mathit{x} \leq 1/2)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&-\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{x}) \leq 2 * \mathit{x}
+&(\mathit{x} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{x}),\; (\mathit{h1} : \mathit{x} \leq 1/2)\\
+\vdash\;&-\mathit{Real}.\mathit{log} (1 - \mathit{x}) \leq 2 * \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,79}\quad\lean{pow\_eq\_exp}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} : \mathbb{R} ),\; (\mathit{hr} : 0 <\\
-&\quad \mathit{rho}),\; (\mathit{N} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{rho} ^{\mathit{N}} =\\
-&\quad \mathit{Real}.\mathit{exp} (-((\mathit{N} : \mathbb{R}\\
-&\quad ) * (-\mathit{Real}.\mathit{log}\\
-&\quad \mathit{rho})))
+&(\mathit{rho} : \mathbb{R} ),\; (\mathit{hr} : 0 < \mathit{rho}),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&\mathit{rho} ^{\mathit{N}} = \mathit{Real}.\mathit{exp} (-((\mathit{N} : \mathbb{R} ) * (-\mathit{Real}.\mathit{log} \mathit{rho})))
 \end{aligned} \]}
 
 \noindent\textbf{A\,80}\quad\lean{sufficient\_count}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{rho} \mathit{L} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hr} : 0 <\\
-&\quad \mathit{rho}),\; (\mathit{heps} : 0 <\\
-&\quad \mathit{eps}),\; (\mathit{hL} : \mathit{L} =\\
-&\quad -\mathit{Real}.\mathit{log}\\
-&\quad \mathit{rho}),\; (\mathit{hN} :\\
-&\quad \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps}))\\
-&\quad \leq (\mathit{N} : \mathbb{R} ) *\\
-&\quad \mathit{L})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{rho} ^{\mathit{N}} / 2\\
-&\quad \leq \mathit{eps}
+&(\mathit{rho} \mathit{L} \mathit{eps} : \mathbb{R} ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hr} : 0 < \mathit{rho}),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hL} : \mathit{L} = -\mathit{Real}.\mathit{log} \mathit{rho}),\; (\mathit{hN} : \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps}))\\
+&\quad \leq (\mathit{N} : \mathbb{R} ) * \mathit{L})\\
+\vdash\;&\mathit{rho} ^{\mathit{N}} / 2 \leq \mathit{eps}
 \end{aligned} \]}
 
 \vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
@@ -1419,155 +642,59 @@ Each entry is a symbol-level transliteration of the Lean statement: Unicode maps
 
 \noindent\textbf{A\,81}\quad\lean{bound\_of\_vanishing\_derivs}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{b}\\
-&\quad \mathit{C} : \mathbb{R} ),\; (\mathit{hb} : 0 <\\
-&\quad \mathit{b}),\; (\mathit{hcd} : \mathit{ContDiffOn}\\
-&\quad \mathbb{R} (\mathit{n} + 1 : \mathbb{N} ) \mathit{F}\\
-&\quad (\mathit{Icc} 0 \mathit{b})),\; (\mathit{hv} :\\
-&\quad \forall \mathit{j}\\
-&\quad \leq \mathit{n}, \mathit{iteratedDerivWithin}\\
-&\quad \mathit{j} \mathit{F} (\mathit{Icc} 0 \mathit{b}) 0 =\\
-&\quad 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc}\\
-&\quad (0:\mathbb{R} ) \mathit{b},\\
-&\quad |\mathit{iteratedDerivWithin} (\mathit{n} + 1)\\
-&\quad \mathit{F} (\mathit{Icc} 0 \mathit{b}) \mathit{y}|\\
-&\quad \leq \mathit{C})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{F} \mathit{b}| \leq \mathit{C}\\
-&\quad * \mathit{b} ^{} (\mathit{n} + 1) /\\
-&\quad \mathit{n} !
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{b} \mathit{C} : \mathbb{R} ),\; (\mathit{hb} : 0 < \mathit{b}),\\
+&\quad \; (\mathit{hcd} : \mathit{ContDiffOn} \mathbb{R} (\mathit{n} + 1 : \mathbb{N} ) \mathit{F} (\mathit{Icc} 0 \mathit{b})),\; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n},\\
+&\quad \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} (\mathit{Icc} 0 \mathit{b}) 0 = 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc} (0:\mathbb{R} ) \mathit{b},\\
+&\quad |\mathit{iteratedDerivWithin} (\mathit{n} + 1) \mathit{F} (\mathit{Icc} 0 \mathit{b}) \mathit{y}| \leq \mathit{C})\\
+\vdash\;&|\mathit{F} \mathit{b}| \leq \mathit{C} * \mathit{b} ^{} (\mathit{n} + 1) / \mathit{n} !
 \end{aligned} \]}
 
 \noindent\textbf{A\,82}\quad\lean{chi2\_upper\_of\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{d}\\
-&\quad \mathit{q} \mathit{G} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : \mathbb{R} ),\; (\mathit{hq} :\\
-&\quad \forall \mathit{x}, 0 < \mathit{q}\\
-&\quad \mathit{x}),\; (\mathit{hG} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{G} \mathit{x}),\; (\mathit{hhr} :\\
-&\quad 0 \leq \mathit{hr}),\;\\
-&\quad (\mathit{hbound} : \forall \mathit{x}, |\mathit{d}\\
-&\quad \mathit{x}| \leq \mathit{hr} * \mathit{G}\\
-&\quad \mathit{x}),\; (\mathit{hintd} : \mathit{Integrable}\\
-&\quad (\mathbf{fun} \mathit{x} => (\mathit{d} \mathit{x})\\
-&\quad ^{2} / \mathit{q} \mathit{x}) \mu ),\; (\mathit{hintG}\\
-&\quad : \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{hr} ^{2} * ((\mathit{G} \mathit{x}) ^{2} /\\
-&\quad \mathit{q} \mathit{x})) \mu )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\int \mathit{x}, (\mathit{d}\\
-&\quad \mathit{x}) ^{2} / \mathit{q}\\
-&\quad \mathit{x} ∂\mu \leq \mathit{hr} ^{2} *\\
-&\quad \int \mathit{x}, (\mathit{G}\\
-&\quad \mathit{x}) ^{2} / \mathit{q}\\
-&\quad \mathit{x} ∂\mu
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{d} \mathit{q} \mathit{G} : \Omega \to \mathbb{R} ),\; (\mathit{hr} : \mathbb{R} ),\; (\mathit{hq} : \forall \mathit{x}, 0 < \mathit{q} \mathit{x}),\\
+&\quad \; (\mathit{hG} : \forall \mathit{x}, 0 \leq \mathit{G} \mathit{x}),\; (\mathit{hhr} : 0 \leq \mathit{hr}),\; (\mathit{hbound} : \forall \mathit{x}, |\mathit{d} \mathit{x}| \leq \mathit{hr} *\\
+&\quad \mathit{G} \mathit{x}),\; (\mathit{hintd} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => (\mathit{d} \mathit{x}) ^{2} / \mathit{q} \mathit{x}) \mu ),\\
+&\quad \; (\mathit{hintG} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => \mathit{hr} ^{2} * ((\mathit{G} \mathit{x}) ^{2} / \mathit{q} \mathit{x})) \mu )\\
+\vdash\;&\int \mathit{x}, (\mathit{d} \mathit{x}) ^{2} / \mathit{q} \mathit{x} ∂\mu \leq \mathit{hr} ^{2} * \int \mathit{x}, (\mathit{G} \mathit{x}) ^{2} / \mathit{q} \mathit{x} ∂\mu
 \end{aligned} \]}
 
 \noindent\textbf{A\,83}\quad\lean{component\_deriv\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y}\\
-&\quad \xi : \mathbb{R} ),\; (\mathit{r} : \mathbb{N}\\
-&\quad ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} :\\
-&\quad |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun}\\
-&\quad \mathit{h} : \mathbb{R} => \mathit{gauss}\\
-&\quad \sigma (\mathit{y}\\
-&\quad - \mathit{v} - \mathit{h} *\\
-&\quad \mathit{g})) \xi | \leq |\mathit{g}|\\
-&\quad ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval}\\
-&\quad (\mathit{y} - \mathit{v} - \xi *\\
-&\quad \mathit{g})| *\\
-&\quad \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) / (2 *\\
-&\quad \sigma ^{2}) + \mathit{M} * |\mathit{y}| / \sigma ^{2})
+&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y} \xi : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} : |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})\\
+\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g})) \xi | \leq\\
+&\quad |\mathit{g}| ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval} (\mathit{y} - \mathit{v} - \xi * \mathit{g})| * \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) /\\
+&\quad (2 * \sigma ^{2}) + \mathit{M} * |\mathit{y}| / \sigma ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{A\,84}\quad\lean{derivWithin\_eq\_deriv\_on\_Icc}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{a}\\
-&\quad \mathit{b} \mathit{x} : \mathbb{R} ),\; (\mathit{hab}\\
-&\quad : \mathit{a} < \mathit{b}),\; (\mathit{hF} :\\
-&\quad \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N}\\
-&\quad \infty ) \mathit{F}),\; (\mathit{hx} :\\
-&\quad \mathit{x} \in \mathit{Icc}\\
-&\quad \mathit{a} \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDerivWithin} \mathit{n}\\
-&\quad \mathit{F} (\mathit{Icc} \mathit{a}\\
-&\quad \mathit{b}) \mathit{x} =\\
-&\quad \mathit{iteratedDeriv} \mathit{n}\\
-&\quad \mathit{F} \mathit{x}
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{a} \mathit{b} \mathit{x} : \mathbb{R} ),\; (\mathit{hab} : \mathit{a} < \mathit{b}),\\
+&\quad \; (\mathit{hF} : \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N} \infty ) \mathit{F}),\; (\mathit{hx} : \mathit{x} \in \mathit{Icc} \mathit{a} \mathit{b})\\
+\vdash\;&\mathit{iteratedDerivWithin} \mathit{n} \mathit{F} (\mathit{Icc} \mathit{a} \mathit{b}) \mathit{x} = \mathit{iteratedDeriv} \mathit{n} \mathit{F} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{A\,85}\quad\lean{gaussComp\_contDiff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{g} \mathit{v} \mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty )\\
-&\quad (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
-&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
-&\quad \mathit{h} * \mathit{g}))
+&(\sigma \mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty ) (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{A\,86}\quad\lean{hellinger\_upper\_const}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mu : \mathit{Measure} \Omega ),\; (\mathit{pA}\\
-&\quad \mathit{pB} \mathit{G} : \Omega \to \mathbb{R}\\
-&\quad ),\; (\mathit{hr} \mathit{J} : \mathbb{R}\\
-&\quad ),\; (\mathit{hpA} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{pA}\\
-&\quad \mathit{x}),\; (\mathit{hpB} : \forall \mathit{x}, 0 <\\
-&\quad \mathit{pB} \mathit{x}),\; (\mathit{hG} :\\
-&\quad \forall \mathit{x},\\
-&\quad 0 \leq \mathit{G} \mathit{x}),\; (\mathit{hhr} : 0\\
-&\quad \leq \mathit{hr}),\; (\mathit{hbound} :\\
-&\quad \forall \mathit{x},\\
-&\quad |\mathit{pA} \mathit{x} - \mathit{pB}\\
-&\quad \mathit{x}| \leq \mathit{hr}\\
-&\quad * \mathit{G} \mathit{x}),\; (\mathit{hintH} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{pA} \mathit{x})\\
-&\quad - \mathit{Real}.\mathit{sqrt} (\mathit{pB}\\
-&\quad \mathit{x})) ^{2}) \mu ),\; (\mathit{hintd} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad (\mathit{pA} \mathit{x} - \mathit{pB} \mathit{x}) ^{2}\\
-&\quad / \mathit{pB} \mathit{x}) \mu ),\; (\mathit{hintG} :\\
-&\quad \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
-&\quad \mathit{hr} ^{2} * ((\mathit{G} \mathit{x}) ^{2} /\\
-&\quad \mathit{pB} \mathit{x})) \mu ),\; (\mathit{hJ}\\
-&\quad : \int \mathit{x},\\
-&\quad (\mathit{G} \mathit{x}) ^{2} / \mathit{pB} \mathit{x}\\
-&\quad ∂\mu = \mathit{J})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 / 2) * \int \mathit{x},\\
-&\quad (\mathit{Real}.\mathit{sqrt} (\mathit{pA} \mathit{x})\\
-&\quad - \mathit{Real}.\mathit{sqrt} (\mathit{pB}\\
-&\quad \mathit{x})) ^{2} ∂\mu \leq (\mathit{J} /\\
-&\quad 2) * \mathit{hr} ^{2}
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{pA} \mathit{pB} \mathit{G} : \Omega \to \mathbb{R} ),\; (\mathit{hr} \mathit{J} : \mathbb{R} ),\\
+&\quad \; (\mathit{hpA} : \forall \mathit{x}, 0 \leq \mathit{pA} \mathit{x}),\; (\mathit{hpB} : \forall \mathit{x}, 0 < \mathit{pB} \mathit{x}),\; (\mathit{hG} : \forall \mathit{x}, 0 \leq \mathit{G} \mathit{x}),\\
+&\quad \; (\mathit{hhr} : 0 \leq \mathit{hr}),\; (\mathit{hbound} : \forall \mathit{x}, |\mathit{pA} \mathit{x} - \mathit{pB} \mathit{x}| \leq \mathit{hr} * \mathit{G} \mathit{x}),\\
+&\quad \; (\mathit{hintH} : \mathit{Integrable} (\mathbf{fun} \mathit{x} => (\mathit{Real}.\mathit{sqrt} (\mathit{pA} \mathit{x}) - \mathit{Real}.\\
+&\quad \mathit{sqrt} (\mathit{pB} \mathit{x})) ^{2}) \mu ),\; (\mathit{hintd} : \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
+&\quad (\mathit{pA} \mathit{x} - \mathit{pB} \mathit{x}) ^{2} / \mathit{pB} \mathit{x}) \mu ),\; (\mathit{hintG} : \mathit{Integrable} (\mathbf{fun} \mathit{x} =>\\
+&\quad \mathit{hr} ^{2} * ((\mathit{G} \mathit{x}) ^{2} / \mathit{pB} \mathit{x})) \mu ),\; (\mathit{hJ} : \int \mathit{x}, (\mathit{G} \mathit{x}) ^{2} / \mathit{pB} \mathit{x} ∂\mu = \mathit{J})\\
+\vdash\;&(1 / 2) * \int \mathit{x}, (\mathit{Real}.\mathit{sqrt} (\mathit{pA} \mathit{x}) - \mathit{Real}.\mathit{sqrt} (\mathit{pB} \mathit{x})) ^{2} ∂\mu \leq\\
+&\quad (\mathit{J} / 2) * \mathit{hr} ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{A\,87}\quad\lean{taylor\_vanishing\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{s} : \mathit{Set} \mathbb{R}\\
-&\quad ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n} :\\
-&\quad \mathbb{N} ),\; (\mathit{hv} : \forall \mathit{j}\\
-&\quad \leq \mathit{n},\\
-&\quad \mathit{iteratedDerivWithin} \mathit{j} \mathit{F}\\
-&\quad \mathit{s} 0 = 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{taylorWithinEval} \mathit{F}\\
-&\quad \mathit{n} \mathit{s} 0 \mathit{x}\\
-&\quad = 0
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{s} : \mathit{Set} \mathbb{R} ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\\
+&\quad \; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n}, \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} \mathit{s} 0 = 0)\\
+\vdash\;&\mathit{taylorWithinEval} \mathit{F} \mathit{n} \mathit{s} 0 \mathit{x} = 0
 \end{aligned} \]}

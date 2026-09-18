@@ -5,7 +5,9 @@ theorem/lemma of those modules to that subsection, renders the substantive ones 
 numbered displays with a lead-in, and leaves only mechanical scaffolding (positivity
 checks, measurability side conditions) to a counted note.  No trailing appendix.
 """
-import json, re, collections, pathlib
+import json, re, collections, pathlib, sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from PAPER_leanfmt import wrap, sequent
 
 SC = ('/private/tmp/claude-502/-Users-phanan-cig-amf-main/'
       '53cb7f6c-fbe2-4b96-92c8-1e901e01194d')
@@ -61,7 +63,8 @@ def translit(s):
     t = t.replace('%', r'\%').replace('#', r'\#').replace('&', r'\&')
     t = re.sub(r'([\^_])\s*(\\mathit\{(?:[^{}]|\\_)*\}|\\mathbf\{[^{}]*\}|\d+|\\[A-Za-z]+)',
                r'\1{\2}', t)
-    t = re.sub(r'([\^_])(?!\{)', r'\1{}', t)
+    # an escaped \_ is a literal underscore in an identifier, not a script marker
+    t = re.sub(r'(?<!\\)([\^_])(?!\{)', r'\1{}', t)
     return re.sub(r'\s+', ' ', t).strip()
 
 
@@ -87,34 +90,6 @@ def split_sig(sig):
     return m.group(2), binders, concl.strip()
 
 
-BREAK = [r'\wedge', r'\vee', r'\leftrightarrow', r'\to', r'\leq', r'\geq',
-         r'\neq', '=', '<', '>', ',']
-
-
-def wrap(expr, width=40):
-    toks, lines, cur, depth = expr.split(' '), [], '', 0
-    for t in toks:
-        u = t.replace(r'\{', '').replace(r'\}', '')
-        depth += u.count('(') + u.count('[')
-        depth -= u.count(')') + u.count(']')
-        cand = (cur + ' ' + t).strip()
-        if cur.endswith(('^', '_')) or re.search(r'\\[A-Za-z]+$', cur):
-            cur = cand; continue
-        if len(cand) > width and depth <= 0 and cur and t in BREAK:
-            lines.append(cur); cur = t
-        elif len(cand) > width * 1.15 and depth <= 0 and cur:
-            lines.append(cur); cur = t
-        elif len(cand) > width * 1.6 and cur:
-            # hard break: a deeply nested expression never returns to depth 0,
-            # and an unbroken line overflows the column whatever its nesting
-            lines.append(cur); cur = t
-        else:
-            cur = cand
-    if cur:
-        lines.append(cur)
-    return lines
-
-
 MECHANICAL = ('measurability', 'positivity')
 
 
@@ -134,18 +109,8 @@ def render(d, n):
     _, binders, concl = split_sig(d['sig'])
     nm = d['name'].replace('_', r'\_')
     L = [r'\noindent\textbf{S\,%d}\quad\lean{%s}' % (n, nm)]
-    if binders:
-        bl = r',\; '.join(translit(b) for b in binders)
-        ls = wrap(bl)
-        L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-        for k, ln in enumerate(ls):
-            L.append((r'&' if k == 0 else r'&\quad ') + ln + (r'\\' if k < len(ls) - 1 else ''))
-        L.append(r'\end{aligned} \]}')
-    cl = wrap(translit(concl))
-    L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-    for k, ln in enumerate(cl):
-        L.append((r'\vdash\;&' if k == 0 else r'&\quad ') + ln + (r'\\' if k < len(cl) - 1 else ''))
-    L.append(r'\end{aligned} \]}')
+    bl = r',\; '.join(translit(b) for b in binders) if binders else ''
+    L += sequent(bl, translit(concl))
     L.append('')
     return L
 

@@ -393,159 +393,69 @@ Theorem~\ref{thm:hermite}---a contradiction.
 
 \noindent\textbf{S\,1}\quad\lean{gauss\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{v} \mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gauss} \sigma (\mathit{y} - \mathit{v})\\
-&\quad = \mathit{gauss} \sigma \mathit{y} *\\
-&\quad \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y} / \sigma ^{2}\\
-&\quad - \mathit{v} ^{2} / (2 * \sigma ^{2}))
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{gauss} \sigma (\mathit{y} - \mathit{v}) = \mathit{gauss} \sigma \mathit{y} * \mathit{Real}.\mathit{exp} (\mathit{v} * \mathit{y} / \sigma ^{2} - \mathit{v} ^{2} / (2 * \sigma ^{2}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{hasDerivAt\_gauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma ) (-(\mathit{y} /\\
-&\quad \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y})\\
-&\quad \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{HasDerivAt} (\mathit{gauss} \sigma ) (-(\mathit{y} / \sigma ^{2}) * \mathit{gauss} \sigma \mathit{y}) \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{hasDerivAt\_hgauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{j} : \mathbb{N}\\
-&\quad ),\; (\mathit{z} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} => (\mathit{hpoly}\\
-&\quad \sigma \mathit{j}).\mathit{eval} \mathit{w} *\\
-&\quad \mathit{gauss}\\
-&\quad \sigma \mathit{w}) ((\mathit{hpoly} \sigma (\mathit{j} +\\
-&\quad 1)).\mathit{eval} \mathit{z} * \mathit{gauss}\\
-&\quad \sigma \mathit{z})\\
-&\quad \mathit{z}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{HasDerivAt} (\mathbf{fun} \mathit{w} => (\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} \mathit{w} * \mathit{gauss} \sigma \mathit{w}) ((\mathit{hpoly} \sigma (\mathit{j}\\
+&\quad + 1)).\mathit{eval} \mathit{z} * \mathit{gauss} \sigma \mathit{z}) \mathit{z}
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{hpoly\_coeff}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{coeff}\\
-&\quad \mathit{n} = (-(1 / \sigma ^{2})) ^{\mathit{n}}
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ) \;\vdash\; \forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{coeff} \mathit{n} = (-(1 / \sigma ^{2})) ^{\mathit{n}} \]}
 
 \noindent\textbf{S\,5}\quad\lean{hpoly\_natDegree\_le}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{natDegree}\\
-&\quad \leq \mathit{n}
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ) \;\vdash\; \forall \mathit{n} : \mathbb{N} , (\mathit{hpoly} \sigma \mathit{n}).\mathit{natDegree} \leq \mathit{n} \]}
 
 \noindent\textbf{S\,6}\quad\lean{hpoly\_ne\_zero}
-{\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{n} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{hpoly} \sigma \mathit{n} \neq 0
-\end{aligned} \]}
+{\footnotesize\[ (\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{n} : \mathbb{N} ) \;\vdash\; \mathit{hpoly} \sigma \mathit{n} \neq 0 \]}
 
 \noindent\textbf{S\,7}\quad\lean{iteratedDeriv\_gauss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{y} : \mathbb{R}\\
-&\quad ), \mathit{iteratedDeriv} \mathit{n}\\
-&\quad (\mathit{gauss} \sigma )\\
-&\quad \mathit{y} = (\mathit{hpoly} \sigma \mathit{n}).\mathit{eval}\\
-&\quad \mathit{y} * \mathit{gauss} \sigma \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0)\\
+\vdash\;&\forall (\mathit{n} : \mathbb{N} ) (\mathit{y} : \mathbb{R} ), \mathit{iteratedDeriv} \mathit{n} (\mathit{gauss} \sigma ) \mathit{y} = (\mathit{hpoly} \sigma \mathit{n}).\mathit{eval} \mathit{y}\\
+&\quad * \mathit{gauss} \sigma \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,8}\quad\lean{iteratedDeriv\_shift}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall (\mathit{j} : \mathbb{N} ) (\mathit{h₀} : \mathbb{R}\\
-&\quad ), \mathit{iteratedDeriv} \mathit{j}\\
-&\quad (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
-&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} *\\
-&\quad \mathit{g})) \mathit{h₀} = (-\mathit{g}) ^{\mathit{j}}\\
-&\quad * ((\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} (\mathit{y}\\
-&\quad - \mathit{v} - \mathit{h₀} * \mathit{g}) *\\
-&\quad \mathit{gauss} \sigma (\mathit{y}\\
-&\quad - \mathit{v} - \mathit{h₀} *\\
-&\quad \mathit{g}))
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\forall (\mathit{j} : \mathbb{N} ) (\mathit{h₀} : \mathbb{R} ), \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v}\\
+&\quad - \mathit{h} * \mathit{g})) \mathit{h₀} = (-\mathit{g}) ^{\mathit{j}} * ((\mathit{hpoly} \sigma \mathit{j}).\mathit{eval} (\mathit{y} - \mathit{v} - \mathit{h₀} * \mathit{g}) *\\
+&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h₀} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,9}\quad\lean{levelSum\_eq\_zero\_of\_levels\_agree}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
-&\quad ),\; (\mathit{cA} \mathit{cB} : \mathbb{R}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S},\\
-&\quad \mathit{cA} \mathit{v} = \mathit{cB}\\
-&\quad \mathit{v}),\; (\mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{levelSum} \sigma \mathit{r} \mathit{S}\\
-&\quad \mathit{cA} \mathit{y} - \mathit{levelSum}\\
-&\quad \sigma \mathit{r}\\
-&\quad \mathit{S} \mathit{cB} \mathit{y} = 0
+&(\sigma : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathbb{R} ),\; (\mathit{cA} \mathit{cB} : \mathbb{R} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hagree} : \forall \mathit{v} \in \mathit{S}, \mathit{cA} \mathit{v} = \mathit{cB} \mathit{v}),\; (\mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{cA} \mathit{y} - \mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{cB} \mathit{y} = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{levelSum\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{r} : \mathbb{N}\\
-&\quad ),\; (\mathit{S} : \mathit{Finset} \mathbb{R}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} \to \mathbb{R}\\
-&\quad ),\; (\mathit{vstar} : \mathbb{R} ),\;\\
-&\quad (\mathit{hvs} : \mathit{vstar} \in \mathit{S}),\;\\
-&\quad (\mathit{htop} : \forall \mathit{v} \in \mathit{S},\\
-&\quad \mathit{v} \neq \mathit{vstar} \to \mathit{v}\\
-&\quad <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{c}\\
-&\quad \mathit{vstar} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{y}, \mathit{levelSum} \sigma \mathit{r}\\
-&\quad \mathit{S} \mathit{c} \mathit{y} \neq 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{S} : \mathit{Finset} \mathbb{R} ),\\
+&\quad \; (\mathit{c} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{vstar} : \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{S}),\\
+&\quad \; (\mathit{htop} : \forall \mathit{v} \in \mathit{S}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} < \mathit{vstar}),\; (\mathit{hc} : \mathit{c} \mathit{vstar} \neq 0)\\
+\vdash\;&\exists \mathit{y}, \mathit{levelSum} \sigma \mathit{r} \mathit{S} \mathit{c} \mathit{y} \neq 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,11}\quad\lean{sum\_by\_level}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{X}],\; [\mathit{DecidableEq}\\
-&\quad \mathit{X}],\; (\mathit{pi} \mathit{f}\\
-&\quad \mathit{w} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{Q} : \mathbb{R} \to \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi}\\
-&\quad \mathit{x} * \mathit{w} \mathit{x} *\\
-&\quad \mathit{Q} (\mathit{f}\\
-&\quad \mathit{x}) = \textstyle\sum \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f} \mathit{Finset}.\mathit{univ}, (\textstyle\sum \mathit{x}\\
-&\quad \in \mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
-&\quad \mathit{x} => \mathit{f} \mathit{x} =\\
-&\quad \mathit{v}), \mathit{pi}\\
-&\quad \mathit{x} * \mathit{w}\\
-&\quad \mathit{x}) * \mathit{Q} \mathit{v}
+&\{ \mathit{X} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{X}],\; [\mathit{DecidableEq} \mathit{X}],\; (\mathit{pi} \mathit{f} \mathit{w} : \mathit{X} \to \mathbb{R} ),\\
+&\quad \; (\mathit{Q} : \mathbb{R} \to \mathbb{R} )\\
+\vdash\;&\textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{w} \mathit{x} * \mathit{Q} (\mathit{f} \mathit{x}) = \textstyle\sum \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ},\\
+&\quad (\textstyle\sum \mathit{x} \in \mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} = \mathit{v}), \mathit{pi} \mathit{x} * \mathit{w} \mathit{x}) *\\
+&\quad \mathit{Q} \mathit{v}
 \end{aligned} \]}
 
 
@@ -553,121 +463,45 @@ Theorem~\ref{thm:hermite}---a contradiction.
 
 \noindent\textbf{S\,12}\quad\lean{contDiff\_component}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g} \mathit{y} :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{n} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun} \mathit{h}\\
-&\quad : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
-&\quad \mathit{h} *\\
-&\quad \mathit{g}))
+&(\sigma : \mathbb{R} ),\; (\mathit{v} \mathit{g} \mathit{y} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N} )\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} \mathit{n} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,13}\quad\lean{iteratedDeriv\_fun\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \iota : \mathit{Type}*\},\; \{ \mathit{u} :\\
-&\quad \mathit{Finset} \iota \},\; \{ \mathit{n} : \mathbb{N}\\
-&\quad \},\; \{ \mathit{F} : \iota \to \mathbb{R}\\
-&\quad \to \mathbb{R} \},\; \{ \mathit{x} :\\
-&\quad \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u},\\
-&\quad \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F}\\
-&\quad \mathit{i})\\
-&\quad \mathit{x})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun} \mathit{z} =>\\
-&\quad \textstyle\sum \mathit{i} \in \mathit{u},\\
-&\quad \mathit{F} \mathit{i}\\
-&\quad \mathit{z}) \mathit{x} = \textstyle\sum \mathit{i}\\
-&\quad \in \mathit{u},\\
-&\quad \mathit{iteratedDeriv} \mathit{n} (\mathit{F}\\
-&\quad \mathit{i}) \mathit{x}
+&\{ \iota : \mathit{Type}*\},\; \{ \mathit{u} : \mathit{Finset} \iota \},\; \{ \mathit{n} : \mathbb{N} \},\; \{ \mathit{F} : \iota \to \mathbb{R} \to\\
+&\quad \mathbb{R} \},\; \{ \mathit{x} : \mathbb{R} \},\; (\mathit{h} : \forall \mathit{i} \in \mathit{u}, \mathit{ContDiffAt} \mathbb{R} \mathit{n} (\mathit{F} \mathit{i}) \mathit{x})\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{n} (\mathbf{fun} \mathit{z} => \textstyle\sum \mathit{i} \in \mathit{u}, \mathit{F} \mathit{i} \mathit{z}) \mathit{x} = \textstyle\sum \mathit{i} \in \mathit{u},\\
+&\quad \mathit{iteratedDeriv} \mathit{n} (\mathit{F} \mathit{i}) \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{S\,14}\quad\lean{iteratedDeriv\_mixture}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j}\\
-&\quad : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} :\\
-&\quad \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
-&\quad \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} -\\
-&\quad \mathit{f} \mathit{x} - \mathit{h} * \mathit{g}\\
-&\quad \mathit{x})) 0 = \mathit{levelSum} \sigma \mathit{j}\\
-&\quad (\mathit{Finset}.\mathit{image} \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ})\\
-&\quad (\mathit{levelMoment} \mathit{pi} \mathit{f}\\
-&\quad \mathit{g}\\
-&\quad \mathit{j}) \mathit{y}
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R} ),\; (\mathit{y} : \mathbb{R} ),\; (\mathit{j} : \mathbb{N} )\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} - \mathit{h}\\
+&\quad * \mathit{g} \mathit{x})) 0 = \mathit{levelSum} \sigma \mathit{j} (\mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}) (\\
+&\quad \mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g} \mathit{j}) \mathit{y}
 \end{aligned} \]}
 
 \noindent\textbf{S\,15}\quad\lean{mixture\_coeff\_diff\_eq\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB} \mathit{fB}\\
-&\quad \mathit{gB} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{y}\\
-&\quad : \mathbb{R}\\
-&\quad ),\; (\mathit{hS} :\\
-&\quad \mathit{Finset}.\mathit{image} \mathit{fB}\\
-&\quad \mathit{Finset}.\mathit{univ} =\\
-&\quad \mathit{Finset}.\mathit{image} \mathit{fA}\\
-&\quad \mathit{Finset}.\mathit{univ}),\;\\
-&\quad (\mathit{hagree} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{fA} \mathit{Finset}.\mathit{univ},\\
-&\quad \mathit{levelMoment} \mathit{piA} \mathit{fA}\\
-&\quad \mathit{gA} \mathit{j} \mathit{v} =\\
-&\quad \mathit{levelMoment} \mathit{piB} \mathit{fB}\\
-&\quad \mathit{gB} \mathit{j}\\
-&\quad \mathit{v})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} :\\
-&\quad \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
-&\quad \mathit{piA} \mathit{x} * \mathit{gauss}\\
-&\quad \sigma (\mathit{y} -\\
-&\quad \mathit{fA} \mathit{x} - \mathit{h} * \mathit{gA}\\
-&\quad \mathit{x})) 0 - \mathit{iteratedDeriv}\\
-&\quad \mathit{j} (\mathbf{fun} \mathit{h} :\\
-&\quad \mathbb{R} => \textstyle\sum \mathit{x} :\\
-&\quad \mathit{X}, \mathit{piB} \mathit{x} *\\
-&\quad \mathit{gauss} \sigma (\mathit{y} -\\
-&\quad \mathit{fB} \mathit{x} - \mathit{h} *\\
-&\quad \mathit{gB}\\
-&\quad \mathit{x})) 0 = 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{piA} \mathit{fA} \mathit{gA} \mathit{piB} \mathit{fB} \mathit{gB} : \mathit{X} \to \mathbb{R} ),\; (\mathit{j} : \mathbb{N} ),\\
+&\quad \; (\mathit{y} : \mathbb{R} ),\; (\mathit{hS} : \mathit{Finset}.\mathit{image} \mathit{fB} \mathit{Finset}.\mathit{univ} = \mathit{Finset}.\mathit{image}\\
+&\quad \mathit{fA} \mathit{Finset}.\mathit{univ}),\; (\mathit{hagree} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{fA} \mathit{Finset}.\mathit{univ}\\
+&\quad , \mathit{levelMoment} \mathit{piA} \mathit{fA} \mathit{gA} \mathit{j} \mathit{v} = \mathit{levelMoment} \mathit{piB} \mathit{fB} \mathit{gB} \mathit{j} \mathit{v})\\
+\vdash\;&\mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{piA} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fA} \mathit{x}\\
+&\quad - \mathit{h} * \mathit{gA} \mathit{x})) 0 - \mathit{iteratedDeriv} \mathit{j} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X},\\
+&\quad \mathit{piB} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{fB} \mathit{x} - \mathit{h} * \mathit{gB} \mathit{x})) 0 = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{mixture\_coeff\_ne\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\;\\
-&\quad (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\;\\
-&\quad (\mathit{vstar} : \mathbb{R}\\
-&\quad ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f}\\
-&\quad \mathit{Finset}.\mathit{univ}),\;\\
-&\quad (\mathit{htop} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image}\\
-&\quad \mathit{f} \mathit{Finset}.\mathit{univ},\\
-&\quad \mathit{v} \neq \mathit{vstar} \to \mathit{v}\\
-&\quad <\\
-&\quad \mathit{vstar}),\; (\mathit{hc} :\\
-&\quad \mathit{levelMoment} \mathit{pi} \mathit{f}\\
-&\quad \mathit{g} \mathit{r} \mathit{vstar}\\
-&\quad \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{y}, \mathit{iteratedDeriv}\\
-&\quad \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} =>\\
-&\quad \textstyle\sum \mathit{x} : \mathit{X},\\
-&\quad \mathit{pi} \mathit{x} *\\
-&\quad \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x} -\\
-&\quad \mathit{h} * \mathit{g}\\
-&\quad \mathit{x})) 0 \neq 0
+&(\sigma : \mathbb{R} ),\; (\mathit{hσ} : \sigma \neq 0),\; (\mathit{pi} \mathit{f} \mathit{g} : \mathit{X} \to \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\\
+&\quad \; (\mathit{vstar} : \mathbb{R} ),\; (\mathit{hvs} : \mathit{vstar} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}),\\
+&\quad \; (\mathit{htop} : \forall \mathit{v} \in \mathit{Finset}.\mathit{image} \mathit{f} \mathit{Finset}.\mathit{univ}, \mathit{v} \neq \mathit{vstar} \to \mathit{v} <\\
+&\quad \mathit{vstar}),\; (\mathit{hc} : \mathit{levelMoment} \mathit{pi} \mathit{f} \mathit{g} \mathit{r} \mathit{vstar} \neq 0)\\
+\vdash\;&\exists \mathit{y}, \mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \textstyle\sum \mathit{x} : \mathit{X}, \mathit{pi} \mathit{x} * \mathit{gauss} \sigma (\mathit{y} - \mathit{f} \mathit{x}\\
+&\quad - \mathit{h} * \mathit{g} \mathit{x})) 0 \neq 0
 \end{aligned} \]}
 
 
@@ -714,92 +548,39 @@ constructed and proved integrable rather than assumed, gives $H^{2}\le(J/2)h^{2r
 
 \noindent\textbf{S\,17}\quad\lean{bound\_of\_vanishing\_derivs}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} :\\
-&\quad \mathbb{N}\\
-&\quad ),\; (\mathit{b} \mathit{C} : \mathbb{R} ),\;\\
-&\quad (\mathit{hb} : 0 <\\
-&\quad \mathit{b}),\; (\mathit{hcd} :\\
-&\quad \mathit{ContDiffOn} \mathbb{R} (\mathit{n} + 1 : \mathbb{N}\\
-&\quad ) \mathit{F} (\mathit{Icc} 0\\
-&\quad \mathit{b})),\; (\mathit{hv} : \forall \mathit{j}\\
-&\quad \leq \mathit{n}, \mathit{iteratedDerivWithin}\\
-&\quad \mathit{j} \mathit{F} (\mathit{Icc} 0\\
-&\quad \mathit{b}) 0 =\\
-&\quad 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc}\\
-&\quad (0:\mathbb{R} ) \mathit{b},\\
-&\quad |\mathit{iteratedDerivWithin} (\mathit{n} + 1)\\
-&\quad \mathit{F} (\mathit{Icc} 0 \mathit{b})\\
-&\quad \mathit{y}| \leq \mathit{C})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{F} \mathit{b}| \leq \mathit{C} * \mathit{b}\\
-&\quad ^{} (\mathit{n} + 1) / \mathit{n} !
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{b} \mathit{C} : \mathbb{R} ),\; (\mathit{hb} : 0 < \mathit{b}),\\
+&\quad \; (\mathit{hcd} : \mathit{ContDiffOn} \mathbb{R} (\mathit{n} + 1 : \mathbb{N} ) \mathit{F} (\mathit{Icc} 0 \mathit{b})),\; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n},\\
+&\quad \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} (\mathit{Icc} 0 \mathit{b}) 0 = 0),\; (\mathit{hC} : \forall \mathit{y} \in \mathit{Icc} (0:\mathbb{R} ) \mathit{b},\\
+&\quad |\mathit{iteratedDerivWithin} (\mathit{n} + 1) \mathit{F} (\mathit{Icc} 0 \mathit{b}) \mathit{y}| \leq \mathit{C})\\
+\vdash\;&|\mathit{F} \mathit{b}| \leq \mathit{C} * \mathit{b} ^{} (\mathit{n} + 1) / \mathit{n} !
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{component\_deriv\_envelope}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y} \xi :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{N} ),\;\\
-&\quad (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} :\\
-&\quad |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} :\\
-&\quad \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} -\\
-&\quad \mathit{h} *\\
-&\quad \mathit{g})) \xi | \leq |\mathit{g}|\\
-&\quad ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval}\\
-&\quad (\mathit{y} - \mathit{v} - \xi *\\
-&\quad \mathit{g})| * \mathit{Real}.\mathit{exp} (-(\mathit{y}\\
-&\quad ^{2}) / (2 * \sigma ^{2}) + \mathit{M} *\\
-&\quad |\mathit{y}| / \sigma ^{2})
+&(\sigma \mathit{M} \mathit{g} \mathit{v} \mathit{y} \xi : \mathbb{R} ),\; (\mathit{r} : \mathbb{N} ),\; (\mathit{hσ} : 0 < \sigma ),\; (\mathit{hmv} : |\mathit{v} + \xi * \mathit{g}| \leq \mathit{M})\\
+\vdash\;&|\mathit{iteratedDeriv} \mathit{r} (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g})) \xi | \leq\\
+&\quad |\mathit{g}| ^{\mathit{r}} * |(\mathit{hpoly} \sigma \mathit{r}).\mathit{eval} (\mathit{y} - \mathit{v} - \xi * \mathit{g})| * \mathit{Real}.\mathit{exp} (-(\mathit{y} ^{2}) /\\
+&\quad (2 * \sigma ^{2}) + \mathit{M} * |\mathit{y}| / \sigma ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{S\,19}\quad\lean{derivWithin\_eq\_deriv\_on\_Icc}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} :\\
-&\quad \mathbb{N}\\
-&\quad ),\; (\mathit{a} \mathit{b} \mathit{x} : \mathbb{R}\\
-&\quad ),\; (\mathit{hab} : \mathit{a} <\\
-&\quad \mathit{b}),\; (\mathit{hF} :\\
-&\quad \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N} \infty )\\
-&\quad \mathit{F}),\; (\mathit{hx} : \mathit{x} \in \mathit{Icc}\\
-&\quad \mathit{a}\\
-&\quad \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{iteratedDerivWithin} \mathit{n}\\
-&\quad \mathit{F} (\mathit{Icc} \mathit{a}\\
-&\quad \mathit{b}) \mathit{x} = \mathit{iteratedDeriv}\\
-&\quad \mathit{n} \mathit{F} \mathit{x}
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\; (\mathit{a} \mathit{b} \mathit{x} : \mathbb{R} ),\; (\mathit{hab} : \mathit{a} < \mathit{b}),\\
+&\quad \; (\mathit{hF} : \mathit{ContDiff} \mathbb{R} (\mathit{n} : \mathbb{N} \infty ) \mathit{F}),\; (\mathit{hx} : \mathit{x} \in \mathit{Icc} \mathit{a} \mathit{b})\\
+\vdash\;&\mathit{iteratedDerivWithin} \mathit{n} \mathit{F} (\mathit{Icc} \mathit{a} \mathit{b}) \mathit{x} = \mathit{iteratedDeriv} \mathit{n} \mathit{F} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{S\,20}\quad\lean{gaussComp\_contDiff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\sigma \mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty )\\
-&\quad (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y}\\
-&\quad - \mathit{v} - \mathit{h} *\\
-&\quad \mathit{g}))
+&(\sigma \mathit{g} \mathit{v} \mathit{y} : \mathbb{R} )\\
+\vdash\;&\mathit{ContDiff} \mathbb{R} (⊤ : \mathbb{N} \infty ) (\mathbf{fun} \mathit{h} : \mathbb{R} => \mathit{gauss} \sigma (\mathit{y} - \mathit{v} - \mathit{h} * \mathit{g}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,21}\quad\lean{taylor\_vanishing\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{s} :\\
-&\quad \mathit{Set} \mathbb{R}\\
-&\quad ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n}\\
-&\quad : \mathbb{N}\\
-&\quad ),\; (\mathit{hv} : \forall \mathit{j}\\
-&\quad \leq \mathit{n}, \mathit{iteratedDerivWithin}\\
-&\quad \mathit{j} \mathit{F} \mathit{s} 0 =\\
-&\quad 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{taylorWithinEval} \mathit{F} \mathit{n}\\
-&\quad \mathit{s} 0 \mathit{x} = 0
+&(\mathit{F} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{s} : \mathit{Set} \mathbb{R} ),\; (\mathit{x} : \mathbb{R} ),\; (\mathit{n} : \mathbb{N} ),\\
+&\quad \; (\mathit{hv} : \forall \mathit{j} \leq \mathit{n}, \mathit{iteratedDerivWithin} \mathit{j} \mathit{F} \mathit{s} 0 = 0)\\
+\vdash\;&\mathit{taylorWithinEval} \mathit{F} \mathit{n} \mathit{s} 0 \mathit{x} = 0
 \end{aligned} \]}
 
 
@@ -880,33 +661,14 @@ $2\cdot(J/2)/(a_{E}^{2}/32)=16J/a_{E}^{2}$.
 
 \noindent\textbf{S\,22}\quad\lean{matching\_rate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus}\\
-&\quad \mathit{h2r} \mathit{eps} : \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \mathbb{N} ),\;\\
-&\quad (\mathit{hH0} : 0 \leq \mathit{H2}),\;\\
-&\quad (\mathit{hH1} : \mathit{H2} \leq 1/2),\;\\
-&\quad (\mathit{hLdef} : \mathit{L} =\\
-&\quad -\mathit{Real}.\mathit{log} (1 -\\
-&\quad \mathit{H2})),\; (\mathit{hlo} :\\
-&\quad \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\;\\
-&\quad (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus}\\
-&\quad *\\
-&\quad \mathit{h2r}),\; (\mathit{heps} : 0 <\\
-&\quad \mathit{eps}),\; (\mathit{hcm} : 0 <\\
-&\quad \mathit{cminus}),\; (\mathit{hh} : 0 <\\
-&\quad \mathit{h2r}),\; (\mathit{hsuff} :\\
-&\quad \mathit{Real}.\mathit{log} (1 / (2 *\\
-&\quad \mathit{eps})) \leq (\mathit{N} : \mathbb{R} )\\
-&\quad * (\mathit{cminus} *\\
-&\quad \mathit{h2r}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L}\\
-&\quad \leq 2 * (\mathit{cplus} *\\
-&\quad \mathit{h2r})) \wedge \mathit{Real}.\mathit{log}\\
-&\quad (1 / (2 *\\
-&\quad \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) *\\
-&\quad \mathit{L}
+&(\mathit{H2} \mathit{L} \mathit{cminus} \mathit{cplus} \mathit{h2r} \mathit{eps} : \mathbb{R} ),\; (\mathit{N} : \mathbb{N} ),\; (\mathit{hH0} : 0 \leq \mathit{H2}),\\
+&\quad \; (\mathit{hH1} : \mathit{H2} \leq 1/2),\; (\mathit{hLdef} : \mathit{L} = -\mathit{Real}.\mathit{log} (1 - \mathit{H2})),\\
+&\quad \; (\mathit{hlo} : \mathit{cminus} * \mathit{h2r} \leq \mathit{H2}),\; (\mathit{hhi} : \mathit{H2} \leq \mathit{cplus} * \mathit{h2r}),\\
+&\quad \; (\mathit{heps} : 0 < \mathit{eps}),\; (\mathit{hcm} : 0 < \mathit{cminus}),\; (\mathit{hh} : 0 < \mathit{h2r}),\\
+&\quad \; (\mathit{hsuff} : \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) * (\mathit{cminus} * \mathit{h2r})\\
+&\quad )\\
+\vdash\;&(\mathit{cminus} * \mathit{h2r} \leq \mathit{L} \wedge \mathit{L} \leq 2 * (\mathit{cplus} * \mathit{h2r})) \wedge\\
+&\quad \mathit{Real}.\mathit{log} (1 / (2 * \mathit{eps})) \leq (\mathit{N} : \mathbb{R} ) * \mathit{L}
 \end{aligned} \]}
 
 
@@ -932,83 +694,26 @@ $L_{\max}=\tfrac{2401}{4096}$, both exact rationals read off the loss geometry.
 
 \noindent\textbf{S\,23}\quad\lean{lrt\_regret\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\;\\
-&\quad (\mathit{lA} \mathit{lB} : \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{aA} \mathit{aB} :\\
-&\quad \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R}\\
-&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h},\\
-&\quad 0 \leq \mathit{PB}\\
-&\quad \mathit{h}),\; (\mathit{hA0} : \mathit{lA} \mathit{aA} =\\
-&\quad 0),\; (\mathit{hB0} : \mathit{lB} \mathit{aB}\\
-&\quad = 0),\; (\mathit{hAx} : \mathit{lA}\\
-&\quad \mathit{aB} \leq \mathit{Lmax}),\;\\
-&\quad (\mathit{hBx} : \mathit{lB} \mathit{aA}\\
-&\quad \leq \mathit{Lmax})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * \mathit{lA}\\
-&\quad (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA}\\
-&\quad \mathbf{else} \mathit{aB}) + \textstyle\sum \mathit{h},\\
-&\quad \mathit{PB} \mathit{h} * \mathit{lB} (\mathbf{if} \mathit{dec}\\
-&\quad \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else}\\
-&\quad \mathit{aB})) / 2 \leq \mathit{Lmax} *\\
-&\quad ((\textstyle\sum \mathit{h}, \mathit{PA}\\
-&\quad \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then}\\
-&\quad (0:\mathbb{R} ) \mathbf{else} 1) +\\
-&\quad \textstyle\sum \mathit{h}, \mathit{PB}\\
-&\quad \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then}\\
-&\quad (1:\mathbb{R} ) \mathbf{else} 0)) /\\
-&\quad 2)
+&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R} ),\; (\mathit{dec} : \mathit{H} \to \mathit{Bool}),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R} ),\\
+&\quad \; (\mathit{aA} \mathit{aB} : \mathit{Act}),\; (\mathit{Lmax} : \mathbb{R} ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq \mathit{PA} \mathit{h}),\\
+&\quad \; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB} \mathit{h}),\; (\mathit{hA0} : \mathit{lA} \mathit{aA} = 0),\; (\mathit{hB0} : \mathit{lB} \mathit{aB} = 0)\\
+&\quad ,\; (\mathit{hAx} : \mathit{lA} \mathit{aB} \leq \mathit{Lmax}),\; (\mathit{hBx} : \mathit{lB} \mathit{aA} \leq \mathit{Lmax})\\
+\vdash\;&(\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * \mathit{lA} (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * \mathit{lB} (\mathbf{if} \mathit{dec} \mathit{h}\\
+&\quad \mathbf{then} \mathit{aA} \mathbf{else} \mathit{aB})) / 2 \leq \mathit{Lmax} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (0:\\
+&\quad \mathbb{R} ) \mathbf{else} 1) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (\mathbf{if} \mathit{dec} \mathit{h} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)) / 2)
 \end{aligned} \]}
 
 \noindent\textbf{S\,24}\quad\lean{regret\_ge\_gamma\_error}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R}\\
-&\quad ),\; (\mathit{D} : \mathit{H} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{lA} \mathit{lB} : \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset}\\
-&\quad \mathit{Act}),\; (\mathit{gamma} : \mathbb{R}\\
-&\quad ),\; (\mathit{hPA} : \forall \mathit{h}, 0\\
-&\quad \leq \mathit{PA}\\
-&\quad \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h},\\
-&\quad 0 \leq \mathit{PB}\\
-&\quad \mathit{h}),\; (\mathit{hD} : \forall \mathit{h}\\
-&\quad \mathit{a}, 0 \leq \mathit{D} \mathit{h}\\
-&\quad \mathit{a}),\; (\mathit{hDsum} : \forall \mathit{h},\\
-&\quad \textstyle\sum \mathit{a}, \mathit{D}\\
-&\quad \mathit{h} \mathit{a} =\\
-&\quad 1),\; (\mathit{hlA} : \forall \mathit{a}, 0\\
-&\quad \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hlB} : \forall \mathit{a},\\
-&\quad 0 \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hA} : \forall \mathit{a}\\
-&\quad \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA}\\
-&\quad \mathit{a}),\; (\mathit{hB} : \forall \mathit{a}\\
-&\quad \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB}\\
-&\quad \mathit{a}),\; (\mathit{hdis} :\\
-&\quad \mathit{Disjoint} \mathit{GA}\\
-&\quad \mathit{GB})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h}, \mathit{PA}\\
-&\quad \mathit{h} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
-&\quad \mathit{D} \mathit{h} \mathit{a}) +\\
-&\quad \textstyle\sum \mathit{h},\\
-&\quad \mathit{PB} \mathit{h} * (1 - \textstyle\sum \mathit{a} \in \mathit{GAᶜ},\\
-&\quad \mathit{D} \mathit{h} \mathit{a})) /\\
-&\quad 2) \leq (\textstyle\sum \mathit{h},\\
-&\quad \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D}\\
-&\quad \mathit{h} \mathit{a} * \mathit{lA}\\
-&\quad \mathit{a}) + \textstyle\sum \mathit{h},\\
-&\quad \mathit{PB} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D}\\
-&\quad \mathit{h} \mathit{a} * \mathit{lB}\\
-&\quad \mathit{a})) / 2
+&(\mathit{PA} \mathit{PB} : \mathit{H} \to \mathbb{R} ),\; (\mathit{D} : \mathit{H} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{lA} \mathit{lB} : \mathit{Act} \to \mathbb{R}\\
+&\quad ),\; (\mathit{GA} \mathit{GB} : \mathit{Finset} \mathit{Act}),\; (\mathit{gamma} : \mathbb{R} ),\; (\mathit{hPA} : \forall \mathit{h}, 0 \leq\\
+&\quad \mathit{PA} \mathit{h}),\; (\mathit{hPB} : \forall \mathit{h}, 0 \leq \mathit{PB} \mathit{h}),\; (\mathit{hD} : \forall \mathit{h} \mathit{a}, 0 \leq \mathit{D} \mathit{h} \mathit{a}),\\
+&\quad \; (\mathit{hDsum} : \forall \mathit{h}, \textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} = 1),\; (\mathit{hlA} : \forall \mathit{a}, 0 \leq \mathit{lA} \mathit{a}),\\
+&\quad \; (\mathit{hlB} : \forall \mathit{a}, 0 \leq \mathit{lB} \mathit{a}),\; (\mathit{hA} : \forall \mathit{a} \notin \mathit{GA}, \mathit{gamma} \leq \mathit{lA} \mathit{a}),\\
+&\quad \; (\mathit{hB} : \forall \mathit{a} \notin \mathit{GB}, \mathit{gamma} \leq \mathit{lB} \mathit{a}),\; (\mathit{hdis} : \mathit{Disjoint} \mathit{GA} \mathit{GB})\\
+\vdash\;&\mathit{gamma} * ((\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a} \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a}) + \textstyle\sum \mathit{h}, \mathit{PB} \mathit{h} * (1 - \textstyle\sum \mathit{a}\\
+&\quad \in \mathit{GAᶜ}, \mathit{D} \mathit{h} \mathit{a})) / 2) \leq (\textstyle\sum \mathit{h}, \mathit{PA} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lA} \mathit{a}) + \textstyle\sum \mathit{h},\\
+&\quad \mathit{PB} \mathit{h} * (\textstyle\sum \mathit{a}, \mathit{D} \mathit{h} \mathit{a} * \mathit{lB} \mathit{a})) / 2
 \end{aligned} \]}
 
 

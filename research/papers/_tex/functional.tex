@@ -322,112 +322,43 @@ intersection of half-spaces.
 
 \noindent\textbf{S\,1}\quad\lean{alternative\_union\_polyhedra}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{Q} :\\
-&\quad \mathit{R} \to \mathit{A} \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
-&\quad \leftrightarrow \exists \mathit{i} \in \mathit{T},\\
-&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
-&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
-&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j}\\
-&\quad \mathit{a} \mathit{b}
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{ClosedAlternative} \mathit{T} \mathit{Q} \leftrightarrow \exists \mathit{i} \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{energy\_inf\_rewrite}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} :\\
-&\quad (\mathit{R} \to \mathit{A} \to \mathbb{R} )\\
-&\quad \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} |\\
-&\quad \exists \mathit{Q},\\
-&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
-&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
-&\quad = \mathit{sInf} \{ \mathit{z} : \mathbb{R} |\\
-&\quad \exists \mathit{i}\\
-&\quad \in \mathit{T}, \exists \mathit{j}, \mathit{j}\\
-&\quad \notin \mathit{T}\\
-&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
-&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
-&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
-&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} )\\
+\vdash\;&\mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\} = \mathit{sInf} \{ \mathit{z} : \mathbb{R} | \exists \mathit{i}\\
+&\quad \in \mathit{T}, \exists \mathit{j}, \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{energy\_sets\_equal}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} :\\
-&\quad (\mathit{R} \to \mathit{A} \to \mathbb{R} )\\
-&\quad \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q},\\
-&\quad \mathit{ClosedAlternative} \mathit{T} \mathit{Q}\\
-&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}\\
-&\quad = \{ \mathit{z} : \mathbb{R} | \exists \mathit{i}\\
-&\quad \in \mathit{T},\\
-&\quad \exists \mathit{j}, \mathit{j} \notin \mathit{T}\\
-&\quad \wedge \exists \mathit{a} \mathit{b} : \mathit{A},\\
-&\quad \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q}\\
-&\quad \mathit{i} \mathit{j} \mathit{a} \mathit{b}\\
-&\quad \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} )\\
+\vdash\;&\{ \mathit{z} : \mathbb{R} | \exists \mathit{Q}, \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \wedge \mathit{E} \mathit{Q} = \mathit{z}\} = \{ \mathit{z} : \mathbb{R} | \exists \mathit{i} \in \mathit{T}, \exists \mathit{j},\\
+&\quad \mathit{j} \notin \mathit{T} \wedge \exists \mathit{a} \mathit{b} : \mathit{A}, \exists \mathit{Q}, \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \wedge \mathit{E} \mathit{Q} = \mathit{z}\}
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{not\_strictTopK\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} :\\
-&\quad \mathbb{N}\\
-&\quad ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} =\\
-&\quad \mathit{k}),\; (\mathit{Q} : \mathit{R}\\
-&\quad \to \mathit{A} \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\neg \mathit{StrictTopK} (\mathbf{fun} \mathit{r} =>\\
-&\quad \mathit{capacity} (\mathit{Q}\\
-&\quad \mathit{r})) \mathit{T} \mathit{k}\\
-&\quad \leftrightarrow \mathit{ClosedAlternative} \mathit{T}\\
-&\quad \mathit{Q}
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hcard} : \mathit{T}.\mathit{card} = \mathit{k}),\\
+&\quad \; (\mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\neg \mathit{StrictTopK} (\mathbf{fun} \mathit{r} => \mathit{capacity} (\mathit{Q} \mathit{r})) \mathit{T} \mathit{k} \leftrightarrow \mathit{ClosedAlternative}\\
+&\quad \mathit{T} \mathit{Q}
 \end{aligned} \]}
 
 \noindent\textbf{S\,5}\quad\lean{pairRegion\_convex}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} :\\
-&\quad \mathit{A})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R}\\
-&\quad \to \mathit{A} \to \mathbb{R} | \mathit{PairRegion}\\
-&\quad \mathit{Q} \mathit{i} \mathit{j} \mathit{a}\\
-&\quad \mathit{b}\}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{i} \mathit{j} : \mathit{R}),\; (\mathit{a} \mathit{b} : \mathit{A}) \;\vdash\; \mathit{Convex} \mathbb{R} \{ \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} | \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b}\} \]}
 
 \noindent\textbf{S\,6}\quad\lean{pair\_le\_capacity}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a}\\
-&\quad \mathit{b} :\\
-&\quad \mathit{A})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{f} \mathit{a} - \mathit{f} \mathit{b}\\
-&\quad \leq \mathit{capacity} \mathit{f}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} : \mathit{A}) \;\vdash\; \mathit{f} \mathit{a} - \mathit{f} \mathit{b} \leq \mathit{capacity} \mathit{f} \]}
 
 \noindent\textbf{S\,7}\quad\lean{range\_ge\_iff\_exists\_pair}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity}\\
-&\quad \mathit{g} \leftrightarrow \exists \mathit{a}\\
-&\quad \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v}\\
-&\quad : \mathit{A}, \mathit{f} \mathit{u} - \mathit{f}\\
-&\quad \mathit{v} \leq \mathit{g} \mathit{a} - \mathit{g}\\
-&\quad \mathit{b}
+&(\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{capacity} \mathit{f} \leq \mathit{capacity} \mathit{g} \leftrightarrow \exists \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{u} \mathit{v} : \mathit{A}, \mathit{f} \mathit{u} - \mathit{f} \mathit{v} \leq \mathit{g} \mathit{a} - \mathit{g} \mathit{b}
 \end{aligned} \]}
 
 
@@ -518,29 +449,14 @@ rather than bounded.
 
 \noindent\textbf{S\,12}\quad\lean{range\_ge\_iff\_exists\_pair\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} :\\
-&\quad \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam}\\
-&\quad \leftrightarrow \exists \mathit{a} \mathit{b} :\\
-&\quad \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} -\\
-&\quad \mathit{lam} \mathit{b}
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{z} \leq \mathit{rng} \mathit{lam} \leftrightarrow \exists \mathit{a} \mathit{b} : \mathit{A}, \mathit{z} \leq \mathit{lam} \mathit{a} - \mathit{lam} \mathit{b}
 \end{aligned} \]}
 
 \noindent\textbf{S\,13}\quad\lean{range\_le\_iff\_exists\_interval}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} :\\
-&\quad \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z}\\
-&\quad \leftrightarrow \exists \mathit{l} : \mathbb{R}\\
-&\quad , \forall \mathit{a} : \mathit{A}, \mathit{l}\\
-&\quad \leq \mathit{lam} \mathit{a} \wedge \mathit{lam}\\
-&\quad \mathit{a} \leq \mathit{l} + \mathit{z}
+&(\mathit{lam} : \mathit{A} \to \mathbb{R} ),\; (\mathit{z} : \mathbb{R} )\\
+\vdash\;&\mathit{rng} \mathit{lam} \leq \mathit{z} \leftrightarrow \exists \mathit{l} : \mathbb{R} , \forall \mathit{a} : \mathit{A}, \mathit{l} \leq \mathit{lam} \mathit{a} \wedge \mathit{lam} \mathit{a} \leq \mathit{l} + \mathit{z}
 \end{aligned} \]}
 
 
@@ -578,92 +494,34 @@ substitution and the inequality by the square-completion residual.
 
 \noindent\textbf{S\,8}\quad\lean{energy\_ge\_of\_pairwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} :\\
-&\quad (\mathit{R} \to \mathit{A} \to \mathbb{R} )\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} ),\;\\
-&\quad (\mathit{hpair} : \forall \mathit{i} \in \mathit{T},\\
-&\quad \forall \mathit{j}, \mathit{j} \notin \mathit{T}\\
-&\quad \to \forall \mathit{a} \mathit{b} :\\
-&\quad \mathit{A}, \forall \mathit{Q} : \mathit{R}\\
-&\quad \to \mathit{A} \to \mathbb{R} ,\\
-&\quad \mathit{PairRegion} \mathit{Q} \mathit{i}\\
-&\quad \mathit{j} \mathit{a} \mathit{b} \to \mathit{c}\\
-&\quad \leq \mathit{E}\\
-&\quad \mathit{Q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A}\\
-&\quad \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T}\\
-&\quad \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} ),\\
+&\quad \; (\mathit{hpair} : \forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} ,\\
+&\quad \mathit{PairRegion} \mathit{Q} \mathit{i} \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E} \mathit{Q})\\
+\vdash\;&\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}
 \end{aligned} \]}
 
 \noindent\textbf{S\,9}\quad\lean{energy\_lower\_bound\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} :\\
-&\quad (\mathit{R} \to \mathit{A} \to \mathbb{R} )\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} ,\\
-&\quad \mathit{ClosedAlternative} \mathit{T}\\
-&\quad \mathit{Q} \to \mathit{c}\\
-&\quad \leq \mathit{E}\\
-&\quad \mathit{Q}) \leftrightarrow (\forall \mathit{i}\\
-&\quad \in \mathit{T}, \forall \mathit{j}, \mathit{j}\\
-&\quad \notin \mathit{T} \to \forall \mathit{a}\\
-&\quad \mathit{b} : \mathit{A}, \forall \mathit{Q} :\\
-&\quad \mathit{R} \to \mathit{A} \to \mathbb{R}\\
-&\quad , \mathit{PairRegion} \mathit{Q} \mathit{i}\\
-&\quad \mathit{j} \mathit{a} \mathit{b} \to \mathit{c}\\
-&\quad \leq \mathit{E}\\
-&\quad \mathit{Q})
+&(\mathit{T} : \mathit{Finset} \mathit{R}),\; (\mathit{E} : (\mathit{R} \to \mathit{A} \to \mathbb{R} ) \to \mathbb{R} ),\; (\mathit{c} : \mathbb{R} )\\
+\vdash\;&(\forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{ClosedAlternative} \mathit{T} \mathit{Q} \to \mathit{c} \leq \mathit{E} \mathit{Q}) \leftrightarrow\\
+&\quad (\forall \mathit{i} \in \mathit{T}, \forall \mathit{j}, \mathit{j} \notin \mathit{T} \to \forall \mathit{a} \mathit{b} : \mathit{A}, \forall \mathit{Q} : \mathit{R} \to \mathit{A} \to \mathbb{R} , \mathit{PairRegion} \mathit{Q} \mathit{i}\\
+&\quad \mathit{j} \mathit{a} \mathit{b} \to \mathit{c} \leq \mathit{E} \mathit{Q})
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{inner\_qp\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
-&\quad \mathbb{R} \},\; (\mathit{h1} : 0 <\\
-&\quad \mathit{w1}),\; (\mathit{h2} : 0 <\\
-&\quad \mathit{w2}),\; (\mathit{h3} : 0 <\\
-&\quad \mathit{w3}),\; (\mathit{h4} : 0 <\\
-&\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4}\\
-&\quad : \mathbb{R} , \mathit{g} \leq \mathit{x1} -\\
-&\quad \mathit{x2} - \mathit{x3} + \mathit{x4}\\
-&\quad \wedge (\mathit{w1}*\mathit{x1}^{2} +\\
-&\quad \mathit{w2}*\mathit{x2}^{2} +\\
-&\quad \mathit{w3}*\mathit{x3}^{2} +\\
-&\quad \mathit{w4}*\mathit{x4}^{2}) / 2 = \mathit{g}\\
-&\quad ^{2} / (2 * \mathit{harm} \mathit{w1}\\
-&\quad \mathit{w2} \mathit{w3}\\
-&\quad \mathit{w4})
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\\
+&\quad \; (\mathit{h4} : 0 < \mathit{w4}),\; (\mathit{g} : \mathbb{R} )\\
+\vdash\;&\exists \mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R} , \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} + \mathit{x4} \wedge (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2}\\
+&\quad + \mathit{w3}*\mathit{x3}^{2} + \mathit{w4}*\mathit{x4}^{2}) / 2 = \mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4})
 \end{aligned} \]}
 
 \noindent\textbf{S\,11}\quad\lean{inner\_qp\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} :\\
-&\quad \mathbb{R} \},\; (\mathit{h1} : 0 <\\
-&\quad \mathit{w1}),\; (\mathit{h2} : 0 <\\
-&\quad \mathit{w2}),\; (\mathit{h3} : 0 <\\
-&\quad \mathit{w3}),\; (\mathit{h4} : 0 <\\
-&\quad \mathit{w4}),\; (\mathit{g} : \mathbb{R} ),\;\\
-&\quad (\mathit{hg} : 0 \leq \mathit{g}),\;\\
-&\quad (\mathit{x1} \mathit{x2} \mathit{x3}\\
-&\quad \mathit{x4} : \mathbb{R}\\
-&\quad ),\; (\mathit{hfeas} : \mathit{g} \leq \mathit{x1}\\
-&\quad - \mathit{x2} - \mathit{x3} +\\
-&\quad \mathit{x4})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2}\\
-&\quad \mathit{w3}\\
-&\quad \mathit{w4}) \leq (\mathit{w1}*\mathit{x1}^{2}\\
-&\quad + \mathit{w2}*\mathit{x2}^{2} +\\
-&\quad \mathit{w3}*\mathit{x3}^{2} +\\
+&\{ \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4} : \mathbb{R} \},\; (\mathit{h1} : 0 < \mathit{w1}),\; (\mathit{h2} : 0 < \mathit{w2}),\; (\mathit{h3} : 0 < \mathit{w3}),\\
+&\quad \; (\mathit{h4} : 0 < \mathit{w4}),\; (\mathit{g} : \mathbb{R} ),\; (\mathit{hg} : 0 \leq \mathit{g}),\; (\mathit{x1} \mathit{x2} \mathit{x3} \mathit{x4} : \mathbb{R} ),\\
+&\quad \; (\mathit{hfeas} : \mathit{g} \leq \mathit{x1} - \mathit{x2} - \mathit{x3} + \mathit{x4})\\
+\vdash\;&\mathit{g} ^{2} / (2 * \mathit{harm} \mathit{w1} \mathit{w2} \mathit{w3} \mathit{w4}) \leq (\mathit{w1}*\mathit{x1}^{2} + \mathit{w2}*\mathit{x2}^{2} + \mathit{w3}*\mathit{x3}^{2} +\\
 &\quad \mathit{w4}*\mathit{x4}^{2}) / 2
 \end{aligned} \]}
 
@@ -809,85 +667,47 @@ second is; and in between both are positive and sum to exactly $\tfrac14$.
 \noindent\emph{Supporting results in \lean{LeanFunctionalScalarProxyFailsV1}.}~These are the two counterexamples, and the division of labour matters. The capacity and cost statements evaluate the instances exactly; the two \lean{\_full} statements bound the true value, one above by an exhibited alternative and one below by the positive-parts inequality; the two \lean{\_scalar\_value} statements evaluate \eqref{eq:scalar}; and the two ratio statements combine them. Only then do the two \lean{\_to\_any\_constant} theorems quantify over every positive constant. They are reproduced as the prover has them; a further $4$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,22}\quad\lean{cap\_i1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{cap3} 0 1 (1/2) = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 1 (1/2) = 1 \]}
 
 \noindent\textbf{S\,23}\quad\lean{cap\_j1}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{cap3} 0 (1/2) (1/4) = 1/2
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 (1/2) (1/4) = 1/2 \]}
 
 \noindent\textbf{S\,24}\quad\lean{family1\_alt\_cost}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eta} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 *\\
-&\quad \mathit{eta} / 32
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{eta} : \mathbb{R} ) \;\vdash\; (1/2) * \mathit{eta} * (1 - 1/4) ^{2} = 9 * \mathit{eta} / 32 \]}
 
 \noindent\textbf{S\,25}\quad\lean{family1\_alt\_ties}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{cap3} 0 (1/2) 1 = \mathit{cap3} 0 1 (1/2)
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{cap3} 0 (1/2) 1 = \mathit{cap3} 0 1 (1/2) \]}
 
 \noindent\textbf{S\,26}\quad\lean{family1\_full\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{halt} :\\
-&\quad \mathit{Jfull} \leq (1/2) * \mathit{eta} * (1 - 1/4)\\
-&\quad ^{2})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Jfull} \mathit{eta} : \mathbb{R} ),\; (\mathit{halt} : \mathit{Jfull} \leq (1/2) * \mathit{eta} * (1 - 1/4) ^{2})\\
 \vdash\;&\mathit{Jfull} \leq 9 * \mathit{eta} / 32
 \end{aligned} \]}
 
 \noindent\textbf{S\,27}\quad\lean{family1\_scalar\_value}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1))\\
-&\quad = 1 / 32
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; (1/2 : \mathbb{R} ) ^{2} / (2 * (1 + 1 + 1 + 1)) = 1 / 32 \]}
 
 \noindent\textbf{S\,28}\quad\lean{family2\_full\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{z} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z})\\
-&\quad 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2) 0) ^{2}\\
-&\quad / 4
+&(\mathit{z} : \mathbb{R} )\\
+\vdash\;&(1/128 : \mathbb{R} ) \leq (\mathit{max} (3/4 - \mathit{z}) 0) ^{2} / 4 + (\mathit{max} (\mathit{z} - 1/2) 0) ^{2} / 4
 \end{aligned} \]}
 
 \noindent\textbf{S\,29}\quad\lean{positive\_parts\_sum}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{z} : \mathbb{R} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 -\\
-&\quad \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2) 0
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{z} : \mathbb{R} ) \;\vdash\; (1/4 : \mathbb{R} ) \leq \mathit{max} (3/4 - \mathit{z}) 0 + \mathit{max} (\mathit{z} - 1/2) 0 \]}
 
 \noindent\textbf{S\,30}\quad\lean{scalar\_not\_lower\_to\_any\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
-&\quad \mathit{C})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
-&\quad \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} /\\
-&\quad (8 * (1 + 3 *\\
-&\quad \mathit{eta}))) < (1 / 128 : \mathbb{R} )
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})\\
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta} \wedge \mathit{eta} \leq 1 \wedge \mathit{C} * (\mathit{eta} / (8 * (1 + 3 * \mathit{eta}))\\
+&\quad ) < (1 / 128 : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{S\,31}\quad\lean{scalar\_not\_upper\_to\_any\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 <\\
-&\quad \mathit{C})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta}\\
-&\quad \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32\\
-&\quad < (1 / 32 : \mathbb{R} ) / \mathit{C}
+&(\mathit{C} : \mathbb{R} ),\; (\mathit{hC} : 0 < \mathit{C})\\
+\vdash\;&\exists \mathit{eta} : \mathbb{R} , 0 < \mathit{eta} \wedge \mathit{eta} \leq 1 \wedge 9 * \mathit{eta} / 32 <\\
+&\quad (1 / 32 : \mathbb{R} ) / \mathit{C}
 \end{aligned} \]}
 
 
@@ -973,188 +793,70 @@ undetermined and no crossing may be reported.
 
 \noindent\textbf{S\,14}\quad\lean{bil\_symm}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{M} : \iota \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hM} : \forall \mathit{p}\\
-&\quad \mathit{q}, \mathit{M}\\
-&\quad \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y}\\
-&\quad = \mathit{bil} \mathit{M} \mathit{y} \mathit{x}
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{x} \mathit{y} : \iota \to \mathbb{R} )\\
+\vdash\;&\mathit{bil} \mathit{M} \mathit{x} \mathit{y} = \mathit{bil} \mathit{M} \mathit{y} \mathit{x}
 \end{aligned} \]}
 
 \noindent\textbf{S\,15}\quad\lean{certificate\_gives\_lower\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{M} : \iota \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\;\\
-&\quad (\mathit{V} : \mathbb{R}\\
-&\quad ),\; (\mathit{hM} : \forall \mathit{p}\\
-&\quad \mathit{q}, \mathit{M} \mathit{p} \mathit{q}\\
-&\quad = \mathit{M} \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d}\\
-&\quad : \iota \to \mathbb{R} , 0 \leq \mathit{quad}\\
-&\quad \mathit{M}\\
-&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c},\\
-&\quad 0 \leq \mathit{y}\\
-&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c},\\
-&\quad \mathit{rowAp} \mathit{A} \mathit{lam}\\
-&\quad \mathit{c} \leq 0),\; (\mathit{hstat} :\\
-&\quad \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M}\\
-&\quad \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu}\\
-&\quad \mathit{q})) + (\textstyle\sum \mathit{c},\\
-&\quad \mathit{y} \mathit{c}\\
-&\quad * \mathit{A} \mathit{c} \mathit{p}) =\\
-&\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c},\\
-&\quad \mathit{y} \mathit{c} * \mathit{rowAp}\\
-&\quad \mathit{A} \mathit{lam} \mathit{c} =\\
-&\quad 0),\; (\mathit{hval} : \mathit{V} = (1/2) *\\
-&\quad \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} =>\\
-&\quad \mathit{lam} \mathit{p} - \mathit{mu}\\
-&\quad \mathit{p}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R}\\
-&\quad , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'}\\
-&\quad \mathit{c} \leq 0)\\
-&\quad \to \mathit{V} \leq (1/2) * \mathit{quad}\\
-&\quad \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p}\\
-&\quad - \mathit{mu}\\
-&\quad \mathit{p})
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R} ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{V} : \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\\
+&\quad \; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0 \leq \mathit{quad} \mathit{M} \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\\
+&\quad \; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q}\\
+&\quad - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p}) = 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c}\\
+&\quad = 0),\; (\mathit{hval} : \mathit{V} = (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu} \mathit{p}))\\
+\vdash\;&\forall \mathit{lam'} : \iota \to \mathbb{R} , (\forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0) \to \mathit{V} \leq\\
+&\quad (1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu} \mathit{p})
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{crossing\_budget}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R}\\
-&\quad ),\; (\mathit{n1} \mathit{n2} : \mathbb{N}\\
-&\quad ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1}\\
-&\quad \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{information} (\mathit{kappa} * ((\mathit{n2} :\\
-&\quad \mathbb{R} ) * \mathit{G2} - (\mathit{n1} :\\
-&\quad \mathbb{R} ) *\\
-&\quad \mathit{G1}) / (\mathit{G2} -\\
-&\quad \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1}\\
-&\quad = \mathit{information} (\mathit{kappa} * ((\mathit{n2} :\\
-&\quad \mathbb{R} ) * \mathit{G2} - (\mathit{n1} :\\
-&\quad \mathbb{R} ) *\\
-&\quad \mathit{G1}) / (\mathit{G2} -\\
-&\quad \mathit{G1})) \mathit{kappa} \mathit{n2} \mathit{G2}
+&(\mathit{kappa} \mathit{G1} \mathit{G2} : \mathbb{R} ),\; (\mathit{n1} \mathit{n2} : \mathbb{N} ),\; (\mathit{hne} : \mathit{G2} - \mathit{G1} \neq 0)\\
+\vdash\;&\mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2}\\
+&\quad - \mathit{G1})) \mathit{kappa} \mathit{n1} \mathit{G1} = \mathit{information} (\mathit{kappa} * ((\mathit{n2} : \mathbb{R} ) * \mathit{G2} - (\\
+&\quad \mathit{n1} : \mathbb{R} ) * \mathit{G1}) / (\mathit{G2} - \mathit{G1})) \mathit{kappa} \mathit{n2} \mathit{G2}
 \end{aligned} \]}
 
 \noindent\textbf{S\,17}\quad\lean{crossing\_sign\_undetermined}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\;\\
-&\quad (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\;\\
-&\quad (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\;\\
-&\quad (\mathit{hov2} : \mathit{G1lo} \leq \mathit{G2hi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo}\\
-&\quad \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi}\\
-&\quad \wedge \mathit{G2lo}\\
-&\quad \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi}\\
-&\quad \wedge \mathit{g2}\\
-&\quad \leq \mathit{g1})\\
-&\quad \wedge (\exists \mathit{g1} \mathit{g2} : \mathbb{R} ,\\
-&\quad \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1}\\
-&\quad \leq \mathit{G1hi}\\
-&\quad \wedge \mathit{G2lo} \leq \mathit{g2}\\
-&\quad \wedge \mathit{g2} \leq \mathit{G2hi}\\
-&\quad \wedge \mathit{g1} \leq \mathit{g2})
+&(\mathit{G1lo} \mathit{G1hi} \mathit{G2lo} \mathit{G2hi} : \mathbb{R} ),\; (\mathit{h1} : \mathit{G1lo} \leq \mathit{G1hi}),\\
+&\quad \; (\mathit{h2} : \mathit{G2lo} \leq \mathit{G2hi}),\; (\mathit{hov1} : \mathit{G2lo} \leq \mathit{G1hi}),\; (\mathit{hov2} : \mathit{G1lo} \leq\\
+&\quad \mathit{G2hi})\\
+\vdash\;&(\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq\\
+&\quad \mathit{G2hi} \wedge \mathit{g2} \leq \mathit{g1}) \wedge (\exists \mathit{g1} \mathit{g2} : \mathbb{R} , \mathit{G1lo} \leq \mathit{g1} \wedge \mathit{g1} \leq \mathit{G1hi} \wedge\\
+&\quad \mathit{G2lo} \leq \mathit{g2} \wedge \mathit{g2} \leq \mathit{G2hi} \wedge \mathit{g1} \leq \mathit{g2})
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{kkt\_certificate}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{M} : \iota \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{y} : \kappa \to \mathbb{R} ),\;\\
-&\quad (\mathit{hM} : \forall \mathit{p} \mathit{q},\\
-&\quad \mathit{M} \mathit{p} \mathit{q} = \mathit{M}\\
-&\quad \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d}\\
-&\quad : \iota \to \mathbb{R} , 0 \leq \mathit{quad}\\
-&\quad \mathit{M}\\
-&\quad \mathit{d}),\; (\mathit{hy} : \forall \mathit{c},\\
-&\quad 0 \leq \mathit{y}\\
-&\quad \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c},\\
-&\quad \mathit{rowAp} \mathit{A} \mathit{lam}\\
-&\quad \mathit{c} \leq 0),\; (\mathit{hstat} :\\
-&\quad \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M}\\
-&\quad \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu}\\
-&\quad \mathit{q})) + (\textstyle\sum \mathit{c},\\
-&\quad \mathit{y} \mathit{c}\\
-&\quad * \mathit{A} \mathit{c} \mathit{p}) =\\
-&\quad 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c},\\
-&\quad \mathit{y} \mathit{c} * \mathit{rowAp}\\
-&\quad \mathit{A} \mathit{lam} \mathit{c} =\\
-&\quad 0),\; (\mathit{lam'} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hfeas'} : \forall \mathit{c},\\
-&\quad \mathit{rowAp} \mathit{A} \mathit{lam'}\\
-&\quad \mathit{c} \leq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} =>\\
-&\quad \mathit{lam} \mathit{p} - \mathit{mu}\\
-&\quad \mathit{p}) \leq (1/2) * \mathit{quad}\\
-&\quad \mathit{M} (\mathbf{fun} \mathit{p} =>\\
-&\quad \mathit{lam'} \mathit{p} - \mathit{mu}\\
-&\quad \mathit{p})
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{A} : \kappa \to \iota \to \mathbb{R} ),\; (\mathit{mu} \mathit{lam} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{y} : \kappa \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{hpsd} : \forall \mathit{d} : \iota \to \mathbb{R} , 0\\
+&\quad \leq \mathit{quad} \mathit{M} \mathit{d}),\; (\mathit{hy} : \forall \mathit{c}, 0 \leq \mathit{y} \mathit{c}),\; (\mathit{hfeas} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} \leq\\
+&\quad 0),\; (\mathit{hstat} : \forall \mathit{p}, (\textstyle\sum \mathit{q}, \mathit{M} \mathit{p} \mathit{q} * (\mathit{lam} \mathit{q} - \mathit{mu} \mathit{q})) + (\textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{A} \mathit{c} \mathit{p})\\
+&\quad = 0),\; (\mathit{hcs} : \textstyle\sum \mathit{c}, \mathit{y} \mathit{c} * \mathit{rowAp} \mathit{A} \mathit{lam} \mathit{c} = 0),\; (\mathit{lam'} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{hfeas'} : \forall \mathit{c}, \mathit{rowAp} \mathit{A} \mathit{lam'} \mathit{c} \leq 0)\\
+\vdash\;&(1/2) * \mathit{quad} \mathit{M} (\mathbf{fun} \mathit{p} => \mathit{lam} \mathit{p} - \mathit{mu} \mathit{p}) \leq (1/2) * \mathit{quad} \mathit{M} (\\
+&\quad \mathbf{fun} \mathit{p} => \mathit{lam'} \mathit{p} - \mathit{mu} \mathit{p})
 \end{aligned} \]}
 
 \noindent\textbf{S\,19}\quad\lean{quad\_add}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{M} : \iota \to \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hM} : \forall \mathit{p}\\
-&\quad \mathit{q}, \mathit{M}\\
-&\quad \mathit{p} \mathit{q} = \mathit{M} \mathit{q}\\
-&\quad \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d})\\
-&\quad = \mathit{quad} \mathit{M} \mathit{a} + 2 *\\
-&\quad \mathit{bil} \mathit{M} \mathit{d} \mathit{a} +\\
-&\quad \mathit{quad} \mathit{M} \mathit{d}
+&(\mathit{M} : \iota \to \iota \to \mathbb{R} ),\; (\mathit{hM} : \forall \mathit{p} \mathit{q}, \mathit{M} \mathit{p} \mathit{q} = \mathit{M} \mathit{q} \mathit{p}),\; (\mathit{a} \mathit{d} : \iota \to \mathbb{R} )\\
+\vdash\;&\mathit{quad} \mathit{M} (\mathit{a} + \mathit{d}) = \mathit{quad} \mathit{M} \mathit{a} + 2 * \mathit{bil} \mathit{M} \mathit{d} \mathit{a} + \mathit{quad} \mathit{M} \mathit{d}
 \end{aligned} \]}
 
 \noindent\textbf{S\,20}\quad\lean{region\_min\_lower\_bounds\_J}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
-&\quad \mathit{R}.\mathit{Nonempty}),\;\\
-&\quad (\mathit{cost} : \rho \to \mathbb{R}\\
-&\quad ),\; (\mathit{J} : \mathbb{R} ),\;\\
-&\quad (\mathit{hJ} : \mathit{J} =\\
-&\quad \mathit{R}.\mathit{inf'} \mathit{hR}\\
-&\quad \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R}\\
-&\quad ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R},\\
-&\quad \mathit{b} \mathit{r} \leq \mathit{cost}\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b}\\
-&\quad \leq \mathit{J}
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R} ),\; (\mathit{J} : \mathbb{R} ),\\
+&\quad \; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR} \mathit{cost}),\; (\mathit{b} : \rho \to \mathbb{R} ),\; (\mathit{hb} : \forall \mathit{r} \in \mathit{R}, \mathit{b} \mathit{r} \leq\\
+&\quad \mathit{cost} \mathit{r})\\
+\vdash\;&\mathit{R}.\mathit{inf'} \mathit{hR} \mathit{b} \leq \mathit{J}
 \end{aligned} \]}
 
 \noindent\textbf{S\,21}\quad\lean{single\_alt\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} :\\
-&\quad \mathit{R}.\mathit{Nonempty}),\;\\
-&\quad (\mathit{cost} : \rho \to \mathbb{R}\\
-&\quad ),\; (\mathit{J} : \mathbb{R} ),\;\\
-&\quad (\mathit{hJ} : \mathit{J} =\\
-&\quad \mathit{R}.\mathit{inf'} \mathit{hR}\\
-&\quad \mathit{cost}),\; \{ \mathit{r} : \rho \},\;\\
-&\quad (\mathit{hr} : \mathit{r} \in \mathit{R})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{R} : \mathit{Finset} \rho ),\; (\mathit{hR} : \mathit{R}.\mathit{Nonempty}),\; (\mathit{cost} : \rho \to \mathbb{R} ),\; (\mathit{J} : \mathbb{R} ),\\
+&\quad \; (\mathit{hJ} : \mathit{J} = \mathit{R}.\mathit{inf'} \mathit{hR} \mathit{cost}),\; \{ \mathit{r} : \rho \},\; (\mathit{hr} : \mathit{r} \in \mathit{R})\\
 \vdash\;&\mathit{J} \leq \mathit{cost} \mathit{r}
 \end{aligned} \]}
 
@@ -1180,106 +882,49 @@ in \lean{LeanFunctionalDesignDualityV1}}
 
 \noindent\textbf{S\,32}\quad\lean{design\_value\_ge}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
-&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} :\\
-&\quad \iota \to \mathit{W} \to \mathbb{R}\\
-&\quad ),\; (\mathit{w} : \mathit{W}),\; (\mathit{c}\\
-&\quad : \mathbb{R}\\
-&\quad ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q},\\
-&\quad \mathit{c} \leq \mathit{f} \mathit{q}\\
-&\quad \mathit{w})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q}\\
-&\quad \mathit{hQ} \mathit{f} \mathit{w}
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\; (\mathit{w} : \mathit{W}),\\
+&\quad \; (\mathit{c} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{q} \in \mathit{Q}, \mathit{c} \leq \mathit{f} \mathit{q} \mathit{w})\\
+\vdash\;&\mathit{c} \leq \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w}
 \end{aligned} \]}
 
 \noindent\textbf{S\,33}\quad\lean{design\_value\_le}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
-&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} :\\
-&\quad \iota \to \mathit{W} \to \mathbb{R}\\
-&\quad ),\; (\mathit{w} : \mathit{W}),\; \{\\
-&\quad \mathit{q} : \iota \},\; (\mathit{hq} :\\
-&\quad \mathit{q} \in \mathit{Q})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f}\\
-&\quad \mathit{w} \leq \mathit{f} \mathit{q} \mathit{w}
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\; (\mathit{w} : \mathit{W}),\\
+&\quad \; \{ \mathit{q} : \iota \},\; (\mathit{hq} : \mathit{q} \in \mathit{Q})\\
+\vdash\;&\mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w} \leq \mathit{f} \mathit{q} \mathit{w}
 \end{aligned} \]}
 
 \noindent\textbf{S\,34}\quad\lean{dual\_gap\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} :\\
-&\quad \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} :\\
-&\quad \iota \to \mathit{W} \to \mathbb{R}\\
-&\quad ),\; (\mathit{lam} : \iota \to \mathbb{R} ),\;\\
-&\quad (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q},\\
-&\quad 0 \leq \mathit{lam}\\
-&\quad \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q}\\
-&\quad \in \mathit{Q}, \mathit{lam} \mathit{q}\\
-&\quad =\\
-&\quad 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} :\\
-&\quad \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w}\\
-&\quad : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q},\\
-&\quad \mathit{lam} \mathit{q} * \mathit{f}\\
-&\quad \mathit{q} \mathit{w} \leq \mathit{U}),\;\\
-&\quad (\mathit{hattain} : \mathit{designValue}\\
-&\quad \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀}\\
-&\quad =\\
-&\quad \mathit{U})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w}\\
-&\quad : \mathit{W}, \mathit{designValue} \mathit{Q}\\
-&\quad \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\}\\
-&\quad \mathit{U}
+&(\mathit{Q} : \mathit{Finset} \iota ),\; (\mathit{hQ} : \mathit{Q}.\mathit{Nonempty}),\; (\mathit{f} : \iota \to \mathit{W} \to \mathbb{R} ),\\
+&\quad \; (\mathit{lam} : \iota \to \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{q} \in \mathit{Q}, 0 \leq \mathit{lam} \mathit{q}),\; (\mathit{hsum} : \textstyle\sum \mathit{q} \in \mathit{Q},\\
+&\quad \mathit{lam} \mathit{q} = 1),\; (\mathit{U} : \mathbb{R} ),\; (\mathit{w₀} : \mathit{W}),\; (\mathit{hcert} : \forall \mathit{w} : \mathit{W}, \textstyle\sum \mathit{q} \in \mathit{Q},\\
+&\quad \mathit{lam} \mathit{q} * \mathit{f} \mathit{q} \mathit{w} \leq \mathit{U}),\; (\mathit{hattain} : \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w₀} = \mathit{U})\\
+\vdash\;&\mathit{IsGreatest} \{ \mathit{v} | \exists \mathit{w} : \mathit{W}, \mathit{designValue} \mathit{Q} \mathit{hQ} \mathit{f} \mathit{w} = \mathit{v}\} \mathit{U}
 \end{aligned} \]}
 
 \noindent\textbf{S\,35}\quad\lean{infeasible\_iff}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} : \mathbb{R}\\
-&\quad ),\; (\mathit{channels} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
-&\quad \mathit{channels} = \mathit{none}\\
-&\quad \leftrightarrow \mathit{total} <\\
-&\quad \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
-&\quad )
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} )\\
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels} = \mathit{none} \leftrightarrow \mathit{total} <\\
+&\quad \mathit{setup} * (\mathit{channels} : \mathbb{R} )
 \end{aligned} \]}
 
 \noindent\textbf{S\,36}\quad\lean{information\_of\_budget}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R}\\
-&\quad ),\; (\mathit{channels} : \mathbb{N} ),\;\\
-&\quad (\mathit{h} : \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
-&\quad ) \leq \mathit{total}),\; (\mathit{hsetup} : 0\\
-&\quad \leq \mathit{setup}),\; (\mathit{hunit} : 0\\
-&\quad \leq \mathit{unit})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} :\\
-&\quad \mathbb{R}\\
-&\quad )) * \mathit{unit} \wedge (\mathit{total} -\\
-&\quad \mathit{setup} * (\mathit{channels} :\\
-&\quad \mathbb{R}\\
-&\quad )) * \mathit{unit} \leq \mathit{total} * \mathit{unit}
+&(\mathit{total} \mathit{setup} \mathit{unit} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\\
+&\quad \mathit{channels} : \mathbb{R} ) \leq \mathit{total}),\; (\mathit{hsetup} : 0 \leq \mathit{setup}),\; (\mathit{hunit} : 0 \leq\\
+&\quad \mathit{unit})\\
+\vdash\;&0 \leq (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit} \wedge\\
+&\quad (\mathit{total} - \mathit{setup} * (\mathit{channels} : \mathbb{R} )) * \mathit{unit} \leq \mathit{total} * \mathit{unit}
 \end{aligned} \]}
 
 \noindent\textbf{S\,37}\quad\lean{value\_of\_feasible}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{total} \mathit{setup} : \mathbb{R}\\
-&\quad ),\; (\mathit{channels} : \mathbb{N}\\
-&\quad ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} :\\
-&\quad \mathbb{R} ) \leq \mathit{total})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup}\\
-&\quad \mathit{channels} = \mathit{some} (\mathit{total} -\\
-&\quad \mathit{setup} * (\mathit{channels} : \mathbb{R}\\
-&\quad ))
+&(\mathit{total} \mathit{setup} : \mathbb{R} ),\; (\mathit{channels} : \mathbb{N} ),\; (\mathit{h} : \mathit{setup} * (\mathit{channels} :\\
+&\quad \mathbb{R} ) \leq \mathit{total})\\
+\vdash\;&\mathit{sampleBudget} \mathit{total} \mathit{setup} \mathit{channels} = \mathit{some} (\mathit{total} - \mathit{setup} * (\\
+&\quad \mathit{channels} : \mathbb{R} ))
 \end{aligned} \]}
 
 

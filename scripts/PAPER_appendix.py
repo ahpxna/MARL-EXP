@@ -4,7 +4,9 @@ Symbol-level transliteration only: Unicode maps to the corresponding LaTeX symbo
 and identifiers are set upright.  No structure is rewritten, so what the appendix
 shows is the statement the prover has, not a paraphrase.
 """
-import json, re, pathlib
+import json, re, pathlib, sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from PAPER_leanfmt import wrap, sequent, CAPS
 
 SIGS = json.load(open('/private/tmp/claude-502/-Users-phanan-cig-amf-main/'
                       '53cb7f6c-fbe2-4b96-92c8-1e901e01194d/sigs.json'))
@@ -63,7 +65,8 @@ def translit(s: str) -> str:
     # every ^ and _ must carry a braced argument, else a line break after it breaks TeX
     t = re.sub(r'([\^_])\s*(\\mathit\{(?:[^{}]|\\_)*\}|\\mathbf\{[^{}]*\}|\d+|\\[A-Za-z]+)',
                r'\1{\2}', t)
-    t = re.sub(r'([\^_])(?!\{)', r'\1{}', t)
+    # an escaped \_ is a literal underscore in an identifier, not a script marker
+    t = re.sub(r'(?<!\\)([\^_])(?!\{)', r'\1{}', t)
     t = re.sub(r'\s+', ' ', t).strip()
     return t
 
@@ -91,37 +94,6 @@ def split_sig(sig: str):
                 buf += c
         i += 1
     return m.group(2), binders, concl.strip()
-
-BREAK = [r'\wedge', r'\vee', r'\leftrightarrow', r'\to', r'\leq', r'\geq',
-         r'\neq', r'=', r'<', r'>', ',']
-
-def wrap(expr: str, width: int = 34):
-    """Break a transliterated expression into aligned lines at top-level operators."""
-    toks = expr.split(' ')
-    lines, cur, depth = [], '', 0
-    for t in toks:
-        # escaped braces are delimiters, not grouping: ignore them for depth
-        u = t.replace(r'\{', '').replace(r'\}', '')
-        depth += u.count('(') + u.count('[')
-        depth -= u.count(')') + u.count(']')
-        cand = (cur + ' ' + t).strip()
-        unsafe = cur.endswith(('^', '_')) or re.search(r'\\[A-Za-z]+$', cur) is not None
-        if unsafe:
-            cur = cand
-            continue
-        if len(cand) > width and depth <= 0 and cur and t in BREAK:
-            lines.append(cur); cur = t
-        elif len(cand) > width * 1.15 and depth <= 0 and cur:
-            lines.append(cur); cur = t
-        elif len(cand) > width * 1.6 and cur:
-            # hard break: a deeply nested expression never returns to depth 0,
-            # and an unbroken line overflows the column whatever its nesting
-            lines.append(cur); cur = t
-        else:
-            cur = cand
-    if cur:
-        lines.append(cur)
-    return lines
 
 STRANDS = {
     'master': ('Master', 'MASTER'), 'query': ('Query', 'Query'),
@@ -162,18 +134,8 @@ for paper, (tag, title) in STRANDS.items():
         _, binders, concl = split_sig(d['sig'])
         nm = d['name'].replace('_', r'\_')
         L.append(r'\noindent\textbf{A\,%d}\quad\lean{%s}' % (n, nm))
-        if binders:
-            bl = r',\; '.join(translit(b) for b in binders)
-            L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-            for k, ln in enumerate(wrap(bl, 34)):
-                L.append((r'&' if k == 0 else r'&\quad ') + ln + (r'\\' if k < len(wrap(bl, 34)) - 1 else ''))
-            L.append(r'\end{aligned} \]}')
-        L.append(r'{\footnotesize\[ \begin{aligned}[t]')
-        cl = wrap(translit(concl), 34)
-        for k, ln in enumerate(cl):
-            pre = r'\vdash\;&' if k == 0 else r'&\quad '
-            L.append(pre + ln + (r'\\' if k < len(cl) - 1 else ''))
-        L.append(r'\end{aligned} \]}')
+        bl = r',\; '.join(translit(b) for b in binders) if binders else ''
+        L += sequent(bl, translit(concl), CAPS.get(d['name']))
         L.append('')
     (OUT / f'{paper}_appendix.tex').write_text('\n'.join(L))
     print(f'{paper:12s} modules={len(mods):3d} statements={len(items):4d}')
