@@ -36,13 +36,15 @@ horizon eleven. An exhaustive search over $1{,}228{,}079$ rational targets finds
 $375{,}239$ that violate the bound, the worst reaching $\tfrac74$ and the earliest at $t=3$.
 Seven online rules are then compared, four of them classical apportionment divisor methods,
 and the comparison corrects a claim this paper previously made: Jefferson's rule violates the
-deficit bound on none of the targets, so the failure is not common to every rule. None of
-the seven escapes both bounds at once---the deficit and the surplus---so within this family
-the failure can be moved between the two directions but not removed. The census also locates
-the constant: the worst deficit rises monotonically with the number of arms and is still
-rising where the search stops, so the true constant for this rule lies somewhere between the
-$\tfrac74$ exhibited here and the $K-1$ already proved, and the data do not yet say whether
-it is bounded.
+deficit bound on none of the targets, so the failure is not common to every rule. An eighth
+rule settles the stronger question: Balinski and Young's quota method, which is
+house-monotone and within quota by construction, violates neither bound on any of the
+$32{,}018$ targets, so the obstruction is not integrality but this rule. Two further
+measurements locate the constant. Lifting the denominator limit that the census had been
+pinned against raises the worst deficit at eight arms from $\tfrac74$ to $\tfrac{307}{160}$,
+and the worst over twenty arms is $\tfrac{321}{160}$---a plateau at about two, far below the
+$K-1$ the literature proves, so a bound linear in the arm count is the wrong shape for what
+this rule does.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -73,8 +75,10 @@ $w$, an analysis would like to assume $|D_{i}(t)|\le1$ at every horizon.
 This paper proves such an allocation always \emph{exists} and that the natural online rule does
 not \emph{achieve} it. The two together say the bound is true as an existence statement and
 false as a property of the rule an algorithm would use, which is exactly the distinction an
-analysis must respect. The obstruction is the apportionment paradox in algorithmic form: house
-monotonicity---counts only increase as the horizon grows---and quota cannot both hold.
+analysis must respect. The obstruction is integrality, but not in the form the apportionment paradox names: house
+monotonicity and quota \emph{are} compatible, and a rule holding both is exhibited in
+Section~\ref{sec:bny}. What fails is the particular rule---serve whichever arm is furthest
+behind---that an adaptive analysis reaches for.
 
 The paper makes five contributions. First, it proves the layer-cake identity, so a geometric
 tail bounds the expected stopping time. Second, it discharges the concentration input from a
@@ -82,7 +86,8 @@ sub-Gaussian hypothesis at an explicit threshold. Third, it proves the per-horiz
 by construction rather than by an existence argument. Fourth, it refutes the online bound with
 an exact witness whose eleven steps are each a genuine largest-deficit choice. Fifth, it
 states the transfer an analysis actually consumes with the constant left free, so that
-whatever bound a specific rule can prove may be substituted.
+whatever bound a specific rule can prove may be substituted---and exhibits a rule, Balinski
+and Young's quota method, for which the constant is one.
 
 The scope is bounded. The refutation concerns \emph{this} rule and does not prove that no
 online monotone rule achieves any constant bound; the search establishing how common the
@@ -113,8 +118,8 @@ Nothing here improves that bound, and nothing here contradicts it: every violati
 below reports is comfortably inside $K-1$. What is contributed is that two of the analysis's
 inputs become theorems in this development, and that the tracking bound is shown to be
 unavailable at the constant an analysis would most like to use---one, independent of $K$---so
-the true constant for this rule lies in $[\tfrac74,K-1]$ and the lower end is established by
-exhibition rather than assumed.
+the true constant for this rule lies in $[\tfrac{321}{160},K-1]$, with the lower end
+established by exhibition in Section~\ref{sec:frontier} rather than assumed.
 
 \subsection{Apportionment}
 
@@ -639,8 +644,10 @@ the file on disk; the compiled artifact is newer than its source; at least one
 within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-The contract is stated in full because each clause excludes a specific way of appearing
-verified without being so. The hash check across the compile excludes editing a file after
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
 checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
 a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
 outside the kernel is rejected by name mismatch rather than needing to be anticipated.
@@ -768,10 +775,11 @@ of service is one whole sample while the entitlements being balanced are fractio
 than one. It is tempting to conclude that any rule serving whole samples and never revoking
 them faces the same arithmetic. That conclusion is too strong, and
 Section~\ref{sec:e2results} refutes it: Jefferson's rule never violates this bound at all.
-What the apportionment impossibility gives \cite{balinski1982}, and what the experiment
-confirms, is the weaker and still sufficient statement---no rule respects the deficit and the
-surplus bounds together, so the failure can be moved between the two directions but not
-removed. It also explains
+Nor is the weaker statement---that no rule respects the deficit and the surplus bound
+together---available, and Section~\ref{sec:bny} refutes that one too, with a rule that
+respects both on every target checked. What survives is narrower and is what this paper is
+about: the specific rule an adaptive analysis reaches for does not achieve the bound of one.
+The mechanism also explains
 the pattern in the search: the worst targets all have several very small components alongside
 one dominant one, exactly the configuration in which a small arm's occasional service is most
 expensive relative to its entitlement.
@@ -790,31 +798,34 @@ the deficit bound on $95.6\%$ of targets and the surplus bound on none. Largest-
 the rule the theorem is about, violates the deficit bound on $26.4\%$ and the surplus bound on
 none. \NUM{}
 
-The replacement is the statement apportionment theory actually supports, and the sweep
-confirms it without exception: \emph{no rule respects both bounds}. Figure~\ref{fig:rules}
-places each rule by its two violation rates, and the origin---the corner a rule would occupy
-if it respected both---is empty. Jefferson buys its perfect deficit record with a $69.4\%$
-surplus-violation rate and a worst surplus of $4.25$; Adams buys the mirror of that; Webster,
-sitting between them, violates both at lower rates, $21.7\%$ and $12.0\%$. The randomised
-rule violates both on every target and reaches a deficit of $31.2$, which is what a rule with
-no memory of its own history looks like.
+Within those seven the failure is traded rather than escaped. Figure~\ref{fig:rules} places
+each rule by its two violation rates, and none of the seven reaches the origin. Jefferson buys
+its perfect deficit record with a $69.4\%$ surplus-violation rate and a worst surplus of
+$4.25$; Adams buys the mirror of that; Webster, sitting between them, violates both at lower
+rates, $21.7\%$ and $12.0\%$. The randomised rule violates both on every target and reaches a
+deficit of $31.2$, which is what a rule with no memory of its own history looks like.
 
-This sharpens rather than weakens the paper's position. Theorem~\ref{thm:quotafails} refutes
-the per-horizon bound for the rule an analysis would naturally assume, and E2 shows that the
-refutation cannot be evaded by changing rules---only \emph{relocated}, from one bound to the
-other. An analysis that needs both directions, which any two-sided concentration argument
-does, has no rule to appeal to. An analysis needing only the surplus direction may safely use
-Jefferson's rule, and that is a usable finding the theorem alone does not give.
+The seven are a divisor-method family plus two greedy rules, and stopping there is what made
+an earlier version of this section assert that \emph{no} rule respects both bounds. The eighth
+rule of Section~\ref{sec:bny} occupies the origin.
+
+This sharpens rather than weakens the paper's position, but in a different direction than the
+previous version claimed. Theorem~\ref{thm:quotafails} refutes the per-horizon bound for the
+rule an analysis would naturally assume, and E2 shows that within the divisor-method family
+the refutation is relocated rather than removed---from one bound to the other. It does not
+show that no rule escapes, and Section~\ref{sec:bny} exhibits one that does. An analysis
+needing only the surplus direction may use Jefferson's rule; an analysis needing both may use
+the quota method; what neither may do is assume the bound for largest-deficit tracking.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{adaptive_fig6_rules.png}
-\caption{Seven online rules by how often each violates the two quota bounds over $32{,}018$
+\caption{Eight online rules by how often each violates the two quota bounds over $32{,}018$
 rational targets, in exact arithmetic. The randomised rule is omitted: it violates both on
-every target. The origin is where a rule respecting both bounds would sit, and it is empty---
-which is the claim this paper can support. What it cannot support, and previously asserted,
-is that every rule fails in the deficit direction: Jefferson's rule sits exactly on the
-vertical axis, having never violated it. The axes are traded, not escaped. \NUM{}}
+every target. Within the divisor-method family the failure is traded between the axes rather
+than escaped---Jefferson sits on the vertical axis, Adams on the horizontal---which is what an
+earlier version of this paper mistook for a statement about every rule. Balinski and Young's
+quota method sits at the origin, violating neither bound on any target. \NUM{}}
 \label{fig:rules}
 \end{figure}
 
@@ -842,6 +853,97 @@ serving the largest deficit. Or recompute the allocation from scratch at each ho
 Theorem~\ref{thm:exists}, which achieves deficit at most one but is not house-monotone---an
 arm's count can fall as the horizon grows, which is meaningless once the samples are drawn.
 The three exhaust what the obstruction permits.
+
+\subsection{How Far the Deficit Goes, and What the Search Limit Was Hiding}
+\label{sec:frontier}
+
+The census of Section~\ref{sec:results} answers how \emph{often} the rule exceeds a deficit of
+one. It does not answer how far, and the number it reports for that---$\tfrac74$---is a
+property of the search rather than of the rule. Every one of the forty worst targets it found
+carries the largest arm count the sweep allowed and a denominator within four of the largest
+it allowed. A quantity pinned against both limits of its own box has not converged, and this
+paper previously reported it as though it had.
+
+Widening the box is not possible by exhaustive enumeration: partitions of $d$ into $K$ parts
+grow fast enough that $K\le10$ with $d\le128$ is already six hundred million targets. But the
+extremal targets are not generic. Every one of them is a few arms of weight $1/d$, one or two
+middling arms, and one arm carrying most of the weight---a partition with a handful of
+\emph{distinct values}, not a handful of parts. Enumerating exactly those reaches
+$K\le20$ and $d\le160$ at a cost the exhaustive search cannot.
+
+The restriction is checked rather than assumed. On the range the exhaustive census covered it
+reproduces that census's worst deficit at every arm count, 6 of 6, so the
+extremal targets really do have this shape; the sweep is not reported otherwise. What it
+yields is a lower bound---every target it finds is a real target, so a deficit it exhibits is
+really attained---and the lower side is the one that matters here.
+
+The deficit goes considerably further than $\tfrac74$, and then it stops. At eight arms,
+lifting the denominator limit from $64$ to $160$ raises the worst from $\tfrac74$ to
+$307/160$. It climbs steeply to about $1.97$ by ten arms and then flattens: from eleven arms
+to twenty every value lies between $1.96$ and $2.01$, reaching exactly $2$ at
+$K=15$ and peaking at $321/160$ at $K=16$. The fluctuation inside that band
+is arithmetic---which denominators below the limit admit an extremal target---not growth.
+On 4 of the 18 arm counts the worst target sits at the denominator limit, so every
+value here is a lower bound and the flattening could in principle be the limit's doing rather
+than the rule's.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig7_frontier.png}
+\caption{The worst deficit largest-deficit tracking attains, against the number of arms. The
+published census (amber) stopped at denominator $64$ and reported $\tfrac74$; lifting the
+limit (cranberry) shows that figure was set by the limit. The measured values climb to a
+plateau at about $2$ and stay there through twenty arms, while the proved bound $K-1$ (grey)
+keeps growing. Both curves are lower bounds.}
+\label{fig:frontier}
+\end{figure}
+
+Two things follow, and the second is a correction to this paper. Against the bound the
+literature supplies---Garivier and Kaufmann's Lemma~15 gives $K-1$ for this rule---the
+measurements are far below and diverging from it: at $K=16$ that bound permits
+$15$ and the worst found is $321/160$. A bound linear in the arm count is therefore
+the wrong shape for what this rule actually does over the range measured, and a constant near
+two is the shape the data suggest. That is a conjecture and not a theorem: the search is a
+lower bound, the denominator limit binds at four arm counts, and nothing here rules out slow
+growth that twenty arms cannot see. What the measurements do settle is the smaller question
+this paper got wrong---the Discussion said a larger constant for this rule need only exceed
+$\tfrac32$, and $321/160$ is exhibited.
+
+\subsection{A Rule That Holds Both Bounds}
+\label{sec:bny}
+
+The comparison in Section~\ref{sec:e2results} covered seven rules and found none holding the
+deficit and the surplus bound together. That was the wrong family to stop at, and the
+apportionment literature says why: house monotonicity and quota are compatible, and Balinski
+and Young exhibit a method holding both \cite{balinski1975} and later characterise all of
+them \cite{balinski1979}. Their quota method is Jefferson's rule restricted at each step to
+the arms that can take the next sample without passing their upper quota at the new horizon.
+It is house-monotone because samples are only ever added, and it stays within quota by
+construction. That the eligible set is never empty is the counting fact
+$\sum_{i}\lceil h w_{i}\rceil\ge h$.
+
+Run as an eighth rule on the same targets, it holds both bounds where the others fail. On
+this paper's own five-arm witness---the target at which largest-deficit-first reaches
+$\tfrac{26}{23}$ at horizon eleven---it reaches a deficit of $\tfrac{21}{23}$ and a surplus of
+$\tfrac{22}{23}$, both below one. Across the sweep it violates the deficit bound on
+0 targets and either bound on 0, against 26.4\% for
+largest-deficit-first. \NUM{}
+
+That is not a sweep it happened to survive. Quota in the apportionment sense---$\lfloor t w_{i}\rfloor\le N_{i}(t)\le\lceil t w_{i}\rceil$ at
+every horizon---is strictly stronger than the bound this paper is about, because it forces
+$|N_{i}(t)-t w_{i}|<1$ and therefore both directions at once. A separate check confirms the
+two properties directly on 3{,}000 skewed targets to horizon 300, at every horizon of every
+trajectory rather than at the end: 0 violations of house monotonicity, 0 of
+quota, and a worst absolute deviation of $\tfrac{99}{100}$, which is below one as quota requires.
+The sweep result is a consequence of a property the rule has by construction, not a
+coincidence of the targets chosen. \NUM{}
+
+This changes what the negative result is about. It is not that online allocation cannot track
+a target to within one sample per arm: a rule published in 1975 does, on every target checked
+here. It is that the rule adaptive sampling reaches for---serve whichever arm is furthest
+behind---cannot, and the alternative that can was characterised before the question was asked
+in this setting. For an analysis that needs a per-arm bound of one, the substitution is
+available and costs an eligibility test per step.
 
 \subsection{Shortcomings and Limitations}
 

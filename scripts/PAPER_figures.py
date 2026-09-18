@@ -10,6 +10,8 @@ from pathlib import Path
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import pathlib
+ROOT = pathlib.Path('/Users/phanan/cig-amf-main')
 
 CRAN, AMBER, GREEN, INK, GREY = '#63131E', '#8A5A00', '#1C6444', '#161213', '#6E6469'
 BLUE = '#1F4E79'
@@ -786,8 +788,17 @@ def adaptive_rules():
     for r in rules:
         s = d['per_rule'][r]
         xs.append(100 * s['fraction']); ys.append(100 * s['fraction_surplus'])
-        labs.append(r.replace('_', ' '))
-    ax.plot(xs, ys, 'o', ms=5, mfc='white', mec=CRAN, mew=1.4, zorder=5, ls='none')
+        labs.append('quota (B&Y)' if r == 'quota_bny'
+                    else r.replace('_', ' '))
+    # the quota method is the point of the figure, so it is drawn apart from the
+    # family that trades one axis for the other
+    at_origin = [i for i, (x, y) in enumerate(zip(xs, ys)) if x == 0 and y == 0]
+    other = [i for i in range(len(xs)) if i not in at_origin]
+    ax.plot([xs[i] for i in other], [ys[i] for i in other], 'o', ms=5,
+            mfc='white', mec=CRAN, mew=1.4, zorder=5, ls='none')
+    if at_origin:
+        ax.plot([xs[i] for i in at_origin], [ys[i] for i in at_origin], 'o', ms=7,
+                mfc=GREEN, mec=GREEN, zorder=6, ls='none')
     label_points(ax, xs, ys, labs)
     # the labels sit to the right of their points, so the box needs room
     ax.set_xlim(-8, 152); ax.set_ylim(-9, 112)
@@ -795,8 +806,10 @@ def adaptive_rules():
     ax.plot([0, 0], [0, 100], color=GREY, lw=0.7, ls=':')
     ax.set_xlabel(r'targets violating the deficit bound  (%)')
     ax.set_ylabel(r'targets violating the surplus bound  (%)')
-    ax.text(0.5, 0.5, 'the origin is empty', transform=ax.transAxes,
-            ha='center', fontsize=6.4, color=GREY)
+    ax.text(0.52, 0.55,
+            'the divisor family trades one axis\nfor the other; the quota method\n'
+            'sits at the origin',
+            transform=ax.transAxes, ha='center', fontsize=6.2, color=GREY)
     fin(fig, 'adaptive_fig6_rules.png')
 
 
@@ -1030,6 +1043,49 @@ def functional_duality():
 # the paper's single-column aspect becomes twelve inches tall and eats forty per
 # cent of the column, which is what forces the body text down to sixteen point.
 # Re-rendering the same figure wider costs nothing and returns the column.
+def adaptive_frontier():
+    """Where the worst deficit of largest-deficit tracking actually sits.
+
+    Three things belong on one axis. The published census stopped at
+    denominator 64 and reported 7/4; every one of its forty worst targets sat
+    against that limit, so the number was a property of the search box. Lifting
+    the limit moves it. And the literature already bounds the same quantity at
+    K-1, which the measurements fall far below once K is more than a few.
+    """
+    import json
+    d = json.load(open(ROOT / 'research/paper_exp_20260916/adaptive_frontier.json'))
+    per = d['per_K']
+    Ks = sorted(int(k) for k in per)
+    worst = [per[str(k)]['worst_float'] for k in Ks]
+    old_K = [3, 4, 5, 6, 7, 8]
+    old_w = [1.3651, 1.5500, 1.6500, 1.6964, 1.7460, 1.7500]
+
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ax.plot(Ks, [k - 1 for k in Ks], color=GREY, ls='--', lw=1.0,
+            label=r'proved upper bound $K-1$')
+    ax.axhline(2.0, color=INK, lw=0.8, ls=':')
+    ax.plot(old_K, old_w, 'o-', color=AMBER, ms=3.0, lw=1.0,
+            label=r'exhaustive, $d\leq64$')
+    ax.plot(Ks, worst, 'o-', color=CRAN, ms=3.0, lw=1.2,
+            label=r'restricted shape, $d\leq%d$' % d['dmax'])
+    ax.axhline(1.0, color=GREEN, lw=0.8)
+    ax.set_xlabel('number of arms  $K$')
+    ax.set_ylabel('worst deficit attained')
+    ax.set_yscale('log')
+    ax.set_yticks([1, 2, 5, 10, 20])
+    ax.set_yticklabels(['1', '2', '5', '10', '20'])
+    ax.set_ylim(0.9, 22)
+    ax.legend(frameon=False, loc='upper left', fontsize=6.0)
+    # the note goes below the axes, clear of the x-axis label: inside, it crossed
+    # both the unit line and the plateau it is describing
+    fig.text(0.5, -0.055,
+             'the bound an analysis wants is 1 (green line); every measured target exceeds it. '
+             'the published $7/4$ was pinned\nto a search limit -- lifting it reaches a plateau '
+             'at about 2, far below the proved $K-1$ once $K>3$.',
+             ha='center', va='top', fontsize=5.8, color=GREY)
+    fin(fig, 'adaptive_fig7_frontier.png')
+
+
 def poster_variants(names=None):
     """Re-render chosen figures at a poster aspect into _figures/poster/."""
     import importlib

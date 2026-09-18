@@ -237,8 +237,8 @@ def query_regret():
         ax.plot([m], [y], 'o', ms=20, color=GREEN, zorder=5)
         ax.text(m, y + .30, f'{m:.5f}', ha='center', fontsize=24,
                 color=GREEN, fontweight='bold')
-        ax.text(lo, y - .34, rf'$\\gamma\\rho^{{2N}}/4$ = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
-        ax.text(hi, y - .34, rf'$L_{{\\max}}\\rho^{{N}}/2$ = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
+        ax.text(lo, y - .34, rf'$\gamma\rho^{{2N}}/4$ = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
+        ax.text(hi, y - .34, rf'$L_{{\max}}\rho^{{N}}/2$ = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
     ax.set_yticks(ys)
     ax.set_yticklabels([f"{r['measurement']}\nN = {r['N']:,},  h = {r['h']}" for r in rows],
                        fontsize=23)

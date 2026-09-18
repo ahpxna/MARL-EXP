@@ -68,7 +68,8 @@ def check(module_path, names=None, thresh=0.12):
     fns = names or [n for n in dir(M)
                     if callable(getattr(M, n)) and not n.startswith('_')
                     and getattr(M, n).__module__ == 'figs'
-                    and n not in ('fin', 'save', 'note', 'poster_variants', 'main')]
+                    and n not in ('fin', 'save', 'note', 'poster_variants', 'main',
+                                  'label_points', 'atoms')]
     findings = []
     for n in sorted(fns):
         made = {}
