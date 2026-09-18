@@ -109,8 +109,45 @@ def main():
     ap.add_argument('--distinct', type=int, default=4)
     ap.add_argument('--check-kmax', type=int, default=8)
     ap.add_argument('--check-dmax', type=int, default=64)
+    ap.add_argument('--validate-against', default=None,
+                    help='an exhaustive census JSON; compare the restricted shape with its '
+                         'worst deficit over the same box and write only that comparison')
     a = ap.parse_args()
     t0 = time.time()
+
+    if a.validate_against:
+        ex = json.loads(Path(a.validate_against).read_text())
+        dmax = int(str(ex['denominators']).split('..')[-1])
+        kmax = max(ex['arms'])
+        best, at, n = F(0), None, 0
+        for K in range(3, kmax + 1):
+            for d in range(K, dmax + 1):
+                for pt in shapes(d, K, a.distinct):
+                    n += 1
+                    w, _ = greedy_worst(pt, d, ex['horizon'])
+                    if w > best:
+                        best, at = w, (K, d, pt)
+        same = best == F(ex['worst_deficit'])
+        out = dict(provenance=_P.stamp(__file__), script='EXP_adaptive_frontier.py --validate-against',
+                   design='the restricted shape checked against an exhaustive census over the '
+                          'same box: if the extremal targets have few distinct values, the two '
+                          'must agree on the worst deficit',
+                   exhaustive_source=a.validate_against,
+                   box=dict(kmax=kmax, dmax=dmax, horizon=ex['horizon']),
+                   exhaustive_targets=ex['targets_checked'],
+                   exhaustive_worst=ex['worst_deficit'],
+                   restricted_targets=n, restricted_worst=str(best),
+                   restricted_at=dict(K=at[0], denominator=at[1],
+                                      target=[f'{x}/{at[1]}' for x in at[2]]),
+                   fraction_of_targets=n / ex['targets_checked'],
+                   agree=bool(same), distinct=a.distinct,
+                   wall_seconds=round(time.time() - t0, 1))
+        Path(a.out).write_text(json.dumps(out, indent=1))
+        print(f'restricted {best} over {n:,} targets vs exhaustive '
+              f"{ex['worst_deficit']} over {ex['targets_checked']:,}: "
+              f"{'AGREE' if same else 'DIFFER'} "
+              f'({100*n/ex["targets_checked"]:.2f}% of the work)')
+        return
 
     # ---------------- self-check: recover the exhaustive worst -----------
     got = {}
