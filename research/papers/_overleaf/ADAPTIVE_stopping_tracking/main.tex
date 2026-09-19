@@ -326,16 +326,32 @@ $\mathbb{E}[\tau]\le C/(1-\rho)$.
 \end{corollary}
 
 \leanbox{\lean{expected\_stopping\_le} in \lean{LeanAdaptiveExpectedStoppingV1}}
-\TODOPAR{What the layer-cake theorem does not say. \lean{expected\_stopping\_le} takes
-$\tau:\Omega\to\mathbb{N}$, so finiteness of the stopping time is a consequence of the
-\emph{type} rather than something proved: a run that never stops has no representative in
-$\mathbb{N}$ and is silently outside the statement. It also takes the geometric tail
-\lean{htail} as a hypothesis. So what is established is the conversion---tail to
-expectation---and not that the scheme terminates or that its tail is geometric. That is the
-right division of labour and the paper says so, but the abstract should not be read as
-bounding a stopping time whose finiteness is in question. \emph{The honest strengthening} is
-to carry $\tau:\Omega\to\mathbb{N}\cup\{\infty\}$ and derive finiteness from the tail, which
-is a short argument and removes the typing sleight.}
+\NOTEPAR{What the layer-cake theorem does not say, and what now does.
+\lean{expected\_stopping\_le} takes $\tau:\Omega\to\mathbb{N}$, so finiteness of the stopping
+time was a consequence of the \emph{type} rather than of an argument: a run that never stops
+has no representative in $\mathbb{N}$ and is silently outside the statement. That gap is now
+closed in \lean{LeanAdaptiveStoppingFiniteV1}, which carries
+$\tau:\Omega\to\mathbb{N}\cup\{\infty\}$---so a run that never stops \emph{is} in the state
+space---and derives almost-sure finiteness from the same geometric tail the expectation bound
+already assumes. Nothing new is assumed. What remains an input, and belongs to the
+algorithm's own analysis rather than to this development, is the geometric tail itself.}
+
+\begin{theorem}[Finiteness from the tail, for a time that may be infinite]
+\label{thm:aefinite}
+Let $\tau:\Omega\to\mathbb{N}\cup\{\infty\}$ and suppose
+$\mu\{\tau>n\}\le C\rho^{n}$ for every $n$, with $C<\infty$ and $\rho<1$. Then
+$\mu\{\tau=\infty\}=0$, so $\tau$ is finite almost everywhere.
+\end{theorem}
+
+\leanbox{\lean{never\_measure\_zero}, \lean{ae\_finite\_of\_geometric\_tail} in
+\lean{LeanAdaptiveStoppingFiniteV1}}
+
+The proof is the one line the typed version was standing in for: the event that the scheme
+never stops is contained in the event that it has not stopped by time $n$, for every $n$, so
+its measure is below $C\rho^{n}$ for every $n$, and a geometric sequence with ratio below one
+tends to zero. Taken with \lean{expected\_stopping\_le}, the pair now says what an analysis
+needs: \emph{given} a geometric tail, the stopping time is almost surely finite and its
+expectation is bounded.
 
 The hypothesis $\rho<1$ is explicit because an earlier version omitted it; the statement is
 then false, and the omission is invisible in prose because ``geometric tail'' carries the
@@ -527,7 +543,9 @@ actually reaches. The eleven step comparisons sit in the proof body of a lemma w
 is \lean{True}, written as hardcoded rationals; each is kernel-checked as an arithmetic fact,
 but nothing about them is exported and no statement connects those literals to $w$ and $N$.
 The rule-to-counts link---the part that makes this a statement about the \emph{rule} rather
-than about some allocation---is carried by a comment in the module, not by a proof.
+than about some allocation---was carried by a comment in the module rather than by a proof
+when this section was first written. Section~\ref{sec:trace} now supplies the proof, and the
+paragraph below records how the link was established before it existed.
 
 \emph{How the link is established instead.} We recomputed the trajectory independently in
 exact rational arithmetic, simulating largest-deficit-first on $w$ from $t=0$ and comparing
@@ -539,6 +557,41 @@ reproducible, and not machine-checked.
 Theorem~\ref{thm:quotafails} should therefore be read as one \PROVED{} half and one \NUM{}
 half. Closing the gap means formalising the greedy rule as a Lean function and proving
 $\mathrm{greedyCount}(w,11)=N$, which is not done.
+
+\subsection{The Rule Reaches the Counts, as a Theorem}
+\label{sec:trace}
+
+The witness is only a witness if the count vector $N$ is what the rule produces. The rule is
+therefore defined here as a function, and the trajectory is computed by the kernel. Because
+every weight of the witness has denominator $23$, the deficit $t\,w_{i}-N_{i}$ equals
+$(t\,p_{i}-N_{i}\cdot23)/23$; a rule that only ever compares deficits with one another can be
+run on the numerators alone, so the whole trajectory is integer arithmetic.
+
+\begin{theorem}[The rule reaches the witness counts]
+\label{thm:trace}
+Running largest-deficit-first on $w=\tfrac{1}{23}(17,1,1,3,1)$ for eleven steps from the
+empty allocation produces $N=(7,1,1,1,1)$, and on that trajectory the scaled deficit of arm
+$0$ is $26$ against the scaled bound $23$: $D_{0}(11)=\tfrac{26}{23}>1$.
+\end{theorem}
+
+\leanbox{\lean{greedy\_reaches\_witness}, \lean{greedy\_deficit\_exceeds\_one},
+\lean{greedy\_step\_is\_maximal} in \lean{LeanAdaptiveGreedyTraceV1}}
+
+Maximality of each step is no longer eleven hand-written comparisons either. It is one lemma
+about the selection function, from which \lean{greedy\_step\_is\_maximal} follows at
+\emph{every} horizon rather than at the eleven this witness happens to need.
+
+\NOTEPAR{Two implementation notes worth keeping. The counts are carried as a five-tuple
+rather than as $\mathsf{Fin}\,5\to\mathbb{Z}$ with \lean{Function.update}: the latter is the
+natural phrasing and the kernel does not reduce it in reasonable time, because each step
+forces five decidable equality tests underneath eleven layers of recursion---a first attempt
+ran for minutes without finishing. The tuple reduces by pattern matching and the file checks
+in fifteen seconds. And the proofs use \lean{decide}, never \lean{native\_decide}, which
+would add \lean{Lean.ofReduceBool} to the axiom set and fail the acceptance contract of
+Section~\ref{sec:verification}. Reported axioms are $\{\textsf{propext}\}$ for the two
+computational statements and
+$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$ for the maximality
+lemma.}
 
 \subsection{What the Analysis Actually Consumes}
 \label{sec:consumes}
@@ -1054,16 +1107,13 @@ available and costs an eligibility test per step.
 A constant \emph{is} now available for one alternative---the quota method holds one, by
 Section~\ref{sec:bny}---but none is computed for the divisor methods.
 
-\emph{The rule-to-counts link is not machine-checked.} As Section~\ref{sec:gap} states, the
-\TODOPAR{\lean{greedy\_steps} concludes \textsf{True}: its eleven comparisons are checked
-inside the proof and do not escape it. The paper is candid about this and a reviewer will
-credit that, but the abstract still calls the witness ``exact'' without the caveat, and
-Theorem~\ref{thm:quotafails} is stated as a proposition about a rule. Closing it is cheap---
-define \texttt{greedyCount} as a \lean{Nat.rec} over a \lean{Finset.argmax} and prove
-$\texttt{greedyCount}(w,11)=N$ by \lean{decide}---and it removes the one place where this
-paper's prose is broader than its artifact.}
-arithmetic of the violation is proved and the identification of $N$ as the greedy trajectory
-rests on an exact recomputation reported here.
+\emph{The rule-to-counts link is now machine-checked.} An earlier version of this paper
+listed this as its one open gap: \lean{greedy\_steps} concluded \textsf{True}, so its eleven
+comparisons were checked inside the proof and nothing about them escaped into a statement,
+and the identification of $N$ as the greedy trajectory rested on a recomputation reported in
+prose. Section~\ref{sec:trace} closes it with a theorem.
+\NOTEPAR{This was the one place where this paper's prose was broader than its artifact, and
+it is worth recording that it is shut rather than quietly deleting the admission.}
 
 \emph{The search covers a finite family.} Exhaustively, rational targets on three to eight
 arms with denominators to $64$ at horizon $240$; on the restricted shape of

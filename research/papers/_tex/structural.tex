@@ -134,7 +134,8 @@ The comparison is instructive because it fails in an identifiable place. The pro
 \emph{is} an instance of K-adaptability: the first stage is a menu of $K$ permutations, the
 uncertain parameter $\xi$ is the budget, and the second-stage decision selects which ranking
 to use. The budget is a scalar, so $n_{\xi}=1$ and Theorem~2 would give two rankings. Yet
-Section~\ref{sec:law} proves a menu of $m-1$ is necessary. The hypothesis that fails is
+Section~\ref{sec:law} proves the ratio $V_{\mathrm{path}}/V_{\mathrm{avg}}=m-1$ between
+committing to one ordering and committing to a distribution. The hypothesis that fails is
 therefore concavity: the budget enters through $\mathrm{prefix}_{\xi}$, a combinatorial step
 function, and the objective is not concave in $\xi$. What separates this work from
 \cite{kurtz2026} is consequently not that the setting is different but that the prefix
@@ -928,10 +929,111 @@ On the cyclic menu, $x^{*}_{i,k}=\min(k,m)/m$ for every item $i$.
 \end{aligned} \]}
 
 
-Theorem~\ref{thm:colsum} cuts both ways. It confirms that the uniform trajectory is
-realisable rather than merely feasible on paper. But because it holds for \emph{every} menu
-it singles out none, so a prescribed column sum cannot by itself exclude the witness of
-Theorem~\ref{thm:attained}. What remains open is a prescribed \emph{non-uniform} trajectory.
+Theorem~\ref{thm:colsum} cuts both ways, and an earlier version of this paper drew the wrong
+conclusion from it. It says the retention probabilities \emph{sum} to $k$ at every budget.
+It does \emph{not} say that each item is retained with probability $k/m$: the first is one
+linear equation per budget, the second is $m$ of them, and every menu satisfies the first
+while almost none satisfies the second. Because the column identity holds for every menu it
+singles out none, so a prescribed column sum cannot by itself exclude the witness of
+Theorem~\ref{thm:attained}---but neither does it establish that the uniform marginal is free.
+
+\TODOPAR{The inference corrected here is the one that mattered. The Lean statement
+\lean{retained\_col\_sum} is valid, and so is \lean{retained\_constrained\_eq\_free}, whose
+hypothesis is that a free-optimal witness \emph{attains the prescribed trajectory}. That
+hypothesis is exactly what fails under a uniform marginal, and the next subsection computes
+what it costs.}
+
+\subsection{The Price of a Uniform Retained Marginal}
+\label{sec:unifretention}
+
+Requiring every labelled item to occupy every position with probability $1/m$---equivalently,
+to be retained at budget $k$ with probability $k/m$---is a real constraint, and on this family
+it is expensive. Write
+\[
+V^{\mathrm{unif}}_{\mathrm{avg}}(m)
+=\inf_{P\,:\,\text{uniform retention}}\;\max_{1\le k<m}\mathbb{E}_{P}[r_{k}]
+\]
+for the constrained value, the infimum over distributions on orderings rather than over
+single orderings.
+
+\begin{theorem}[Exact value under uniform retention]
+\label{thm:unifretention}
+For $m\ge5$,
+\begin{equation}
+V^{\mathrm{unif}}_{\mathrm{avg}}(m)=
+\begin{cases}
+\dfrac{4}{m(m+4)}, & m\text{ even},\\[6pt]
+\dfrac{m+3}{m(m+4)}, & m\text{ odd}.
+\end{cases}
+\label{eq:unifretention}
+\end{equation}
+\end{theorem}
+
+Against the free value $V_{\mathrm{avg}}=2/((m+4)(m-1))$ of \eqref{eq:law}, the multiplicative
+price of the constraint is
+\begin{equation}
+\frac{V^{\mathrm{unif}}_{\mathrm{avg}}}{V_{\mathrm{avg}}}
+=\begin{cases}
+2(m-1)/m, & m\text{ even},\\[4pt]
+(m+3)(m-1)/(2m)\;\sim\;m/2, & m\text{ odd}.
+\end{cases}
+\label{eq:unifprice}
+\end{equation}
+At even sizes the constraint costs a factor approaching two. At odd sizes it costs a factor
+growing \emph{linearly} in the population. Both values still tend to zero, so this is a
+relative price and not a positive limiting regret.
+
+\begin{proof}[Proof sketch]
+\emph{Even $m$, lower bound.} At budget $1$ each item is first with probability $1/m$. The two
+items of magnitude $3$ contribute defect $2$ and the rest contribute $0$, so
+$\mathbb{E}[d_{1}]=4/m$ and $V^{\mathrm{unif}}_{\mathrm{avg}}\ge4/(mD)$.
+
+\emph{Even $m$, attainment.} Set $B=m/2$ and form $B$ zero-sum two-item blocks: one special
+block $(-3,3)$ and $B-1$ ordinary blocks $(-1,1)$. Place the special block uniformly among the
+$B$ block positions, choose one of two global orientations fairly, and assign the labels
+within each sign class uniformly. Each special item then occupies each position with
+probability $(1/B)(1/2)=1/m$; each position is a negative unit slot with probability
+$(B-1)/(2B)$, which divided among the $B-1$ labels is again $1/m$. Every even prefix ends at a
+block boundary and sums to zero; an odd prefix holds the first item of one block, special with
+probability $2/m$. Hence $\mathbb{E}[d_{k}]$ is $0$ at even $k$ and $4/m$ at odd $k$, which
+meets the bound.
+
+\emph{Odd $m$, lower bound.} The full sum is $-1$, and at budget $m-1$ the retained sum is
+$-1$ minus the last item's weight, with no parity subtraction since $m-1$ is even. A uniform
+last-position marginal forces
+$\mathbb{E}[d_{m-1}]=\bigl(2+4+2q\bigr)/m=(m+3)/m$.
+
+\emph{Odd $m$, attainment.} Run the even construction on $n=m-1$ labelled items and insert one
+further item of weight $-1$ at a uniformly chosen position. Uniform position marginals survive
+the insertion, since an old item reaches new position $j$ from old position $j$ or $j-1$ and
+the two contributions sum to $1/m$. Conditioning on whether the inserted item lies inside the
+prefix gives $\mathbb{E}[d_{k}]=4(m-k)/(m(m-1))$ at odd $k$ and $k(m+3)/(m(m-1))$ at even $k$;
+the maximum is at $k=m-1$ and equals $(m+3)/m$.
+\end{proof}
+
+\TODOPAR{Status of Theorem~\ref{thm:unifretention}. This is a new mathematical result and it
+is \emph{not} Lean-verified; no compile is claimed for it. Rational primal and dual
+certificates for the finite pattern LP at $m=5,\dots,10$ give
+$\tfrac{8}{45},\tfrac1{15},\tfrac{10}{77},\tfrac1{24},\tfrac4{39},\tfrac1{35}$, which agree
+with \eqref{eq:unifretention} exactly at every one of those sizes; that is supporting finite
+evidence and not the universal proof. A formalisation route is written out in
+\url{research/papers/review_20260919/STRUCTURAL_UNIFORM_RETENTION_PROOF_20260919.md}
+and needs no search or enumeration: define the finite probability space of block position,
+orientation and two label permutations; prove each item's position is uniform and sum to get
+$\mathrm{retained}\,i\,k=k/m$; prove the prefix-sum identities by splitting a prefix into whole
+blocks plus at most one item; add the uniform insertion slot for odd $m$; and note that the
+lower bounds use only budgets $1$ and $m-1$. Suggested names are given there.}
+
+\TODOPAR{Prior art. Randomized rankings subject to prescribed marginals are already studied---
+Singh and Joachims treat exactly this object under fairness-of-exposure constraints
+\cite{singh2018}---so the contribution here cannot be the constrained-ranking formulation. What
+is candidate-new is this particular signed-prefix objective and the parity effect: the price is
+bounded at even sizes and grows linearly at odd ones. \emph{Position the result that way.}}
+
+What remains open is a prescribed \emph{non-uniform} trajectory, and the constrained analogue
+of $V_{\mathrm{path}}$: \eqref{eq:unifretention} is a statement about $V_{\mathrm{avg}}$ only,
+and the certificates establish the constrained $V_{\mathrm{path}}$ at $m=5,\dots,10$ and no
+further.
 
 \section{Experimental Design}
 \label{sec:expdesign}
@@ -1180,10 +1282,35 @@ total weight, so the absolute regret under either objective shrinks. The ratio g
 $V_{\mathrm{avg}}$ additionally divides by the number of budgets. A client with a fixed
 absolute tolerance therefore finds both regimes acceptable once $m$ is large enough.
 
-What does translate is the menu size. At every $m\ge5$, achieving $V_{\mathrm{avg}}$ rather
-than $V_{\mathrm{path}}$ requires $m-1$ schedules rather than one, and that cost is paid in
-full whatever the tolerance. The correct summary is not ``the gap grows'' but ``the gap is
-exactly the menu size, at every population size''.
+What does translate is the menu size, and it has to be stated against the right protocol,
+because three are in play and they give three different answers.
+
+\begin{enumerate}
+\item[(i)] \textbf{One distribution, fixed before the budget}, scored by
+$\max_{k}\mathbb{E}[r_{k}]$. This is $V_{\mathrm{avg}}$.
+\item[(ii)] \textbf{One ordering, drawn once and used at every budget}, scored by
+$\mathbb{E}[\max_{k}r_{k}]$. This is $V_{\mathrm{path}}$.
+\item[(iii)] \textbf{A menu, from which an ordering may be chosen \emph{after} the budget is
+revealed.} This is the adaptive protocol, and it is the one a ``menu size'' is naturally about.
+\end{enumerate}
+
+The ratio $V_{\mathrm{path}}/V_{\mathrm{avg}}=m-1$ compares (i) with (ii), and that is what
+Theorem~\ref{thm:law} establishes. It is \emph{not} the size of an adaptive menu. Under
+protocol (iii) this family needs only \textbf{two} orderings: take two one-defect schedules
+whose single bad budgets differ, and at every budget one of the two is optimal, so the menu
+achieves zero regret. One ordering cannot suffice, by Theorem~\ref{thm:everyorderpays}. Hence
+the adaptive menu size of this family is exactly two, at every $m\ge5$.
+
+\TODOPAR{An earlier version of this paper reported $m-1$ as the menu size, which conflated
+(i)--(ii) with (iii). The identity $V_{\mathrm{path}}/V_{\mathrm{avg}}=m-1$ stands; what does
+not stand is calling $m-1$ an adaptive menu size for this family, where the answer is two.
+This does not touch the separate actual-geometry $\chi\ge5$ witness, which is a different
+construction and a different question.}
+
+The correct summary is therefore neither ``the gap grows'' nor ``the gap is the menu size''.
+It is that committing to a single ordering \emph{before} the budget costs a factor $m-1$ over
+committing to a distribution, while being allowed to choose \emph{after} costs nothing beyond
+carrying two orderings.
 
 \subsection{Is the Family Special, or Is the Setting?}
 \label{sec:families}
@@ -1305,6 +1432,10 @@ size is the number of budgets to be served.
 The formal development uses the Lean~4 theorem prover and the mathlib library.
 
 \begin{thebibliography}{00}
+
+\bibitem{singh2018} A. Singh and T. Joachims, ``Fairness of exposure in rankings,'' in
+\emph{Proc. 24th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining}, 2018,
+pp.~2219--2228.
 
 \bibitem{bernstein2017} A. Bernstein, Y. Disser, M. Gro\ss{}, and S. Himburg, ``General
 bounds for incremental maximization,'' \emph{Math. Program.}, vol.~191, pp.~953--979, 2022.
