@@ -34,6 +34,9 @@ PAPERS = {
     'd6': 'D6_query_width',
     'support': 'SUPPORT_decide_without_identifying',
     'adaptive': 'ADAPTIVE_stopping_tracking',
+    # merged drafts, named for the two strands they join
+    'd6_functional': 'D6_Functional',
+    'support_query': 'Support_Query',
 }
 
 INPUT = re.compile(r'\\input\{([^}]+)\}')
