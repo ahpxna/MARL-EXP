@@ -270,6 +270,16 @@ $\mathbb{E}[\tau]\le C/(1-\rho)$.
 \end{corollary}
 
 \leanbox{\lean{expected\_stopping\_le} in \lean{LeanAdaptiveExpectedStoppingV1}}
+\TODOPAR{What the layer-cake theorem does not say. \lean{expected\_stopping\_le} takes
+$\tau:\Omega\to\mathbb{N}$, so finiteness of the stopping time is a consequence of the
+\emph{type} rather than something proved: a run that never stops has no representative in
+$\mathbb{N}$ and is silently outside the statement. It also takes the geometric tail
+\lean{htail} as a hypothesis. So what is established is the conversion---tail to
+expectation---and not that the scheme terminates or that its tail is geometric. That is the
+right division of labour and the paper says so, but the abstract should not be read as
+bounding a stopping time whose finiteness is in question. \emph{The honest strengthening} is
+to carry $\tau:\Omega\to\mathbb{N}\cup\{\infty\}$ and derive finiteness from the tail, which
+is a short argument and removes the typing sleight.}
 
 The hypothesis $\rho<1$ is explicit because an earlier version omitted it; the statement is
 then false, and the omission is invisible in prose because ``geometric tail'' carries the

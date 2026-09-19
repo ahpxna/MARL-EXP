@@ -68,10 +68,21 @@ def build(paper, folder):
     (dest / 'figures').mkdir(parents=True)
 
     deps = inputs_of(paper)
+    preamble = (TEX / 'preamble.tex').read_text()
     for n in sorted(deps):
+        if n == 'preamble':
+            continue          # inlined below, not shipped as a file
         src = TEX / f'{n}.tex'
-        # the paper itself becomes main.tex; everything else keeps its name
-        shutil.copy2(src, dest / ('main.tex' if n == paper else f'{n}.tex'))
+        if n == paper:
+            # Overleaf picks the main document by looking for \documentclass.
+            # With the preamble in its own file there are two candidates and it
+            # picks the wrong one -- preamble.tex, which has no \end{document},
+            # so the build dies with "no legal \end found". Inlining leaves
+            # exactly one file carrying \documentclass and removes the choice.
+            body = src.read_text().replace('\\input{preamble}', preamble.rstrip(), 1)
+            (dest / 'main.tex').write_text(body)
+        else:
+            shutil.copy2(src, dest / f'{n}.tex')
 
     missing = []
     for g in sorted(figures_of(deps)):
@@ -88,8 +99,16 @@ def build(paper, folder):
         'Draft notes are the coloured passages: blue is information carried\n'
         'forward, red is a decision or gap that still needs an author. To hide\n'
         'every one of them at once, change \\shownotestrue to \\shownotesfalse\n'
-        'in preamble.tex -- nothing else has to be edited.\n')
+        'near the top of main.tex -- nothing else has to be edited.\n')
     return missing
+
+
+def one_documentclass(folder):
+    """Overleaf's main-document heuristic must have exactly one answer."""
+    d = OUT / folder
+    carriers = [f.name for f in sorted(d.rglob('*.tex'))
+                if '\\documentclass' in f.read_text()]
+    return carriers == ['main.tex'], carriers
 
 
 def compile_ok(folder):
@@ -116,6 +135,13 @@ def main():
     rows, failed = [], []
     for paper, folder in PAPERS.items():
         missing = build(paper, folder)
+        single, carriers = one_documentclass(folder)
+        if not single:
+            print(f'  {folder}: \\documentclass appears in {carriers}; '
+                  'Overleaf would have to guess the main document')
+            failed.append(folder)
+            rows.append((folder, 0, 0, len(missing), False))
+            continue
         ok, pages, warn = compile_ok(folder)
         rows.append((folder, pages, warn, len(missing), ok))
         if missing:
@@ -129,7 +155,7 @@ def main():
         z = OUT / f'{folder}.zip'
         with zipfile.ZipFile(z, 'w', zipfile.ZIP_DEFLATED) as zf:
             for f in sorted((OUT / folder).rglob('*')):
-                if f.is_file():
+                if f.is_file() and f.name != '.DS_Store':
                     zf.write(f, f.relative_to(OUT / folder))
 
     print(f"\n{'bundle':38}{'pages':>6}{'warn':>6}{'figs missing':>14}")

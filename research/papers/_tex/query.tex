@@ -813,6 +813,19 @@ Theorem~\ref{thm:nonvanish}.
 \leanbox{\lean{ratio\_tendsto\_of\_dominated}, \lean{hellinger\_ratio\_tendsto},
 \lean{limit\_pos\_of\_ae\_ne\_zero}, \lean{eventually\_pos\_of\_limit\_pos} in
 \lean{LeanQueryAnalyticLimitV1}}
+\TODOPAR{Where this module stops. \lean{hellinger\_ratio\_tendsto} takes five
+hypotheses---\lean{hmeas}, \lean{hdom} ($\lVert F_{h}\rVert\le\mathit{bound}$), \lean{hint}
+($\mathit{bound}$ integrable), \lean{hptw} (the pointwise limit
+$F_{h}\to\Delta_{r}^{2}/4p_{0}$), and \lean{hH2} (the Hellinger identity
+$H^{2}(h)=\tfrac12\int F_{h}$)---and concludes the limit. It is therefore a dominated
+-convergence wrapper: it says the interchange is legitimate \emph{given} domination, the
+pointwise limit and the identity, and none of those three is established here for the
+normalised observation laws this paper is actually about. \lean{ratio\_tendsto\_of\_dominated}
+is the same shape one level down. What is missing is an instantiation: exhibit the envelope,
+prove the pointwise convergence from the mixture, and derive the identity from the
+normalisation, so that Theorem~\ref{thm:limit} rests on the model rather than on three
+assumptions about it. Until then the paper should say the limit is proved \emph{modulo} those
+three inputs, which is weaker than it currently reads.}
 
 Theorem~\ref{thm:limit} upgrades the result from ``the rate is $h^{2r}$ up to constants'' to
 ``the leading constant exists and is positive''. Positivity of the limit is \emph{equivalent}

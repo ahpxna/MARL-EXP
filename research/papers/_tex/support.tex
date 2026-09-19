@@ -426,6 +426,18 @@ sums, then collect the rule's action at each observation.
 \end{proof}
 
 \leanbox{\lean{bayesRisk\_eq\_sum\_postLoss} in \lean{LeanSupportMinimaxLowerV1}}
+\TODOPAR{Two gaps, and the second is larger. (i) \lean{equivariant\_is\_minimax} takes
+\lean{hconst} (the decoder has constant risk $r$) and \lean{hopt} (the Bayes value equals
+$r$) as hypotheses and concludes minimaxity. Both are exactly the facts that make the
+argument work, and neither is proved here for this paper's decoder on this paper's
+transcript; \lean{constant\_risk\_of\_symmetry} supplies the first \emph{abstractly}, from a
+transitive risk-invariant group action, but that action is not instantiated for the model.
+(ii) The quantifier is over deterministic rules $d:\mathit{Obs}\to\mathit{Act}$. A minimax
+claim against \emph{all} decision rules has to admit randomised ones, and in a finite
+symmetric problem the usual route is that randomisation cannot beat the Bayes value---which
+is itself a step this development does not contain. \emph{Either instantiate the group action
+and extend the quantifier, or state the theorem as minimax over deterministic rules}, which
+is what is proved.}
 
 After \eqref{eq:bayes} the rule appears only inside $g$, once per observation, so the Bayes
 risk of an arbitrary rule is a sum of independent terms each depending on the rule through a
