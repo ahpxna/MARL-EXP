@@ -1,0 +1,145 @@
+{
+  "protocol_version": "functional_variance_stopping_v4_permuted_random_extrema",
+  "admissibility": {
+    "class": "DEVELOPMENT",
+    "uses_exactly_the_frozen_seed_set": false,
+    "frozen_seeds_touched": [],
+    "peeks_at_frozen_seeds_without_being_confirmatory": false,
+    "seeds_used": [
+      839
+    ],
+    "max_n": 131072,
+    "rng_protocol": "instance_cell_v1",
+    "note": "Replaces the field development_only, which was a hard-coded True in every artifact this lab produced before 2026-09-12 (v3 line 324, v4 line 479) and therefore distinguished nothing, including in runs already cited as evidence. A run that touches a frozen seed without being the full confirmatory panel is a peek and is recorded as one."
+  },
+  "development_only": true,
+  "world_audit": {
+    "instances": 1000,
+    "zero_information_accuracy": 0.089,
+    "zero_information_accuracy_expected_if_unbiased": 0.1,
+    "extrema_always_at_endpoints_fraction": 0.0,
+    "distinct_true_topk_sets": 10,
+    "distinct_topk_sets_possible": 10,
+    "permute_relations": true,
+    "random_extrema": true,
+    "extrema_shift": 0.0,
+    "confound_removed": true,
+    "note": "v3 reported zero_information_accuracy 1.0 and extrema_always_at_endpoints_fraction 1.0; its Top-k claims are therefore not supported by that panel."
+  },
+  "primary_endpoint": "N_certificate",
+  "scientific_headline": "query/functional geometry controls certification complexity",
+  "common_random_streams": true,
+  "rng_protocol": "instance_cell_v1",
+  "cross_horizon_common_world_and_cell_prefixes": true,
+  "fixed_confidence": 0.95,
+  "confidence_method": "finite-horizon Bonferroni over every possible per-cell sample size; fixed-n Student t (unknown sigma) or normal (oracle known sigma)",
+  "adaptive_stopping_coverage_contract": "union over n=2..max_n, not realized-look-only calibration",
+  "pilot_fraction": 0.15,
+  "deployable_variants": [
+    "uniform",
+    "C_lucb",
+    "C_split",
+    "C_pilot",
+    "C_shrink",
+    "C_anytime"
+  ],
+  "diagnostic_variants": [
+    "C_known_sigma",
+    "C_extrema_oracle"
+  ],
+  "known_sigma_policy": "oracle diagnostic ceiling only; excluded from deployable winner",
+  "instances_per_seed": 1000,
+  "seeds": [
+    839
+  ],
+  "relations": 5,
+  "actions": 6,
+  "topk": 2,
+  "max_n": 131072,
+  "by_variant": {
+    "uniform": {
+      "median_N_certificate": 103852.0,
+      "median_censored_N_certificate": 103852.0,
+      "restricted_mean_censored_N_certificate": 81662.49,
+      "certificate_fraction": 0.55,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.30588654296281304
+    },
+    "C_lucb": {
+      "median_N_certificate": 26356.0,
+      "median_censored_N_certificate": 26356.0,
+      "restricted_mean_censored_N_certificate": 51630.406,
+      "certificate_fraction": 0.762,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.4728192798724343
+    },
+    "C_split": {
+      "median_N_certificate": 70409.0,
+      "median_censored_N_certificate": 70409.0,
+      "restricted_mean_censored_N_certificate": 80372.8,
+      "certificate_fraction": 0.661,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.38144320782098806
+    },
+    "C_pilot": {
+      "median_N_certificate": 46749.0,
+      "median_censored_N_certificate": 46749.0,
+      "restricted_mean_censored_N_certificate": 68338.276,
+      "certificate_fraction": 0.689,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.2849253401239662
+    },
+    "C_shrink": {
+      "median_N_certificate": 47061.0,
+      "median_censored_N_certificate": 47061.0,
+      "restricted_mean_censored_N_certificate": 68304.96,
+      "certificate_fraction": 0.694,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.2845734286432129
+    },
+    "C_anytime": {
+      "median_N_certificate": 38156.0,
+      "median_censored_N_certificate": 38156.0,
+      "restricted_mean_censored_N_certificate": 59715.169,
+      "certificate_fraction": 0.715,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.3653499824929802
+    },
+    "C_known_sigma": {
+      "median_N_certificate": 37804.0,
+      "median_censored_N_certificate": 37804.0,
+      "restricted_mean_censored_N_certificate": 59351.116,
+      "certificate_fraction": 0.716,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.3656249199653415
+    },
+    "C_extrema_oracle": {
+      "median_N_certificate": 33404.0,
+      "median_censored_N_certificate": 33404.0,
+      "restricted_mean_censored_N_certificate": 57129.808,
+      "certificate_fraction": 0.728,
+      "false_safe_count": 0,
+      "false_safe_rate_among_emitted": 0.0,
+      "mean_final_capacity_interval_width": 0.3709673780737605
+    }
+  },
+  "allocation_policy": "uniform round-robin; >=20% least-sampled exploration for every adaptive policy; fixed-driver exploitation maximizes sigma^2/[n(n+1)]",
+  "deployable_winner_by_median_N_certificate": "C_lucb",
+  "deployable_winner_status": "IDENTIFIED_BY_MEDIAN",
+  "deployable_secondary_order": [
+    "C_lucb",
+    "C_anytime",
+    "C_shrink",
+    "C_pilot",
+    "C_split",
+    "uniform"
+  ],
+  "censoring_note": "do not name a median-N winner when the best median is max_n+1 or tied; certificate_fraction/RMST-like summaries are secondary diagnostics"
+}

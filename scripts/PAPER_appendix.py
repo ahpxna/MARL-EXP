@@ -100,6 +100,7 @@ STRANDS = {
     'structural': ('Structural', 'Structural'), 'functional': ('Functional', 'Functional'),
     'd6': ('D6', 'D6'), 'support': ('Support', 'Support'),
     'adaptive': ('Adaptive', 'Adaptive'),
+    'unified': ('Unified', 'unified-batch'),
 }
 OUT = pathlib.Path('research/papers/_tex')
 
@@ -107,14 +108,17 @@ for paper, (tag, title) in STRANDS.items():
     mods = {m: v for m, v in SIGS.items() if m.startswith('Lean' + tag)}
     items = [(m, d) for m in sorted(mods) for d in mods[m] if d['kind'] in ('theorem', 'lemma')]
     L = [r'\appendices', r'\section{Complete statement inventory}', r'\label{app:inventory}', '']
+    _where = ('displayed beside the step that consumes them'
+              if paper == 'unified'
+              else r'displayed in Section~\ref{sec:setting}, beside the step that '
+                   r'consumes them')
     L.append(
-        r'The %s strand contributes $%d$ axiom-audited theorems and lemmas across its '
-        r'accepted modules. Those that any step of this paper uses are displayed in '
-        r'Section~\ref{sec:setting}, beside the step that consumes them. This appendix '
-        r'reproduces the \emph{complete} chain---every audited statement of the strand, '
-        r'grouped by module, including the ones already shown---so that the development can '
-        r'be read end to end without reassembling it from the body.'
-        % (title, len(items)))
+        r'The %s development contributes $%d$ axiom-audited theorems and lemmas across '
+        r'its accepted modules. Those that any step of this paper uses are %s. This '
+        r'appendix reproduces the \emph{complete} chain---every audited statement, '
+        r'grouped by module, including the ones already shown---so that the development '
+        r'can be read end to end without reassembling it from the body.'
+        % (title, len(items), _where))
     L += ['', r'Each entry is a symbol-level transliteration of the Lean statement: Unicode '
               r'maps to the corresponding \LaTeX{} symbol and identifiers are set upright, '
               r'but no structure is rewritten and no hypothesis is dropped. Binders are '

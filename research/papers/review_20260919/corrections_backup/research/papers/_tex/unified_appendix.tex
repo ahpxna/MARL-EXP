@@ -1,0 +1,631 @@
+\appendices
+\section{Complete statement inventory}
+\label{app:inventory}
+
+The unified-batch development contributes $95$ axiom-audited theorems and lemmas across its accepted modules. Those that any step of this paper uses are displayed beside the step that consumes them. This appendix reproduces the \emph{complete} chain---every audited statement, grouped by module, including the ones already shown---so that the development can be read end to end without reassembling it from the body.
+
+Each entry is a symbol-level transliteration of the Lean statement: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. Binders are listed as the prover has them and the turnstile $\vdash$ separates them from the conclusion. Every entry carries an acceptance receipt and an axiom audit confining it to $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; none contains \texttt{sorry}.
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedCompressionDecisionV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,1}\quad\lean{residt\_p0}
+{\footnotesize\[ (\mathit{t} : \mathbb{R} ),\; (\mathit{T} : \mathit{Finset} (\mathit{Fin} 3)) \;\vdash\; \mathit{residt} \mathit{t} \mathit{T} \mathit{p0} = 0 \]}
+
+\noindent\textbf{A\,2}\quad\lean{residt\_first\_p1}
+{\footnotesize\[ (\mathit{t} : \mathbb{R} ) \;\vdash\; \mathit{residt} \mathit{t} \{ 0\} \mathit{p1} = -4 + 2 * \mathit{t} \]}
+
+\noindent\textbf{A\,3}\quad\lean{residt\_second\_p1}
+{\footnotesize\[ (\mathit{t} : \mathbb{R} ) \;\vdash\; \mathit{residt} \mathit{t} \{ 1\} \mathit{p1} = 1 + 2 * \mathit{t} \]}
+
+\noindent\textbf{A\,4}\quad\lean{mem\_Kw'}
+{\footnotesize\[ (\mathit{x} : \mathit{Pt}),\; (\mathit{hx} : \mathit{x} \in \mathit{Kw}) \;\vdash\; \mathit{x} = \mathit{p0} \vee \mathit{x} = \mathit{p1} \]}
+
+\noindent\textbf{A\,5}\quad\lean{loss\_retain\_first}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} : \mathbb{R} ),\; (\mathit{ht} : \mathit{t} \leq 2)\\
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 0\} ) = 2 - \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{A\,6}\quad\lean{loss\_retain\_second}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} : \mathbb{R} ),\; (\mathit{ht} : -1 / 2 \leq \mathit{t})\\
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 1\} ) = 1 / 2 + \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{A\,7}\quad\lean{decision\_flips\_at\_three\_quarters}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} (3 / 4) \{ 0\} ) =\\
+&\quad \mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} (3 / 4) \{ 1\} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,8}\quad\lean{first\_better\_above}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} : \mathbb{R} ),\; (\mathit{h1} : 3 / 4 < \mathit{t}),\; (\mathit{h2} : \mathit{t} \leq 2)\\
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 0\} ) < \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 1\} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,9}\quad\lean{second\_better\_below}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} : \mathbb{R} ),\; (\mathit{h1} : -1 / 2 \leq \mathit{t}),\; (\mathit{h2} : \mathit{t} < 3 / 4)\\
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 1\} ) < \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{residt} \mathit{t} \{ 0\} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,10}\quad\lean{safe\_first\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : 0 \leq \mathit{eps})\\
+\vdash\;&(2 - \mathit{t}) - \mathit{min} (2 - \mathit{t}) (1 / 2 + \mathit{t}) \leq \mathit{eps} \leftrightarrow 3 / 4 - \mathit{eps} / 2 \leq \mathit{t}
+\end{aligned} \]}
+
+\noindent\textbf{A\,11}\quad\lean{safe\_second\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : 0 \leq \mathit{eps})\\
+\vdash\;&(1 / 2 + \mathit{t}) - \mathit{min} (2 - \mathit{t}) (1 / 2 + \mathit{t}) \leq \mathit{eps} \leftrightarrow \mathit{t} \leq\\
+&\quad 3 / 4 + \mathit{eps} / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,12}\quad\lean{decision\_distance\_eq}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{eps} : \mathbb{R} )\\
+\vdash\;&(\mathbf{if} 3 / 4 \leq \mathit{t} \mathbf{then} \mathit{t} - (3 / 4 - \mathit{eps} / 2) \mathbf{else} (3 / 4 + \mathit{eps} / 2) -\\
+&\quad \mathit{t}) = |\mathit{t} - 3 / 4| + \mathit{eps} / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,13}\quad\lean{nuisance\_profiled\_information}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{wo} \mathit{wa} \mathit{sigma} \mathit{nu} \mathit{D} \mathit{u} : \mathbb{R} ),\; (\mathit{hwo} : 0 < \mathit{wo}),\; (\mathit{hwa} : 0 < \mathit{wa}),\\
+&\quad \; (\mathit{hs} : 0 < \mathit{sigma}),\; (\mathit{hn} : 0 < \mathit{nu})\\
+\vdash\;&\mathit{D} ^{2} / (2 * (\mathit{sigma} ^{2} / \mathit{wo} + \mathit{nu} ^{2} / \mathit{wa})) \leq \mathit{wo} * (\mathit{D} + \mathit{u}) ^{2} / (2 *\\
+&\quad \mathit{sigma} ^{2}) + \mathit{wa} * \mathit{u} ^{2} / (2 * \mathit{nu} ^{2})
+\end{aligned} \]}
+
+\noindent\textbf{A\,14}\quad\lean{allocation\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{wo} \mathit{wa} \mathit{sigma} \mathit{nu} \mathit{s} \mathit{r} : \mathbb{R} ),\; (\mathit{hwo} : 0 < \mathit{wo}),\; (\mathit{hwa} : 0 < \mathit{wa}),\\
+&\quad \; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hr} : 0 < \mathit{r}),\; (\mathit{hsig} : 0 < \mathit{sigma}),\\
+&\quad \; (\mathit{hnu} : 0 < \mathit{nu}),\; (\mathit{hbudget} : \mathit{s} ^{2} * \mathit{wo} + \mathit{r} ^{2} * \mathit{wa} = 1)\\
+\vdash\;&(\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}) ^{2} \leq \mathit{sigma} ^{2} / \mathit{wo} + \mathit{nu} ^{2} / \mathit{wa}
+\end{aligned} \]}
+
+\noindent\textbf{A\,15}\quad\lean{allocation\_optimum\_attained}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{sigma} \mathit{nu} \mathit{s} \mathit{r} : \mathbb{R} ),\; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hr} : 0 < \mathit{r}),\\
+&\quad \; (\mathit{hsig} : 0 < \mathit{sigma}),\; (\mathit{hnu} : 0 < \mathit{nu})\\
+\vdash\;&\mathit{s} ^{2} * (\mathit{sigma} / (\mathit{s} * (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}))) + \mathit{r} ^{2} * (\mathit{nu} / (\mathit{r} * (\\
+&\quad \mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}))) = 1 \wedge \mathit{sigma} ^{2} / (\mathit{sigma} / (\mathit{s} * (\mathit{sigma} *\\
+&\quad \mathit{s} + \mathit{nu} * \mathit{r}))) + \mathit{nu} ^{2} / (\mathit{nu} / (\mathit{r} * (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}))) =\\
+&\quad (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}) ^{2}
+\end{aligned} \]}
+
+\noindent\textbf{A\,16}\quad\lean{gamma\_comp\_eq}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Delta} \mathit{sigma} \mathit{nu} \mathit{s} \mathit{r} : \mathbb{R} ),\; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hr} : 0 < \mathit{r}),\\
+&\quad \; (\mathit{hsig} : 0 < \mathit{sigma}),\; (\mathit{hnu} : 0 < \mathit{nu})\\
+\vdash\;&(3 * \mathit{Delta}) ^{2} / (2 * (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}) ^{2}) =\\
+&\quad 9 * \mathit{Delta} ^{2} / (2 * (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}) ^{2})
+\end{aligned} \]}
+
+\noindent\textbf{A\,17}\quad\lean{game\_value\_upper}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{wo} \mathit{wa} \mathit{sigma} \mathit{nu} \mathit{s} \mathit{r} \mathit{Delta} : \mathbb{R} ),\; (\mathit{hwo} : 0 < \mathit{wo}),\; (\mathit{hwa} : 0 < \mathit{wa}),\\
+&\quad \; (\mathit{hs} : 0 < \mathit{s}),\; (\mathit{hr} : 0 < \mathit{r}),\; (\mathit{hsig} : 0 < \mathit{sigma}),\\
+&\quad \; (\mathit{hnu} : 0 < \mathit{nu}),\; (\mathit{hbudget} : \mathit{s} ^{2} * \mathit{wo} + \mathit{r} ^{2} * \mathit{wa} = 1)\\
+\vdash\;&(3 * \mathit{Delta}) ^{2} / (2 * (\mathit{sigma} ^{2} / \mathit{wo} + \mathit{nu} ^{2} / \mathit{wa})) \leq\\
+&\quad (3 * \mathit{Delta}) ^{2} / (2 * (\mathit{sigma} * \mathit{s} + \mathit{nu} * \mathit{r}) ^{2})
+\end{aligned} \]}
+
+\noindent\textbf{A\,18}\quad\lean{confounded\_pair\_same\_law}
+{\footnotesize\[ \vdash\; \mathit{meanY} 0 0 = \mathit{meanY} 1 (-3) \]}
+
+\noindent\textbf{A\,19}\quad\lean{confounded\_pair\_need\_different\_answers}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eps} : \mathbb{R} ),\; (\mathit{heps} : 0 \leq \mathit{eps}),\; (\mathit{hlt} : \mathit{eps} < 1 / 2)\\
+\vdash\;&\neg ((2 - (0:\mathbb{R} )) - \mathit{min} (2 - (0:\mathbb{R} )) (1 / 2 + (0:\mathbb{R} )) \leq \mathit{eps}) \wedge\\
+&\quad \neg ((1 / 2 + (1:\mathbb{R} )) - \mathit{min} (2 - (1:\mathbb{R} )) (1 / 2 + (1:\mathbb{R} )) \leq \mathit{eps})
+\end{aligned} \]}
+
+\noindent\textbf{A\,20}\quad\lean{no\_measurement\_phase}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{t} \mathit{eps} : \mathbb{R} ),\; (\mathit{h0} : 0 \leq \mathit{t}),\; (\mathit{h1} : \mathit{t} \leq 1),\; (\mathit{heps} : 1 / 2 \leq \mathit{eps})\\
+\vdash\;&(1 / 2 + \mathit{t}) - \mathit{min} (2 - \mathit{t}) (1 / 2 + \mathit{t}) \leq \mathit{eps}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedGeometryBoundV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,21}\quad\lean{le\_maxOn}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\\
+&\quad \; \{ \mathit{a} : \mathit{A}\},\; (\mathit{ha} : \mathit{a} \in \mathit{S})\\
+\vdash\;&\mathit{f} \mathit{a} \leq \mathit{maxOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,22}\quad\lean{minOn\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\\
+&\quad \; \{ \mathit{a} : \mathit{A}\},\; (\mathit{ha} : \mathit{a} \in \mathit{S})\\
+\vdash\;&\mathit{minOn} \mathit{S} \mathit{hS} \mathit{f} \leq \mathit{f} \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,23}\quad\lean{maxOn\_le\_of}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{b} : \mathbb{R} ),\\
+&\quad \; (\mathit{h} : \forall \mathit{x} \in \mathit{S}, \mathit{f} \mathit{x} \leq \mathit{b})\\
+\vdash\;&\mathit{maxOn} \mathit{S} \mathit{hS} \mathit{f} \leq \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{A\,24}\quad\lean{le\_minOn\_of}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{b} : \mathbb{R} ),\\
+&\quad \; (\mathit{h} : \forall \mathit{x} \in \mathit{S}, \mathit{b} \leq \mathit{f} \mathit{x})\\
+\vdash\;&\mathit{b} \leq \mathit{minOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,25}\quad\lean{exists\_maxOn}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\exists \mathit{a} \in \mathit{S}, \mathit{f} \mathit{a} = \mathit{maxOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,26}\quad\lean{exists\_minOn}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\exists \mathit{a} \in \mathit{S}, \mathit{f} \mathit{a} = \mathit{minOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,27}\quad\lean{oscOn\_nonneg}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&0 \leq \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,28}\quad\lean{oscOn\_const}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{b} : \mathbb{R} )\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} (\mathbf{fun} \mathit{\_} => \mathit{b}) = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,29}\quad\lean{oscOn\_add\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} + \mathit{g} \mathit{x}) \leq \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{f} + \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{g}
+\end{aligned} \]}
+
+\noindent\textbf{A\,30}\quad\lean{oscOn\_neg}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} (\mathbf{fun} \mathit{x} => -\mathit{f} \mathit{x}) = \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,31}\quad\lean{oscOn\_sub\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} \mathit{g} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} (\mathbf{fun} \mathit{x} => \mathit{f} \mathit{x} - \mathit{g} \mathit{x}) \leq \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{f} + \mathit{oscOn} \mathit{S} \mathit{hS} \mathit{g}
+\end{aligned} \]}
+
+\noindent\textbf{A\,32}\quad\lean{oscOn\_sum\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \iota : \mathit{Type}*\},\; [\mathit{DecidableEq} \iota ],\; (\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty})\\
+&\quad ,\; (\mathit{Q} : \iota \to \mathit{A} \to \mathbb{R} ),\; (\mathit{E} : \mathit{Finset} \iota )\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} (\mathbf{fun} \mathit{x} => \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{Q} \mathit{j} \mathit{x}) \leq \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{S} \mathit{hS} (\mathit{Q} \mathit{j})
+\end{aligned} \]}
+
+\noindent\textbf{A\,33}\quad\lean{geomGap\_eq\_of\_modular}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\\
+&\quad \mathit{Nonempty}),\; (\mathit{Q} : \iota \to \mathit{A} \to \mathbb{R} ),\; (\mathit{E} : \mathit{Finset} \iota ),\\
+&\quad \; (\mathit{hmod} : \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{E}) = \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q}\\
+&\quad \mathit{j}))\\
+\vdash\;&\mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{E}) = ((\textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q}\\
+&\quad \mathit{j})) - \mathit{oscOn} \mathit{K} \mathit{hK} (\mathit{sumOver} \mathit{Q} \mathit{E})) / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,34}\quad\lean{compl\_sdiff\_compl}
+{\footnotesize\[ (\mathit{S} \mathit{T} : \mathit{Finset} \iota ) \;\vdash\; \mathit{Sᶜ} \ \mathit{Tᶜ} = \mathit{T} \ \mathit{S} \]}
+
+\noindent\textbf{A\,35}\quad\lean{geomGap\_diff\_le\_spans}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\\
+&\quad \mathit{Nonempty}),\; (\mathit{hsub} : \mathit{K} \subseteq \mathit{X}),\; (\mathit{Q} : \iota \to \mathit{A} \to \mathbb{R} ),\\
+&\quad \; (\mathit{T} \mathit{S} : \mathit{Finset} \iota ),\; (\mathit{hmod} : \forall \mathit{E} : \mathit{Finset} \iota , \mathit{oscOn} \mathit{X} \mathit{hX} (\\
+&\quad \mathit{sumOver} \mathit{Q} \mathit{E}) = \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j}))\\
+\vdash\;&\mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{Sᶜ}) - \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} (\\
+&\quad \mathit{sumOver} \mathit{Q} \mathit{Tᶜ}) \leq (\textstyle\sum \mathit{j} \in \mathit{T} \ \mathit{S}, (\mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j}) + \mathit{oscOn} \mathit{K} \mathit{hK}\\
+&\quad (\mathit{Q} \mathit{j}))) / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,36}\quad\lean{kappa\_of\_spans}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\\
+&\quad \mathit{Nonempty}),\; (\mathit{hsub} : \mathit{K} \subseteq \mathit{X}),\; (\mathit{Q} : \iota \to \mathit{A} \to \mathbb{R} ),\\
+&\quad \; (\mathit{T} \mathit{S} : \mathit{Finset} \iota ),\; (\mathit{kappa} : \mathbb{R} ),\; (\mathit{hmod} : \forall \mathit{E} : \mathit{Finset} \iota\\
+&\quad , \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{E}) = \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j})),\\
+&\quad \; (\mathit{hkap} : \forall \mathit{j} \in \mathit{T}, (\mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j}) + \mathit{oscOn} \mathit{K} \mathit{hK} (\mathit{Q} \mathit{j})) /\\
+&\quad 2 \leq \mathit{kappa})\\
+\vdash\;&\mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{Sᶜ}) - \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} (\\
+&\quad \mathit{sumOver} \mathit{Q} \mathit{Tᶜ}) \leq \mathit{kappa} * ((\mathit{T} \ \mathit{S}).\mathit{card} : \mathbb{R} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,37}\quad\lean{computable\_threshold}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\mathit{Nonempty}),\\
+&\quad \; (\mathit{hsub} : \mathit{K} \subseteq \mathit{X}),\; (\mathit{Q} : \iota \to \mathit{A} \to \mathbb{R} ),\; (\mathit{T} \mathit{S} : \mathit{Finset} \iota ),\\
+&\quad \; (\mathit{delta} \mathit{rho} \mathit{kappa} : \mathbb{R} ),\; (\mathit{hmod} : \forall \mathit{E} : \mathit{Finset} \iota , \mathit{oscOn} \mathit{X} \mathit{hX} (\\
+&\quad \mathit{sumOver} \mathit{Q} \mathit{E}) = \textstyle\sum \mathit{j} \in \mathit{E}, \mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j})),\; (\mathit{hkap} : \forall \mathit{j} \in \mathit{T},\\
+&\quad (\mathit{oscOn} \mathit{X} \mathit{hX} (\mathit{Q} \mathit{j}) + \mathit{oscOn} \mathit{K} \mathit{hK} (\mathit{Q} \mathit{j})) / 2 \leq \mathit{kappa}),\\
+&\quad \; (\mathit{hfull} : 2 * (\mathit{lossOn} \mathit{X} \mathit{hX} (\mathit{sumOver} \mathit{Q} \mathit{Tᶜ}) - \mathit{lossOn} \mathit{X} \mathit{hX} (\\
+&\quad \mathit{sumOver} \mathit{Q} \mathit{Sᶜ})) \leq (((\mathit{T} \ \mathit{S}).\mathit{card} : \mathbb{N} ) : \mathbb{R} ) * (2 * \mathit{delta} -\\
+&\quad \mathit{rho})),\; (\mathit{hthr} : 2 * \mathit{delta} + 2 * \mathit{kappa} \leq \mathit{rho})\\
+\vdash\;&\mathit{lossOn} \mathit{K} \mathit{hK} (\mathit{sumOver} \mathit{Q} \mathit{Tᶜ}) \leq \mathit{lossOn} \mathit{K} \mathit{hK} (\mathit{sumOver} \mathit{Q} \mathit{Sᶜ})
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedObstructionOrderV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,38}\quad\lean{hasCommon\_mono}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{H} \mathit{H'} : \mathit{Finset} \mathit{World}\},\; (\mathit{hsub} : \mathit{H} \subseteq \mathit{H'}),\; (\mathit{h} : \mathit{HasCommon} \mathit{safe}\\
+&\quad \mathit{H'})\\
+\vdash\;&\mathit{HasCommon} \mathit{safe} \mathit{H}
+\end{aligned} \]}
+
+\noindent\textbf{A\,39}\quad\lean{isObstruction\_mono}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{H} \mathit{H'} : \mathit{Finset} \mathit{World}\},\; (\mathit{hsub} : \mathit{H} \subseteq \mathit{H'}),\; (\mathit{h} : \mathit{IsObstruction} \mathit{safe}\\
+&\quad \mathit{H})\\
+\vdash\;&\mathit{IsObstruction} \mathit{safe} \mathit{H'}
+\end{aligned} \]}
+
+\noindent\textbf{A\,40}\quad\lean{classes\_resolve\_iff}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{K} : \mathit{Type}*\},\; [\mathit{DecidableEq} \mathit{K}],\; [\mathit{Fintype} \mathit{K}],\\
+&\quad \; (\mathit{cls} : \mathit{World} \to \mathit{K})\\
+\vdash\;&(\forall \mathit{k} : \mathit{K}, \mathit{HasCommon} \mathit{safe} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{F} => \mathit{cls} \mathit{F} = \mathit{k}))\\
+&\quad ) \leftrightarrow (\forall \mathit{H} : \mathit{Finset} \mathit{World}, \mathit{IsObstruction} \mathit{safe} \mathit{H} \to \neg \exists \mathit{k} : \mathit{K},\\
+&\quad \mathit{H} \subseteq \mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{F} => \mathit{cls} \mathit{F} = \mathit{k}))
+\end{aligned} \]}
+
+\noindent\textbf{A\,41}\quad\lean{resolution\_refines}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \mathit{Act}],\; \{ \mathit{K} \mathit{L} : \mathit{Type}*\},\; [\mathit{DecidableEq} \mathit{K}],\\
+&\quad \; [\mathit{DecidableEq} \mathit{L}],\; [\mathit{Fintype} \mathit{K}],\; [\mathit{Fintype} \mathit{L}],\; (\mathit{coarse} : \mathit{World}\\
+&\quad \to \mathit{K}),\; (\mathit{fine} : \mathit{World} \to \mathit{L}),\; (\mathit{hrefine} : \forall \mathit{F} \mathit{G} : \mathit{World}, \mathit{fine} \mathit{F} =\\
+&\quad \mathit{fine} \mathit{G} \to \mathit{coarse} \mathit{F} = \mathit{coarse} \mathit{G}),\; (\mathit{hcoarse} : \forall \mathit{k} : \mathit{K},\\
+&\quad \mathit{HasCommon} \mathit{safe} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{F} => \mathit{coarse} \mathit{F} = \mathit{k})))\\
+\vdash\;&\forall \mathit{l} : \mathit{L}, \mathit{HasCommon} \mathit{safe} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{F} => \mathit{fine} \mathit{F} = \mathit{l}))
+\end{aligned} \]}
+
+\noindent\textbf{A\,42}\quad\lean{obstruction\_error\_floor\_deterministic}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{H} : \mathit{Finset} \mathit{World}\},\; (\mathit{hH} : \mathit{IsObstruction} \mathit{safe} \mathit{H}),\; (\mathit{a} : \mathit{Act})\\
+\vdash\;&\exists \mathit{F} \in \mathit{H}, \mathit{a} \notin \mathit{safe} \mathit{F}
+\end{aligned} \]}
+
+\noindent\textbf{A\,43}\quad\lean{obstruction\_total\_unsafe\_mass}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{H} : \mathit{Finset} \mathit{World}\},\; (\mathit{hH} : \mathit{IsObstruction} \mathit{safe} \mathit{H}),\; (\mathit{p} : \mathit{Act} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{a}, 0 \leq \mathit{p} \mathit{a}),\; (\mathit{hsum} : \textstyle\sum \mathit{a}, \mathit{p} \mathit{a} = 1)\\
+\vdash\;&1 \leq \textstyle\sum \mathit{F} \in \mathit{H}, \mathit{unsafeMass} \mathit{safe} \mathit{p} \mathit{F}
+\end{aligned} \]}
+
+\noindent\textbf{A\,44}\quad\lean{obstruction\_error\_floor\_randomized}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{H} : \mathit{Finset} \mathit{World}\},\; (\mathit{hH} : \mathit{IsObstruction} \mathit{safe} \mathit{H}),\; (\mathit{hne} : \mathit{H}.\\
+&\quad \mathit{Nonempty}),\; (\mathit{p} : \mathit{Act} \to \mathbb{R} ),\; (\mathit{hp} : \forall \mathit{a}, 0 \leq \mathit{p} \mathit{a}),\; (\mathit{hsum} : \textstyle\sum \mathit{a},\\
+&\quad \mathit{p} \mathit{a} = 1)\\
+\vdash\;&\exists \mathit{F} \in \mathit{H}, 1 / (\mathit{H}.\mathit{card} : \mathbb{R} ) \leq \mathit{unsafeMass} \mathit{safe} \mathit{p} \mathit{F}
+\end{aligned} \]}
+
+\noindent\textbf{A\,45}\quad\lean{no\_obstruction\_iff\_global\_answer}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{HasCommon} \mathit{safe} (\mathit{univ} : \mathit{Finset} \mathit{World}) \leftrightarrow \forall \mathit{H} : \mathit{Finset} \mathit{World},\\
+&\quad \neg \mathit{IsObstruction} \mathit{safe} \mathit{H}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedQueryOrderV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,46}\quad\lean{chiS\_mul}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} \mathit{T} : \mathit{Finset} (\mathit{Fin} \mathit{n})),\; (\mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool})\\
+\vdash\;&\mathit{chiS} \mathit{S} \mathit{z} * \mathit{chiS} \mathit{T} \mathit{z} = \mathit{chiS} (\mathit{symmDiff} \mathit{S} \mathit{T}) \mathit{z}
+\end{aligned} \]}
+
+\noindent\textbf{A\,47}\quad\lean{expect\_chi}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} (\mathit{Fin} \mathit{n}))\\
+\vdash\;&\textstyle\sum \mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool}, \mathit{chiS} \mathit{S} \mathit{z} = \mathbf{if} \mathit{S} = \emptyset \mathbf{then} (2 : \mathbb{R} ) ^{\mathit{n}} \mathbf{else} 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,48}\quad\lean{HasDeg\_one}
+{\footnotesize\[ \vdash\; \mathit{HasDeg} (\mathit{n} := \mathit{n}) 0 (\mathbf{fun} \mathit{\_} => 1) \]}
+
+\noindent\textbf{A\,49}\quad\lean{HasDeg\_mono}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{D} \mathit{D'} : \mathbb{N} \},\; \{ \mathit{h} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to \mathbb{R} \},\; (\mathit{hD} : \mathit{D} \leq \mathit{D'}),\\
+&\quad \; (\mathit{hh} : \mathit{HasDeg} \mathit{D} \mathit{h})\\
+\vdash\;&\mathit{HasDeg} \mathit{D'} \mathit{h}
+\end{aligned} \]}
+
+\noindent\textbf{A\,50}\quad\lean{card\_symmDiff\_le}
+{\footnotesize\[ (\mathit{S} \mathit{T} : \mathit{Finset} (\mathit{Fin} \mathit{n})) \;\vdash\; (\mathit{symmDiff} \mathit{S} \mathit{T}).\mathit{card} \leq \mathit{S}.\mathit{card} + \mathit{T}.\mathit{card} \]}
+
+\noindent\textbf{A\,51}\quad\lean{HasDeg\_mul}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{D₁} \mathit{D₂} : \mathbb{N} \},\; \{ \mathit{h₁} \mathit{h₂} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to \mathbb{R} \},\; (\mathit{hh₁} : \mathit{HasDeg} \mathit{D₁} \mathit{h₁}),\\
+&\quad \; (\mathit{hh₂} : \mathit{HasDeg} \mathit{D₂} \mathit{h₂})\\
+\vdash\;&\mathit{HasDeg} (\mathit{D₁} + \mathit{D₂}) (\mathbf{fun} \mathit{z} => \mathit{h₁} \mathit{z} * \mathit{h₂} \mathit{z})
+\end{aligned} \]}
+
+\noindent\textbf{A\,52}\quad\lean{HasDeg\_pow}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{D} : \mathbb{N} \},\; \{ \mathit{h} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to \mathbb{R} \},\; (\mathit{hh} : \mathit{HasDeg} \mathit{D} \mathit{h})\\
+\vdash\;&\forall \mathit{j} : \mathbb{N} , \mathit{HasDeg} (\mathit{j} * \mathit{D}) (\mathbf{fun} \mathit{z} => (\mathit{h} \mathit{z}) ^{\mathit{j}})
+\end{aligned} \]}
+
+\noindent\textbf{A\,53}\quad\lean{top\_character\_orthogonal}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{D} : \mathbb{N} \},\; (\mathit{hD} : \mathit{D} < \mathit{n}),\; \{ \mathit{h} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to\\
+&\quad \mathbb{R} \},\; (\mathit{hh} : \mathit{HasDeg} \mathit{D} \mathit{h})\\
+\vdash\;&\textstyle\sum \mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool}, \mathit{chiS} (\mathit{univ} : \mathit{Finset} (\mathit{Fin} \mathit{n})) \mathit{z} * \mathit{h} \mathit{z} = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,54}\quad\lean{order\_of\_ceil\_div}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{n} \mathit{d} : \mathbb{N} ),\; (\mathit{hd} : 0 < \mathit{d}),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{hj} : \mathit{j} < (\mathit{n} + \mathit{d} - 1) / \mathit{d})\\
+\vdash\;&\mathit{j} * \mathit{d} < \mathit{n}
+\end{aligned} \]}
+
+\noindent\textbf{A\,55}\quad\lean{moment\_vanishes\_below\_order}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{d} \mathit{j} : \mathbb{N} \},\; \{ \mathit{g} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to \mathbb{R} \},\; (\mathit{hg} : \mathit{HasDeg} \mathit{d} \mathit{g}),\\
+&\quad \; (\mathit{hjd} : \mathit{j} * \mathit{d} < \mathit{n})\\
+\vdash\;&\textstyle\sum \mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool}, \mathit{chiS} (\mathit{univ} : \mathit{Finset} (\mathit{Fin} \mathit{n})) \mathit{z} * (\mathit{g} \mathit{z}) ^{\mathit{j}} = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,56}\quad\lean{moment\_vanishes\_below\_s}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{d} : \mathbb{N} \},\; (\mathit{hd} : 0 < \mathit{d}),\; \{ \mathit{g} : (\mathit{Fin} \mathit{n} \to \mathit{Bool}) \to \mathbb{R} \},\; (\mathit{hg} : \mathit{HasDeg} \mathit{d}\\
+&\quad \mathit{g}),\; (\mathit{j} : \mathbb{N} ),\; (\mathit{hj} : \mathit{j} < (\mathit{n} + \mathit{d} - 1) / \mathit{d})\\
+\vdash\;&\textstyle\sum \mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool}, \mathit{chiS} (\mathit{univ} : \mathit{Finset} (\mathit{Fin} \mathit{n})) \mathit{z} * (\mathit{g} \mathit{z}) ^{\mathit{j}} = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,57}\quad\lean{top\_query\_is\_informative\_at\_first\_order}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\textstyle\sum \mathit{z} : \mathit{Fin} \mathit{n} \to \mathit{Bool}, \mathit{chiS} (\mathit{univ} : \mathit{Finset} (\mathit{Fin} \mathit{n})) \mathit{z} * (\mathit{chiS} (\mathit{univ} :\\
+&\quad \mathit{Finset} (\mathit{Fin} \mathit{n})) \mathit{z}) ^{1} = (2 : \mathbb{R} ) ^{\mathit{n}}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedStructuralRelaxedV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,58}\quad\lean{band\_expectation\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{I}],\; (\mathit{c} \mathit{pi} : \mathit{I} \to \mathbb{R} ),\; (\mathit{m} \mathit{eta} \mathit{center} : \mathbb{R} ),\\
+&\quad \; (\mathit{hm} : 0 < \mathit{m}),\; (\mathit{hsum} : \textstyle\sum \mathit{i}, \mathit{pi} \mathit{i} = 1),\; (\mathit{hband} : \forall \mathit{i}, |\mathit{pi} \mathit{i} - 1 / \mathit{m}|\\
+&\quad \leq \mathit{eta} / \mathit{m}),\; (\mathit{hcard} : (\mathit{Fintype}.\mathit{card} \mathit{I} : \mathbb{R} ) = \mathit{m})\\
+\vdash\;&(\textstyle\sum \mathit{i}, \mathit{c} \mathit{i}) / \mathit{m} - (\mathit{eta} / \mathit{m}) * (\textstyle\sum \mathit{i}, |\mathit{c} \mathit{i} - \mathit{center}|) \leq \textstyle\sum \mathit{i}, \mathit{pi} \mathit{i} * \mathit{c} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{A\,59}\quad\lean{card\_item}
+{\footnotesize\[ (\mathit{p} \mathit{q} : \mathbb{N} ) \;\vdash\; (\mathit{Fintype}.\mathit{card} (\mathit{Item} \mathit{p} \mathit{q}) : \mathbb{R} ) = 2 + \mathit{p} + \mathit{q} \]}
+
+\noindent\textbf{A\,60}\quad\lean{total\_eq\_neg\_one}
+{\footnotesize\[ \{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1) \;\vdash\; \mathit{total} \mathit{p} \mathit{q} = -1 \]}
+
+\noindent\textbf{A\,61}\quad\lean{coef\_values}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1)\\
+\vdash\;&(\mathit{coef} (\mathit{p} := \mathit{p}) (\mathit{q} := \mathit{q}) (\mathit{Sum}.\mathit{inl} ()) = 2) \wedge\\
+&\quad (\forall \mathit{a} : \mathit{Fin} \mathit{p}, \mathit{coef} (\mathit{p} := \mathit{p}) (\mathit{q} := \mathit{q}) (\mathit{Sum}.\mathit{inr} (\mathit{Sum}.\mathit{inl} \mathit{a})) = 0)\\
+&\quad \wedge (\forall \mathit{b} : \mathit{Fin} \mathit{q}, \mathit{coef} (\mathit{p} := \mathit{p}) (\mathit{q} := \mathit{q}) (\mathit{Sum}.\mathit{inr} (\mathit{Sum}.\mathit{inr} (\mathit{Sum}.\\
+&\quad \mathit{inl} \mathit{b}))) = 2) \wedge (\mathit{coef} (\mathit{p} := \mathit{p}) (\mathit{q} := \mathit{q}) (\mathit{Sum}.\mathit{inr} (\mathit{Sum}.\mathit{inr} (\\
+&\quad \mathit{Sum}.\mathit{inr} ()))) = 4)
+\end{aligned} \]}
+
+\noindent\textbf{A\,62}\quad\lean{sum\_coef}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1)\\
+\vdash\;&\textstyle\sum \mathit{i} : \mathit{Item} \mathit{p} \mathit{q}, \mathit{coef} \mathit{i} = (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 3
+\end{aligned} \]}
+
+\noindent\textbf{A\,63}\quad\lean{sum\_abs\_coef\_sub\_two}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1)\\
+\vdash\;&\textstyle\sum \mathit{i} : \mathit{Item} \mathit{p} \mathit{q}, |\mathit{coef} \mathit{i} - 2| = (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 1
+\end{aligned} \]}
+
+\noindent\textbf{A\,64}\quad\lean{relaxed\_expected\_defect\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1),\; (\mathit{eta} : \mathbb{R} ),\; (\mathit{pi} : \mathit{Item} \mathit{p} \mathit{q} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hsum} : \textstyle\sum \mathit{i}, \mathit{pi} \mathit{i} = 1),\; (\mathit{hband} : \forall \mathit{i}, |\mathit{pi} \mathit{i} - 1 / (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}\\
+&\quad )| \leq \mathit{eta} / (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}))\\
+\vdash\;&((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 3 - ((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 1) * \mathit{eta}) / (2 +\\
+&\quad (\mathit{p} : \mathbb{R} ) + \mathit{q}) \leq \textstyle\sum \mathit{i}, \mathit{pi} \mathit{i} * \mathit{coef} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{A\,65}\quad\lean{relaxed\_value\_lower\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{p} \mathit{q} : \mathbb{N} \},\; (\mathit{hpq} : \mathit{p} = \mathit{q} + 1),\; (\mathit{eta} : \mathbb{R} ),\; (\mathit{pi} : \mathit{Item} \mathit{p} \mathit{q} \to \mathbb{R} ),\\
+&\quad \; (\mathit{hsum} : \textstyle\sum \mathit{i}, \mathit{pi} \mathit{i} = 1),\; (\mathit{hband} : \forall \mathit{i}, |\mathit{pi} \mathit{i} - 1 / (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}\\
+&\quad )| \leq \mathit{eta} / (2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}))\\
+\vdash\;&((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 3 - ((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 1) * \mathit{eta}) / ((2\\
+&\quad + (\mathit{p} : \mathbb{R} ) + \mathit{q}) * ((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 4)) \leq (\textstyle\sum \mathit{i},\\
+&\quad \mathit{pi} \mathit{i} * \mathit{coef} \mathit{i}) / ((2 + (\mathit{p} : \mathbb{R} ) + \mathit{q}) + 4)
+\end{aligned} \]}
+
+\noindent\textbf{A\,66}\quad\lean{relaxed\_bound\_is\_linear\_in\_m}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{m} \mathit{eta} \mathit{eta0} : \mathbb{R} ),\; (\mathit{hm} : 0 < \mathit{m}),\; (\mathit{heta} : 0 \leq \mathit{eta}),\\
+&\quad \; (\mathit{hle} : \mathit{eta} \leq \mathit{eta0}),\; (\mathit{hlt} : \mathit{eta0} < 1)\\
+\vdash\;&(1 - \mathit{eta0}) / (\mathit{m} + 4) \leq (\mathit{m} + 3 - (\mathit{m} + 1) * \mathit{eta}) / (\mathit{m} * (\mathit{m} + 4))
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanUnifiedSupportExchangeV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,67}\quad\lean{maxOn\_eq\_of}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} : \mathit{A}),\\
+&\quad \; (\mathit{ha} : \mathit{a} \in \mathit{S}),\; (\mathit{hmax} : \forall \mathit{x} \in \mathit{S}, \mathit{f} \mathit{x} \leq \mathit{f} \mathit{a})\\
+\vdash\;&\mathit{maxOn} \mathit{S} \mathit{hS} \mathit{f} = \mathit{f} \mathit{a}
+\end{aligned} \]}
+
+\noindent\textbf{A\,68}\quad\lean{minOn\_eq\_of}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{b} : \mathit{A}),\\
+&\quad \; (\mathit{hb} : \mathit{b} \in \mathit{S}),\; (\mathit{hmin} : \forall \mathit{x} \in \mathit{S}, \mathit{f} \mathit{b} \leq \mathit{f} \mathit{x})\\
+\vdash\;&\mathit{minOn} \mathit{S} \mathit{hS} \mathit{f} = \mathit{f} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{A\,69}\quad\lean{oscOn\_eq\_sub}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{S} : \mathit{Finset} \mathit{A}),\; (\mathit{hS} : \mathit{S}.\mathit{Nonempty}),\; (\mathit{f} : \mathit{A} \to \mathbb{R} ),\; (\mathit{a} \mathit{b} : \mathit{A}),\\
+&\quad \; (\mathit{ha} : \mathit{a} \in \mathit{S}),\; (\mathit{hb} : \mathit{b} \in \mathit{S}),\; (\mathit{hmax} : \forall \mathit{x} \in \mathit{S}, \mathit{f} \mathit{x} \leq \mathit{f} \mathit{a}),\\
+&\quad \; (\mathit{hmin} : \forall \mathit{x} \in \mathit{S}, \mathit{f} \mathit{b} \leq \mathit{f} \mathit{x})\\
+\vdash\;&\mathit{oscOn} \mathit{S} \mathit{hS} \mathit{f} = \mathit{f} \mathit{a} - \mathit{f} \mathit{b}
+\end{aligned} \]}
+
+\noindent\textbf{A\,70}\quad\lean{osc\_eq\_oscOn\_univ}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{A} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{A}],\; [\mathit{DecidableEq} \mathit{A}],\; [\mathit{Nonempty} \mathit{A}],\\
+&\quad \; (\mathit{f} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{osc} \mathit{f} = \mathit{oscOn} \mathit{univ} \mathit{Finset}.\mathit{univ\_nonempty} \mathit{f}
+\end{aligned} \]}
+
+\noindent\textbf{A\,71}\quad\lean{geomGap\_nonneg}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\mathit{Nonempty}),\\
+&\quad \; (\mathit{hsub} : \mathit{K} \subseteq \mathit{X}),\; (\mathit{r} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&0 \leq \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{r}
+\end{aligned} \]}
+
+\noindent\textbf{A\,72}\quad\lean{support\_decomposition}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\mathit{Nonempty})\\
+&\quad ,\; (\mathit{rT} \mathit{rS} : \mathit{A} \to \mathbb{R} )\\
+\vdash\;&\mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rT} - \mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rS} = (\mathit{lossOn} \mathit{X} \mathit{hX} \mathit{rT} - \mathit{lossOn} \mathit{X}\\
+&\quad \mathit{hX} \mathit{rS}) + (\mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rS} - \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rT})
+\end{aligned} \]}
+
+\noindent\textbf{A\,73}\quad\lean{support\_exchange\_of\_full}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\mathit{Nonempty}),\\
+&\quad \; (\mathit{rT} \mathit{rS} : \mathit{A} \to \mathbb{R} ),\; (\mathit{bound} : \mathbb{R} ),\; (\mathit{hfull} : 2 * (\mathit{lossOn} \mathit{X} \mathit{hX}\\
+&\quad \mathit{rT} - \mathit{lossOn} \mathit{X} \mathit{hX} \mathit{rS}) \leq \mathit{bound})\\
+\vdash\;&2 * (\mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rT} - \mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rS}) \leq \mathit{bound} + 2 * (\\
+&\quad \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rS} - \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rT})
+\end{aligned} \]}
+
+\noindent\textbf{A\,74}\quad\lean{support\_optimal\_of\_margin}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} \mathit{X} : \mathit{Finset} \mathit{A}),\; (\mathit{hK} : \mathit{K}.\mathit{Nonempty}),\; (\mathit{hX} : \mathit{X}.\mathit{Nonempty})\\
+&\quad ,\; (\mathit{rT} \mathit{rS} : \mathit{A} \to \mathbb{R} ),\; (\mathit{card} : \mathbb{N} ),\; (\mathit{delta} \mathit{rho} \mathit{kappa} : \mathbb{R} )\\
+&\quad ,\; (\mathit{hfull} : 2 * (\mathit{lossOn} \mathit{X} \mathit{hX} \mathit{rT} - \mathit{lossOn} \mathit{X} \mathit{hX} \mathit{rS}) \leq (\mathit{card} :\\
+&\quad \mathbb{R} ) * (2 * \mathit{delta} - \mathit{rho})),\; (\mathit{hkappa} : \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rS}\\
+&\quad - \mathit{geomGap} \mathit{K} \mathit{X} \mathit{hK} \mathit{hX} \mathit{rT} \leq \mathit{kappa} * (\mathit{card} : \mathbb{R} )),\\
+&\quad \; (\mathit{hthr} : 2 * \mathit{delta} + 2 * \mathit{kappa} \leq \mathit{rho})\\
+\vdash\;&\mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rT} \leq \mathit{lossOn} \mathit{K} \mathit{hK} \mathit{rS}
+\end{aligned} \]}
+
+\noindent\textbf{A\,75}\quad\lean{bit\_nonneg}
+{\footnotesize\[ (\mathit{u} : \mathit{Fin} 2) \;\vdash\; 0 \leq \mathit{bit} \mathit{u} \]}
+
+\noindent\textbf{A\,76}\quad\lean{bit\_le\_one}
+{\footnotesize\[ (\mathit{u} : \mathit{Fin} 2) \;\vdash\; \mathit{bit} \mathit{u} \leq 1 \]}
+
+\noindent\textbf{A\,77}\quad\lean{Kw\_nonempty}
+{\footnotesize\[ \vdash\; \mathit{Kw}.\mathit{Nonempty} \]}
+
+\noindent\textbf{A\,78}\quad\lean{Kw\_sub\_univ}
+{\footnotesize\[ \vdash\; \mathit{Kw} \subseteq (\mathit{univ} : \mathit{Finset} \mathit{Pt}) \]}
+
+\noindent\textbf{A\,79}\quad\lean{witness\_interaction\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{i} : \mathit{Fin} 3),\; (\mathit{x} \mathit{c} : \mathit{Pt})\\
+\vdash\;&\mathit{CIGAMF}.\mathit{V4}.\mathit{ProductSurrogate}.\mathit{mixedDifference} \mathit{Fw} \mathit{i} \mathit{x} \mathit{c} = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,80}\quad\lean{witness\_spans}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Qw} 0 1 - \mathit{Qw} 0 0 = 3 \wedge \mathit{Qw} 1 1 - \mathit{Qw} 1 0 = -2 \wedge \mathit{Qw} 2 1 - \mathit{Qw} 2 0 =\\
+&\quad -2
+\end{aligned} \]}
+
+\noindent\textbf{A\,81}\quad\lean{resid\_zero}
+{\footnotesize\[ (\mathit{x} : \mathit{Pt}) \;\vdash\; \mathit{resid} \{ 0\} \mathit{x} = -2 * \mathit{bit} (\mathit{x} 1) - 2 * \mathit{bit} (\mathit{x} 2) \]}
+
+\noindent\textbf{A\,82}\quad\lean{resid\_one}
+{\footnotesize\[ (\mathit{x} : \mathit{Pt}) \;\vdash\; \mathit{resid} \{ 1\} \mathit{x} = 3 * \mathit{bit} (\mathit{x} 0) - 2 * \mathit{bit} (\mathit{x} 2) \]}
+
+\noindent\textbf{A\,83}\quad\lean{mem\_Kw}
+{\footnotesize\[ (\mathit{x} : \mathit{Pt}),\; (\mathit{hx} : \mathit{x} \in \mathit{Kw}) \;\vdash\; \mathit{x} = \mathit{p0} \vee \mathit{x} = \mathit{p1} \]}
+
+\noindent\textbf{A\,84}\quad\lean{witness\_lossK\_zero}
+{\footnotesize\[ \vdash\; \mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 0\} ) = 2 \]}
+
+\noindent\textbf{A\,85}\quad\lean{witness\_lossK\_one}
+{\footnotesize\[ \vdash\; \mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 1\} ) = 1 / 2 \]}
+
+\noindent\textbf{A\,86}\quad\lean{witness\_lossX\_zero}
+{\footnotesize\[ \vdash\; \mathit{lossOn} (\mathit{univ} : \mathit{Finset} \mathit{Pt}) \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 0\} ) = 2 \]}
+
+\noindent\textbf{A\,87}\quad\lean{witness\_lossX\_one}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{lossOn} (\mathit{univ} : \mathit{Finset} \mathit{Pt}) \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 1\} ) =\\
+&\quad 5 / 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,88}\quad\lean{witness\_gap\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 0\\
+&\quad \} ) = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,89}\quad\lean{witness\_gap\_one}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 1\\
+&\quad \} ) = 2
+\end{aligned} \]}
+
+\noindent\textbf{A\,90}\quad\lean{witness\_topC\_not\_optimal\_on\_support}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 1\} ) < \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{resid} \{ 0\} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,91}\quad\lean{witness\_topC\_optimal\_on\_cube}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{lossOn} (\mathit{univ} : \mathit{Finset} \mathit{Pt}) \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 0\} ) <\\
+&\quad \mathit{lossOn} (\mathit{univ} : \mathit{Finset} \mathit{Pt}) \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 1\} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,92}\quad\lean{witness\_doubled\_support\_regret}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 * (\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 0\} ) - \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{resid} \{ 1\} )) = 3
+\end{aligned} \]}
+
+\noindent\textbf{A\,93}\quad\lean{witness\_plain\_bound\_fails}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\neg (2 * (\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 0\} ) - \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{resid} \{ 1\} )) \leq (1 : \mathbb{R} ) * (2 * 0 - 1))
+\end{aligned} \]}
+
+\noindent\textbf{A\,94}\quad\lean{witness\_exchange\_equality}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&2 * (\mathit{lossOn} \mathit{Kw} \mathit{Kw\_nonempty} (\mathit{resid} \{ 0\} ) - \mathit{lossOn} \mathit{Kw}\\
+&\quad \mathit{Kw\_nonempty} (\mathit{resid} \{ 1\} )) = (1 : \mathbb{R} ) * (2 * 0 - 1) + 2 * (\\
+&\quad \mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\mathit{univ\_nonempty} (\\
+&\quad \mathit{resid} \{ 1\} ) - \mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\\
+&\quad \mathit{univ\_nonempty} (\mathit{resid} \{ 0\} ))
+\end{aligned} \]}
+
+\noindent\textbf{A\,95}\quad\lean{witness\_kappa\_is\_two}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\mathit{univ\_nonempty} (\mathit{resid} \{ 1\\
+&\quad \} ) - \mathit{geomGap} \mathit{Kw} \mathit{univ} \mathit{Kw\_nonempty} \mathit{Finset}.\mathit{univ\_nonempty} (\\
+&\quad \mathit{resid} \{ 0\} ) = 2 * (1 : \mathbb{R} )
+\end{aligned} \]}

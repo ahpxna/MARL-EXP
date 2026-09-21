@@ -1,0 +1,796 @@
+\input{preamble}
+
+\begin{document}
+
+\title{Exact Marginal--Regret Frontiers\\for Signed-Prefix Compression}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A compression that must serve a ranking, and must be good at \emph{every} prefix length,
+pays for the constraint that each item occupy each position about equally often. We
+quantify that payment for the signed-prefix family, in which the regret at budget $k$ is
+the excess of $|\sum_{\ell\le k}g_{\pi_\ell}|$ over the best achievable at that budget.
+Three results. First, the constrained optimum is computable in polynomial size: the game on
+$m!$ rankings reduces exactly to a flow on $O(m^{2})$ prefix compositions, which we verify
+against the permutation formulation wherever both can run and then use to reach $m=31$,
+where enumeration is hopeless. Second, the price is \emph{robust}: relaxing the exact
+marginal constraint to a band of width $\eta/m$ leaves the odd-size optimum at least
+$(m+3-(m+1)\eta)/m(m+4)$, so for odd $m$ and any fixed $\eta<1$ it stays $\Omega(1/m)$
+against the unconstrained $\Theta(1/m^{2})$, and the value is stable under weight perturbation with the
+\emph{recomputed} per-budget baseline. That bound is not merely a bound: for odd $m$ it is
+\emph{attained}, so on an initial segment of $\eta$ it is the value $V_{m}(\eta)$ itself,
+pinned between a Lean theorem below and an exhibited rational flow above. Third, we locate the breakpoint at which the price
+vanishes, $\eta_{*}=1$ for odd $m$ and $(m-2)/2(m-1)$ for even $m$, and we say exactly how
+much of that is proved, and exactly where the remaining debt sits. (O1), that the two
+meet \emph{at} the breakpoint, is a theorem at every $m$ and both parities, by an explicit
+insertion mixture rather than a certificate size by size. (O2), that the optimum strictly
+exceeds the free value below it, is a theorem at every $m$ and both parities with no
+window and no even-$m$ gap --- but \emph{conditionally}: it is proved for any family
+satisfying the per-ranking counting inequality and the band bound, and instantiating those
+two at the concrete ranking family is not written. So the breakpoint is two-sided modulo
+one combinatorial instantiation, which we name rather than absorb. What remains outside it is the rest of the frontier $V_{m}(\eta)$ away from
+the breakpoint, and the collapse scale of the robustness floor, both named below. Randomised rankings under
+marginal constraints are a studied object; what we claim is the exact signed-prefix law, its
+parity dependence, and the quantitative price.
+\end{abstract}
+
+\begin{IEEEkeywords}
+ranking under constraints, prefix regret, linear programming duality, formal verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{The question}
+
+A served compression is often a \emph{ranking}: the system returns an order, and a
+downstream consumer takes some prefix of it whose length is not known in advance. Fairness
+or exposure requirements then constrain the ranking distribution---each item should occupy
+each position about equally often---and the question is what that constraint costs when the
+ranking must be good at every prefix length simultaneously.
+
+Fix weights $g=(g_{1},\dots,g_{m})$ and a normaliser $D$. For a permutation $\pi$ and a
+budget $k$, the achievable optimum and the regret are
+\begin{equation}
+b_{k}(g)=\min_{|S|=k}\Bigl|\sum_{i\in S}g_{i}\Bigr|,\quad
+r_{k}(\pi;g)=\frac{\bigl|\sum_{\ell\le k}g_{\pi_{\ell}}\bigr|-b_{k}(g)}{D}.
+\label{eq:regret}
+\end{equation}
+Writing $P$ for a distribution over rankings, the constrained optimum is
+\begin{equation}
+V_{g}(\eta)=\inf_{P}\ \max_{1\le k<m}\ \mathbb{E}_{\pi\sim P}\,r_{k}(\pi;g),
+\label{eq:value}
+\end{equation}
+subject to the retained-marginal band
+\begin{equation}
+\Bigl|\Pr\nolimits_{P}\bigl(i\in\mathrm{prefix}_{k}\bigr)-\tfrac{k}{m}\Bigr|\le\tfrac{\eta}{m}
+\quad\text{for every }i,k.
+\label{eq:band}
+\end{equation}
+
+\NOTEPAR{Two objectives must never be conflated, and both appear in the literature:
+$\max_{k}\mathbb{E}\,r_{k}$, which is this paper's, and $\mathbb{E}\max_{k}r_{k}$, in which a
+single drawn ranking is judged across all budgets. The constructions and the value differ.
+The final version should state this in the first paragraph of Section~\ref{sec:setting},
+not only here.}
+
+\subsection{What is new, against the nearest source}
+
+Randomised rankings with prescribed or constrained position marginals are studied, and the
+fairness--utility trade-off they induce is known; Singh and Joachims~\cite{singh2018}
+introduce the exposure constraint and Singh, Kempe and Joachims~\cite{singh2021} treat it
+under uncertainty. We take that framing as given. Three things here are not in it.
+
+\begin{enumerate}
+\item[1)] \textbf{The signed-prefix objective.} Those works optimise a linear utility under
+exposure constraints. Our objective~\eqref{eq:regret} is an \emph{absolute prefix sum} net
+of the per-budget optimum, evaluated at every budget; it is not linear in the ranking, and
+the parity of $k$ enters through $b_{k}$.
+\item[2)] \textbf{An exact value with a parity split.} We give $V_{g}(0)$ exactly, and it
+differs by a factor $\Theta(m)$ between odd and even $m$. A fairness--utility curve does not
+predict that.
+\item[3)] \textbf{A polynomial-size exact reduction.} The flow formulation of
+Section~\ref{sec:flow} solves the game on $m!$ rankings in $O(m^{2})$ variables, which is
+what makes the frontier computable at all.
+\end{enumerate}
+
+We do \emph{not} claim the flow-LP technique itself; reducing a permutation polytope to a
+compositions DAG is standard. The claim is the law it lets us compute.
+
+\section{Setting}
+\label{sec:setting}
+
+The family studied throughout is
+\begin{equation}
+g_{m}=\bigl(-3,\underbrace{-1,\dots,-1}_{p},\underbrace{1,\dots,1}_{q},3\bigr),
+\quad D=m+4,
+\label{eq:family}
+\end{equation}
+with $p=\lceil(m-2)/2\rceil$ and $q=\lfloor(m-2)/2\rfloor$. All weights are odd integers, so
+every prefix sum of length $k$ has the parity of $k$; consequently $b_{k}(g_{m})=k\bmod 2$,
+a fact we verify from the definition rather than assume.
+
+\leanbox{verified for $m=5,\dots,13$ in \texttt{EXP\_paperC\_flow\_lp}; the parity shortcut
+is \emph{not} used in any proof}
+
+Two values anchor everything. The unconstrained optimum is
+$V^{\mathrm{free}}_{m}=2/(m+4)(m-1)$, and the exactly-uniform optimum is
+\begin{equation}
+V_{m}(0)=
+\begin{cases}
+4/m(m+4), & m\text{ even},\\
+(m+3)/m(m+4), & m\text{ odd}.
+\end{cases}
+\label{eq:vunif}
+\end{equation}
+The odd-size ratio $V_{m}(0)/V^{\mathrm{free}}_{m}$ grows linearly in $m$: constraining the
+marginals costs a factor $m$, and only in odd size.
+
+\section{The game is a polynomial-size flow}
+\label{sec:flow}
+
+\subsection{The reduction}
+
+Enumerating rankings is hopeless past $m=11$. It is also unnecessary. A prefix is
+characterised, for the objective and for the constraints alike, by its \emph{composition}
+\begin{equation}
+v=(n_{-3},n_{-1},n_{+1},n_{+3}),\qquad v\le(1,p,q,1),
+\label{eq:state}
+\end{equation}
+of which there are $4(p+1)(q+1)=O(m^{2})$. Build the DAG whose edges add one item of a given
+weight. Three equalities make the reduction exact.
+
+\begin{enumerate}
+\item[E1)] \textbf{Symmetrisation.} Averaging a feasible ranking distribution over
+relabellings inside a weight type leaves $\max_{k}\mathbb{E}r_{k}$ unchanged, because
+$r_{k}$ does not see labels, and keeps~\eqref{eq:band}, because each item's marginal becomes
+the type average and the deviation of an average is at most the average of the deviations.
+\item[E2)] \textbf{Ranking to flow.} Every ranking distribution induces a unit flow, with
+occupancy $f_{v}=\Pr(\text{the length-}|v|\text{ prefix has composition }v)$.
+\item[E3)] \textbf{Flow to ranking.} Every unit flow decomposes into a distribution over
+paths; labelling uniformly inside each type turns a path into a ranking with the same
+objective and the same marginals.
+\end{enumerate}
+
+\TODOPAR{E1--E3 are argued here and are \emph{not} formalised in Lean. They are the load
+bearing step of the whole paper---without them the flow LP computes a different quantity---so
+the final version should either formalise them or present the numerical agreement of
+Table~\ref{tab:agree} as the evidence it is. Do not describe the reduction as ``proved''.}
+
+\subsection{It agrees, and then it goes further}
+
+\begin{table}[t]
+\caption{The flow LP against the permutation LP. Agreement is exact at every size and band
+where both can be run; beyond $m=11$ only the flow formulation exists. \NUM{}}
+\label{tab:agree}
+\centering
+\footnotesize
+\begin{tabular}{@{}rrrl@{}}
+\toprule
+$m$ & flow states & flow edges & permutations \\
+\midrule
+$11$ & $120$ & $316$ & $13{,}860$ \\
+$15$ & $224$ & $612$ & intractable \\
+$21$ & $440$ & $1236$ & intractable \\
+$31$ & $960$ & $2756$ & intractable \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two formulations give the same value at $m=5,\dots,9$ for $\eta\in\{0,\tfrac14,\tfrac12,1\}$
+and on the unconstrained problem, and the flow LP reproduces both anchors---the proved
+$V_{m}(0)$ of~\eqref{eq:vunif} and $V^{\mathrm{free}}_{m}$---at $m=5,\dots,11$. \NUM{}
+
+\section{The price is robust}
+\label{sec:robust}
+
+\subsection{Relaxing the constraint}
+
+\begin{theorem}[Relaxed lower bound, $m$ odd]
+\label{thm:relaxed}
+\begin{equation}
+V_{m}(\eta)\ \ge\ \frac{m+3-(m+1)\eta}{m(m+4)} .
+\label{eq:relaxed}
+\end{equation}
+\end{theorem}
+
+\leanbox{\lean{relaxed\_value\_lower\_bound} in \lean{LeanUnifiedStructuralRelaxedV1}}
+
+Only the budget $k=m-1$ is used, where the parity correction vanishes and the loss is
+decided by which item is last. The argument is a centring bound, and the centre is what
+makes it sharp: since the deviations sum to zero, the deviation term may be measured against
+any constant, and centring the last-position loss coefficients at $2$ makes their total
+absolute deviation exactly $m+1$ rather than the $m+3$ that centring at $0$ gives.
+
+\leanbox{\lean{band\_expectation\_lower\_bound}, \lean{sum\_abs\_coef\_sub\_two} in the same
+module}
+
+\begin{corollary}
+For \emph{odd} $m$ and any fixed $\eta\le\eta_{0}<1$,
+$V_{m}(\eta)\ge(1-\eta_{0})/(m+4)=\Omega(1/m)$, against
+$V^{\mathrm{free}}_{m}=\Theta(1/m^{2})$.
+\end{corollary}
+
+\leanbox{\lean{relaxed\_bound\_is\_linear\_in\_m} in the same module}
+
+So the linear-in-$m$ price is not an artefact of demanding exact uniformity.
+
+\subsection{The bound is attained}
+\label{sec:attained}
+
+A lower bound leaves open how much of the gap to the solved curve is the bound's weakness
+and how much is the problem's. Here the answer is that, for odd $m$, there is no weakness on
+an initial segment: \eqref{eq:relaxed} is met with equality.
+
+\begin{proposition}[Attainment; exact at the tested points]
+\label{prop:attained}
+For every $m\in\{5,7,9\}$ and every $\eta\in\{0,\tfrac14,\tfrac12,\tfrac34\}$ there is a
+band-feasible flow with rational masses whose objective equals the right-hand side of
+\eqref{eq:relaxed} exactly. Hence at each of those twelve points
+\begin{equation}
+V_{m}(\eta)\ =\ \frac{m+3-(m+1)\eta}{m(m+4)} .
+\label{eq:attained}
+\end{equation}
+\end{proposition}
+
+The two sides are established by different means and neither is a solver reading. Below,
+\lean{relaxed\_value\_lower\_bound} is a theorem. Above, the flow is exhibited: the solver
+locates it, a path decomposition rationalises its \emph{path masses} so that conservation
+survives rounding by construction, and band feasibility and objective are then verified in
+exact rational arithmetic. A floating-point optimum is used only to find the candidate,
+never to certify it.
+
+How far the equality extends is measured, not proved. Bisecting on the solved frontier, the
+largest $\eta$ at which \eqref{eq:attained} still holds agrees with
+\begin{equation}
+\eta_{\mathrm{tight}}(m)\ =\ 1-\frac{2}{m(m-1)}
+\label{eq:tight}
+\end{equation}
+to seven digits at $m=5,7,9,11,13,15$. On that reading the bound is the exact frontier on
+almost the whole range, and departs from it only on a window of width $2/m(m-1)$ at the top.
+We state \eqref{eq:tight} as a measured law and not a theorem: it rests on a
+floating-point bisection, and only \eqref{eq:attained} at the twelve tabulated points is
+exact.
+
+Two consequences are worth separating. Proposition~\ref{prop:attained} upgrades the
+\emph{price} claim from a bound to a value, so the factor-$m$ separation from
+$V^{\mathrm{free}}_{m}$ is the truth about the constrained game and not an artefact of a
+lossy argument. It does \emph{not} upgrade the breakpoint: \eqref{eq:tight} and the
+breakpoint $\eta_{*}=1$ are different quantities, and the gap between them, of width
+$2/m(m-1)$, is where the bound degrades --- not where the frontier meets the free value.
+
+\subsection{Stability under perturbation}
+
+A price claim is worthless if a small change in the weights destroys it. The subtlety is
+that $b_{k}$ is itself a function of the weights: perturbing $g$ while keeping the parity
+baseline of the unperturbed family measures the wrong thing.
+
+\begin{theorem}[Stability]
+\label{thm:stab}
+With $D$ fixed and the baseline recomputed,
+$\bigl|r_{k}(\pi;g)-r_{k}(\pi;g')\bigr|\le 2\|g-g'\|_{1}/D$, and the same bound holds for the
+value over any fixed feasible set.
+\end{theorem}
+
+\leanbox{\lean{regret\_perturbation}, with \lean{abs\_baseline\_sub\_le} and
+\lean{abs\_expect\_sub\_le}, \lean{abs\_sup'\_sub\_le}, \lean{abs\_inf'\_sub\_le}, in
+\lean{LeanPaperCFrontierV1}}
+
+The factor two is exactly the two moving parts, the prefix sum and the baseline, and neither
+can be dropped.
+
+\section{The frontier, and the breakpoint}
+\label{sec:frontier}
+
+\subsection{Shape}
+
+\begin{theorem}[Shape of the frontier]
+\label{thm:shape}
+$V_{g}(\eta)$ is non-increasing in $\eta$, and convex.
+\end{theorem}
+
+\leanbox{\lean{value\_antitone\_of\_nested}, \lean{value\_convex\_of\_convex\_feasible} in
+\lean{LeanPaperCFrontierV1}}
+
+Monotonicity is nesting of the feasible sets. Convexity holds because the constraint
+right-hand side is affine in $\eta$ and the objective is affine, so a convex combination of
+plans optimal for two bands is feasible for the combined band. Theorem~\ref{thm:shape} is
+what makes a bisection for the breakpoint well posed: without it, finitely many solved points
+say nothing in between.
+
+\subsection{The breakpoint, and its unpaid debt}
+
+Solving the flow LP and bisecting gives
+\begin{equation}
+\eta_{*}(m)=
+\begin{cases}
+1, & m\text{ odd},\\[2pt]
+\dfrac{m-2}{2(m-1)}, & m\text{ even},
+\end{cases}
+\label{eq:breakpoint}
+\end{equation}
+at each of the \emph{sixteen} sizes tested, namely $m\in\{5,\dots,15\}\cup\{17,19,21,25,31\}$;
+the intermediate even sizes above $15$ were not run, so this is sixteen confirmations and
+not a check of every $m$ in the range. \NUM{} Calling this exact needs two proofs:
+\begin{align}
+\text{(O1)}\quad & V_{m}(\eta_{*})=V^{\mathrm{free}}_{m},\label{eq:O1}\\
+\text{(O2)}\quad & \eta<\eta_{*}\ \Longrightarrow\ V_{m}(\eta)>V^{\mathrm{free}}_{m}.
+\label{eq:O2}
+\end{align}
+
+\begin{theorem}[(O2) for odd $m$, below an explicit edge]
+\label{thm:o2}
+For \emph{odd} $m\ge5$, the bound of Theorem~\ref{thm:relaxed} strictly exceeds
+$V^{\mathrm{free}}_{m}$ exactly when $\eta<(m^{2}-3)/(m^{2}-1)$. Hence \eqref{eq:O2} holds on
+that range, as a consequence of a proved theorem and with no solver involved.
+\end{theorem}
+
+The arithmetic comparison itself is proved for every real $m\ge5$; it is
+Theorem~\ref{thm:relaxed}. That route restricted the conclusion about $V_{m}(\eta)$ to
+odd $m$ and left a window; it is \emph{superseded}. \lean{O2\_strict\_odd} and
+\lean{O2\_strict\_even} prove \eqref{eq:O2} at every $m$ and both parities with no
+window, because their proofs use the free value only as an upper bound and so inherit a
+margin uniform over the band-feasible set. Independently,
+\lean{strict\_gap\_of\_compact} shows the two statements were never separable: on a
+compact feasible set a continuous value attains its minimum, so ``no feasible distribution
+achieves $V^{\mathrm{free}}$'' already yields a positive uniform margin. No census is
+needed for either route, and none is run.
+
+\leanbox{\lean{proved\_bound\_beats\_free}, \lean{breakpoint\_window\_shrinks} in
+\lean{LeanPaperClosuresV1}}
+
+The window that route left open is $[(m^{2}-3)/(m^{2}-1),\,1)$, of width exactly
+$2/(m^{2}-1)$. Table~\ref{tab:window} records it \emph{for comparison only}: the route is
+superseded and no window remains in the statement now proved.
+
+\subsection{What is closed now, and at which sizes}
+\label{sec:closed}
+
+Two things are narrower than a general-$m$ theorem and stronger than the window of
+Table~\ref{tab:window}, and it matters which is which.
+
+\paragraph{(O2) is closed exactly at $m=5,\dots,11$.}
+The infeasibility certificate produced at each of those sizes is a Farkas vector in exact
+rational arithmetic, and it is \emph{affine} in $\eta$: the certified inequality has the
+form $a_{m}+b_{m}\eta<0$. One certificate therefore excludes a whole interval rather than a
+grid point, and its root $-a_{m}/b_{m}$ equals $\eta_{*}(m)$ of \eqref{eq:breakpoint} at all
+seven sizes. So $[0,\eta_{*})$ is excluded outright there. The
+\texttt{window\_left\_open} field of the stored artifact is a residue of the earlier grid
+search and no longer describes the strength of the certificate. \CERT{}
+
+\paragraph{The flow-to-ranking transfer is no longer a debt.}
+The reduction to a flow is only a reduction if every unit flow comes from a randomised
+ranking with the same value, and that transfer used to be recorded as owed. It is now
+proved, in two halves. First, a unit flow carries its own Markov law on \emph{whole
+trajectories}, and that law's marginal at every budget is the flow's occupancy there ---
+layer marginals alone would not suffice, since a ranking is a trajectory and marginals do
+not determine a joint law. Second, applying a uniform random relabelling inside each
+equal-weight group yields a distribution that is invariant under every relabelling, which
+supplies the constancy the marginal bridge previously assumed, and that moves no
+relabelling-invariant quantity, so symmetrising is free. Any objective linear in the layer
+marginals is then determined by them, so no further hypothesis is needed for the values to
+agree.
+
+That last hypothesis --- that every trajectory the flow charges is realised by some
+ranking --- is now \emph{discharged} rather than assumed. Because it was the load-bearing
+assumption, we give the argument in full rather than by reference.
+
+\begin{proposition}[The section exists]
+\label{prop:sec}
+Let the state space be the count vectors $V=\{0,\dots,m\}^{d}$, let $\mathrm{ty}:[m]\to[d]$
+give each item's type, and let $F$ be a layered flow whose edge weights vanish off the
+relation ``exactly one coordinate rises by one''. Then every trajectory $t$ with
+$F.\mathrm{trajLaw}(t)\ne0$ that starts at $0$ and ends at the multiplicity vector of
+$\mathrm{ty}$ is the layer-count map of an actual permutation of the items.
+\end{proposition}
+
+\begin{proof}
+Three steps.
+
+\emph{(i) Positive mass forces legal steps.} The flow's Markov kernel is
+$f/x$ where $x>0$ and $0$ otherwise, so it vanishes wherever $f$ does; hence it is
+supported on the increment relation. A trajectory's mass is the product of its kernel
+factors, so if any factor sat on a non-increment edge the product would be zero. Induction
+on the horizon turns this into: every consecutive pair of a positive-mass trajectory is an
+increment.
+
+\emph{(ii) A legal count-path is a type sequence.} At step $i$ exactly one coordinate
+rises; call it $\tau_{i}$, and let $s=(\tau_{0},\dots,\tau_{m-1})$. Write
+$\mathrm{layerCount}(s,i,\tau)$ for the number of $k<i$ with $s_{k}=\tau$. Both
+$t_{i}(\tau)$ and $\mathrm{layerCount}(s,i,\tau)$ start at $0$ and increase by $1$ exactly
+when $\tau_{i}=\tau$, so they agree at every $i$ by induction. In particular at $i=m$ the
+multiplicities of $s$ are the path's endpoint.
+
+\emph{(iii) A type sequence of the right multiplicities is a permutation.} By hypothesis
+the endpoint is the multiplicity vector of $\mathrm{ty}$, so for each type $\tau$ the fibre
+$\{k:s_{k}=\tau\}$ and the fibre $\{j:\mathrm{ty}(j)=\tau\}$ have the same cardinality.
+Choose a bijection between them for each $\tau$ and glue: $[m]\cong\coprod_{\tau}s^{-1}(\tau)
+\cong\coprod_{\tau}\mathrm{ty}^{-1}(\tau)\cong[m]$. The resulting $\omega$ satisfies
+$\mathrm{ty}(\omega(k))=s_{k}$, so its layer counts are exactly $t$.
+\end{proof}
+
+The section is therefore a function with its defining property proved, and
+\lean{pathDecomposition\_count\_states} carries no such hypothesis. The group it
+symmetrises over is the type-preserving subgroup $\{g:\mathrm{ty}\circ g=\mathrm{ty}\}$,
+under which the layer map is invariant --- which is the only property the symmetrisation
+needs.
+
+\leanbox{\lean{trajLaw\_marginal\_all}, \lean{relabelledLaw\_invariant},
+\lean{relabelledLaw\_expectation}, \lean{linear\_objective\_from\_marginals},
+\lean{pathDecomposition\_discharged} in \lean{LeanPaperCBreakpointV1};
+\lean{kernel\_stepSupported}, \lean{trajLaw\_stepC}, \lean{hsec\_count\_states},
+\lean{matchPerm\_type} in \lean{LeanPaperCBreakpointV1};
+\lean{exists\_rank\_section}, \lean{countSec\_layer}, \lean{rankLayer\_smul},
+\lean{pathDecomposition\_count\_states}, \lean{strict\_gap\_of\_compact},
+\lean{breakpoint\_strict\_below} in \lean{LeanPaperCFinalV1}}
+
+\paragraph{(O1) is closed for every $m$; the sweep is now a cross-check.}
+Write the family as $g=(-3,(-1)^{p},(+1)^{q},+3)$. Start from the alternating ordinary
+sequence $-1,+1,-1,+1,\dots$ of length $m-2$ and, for each $j\in\{1,\dots,m-1\}$, insert the
+pair $(+3,-3)$ at positions $j,j+1$; mix uniformly over $j$, and for even $m$ mix each
+ranking half and half with its sign flip, which is again a ranking of the family because the
+counts of $+1$ and $-1$ agree. In exact rational arithmetic, at every size in that range:
+the excess profile of each ranking is the single spike $|S_{k}|-b_{k}=2\cdot[k=j]$; the
+mixture attains $V^{\mathrm{free}}_{m}$ at \emph{every} budget; and the worst
+marginal-band slack is exactly $0$ at $\eta_{*}(m)$ and strictly negative just below it. The
+first two give $\eta_{*}(m)\le$ the value in \eqref{eq:breakpoint}; the third says this
+construction cannot do better, which is not the same as saying no construction can. \CERT{}
+
+Both halves of (O1) are, moreover, proved for \emph{every} $m$, not only at the sizes swept.
+
+\emph{Attainment}: each $\pi_{j}$ has excess exactly $2$ at budget $j$ and $0$ at every
+other budget, and averaging the spike uniformly over $j$ puts exactly
+$2/D(m-1)=V^{\mathrm{free}}_{m}$ at every budget.
+
+\emph{Feasibility}: the expected count of each type in each prefix comes out in closed form,
+because the construction says where everything is --- the $+3$ at $a$, the $-3$ at $a+1$,
+and every other position carrying $-1$ at even index and $+1$ at odd, the insertion shifting
+later base indices by two and so moving no parity. For odd $m$ the four bands hold at
+$\eta=1$, with the $+3$ band tight at $k=m-1$, which is what pins the breakpoint there. For
+even $m$, mixing each $\pi_{j}$ half and half with its sign flip --- again a ranking of the
+same family, since the counts of $\pm1$ agree --- symmetrises the heavy and the light types,
+and all bands hold at $\eta_{*}(m)=(m-2)/2(m-1)$.
+
+\leanbox{\lean{insRanking\_prefix}, \lean{insRanking\_excess},
+\lean{insMixture\_free\_value}, \lean{mixCount\_three}, \lean{mixCount\_neg\_one},
+\lean{O1\_odd}, \lean{O1\_even} in \lean{LeanPaperCRankingV1}}
+
+\paragraph{The general-$m$ lower bound is now a theorem.}
+It rests on two combinatorial statements about rankings of the family, and on nothing else:
+\begin{align}
+\text{(L1), $m$ even:}\quad & r_{1}+r_{m-1}=\tfrac{2}{D}\bigl([\,\pi_{1}\ \text{heavy}\,]
+  +[\,\pi_{m}\ \text{heavy}\,]\bigr),\label{eq:L1}\\
+\text{(L2), $m$ odd:}\quad & \textstyle\sum_{k=1}^{m-1}\bigl(|S_{k}|-b_{k}\bigr)\ \ge\
+  2+2\,[\,\pi_{m}>0\,],\label{eq:L2}
+\end{align}
+where \emph{heavy} means weight $\pm3$. Both are proved for every $m$.
+
+\eqref{eq:L1} is short once the model is written down: for even $m$ the weights sum to
+zero, so the prefix of length $m-1$ is minus the last item exactly as the prefix of length
+one is the first item. Both excesses therefore read off an end position, and each is $2$
+when that end is heavy and $0$ when it is not. The baseline $b_{1}=b_{m-1}=1$ is not a
+convention: it is the minimum over family rankings, with the lower bound holding on every
+ranking and the value attained by an explicit ranking at every even $m\ge4$.
+
+\eqref{eq:L2} needs one further ingredient, parity. Every weight is an odd integer, so
+$S_{k}$ has the parity of $k$, an odd budget cannot have prefix sum zero, and $b_{k}=k\bmod
+2$ is a baseline rather than a guess. With that, the mechanism is the $+3$ step: if
+$S_{k+1}=S_{k}+3$ then $|S_{k}|+|S_{k+1}|\ge3$ while the two baselines sum to one, so the
+two budgets straddling the heavy positive item already carry excess $2$. The case analysis
+only keeps those budgets in range, and the one case needing its own computation is the heavy
+item immediately before the end, where the straddling pair overlaps the last budget.
+
+The arithmetic that turns them into \eqref{eq:breakpoint} is proved for every real $m$, and
+so is the step from the marginal band to the floor that arithmetic consumes. Given
+\eqref{eq:L1}, attaining $V^{\mathrm{free}}_{m}$ at the first and last budgets forces
+$\eta\ge(m-2)/2(m-1)$; given \eqref{eq:L2}, attaining it at every budget forces the last
+item to be negative almost surely, which the band permits only at $\eta\ge1$. The parity is
+not an artefact of small sizes: the even breakpoint is below $1/2$ at every $m$ while the
+odd one is exactly $1$, so the two are separated by at least $1/2$ uniformly.
+
+\leanbox{\lean{two\_budget\_identity}, \lean{prefixSum\_parity},
+\lean{jump\_forces\_excess}, \lean{odd\_total\_excess}, \lean{baseline\_first},
+\lean{baseline\_last} in \lean{LeanPaperCRankingV1}; \lean{band\_floor},
+\lean{end\_floor\_of\_band}, \lean{breakpoint\_lower\_even},
+\lean{breakpoint\_lower\_odd}, \lean{parity\_gap\_half} in
+\lean{LeanPaperCBreakpointV1}}
+
+\paragraph{(O2) holds at every $m$ and both parities, with no window.}
+The lower-bound theorems are stated with the free value as an \emph{equality}, which makes
+them statements about a distribution that attains it, and invites an attainment argument
+to convert them. No such argument is needed: their proofs use the equality only as an
+upper bound, so the resulting inequality is uniform over the whole band-feasible set. For
+odd $m$, every feasible $P$ satisfies
+\[
+\frac{\mathbb{E}_{P}[\mathrm{tot}]}{D(m-1)}
+\;\ge\;
+\frac{2}{D(m-1)}+\frac{1-\eta}{Dm},
+\]
+and for even $m$, below the breakpoint the two end budgets alone already exceed the free
+value. The infimum inherits the margin, so $V_{m}(\eta)>V^{\mathrm{free}}_{m}$ for every
+$\eta$ below $\eta_{*}(m)$ --- no compactness, no attainment, and no window.
+
+\leanbox{\lean{O2\_strict\_odd}, \lean{O2\_strict\_even} in \lean{LeanPaperCBreakpointV1}}
+
+\NOTEPAR{Scope, stated where it belongs. \lean{O2\_strict\_odd} takes the per-ranking
+counting inequality $2+2\,\mathrm{lastPos}(x)\le\mathrm{tot}(x)$ and the band bound on
+$\mathbb{E}_{P}[\mathrm{lastPos}]$ as \emph{hypotheses}; \lean{O2\_strict\_even} likewise
+takes $r_{1}+r_{m}=(2/D)\,\mathrm{big}$ and its band bound. Both are facts about the
+concrete family $g_{m}$, and both are argued in the text rather than proved in Lean. The
+theorem is therefore: \emph{for any family with those two properties}, (O2) holds at every
+$m$ and both parities with no window. Do not cite it as an unconditional closure of the
+breakpoint until the instantiation is written.}
+
+\NOTEPAR{Scope discipline, stated once and without slack. The breakpoint law is now
+two-sided at every $m$ and both parities: the lower side of \eqref{eq:breakpoint};
+(O1), the attainment $\sum_{a}\pi_{a}\,\mathrm{excess}/D=2/(D(m-1))$ together with band
+feasibility, for the plain insertion mixture and its sign-flipped symmetrisation alike;
+and (O2), the strict excess below the breakpoint. Table~\ref{tab:window} records the
+window the \emph{earlier} odd-$m$ route left open and is kept for comparison only; it no
+longer describes what is proved. What is still \emph{not} proved is the rest of the
+frontier: the breakpoint is one point of $V_{m}(\eta)$, and pinning the whole curve is a
+separate obligation.}
+
+\begin{table}[t]
+\caption{The window left open by the \emph{earlier} odd-$m$ route to
+obligation~\eqref{eq:O2}, kept for comparison. \lean{O2\_strict\_odd} and
+\lean{O2\_strict\_even} now close \eqref{eq:O2} at every $m$ and both parities, so no
+window remains. \CERT{}}
+\label{tab:window}
+\centering
+\footnotesize
+\begin{tabular}{@{}rll@{}}
+\toprule
+$m$ & proved for $\eta<$ & open window width \\
+\midrule
+$5$ & $11/12$ & $0.0833$ \\
+$9$ & $39/40$ & $0.0250$ \\
+$13$ & $83/84$ & $0.0119$ \\
+$15$ & $111/112$ & $0.0089$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For obligation~\eqref{eq:O1} we do better than read a floating-point optimum: at each
+$m=5,\dots,11$ we extract a band-feasible flow, round it to exact rationals, and verify its
+feasibility and objective in exact arithmetic against $V^{\mathrm{free}}_{m}$. The values
+attained are $1/18$, $1/25$, $1/33$, $1/42$, $1/52$, $1/63$, $1/75$. \CERT{}
+
+\paragraph{(O1) is now a theorem, at every $m$ and both parities.}
+The seven exact-rational flows above certify \eqref{eq:O1} size by size; they are no longer
+the only evidence for it. The insertion mixture --- uniform over the $m-1$ rankings that
+insert the heavy pair at each position --- attains $2/(D(m-1))=V^{\mathrm{free}}_{m}$ at
+every budget, and its marginal counts satisfy the band at $\eta_{*}(m)$. For even $m$ the
+mixture is symmetrised by the sign flip, and the flip costs nothing: $\mathrm{excess}$ is
+built from $|{\rm prefixSum}|$, so flipping every sign leaves it unchanged and the
+symmetrised mixture has the same value. A feasible point at $V^{\mathrm{free}}_{m}$, plus
+$V_{m}\ge V^{\mathrm{free}}_{m}$, is \eqref{eq:O1}.
+
+\leanbox{\lean{insMixture\_free\_value}, \lean{excess\_neg},
+\lean{insMixtureEven\_free\_value}, \lean{O1\_odd}, \lean{O1\_even} in
+\lean{LeanPaperCRankingV1}}
+
+\TODOPAR{Superseded, and corrected here rather than deleted. This paragraph used to say
+\eqref{eq:O2} was proved only off a window for odd $m$ and untouched for even $m$; that
+described the earlier relaxed-bound route and is no longer what the corpus contains.
+\lean{O2\_strict\_odd} and \lean{O2\_strict\_even} prove \eqref{eq:O2} at every $m$ and
+both parities with no window. What is still owed is narrower and purely combinatorial:
+instantiating their two hypotheses --- the per-ranking counting inequality and the band
+bound --- at the concrete family. Until that is written, \eqref{eq:breakpoint} is
+two-sided \emph{modulo} that instantiation, and should be cited that way and no more
+strongly.}
+
+\subsection{Is the price robust, or does it live on cancellations?}
+\label{sec:robust}
+
+The family $g_{m}=(-3,(-1)^{p},(+1)^{q},3)$ is highly structured, and a reviewer is
+entitled to ask whether the factor-$m$ price is a phenomenon or an artefact of exact
+cancellation. The stability envelope does not settle it: it bounds the value's motion by
+$2\|u\|_{1}/D=O(1/m)$ against a baseline $V^{\mathrm{free}}=O(1/m^{2})$, so it
+\emph{permits} a collapse without predicting one.
+
+Kept in ratio form rather than applied to each side separately, the same envelope does
+give a floor. With $\|u\|_{1}\le\varepsilon$ and the normaliser held at $D=m+4$,
+\[
+\frac{V_{\mathrm{unif}}(g+u)}{V^{\mathrm{free}}(g+u)}
+\;\ge\;
+\frac{(m+3)/m-2\varepsilon}{2/(m-1)+2\varepsilon}
+\;\ge\;
+\frac{1}{4\varepsilon+4/(m-1)} ,
+\qquad \varepsilon\le\tfrac14 .
+\]
+So the price survives as $\Omega(m)$ while $\varepsilon=O(1/m)$, and the guarantee decays
+to $\Omega(1/\varepsilon)$ once $\varepsilon$ is held fixed.
+
+\leanbox{\lean{price\_ratio\_robust} in \lean{LeanPaperCBreakpointV1}}
+
+\paragraph{Two caveats that limit what ``robust'' can mean here.}
+First, the objective is $\max_{k}\mathbb{E}[r_{k}]$, not $\mathbb{E}[\max_{k}r_{k}]$. A
+distribution that is good for the first need not be good when a user actually draws one
+ranking and serves it across every budget, and nothing here is claimed for the second.
+Second, widening the family to $g_{m,a}=(-a,(-1)^{p},(+1)^{q},a)$ with $a$ ranging over an
+interval does \emph{not} answer the robustness question: blocks of weights stay equal, so
+the symmetry the argument uses is intact, and $\rho=p-q$ is an integer, so speaking of an
+``open region in $(a,\rho)$'' has no content until a topology on that pair is stated. The
+question is about arbitrary perturbations in $\mathbb{R}^{m}$, which is why the search
+below is over per-item perturbations rather than over a wider symmetric family.
+
+
+
+That is a floor, not the truth. Whether the worst case sits on it is measured by searching
+for the perturbation that hurts the ratio most --- random restarts followed by coordinate
+descent on the ratio, with baseline and normaliser recomputed at every step, over the
+$m!$ permutation formulation so that per-item perturbations breaking the equal-weight
+groups are admissible. A minimisation returns an \emph{upper} bound on the worst case,
+which is the direction that can exhibit a collapse. \NUM{}
+
+The measurement is unambiguous, and it goes against the floor. Three families were tried
+--- an adversarial search, shrinking the $\pm3$ anchors toward the bulk, and a uniform
+shift --- at $m=5,6,7$ and $\varepsilon$ up to $1.6$. \emph{None} loses half the price at
+any $\varepsilon$ tested for $m=5,6$, against a Lipschitz scale $1/(m-1)$ of $0.25$ and
+$0.20$: at $m=5$ the anchor family still keeps $95\%$ at $\varepsilon=0.4$ and $75\%$ at
+$\varepsilon=1.6$, and the uniform shift at $m=6$ \emph{raises} the price, to $2.5\times$
+its unperturbed value. Only at $m=7$ does the anchor family approach half, keeping $57\%$
+at $\varepsilon=1.6$. \NUM{}
+
+\NOTEPAR{So the floor is loose by close to an order of magnitude in $\varepsilon$, and the
+honest conclusion is that the Lipschitz envelope does not locate the collapse scale at
+all. Two different questions, and only one is answered. Proved: the floor. Measured: the
+worst case over three families, which survives far past that scale. Not proved: a matching
+construction, or a theorem that the price cannot collapse. The mechanism the measurement
+points to is that the \emph{free} problem re-optimises --- it may place perturbed items
+late, so a concentrated perturbation moves few prefixes --- and a bound exploiting that,
+rather than the pointwise envelope, is what would turn the parity formula into a
+robustness law.}
+
+\section{Evidence}
+\label{sec:evidence}
+
+Every number is produced by a script that self-checks against a statement proved in Lean and
+refuses to write output if a check fails. Evidence classes are kept distinct and are printed
+on each figure.
+
+\begin{table}[t]
+\caption{Evidence packages for this paper.}
+\label{tab:evidence}
+\centering
+\footnotesize
+\begin{tabular}{@{}llr@{}}
+\toprule
+Package & Script & Checks \\
+\midrule
+Flow reduction, breakpoints & \texttt{EXP\_paperC\_flow\_lp} & 5/5 \\
+Frontier, stability & \texttt{EXP\_unified\_structural\_frontier} & 9/9 \\
+(O1)/(O2) certificates & \texttt{EXP\_paperC\_breakpoint\_certs} & 5/5 \\
+Attainment, tight segment & \texttt{EXP\_paperC\_dual\_certificates} & 7/7 \\
+Exact (O2), affine Farkas roots & \texttt{EXP\_paperC\_exact\_dual} & 5/5 \\
+Breakpoint law, $m=4,\dots,24$ & \texttt{EXP\_paperC\_general\_m} & 9/9 \\
+Perturbation, both normalisations & \texttt{EXP\_paperC\_perturbation} & 9/9 \\
+Price robustness, adversarial & \texttt{EXP\_paperC\_robustness} & 4/4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperC_general_m.pdf}
+\caption{Left: the breakpoint by parity, across the sizes at which the construction was
+checked. Right: the worst marginal-band slack of that construction, exactly $0$ at
+$\eta_{*}(m)$ and negative just below --- so the construction is tight at the law.
+Exact rational arithmetic; no solver on either panel.}
+\label{fig:generalm}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperC_frontier.pdf}
+\caption{Left: the relative price along the band. Right: the range on which
+obligation~\eqref{eq:O2} is a theorem, and the window that is not.}
+\label{fig:frontier}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\columnwidth]{paperC_flow.pdf}
+\caption{Breakpoints located by the flow LP, against \eqref{eq:breakpoint}. Solved, not
+proved.}
+\label{fig:flow}
+\end{figure}
+
+\section{Limitations}
+\label{sec:limits}
+
+\begin{enumerate}
+\item[1)] \textbf{E1--E2 are not formalised.} The flow reduction is argued and checked
+numerically wherever both formulations run; those two are not Lean theorems. E3, the
+flow-to-ranking transfer, is (\lean{pathDecomposition\_count\_states}), with its section
+built rather than assumed, so the reduction's \emph{lossless} half no longer rests on the
+numerics or on an unproved realisation hypothesis.
+\item[2)] \textbf{The breakpoint is two-sided.} (O1) --- that the constrained value
+\emph{reaches} the free value at the breakpoint --- is a theorem at every $m$ and both
+parities. (O2) --- that it strictly exceeds it below --- is likewise a theorem at every $m$
+and both parities, with no window. What is \emph{not} claimed is the rest of the frontier
+away from the breakpoint.
+\item[3)] \textbf{One family.} Everything is for $g_{m}$ of~\eqref{eq:family}. The relaxed
+bound is odd-$m$ only.
+\item[6)] \textbf{Attainment is point-by-point, and its extent is measured.}
+Proposition~\ref{prop:attained} is exact at twelve tabulated $(m,\eta)$; it is not a
+general-$m$ theorem, and no rational flow is exhibited for even $m$. The tight segment
+\eqref{eq:tight} comes from a floating-point bisection and is a measured law only.
+\item[4)] \textbf{Stability holds $D$ and the feasible set fixed.} If the perturbation
+changes the normaliser, or breaks the equal-weight groups the symmetry reduction uses, the
+bound does not transfer.
+\item[5)] \textbf{The objective is $\max_{k}\mathbb{E}r_{k}$}, not
+$\mathbb{E}\max_{k}r_{k}$, and no result here is claimed for the latter. This is not a
+technicality: a served ranking is a single draw used across every budget, so the second
+functional is the one an application meets, and the marginal price for it is unknown.
+\end{enumerate}
+
+\section{Conclusion}
+
+Constraining the retained marginals of a served ranking costs a factor $m$ in odd size, the
+cost survives relaxing the constraint to a band of any fixed width below one, and it is
+stable under weight perturbation once the per-budget baseline is recomputed. On an initial
+segment of the band the lower bound is not a bound but the value: it is met with equality by
+an exhibited rational flow, so the factor-$m$ price is the truth about the constrained game
+rather than the reach of a lossy argument. The frontier is
+a non-increasing convex curve computable in $O(m^{2})$ variables rather than $m!$, which is
+what lets it be traced at all. That it \emph{does} meet the unconstrained value at the
+breakpoint is now a theorem at every size, by an explicit insertion mixture; that it stays
+strictly above below the breakpoint is now also a theorem at every size and both parities,
+with no window. What we have measured rather than hidden is elsewhere, and one earlier
+reading of it was wrong. Across the two \emph{structured} families (shrink-anchors,
+uniform-shift) at $m=5,6,7$ no family loses half the price at any
+$\varepsilon\le1.6$ --- the uniform shift at $m=6$ \emph{raises} it to $2.5\times$ --- but
+the \emph{adversarially searched} family does: at $m=7$ it keeps $43.5\%$ of the price at
+$\varepsilon=0.8$ and $30.1\%$ at $\varepsilon=1.6$. So the price does collapse below half,
+and the earlier sentence that no family does was reading only the structured two. What
+remains unlocated is the collapse \emph{scale}: an adversarial search returns an upper
+bound on the worst case, so failing to find a worse perturbation is not evidence of
+robustness, and no matching construction is proved.
+
+\section*{Companion material}
+Two files accompany this paper and are part of the submission record.
+\texttt{PROOFS.md} gives the central arguments as readable mathematics with no Lean
+required --- setup, claim, proof, and in the same breath what the claim does not
+cover. \texttt{DOSSIER.md} carries the full state: every audited theorem, every
+measured number with its artifact and provenance status, the open list, and the
+claims retracted during preparation, recorded rather than silently edited.
+\texttt{CLAIMS.md} is the one-row-per-headline table of claim, final theorem,
+remaining hypotheses and evidence.
+
+\begin{thebibliography}{00}
+
+\bibitem{singh2018} A. Singh and T. Joachims, ``Fairness of exposure in rankings,'' in
+\emph{Proc. 24th ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining}, 2018,
+pp.~2219--2228.
+
+\bibitem{singh2021} A. Singh, D. Kempe, and T. Joachims, ``Fairness in ranking under
+uncertainty,'' in \emph{Advances in Neural Information Processing Systems 34}, 2021,
+pp.~11896--11908.
+
+\bibitem{balinski1982} M. L. Balinski and H. P. Young, \emph{Fair Representation: Meeting
+the Ideal of One Man, One Vote}. New Haven, CT: Yale Univ. Press, 1982.
+
+\bibitem{schrijver2003} A. Schrijver, \emph{Combinatorial Optimization: Polyhedra and
+Efficiency}. Berlin, Germany: Springer, 2003.
+
+\bibitem{boyd2004} S. Boyd and L. Vandenberghe, \emph{Convex Optimization}. Cambridge,
+U.K.: Cambridge Univ. Press, 2004.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\end{document}

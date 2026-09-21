@@ -111,7 +111,9 @@ def build_gap(rng, r, gap, sigma):
 
 def coefficients(inst, r):
     lv = sorted(set(inst['f0']))
-    out = {}
+    out = {
+           "source_sha256": __import__("hashlib").sha256(
+               __import__("pathlib").Path("scripts/EXP_query_tiedtop.py").read_bytes()).hexdigest(),}
     for v in lv:
         m0 = sum(inst['pi'][i] * inst['g'][i] ** r
                  for i in range(len(inst['g'])) if inst['f0'][i] == v)

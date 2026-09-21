@@ -33,7 +33,9 @@ def _git(*args):
 
 
 def versions():
-    out = {'python': sys.version.split()[0], 'platform': platform.platform()}
+    out = {
+           "source_sha256": __import__("hashlib").sha256(
+               __import__("pathlib").Path("scripts/EXP_provenance.py").read_bytes()).hexdigest(),'python': sys.version.split()[0], 'platform': platform.platform()}
     for name in ('numpy', 'scipy', 'mpmath'):
         try:
             mod = __import__(name)

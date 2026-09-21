@@ -1,0 +1,136 @@
+{
+  "smoke": true,
+  "ms": [
+    5
+  ],
+  "epss": [
+    0.05,
+    0.4
+  ],
+  "size_cap_reason": "the permutation LP has m! columns; m <= 7",
+  "unperturbed": [
+    {
+      "m": 5,
+      "ratio": 3.1999999999999984,
+      "floor_eps0": 1.0
+    }
+  ],
+  "rows": [
+    {
+      "m": 5,
+      "eps": 0.05,
+      "worst_ratio": 3.0797117370386604,
+      "proved_floor": 0.8333333333333334,
+      "ratio_over_floor": 3.6956540844463923,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.9624099178245819,
+      "u": [
+        0.01205177803308027,
+        -0.0029052694742314924,
+        0.01760336472156303,
+        0.0012513976185219062,
+        0.0161881901526033
+      ]
+    },
+    {
+      "m": 5,
+      "eps": 0.4,
+      "worst_ratio": 2.409149634636156,
+      "proved_floor": 0.3846153846153846,
+      "ratio_over_floor": 6.263789050054005,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.7528592608237991,
+      "u": [
+        0.10203258594695144,
+        0.10882382037895716,
+        -0.024758698592210818,
+        0.03353609257748263,
+        0.13084880250439798
+      ]
+    }
+  ],
+  "verdict": null,
+  "structured": [
+    {
+      "m": 5,
+      "family": "shrink_anchors",
+      "eps": 0.05,
+      "ratio": 3.1800000000000006,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.9937500000000007,
+      "proved_floor": 0.8333333333333334
+    },
+    {
+      "m": 5,
+      "family": "shrink_anchors",
+      "eps": 0.4,
+      "ratio": 3.04,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.9500000000000005,
+      "proved_floor": 0.3846153846153846
+    },
+    {
+      "m": 5,
+      "family": "uniform_shift",
+      "eps": 0.05,
+      "ratio": 3.136000000000001,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.9800000000000008,
+      "proved_floor": 0.8333333333333334
+    },
+    {
+      "m": 5,
+      "family": "uniform_shift",
+      "eps": 0.4,
+      "ratio": 2.687999999999996,
+      "unperturbed": 3.1999999999999984,
+      "kept_fraction": 0.8399999999999992,
+      "proved_floor": 0.3846153846153846
+    }
+  ],
+  "collapse_scale": [
+    {
+      "m": 5,
+      "family": "shrink_anchors",
+      "eps_half": null,
+      "lipschitz_scale": 0.25
+    },
+    {
+      "m": 5,
+      "family": "uniform_shift",
+      "eps_half": null,
+      "lipschitz_scale": 0.25
+    },
+    {
+      "m": 5,
+      "family": "adversarial",
+      "eps_half": null,
+      "lipschitz_scale": 0.25
+    }
+  ],
+  "scope": "proved floor vs adversarially searched worst case; the matching construction is not proved",
+  "source_sha256": "37484498f09cbfecf0183b9795f4acc2d7fced0b4b8df42e40f0446ebe5be7ce",
+  "checks": [
+    {
+      "name": "the price survives well beyond the Lipschitz scale 1/(m-1) in every family tried -- so the proved floor is LOOSE, and the true collapse scale is set by the structure (the anchors), not by the l^1 radius",
+      "ok": true,
+      "detail": "m=5 shrink_anchors: never vs 0.25; m=5 uniform_shift: never vs 0.25; m=5 adversarial: never vs 0.25"
+    },
+    {
+      "name": "every perturbation found lies ABOVE the proved floor 1/(4 eps + 4/(m-1)), so `price_ratio_robust` is not contradicted by an adversarial search",
+      "ok": true,
+      "detail": "2/2; tightest found/floor = 3.696"
+    },
+    {
+      "name": "at eps = O(1/m) the price is essentially untouched, which is the regime the floor guarantees",
+      "ok": true,
+      "detail": "m=5, eps=0.05: kept 96.2%"
+    },
+    {
+      "name": "the search is adversarial (random restarts then coordinate descent) and so returns an UPPER bound on the worst case -- the direction that can show a collapse; not finding one is the weaker reading",
+      "ok": true,
+      "detail": "3 restarts and 2 descent sweeps per (m, eps)"
+    }
+  ],
+  "all_passed": true
+}
