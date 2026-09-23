@@ -111,10 +111,26 @@ def mixture_density(mu, sigma, y):
 
 
 def hellinger_sq(mu1, mu2, sigma, y, w):
+    """`H^2` by the SQUARED-DIFFERENCE form, never as `1 - affinity`.
+
+    The quantity being measured here is of order `h^{2r}` -- at `r = 3` and `h = 0.05`
+    that is `1e-8` -- while the affinity is within `1e-8` of one.  Forming `1 - affinity`
+    in double precision therefore cancels about eight of the sixteen significant digits
+    before the quadrature error is even considered, and the leading digits that survive are
+    the ones being fitted for a slope.  The identity
+
+        H^2(P,Q) = (1/2) integral (p - q)^2 / (sqrt p + sqrt q)^2
+
+    has no such cancellation: the numerator is computed from a difference of densities that
+    is itself of order `h^r`, and nothing subtracts two nearly equal O(1) numbers.
+    """
     p = mixture_density(mu1, sigma, y)
     q = mixture_density(mu2, sigma, y)
-    aff = float(np.sum(w * np.sqrt(np.maximum(p * q, 0.0))))
-    return 1.0 - aff, float(np.sum(w * p)), float(np.sum(w * q))
+    sp, sq = np.sqrt(np.maximum(p, 0.0)), np.sqrt(np.maximum(q, 0.0))
+    den = (sp + sq) ** 2
+    integrand = np.where(den > 0.0, (p - q) ** 2 / np.where(den > 0.0, den, 1.0), 0.0)
+    h2 = 0.5 * float(np.sum(w * integrand))
+    return h2, float(np.sum(w * p)), float(np.sum(w * q))
 
 
 def grid(sigma, r, npts=6001):
@@ -198,11 +214,19 @@ def sup_hellinger(r, h, sigma, direction, restarts, rng, y, w, basis, extra_seed
             e = np.zeros(ncoef)
             e[i] = sgn
             seeds.append(e)
-    # The CANONICAL construction probe -- the equal mix of the tail coordinates, which on
-    # the linear basis is g = (z_4 + z_5 + z_6)/3 -- is a mandatory baseline, not something
-    # the random ascent is trusted to rediscover.  Both signs are seeded.
-    for sgn in (1.0, -1.0):
-        seeds.append(sgn * np.ones(ncoef) / ncoef)
+    # The CANONICAL construction probe is the equal mix of the TAIL coordinates alone,
+    # `g = (1/r) sum_{l=4}^{r+3} z_l`.  A flat vector over every coefficient is NOT that
+    # probe: it spreads the same mass over the head coordinates `z_1, z_2, z_3`, which carry
+    # the decision signal rather than the identification signal, so seeding it does not put
+    # the ascent anywhere near the construction's own attaining probe.  The coefficients are
+    # recovered from the basis by least squares, so this is right for any basis that spans
+    # the probe, and the residual is checked rather than assumed.
+    g_tail = cube(r + 3)[:, 3:3 + r].mean(axis=1)
+    c_tail, *_ = np.linalg.lstsq(basis, g_tail, rcond=None)
+    tail_residual = float(np.max(np.abs(basis @ c_tail - g_tail)))
+    if tail_residual <= 1e-9:
+        for sgn in (1.0, -1.0):
+            seeds.append(sgn * c_tail)
     seeds.extend(np.asarray(e, dtype=float) for e in extra_seeds)
     n_conv = 0
     for k in range(restarts + len(seeds)):
@@ -224,6 +248,10 @@ def sup_hellinger(r, h, sigma, direction, restarts, rng, y, w, basis, extra_seed
             "n_starts": int(restarts + len(seeds)), "n_converged": int(n_conv),
             "achieving_coeffs": [float(c) for c in best_c],
             "sup_is_lower_bound_on_supremum": True,
+            "canonical_tail_seed_residual": tail_residual,
+            "canonical_tail_seed_used": bool(tail_residual <= 1e-9),
+            "hellinger_form": "squared-difference: (1/2) int (p-q)^2/(sqrt p + sqrt q)^2"
+                              " -- NOT 1 - affinity",
             "probe_sup_norm": float(np.max(np.abs(gbest)))}
 
 

@@ -106,7 +106,7 @@ def fig_calibration():
 
 def fig_oracle_gap():
     """Panel 3: what the certificate costs over the decision."""
-    d = load("oracle_gap.json")
+    d = load("oracle_gap_corrected_v2.json")
     rows = d["rows"]
     fig, ax = plt.subplots(figsize=(3.4, 2.5))
     cs = [r["c"] for r in rows]
@@ -134,14 +134,14 @@ def fig_oracle_gap():
 
 def fig_query_order():
     """Panel 4: the measured Hellinger order against the predicted 2s."""
-    d = load("query_order.json")
+    d = load("query_order_corrected_v2.json")
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.5))
     for row in d["hellinger"]:
         h = np.array(row["h"]); H2 = np.array(row["H2"])
         ax[0].loglog(h, H2, "o-", ms=3,
                      label=fr"$n={row['n']},d={row['d']}$ ($s={row['s']}$)")
     ax[0].set_xlabel("$h$"); ax[0].set_ylabel(r"$H^2$")
-    ax[0].set_title("Hellinger falls at the predicted order")
+    ax[0].set_title(r"measured slopes, within tolerance of $2s$")
     ax[0].legend(frameon=False, fontsize=6)
 
     s_pred = [2 * r["s"] for r in d["hellinger"]]
@@ -152,7 +152,7 @@ def fig_query_order():
     ax[1].set_xlim(lim); ax[1].set_ylim(lim)
     ax[1].set_xlabel(r"predicted slope $2s=2\lceil n/d\rceil$")
     ax[1].set_ylabel("measured slope")
-    ax[1].set_title("exact moments, deterministic quadrature")
+    ax[1].set_title("measured against predicted; quadrature error uncertified")
     for xp, yp, r in zip(s_pred, s_meas, d["hellinger"]):
         ax[1].annotate(fr"$d={r['d']}$", (xp, yp), textcoords="offset points",
                        xytext=(5, -7), fontsize=6)
@@ -164,7 +164,7 @@ def fig_query_order():
 
 def fig_obstruction():
     """Panel 5: deciding against identifying."""
-    d = load("obstruction_order.json")
+    d = load("obstruction_order_corrected_v2.json")
     fig, ax = plt.subplots(figsize=(3.4, 2.5))
     h = np.array([r["h"] for r in d["cost"]])
     cd = np.array([r["cost_decide"] for r in d["cost"]])
@@ -183,7 +183,7 @@ def fig_obstruction():
 
 def fig_structural_frontier():
     """Panel 6: the frontier in eta, and where the separation dies."""
-    d = load("structural_frontier.json")
+    d = load("structural_frontier_corrected_v2.json")
     etas = d["etas"]
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.5))
     for m in sorted(d["frontier"], key=int):

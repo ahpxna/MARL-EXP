@@ -138,7 +138,13 @@ def main():
     def phi(t):
         return np.exp(-t ** 2 / (2 * sigma ** 2)) / (sigma * np.sqrt(2 * np.pi))
 
-    head = np.array([-4.0, 0.0, 0.0, 4.0])          # -2 z2 - 2 z3 over the cube
+    # The FULL head of the observation model is `3 u z1 - 2 z2 - 2 z3` over the cube,
+    # with u = 1 as used by `base_means` above -- eight atoms, not four.  An earlier
+    # version built only the `-2 z2 - 2 z3` part, i.e. the density of a DIFFERENT model,
+    # so the expansion coefficients it verified were not this model's.
+    u_head = 1.0
+    head = np.array([3.0 * u_head * z1 - 2.0 * z2 - 2.0 * z3
+                     for z1 in (-1.0, 1.0) for z2 in (-1.0, 1.0) for z3 in (-1.0, 1.0)])
     f = sum(phi(y - hh) for hh in head) / len(head)
 
     def dd(a, k):

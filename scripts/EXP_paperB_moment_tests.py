@@ -39,6 +39,7 @@ import sys
 from itertools import product
 
 import numpy as np
+from scipy import stats
 
 CHECKS = []
 
@@ -110,11 +111,25 @@ def adaptive_reps(N, reps):
     return int(max(16, min(reps, BUDGET_DRAWS // max(N, 1))))
 
 
+def cp_upper(k, n, conf=0.95):
+    """Exact binomial UPPER confidence bound.
+
+    A cell with `0` mistakes out of `16` repetitions has an observed rate of zero and an
+    upper bound of about `0.17`.  Reporting the rate alone invites reading the first number
+    as the second; the bound is what a cell with few repetitions actually establishes.
+    """
+    if n == 0:
+        return 1.0
+    if k >= n:
+        return 1.0
+    return float(stats.beta.ppf(conf, k + 1, n - k))
+
+
 def error_rate(rng, N, r, h, sigma, mode, power, thresh, hi_is, reps):
     use = adaptive_reps(N, reps)
     bad = sum(0 if mom_test(rng, N, r, h, sigma, mode, power, thresh, hi_is) else 1
               for _ in range(use))
-    return bad / use, use
+    return bad / use, use, cp_upper(bad, use)
 
 
 def main():
@@ -196,16 +211,17 @@ def main():
                 if Nd < 8 or Nd > NMAX:
                     skipped["decision"] += 1
                     continue
-                e, u = error_rate(rng, Nd, r, h, sigma, "decision", 2, td, +1, reps)
-                dec.append({"h": h, "N": Nd, "scaled": Nd * h ** 2, "err": e, "reps": u})
+                e, u, ub = error_rate(rng, Nd, r, h, sigma, "decision", 2, td, +1, reps)
+                dec.append({"h": h, "N": Nd, "scaled": Nd * h ** 2, "err": e, "reps": u,
+                            "err_upper95": ub})
             for S in id_ladder:
                 Ni = int(round(S / h ** (2 * r)))
                 if Ni < 8 or Ni > NMAX:
                     skipped["ident"] += 1
                     continue
-                e2, u2 = error_rate(rng, Ni, r, h, sigma, "ident", r + 1, ti, +1, reps)
+                e2, u2, ub2 = error_rate(rng, Ni, r, h, sigma, "ident", r + 1, ti, +1, reps)
                 ide.append({"h": h, "N": Ni, "scaled": Ni * h ** (2 * r), "err": e2,
-                            "reps": u2})
+                            "reps": u2, "err_upper95": ub2})
             print(f"      h={h:5.3f}: decision errors "
                   f"{[round(d['err'], 3) for d in dec if d['h'] == h]}")
             print(f"              identification errors "
@@ -257,6 +273,22 @@ def main():
           True,
           "; ".join(f"r={k}: {v['skipped_over_budget']} dropped"
                     for k, v in results.items()))
+
+    # Every cell's repetition count and binomial upper bound are recorded, because a cell
+    # with few repetitions bounds the error weakly even when it observes none: `0/16` gives
+    # an upper bound near `0.17`, not near zero, and the two must not be read as the same.
+    allcells = [c for rr in results.values() for key in ("decision", "ident")
+                for c in rr.get(key, [])]
+    minreps = min((c["reps"] for c in allcells), default=0)
+    worstub = max((c.get("err_upper95", 1.0) for c in allcells), default=1.0)
+    nlow = sum(1 for c in allcells if c["reps"] <= 16)
+    check("every cell carries its repetition count AND a binomial upper confidence bound,"
+          " so a cell that observed no mistakes is not read as having near-zero error:"
+          " the fewest repetitions in the panel bound the error only as well as the"
+          " binomial allows",
+          all("reps" in c and "err_upper95" in c for c in allcells),
+          f"{len(allcells)} cells, fewest repetitions {minreps} ({nlow} cells at 16 or"
+          f" fewer), worst upper bound over the panel {worstub:.3f}")
 
     nfail = sum(1 for c in CHECKS if not c["ok"])
     print("\n" + "=" * 78)

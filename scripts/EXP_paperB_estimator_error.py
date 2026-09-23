@@ -38,6 +38,7 @@ import math
 import sys
 
 import numpy as np
+from scipy import stats
 
 CHECKS = []
 
@@ -98,22 +99,68 @@ def lrt(rng, N, truth, alt_v_or_u, r, h, sigma, mode, which):
     return 1 if l1 > l2 else -1
 
 
-def error_rate(rng, N, r, h, sigma, reps, which):
+def clopper_pearson_upper(k, n, conf=0.95):
+    """Exact binomial UPPER confidence bound on the error probability.
+
+    A point estimate `k/n` is not a guarantee.  If the claim is "this budget attains error
+    at most alpha", the quantity that has to clear alpha is the upper end of a confidence
+    interval, not the observed rate.
+    """
+    if n == 0:
+        return 1.0
+    if k >= n:
+        return 1.0
+    return float(stats.beta.ppf(conf, k + 1, n - k))
+
+
+def error_per_world(rng, N, r, h, sigma, reps, which):
+    """Error rate at EACH world separately, and the worst of them.
+
+    An earlier version drew the truth at random and pooled the mistakes.  That estimates the
+    average error under a uniform prior on the truth, which is not a worst-case guarantee
+    and is the quantity a minimax statement must not be built from.  The two worlds are run
+    with the same number of repetitions and reported separately.
+    """
     mode = "decision" if which == "decision" else "ident"
-    bad = 0
-    for _ in range(reps):
-        truth = int(rng.choice([-1, 1]))
-        bad += (lrt(rng, N, truth, None, r, h, sigma, mode, which) != truth)
-    return bad / reps
+    out = {}
+    for truth in (-1, 1):
+        bad = 0
+        for _ in range(reps):
+            bad += (lrt(rng, N, truth, None, r, h, sigma, mode, which) != truth)
+        out[truth] = {"errors": int(bad), "reps": int(reps), "rate": bad / reps,
+                      "upper95": clopper_pearson_upper(bad, reps)}
+    worst = max(out[t]["rate"] for t in (-1, 1))
+    worst_upper = max(out[t]["upper95"] for t in (-1, 1))
+    return {"per_world": {str(t): out[t] for t in (-1, 1)},
+            "worst_rate": worst, "worst_upper95": worst_upper,
+            "pooled_rate": 0.5 * (out[-1]["rate"] + out[1]["rate"])}
 
 
-def find_N(rng, r, h, sigma, alpha, reps, which, Nmax):
-    """Smallest N on a fine geometric ladder whose empirical error is at most alpha."""
+def find_N(rng, r, h, sigma, alpha, reps, which, Nmax, confirm_reps=None):
+    """A PILOT chooses the budget; INDEPENDENT data confirms it.
+
+    Taking the first ladder point whose observed error clears `alpha` selects on noise: the
+    winner is biased low precisely because it was chosen for being low.  So the ladder is a
+    pilot, and the selected budget is then re-run on fresh repetitions, where the quantity
+    that must clear `alpha` is the worst world's upper confidence bound.  A budget that
+    fails confirmation is reported as unconfirmed rather than silently accepted.
+    """
+    confirm_reps = confirm_reps or (4 * reps)
     N = 8
+    rejected = 0
     while N <= Nmax:
-        e = error_rate(rng, N, r, h, sigma, reps, which)
-        if e <= alpha:
-            return N, e
+        e = error_per_world(rng, N, r, h, sigma, reps, which)
+        if e["worst_rate"] <= alpha:
+            conf = error_per_world(rng, N, r, h, sigma, confirm_reps, which)
+            if conf["worst_upper95"] <= alpha:
+                return N, {"pilot": e, "confirm": conf, "confirmed": True,
+                           "confirm_reps": confirm_reps,
+                           "pilot_points_rejected_by_confirmation": rejected}
+            # The pilot cleared the target and the independent re-run did not.  That is the
+            # winner's curse, not a fluke to be ignored: the ladder point was SELECTED for
+            # having a low observed error, so its observed error is biased low.  Count it
+            # and keep climbing rather than reporting it.
+            rejected += 1
         N = max(N + 1, int(N * 1.35))
     return None, None
 
@@ -146,8 +193,12 @@ def main():
             ide.append((h, Ni, ei))
             ds = f"{Nd:6d}" if Nd else "  >max"
             is_ = f"{Ni:8d}" if Ni else "    >max"
-            print(f"      h={h:5.3f}:  decide N*={ds} (err {ed if ed is not None else float('nan'):.3f})"
-                  f"   identify N*={is_} (err {ei if ei is not None else float('nan'):.3f})")
+            dtag = ("conf" if ed and ed["confirmed"] else "UNCONF") if ed else "-"
+            itag = ("conf" if ei and ei["confirmed"] else "UNCONF") if ei else "-"
+            dw = f"{ed['confirm']['worst_upper95']:.3f}" if ed else "  nan"
+            iw = f"{ei['confirm']['worst_upper95']:.3f}" if ei else "  nan"
+            print(f"      h={h:5.3f}:  decide N*={ds} [{dtag}, worst UCB {dw}]"
+                  f"   identify N*={is_} [{itag}, worst UCB {iw}]")
         results[r] = {"decision": dec, "ident": ide}
 
         dh = [math.log(h) for h, N, _ in dec if N]
@@ -166,6 +217,31 @@ def main():
               abs(si + 2 * r) < 0.55 * r, f"slope {si:.2f}")
         check(f"r={r}: identification is strictly more expensive than deciding",
               si < sd - 1.0, f"{si:.2f} vs {sd:.2f}")
+
+        # The budget is chosen on a PILOT and confirmed on INDEPENDENT data, and what has to
+        # clear `alpha` is the WORST world's upper confidence bound -- not the pooled point
+        # estimate, and not the pilot that selected the budget in the first place.
+        allres = [e for _, N, e in dec if N] + [e for _, N, e in ide if N]
+        nconf = sum(1 for e in allres if e["confirmed"])
+        nrej = sum(e["pilot_points_rejected_by_confirmation"] for e in allres)
+        check(f"r={r}: every reported budget is CONFIRMED on independent repetitions, with"
+              " the worst world's Clopper-Pearson upper bound below the target -- a budget"
+              " selected by the first ladder point to clear the target is biased low"
+              " precisely because it was selected for clearing it",
+              nconf == len(allres),
+              f"{nconf}/{len(allres)} confirmed; {nrej} pilot points were rejected BY the"
+              f" confirmation step (the winner's curse, measured); worst UCB over all"
+              f" reported budgets"
+              f" {max((e['confirm']['worst_upper95'] for e in allres), default=float('nan')):.3f}"
+              f" against alpha {alpha}")
+
+        check(f"r={r}: error is reported PER WORLD and the headline is the WORST of them,"
+              " never the average over a uniform prior on the truth -- the two are"
+              " different quantities and only the first supports a minimax statement",
+              all("per_world" in e["confirm"] and len(e["confirm"]["per_world"]) == 2
+                  for e in allres),
+              f"{len(allres)} budgets, each with both worlds run at"
+              f" {allres[0]['confirm_reps'] if allres else 0} repetitions")
 
     nfail = sum(1 for c in CHECKS if not c["ok"])
     print("\n" + "=" * 78)

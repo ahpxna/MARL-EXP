@@ -201,52 +201,88 @@ def fig_c_general_m():
 
 
 def fig_a7():
-    """A7: three arms on one model, with censoring and regret reported."""
+    """A7: the panel per alpha, and the alpha axis read as a SLOPE.
+
+    An earlier version of this figure plotted `tau/log(1/alpha)` against a band for
+    `1/Gamma_comp`.  That is a comparison of LEVELS, and the levels are not testable on this
+    panel: the stopping threshold carries `(1/2) sum_e log(1 + N_e/a)`, measured at ~19.7
+    against `log(1/alpha) <= 4.61`, so the ratio is dominated by the penalty and not by the
+    rate.  Drawing the benchmark band beside it invited exactly the reading the analysis
+    rules out.  An additive penalty cancels in the SLOPE, so that is what the right panel
+    shows, with the prediction corrected for the penalty's own measured drift.
+    """
     d = load("paperA7_learner.json")
+    scope = d.get("panel_scope")
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.5))
     alphas = [r["alpha"] for r in d["rows"]]
     L = np.log(1.0 / np.array(alphas))
-    G_lo = d.get("Gamma_comp_lower", d["Gamma_comp"])
-    G_up = d.get("Gamma_comp_upper", d["Gamma_comp"])
+
+    # ---- left: the panel itself, per alpha, with standard errors ----------------
     for arm, col, mk in (("learner", "#4C72B0", "o"),
                          ("oracle", "#55A868", "s"),
                          ("uniform", "#C44E52", "^")):
         mus = np.array([r["arms"][arm]["mean_tau"] for r in d["rows"]])
         cens = sum(r["arms"][arm]["censored"] for r in d["rows"])
-        lab = arm + (" (diagnostic)" if arm == "oracle" else "")
+        if scope:
+            sems = np.array([c["arms"][arm]["sem"] for c in scope["per_alpha"]])
+        else:
+            sems = np.zeros_like(mus)
+        lab = arm + (" (diagnostic, NOT a lower bound)" if arm == "oracle" else "")
         lab += f"  [{cens} censored]" if cens else ""
-        ax[0].plot(L, mus / L, mk + "-", ms=4, color=col, label=lab)
-    # The benchmark is a BRACKET, not a point: the lower side of Gamma comes from a
-    # design that was actually achieved, the upper side from a prior over the collected
-    # alternatives.  Drawing one line would assert a precision the artifact does not have.
-    ax[0].axhspan(1.0 / G_up, 1.0 / G_lo, color="0.85", zorder=0,
-                  label=r"$1/\Gamma_{\rm comp}$ bracket (asymptotic)")
-    ax[0].axhline(1.0 / G_lo, color="k", ls="--", lw=0.8)
-    ax[0].axhline(1.0 / G_up, color="k", ls=":", lw=0.8)
+        ax[0].errorbar(L, mus, yerr=sems, fmt=mk + "-", ms=4, capsize=2,
+                       color=col, label=lab)
     ax[0].set_xlabel(r"$\log(1/\alpha)$")
-    ax[0].set_ylabel(r"$\bar\tau/\log(1/\alpha)$")
-    ax[0].set_title("stopping cost per unit of confidence")
+    ax[0].set_ylabel(r"mean $\tau$")
+    ax[0].set_title("stopping time per confidence level")
     ax[0].legend(frameon=False, fontsize=5.5)
-    tag(ax[0], "NUMERICAL; benchmark is an asymptotic BRACKET, points are finite-$\\alpha$")
+    tag(ax[0], "NUMERICAL; common random numbers across $\\alpha$; bars are $\\pm$1 s.e.")
 
-    corr, tot = [], []
-    for r in d["rows"]:
-        c = sum(r["arms"][a]["correct"] for a in ("learner", "oracle", "uniform"))
-        n = sum(r["arms"][a]["n_runs"] - r["arms"][a]["censored"]
-                for a in ("learner", "oracle", "uniform"))
-        corr.append(c); tot.append(n)
-    ax[1].bar(range(len(alphas)), [c / max(t, 1) for c, t in zip(corr, tot)],
-              color="#4C72B0", width=0.6)
-    ax[1].set_xticks(range(len(alphas)))
-    ax[1].set_xticklabels([f"{a:g}" for a in alphas])
-    ax[1].set_ylim(0, 1.15)
-    ax[1].axhline(1.0, color="k", ls="--", lw=0.8)
-    for i, (c, t) in enumerate(zip(corr, tot)):
-        ax[1].text(i, 1.03, f"{c}/{t}", ha="center", fontsize=5.5)
-    ax[1].set_xlabel(r"$\alpha$")
-    ax[1].set_ylabel("fraction correct")
-    ax[1].set_title("every stopped run returned the right answer")
-    tag(ax[1], "NUMERICAL; regret is zero on every stopped run")
+    # ---- right: the slope, which is the part that IS testable -------------------
+    try:
+        sl = load("paperA7_alpha_slope.json")
+    except FileNotFoundError:
+        sl = None
+    if sl is not None:
+        arms = ("learner", "oracle", "uniform")
+        cols = ("#4C72B0", "#55A868", "#C44E52")
+        xs = np.arange(len(arms))
+        vals = [sl["per_arm"][a]["slope_mean"] for a in arms]
+        errs = [1.96 * sl["per_arm"][a]["slope_sem"] for a in arms]
+        ax[1].errorbar(xs, vals, yerr=errs, fmt="o", ms=5, capsize=3,
+                       color="k", ecolor="0.4", lw=0)
+        for x, v, c in zip(xs, vals, cols):
+            ax[1].plot([x], [v], "o", ms=5, color=c)
+        pred = sl.get("predicted_slope_with_drift")
+        if pred:
+            ax[1].axhspan(pred[0], pred[1], color="#f0c674", alpha=0.55, zorder=0,
+                          label="predicted $1/\\Gamma$, penalty drift included")
+            ax[1].axhline(pred[0], color="#a07a10", lw=0.8)
+        inv = sl.get("inv_Gamma_comp_bracket")
+        if inv:
+            ax[1].axhline(inv[0], color="k", ls=":", lw=0.8,
+                          label=r"$1/\Gamma_{\rm comp}$ (no drift)")
+        ax[1].set_xticks(xs)
+        ax[1].set_xticklabels(arms)
+        ax[1].set_ylabel(r"$d\bar\tau\,/\,d\log(1/\alpha)$")
+        ax[1].set_title("slope in $\\log(1/\\alpha)$ (the testable part)")
+        ax[1].legend(frameon=False, fontsize=5.5, loc="upper left")
+        tag(ax[1], "NUMERICAL; bars are 95% CI over paths. LEVELS are NOT\ncomparable"
+                   " with $1/\\Gamma$: threshold penalty $\\approx$ 19.7 vs $\\log(1/\\alpha)\\leq$ 4.6")
+    else:
+        corr, tot = [], []
+        for r in d["rows"]:
+            c = sum(r["arms"][a]["correct"] for a in ("learner", "oracle", "uniform"))
+            n = sum(r["arms"][a]["n_runs"] - r["arms"][a]["censored"]
+                    for a in ("learner", "oracle", "uniform"))
+            corr.append(c); tot.append(n)
+        ax[1].bar(range(len(alphas)), [c / max(t, 1) for c, t in zip(corr, tot)],
+                  color="#4C72B0", width=0.6)
+        ax[1].set_xticks(range(len(alphas)))
+        ax[1].set_xticklabels([f"{a:g}" for a in alphas])
+        ax[1].set_ylim(0, 1.15)
+        ax[1].set_xlabel(r"$\alpha$")
+        ax[1].set_ylabel("fraction correct")
+        tag(ax[1], "NUMERICAL")
 
     fig.tight_layout()
     fig.savefig(f"{OUT}/paperA7_learner.pdf")

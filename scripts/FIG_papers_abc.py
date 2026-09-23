@@ -78,7 +78,7 @@ def figA_proxy():
 
 
 def figA_oracle_gap():
-    d = load("oracle_gap.json")
+    d = load("oracle_gap_corrected_v2.json")
     rows = d["rows"]
     fig, ax = plt.subplots(figsize=(3.4, 2.5))
     fin = [(r["c"], r["cost_ratio"]) for r in rows
@@ -106,16 +106,16 @@ def figA_oracle_gap():
 # ------------------------------------------------------------------ Paper B
 
 def figB_orders():
-    d = load("query_order.json")
+    d = load("query_order_corrected_v2.json")
     b = load("paperB_construction.json")
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.5))
     for row in d["hellinger"]:
         ax[0].loglog(row["h"], row["H2"], "o-", ms=3,
                      label=fr"$n={row['n']},d={row['d']}$ ($s={row['s']}$)")
     ax[0].set_xlabel("$h$"); ax[0].set_ylabel(r"$H^2$")
-    ax[0].set_title("Hellinger falls at the predicted order")
-    ax[0].legend(frameon=False, fontsize=6)
-    tag(ax[0], "NUMERICAL quadrature")
+    ax[0].set_title(r"measured slopes, within tolerance of $2s$")
+    ax[0].legend(frameon=False, fontsize=6, loc="upper left")
+    tag(ax[0], "NUMERICAL quadrature, error uncertified")
 
     rs = [r["r"] for r in b["moment_identity"]]
     got = [float(eval(r["E_chi_g_r"])) for r in b["moment_identity"]]
@@ -158,7 +158,7 @@ def figB_two_scales():
 # ------------------------------------------------------------------ Paper C
 
 def figC_frontier():
-    d = load("structural_frontier.json")
+    d = load("structural_frontier_corrected_v2.json")
     cert = load("paperC_breakpoint_certs.json")
     fig, ax = plt.subplots(1, 2, figsize=(6.6, 2.5))
     etas = d["etas"]
@@ -171,7 +171,7 @@ def figC_frontier():
     ax[0].set_ylabel(r"$V^{(\eta)}/V^{\rm free}$")
     ax[0].set_title("the relative price along the band")
     ax[0].legend(frameon=False, ncol=2, fontsize=6)
-    tag(ax[0], "NUMERICAL LP")
+    tag(ax[0], "NUMERICAL float LP\nno rational or breakpoint certificate")
 
     rows = cert["O2_window"]
     ms = [r["m"] for r in rows]

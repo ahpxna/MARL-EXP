@@ -6,16 +6,28 @@
 # makes Lean insert `sorryAx` into the downstream theorems of that module, so a clean
 # error count alone does not establish that the theorems are proved.
 # Dependencies come before dependents: BGeometry < BTest, CBreakpoint < CFinal,
-# ARPair < ARGames, A7Tail < A7Eta.
-MODS="LeanPaperClosuresV1 \
+# ARPair < ARGames, A7Tail < A7Eta, CFinal < CVacuity < CHorizon,
+# CPerm/CUniform < CRelabel.
+MODS="LeanPaperClosuresV1 LeanPaperAClosureV1 \
 LeanPaperAAlternativesV1 LeanPaperAAlternativeUnionV1 LeanPaperAModelBridgeV1 \
 LeanPaperAOracleCertificateV1 LeanPaperARepairV1 LeanPaperASeparationV1 \
-LeanPaperARPairV1 LeanPaperARGamesV1 LeanPaperAHomogV1 LeanPaperAFrozenV1 \
+LeanPaperARPairV1 LeanPaperARGamesV1 LeanPaperAHomogV1 LeanPaperAFrozenV1 LeanPaperACentredV1 \
+ LeanPaperACentredModelV1 LeanPaperARegionV1 LeanPaperAOracleRegionV1 LeanPaperAStrictV1 LeanPaperAFrontierV1 \
 LeanPaperA7OracleSelectV1 LeanPaperA7TrackingV1 LeanPaperA7ConfidenceV1 \
-LeanPaperA7StreamV1 LeanPaperA7TailV1 LeanPaperA7EtaV1 LeanPaperA2ChainV1 \
-LeanPaperBAttainmentV1 LeanPaperBHellingerV1 LeanPaperBTranscriptKLV1 \
-LeanPaperBRatesV1 LeanPaperBGeometryV1 LeanPaperBTestV1 LeanPaperBCrossoverV1 \
-LeanPaperCFrontierV1 LeanPaperCRankingV1 LeanPaperCBreakpointV1 LeanPaperCFinalV1"
+LeanPaperA7StreamV1 LeanPaperAFreezeV1 LeanPaperAMartingaleV1 LeanPaperAAdaptMartV1 LeanPaperAStopJoinV1 LeanPaperAStoppingV1 LeanPaperA7TailV1 LeanPaperA7EtaV1 LeanPaperA7ChainV1 LeanPaperA2ChainV1 LeanPaperASurrogateV1 \
+LeanPaperAConfStepV1 LeanPaperAIdentifyV1 LeanPaperA7ThresholdV1 \
+LeanPaperBAttainmentV1 LeanPaperBHellingerV1 LeanPaperBTranscriptKLV1 LeanPaperBChangeV1 \
+LeanPaperBRatesV1 LeanPaperBHeadlineV1 LeanPaperBExactConstV1 LeanPaperBDecideV1 LeanPaperBGeometryV1 LeanPaperBIndistV1 LeanPaperBDensityV1 LeanPaperBSafeOrderV1 LeanPaperBCubeV1 LeanPaperBAttainV1 LeanPaperBParityV1 LeanPaperBDecoderV1 LeanPaperBTranscriptV1 LeanPaperBHoeffdingV1 LeanPaperBAdaptiveV1 \
+ LeanPaperBTipV1 LeanPaperBKLV1 LeanPaperBRateKLV1 LeanPaperBWorldsV1 \
+ LeanPaperBQueryClassV1 LeanPaperBScopeV1 LeanPaperBChannelPairV1 \
+ LeanPaperBSepDerivedV1 LeanPaperBPairRateV1 LeanPaperBDataProcV1 LeanPaperAChangeV1 \
+ LeanPaperBGaussStepV1 LeanPaperBDensRatioV1 \
+ LeanPaperBTestV1 \
+ LeanPaperBCrossoverV1 \
+LeanPaperCFrontierV1 LeanPaperCRankingV1 LeanPaperCBreakpointV1 LeanPaperCBandV1 LeanPaperCEndpointV1 \
+ LeanPaperCInstantiationV1 LeanPaperCFamilyV1 LeanPaperCRearrangeV1 LeanPaperCAttainV1 LeanPaperCFlowV1 LeanPaperCNamingV1 LeanPaperCTransport2V1 LeanPaperCTransportV1 LeanPaperCEvenV1 LeanPaperCMixV1 LeanPaperCUniformV1 LeanPaperCEvenResolveV1 LeanPaperCValueSetV1 LeanPaperCLowerZeroV1 LeanPaperCCollapseV1 LeanPaperCPermV1 LeanPaperCPathV1 LeanPaperCCyclicV1 LeanPaperCOmitV1 LeanPaperCOddV1 LeanPaperCWindowV1 LeanPaperCValueV1 \
+ LeanPaperCFinalV1 LeanPaperCVacuityV1 LeanPaperCHorizonV1 \
+ LeanPaperCHorizonSecV1 LeanPaperCRankFlowV1 LeanPaperCFlowLawV1 LeanPaperCRelabelV1 LeanPaperCFamilyV1 LeanPaperBKernelV1"
 tot=0; bad=0; sry=0; nat=0; thm=0
 for m in $MODS; do
   lake env lean -o .lake/build/lib/lean/$m.olean $m.lean > /tmp/v_$m.log 2>&1
