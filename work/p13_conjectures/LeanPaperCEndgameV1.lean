@@ -43,7 +43,12 @@ lemma blend_feasible {m : ℕ} (P Q : Perm m → ℝ) (a b t : ℝ)
     have heq : (∑ σ, blend t P Q σ * inPrefixInd σ k i)-(k:ℝ)/(m:ℝ) =
         (1-t)*((∑ σ,P σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ)) +
         t*((∑ σ,Q σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ)) := by
-      simp [blend, add_mul, sum_add_distrib, ← mul_sum]; ring
+      have hpt : ∀ σ, blend t P Q σ * inPrefixInd σ k i
+          = (1-t) * (P σ * inPrefixInd σ k i) + t * (Q σ * inPrefixInd σ k i) := by
+        intro σ; unfold blend; ring
+      rw [Finset.sum_congr rfl (fun σ _ => hpt σ), Finset.sum_add_distrib,
+        ← Finset.mul_sum, ← Finset.mul_sum]
+      ring
     rw [heq]
     calc _ ≤ |(1-t)*((∑ σ,P σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ))| +
           |t*((∑ σ,Q σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ))| := abs_add _ _
@@ -60,14 +65,19 @@ lemma objective_blend_le {m : ℕ} (hm : 2 ≤ m) (P Q : Perm m → ℝ) (t : �
   unfold objective maxRegret
   apply Finset.sup'_le
   intro k hk
-  simp only [blend, add_mul, sum_add_distrib, ← mul_sum]
+  have hsplit : (∑ σ, blend t P Q σ * regret (gFamily m) (id σ) (denom m) k)
+      = (1-t) * (∑ σ, P σ * regret (gFamily m) (id σ) (denom m) k)
+        + t * (∑ σ, Q σ * regret (gFamily m) (id σ) (denom m) k) := by
+    rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl (fun σ _ => by unfold blend; ring)
+  rw [hsplit]
   exact add_le_add (mul_le_mul_of_nonneg_left (le_sup' _ hk) (by linarith))
     (mul_le_mul_of_nonneg_left (le_sup' _ hk) ht)
 
 lemma value_le_witness (m : ℕ) (hm : 3 ≤ m) (η : ℝ) (P : Perm m → ℝ)
     (hP : P ∈ FeasibleAt id η) : value m (by omega) η ≤ objective m (by omega) P := by
   apply csInf_le
-  · exact Vm_bddBelow (gFamily m) id (denom m) η (by positivity)
+  · exact Vm_bddBelow (gFamily m) id (denom m) η (by first | positivity | (unfold denom; positivity) | linarith | nlinarith)
       (budgets m) (budgets_nonempty m (by omega))
       (fun k hk => by simp [budgets] at hk; omega)
       (fun σ i => gFamily_weights m (σ i))
@@ -106,28 +116,30 @@ lemma universal_free_lower (m : ℕ) (hm : 4 ≤ m) (E : EvenEndpointData m hm)
       ≤ ((m:ℝ)-1)*objective m (by omega) P := by
     calc _ ≤ ∑ _k ∈ budgets m, objective m (by omega) P := by
             apply sum_le_sum; intro k hk; exact le_sup' _ hk
-      _ = _ := by simp [budgets, Nat.cast_sub (by omega : 1 ≤ m)]; ring
+      _ = _ := by simp [budgets, Nat.cast_sub (by omega : 1 ≤ m)]; try ring
   unfold freeValue
-  rw [← div_div, div_le_iff₀ (by norm_cast; omega)]
+  rw [← div_div, div_le_iff₀ (by first | positivity | linarith | nlinarith)]
   exact hsum.trans hmax
 
 lemma even_value_zero (m : ℕ) (hm : 4 ≤ m) (heven : Even m) :
     value m (by omega) 0 = 4/((m:ℝ)*denom m) := by
   exact even_allPerm_value m heven hm (budgets m) (budgets_nonempty m (by omega))
-    (by simp [budgets]; omega) (fun k hk => by simpa [budgets] using hk)
+    (by simp [budgets]; try omega) (fun k hk => by simpa [budgets] using hk)
 
 /-- FINAL even frontier, conditional only on the two named upstream obligations above. -/
 theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
     (E : EvenEndpointData m hm) (η : ℝ) (hη : 0≤η) :
     value m (by omega) η = max (freeValue m) (4*(1-η)/((m:ℝ)*denom m)) := by
   have hmR : (4:ℝ) ≤ m := by exact_mod_cast hm
-  have hs : 0 < etaStar m := by unfold etaStar; positivity
+  have hs : 0 < etaStar m := by
+    unfold etaStar
+    apply div_pos <;> linarith
   have hfree := value_lower m (by omega) η (freeValue m) hη
     (fun P hP => universal_free_lower m hm E P hP.1 hP.2.1)
   have hband : 4*(1-η)/((m:ℝ)*denom m) ≤ value m (by omega) η := by
     convert Vm_allPerm_ge_band (m-2) (by omega) (by omega) (denom m) η
-      (by positivity) hη (budgets m) (budgets_nonempty m (by omega))
-      (by simp [budgets]; omega) (by simp [budgets]; omega) using 1 <;>
+      (by first | positivity | (unfold denom; positivity) | linarith | nlinarith) hη (budgets m) (budgets_nonempty m (by omega))
+      (by simp [budgets]; try omega) (by simp [budgets]; try omega) using 1 <;>
       simp [Nat.sub_add_cancel (by omega : 2 ≤ m), Nat.cast_sub (by omega : 2 ≤ m)]
   apply le_antisymm
   · by_cases hηs : η≤etaStar m
@@ -142,7 +154,7 @@ theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
       have hlinear : (1-t)*(4/((m:ℝ)*denom m))+t*freeValue m
           = 4*(1-η)/((m:ℝ)*denom m) := by
         dsimp [t,etaStar,freeValue,denom]
-        field_simp; ring
+        field_simp; try ring
       calc value m (by omega) η ≤ objective m (by omega) (blend t P0 E.endpoint) :=
           value_le_witness m (by omega) η _ hPf
         _ ≤ (1-t)*objective m (by omega) P0+t*objective m (by omega) E.endpoint :=
@@ -165,7 +177,7 @@ theorem even_breakpoint_iff (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
   rw [even_frontier m hm heven E η hη, max_eq_left_iff]
   unfold etaStar freeValue
   have hmR : (4:ℝ) ≤ m := by exact_mod_cast hm
-  rw [div_le_div_iff₀ (by positivity) (by positivity), div_le_iff₀ (by positivity)]
+  rw [div_le_div_iff₀ (by first | positivity | (unfold denom; positivity) | linarith | nlinarith) (by first | positivity | (unfold denom; positivity) | linarith | nlinarith), div_le_iff₀ (by first | positivity | (unfold denom; positivity) | linarith | nlinarith)]
   unfold denom at *
   constructor <;> intro h <;> nlinarith
 
@@ -175,14 +187,14 @@ theorem odd_value_zero (s : ℕ) :
     value (2*s+3) (by omega) 0 =
       (((2*s+3:ℕ):ℝ)+3)/(((2*s+3:ℕ):ℝ)*denom (2*s+3)) := by
   exact odd_allPerm_value s (budgets (2*s+3)) (budgets_nonempty _ (by omega))
-    (fun k hk => by simp [budgets] at hk; omega) (by simp [budgets]; omega)
+    (fun k hk => by simp [budgets] at hk; omega) (by simp [budgets]; try omega)
 
 theorem odd_uniform_price_ratio (s : ℕ) :
     value (2*s+3) (by omega) 0 / freeValue (2*s+3) =
       ((((2*s+3:ℕ):ℝ)+3)*(((2*s+3:ℕ):ℝ)-1))/(2*((2*s+3:ℕ):ℝ)) := by
   rw [odd_value_zero]
   unfold freeValue denom
-  field_simp; ring
+  field_simp; try ring
 
 /-- OPEN terminal target for the separate odd-breakpoint argument. This is a definition
 of the requested result, not a theorem claiming the narrow window is already closed. -/

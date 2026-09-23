@@ -271,10 +271,8 @@ lemma typed_prefix_sum (ty : Fin m → Fin d) (w : Fin d → ℝ)
   classical
   simp_rw [count_eq_item_sum, Finset.mul_sum, Finset.sum_filter]
   rw [Finset.sum_comm]
-  simp only [mul_ite, mul_zero]
-  simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
   rw [← Equiv.sum_comp σ]
-  simp [prefixSum, inPrefixInd, Equiv.symm_apply_apply]
+  simp [prefixSum, inPrefixInd, Equiv.symm_apply_apply, Finset.sum_filter]
 
 lemma signedCost_eq_regret (D : ℝ) (σ : Equiv.Perm (Fin m)) (k : Fin (m+1)) :
     signedCost D k (rankLayer (familyType m) k σ) = regret (gFamily m) σ D k.val := by
@@ -288,9 +286,16 @@ theorem actual_banded_vectors (D η : ℝ) :
       (fun k => ∑ σ, P σ * regret (gFamily m) σ D k.val) = y} =
     {y | ∃ F, CountFeasibleH (familyType m) F ∧ FlowBand (familyType m) F η ∧
       flowObj (signedCost D) F = y} := by
+  have hkey : ∀ (P : Equiv.Perm (Fin m) → ℝ),
+      rankObj (familyType m) (signedCost D) P
+        = fun k => ∑ σ, P σ * regret (gFamily m) σ D k.val := by
+    intro P
+    funext k
+    unfold rankObj
+    exact Finset.sum_congr rfl (fun σ _ => by rw [signedCost_eq_regret])
   convert banded_vectors_agree (familyType m) η (signedCost D) using 1
   ext y
-  simp only [rankObj, signedCost_eq_regret]
+  simp only [hkey]
 
 /-- ANY functional of the vector, including max over the interior budgets, has equal infima. -/
 theorem actual_banded_infima (D η : ℝ) (Φ : (Fin (m+1) → ℝ) → ℝ) :
