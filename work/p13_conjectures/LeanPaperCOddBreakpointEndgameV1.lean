@@ -97,7 +97,7 @@ lemma odd_mean_total (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1)
     (P : Perm m → ℝ) (hP : ∀ σ,0 ≤ P σ) (hP1 : ∑ σ,P σ=1) :
     2+2*(∑ σ,P σ*(if plusItem m hm=σ ⟨m-1,by omega⟩ then (1:ℝ) else 0))
       ≤ ∑ σ,P σ*totalExcess (rankOf (gFamily m) σ) := by
-  have h := sum_le_sum (fun σ (_ : σ∈(univ : Finset (Perm m))) =>
+  have h := sum_le_sum (fun σ (_ : σ ∈ (univ : Finset (Perm m))) =>
     mul_le_mul_of_nonneg_left (odd_rank_total m hm hmo σ) (hP σ))
   convert h using 1
   simp only [mul_add,sum_add_distrib,← sum_mul,← mul_sum,hP1]
@@ -130,7 +130,7 @@ theorem odd_law_gap (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (η : ℝ)
   ring
 
 /-- A positive gap survives the infimum over the ENTIRE feasible game. -/
-theorem odd_value_gap (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (η : ℝ) (hη : 0≤η) :
+theorem odd_value_gap (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (η : ℝ) (hη : 0 ≤ η) :
     freeValue m+2*(1-η)/((m:ℝ)*denom m*((m:ℝ)-1)) ≤ value m (by omega) η := by
   exact value_lower m hm η _ hη (fun P hP => odd_law_gap m hm hmo η P hP)
 
@@ -154,14 +154,14 @@ structure OddEndpointData (m : ℕ) (hm : 3 ≤ m) where
 /-- The general odd breakpoint. Lower direction is unconditional; the remaining upstream
 obligation is exactly an actual endpoint witness. No family of Farkas certificates needed. -/
 theorem odd_breakpoint_iff (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1)
-    (E : OddEndpointData m hm) (η : ℝ) (hη : 0≤η) :
-    value m (by omega) η=freeValue m ↔ 1≤η := by
+    (E : OddEndpointData m hm) (η : ℝ) (hη : 0 ≤ η) :
+    value m (by omega) η=freeValue m ↔ 1 ≤ η := by
   have hmR : (3:ℝ) ≤ m := by exact_mod_cast hm
   constructor
   · intro heq
     by_contra hη1
     have hpos : 0 < 2*(1-η)/((m:ℝ)*denom m*((m:ℝ)-1)) := by
-      have : η<1 := lt_of_not_ge hη1
+      have : η < 1 := lt_of_not_ge hη1
       unfold denom; positivity
     have h := odd_value_gap m hm hmo η hη
     rw [heq] at h

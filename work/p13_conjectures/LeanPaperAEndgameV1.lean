@@ -105,7 +105,7 @@ theorem no_uniform_proxy_factor : ∀ ε : ℝ, 0 < ε → ∃ r : ℕ, 0 < r �
   · exact lt_of_lt_of_le (by positivity) (strict_game_bounds (r:=r) 1 (by norm_num) hr0).1
   · have hsep := (strict_optimized_separation (r:=r) 1 (by norm_num) hr0).2
     have hlarge : 64/(9*ε) < (r:ℝ) := (le_max_right _ _).trans_lt hr
-    have hsmall : 64/(9*(r:ℝ))<ε := by
+    have hsmall : 64/(9*(r:ℝ)) < ε := by
       rw [div_lt_iff₀ (by positivity)]
       have := (div_lt_iff₀ (by positivity : (0:ℝ) < 9*ε)).mp hlarge
       nlinarith
@@ -214,8 +214,8 @@ finiteness has been established. μ and τ must be the concrete protocol from th
 def OperationalFinish {Ω : Type*} [MeasurableSpace Ω]
     (μ : Measure Ω) (τ : ℝ → Ω → ℕ∞) (Γ : ℝ) : Prop :=
   0 < Γ ∧
-  (∀ δ, 0<δ → δ<1 → (∫⁻ ω, (τ δ ω).toENNReal ∂μ) ≠ ⊤) ∧
-  ∀ ε, 0<ε → EventuallyAtZero (fun δ =>
+  (∀ δ, 0 < δ → δ < 1 → (∫⁻ ω, (τ δ ω).toENNReal ∂μ) ≠ ⊤) ∧
+  ∀ ε, 0 < ε → EventuallyAtZero (fun δ =>
     |(∫⁻ ω, (τ δ ω).toENNReal ∂μ).toReal / Real.log (1/δ) - 1/Γ| ≤ ε)
 
 /-- Concrete-family terminal assembly. hUpper and hLower are the obligations from the
@@ -224,7 +224,7 @@ binds their rate to the ACTUAL KL game, not to a supplied unrelated scalar Gamma
 theorem family_operational_finish {Ω : Type*} [MeasurableSpace Ω]
     (μ : Measure Ω) (τ : ℝ → Ω → ℕ∞) (M : ℝ) (hM : 0 < M) (hr : 0 < r) [NeZero r]
     (hKL : GaussianKLIdentification r M hM)
-    (hfinite : ∀ δ, 0<δ → δ<1 → (∫⁻ ω,(τ δ ω).toENNReal ∂μ) ≠ ⊤)
+    (hfinite : ∀ δ, 0 < δ → δ < 1 → (∫⁻ ω,(τ δ ω).toENNReal ∂μ) ≠ ⊤)
     (hUpper : UpperRate (fun δ => (∫⁻ ω,(τ δ ω).toENNReal ∂μ).toReal) (actualKLGame r M hM))
     (hLower : LowerRate (fun δ => (∫⁻ ω,(τ δ ω).toENNReal ∂μ).toReal) (actualKLGame r M hM)) :
     OperationalFinish μ τ (actualKLGame r M hM) := by

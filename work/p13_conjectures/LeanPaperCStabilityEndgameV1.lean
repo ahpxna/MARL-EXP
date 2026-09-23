@@ -174,7 +174,7 @@ lemma trueValue_bddBelow (g : Fin m → ℝ) (hg : 0 < normMass g) (η : ℝ)
 
 /-- The stability statement is about the full item-band optimum on arbitrary real weights.
 It does not assume that perturbations preserve the original four weight classes. -/
-theorem trueValue_stable (g g' : Fin m → ℝ) (η : ℝ) (hη : 0≤η) [NeZero m]
+theorem trueValue_stable (g g' : Fin m → ℝ) (η : ℝ) (hη : 0 ≤ η) [NeZero m]
     (K : Finset (Fin (m+1))) (hK : K.Nonempty)
     (d : ℝ) (hd : 0 < d) (hg : d ≤ normMass g) (hg' : d ≤ normMass g') :
     |trueValue g η K hK-trueValue g' η K hK|≤3*l1 g g'/d := by

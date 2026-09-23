@@ -1,0 +1,56 @@
+PATCH (NOT APPLIED) -- make EXP_paperA_mechanism.py record its own statistic
+drafted 2026-09-22 during the experiment-artifact audit
+
+WHY IT IS NOT APPLIED
+---------------------
+research/unified_20260919/paperA_mechanism.json records `source_sha256`, the sha256 of
+scripts/EXP_paperA_mechanism.py.  At the time of writing that is
+
+    5149c870090650917c1ed88a8b84de0bcb5d6dbab242b524e15e99fd0de19aee
+
+and it matches the script on disk, so the artifact is CURRENT under
+scripts/AUDIT_provenance.py.  ANY edit to the script -- including this one, which cannot
+change a single computed number -- changes that hash and immediately turns the artifact
+STALE against its producer.  Clearing that would need a full regeneration of the
+experiment, which costs over two hours.
+
+APPLY THIS ONLY WHEN THAT EXPERIMENT IS NEXT REGENERATED FOR AN INDEPENDENT REASON.
+Do not apply it on its own.
+
+WHAT IT FIXES
+-------------
+The artifact does not say what statistic it used.  The strings `effective_N`, `a_reg` and
+`statistic` appear nowhere in paperA_mechanism.json; the rule
+
+    effective_N = N**2 / (a_reg + N)          # scripts/EXP_paperA_mechanism.py:219
+    thr = log(1/alpha) + 0.5*sum(log1p(N/a_reg))   # :221
+    a_reg = 1.0                               # default at :191, never overridden --
+                                              # the sole call site at :358 omits it
+
+is visible only by reading the hashed script.  An artifact that carries a hash but not the
+statistic is traceable, not self-describing.
+
+THE PATCH
+---------
+1. In the import block (currently hashlib, json, math, pathlib, sys, numpy,
+   scipy.optimize.minimize), add:
+
+       import inspect
+
+2. In the `out` dict, immediately after the line
+
+       "same_certificate_for_every_rule": True,
+
+   (scripts/EXP_paperA_mechanism.py:397 as of this hash), add:
+
+       "statistic": "effective_N = N**2/(a_reg + N); threshold = log(1/alpha)"
+                    " + 0.5*sum(log1p(N/a_reg))  (LeanPaperA7ConfidenceV1.Mstat_log)",
+       "a_reg": inspect.signature(run).parameters["a_reg"].default,
+
+Reading a_reg from the signature rather than hardcoding 1.0 means the recorded value
+cannot drift away from the code if the default is ever changed.
+
+It is a pure addition: it touches only the serialised dict, never run(), the RNG seeding
+(np.random.default_rng([20260922, r, hash(name) % 9973, ix])) or any computed quantity.
+The next run's numbers are identical to the current artifact's apart from the recorded
+hash, which will be the new script's.

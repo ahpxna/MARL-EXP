@@ -86,10 +86,10 @@ theorem every_policy_cost (E : Experiment W A Pol Ω) (task : Task) (h δ : ℝ)
     (π : Pol) (hπ : Correct E task h δ π) :
     demand/info ≤ worstCost E h π := by
   obtain ⟨w,v,hwv,hd⟩ := L.find_pair π hπ
-  have h := hd.trans (L.stopped_information π hπ.1 w v hwv)
+  have hinfo := hd.trans (L.stopped_information π hπ.1 w v hwv)
   have hdiv : demand/info ≤ costAt E h π w := by
     apply (ENNReal.div_le_iff hi0 hiTop).2
-    simpa [mul_comm] using h
+    simpa [mul_comm] using hinfo
   exact hdiv.trans (le_iSup (costAt E h π) w)
 
 theorem minimax_sandwich (E : Experiment W A Pol Ω) (task : Task) (h δ : ℝ)
@@ -125,11 +125,11 @@ theorem rate_ratio_lower (Ns Ni c C h δ : ℝ) (s d : ℕ)
   have hlog : 0 < Real.log (1/δ) := Real.log_pos ((one_lt_div hδ).2 hδ1)
   have hupper : 0 < C*scale h δ s := by unfold scale; positivity
   have hbase : (c*scale h δ (s+d))/(C*scale h δ s) ≤ Ni/Ns := by
-    apply div_le_div₀ (by unfold scale; positivity) hL hNs hU
+    apply div_le_div₀ (le_trans (by unfold scale; positivity) hL) hL hNs hU
   have heq : (c*scale h δ (s+d))/(C*scale h δ s) = (c/C)/h^(2*d) := by
     unfold scale
     rw [Nat.mul_add, pow_add]
-    field_simp; ring
+    field_simp; try ring
   rwa [heq] at hbase
 
 /-- Actual support geometry join. This relates correctness of the output to selectedRadius;
@@ -156,7 +156,7 @@ def TipFinish (m : ℕ) (hm : 3 ≤ m) (E : Experiment (Fin m) (Fin m) Pol Ω) :
 This elementary endpoint prevents an unconditional positive-rate claim in that regime. -/
 theorem zero_cost_endpoint (E : Experiment W A Pol Ω) (h δ : ℝ)
     (U : DecoderWitness E .safe h δ 0) : complexity E .safe h δ = 0 := by
-  apply le_antisymm _ (zero_le _)
+  apply le_antisymm _ bot_le
   exact (iInf_le _ ⟨U.code,U.correct⟩).trans (iSup_le U.cost)
 
 #print axioms every_policy_cost

@@ -263,10 +263,10 @@ def main():
             "r": r, "M": M, "answer_at_truth": ans0, "rangeA": rA0, "rangeB": rB0,
             "Gamma_frozen_theorem": G_fr,
             "Gamma_true_lower_theorem": lo_thm, "Gamma_true_upper_theorem": up_thm,
-            "J_true_at_cert_design": v_cert,
-            "J_true_at_geometry_design": v_geom,
-            "J_true_at_proxy_optimum": v_proxy,
-            "J_true_at_uniform": v_unif,
+            "J_true_lower_at_cert_design": v_cert,
+            "J_true_lower_at_geometry_design": v_geom,
+            "J_true_lower_at_proxy_optimum": v_proxy,
+            "J_true_lower_at_uniform": v_unif,
             "Gamma_true_attained_lower": G_true_lo,
             "ratio_lower_theorem": 4.0 / (4.0 + 2.0 * r * M),
             "ratio_upper_theorem": 64.0 / (9.0 * r * M),
@@ -275,19 +275,19 @@ def main():
 
     print("\n  the theorems, evaluated on this family before any run")
     print("  " + "-" * 74)
-    print("      r |   J_true(cert)   J_true(geom)  J_true(proxy)   [thm lower, upper]")
+    print("      r | J_true_lo(cert) J_true_lo(geom) J_true_lo(proxy)  [thm lower, upper]")
     for row in rows:
-        print(f"    {row['r']:3d} | {row['J_true_at_cert_design']:.6e}"
-              f"  {row['J_true_at_geometry_design']:.6e}"
-              f"  {row['J_true_at_proxy_optimum']:.6e}"
+        print(f"    {row['r']:3d} | {row['J_true_lower_at_cert_design']:.6e}"
+              f"  {row['J_true_lower_at_geometry_design']:.6e}"
+              f"  {row['J_true_lower_at_proxy_optimum']:.6e}"
               f"   [{row['Gamma_true_lower_theorem']:.3e},"
               f" {row['Gamma_true_upper_theorem']:.3e}]")
 
     check("THE STARVATION THEOREM, on this family: the frozen surrogate's optimum is"
           " supported on the four extremum cells and carries EXACTLY ZERO information"
           " against the compression alternatives (`frozen_optimum_trueValueC0_zero`)",
-          all(row["J_true_at_proxy_optimum"] == 0.0 for row in rows),
-          "; ".join(f"r={row['r']}: {row['J_true_at_proxy_optimum']:.1e}" for row in rows))
+          all(row["J_true_lower_at_proxy_optimum"] == 0.0 for row in rows),
+          "; ".join(f"r={row['r']}: {row['J_true_lower_at_proxy_optimum']:.1e}" for row in rows))
 
     check("THE SEPARATION BRACKET (`centred_separation`): an attained design's value is at"
           " least the theorem's lower bound and no design exceeds its upper bound",
@@ -337,12 +337,15 @@ def main():
         cache = {}
 
         def geom_rule(mu, r=r):
-            key = int(cache.get("t", 0)) // REFRESH_EVERY
+            # The refresh counter must NOT be reset inside the refresh branch: doing so
+            # made the schedule 1, 201, 202, 402, 403, ... instead of 1, 201, 401, ...
+            t = int(cache.get("t", 0))
+            key = t // REFRESH_EVERY
             if key not in cache:
                 cache.clear()
+                cache["t"] = t
                 cache[key] = w_geometry(w_cert(r, M), var, mu, HS)
-                cache["t"] = 0
-            cache["t"] = cache.get("t", 0) + 1
+            cache["t"] = t + 1
             return cache[key]
 
         rules = {
@@ -353,8 +356,15 @@ def main():
         for alpha in alphas:
             for name, (rule, rho) in rules.items():
                 taus, cens, corr, shares = [], 0, 0, []
+                # The oracle cache is per RUN: leaving it outside this loop let a run
+                # start from an allocation computed on the previous run's data, so the
+                # runs were not independent restarts.
+                rule_id = {"geometry": 1, "proxy": 2, "uniform": 3}[name]
                 for ix in range(n_runs):
-                    rr = np.random.default_rng([20260922, r, hash(name) % 9973, ix])
+                    cache.clear()
+                    # a fixed numeric id, not hash(name): PYTHONHASHSEED makes `hash`
+                    # differ between interpreter processes, so the seed was not reproducible
+                    rr = np.random.default_rng([20260922, r, rule_id, ix])
                     t, ans, N, c, tr = run(rr, theta, var, bcells, HS, rule, alpha,
                                            budget, check_every, rho,
                                            trace_every=max(1, budget // 40))
@@ -366,6 +376,7 @@ def main():
                         row.setdefault("traces", {})[name] = tr
                 row["runs"][name] = {
                     "alpha": alpha, "n": n_runs,
+                    "tau_per_run": [int(t) for t in taus],
                     "restricted_mean_tau": float(np.mean(taus)),
                     "sem": float(np.std(taus, ddof=1) / math.sqrt(len(taus))),
                     "censored": cens, "correct": corr,

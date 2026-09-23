@@ -83,7 +83,7 @@ lemma value_le_witness (m : ℕ) (hm : 3 ≤ m) (η : ℝ) (P : Perm m → ℝ)
       (fun σ i => gFamily_weights m (σ i))
   · exact ⟨P,hP,rfl⟩
 
-lemma value_lower (m : ℕ) (hm : 3 ≤ m) (η c : ℝ) (hη : 0≤η)
+lemma value_lower (m : ℕ) (hm : 3 ≤ m) (η c : ℝ) (hη : 0 ≤ η)
     (h : ∀ P ∈ FeasibleAt (id : Perm m → _) η, c ≤ objective m (by omega) P) :
     c ≤ value m (by omega) η := by
   letI : NeZero m := ⟨by omega⟩
@@ -128,7 +128,7 @@ lemma even_value_zero (m : ℕ) (hm : 4 ≤ m) (heven : Even m) :
 
 /-- FINAL even frontier, conditional only on the two named upstream obligations above. -/
 theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
-    (E : EvenEndpointData m hm) (η : ℝ) (hη : 0≤η) :
+    (E : EvenEndpointData m hm) (η : ℝ) (hη : 0 ≤ η) :
     value m (by omega) η = max (freeValue m) (4*(1-η)/((m:ℝ)*denom m)) := by
   have hmR : (4:ℝ) ≤ m := by exact_mod_cast hm
   have hs : 0 < etaStar m := by
@@ -142,7 +142,7 @@ theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
       (by simp [budgets]; try omega) (by simp [budgets]; try omega) using 1 <;>
       simp [Nat.sub_add_cancel (by omega : 2 ≤ m), Nat.cast_sub (by omega : 2 ≤ m)]
   apply le_antisymm
-  · by_cases hηs : η≤etaStar m
+  · by_cases hηs : η ≤ etaStar m
     · obtain ⟨P0,hP0,hV0⟩ := even_allPerm_witness m heven hm (budgets m)
         (budgets_nonempty m (by omega)) (fun k hk => by simpa [budgets] using hk)
       let t := η/etaStar m
@@ -172,7 +172,7 @@ theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
 
 /-- No bisection/tolerance in the breakpoint definition. -/
 theorem even_breakpoint_iff (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
-    (E : EvenEndpointData m hm) (η : ℝ) (hη : 0≤η) :
+    (E : EvenEndpointData m hm) (η : ℝ) (hη : 0 ≤ η) :
     value m (by omega) η = freeValue m ↔ etaStar m ≤ η := by
   rw [even_frontier m hm heven E η hη, max_eq_left_iff]
   unfold etaStar freeValue
@@ -199,8 +199,8 @@ theorem odd_uniform_price_ratio (s : ℕ) :
 /-- OPEN terminal target for the separate odd-breakpoint argument. This is a definition
 of the requested result, not a theorem claiming the narrow window is already closed. -/
 def OddBreakpointFinish : Prop :=
-  ∀ s : ℕ, ∀ η : ℝ, 0≤η →
-    (value (2*s+3) (by omega) η = freeValue (2*s+3) ↔ 1≤η)
+  ∀ s : ℕ, ∀ η : ℝ, 0 ≤ η →
+    (value (2*s+3) (by omega) η = freeValue (2*s+3) ↔ 1 ≤ η)
 
 #print axioms blend_feasible
 #print axioms universal_free_lower
