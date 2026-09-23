@@ -155,6 +155,8 @@ theorem strict_value_is_actual (M : ℝ) (w : Cell r → ℝ) :
     trueValueStrict M w = sInf (energy w (pairVar M) (thetaC r) ''
       {lam : Cell r → ℝ | ActualBadA 0 lam ∧ lam ∈ Centred r}) := by
   rw [actual_strict_alternative_eq]
+  unfold trueValueStrict
+  rw [Set.image_eq_range]
   rfl
 
 #print axioms actualLossA_eq

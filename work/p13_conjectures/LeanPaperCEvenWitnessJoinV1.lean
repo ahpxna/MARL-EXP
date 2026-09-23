@@ -18,11 +18,11 @@ open CIGAMF.P13.PaperCLawRelabel CIGAMF.P13.PaperCLawPush
 /-- Explicit relabelling: alternating light items are sorted by sign. -/
 noncomputable def flatToFamily (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m) : Equiv.Perm (Fin m) where
   toFun i := ⟨if i.val=0 then 0 else if i.val=m-1 then m-1
-    else if i.val%2=0 then i.val/2 else (m-2)/2+(i.val+1)/2, by
+    else if i.val % 2=0 then i.val/2 else (m-2)/2+(i.val+1)/2, by
       have hi := i.isLt; have hp := Nat.even_iff.mp hm
       split_ifs <;> omega⟩
   invFun j := ⟨if j.val=0 then 0 else if j.val=m-1 then m-1
-    else if j.val≤(m-2)/2 then 2*j.val else 2*(j.val-(m-2)/2)-1, by
+    else if j.val ≤ (m-2)/2 then 2*j.val else 2*(j.val-(m-2)/2)-1, by
       have hj := j.isLt; have hp := Nat.even_iff.mp hm
       split_ifs <;> omega⟩
   left_inv i := by
@@ -39,8 +39,9 @@ noncomputable def flatToFamily (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m) : Equiv.P
 theorem flatToFamily_apply (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m) (i : Fin m) :
     gFamily m (flatToFamily m hm hm4 i) = flatEven m i := by
   have hi := i.isLt; have hp := Nat.even_iff.mp hm
-  unfold flatToFamily gFamily gN flatEven flatW
-  simp only [Fin.val_mk]
+  show gN m (if (i:ℕ) = 0 then 0 else if (i:ℕ) = m-1 then m-1
+      else if (i:ℕ) % 2 = 0 then (i:ℕ)/2 else (m-2)/2 + ((i:ℕ)+1)/2) = flatW m (i:ℕ)
+  unfold gN flatW
   split_ifs <;> first | rfl | omega
 
 theorem family_position_counts (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
@@ -60,9 +61,11 @@ theorem family_position_counts (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
           (if flatEven m (basePerm m hm hm4 x p)=w then (1:ℝ) else 0))
         = ((univ.filter (fun i : Fin m => flatEven m i=w)).card:ℝ) := by
       intro x
-      simp only [Fin.isLt, filter_true_of_mem, sum_filter]
-      rw [Equiv.sum_comp (basePerm m hm hm4 x)]
-      simp
+      have hfilt : (univ.filter (fun p : Fin m => p.val < m)) = univ :=
+        Finset.filter_true_of_mem (fun p _ => p.isLt)
+      rw [hfilt, Equiv.sum_comp (basePerm m hm hm4 x)
+        (fun q => if flatEven m q = w then (1:ℝ) else 0)]
+      simp [Finset.sum_boole]
     simp_rw [hcount]
     rw [← sum_mul, famQ_sum m (by omega)]
     field_simp
@@ -97,12 +100,22 @@ theorem family_position_counts (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
   unfold cntBelow
   have hzero : ∀ i ∈ range k, (if famW m x i=w then (1:ℝ) else 0)=0 := by
     intro i hi
-    rcases x with ⟨a,b⟩
-    cases a with
-    | inl a => cases b <;> simp only [famW] <;>
-        have h := insWeight_mem a.val i <;> rcases h with h|h|h|h <;> simp_all
-    | inr a => cases b <;> simp only [famW] <;>
-        have h := flatW_mem m i <;> rcases h with h|h|h|h <;> simp_all
+    have hmem : famW m x i = -3 ∨ famW m x i = -1 ∨ famW m x i = 1 ∨ famW m x i = 3 := by
+      rcases x with ⟨a,b⟩
+      cases a with
+      | inl a =>
+          cases b
+          · exact insWeight_mem a.val i
+          · rcases insWeight_mem a.val i with h|h|h|h <;>
+              (simp only [famW, h]; norm_num)
+      | inr a =>
+          cases b
+          · exact flatW_mem m i
+          · rcases flatW_mem m i with h|h|h|h <;>
+              (simp only [famW, h]; norm_num)
+    rw [if_neg]
+    rintro rfl
+    rcases hmem with h|h|h|h <;> simp_all
   simp [sum_congr rfl hzero]
 
 theorem family_class_occupancy (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
@@ -125,9 +138,25 @@ theorem family_expected_value (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
   unfold famQ
   rw [Fintype.sum_prod_type, Fintype.sum_sum_type]
   simp only [Fintype.sum_bool, famRanking, famW, Finset.univ_unique, Finset.sum_singleton]
-  rw [Fin.sum_univ_eq_sum_range]
-  convert evenMixtureFlipped_value_at_D m (by omega) k hk1 hkl using 1 <;>
-    simp only [add_comm,add_left_comm,add_assoc]
+  have hfam1 : ∀ j : Fin (m-1),
+      famRanking m (Sum.inl j, true) = fun i : Fin m => -(insWeight (j:ℕ) (i:ℕ)) :=
+    fun _ => rfl
+  have hfam2 : ∀ j : Fin (m-1),
+      famRanking m (Sum.inl j, false) = fun i : Fin m => insWeight (j:ℕ) (i:ℕ) :=
+    fun _ => rfl
+  have hfam3 : famRanking m (Sum.inr default, true) = fun i : Fin m => -(flatEven m i) := rfl
+  have hfam4 : famRanking m (Sum.inr default, false) = flatEven m := rfl
+  simp only [hfam1, hfam2, hfam3, hfam4]
+  rw [Fin.sum_univ_eq_sum_range
+    (fun j => 1/(2*(m:ℝ)) * (excess (fun i : Fin m => -(insWeight j (i:ℕ))) k / ((m:ℝ)+4))
+      + 1/(2*(m:ℝ)) * (excess (fun i : Fin m => insWeight j (i:ℕ)) k / ((m:ℝ)+4))) (m-1)]
+  have hins : ∀ a : ℕ, (fun i : Fin m => insWeight a (i:ℕ)) = insRanking m a := fun _ => rfl
+  convert evenMixtureFlipped_value_at_D m (by omega) k hk1 hkl using 1
+  congr 1 <;>
+    first
+      | exact Finset.sum_congr rfl (fun a _ => add_comm _ _)
+      | rfl
+      | ring
 
 /-- Concrete uniform-band witness; no class-count or value hypothesis remains. -/
 theorem even_allPerm_witness (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
@@ -148,20 +177,22 @@ theorem even_allPerm_witness (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
 theorem gFamily_abs_sum (m : ℕ) (hm3 : 3 ≤ m) : ∑ i, |gFamily m i| = (m:ℝ)+4 := by
   classical
   have hh : (heavySet (gFamily m)).card=2 := by
-    convert gFamily_heavy_card (m-2) (by omega) using 1 <;> congr 1 <;> omega
+    have hgc := gFamily_heavy_card (m-2) (by omega)
+    rwa [show m - 2 + 2 = m from by omega] at hgc
   have hpt : ∀ i : Fin m,
-      |gFamily m i| = 1+2*(if i∈heavySet (gFamily m) then (1:ℝ) else 0) := by
+      |gFamily m i| = 1+2*(if i ∈ heavySet (gFamily m) then (1:ℝ) else 0) := by
     intro i
     rcases gFamily_weights m i with h|h|h|h <;>
-      simp [mem_heavySet,h]
+      (simp [mem_heavySet, heavy, h]; try norm_num)
   simp_rw [hpt]
   rw [sum_add_distrib]
   simp [← mul_sum,hh]
+  try norm_num
 
 /-- The value is for the complete permutation game, with universal lower bound. -/
 theorem even_allPerm_value (m : ℕ) (hm : Even m) (hm4 : 4 ≤ m)
-    (budgets : Finset ℕ) (hne : budgets.Nonempty) (h1 : 1∈budgets)
-    (hbud : ∀ k∈budgets, 1≤k ∧ k≤m-1) :
+    (budgets : Finset ℕ) (hne : budgets.Nonempty) (h1 : 1 ∈ budgets)
+    (hbud : ∀ k ∈ budgets, 1 ≤ k ∧ k ≤ m-1) :
     Vm (gFamily m) id ((m:ℝ)+4) 0 budgets hne = 4/((m:ℝ)*((m:ℝ)+4)) := by
   apply Vm_eq_at_zero (by omega) (gFamily m) id (gFamily_abs_sum m (by omega))
     budgets hne h1 (by positivity) (fun k hk => by have := (hbud k hk).2; omega)

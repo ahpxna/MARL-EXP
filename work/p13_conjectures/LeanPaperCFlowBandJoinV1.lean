@@ -19,6 +19,7 @@ open CIGAMF.P13.PaperCRelabel CIGAMF.P13.PaperCLawPush
 open CIGAMF.P13.PaperCValueSet CIGAMF.P13.PaperCBreakpoint
 open CIGAMF.P13.PaperCRanking CIGAMF.P13.PaperCEndpoint
 open CIGAMF.P13.PaperCFamily
+open CIGAMF.P13.PaperCInstantiation
 variable {d m : ℕ}
 
 noncomputable def typeLabel (ty : Fin m → Fin d) : Ranking m :=
@@ -36,21 +37,54 @@ def FlowBand (ty : Fin m → Fin d) (F : LayeredFlow (CState d m)) (η : ℝ) : 
   ∀ k : Fin (m+1), ∀ τ, 0 < mult ty τ →
     |typeMean ty F k τ - (k.val : ℝ)/(m : ℝ)| ≤ η/(m : ℝ)
 
-/-- Counts and item indicators count the SAME prefix; no occupancy assumption. -/
+/-- Count positions inside `Fin m` first. Extending the prefix by one inserts exactly
+one position; this removes the dependent `dite` from the later permutation reindexing. -/
+lemma layerCount_eq_prefix_card (s : Fin m → Fin d) (τ : Fin d) :
+    ∀ k : ℕ, k ≤ m →
+      layerCount m s k τ =
+        ((univ.filter (fun p : Fin m => p.val < k)).filter (fun p => s p = τ)).card := by
+  classical
+  intro k
+  induction k with
+  | zero =>
+      intro hk
+      simp [layerCount]
+  | succ k ih =>
+      intro hk
+      have hkm : k < m := by omega
+      have hprefix :
+          univ.filter (fun p : Fin m => p.val < k + 1) =
+            insert ⟨k, hkm⟩ (univ.filter (fun p : Fin m => p.val < k)) := by
+        ext p
+        simp only [mem_filter, mem_univ, true_and, mem_insert, Fin.ext_iff]
+        omega
+      rw [layerCount_succ m s k hkm τ, ih (by omega), hprefix, Finset.filter_insert]
+      by_cases ht : s ⟨k, hkm⟩ = τ <;> simp [ht]
+
+/-- Counts and item indicators count the SAME filtered prefix. The first half is a
+cardinality identity; only after it is proved do we reindex positions by the permutation. -/
 lemma count_eq_item_sum (ty : Fin m → Fin d) (σ : Equiv.Perm (Fin m))
-    (k : Fin (m+1)) (τ : Fin d) :
+    (k : Fin (m + 1)) (τ : Fin d) :
     ((rankLayer ty k σ τ).val : ℝ) =
       ∑ i ∈ univ.filter (fun i => ty i = τ), inPrefixInd σ k.val i := by
   classical
-  rw [Finset.sum_filter, ← Equiv.sum_comp σ]
-  simp only [inPrefixInd, Equiv.symm_apply_apply]
-  unfold rankLayer layerState layerCount
-  rw [Nat.cast_sum]
-  rw [← Fin.sum_univ_eq_sum_range]
+  change (layerCount m (fun p => ty (σ p)) k.val τ : ℝ) = _
+  rw [layerCount_eq_prefix_card _ τ k.val (Nat.le_of_lt_succ k.isLt)]
+  have hcard :
+      (((univ.filter (fun p : Fin m => p.val < k.val)).filter
+        (fun p => ty (σ p) = τ)).card : ℝ) =
+      ∑ p ∈ univ.filter (fun p : Fin m => p.val < k.val),
+        (if ty (σ p) = τ then (1 : ℝ) else 0) := by
+    rw [Finset.card_filter, Nat.cast_sum]
+    apply Finset.sum_congr rfl
+    intro p hp
+    split_ifs <;> norm_num
+  rw [hcard, Finset.sum_filter, Finset.sum_filter,
+    ← Equiv.sum_comp σ (fun i => if ty i = τ then inPrefixInd σ k.val i else 0)]
   apply Finset.sum_congr rfl
   intro p hp
-  by_cases hk : p.val < k.val <;> by_cases ht : ty (σ p) = τ <;>
-    simp [hk, ht, p.isLt]
+  simp only [inPrefixInd, Equiv.symm_apply_apply]
+  by_cases hk : p.val < k.val <;> by_cases ht : ty (σ p) = τ <;> simp [hk, ht]
 
 lemma mult_pos_at (ty : Fin m → Fin d) (i : Fin m) : 0 < mult ty (ty i) := by
   exact Finset.card_pos.mpr ⟨i, by simp [mult]⟩
@@ -81,7 +115,7 @@ theorem rankingFlow_band (ty : Fin m → Fin d) (η : ℝ)
           (mult ty τ : ℝ) := by
     rw [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul]
     change _ = (_ - (mult ty τ : ℝ) * _) / _
-    field_simp; ring
+    field_simp
   rw [heq, abs_div, abs_of_pos hc]
   apply (div_le_iff₀ hc).2
   calc |∑ i ∈ univ.filter (fun i => ty i = τ),
@@ -176,7 +210,8 @@ lemma bandFlowLaw_marginal (ty : Fin m → Fin d) (F : LayeredFlow (CState d m))
     (hF : CountFeasibleH ty F) (k : Fin (m+1)) (i : Fin m) :
     (∑ σ, bandFlowLaw ty F σ * inPrefixInd σ k.val i) = typeMean ty F k (ty i) := by
   rw [bandFlowLaw, symLaw_marginal]
-  simp_rw [Finset.sum_comm, ← Finset.mul_sum, ← count_eq_item_sum]
+  rw [Finset.sum_comm]
+  simp_rw [← Finset.mul_sum, ← count_eq_item_sum]
   have hv := congrFun (bandFlowLaw_vector ty F hF
     (fun _ v => ((v (ty i)).val : ℝ))) k
   rw [bandFlowLaw, symLaw_objective] at hv
@@ -190,8 +225,9 @@ theorem bandFlowLaw_feasible (ty : Fin m → Fin d) (F : LayeredFlow (CState d m
     ⟨flowLaw_nonneg ty F, flowLaw_sum ty F hF.1⟩
   refine ⟨hprob.1, hprob.2, ?_⟩
   intro k hk i
-  rw [show k = (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (m+1)).val from rfl]
-  simp only [id_eq, bandFlowLaw_marginal ty F hF]
+  simp only [id_eq]
+  rw [show k = (⟨k, Nat.lt_succ_of_le hk⟩ : Fin (m+1)).val from rfl,
+    bandFlowLaw_marginal ty F hF ⟨k, Nat.lt_succ_of_le hk⟩ i]
   exact hband _ (ty i) (mult_pos_at ty i)
 
 /-- #15 WITH bands, in both directions, preserving all budgets simultaneously. -/
@@ -219,7 +255,11 @@ def typeWeight (τ : Fin 4) : ℝ := ![-3,-1,1,3] τ
 lemma familyType_weight (m : ℕ) (i : Fin m) :
     typeWeight (familyType m i) = gFamily m i := by
   unfold familyType typeWeight gFamily gN
-  split_ifs <;> norm_num
+  split_ifs <;>
+    first
+      | rfl
+      | norm_num [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+          Matrix.cons_val_succ]
 
 noncomputable def signedCost (D : ℝ) (k : Fin (m+1)) (v : CState 4 m) : ℝ :=
   (|∑ τ, typeWeight τ * ((v τ).val : ℝ)| - (k.val % 2 : ℕ)) / D
@@ -260,6 +300,8 @@ theorem actual_banded_infima (D η : ℝ) (Φ : (Fin (m+1) → ℝ) → ℝ) :
       flowObj (signedCost D) F = y}) := by
   rw [actual_banded_vectors]
 
+#print axioms layerCount_eq_prefix_card
+#print axioms count_eq_item_sum
 #print axioms rankingFlow_band
 #print axioms bandFlowLaw_marginal
 #print axioms bandFlowLaw_feasible
