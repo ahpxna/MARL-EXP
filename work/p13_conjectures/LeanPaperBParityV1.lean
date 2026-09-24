@@ -55,9 +55,26 @@ theorem maskVal_eq_neg_one_iff (j w : ℕ) : maskVal j w = -1 ↔ j = w := by
     exact absurd h (by norm_num)
   · intro h; rw [if_pos h]
 
-/-- **The channel's characteristic-function difference, exactly.**  This is `cube_difference`
-at the parity-mask query: the two mask values differ by a factor whose entire `h`-dependence
-is the `j`-th power. -/
+/-- **The UNNORMALISED cube difference at the parity-mask query.**
+
+This is NOT yet the characteristic-function difference of the two observation laws, and the
+name must not be read as though it were.  Two links are missing and both change the constant:
+
+* the cube is UNIFORM, so each of the `2^j` points carries probability `2^{-j}`.  Dividing
+  by `2^j` leaves the factor `2`, not `2^{j+1}`;
+* the observation carries independent Gaussian noise, contributing `exp(-sigma^2 t^2 / 2)`.
+
+With both, and using `sinh (I t) = I sin t`, the difference of the two observation laws'
+characteristic functions is
+
+    phi_+ (t) - phi_- (t) = 2 I^(j+1) * sin t * sin (t h / j)^j * exp (-sigma^2 t^2 / 2),
+
+which is what `EXP_paperB_decoder.py`'s `closed_form_gap` implements -- so the measured
+numbers are unaffected by this gap.  What the statement below gives, exactly, is the
+`h`-dependence: the entire dependence is the `j`-th power, and that is what the order claim
+uses.  `parity_cf_difference_normalised` (`LeanPaperBParityNormV1`) supplies the `2^{-j}`
+link; the Gaussian factor comes with the observation law, which `LeanPaperBParityLawV1`
+defines (`parity_obs_cf_difference`). -/
 theorem parity_cf_difference (j : ℕ) (t hh : ℝ) :
     (∑ z : Fin j → Bool,
         Complex.exp ((Complex.I * t) * chr z + (Complex.I * t * hh / j) * csum z))

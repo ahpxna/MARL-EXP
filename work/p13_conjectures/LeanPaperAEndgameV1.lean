@@ -2,7 +2,7 @@ import «LeanPaperAActualDecisionBridgeV1»
 import «LeanPaperAStoppingV1»
 
 /-!
-DRAFT ENDGAME — deliberately not compiled. This file is downstream of the earlier batch.
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. This file is downstream of the earlier batch.
 It does not re-prove the learner recursion, its tail, or the Gaussian RN derivative.
 
 NEW assembly: strict alternatives + ALL allocations + actual response means; the separation
@@ -29,11 +29,15 @@ theorem family_unique_answer (r : ℕ) :
     have hhi : (BCells r).sup' (BCells_nonempty r) (thetaC r)=1/8 := by
       apply le_antisymm
       · exact Finset.sup'_le _ _ (fun e he => (thetaC_bcell_bound r e he).2)
-      · have hmem : (Sum.inl 3 : Cell r) ∈ BCells r := by simp [BCells,isBCell]
-        simpa [thetaC_3] using Finset.le_sup' (thetaC r) hmem
+      · have hmem : (Sum.inl 3 : Cell r) ∈ BCells r := by
+          rw [BCells, Finset.mem_filter]
+          exact ⟨Finset.mem_univ _, rfl⟩
+        have hle := Finset.le_sup' (thetaC r) hmem
+        rwa [thetaC_3] at hle
     have hlo : (BCells r).inf' (BCells_nonempty r) (thetaC r)= -(1/8) := by
       apply le_antisymm
-      · simpa [thetaC_2] using Finset.inf'_le (thetaC r) (bAnchor_mem r)
+      · have hge := Finset.inf'_le (thetaC r) (bAnchor_mem r)
+        rwa [thetaC_2] at hge
       · exact Finset.le_inf' _ _ (fun e he => (thetaC_bcell_bound r e he).1)
     unfold rangeB; rw [hhi,hlo]; norm_num
   rw [actualLossA_eq _ (thetaC_mem_centred r), actualLossB_eq _ (thetaC_mem_centred r),hA,hB]
@@ -58,7 +62,8 @@ theorem strict_design_upper (M : ℝ) (hM : 0 < M) (hr : 0 < r) [NeZero r]
       ≤ (1/2+d)^2/(2*M*(r:ℝ)) := by
     have := mul_le_mul_of_nonneg_right hj (sq_nonneg (1/2+d))
     apply (div_le_div_of_nonneg_right this (by positivity)).trans_eq
-    field_simp; ring
+    field_simp
+    try ring
   have hsmall : (1/2+d)^2/(2*M*(r:ℝ)) ≤ 1/(8*M*(r:ℝ))+ε := by
     rw [div_le_iff₀ (by positivity)]
     have heq : (1/(8*M*(r:ℝ))+ε)*(2*M*(r:ℝ)) = 1/4+2*M*(r:ℝ)*ε := by
@@ -85,12 +90,22 @@ theorem strict_optimized_separation (M : ℝ) (hM : 0 < M) (hr : 0 < r) [NeZero 
     4/(4+2*(r:ℝ)*M) ≤ trueGameStrict r M / frozenGameC₀ r M ∧
     trueGameStrict r M / frozenGameC₀ r M ≤ 64/(9*M*(r:ℝ)) := by
   obtain ⟨hlo,hhi⟩ := strict_game_bounds M hM hr
+  have hrR : (0:ℝ) < (r:ℝ) := by exact_mod_cast hr
+  have hrne : (r:ℝ) ≠ 0 := ne_of_gt hrR
+  have hMne : M ≠ 0 := ne_of_gt hM
+  have hdne : (4 + 2*(r:ℝ)*M) ≠ 0 := by positivity
   rw [frozenGameC₀_eq r M hM]
   constructor
-  · apply (le_div_iff₀ (by norm_num : (0:ℝ) < 9/512)).2
-    convert hlo using 1 <;> field_simp <;> ring
-  · apply (div_le_iff₀ (by norm_num : (0:ℝ) < 9/512)).2
-    convert hhi using 1 <;> field_simp <;> ring
+  · rw [le_div_iff₀ (by norm_num : (0:ℝ) < 9/512)]
+    have heq : 4/(4+2*(r:ℝ)*M) * (9/512) = 9/(128*(4+2*(r:ℝ)*M)) := by
+      field_simp
+      try ring
+    rw [heq]; exact hlo
+  · rw [div_le_iff₀ (by norm_num : (0:ℝ) < 9/512)]
+    have heq : 64/(9*M*(r:ℝ)) * (9/512) = 1/(8*M*(r:ℝ)) := by
+      field_simp
+      try ring
+    rw [heq]; exact hhi
 
 /-- Explicit quantifiers: for EVERY accuracy factor, SOME finite unit-variance family
 violates that factor. This is not an asymptotic statement at a frozen design. -/
@@ -100,16 +115,18 @@ theorem no_uniform_proxy_factor : ∀ ε : ℝ, 0 < ε → ∃ r : ℕ, 0 < r �
   obtain ⟨r,hr⟩ := exists_nat_gt (max 1 (64/(9*ε)))
   have hr1 : (1:ℝ) < r := (le_max_left _ _).trans_lt hr
   have hr0 : 0 < r := by exact_mod_cast (lt_trans zero_lt_one hr1)
-  letI : NeZero r := ⟨Nat.ne_of_gt hr0⟩
+  have : NeZero r := ⟨Nat.ne_of_gt hr0⟩
+  have hrR : (0:ℝ) < (r:ℝ) := lt_trans zero_lt_one hr1
   refine ⟨r,hr0,?_,?_⟩
   · exact lt_of_lt_of_le (by positivity) (strict_game_bounds (r:=r) 1 (by norm_num) hr0).1
   · have hsep := (strict_optimized_separation (r:=r) 1 (by norm_num) hr0).2
     have hlarge : 64/(9*ε) < (r:ℝ) := (le_max_right _ _).trans_lt hr
-    have hsmall : 64/(9*(r:ℝ)) < ε := by
-      rw [div_lt_iff₀ (by positivity)]
+    have hsmall : 64/(9*1*(r:ℝ)) < ε := by
+      have h9 : (9:ℝ)*1*(r:ℝ) = 9*(r:ℝ) := by ring
+      rw [h9, div_lt_iff₀ (by positivity)]
       have := (div_lt_iff₀ (by positivity : (0:ℝ) < 9*ε)).mp hlarge
       nlinarith
-    simpa using hsep.trans_lt hsmall
+    exact hsep.trans_lt hsmall
 
 noncomputable def familyVariance (r : ℕ) (M : ℝ) (hM : 0 < M) : Cell r → NNReal :=
   fun e => ⟨pairVar M e, (pairVarC_pos M hM e).le⟩
@@ -130,6 +147,20 @@ noncomputable def actualKLValue (M : ℝ) (hM : 0 < M) (w : Cell r → ℝ) : �
 noncomputable def actualKLGame (r : ℕ) (M : ℝ) (hM : 0 < M) : ℝ :=
   ⨆ w : {w : Cell r → ℝ // IsAlloc w}, actualKLValue M hM w.val
 
+/-- The per-cell identification, summed against a design: the weighted observation
+divergence IS the `energy` the strict game optimises. Stated separately because the two
+sides differ only after the identification is applied cell by cell. -/
+theorem kl_sum_eq_energy (M : ℝ) (hM : 0 < M)
+    (hKL : GaussianKLIdentification r M hM) (w lam : Cell r → ℝ)
+    (hlam : lam ∈ Centred r) :
+    ∑ e, w e * (klDiv (observationLaw (familyVariance r M hM) (thetaC r) e)
+      (observationLaw (familyVariance r M hM) lam e)).toReal
+      = energy w (pairVar M) (thetaC r) lam := by
+  rw [energy_eq_sum_gaussKL]
+  refine Finset.sum_congr rfl fun e _ => ?_
+  obtain ⟨-, h2⟩ := hKL (thetaC r) lam (thetaC_mem_centred r) hlam e
+  rw [h2]
+
 /-- CONDITIONAL model join: hKL must be instantiated, not passed by a new headline axiom. -/
 theorem actualKLValue_eq (M : ℝ) (hM : 0 < M)
     (hKL : GaussianKLIdentification r M hM) (w : Cell r → ℝ) :
@@ -138,20 +169,14 @@ theorem actualKLValue_eq (M : ℝ) (hM : 0 < M)
   apply congrArg sInf
   ext z
   constructor
-  · rintro ⟨lam,hlam,rfl⟩
-    refine ⟨⟨lam,by simpa [← actual_strict_alternative_eq] using hlam⟩,?_⟩
-    rw [energy_eq_sum_gaussKL]
-    apply Finset.sum_congr rfl
-    intro e he
-    rw [(hKL (thetaC r) lam (thetaC_mem_centred r) hlam.2 e).2]
+  · rintro ⟨lam,⟨hbad,hc⟩,rfl⟩
+    refine ⟨⟨lam,?_⟩,?_⟩
+    · rw [← actual_strict_alternative_eq]; exact ⟨hbad,hc⟩
+    · exact (kl_sum_eq_energy M hM hKL w lam hc).symm
   · rintro ⟨lam,rfl⟩
-    have hlam : ActualBadA 0 lam.val ∧ lam.val ∈ Centred r := by
-      simpa [actual_strict_alternative_eq] using lam.property
-    refine ⟨lam.val,hlam,?_⟩
-    rw [energy_eq_sum_gaussKL]
-    apply Finset.sum_congr rfl
-    intro e he
-    rw [(hKL (thetaC r) lam.val (thetaC_mem_centred r) hlam.2 e).2]
+    have hmem : lam.val ∈ {x : Cell r → ℝ | ActualBadA 0 x ∧ x ∈ Centred r} := by
+      rw [actual_strict_alternative_eq]; exact lam.property
+    exact ⟨lam.val,hmem,kl_sum_eq_energy M hM hKL w lam.val hmem.2⟩
 
 theorem actualKLGame_eq (M : ℝ) (hM : 0 < M)
     (hKL : GaussianKLIdentification r M hM) : actualKLGame r M hM = trueGameStrict r M := by

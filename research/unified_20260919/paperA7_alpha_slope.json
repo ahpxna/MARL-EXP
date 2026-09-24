@@ -1,0 +1,170 @@
+{
+ "source_sha256": "013f2430eed6570b6c32cddb8bf609b28f54f5b41747461ace84794ec1fa78b0",
+ "dependency_sha256": {
+  "paperA7_learner.json": "bb9e6f55bbe3f3f9b4ffc79e477cc5291685316bc8d4130bdb36b9ab27bf7633"
+ },
+ "depends_on_panel_scope": {
+  "common_random_numbers": true,
+  "seed_recipe": "[BASE_SEED, arm_index, run_index] -- free of alpha",
+  "M": 16.0,
+  "scale": 4.0,
+  "runs_per_cell": 12,
+  "worlds": 1
+ },
+ "alphas": [
+  0.1,
+  0.05,
+  0.02,
+  0.01
+ ],
+ "log_inv_alpha": [
+  2.302585092994046,
+  2.995732273553991,
+  3.912023005428146,
+  4.605170185988092
+ ],
+ "per_arm": {
+  "learner": {
+   "path_slopes": [
+    18.74615351344102,
+    44.95215151858811,
+    63.698305032029126,
+    0.0,
+    18.746153513441026,
+    18.746153513441026,
+    18.74615351344102,
+    71.15814952373519,
+    112.47692108064612,
+    149.77614353917647,
+    52.41199601029419,
+    26.205998005147094
+   ],
+   "slope_mean": 49.638689896948364,
+   "slope_sem": 12.761522870972183,
+   "slope_ci95": [
+    24.626105069842883,
+    74.65127472405385
+   ],
+   "pooled_slope": 49.63868989694837,
+   "pooled_intercept": 1210.8457055779654,
+   "pooled_slope_se": 7.6920492862595875,
+   "cell_means": [
+    1316.6666666666667,
+    1366.6666666666667,
+    1416.6666666666667,
+    1429.1666666666667
+   ]
+  },
+  "oracle": {
+   "path_slopes": [
+    0.0,
+    153.6026080692054,
+    93.7307675672051,
+    93.73076756720513,
+    52.41199601029419,
+    37.492307026882045,
+    56.23846054032308,
+    131.22307459408714,
+    101.19061205891116,
+    0.0,
+    74.98461405376409,
+    63.69830503202915
+   ],
+   "slope_mean": 71.5252927099922,
+   "slope_sem": 13.548152439061504,
+   "slope_ci95": [
+    44.97091392943165,
+    98.07967149055276
+   ],
+   "pooled_slope": 71.52529270999216,
+   "pooled_intercept": 948.7937241842378,
+   "pooled_slope_se": 11.295191337477583,
+   "cell_means": [
+    1104.1666666666667,
+    1183.3333333333333,
+    1212.5,
+    1283.3333333333333
+   ]
+  },
+  "uniform": {
+   "path_slopes": [
+    93.73076756720513,
+    26.205998005147094,
+    149.77614353917647,
+    104.82399202058838,
+    44.95215151858811,
+    44.95215151858811,
+    37.49230702688204,
+    26.205998005147094,
+    18.746153513441026,
+    52.41199601029419,
+    153.6026080692054,
+    18.74615351344102
+   ],
+   "slope_mean": 64.30386835897535,
+   "slope_sem": 14.155724324009407,
+   "slope_ci95": [
+    36.558648683916914,
+    92.04908803403379
+   ],
+   "pooled_slope": 64.30386835897536,
+   "pooled_intercept": 1467.485640275491,
+   "pooled_slope_se": 5.2161318902506855,
+   "cell_means": [
+    1620.8333333333333,
+    1650.0,
+    1725.0,
+    1762.5
+   ]
+  }
+ },
+ "penalty_by_alpha": {
+  "0.1": 19.571172633088594,
+  "0.05": 19.69818766427076,
+  "0.02": 19.801650961683197,
+  "0.01": 19.830757964747207
+ },
+ "penalty_drift_per_log_unit": 0.11276093172811584,
+ "Gamma_comp_bracket": [
+  0.023256684617029778,
+  0.023256760825557204
+ ],
+ "inv_Gamma_comp_bracket": [
+  42.99824930482516,
+  42.99839020338037
+ ],
+ "predicted_slope_with_drift": [
+  47.846771959115046,
+  47.846928745522625
+ ],
+ "measured_over_inv_Gamma": 1.1544313557358703,
+ "ci_overlaps_prediction": true,
+ "what_this_is_not": "A HEURISTIC DIAGNOSTIC at one world. Differencing along the alpha axis removes the penalty's constant part and its measured drift, but NOT the threshold overshoot O_alpha nor the finite-time information residual R_tau; neither is bounded in this corpus, and either can move the slope in either direction. So this is not an upper bound on 1/Gamma and not an independent test of the rate. The four-point baseline in log(1/alpha) spans only 2.30 to 4.61, and the LEVELS are not testable on this panel at all.",
+ "unbounded_terms_not_removed": [
+  "threshold overshoot O_alpha",
+  "finite-time information residual R_tau"
+ ],
+ "checks": [
+  {
+   "name": "the panel is under COMMON RANDOM NUMBERS -- without it the four alphas sit on independent paths and a slope along the alpha axis is not identified from 12 runs per cell",
+   "ok": true,
+   "detail": "seed recipe: [BASE_SEED, arm_index, run_index] -- free of alpha"
+  },
+  {
+   "name": "tau is non-increasing in alpha on EVERY path, re-derived here from the stored runs rather than taken from the producing script.  This is what makes the within-path difference a clean estimate of the slope",
+   "ok": true,
+   "detail": "36 paths, 0 violations"
+  },
+  {
+   "name": "the slope is REPORTED against the prediction as a HEURISTIC DIAGNOSTIC, and the comparison is recorded whichever way it falls.  It is not an upper bound on 1/Gamma and not an independent test of the rate: differencing removes the penalty's constant part and (measured) its drift, but NOT the threshold overshoot or the finite-time information residual, neither of which is bounded anywhere in this corpus",
+   "ok": true,
+   "detail": "measured 49.64 against predicted [47.85, 47.85]: CI overlaps; measured/1Gamma = 1.154"
+  },
+  {
+   "name": "the LEVELS remain untestable and are not used: only differences along a path enter the slope, so the additive penalty (~19.7, i.e. 4.3x the largest log(1/alpha)) cancels.  This does not rehabilitate the levels",
+   "ok": true,
+   "detail": "penalty 19.6-19.8"
+  }
+ ],
+ "all_passed": true
+}

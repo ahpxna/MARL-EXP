@@ -16,6 +16,28 @@ Those are the three places this table is for.
 
 ---
 
+## State on 2026-09-24 — supersedes the status column of the tables below where they conflict
+
+The rows further down are kept as the record of how each claim was reached, including their
+retractions. Where a row below says "open", "owed" or "conditional" and a row here names a
+final theorem, this row is current. Gate: smoke `smokeA_20260924_ideal` PASS (54 modules;
+the closure of `LeanPaperA7IdealFamilyV1`); full gate `full3_20260924_ideal` (188 modules)
+running at the time of writing.
+
+| # | Status | Headline, on the paper's own object | Final theorem (module) | Hypotheses left | Scope that must travel with it |
+|---|---|---|---|---|---|
+| A-H4′ | **headline, for the IDEAL learner** | The defined learner attains the exact rate: `E τ_δ / log(1/δ) → 1/Γ_actual`, `E τ_δ < ∞` at every `δ`; wrong answer w.p. `≤ δ` | `ideal_family_finish`, `ideal_family_correct`, `GamT_fam` (`LeanPaperA7IdealFamilyV1`); `ideal_upper_rate`, `ideal_finite`, `ideal_correct` (`LeanPaperA7IdealUpperV1`); `ideal_direct` (`LeanPaperA7IdealDirect2V1`); lower via `runS_eq`, `cnt_le_tau`, `ansEv_alt_le`, `ansEv_true_ge` (`LeanPaperA7IdealStoppedV1`) + `stream_eq_hist_fresh` + `family_policy_lower` | `M>0`, `r>0`, `a>0` only | IDEAL: exact `J` over a refining net, exact GLR infimum (`ν_t = 0`). NOT `EXP_paperA7_learner.py`; the shipped learner stays under A-H4 (conditional). Rate and finiteness at `θ_C`; correctness at every world with one correct answer. No numerical artifact comes from this learner |
+| A-F | **NUM + theorem** | Centred separation interval and allocation mechanism | `paperA_mechanism.pdf` (`FIG_paperA_mechanism.py`, 7/7) | — | the runs certify answer A only: allocation diagnostic under one certificate, not a learner (`paperA_mechanism.PROVENANCE_NOTE.md`, addendum) |
+| B-H5 | **headline, on the parity channel** | Both minimax rates on ONE channel: `Θ(log(1/δ)/h²)` safe, `Θ(log(1/δ)/h^{2(m−1)})` identification, uniform on a rectangle | `parity_tip_finish`, `parity_rates`, `safeCert`, `idCert` (`LeanPaperBParityFinishV1`); `safeLower`, `idLower` (`LeanPaperBParityExperimentV1`); `transcript_kl_le` (`LeanPaperBProtocolV1`) | `m≥3`, `σ>0` | randomised adaptive policies with a FINITE horizon (bounded stopping). Supersedes B-H3's "continuous alphabet open" and B-H4's "upper side in δ" for this channel; the `F_{u,v}` family's adaptive Gaussian instantiation is still open |
+| B-D | **provenance** | Decoder counts vs the formalized decoder | `lean_wrong_imp_py_wrong` (`LeanPaperBDecoderMatchV1`) | — | identification counts are a CONSERVATIVE UPPER bound on the formalized decoder's error, not a measurement of it (`paperB_decoder.PROVENANCE_NOTE.md`) |
+| C-H1′ | **headline** | `V_m(0)` exact: `4/m(m+4)` even, `(m+3)/m(m+4)` odd | `even_value_zero`, `odd_value_zero` (`LeanPaperCEndgameV1`); the laws `even_endpoint_law`, `odd_endpoint_law` (`LeanPaperCEndpointLawV1`) | — | supersedes C-H1's "one construction owed" |
+| C-H2′ | **headline** | Even: the whole frontier `V_m(η) = max{2/(m+4)(m−1), 4(1−η)/m(m+4)}`; odd: `V_m(η) = V_free ⇔ η ≥ 1` | `even_frontier_all`, `odd_breakpoint`, `oddBreakpointFinish_holds` (`LeanPaperCEndpointLawV1`) | — | the odd curve strictly between its anchors is not claimed |
+| C-H3′ | **headline** | The ranking program and the four-type flow program have the SAME value, all bands carried | `actual_banded_infima` (`LeanPaperCFlowBandJoinV1`); `value_eq_flow`, `even_frontier_flow`, `odd_breakpoint_flow` (`LeanPaperCFlowObjectiveV1`) | — | a statement about the VALUE on `g_m`, not an algorithm for perturbed weights. Supersedes C-H3's "nothing in the gated corpus proves it" |
+| C-H4′ | **headline** | The physical optimum is the paper's value, and moves at most `3‖g−g'‖₁/d` | `familyBaselineIdentification_holds` (`LeanPaperCBaselineAttainV1`); `trueValue_family`, `family_value_robust`, `even_frontier_robust` (`LeanPaperCStabilityFamilyV1`); `trueValue_stable` (`LeanPaperCStabilityEndgameV1`) | `0 < d ≤ min(‖g_m‖₁, ‖g'‖₁)` | moving normaliser, recomputed baseline, per-item bands, feasible set fixed. An envelope; the collapse scale is a separate result (C-H4) |
+| C-F | **NUM + theorem** | C-F1 price/phase boundary, C-F2 stability | `paperC_price_boundary.pdf`, `paperC_stability.pdf` (`FIG_paperC_endpoints.py`, 10/10) | — | all 220 stored perturbations under the Lean envelope (worst 0.32); the robustness check name "floor is LOOSE" over-claims (`paperC_robustness.AUDIT_NOTE.md`) |
+
+---
+
 ## Paper A — optimising a surrogate can cost the decision
 
 **Model, fixed once.** Cells `e` of two arms, arm `A` with `2` actions and arm `B` with

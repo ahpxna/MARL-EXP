@@ -1,0 +1,239 @@
+import «LeanPaperCParityBaselineV1»
+
+/-!
+# Paper C: the attainment half, and `FamilyBaselineIdentification` closed
+
+`LeanPaperCParityBaselineV1` proves the LOWER half of the obligation -- no cardinality-`k`
+subset of `g_m` beats `k mod 2` -- from the single fact that every weight is an odd integer.
+This module supplies the other half by CONSTRUCTING, for each interior budget, a subset that
+attains it, and then closes `FamilyBaselineIdentification`.
+
+The construction uses only the light items, `-1` and `+1`, except at the very last budget:
+
+* for `1 <= k <= m-2`, take `a = (k+1)/2` light negatives and `b = k/2` light positives.
+  Then `a + b = k` and the sum is `b - a`, which is `0` for even `k` and `-1` for odd `k` --
+  in both cases of absolute value `k mod 2`.  The single formula covers both parities
+  because natural-number division already does the case split;
+* for `k = m-1` the light items no longer suffice, and this is exactly the budget the
+  endgame file warns about.  Delete ONE light negative from everything.  The sum is then
+  `total + 1`, and `total` is `0` when `m` is even and `-1` when `m` is odd -- while
+  `(m-1) mod 2` is `1` when `m` is even and `0` when `m` is odd.  The two agree, so the same
+  deletion works for both parities, but only because the item deleted is a `-1`: deleting a
+  `+1` would give `total - 1` and fail for odd `m`.  Reusing the even case's zero-total
+  argument there would be wrong.
+
+The counts are obtained from one reusable interval-cardinality lemma rather than by
+enumerating the family, and the subsets themselves come from `Finset.exists_subset_card_eq`,
+so no explicit index gymnastics is needed beyond identifying the two blocks.
+-/
+
+namespace CIGAMF.P13.PaperCBaselineAttain
+
+open Finset
+open CIGAMF.P13.PaperCRanking CIGAMF.P13.PaperCFamily
+open CIGAMF.P13.PaperCFrontier CIGAMF.P13.PaperCStabilityEndgame
+open CIGAMF.P13.PaperCParityBaseline CIGAMF.P13.PaperCEvenWitnessJoin
+open CIGAMF.P13.PaperCEndpoint
+
+variable {m : ℕ}
+
+/-! ## 1. Counting a numeric interval inside `Fin m` -/
+
+/-- The number of `Fin m` indices whose value lies in `[lo, hi]`. -/
+theorem card_filter_Icc (m lo hi : ℕ) (hhi : hi < m) :
+    ((univ : Finset (Fin m)).filter (fun i : Fin m => lo ≤ (i : ℕ) ∧ (i : ℕ) ≤ hi)).card
+      = hi + 1 - lo := by
+  classical
+  have himg : ((univ : Finset (Fin m)).filter
+      (fun i : Fin m => lo ≤ (i : ℕ) ∧ (i : ℕ) ≤ hi)).image Fin.val = Finset.Icc lo hi := by
+    ext n
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and,
+      Finset.mem_Icc]
+    constructor
+    · rintro ⟨i, hi', rfl⟩
+      exact hi'
+    · rintro ⟨h1, h2⟩
+      exact ⟨⟨n, lt_of_le_of_lt h2 hhi⟩, ⟨h1, h2⟩, rfl⟩
+  have hinj : Set.InjOn Fin.val
+      (↑((univ : Finset (Fin m)).filter
+        (fun i : Fin m => lo ≤ (i : ℕ) ∧ (i : ℕ) ≤ hi)) : Set (Fin m)) :=
+    fun _ _ _ _ h => Fin.val_injective h
+  rw [← Finset.card_image_of_injOn hinj, himg, Nat.card_Icc]
+
+/-! ## 2. The two light blocks -/
+
+/-- The light negatives: indices `1 .. (m-1)/2`. -/
+def negSet (m : ℕ) : Finset (Fin m) :=
+  (univ : Finset (Fin m)).filter (fun i : Fin m => 1 ≤ (i : ℕ) ∧ (i : ℕ) ≤ (m - 1) / 2)
+
+/-- The light positives: indices `(m-1)/2 + 1 .. m-2`. -/
+def posSet (m : ℕ) : Finset (Fin m) :=
+  (univ : Finset (Fin m)).filter
+    (fun i : Fin m => (m - 1) / 2 + 1 ≤ (i : ℕ) ∧ (i : ℕ) ≤ m - 2)
+
+theorem negSet_card (m : ℕ) (hm : 4 ≤ m) : (negSet m).card = (m - 1) / 2 := by
+  rw [negSet, card_filter_Icc m 1 ((m - 1) / 2) (by omega)]
+  omega
+
+theorem posSet_card (m : ℕ) (hm : 4 ≤ m) :
+    (posSet m).card = m - 2 - (m - 1) / 2 := by
+  rw [posSet, card_filter_Icc m ((m - 1) / 2 + 1) (m - 2) (by omega)]
+  omega
+
+theorem negSet_value (m : ℕ) (hm : 4 ≤ m) (i : Fin m) (hi : i ∈ negSet m) :
+    gFamily m i = -1 := by
+  simp only [negSet, Finset.mem_filter, Finset.mem_univ, true_and] at hi
+  obtain ⟨h1, h2⟩ := hi
+  show gN m (i : ℕ) = -1
+  unfold gN
+  rw [if_neg (by omega), if_neg (by omega), if_pos (by omega)]
+
+theorem posSet_value (m : ℕ) (hm : 4 ≤ m) (i : Fin m) (hi : i ∈ posSet m) :
+    gFamily m i = 1 := by
+  simp only [posSet, Finset.mem_filter, Finset.mem_univ, true_and] at hi
+  obtain ⟨h1, h2⟩ := hi
+  show gN m (i : ℕ) = 1
+  unfold gN
+  rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+
+theorem negSet_disjoint_posSet (m : ℕ) : Disjoint (negSet m) (posSet m) := by
+  rw [Finset.disjoint_left]
+  intro i hi hj
+  simp only [negSet, posSet, Finset.mem_filter, Finset.mem_univ, true_and] at hi hj
+  omega
+
+/-- A subset on which the weight is constant sums to `card * c`. -/
+theorem sum_const_on_subset (m : ℕ) (A : Finset (Fin m)) (c : ℝ)
+    (h : ∀ i ∈ A, gFamily m i = c) : ∑ i ∈ A, gFamily m i = (A.card : ℝ) * c := by
+  rw [Finset.sum_congr rfl h, Finset.sum_const, nsmul_eq_mul]
+
+/-! ## 3. Attainment at the interior budgets -/
+
+/-- **`a = (k+1)/2` negatives and `b = k/2` positives.**  One formula for both parities:
+natural division already performs the case split, and `a + b = k`, `b - a = -(k mod 2)`. -/
+theorem attain_interior (m : ℕ) (hm : 4 ≤ m) (k : ℕ) (hk1 : 1 ≤ k) (hk : k ≤ m - 2) :
+    ∃ S : Finset (Fin m), S.card = k ∧
+      |∑ i ∈ S, gFamily m i| = ((k % 2 : ℕ) : ℝ) := by
+  classical
+  obtain ⟨A, hAsub, hAcard⟩ := Finset.exists_subset_card_eq
+    (show (k + 1) / 2 ≤ (negSet m).card by rw [negSet_card m hm]; omega)
+  obtain ⟨B, hBsub, hBcard⟩ := Finset.exists_subset_card_eq
+    (show k / 2 ≤ (posSet m).card by rw [posSet_card m hm]; omega)
+  have hdisj : Disjoint A B :=
+    Disjoint.mono hAsub hBsub (negSet_disjoint_posSet m)
+  refine ⟨A ∪ B, ?_, ?_⟩
+  · rw [Finset.card_union_of_disjoint hdisj, hAcard, hBcard]
+    omega
+  · rw [Finset.sum_union hdisj,
+      sum_const_on_subset m A (-1) (fun i hi => negSet_value m hm i (hAsub hi)),
+      sum_const_on_subset m B 1 (fun i hi => posSet_value m hm i (hBsub hi)),
+      hAcard, hBcard]
+    rcases Nat.even_or_odd k with he | ho
+    · have h0 : k % 2 = 0 := Nat.even_iff.mp he
+      have ha : (k + 1) / 2 = k / 2 := by omega
+      have hval : (((k / 2 : ℕ)) : ℝ) * (-1) + (((k / 2 : ℕ)) : ℝ) * 1 = 0 := by ring
+      rw [ha, hval, h0]
+      norm_num
+    · have h0 : k % 2 = 1 := Nat.odd_iff.mp ho
+      have ha : (k + 1) / 2 = k / 2 + 1 := by omega
+      have hval : (((k / 2 + 1 : ℕ)) : ℝ) * (-1) + (((k / 2 : ℕ)) : ℝ) * 1 = -1 := by
+        push_cast
+        ring
+      rw [ha, hval, h0]
+      norm_num
+
+/-! ## 4. Attainment at the last budget, where the light items run out -/
+
+/-- **Delete one light negative.**  The sum becomes `total + 1`, which is `1` for even `m`
+and `0` for odd `m` -- exactly `(m-1) mod 2` in both cases.  Deleting a `+1` instead would
+give `total - 1` and fail at odd `m`, which is why the choice is a negative. -/
+theorem attain_last (m : ℕ) (hm : 4 ≤ m) :
+    ∃ S : Finset (Fin m), S.card = m - 1 ∧
+      |∑ i ∈ S, gFamily m i| = (((m - 1) % 2 : ℕ) : ℝ) := by
+  classical
+  have hne : (negSet m).Nonempty := by
+    rw [← Finset.card_pos, negSet_card m hm]
+    omega
+  obtain ⟨i₀, hi₀⟩ := hne
+  have hval : gFamily m i₀ = -1 := negSet_value m hm i₀ hi₀
+  refine ⟨(univ : Finset (Fin m)).erase i₀, ?_, ?_⟩
+  · rw [Finset.card_erase_of_mem (Finset.mem_univ i₀), Finset.card_univ, Fintype.card_fin]
+  · have hsplit : (∑ i, gFamily m i)
+        = gFamily m i₀ + ∑ i ∈ (univ : Finset (Fin m)).erase i₀, gFamily m i := by
+      have h := Finset.sum_insert (f := fun i => gFamily m i)
+        (Finset.notMem_erase i₀ (univ : Finset (Fin m)))
+      rw [Finset.insert_erase (Finset.mem_univ i₀)] at h
+      exact h
+    have hsum : ∑ i ∈ (univ : Finset (Fin m)).erase i₀, gFamily m i
+        = (∑ i, gFamily m i) + 1 := by
+      rw [hsplit, hval]
+      ring
+    rw [hsum]
+    rcases Nat.even_or_odd m with he | ho
+    · have hpar : m % 2 = 0 := Nat.even_iff.mp he
+      have hE := gFamily_isEvenFamily (m - 2) (by omega) (by omega)
+      rw [show m - 2 + 2 = m from by omega] at hE
+      rw [hE.total, show (m - 1) % 2 = 1 from by omega]
+      norm_num
+    · have hpar : m % 2 = 1 := Nat.odd_iff.mp ho
+      have hO := gFamily_isOddFamily (m - 2) (by omega) (by omega)
+      rw [show m - 2 + 2 = m from by omega] at hO
+      rw [hO.total, show (m - 1) % 2 = 0 from by omega]
+      norm_num
+
+/-! ## 5. The obligation, closed -/
+
+/-- **Attainment at every interior budget.** -/
+theorem attainment (m : ℕ) (hm : 4 ≤ m) (k : Fin (m + 1)) (hk : 1 ≤ k.val)
+    (hkm : k.val < m) :
+    ∃ S : Finset (Fin m), S.card = k.val ∧
+      |∑ i ∈ S, gFamily m i| = ((k.val % 2 : ℕ) : ℝ) := by
+  rcases Nat.lt_or_ge k.val (m - 1) with h | h
+  · exact attain_interior m hm k.val hk (by omega)
+  · have hlast : k.val = m - 1 := by omega
+    rw [hlast]
+    exact attain_last m hm
+
+/-- **`FamilyBaselineIdentification`, discharged.**  Lower half from parity
+(`parity_le_trueBaseline`), upper half from the construction above.  After this,
+`family_regret_identification` (`LeanPaperCStabilityEndgameV1`) no longer carries an
+undischarged join: on this family the algebraic regret IS the physical regret. -/
+theorem familyBaselineIdentification_holds (m : ℕ) (hm : 4 ≤ m) :
+    FamilyBaselineIdentification m :=
+  familyBaselineIdentification_of_attainment m (fun k hk hkm => attainment m hm k hk hkm)
+
+/-! ## 6. The physical join, now with NO hypothesis left
+
+`family_regret_identification` (`LeanPaperCStabilityEndgameV1`) takes two inputs: the
+baseline identification, closed just above, and the normaliser `sum |g_i| = m + 4`.  The
+second was already proved -- `gFamily_abs_sum` (`LeanPaperCEvenWitnessJoinV1`) derives it
+from the two heavy entries rather than assuming it -- so both are available and the
+identification can be stated outright. -/
+
+/-- The normaliser is the family's own absolute mass, not a supplied constant. -/
+theorem normMass_gFamily (m : ℕ) (hm : 3 ≤ m) : normMass (gFamily m) = (m : ℝ) + 4 := by
+  unfold normMass
+  exact gFamily_abs_sum m hm
+
+/-- **On this family the algebraic regret IS the physical regret**, unconditionally at every
+interior budget and every relabelling.  Previously this was a conditional on
+`FamilyBaselineIdentification`. -/
+theorem family_regret_identification_unconditional (m : ℕ) (hm : 4 ≤ m)
+    (σ : Equiv.Perm (Fin m)) (k : Fin (m + 1)) (hk : 1 ≤ k.val) (hkm : k.val < m) :
+    normalizedRegret (gFamily m) σ k = regret (gFamily m) σ ((m : ℝ) + 4) k.val :=
+  family_regret_identification (familyBaselineIdentification_holds m hm)
+    (normMass_gFamily m (by omega)) σ k hk hkm
+
+/-! ## Audit -/
+
+#print axioms normMass_gFamily
+#print axioms family_regret_identification_unconditional
+#print axioms card_filter_Icc
+#print axioms negSet_card
+#print axioms posSet_card
+#print axioms attain_interior
+#print axioms attain_last
+#print axioms attainment
+#print axioms familyBaselineIdentification_holds
+
+end CIGAMF.P13.PaperCBaselineAttain

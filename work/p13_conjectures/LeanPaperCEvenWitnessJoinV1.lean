@@ -3,7 +3,7 @@ import «LeanPaperCEvenResolveV1»
 import «LeanPaperCLawRelabelV1»
 
 /-!
-DRAFT SOURCE — no compile claim. Concrete #13 closure, with no hclass/hvalue premises.
+COMPILED and in the verification gate. Concrete #13 closure, with no hclass/hvalue premises.
 All counts are taken from CFam13/CUniform and the value from CEvenResolve; the final
 witness is a law on ALL permutations of the original gFamily, not a menu optimum.
 -/

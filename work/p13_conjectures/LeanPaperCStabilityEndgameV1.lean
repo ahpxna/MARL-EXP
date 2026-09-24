@@ -3,7 +3,7 @@ import «LeanPaperCFrontierV1»
 import «LeanPaperBTipV1»
 
 /-!
-DRAFT ENDGAME — not compiled. New downstream generalization: real signed weights, actual
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. New downstream generalization: real signed weights, actual
 selectedRadius, a RECOMPUTED optimal baseline, and a MOVING normalization.
 No fixed-weight type partition is used in the optimization domain: all permutations with
 item-marginal bands are retained, so small perturbations do not secretly change feasibility.
@@ -19,7 +19,7 @@ open CIGAMF.V4.SupportGeometry
 open CIGAMF.P13.PaperCFrontier CIGAMF.P13.PaperCBreakpoint
 open CIGAMF.P13.PaperCValueSet CIGAMF.P13.PaperCLawPush
 open CIGAMF.P13.PaperCRanking CIGAMF.P13.PaperCEndpoint
-open CIGAMF.P13.PaperCFamily
+open CIGAMF.P13.PaperCFamily CIGAMF.P13.PaperCInstantiation
 open CIGAMF.P13.PaperBTip (osc_bool_of_zero)
 variable {m : ℕ}
 
@@ -44,7 +44,20 @@ lemma prefixSet_card (σ : Equiv.Perm (Fin m)) (k : Fin (m+1)) :
   have he : prefixSet σ k = (univ.filter (fun i : Fin m => i.val < k.val)).map σ.toEmbedding := by
     ext i; simp [prefixSet]
   rw [he,card_map]
-  simp [Finset.card_filter, Fin.sum_univ_eq_sum_range, Nat.le_of_lt_succ k.isLt]
+  have hkm : k.val ≤ m := Nat.le_of_lt_succ k.isLt
+  have himg : (univ.filter (fun i : Fin m => i.val < k.val)).image Fin.val
+      = Finset.range k.val := by
+    ext n
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and,
+      Finset.mem_range]
+    constructor
+    · rintro ⟨i,hi,rfl⟩; exact hi
+    · intro hn
+      exact ⟨⟨n,lt_of_lt_of_le hn hkm⟩,hn,rfl⟩
+  have hinj : Set.InjOn Fin.val
+      (↑(univ.filter (fun i : Fin m => i.val < k.val)) : Set (Fin m)) :=
+    fun _ _ _ _ h => Fin.val_injective h
+  rw [← Finset.card_image_of_injOn hinj, himg, Finset.card_range]
 
 lemma subsets_nonempty (k : Fin (m+1)) :
     (univ.filter (fun S : Finset (Fin m) => S.card=k.val)).Nonempty :=
@@ -65,9 +78,9 @@ theorem physical_minimum (g : Fin m → ℝ) (k : Fin (m+1)) :
   simp_rw [physical_radius]
   apply le_antisymm
   · obtain ⟨S,hS,hmin⟩ := Finset.exists_mem_eq_inf'
-      (univ.filter (fun S : Finset (Fin m) => S.card=k.val)) (subsets_nonempty k)
-      (fun S => |∑ i ∈ S,g i|)
-    rw [← hmin]
+      (s := (univ.filter (fun S : Finset (Fin m) => S.card=k.val)))
+      (subsets_nonempty k) (fun S => |∑ i ∈ S,g i|)
+    rw [hmin]
     exact inf'_le _ hS
   · apply le_inf'
     intro S hS
@@ -89,7 +102,8 @@ theorem physical_normalized_regret (g : Fin m → ℝ) (σ : Equiv.Perm (Fin m))
   ring
 
 lemma baseline_nonneg (g : Fin m → ℝ) (k : Fin (m+1)) : 0 ≤ trueBaseline g k := by
-  apply le_inf'; intro S hS; exact abs_nonneg _
+  unfold trueBaseline baseline
+  exact le_inf' _ _ (fun S _ => abs_nonneg _)
 
 lemma baseline_le_prefix (g : Fin m → ℝ) (σ : Equiv.Perm (Fin m)) (k : Fin (m+1)) :
     trueBaseline g k≤|∑ i ∈ prefixSet σ k,g i| := by
@@ -134,14 +148,20 @@ theorem normalized_regret_stable (g g' : Fin m → ℝ) (σ : Equiv.Perm (Fin m)
     ⟨div_nonneg hR'.1 hD'.le,(div_le_one hD').2 hR'.2⟩
   rw [hid]
   calc _ ≤ |(rawRegret g σ k-rawRegret g' σ k)/normMass g| +
-        |(rawRegret g' σ k/normMass g')*((normMass g'-normMass g)/normMass g)| := abs_add _ _
+        |(rawRegret g' σ k/normMass g')*((normMass g'-normMass g)/normMass g)| := abs_add_le _ _
     _ ≤ 2*l1 g g'/normMass g+l1 g g'/normMass g := by
-      rw [abs_div,abs_mul,abs_div,abs_of_pos hD,abs_of_nonneg hfrac.1]
+      rw [abs_div,abs_mul,abs_div,abs_of_pos hD]
       apply add_le_add
       · exact div_le_div_of_nonneg_right (raw_stable g g' σ k) hD.le
-      · have hnorm : |normMass g'-normMass g|≤l1 g g' := by
+      · have habs : |rawRegret g' σ k|/|normMass g'| = rawRegret g' σ k/normMass g' := by
+          rw [abs_of_nonneg hR'.1, abs_of_pos hD']
+        have hnorm : |normMass g'-normMass g|≤l1 g g' := by
           rw [abs_sub_comm]; exact normMass_stable g g'
-        exact (mul_le_mul_of_nonneg_right hfrac.2 (by positivity)).trans (by gcongr)
+        rw [habs, abs_div, abs_of_pos hD]
+        calc rawRegret g' σ k/normMass g'*(|normMass g'-normMass g|/normMass g)
+            ≤ 1*(l1 g g'/normMass g) := by
+              exact mul_le_mul hfrac.2 (by gcongr) (by positivity) (by norm_num)
+          _ = l1 g g'/normMass g := one_mul _
     _ = 3*l1 g g'/normMass g := by ring
     _ ≤ 3*l1 g g'/d := div_le_div_of_nonneg_left (by positivity) hd hg
 
@@ -195,11 +215,17 @@ theorem family_regret_identification (hbase : FamilyBaselineIdentification m)
     (hnorm : normMass (gFamily m)=(m:ℝ)+4) (σ : Equiv.Perm (Fin m))
     (k : Fin (m+1)) (hk : 1 ≤ k.val) (hkm : k.val < m) :
     normalizedRegret (gFamily m) σ k=regret (gFamily m) σ ((m:ℝ)+4) k.val := by
-  rw [normalizedRegret,rawRegret,hbase k hk hkm,hnorm]
-  unfold regret excess prefixSum rankOf
-  congr 2
-  rw [sum_filter, ← Equiv.sum_comp σ]
-  simp [prefixSet,Equiv.symm_apply_apply]
+  classical
+  have hprefix : ∑ i ∈ prefixSet σ k, gFamily m i
+      = prefixSum (rankOf (gFamily m) σ) k.val := by
+    unfold prefixSet prefixSum rankOf
+    rw [Finset.sum_filter, Finset.sum_filter,
+      ← Equiv.sum_comp σ
+        (fun i => if ((σ.symm i : Fin m) : ℕ) < k.val then gFamily m i else 0)]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [Equiv.symm_apply_apply]
+  unfold normalizedRegret rawRegret regret excess
+  rw [hbase k hk hkm, hnorm, hprefix]
 
 #print axioms physical_radius
 #print axioms physical_minimum

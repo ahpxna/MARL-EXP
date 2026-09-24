@@ -1,7 +1,7 @@
 import «LeanPaperCLawPushV1»
 import «LeanPaperCRelabelV1»
 
-/-! DRAFT source, not compiled. Transport of the same law between two rearranged bases.
+/-! COMPILED and in the verification gate. Transport of the same law between two rearranged bases.
 The item labels move, positions do not. The per-item band and the entire regret vector
 are preserved. This is used by the concrete even and odd witnesses below. -/
 namespace CIGAMF.P13.PaperCLawRelabel

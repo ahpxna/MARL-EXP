@@ -83,8 +83,15 @@ def fig_swap():
 
 def fig_decoder():
     """Decision and identification on the same channel, raw and rescaled."""
+    # The raw counts stay the source of truth, but their INTERPRETATION comes from the
+    # corrected postprocessor, not from the producer's own bracket fields: the producer
+    # spent 0.05/J on each of two tails (0.10 in total) and localised a budget from a
+    # single failing rung, which is invalid without monotonicity of the decoder's error.
+    # `paperB_decoder_grid_v2_20260923.json` redoes both from the same `bad/reps` counts,
+    # with 0.05/(2J) per tail and a contiguous failed prefix. No resampling was done.
     d = load("paperB_decoder.json")
-    res = d["results"]
+    v2 = load("paperB_decoder_grid_v2_20260923.json")
+    res = v2["corrected_rows"]
     fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.4))
 
     ms = sorted(set(r["m"] for r in res))
@@ -96,37 +103,46 @@ def fig_decoder():
     ax = axes[0]
     for i, h in enumerate(hs):
         sel = [r for r in res if r["decoder"] == "safe" and r["m"] == m0 and r["h"] == h]
-        by = {}
+        hi, lo = {}, {}
         for r in sel:
-            by.setdefault(r["total_budget"], []).append(r["err_upper95"])
-        xs = sorted(by)
-        ax.plot(xs, [max(by[x]) for x in xs], "o-", ms=2.5, lw=0.9,
-                color=cmap(i / max(1, len(hs) - 1)), label=f"h={h}")
+            hi.setdefault(r["total_budget"], []).append(r["error_upper"])
+            lo.setdefault(r["total_budget"], []).append(r["error_lower"])
+        xs = sorted(hi)
+        col = cmap(i / max(1, len(hs) - 1))
+        ax.plot(xs, [max(hi[x]) for x in xs], "o-", ms=2.5, lw=0.9,
+                color=col, label=f"h={h}")
+        # The LOWER bound is drawn because a rung whose upper bound sits above delta is not
+        # a rung proved too expensive; only a lower bound above delta shows that.
+        ax.plot(xs, [max(lo[x]) for x in xs], lw=0.6, ls=":", color=col, alpha=0.8)
     ax.axhline(0.05, color="black", lw=0.6, ls="--")
     ax.text(ax.get_xlim()[1], 0.055, r"$\delta=0.05$", ha="right", fontsize=5.5)
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("total budget"); ax.set_ylabel("worst-world error (95% upper)")
+    ax.set_xlabel("total budget"); ax.set_ylabel("worst-world error (family-wise CP)")
     ax.set_title(f"safe decoder, m={m0}", fontsize=7.5)
     ax.legend(fontsize=5, frameon=False)
-    tag(ax, "MONTE CARLO\nClopper-Pearson upper bound")
+    tag(ax, "MONTE CARLO\nsolid: CP upper; dotted: CP lower\nboth at the family-wise level")
 
     # (2) the same for identification
     ax = axes[1]
     for i, h in enumerate(hs):
         sel = [r for r in res if r["decoder"] == "identification"
                and r["m"] == m0 and r["h"] == h]
-        by = {}
+        hi, lo = {}, {}
         for r in sel:
-            by.setdefault(r["total_budget"], []).append(r["err_upper95"])
-        xs = sorted(by)
-        ax.plot(xs, [max(by[x]) for x in xs], "s-", ms=2.5, lw=0.9,
-                color=cmap(i / max(1, len(hs) - 1)), label=f"h={h}")
+            hi.setdefault(r["total_budget"], []).append(r["error_upper"])
+            lo.setdefault(r["total_budget"], []).append(r["error_lower"])
+        xs = sorted(hi)
+        col = cmap(i / max(1, len(hs) - 1))
+        ax.plot(xs, [max(hi[x]) for x in xs], "s-", ms=2.5, lw=0.9,
+                color=col, label=f"h={h}")
+        ax.plot(xs, [max(lo[x]) for x in xs], lw=0.6, ls=":", color=col, alpha=0.8)
     ax.axhline(0.05, color="black", lw=0.6, ls="--")
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel("total budget (sum over queries)")
     ax.set_title(f"identification decoder, m={m0}", fontsize=7.5)
     ax.legend(fontsize=5, frameon=False)
-    tag(ax, "MONTE CARLO\nbudget is the SUM over tests")
+    tag(ax, "MONTE CARLO\nbudget is the SUM over tests\na budget is bracketed only where the\n"
+            "dotted lower bound clears delta below it")
 
     # (3) the gap's order, with the proved lower bound
     ax = axes[2]

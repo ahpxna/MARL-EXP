@@ -1,7 +1,7 @@
 import «LeanPaperBEndgameV1»
 
 /-!
-DRAFT ENDGAME — not compiled. This is the final uniform-rate join, downstream of the
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. This is the final uniform-rate join, downstream of the
 already-assigned continuous transcript and actual decoder proofs. It does not reprove
 those upstream steps or substitute a discrete experiment for the Gaussian experiment.
 

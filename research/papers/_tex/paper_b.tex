@@ -34,8 +34,13 @@ obstruction every \emph{randomised} rule leaves unsafe mass at least $1/|H|$. De
 without identifying, and signal appearing only at high moments, are both known; what we
 claim is the combined law relating safe-decision geometry, a query class, and adaptive
 transcripts. The two orders are matched \emph{on the constructed family of
-Section~\ref{sec:family}}, and in the confidence parameter; the adaptive Gaussian
-instantiation, and the identification-rate curve, are open.
+Section~\ref{sec:family}}, and in the confidence parameter; on that family the adaptive
+Gaussian instantiation, and the identification-rate curve, are open. On a second
+construction, the parity-mask channel with $m$ worlds and Gaussian noise, both rates are
+theorems against every randomised adaptive policy with a finite horizon: the minimax cost is
+$\Theta(\log(1/\delta)/h^{2})$ for the safe decision and
+$\Theta(\log(1/\delta)/h^{2(m-1)})$ for identification, uniformly on a rectangle in
+$(h,\delta)$ (Theorem~\ref{thm:endpoint}).
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -1036,9 +1041,20 @@ mask $v(j,w)=1-2\mathbf1\{j=w\}$ is $-1$ precisely at the named world. Query $j$
 \[
 Y_{j}=v(j,w)\prod_{\ell\le j}Z_{\ell}+\frac hj\sum_{\ell\le j}Z_{\ell}+\xi ,
 \]
-a Gaussian mixture over the sign cube whose characteristic-function difference between the two
-mask values is $2^{j+1}\sinh(it)\sinh(ith/j)^{j}$ --- the cube identity verbatim --- of
-magnitude $\Theta(h^{j})$. The $v$-dependent term is real for odd $j$ and imaginary for even
+a Gaussian mixture over the sign cube. The cube identity \lean{parity\_cf\_difference} gives
+the \emph{unnormalised} difference over the $2^{j}$ cube points,
+$2^{j+1}\sinh(it)\sinh(ith/j)^{j}$; it is not yet a characteristic function. The cube is
+uniform, so each point carries mass $2^{-j}$, and the additive noise contributes its own
+Gaussian factor. Supplying both, the characteristic-function difference of the two
+\emph{observation} laws is
+\[
+\varphi_{+,j}(t)-\varphi_{-,j}(t)
+=2\,i^{\,j+1}\sin t\,\bigl(\sin (th/j)\bigr)^{j}e^{-\sigma^{2}t^{2}/2},
+\]
+of magnitude $\Theta(h^{j})$ --- the leading constant is $2$, not $2^{j+1}$, because the
+$2^{-j}$ normalisation cancels all but one power of two. The decoder experiment implements
+this normalised form, so no measured number depends on the distinction; the $h$-dependence,
+which is what the order claim uses, is the $j$-th power either way. The $v$-dependent term is real for odd $j$ and imaginary for even
 $j$, which is why the statistic is chosen by parity. Query $j$ therefore decides $w=j$ at
 order $j$, a pair resolves at $\min(w,w')$, and the classes at level $s$ are
 $\{1\},\dots,\{s\},\{s+1,\dots,m\}$: $s_{\mathrm{safe}}=1$ and $s_{\mathrm{id}}=m-1$.
@@ -1056,21 +1072,46 @@ writing it as one model would be wrong.}
 \includegraphics[width=\textwidth]{paperB_decoder.pdf}
 \caption{The two decoders on one channel. Left and centre: worst-world error against the
 \emph{total} budget --- for identification that is the sum over the $m-1$ queries, not the
-per-test sample size --- with Clopper--Pearson upper bounds, so a budget counts as achieving
-$\delta$ only when the upper bound clears it. The reported budget of a panel is the first rung
-of a seven-rung ladder that clears the target, which is a selection; every Clopper--Pearson
-interval in the run is therefore taken at level $1-0.05/J$ with $J=392$ the number of
-intervals, so the budgets hold simultaneously at $95\%$. Under that correction two safe
-budgets move ($m=3$: $25\to 50$ at $h=0.6$, $50\to 100$ at $h=0.32$) and the count of
-certified cells is unchanged at nine. Only ONE $(m,h)$ cell certifies both decoders --- seven
-of the eight identification cells are censored --- so the panel shows that the safe decoder is
-cheaper where both certify, and is \emph{not} an identification-rate curve; the budget ratio
-read off it is a ratio of rungs meeting the ladder's standard, not a measured complexity
-ratio. Right: the log-log slope of the mean gap
+per-test sample size --- with Clopper--Pearson bounds from the saved counts (\texttt{paperB\_decoder\_grid\_v2}; no
+resampling). A budget counts as achieving $\delta$ only when the upper bound clears it. The
+reported budget of a panel is the first rung of an eleven-rung ladder that clears the target,
+which is a selection over $J=616$ intervals, so BOTH tails of every interval are budgeted at
+$0.05/(2J)$ and all bounds hold simultaneously at $95\%$. Eleven of the sixteen panels have an
+upper certificate, six of those also have a failed prefix, and five have none. THREE $(m,h)$
+cells certify both decoders, all at $m=3$: at $h=0.6$, $0.45$, $0.32$ the total budgets are
+$25\to6400$, $100\to12800$ and $100\to51200$ --- ratios $256$, $128$, $512$; five of the
+eight identification panels remain censored. So the panel shows that the safe decoder is
+cheaper where both certify, and is \emph{not} an identification-rate curve.
+A certified budget is an \emph{upper} bound and nothing more: a rung that failed to certify
+is a rung whose upper bound came out above $\delta$, which is \emph{not} evidence that its
+true error exceeds $\delta$. Nor is a fixed decoder's error known to be monotone in $N$, so
+one failing rung below a success excludes nothing between them --- only a \emph{contiguous
+prefix} of tested budgets whose LOWER bounds all exceed $\delta$ bounds the first successful
+\emph{tested} budget from below (dotted curves). That bracket concerns this grid; it bounds
+neither the untested integers between rungs nor the minimum over all decoders. At $m=3$ the
+identification slope interval is $[-5.59,\,-1.07]$, which contains both $-2(m-1)=-4$ and the
+safe decoder's $-2$: this panel establishes an achieved-cost separation and \emph{cannot}
+separate the two exponents. The ratios above are ratios of rungs meeting the ladder's
+standard, not measured complexity ratios. Right: the log-log slope of the mean gap
 converges to the query index $j$ as $h$ shrinks; the coarse grid sits below it because of the
 sine's cubic term, and the drag is shown rather than hidden.}
 \label{fig:bdecoder}
 \end{figure*}
+
+\NOTEPAR{Which identification decoder the counts measure. The script's identification rule
+returns no answer, which is counted as an error, when two or more tests fire. The formalized
+decoder returns a default world on that event and may be right there. The two rules agree
+everywhere else: same channel, same bounded feature, same per-query sample size, and the same
+strict nearest-mean test, with ties falling to ``not named''. On every outcome vector and at
+every world, a wrong formalized guess implies a wrong script guess. So on the same samples the
+recorded identification counts are a CONSERVATIVE UPPER BOUND on the formalized decoder's
+error. The upper-certified budgets therefore transfer to it, but the counts are not a
+measurement of it. The lower (dotted) brackets are lower bounds for the script's rule only.
+The safe-task counts measure the formalized safe decoder exactly, since its rule has no
+ambiguous branch.}
+
+\leanbox{\lean{pyGuess}, \lean{decodeB\_of\_pyGuess}, \lean{lean\_wrong\_imp\_py\_wrong} in
+\lean{LeanPaperBDecoderMatchV1}}
 
 \subsection{The upper bound, with its per-pair input derived}
 
@@ -1124,6 +1165,56 @@ the theorem is not vacuous.
 \lean{identify\_sample\_complexity}, \lean{decoder\_total\_error},
 \lean{separation\_nonvacuous} in \lean{LeanPaperBTestV1}; \lean{decoder\_union\_bound},
 \lean{bounds\_same\_order} in \lean{LeanPaperBGeometryV1}}
+
+\subsection{The endpoint on the parity channel: both rates, every finite-horizon policy}
+\label{sec:endpoint}
+
+On the parity-mask channel the pieces above are composed into one statement about the
+minimax cost itself. It uses the continuous Gaussian observation model and adaptive
+randomised policies, so it does not rest on the finite-alphabet transcript or the
+finite-alphabet test. Write $N^{*}_{\mathrm{safe}}(h,\delta)$ and $N^{*}_{\mathrm{id}}(h,\delta)$
+for the minimax worst-world expected number of non-dummy queries. The minimum is over
+$\delta$-correct policies: every world has non-termination probability zero and error
+probability at most $\delta$ for the task.
+
+\begin{theorem}[The two rates on one channel]
+\label{thm:endpoint}
+Fix $m\ge3$ and noise $\sigma>0$. Take the parity channel with the tip loss and tolerance
+$0$, so a safe answer at world $w$ is any $a\ne w$. The policy class is every randomised
+adaptive policy with a finite horizon whose answer and guess are measurable. There are
+$0<c\le C$, $h_{0}>0$ and $\delta_{0}\in(0,1)$, depending on $m$ and $\sigma$ only, such that
+for all $0<h\le h_{0}$ and $0<\delta\le\delta_{0}$
+\[
+c\,\frac{\log(1/\delta)}{h^{2}}\le N^{*}_{\mathrm{safe}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2}},
+\qquad
+c\,\frac{\log(1/\delta)}{h^{2(m-1)}}\le N^{*}_{\mathrm{id}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2(m-1)}} .
+\]
+\end{theorem}
+
+Both lower sides hold against every policy in the class. A correct safe policy's answer at
+one world puts mass $(1-\delta)/(m-1)$ on an event of mass at most $\delta$ at another world,
+which forces the divergence to be at least $\log(1/\delta)/4(m-1)$. The transcript's
+divergence is at most the per-query $\chi^{2}$, of order $h^{2}$, times the expected number of
+queries. For identification the pair of worlds is named only by query $m-1$, whose
+information is of order $h^{2(m-1)}$. The upper sides are the two decoders of
+Figure~\ref{fig:bdecoder}. They use the bounded statistic $\cos(t_{0}Y)$ or $\sin(t_{0}Y)$,
+per-test budgets from a concentration bound, and the total budget summed over every test the
+decoder runs.
+
+\leanbox{\lean{parity\_tip\_finish}, \lean{parity\_rates}, \lean{safeCert},
+\lean{idCert} in \lean{LeanPaperBParityFinishV1}; \lean{safeLower}, \lean{idLower} in
+\lean{LeanPaperBParityExperimentV1}; \lean{transcript\_kl\_le} in
+\lean{LeanPaperBProtocolV1}; \lean{parChan\_chi\_le} in \lean{LeanPaperBParityChannelV1};
+\lean{event\_klDiv\_ge}, \lean{safe\_pair\_exists} in \lean{LeanPaperBObstructionV1};
+\lean{tip\_finish\_from\_protocols} in \lean{LeanPaperBRateClosureV1}}
+
+\NOTEPAR{Scope. The policy class has a finite horizon, so stopping times are bounded, not
+merely almost surely finite; a policy stops early by issuing the zero-information dummy
+query, which is not counted. The constants are uniform in $h$ and $\delta$ on the rectangle,
+but depend on $m$ and $\sigma$. The theorem concerns this channel and this loss, not the
+general law of Section~\ref{sec:law}. The decoder experiment measures the script's rules;
+for identification its counts are a conservative upper bound on the formalized decoder
+(see the note after Figure~\ref{fig:bdecoder}).}
 
 \subsection{The crossover: the mechanism, not a sweep}
 \label{sec:crossover}

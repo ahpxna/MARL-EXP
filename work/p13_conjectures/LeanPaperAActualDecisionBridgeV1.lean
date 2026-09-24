@@ -1,11 +1,12 @@
 import «LeanPaperAStrictV1»
 
 /-!
-DRAFT proof source, written without a compile pass at the user's request.
+COMPILED and in the verification gate (it was first written without a compile pass).
 The bridge uses oscillation on the FULL product domain for BOTH retained choices.
 The alternative equality is strict and quantified over every centered candidate.
 The Gaussian integral theorem is about the actual marginal observation laws; a separate
-identification with Mathlib's ENNReal klDiv is not asserted by this module.
+identification with Mathlib's ENNReal klDiv is not asserted by this module; it is
+`gaussianKLIdentification_holds` in `LeanPaperAGaussianKLV1`.
 -/
 namespace CIGAMF.P13.PaperAActualDecisionBridge
 open Finset MeasureTheory ProbabilityTheory

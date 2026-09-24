@@ -4,7 +4,7 @@ import «LeanPaperBTipV1»
 import «LeanPaperBDecoderV1»
 
 /-!
-DRAFT ENDGAME — not compiled. Downstream of the density/transcript/decoder work already
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. Downstream of the density/transcript/decoder work already
 assigned. The new work is the operational MINIMAX join, not another two-point calculation.
 Both tasks use ONE Experiment, hence the same query restrictions, transcript law and cost.
 

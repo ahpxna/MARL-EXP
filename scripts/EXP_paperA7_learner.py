@@ -33,12 +33,12 @@ the only channel is the sampled `Y`.
 THE POLICY, following the blueprint.
 
   1. `mu_hat_t` from the observations; the tracking radius
-     `r_t = max_e sqrt(2 (a + N_e) b_t(t^-4)) / N_e` at the SHRINKING level `t^-4`.
+     `r_t = max_e sigma_e sqrt(2 (a + N_e) b_t(t^-4)) / N_e` at level `t^-4`.
   2. Oracle brackets `[l_T, u_T]` for each answer, from the cutting-plane solver at
      `mu_hat_t`: the lower bracket is an achieved design's value, the upper is the LP bound.
      Both are computed, so the bracket width is real and is recorded.
-  3. Keep `{T : u_T >= max_S l_S - 2 L r_t}` with `L = 2B` the Lipschitz modulus of
-     `J_lipschitz_in_world`, and take the first survivor in a FIXED order.
+  3. Keep `{T : u_T >= max_S l_S - 2 L r_t}` with `L = 2B/min_e var_e`, the
+     variance-aware Lipschitz modulus, and take the first survivor in a FIXED order.
   4. Allocation from the selected answer's cutting-plane design, at `mu_hat_t`.
   5. Forced exploration `rho_t = (t+1)^-1/2`, then cumulative-quota tracking with the index
      convention of `LeanPaperA7TrackingV1`.
@@ -550,9 +550,16 @@ def run(rng, sampler, var, alpha, budget, arm, oracle_every, check_every,
             # one -- and this world has variance 16 on two cells, so the factor is 4.
             r_t = float(np.max(np.sqrt(var) * np.sqrt(2.0 * (REG_A + N) * b_t4)
                                / np.maximum(N, 1.0)))
-            # The oracle's own error must go to zero for the accumulation argument to
-            # apply, so the tolerance is tightened and the iteration budget raised with
-            # the refresh index rather than being frozen at 25 rounds.
+            # The accumulation argument in the theorem wants the oracle's own error to go
+            # to zero.  THIS SCHEDULE DOES NOT DELIVER THAT, and the code must not be read
+            # as if it did: `tol_t` is tightened with the refresh index but then FLOORED at
+            # `BRACKET_TOL_FLOOR`, and `iters_t` is CAPPED at `BRACKET_ITERS_CAP`, so
+            # the schedule alone does not GUARANTEE eps_t -> 0. A positive requested
+            # tolerance does not imply a positive lower bound on the ACTUAL solver error.
+            # A finite-eps rate needs a proved uniform error bound, answer stability, and
+            # a stopping-certificate tightness bound. Finite observed gaps do not provide
+            # these uniform-in-time premises. This panel reports the achieved finite-run
+            # gaps; it does not establish either an exact or finite-eps asymptotic rate.
             n_ref = len(sel_trace) + 1
             # The tolerance tightens with the refresh index, floored at a width the
             # bracket can still reach.  MEASURED, so the floor is not guesswork: at a
@@ -983,14 +990,33 @@ def main():
               sched_ok and len(idx) >= 2,
               f"refreshes {idx[0]}..{idx[-1]}; achieved eps_t = {eps_first:.3e} at the"
               f" first and {eps_last:.3e} at the last")
+        # --------------------------------------------- the floor, and what it costs the claim
+        # The requested tolerance is `max(1e-4/n^2, BRACKET_TOL_FLOOR)` and the iteration
+        # budget is `min(25 + 5n, BRACKET_ITERS_CAP)`.  Both are bounded, so the schedule
+        # does not guarantee vanishing actual error. This check verifies the schedule's
+        # floor/cap only; it cannot prove a rate or a positive lower bound on actual error.
+        sched_floor_binds = (1e-4 / float(max(idx)) ** 2 <= BRACKET_TOL_FLOOR
+                             if max(idx) > 0 else False)
+        eps_floor_positive = BRACKET_TOL_FLOOR > 0 and BRACKET_ITERS_CAP < float("inf")
+        check("the requested oracle schedule has a positive tolerance floor and a finite"
+              " iteration cap; this verifies configuration only, not vanishing actual"
+              " error or an asymptotic stopping guarantee",
+              eps_floor_positive,
+              f"tolerance floor {BRACKET_TOL_FLOOR:.1e}, iteration cap"
+              f" {BRACKET_ITERS_CAP}; at the deepest refresh index reached ({max(idx)}) the"
+              f" unfloored schedule would ask {1e-4 / float(max(idx)) ** 2:.2e}, so the"
+              f" floor "
+              + ("BINDS" if sched_floor_binds else "does not yet bind")
+              + f"; worst achieved eps_t over all refreshes"
+              f" {max(max(v) for v in prof.values()):.3e}")
         print(f"      achieved eps_t at the last refresh: {eps_last:.3e}.  In-run this is")
         print(f"      NOT monotone -- the estimate moves between refreshes, so each is a")
         print(f"      different problem -- which is why the solver is judged separately at")
         print(f"      a fixed estimate above.  What the rate theorem consumes is a bound on")
-        print(f"      eps_t, and the eta-parametrised form applies at whatever bound holds:")
-        print(f"      limsup E tau / log(1/alpha) <= 1/(Gamma - c*eps).  Sending eta to zero")
-        print(f"      exactly is still not proved, and no floating-point bracket can prove")
-        print(f"      it; what is now true is that the shortfall is numerically negligible.")
+        print("      eps_t uniformly over future runs, plus answer stability and stopping")
+        print("      certificate tightness. Recorded finite-run gaps do not discharge those")
+        print("      premises. Report this panel as finite-alpha performance; derive any")
+        print("      asymptotic or finite-eps rate from the completed operational theorem.")
     lw, ow = np.mean(agg("learner", "mean_tau")), np.mean(agg("oracle", "mean_tau"))
     uw = np.mean(agg("uniform", "mean_tau"))
     def arm_stats(arm):

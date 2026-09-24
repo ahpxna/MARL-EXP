@@ -1355,7 +1355,9 @@ $\mathrm{winBudget}=C+2\Gamma+\Gamma^{2}/(\varepsilon G)+14(1-\varepsilon)G$ ---
 summand is what forces the crossing time past $16$, the smallest $t$ at which the $\sqrt t$
 window is admissible at all --- the truncated expectations obey
 $\mathbb{E}\tau\le(b+\mathrm{winBudget})/((1-\varepsilon)G)+19$, and the rate follows at
-$1/((1-\varepsilon)\Gamma)$. Every link is now discharged rather than assumed.
+$1/((1-\varepsilon)\Gamma)$. What is now a theorem is the COMPOSITION of the links; its
+inputs are hypotheses about abstract processes $z$, $Z$ and $\mathrm{good}(s)$, and they are
+not yet discharged for the actual learner (see the note below).
 
 \NOTEPAR{$\varepsilon=0$ is not available inside this argument: the split's constant
 $\Gamma^{2}/(\varepsilon G)$ blows up. So the joined chain lands in the same $\Gamma-\eta$
@@ -1368,11 +1370,60 @@ $1/\Gamma$. The $s^{-4}$ confidence step remains a hypothesis here too.}
 \lean{expected\_stopping\_bound\_window}, \lean{chain\_expected\_bound},
 \lean{a7\_chain\_rate}, \lean{chain\_rate\_is\_deficient} in \lean{LeanPaperA7ChainV1}}
 
-\NOTEPAR{Exactly one probabilistic input remains, and it is named: the per-step guarantee
-$\Pr(\text{confidence fails at }s)\le s^{-4}$ for the concrete tracking statistic. That is
-a Ville application --- the theorem is proved (\lean{ville\_finite\_horizon}) --- but it is
-not instantiated at the algorithm's own confidence set, and until it is, the chain above is
-a conditional statement. Do not write that the rate is proved unconditionally.}
+\NOTEPAR{What the chain still takes as input --- all of it, not only the confidence step.
+(i) $\Pr(\mathrm{good}(s)^{c})\le s^{-4}$ for the concrete tracking statistic: a Ville
+application whose theorem is proved (\lean{ville\_finite\_horizon}) but not instantiated at
+the algorithm's own confidence set. (ii) The accumulation hypotheses $G\le z_{s}$ on good
+rounds and $Z_{t}\ge\sum_{s<t}z_{s}-C$ for the learner's ACTUAL statistic: this is the
+tracking, selection, oracle-perturbation, forced-mixture and concavity chain of the
+operational analysis, plus the stopping-certificate gap $\nu_{t}$. Its last link, from
+the linear-count energy to the implemented $Q_{t}$ uniformly over the alternatives, is now
+proved (\lean{sInf\_Qstat\_ge}, with the $v_{\min}$ bound
+\lean{perturbationCost\_div\_le}); the earlier links are not. (iii) The hitting time here is
+$\mathbb{N}$-valued; the operational target \lean{family\_operational\_finish} is stated for
+the untruncated $\mathbb{N}_{\infty}$ hitting time and still takes the hypotheses
+\texttt{hfinite}, \texttt{hUpper} and \texttt{hLower}. So for this abstract chain, and for the SHIPPED learner, the
+rate is a CONDITIONAL statement; do not write that it is proved for the shipped learner, and
+do not write that only one input remains. The ideal learner of the next paragraph is a
+different algorithm, for which all three inputs are discharged.}
+
+\paragraph{The ideal learner, end to end.}
+The exact endpoint of the precision contract is a learner whose infima are exact. We define
+it completely and prove the rate for it, with no hypothesis beyond $M>0$, $r>0$, $a>0$. After
+a warm start of one query per cell, round $s$ selects a pair (answer, design) by a
+measurable first maximiser of the exact value $J$ over the answers and a grid of allocations
+of mesh $1/(s+1)$; it mixes in the uniform design with weight $\rho_{s}=1/\sqrt{s+1}$ and
+tracks the averaged target by a post-warm-up quota; it stops at the first $t\ge K$ at which
+some answer's generalised likelihood ratio, the exact infimum of $Q_{t}$ over that answer's
+alternatives, exceeds $\log(1/\delta)+\tfrac12\sum_{e}\log(1+N_{e}/a)$. For this learner:
+(i) the $s^{-4}$ confidence event is Ville's inequality at the learner's own statistic;
+(ii) on that event the statistic accumulates at $\Gamma-\eta$ for every $\eta>0$, with no
+box on the worlds; (iii) $\mathbb{E}\tau_{\delta}$ is finite and at most
+$\log(1/\delta)/(\Gamma-\eta)+A_{\eta}$. For the lower side the learner is run as a policy of
+the kernel protocol that queries a FRESH dummy after stopping. It is coupled path by path
+with the unstopped run, so its real-cell count within any horizon is at most $\tau_{\delta}$,
+and the policy lower bound applies to it. On the separating family the learner's game is the
+actual Gaussian KL game, and
+\[
+\frac{\mathbb{E}\,\tau_{\delta}}{\log(1/\delta)}\ \longrightarrow\ \frac{1}{\Gamma_{\rm actual}},
+\qquad \Pr_{\theta_{C}}(\text{wrong answer})\le\delta .
+\]
+
+\NOTEPAR{Scope. This is the IDEAL learner: its oracle maximises the exact $J$ over a refining
+net and its stop uses the exact infimum, so the stopping-certificate gap is $\nu_{t}=0$ by
+construction. It is not \texttt{EXP\_paperA7\_learner.py} (floor $10^{-6}$, 80-iteration
+cap), whose rate remains conditional as stated above. No numerical artifact in this paper
+was produced by the ideal learner. Correctness is proved at every world where exactly one
+answer is correct (\lean{ideal\_correct}); on the family these are the centred worlds with a
+strict range gap, $\theta_{C}$ among them. The finite-expectation and rate statements are
+proved at $\theta_{C}$ only.}
+
+\leanbox{\lean{ideal\_family\_finish}, \lean{ideal\_family\_correct}, \lean{GamT\_fam},
+\lean{ideal\_family\_lower} in \lean{LeanPaperA7IdealFamilyV1};
+\lean{ideal\_expect\_bound}, \lean{ideal\_upper\_rate}, \lean{ideal\_finite},
+\lean{ideal\_correct} in \lean{LeanPaperA7IdealUpperV1}; \lean{ideal\_direct} in
+\lean{LeanPaperA7IdealDirect2V1}; \lean{runS\_eq}, \lean{cnt\_le\_tau},
+\lean{ansEv\_alt\_le}, \lean{ansEv\_true\_ge} in \lean{LeanPaperA7IdealStoppedV1}}
 
 \section{Evidence}
 \label{sec:evidence}
@@ -1395,6 +1446,8 @@ Learner: stopping with a certificate & \texttt{EXP\_paperA7\_learner} & 14/14 \\
 Track-and-stop, window accumulation & \texttt{EXP\_paperA7\_track\_and\_stop} & 6/6 \\
 Does the rule learn the answer? & \texttt{EXP\_paperA\_swap} & 5/5 \\
 Grid rate and the stopping chain & \texttt{EXP\_paperA7\_stopping\_chain} & 10/10 \\
+Allocation mechanism, one certificate & \texttt{EXP\_paperA\_mechanism} & 5/5 \\
+Mechanism data against the theorems & \texttt{FIG\_paperA\_mechanism} & 7/7 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1451,6 +1504,27 @@ $64/M$ exceeds $1$ and therefore says nothing.}
 \caption{Certifying the margin against making the decision.}
 \label{fig:margin}
 \end{figure}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_mechanism.pdf}
+\caption{The centred separation and the mechanism, from one stored panel ($M=1$, $\alpha=0.05$,
+24 runs per rule and $r$, budget $B=6\times10^{4}$); nothing was re-solved or re-sampled.
+Left: the band is the proved bracket $4/(4+2rM)\le\Gamma_{\rm true}/\Gamma_{\rm proxy}\le
+64/(9rM)$. Each interval runs from the best attained LOWER certificate on the true value
+(floating point; the strict centred alternatives are relaxed to a union of polyhedra, which
+can only lower the infimum) up to the theorem's upper bound. No numerical upper bound is
+claimed. At $r=8$ the whole interval lies below $1$. Centre: the share of queries on the
+middle cells. The frozen proxy's optimum puts nothing there, and its runs sample the middles
+only through the forced exploration. Right: $\mathbb{E}[\min(\tau,B)]$ with its standard
+error. All proxy runs are censored at $B$, which does not show that they never stop. SCOPE:
+the stopping test certifies answer $A$ only, and the geometry rule optimises that same
+certificate. The answer at the truth is therefore fixed in advance: this is an ALLOCATION
+diagnostic under one certificate, not a $\delta$-correct learner (for that question see
+Figure~\ref{fig:aswap}). Every stored number drawn was checked against the proved formula
+beside it before drawing (\texttt{FIG\_paperA\_mechanism}, 7/7).}
+\label{fig:amech}
+\end{figure*}
 
 \section{Limitations}
 \label{sec:limits}

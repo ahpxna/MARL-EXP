@@ -4,7 +4,8 @@ import «LeanPaperCRelabelV1»
 import «LeanPaperCFamilyV1»
 
 /-!
-DRAFT — NOT COMPILED. The missing #15 join, with actual marginal constraints.
+COMPILED and in the verification gate. The #15 join, with actual marginal constraints;
+instantiated at the paper's objective in `LeanPaperCFlowObjectiveV1`.
 The reverse map is NOT the arbitrary section law: that law is uniformly relabelled inside
 EACH type before being pushed onto all permutations. This preserves the entire count path
 and hence the entire objective vector. No hconst, hocc, section or band-transfer premise

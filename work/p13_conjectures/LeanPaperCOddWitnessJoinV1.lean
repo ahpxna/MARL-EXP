@@ -4,7 +4,7 @@ import «LeanPaperCOmitV1»
 import «LeanPaperCLawRelabelV1»
 
 /-!
-DRAFT source, not compiled. This joins the existing odd window calculation to an actual
+COMPILED and in the verification gate. This joins the existing odd window calculation to an actual
 law on all permutations of gFamily. The lower bound is for EVERY uniform-marginal law,
 using its uniform omitted item, not just for the constructed cyclic law.
 -/

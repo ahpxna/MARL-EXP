@@ -15,27 +15,24 @@ extremum cells have variance `1`, the middle cells variance `M`.  Retaining an a
 half the range of the OTHER arm, so at the true world retaining `A` costs `1/8` and
 retaining `B` costs `1/2`: the correct answer is `A`.
 
-THE ALTERNATIVES, AND A CLOSED-FORM CERTIFICATE.  Retaining `A` is wrong exactly when
-`range(lam_B) > range(lam_A)`.  That set is covered by finitely many HALF-SPACES: for each
-ordered pair `(p, q)` of arm-`B` cells and each sign `s`,
+THE ALTERNATIVES AND THE IMPLEMENTED LOWER CERTIFICATE. Retaining A is wrong when
+range(lam_B) > |lam_1-lam_0|. For a candidate ordered B-pair (p,q), the closed region
+requires BOTH inequalities simultaneously:
 
-    H(p, q, s) = { lam : lam_p - lam_q >= s * (lam_{A,1} - lam_{A,0}) } .
+    lam_p-lam_q >= lam_1-lam_0, and lam_p-lam_q >= lam_0-lam_1.
 
-Over a single half-space `a . lam >= c` the minimum of the energy has an exact closed form:
-with `h_e = w_e / sigma_e^2` and `t = c - a . mu`,
-
-    min = 0                       if t <= 0,
-    min = t^2 / (2 * sum_e a_e^2 / h_e)   otherwise,
-
-and `min = 0` whenever some coordinate with `a_e != 0` carries `h_e = 0` -- a starved cell
-is free for the adversary to move.  Since `Alt` is CONTAINED in the union, the minimum over
-half-spaces is a valid LOWER bound on the regional infimum, which is the direction a
-stopping rule needs.  No solver, no dual, no tolerance: the certificate is exact arithmetic
-on the estimate.  (Verified against a constrained solver to `2e-16` before this was built.)
+The alternative is contained in the union of these two-row regions. `value_at` takes the
+minimum over pairs of the MAXIMUM of the two individual half-space energy minima. Each
+half-space is a relaxation of its region, so this is a LOWER bound on the true infimum.
+It is not the exact regional optimum or the exact information game. The half-space
+formula is analytic; its implementation uses floating arithmetic without an outward-error
+certificate. `w_geometry` optimizes this lower objective numerically by Nelder-Mead and
+does not supply a certificate of global design optimality.
 
 WHAT IS COMPARED.  Three DEPLOYABLE rules, all stopping on the same certificate:
 
-    GEOMETRY   allocation from the true game at the current estimate.
+    GEOMETRY   allocation maximising the CERTIFIED LOWER BOUND at the current estimate
+               (Nelder-Mead, no global-optimality certificate -- see `w_geometry`).
     PROXY      allocation from the frozen surrogate, plus forced exploration.
     UNIFORM    equal weight.
 
@@ -168,9 +165,24 @@ def w_cert(r, M):
 
 
 def w_geometry(w0, var, mu, HS, iters=60):
-    """Allocation from the TRUE game at the estimate: maximise the certificate over the
-    simplex.  The objective is concave in `w` (a min of concave functions), so a projected
-    ascent from the variance-proportional design is adequate and its value is reported."""
+    """Allocation maximising the CERTIFIED LOWER BOUND `value_at` at the estimate.
+
+    This is NOT "the allocation from the true game", and the earlier wording here said so
+    wrongly in two ways.
+
+    * The objective is `value_at`, which its own docstring states is a valid LOWER bound on
+      `inf_{lam in Alt} energy`, obtained by two relaxations.  Maximising a lower bound is
+      not solving the true game; it is choosing the design that certifies the most.
+    * The search is scipy's Nelder-Mead in a softmax parametrisation, NOT a projected
+      ascent, and it returns no certificate of global optimality.  Concavity of the
+      objective in `w` would not rescue the claim either: the softmax reparametrisation is
+      not affine, so concavity in `w` does not transfer to `z`, and Nelder-Mead does not
+      certify a stationary point in any case.
+
+    What the run may therefore report is a design and the lower bound it attains -- both
+    sound -- and not a solved true game or an optimal design.  The starvation and separation
+    checks do not depend on this: they compare `value_at` across rules, and a conservative
+    bound only weakens the rule it favours."""
     n = len(var)
 
     def neg(z):
@@ -309,7 +321,8 @@ def main():
         for b in betas:
             wb = (1.0 - b) * w_proxy(r, M) + b * w_cert(r, M)
             fr.append({"beta": b,
-                       "J_true": value_at(wb, var, theta, HS),
+                       # the same `value_at` LOWER certificate as every J_true_lower_at_* key
+                       "J_true_lower_at_mixture": value_at(wb, var, theta, HS),
                        "lower_theorem": 9.0 * b / (128.0 * (4.0 + 2.0 * r * M)),
                        "upper_theorem": b / (8.0 * r * M)})
         row["frontier"] = fr
@@ -317,9 +330,9 @@ def main():
     check("THE FRONTIER (`frontier_two_sided`): the explicit mixture"
           " `(1-b)*w_proxy + b*w_cert` lands inside `[9b/(128(4+2rM)), b/(8rM)]` at every"
           " sacrifice `b`, so the two-sided law is exhibited and not only proved",
-          all(f["lower_theorem"] - 1e-12 <= f["J_true"] <= f["upper_theorem"] + 1e-12
+          all(f["lower_theorem"] - 1e-12 <= f["J_true_lower_at_mixture"] <= f["upper_theorem"] + 1e-12
               for row in rows for f in row["frontier"]),
-          "; ".join(f"r={row['r']}: b=0.5 -> {row['frontier'][2]['J_true']:.3e}"
+          "; ".join(f"r={row['r']}: b=0.5 -> {row['frontier'][2]['J_true_lower_at_mixture']:.3e}"
                     f" in [{row['frontier'][2]['lower_theorem']:.3e},"
                     f" {row['frontier'][2]['upper_theorem']:.3e}]" for row in rows))
 
@@ -411,10 +424,24 @@ def main():
                   " (-1/8,1/8) with 2r middle cells at 0; variance 1 on the four extrema,"
                   " M on the middles",
         "M": M, "r_values": rs, "alphas": alphas, "n_runs": n_runs, "budget": budget,
-        "certificate": "exact closed form on each covering half-space; Alt is CONTAINED in"
-                       " the union, so the minimum over half-spaces is a valid LOWER bound"
-                       " on the regional infimum -- the direction stopping needs",
+        "certificate": "value_at: Alt is CONTAINED in the union of two-row regions, one per"
+                       " ordered B-pair; each region's infimum is at least the larger of its"
+                       " two half-space minima (analytic closed form, evaluated in floating"
+                       " point without outward rounding), so min over pairs of that max is a"
+                       " valid LOWER bound on the regional infimum -- the direction stopping"
+                       " needs.  It is not the exact regional optimum.",
         "same_certificate_for_every_rule": True,
+        "geometry_rule_solver": "scipy Nelder-Mead in a softmax parametrisation, maxiter"
+                                " 60*n, fatol 1e-14, xatol 1e-10.  It returns NO certificate"
+                                " of global optimality, and the softmax reparametrisation is"
+                                " not affine, so concavity of the objective in w does not"
+                                " transfer to the search variable.  The GEOMETRY rule is"
+                                " therefore 'the design this search found', not 'the optimal"
+                                " design'.",
+        "geometry_rule_objective": "value_at, a certified LOWER bound on the regional"
+                                   " infimum -- maximising it is not solving the true game."
+                                   " Every J_true_lower_at_* key is this bound, never the"
+                                   " true value.",
         "rows": rows,
         "checks": CHECKS,
         "all_passed": all(c["ok"] for c in CHECKS),

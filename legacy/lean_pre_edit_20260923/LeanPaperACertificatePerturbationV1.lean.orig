@@ -1,0 +1,116 @@
+import «LeanPaperA7StreamV1»
+
+/-!
+UNCOMPILED PROOF DRAFT, 2026-09-23.
+
+Concrete deterministic bridge for A7: the implemented Qstat uses effective counts
+N^2/(a+N), whereas the information game uses N. Estimate perturbation and the exact loss
+from this regularisation are bounded here, for EVERY alternative lambda in the model box.
+No good-event probability, tracking theorem, stopping tail, or oracle accuracy is assumed
+proved by this file. The guide explains how to derive those and where this bound is used.
+
+Residuals are N*(muHat-lambda)/sigma, never N*muHat/sigma except at the null lambda=0.
+The existing Qstat already has the correct residual; do not replace its definition.
+-/
+namespace CIGAMF.P13.PaperACertificatePerturbation
+open Finset
+open CIGAMF.P13.PaperA7Stream
+
+theorem effective_count_identity (a n : ℝ) (ha : 0 < a) (hn : 0 ≤ n) :
+    n - n^2/(a+n) = a*n/(a+n) := by
+  have hden : a+n ≠ 0 := ne_of_gt (by linarith)
+  field_simp
+  ring
+
+theorem effective_count_loss_le (a n : ℝ) (ha : 0 < a) (hn : 0 ≤ n) :
+    0 ≤ n - n^2/(a+n) ∧ n - n^2/(a+n) ≤ a := by
+  rw [effective_count_identity a n ha hn]
+  constructor
+  · positivity
+  · apply (div_le_iff₀ (by linarith : 0 < a+n)).2
+    nlinarith [sq_nonneg a]
+
+theorem sq_residual_bound (B r mu theta lam : ℝ)
+    (hB : 0 ≤ B) (hr : 0 ≤ r) (ht : |theta| ≤ B) (hl : |lam| ≤ B)
+    (he : |mu-theta| ≤ r) : (mu-lam)^2 ≤ (2*B+r)^2 := by
+  have hdist : |mu-lam| ≤ 2*B+r := by
+    calc |mu-lam| = |(mu-theta)+(theta-lam)| := by congr 1 <;> ring
+      _ ≤ |mu-theta|+|theta-lam| := abs_add _ _
+      _ ≤ r+(|theta|+|lam|) := add_le_add he (abs_sub_le _ _)
+      _ ≤ 2*B+r := by linarith
+  have habs : 0 ≤ |mu-lam| := abs_nonneg _
+  have hb : 0 ≤ 2*B+r := by positivity
+  nlinarith [sq_abs (mu-lam)]
+
+theorem sq_residual_difference (B r mu theta lam : ℝ)
+    (hB : 0 ≤ B) (hr : 0 ≤ r) (ht : |theta| ≤ B) (hl : |lam| ≤ B)
+    (he : |mu-theta| ≤ r) :
+    |(theta-lam)^2-(mu-lam)^2| ≤ r*(4*B+r) := by
+  have htlam : |theta-lam| ≤ 2*B := (abs_sub_le _ _).trans (by linarith)
+  have hmulam : |mu-lam| ≤ 2*B+r := by
+    calc |mu-lam| = |(mu-theta)+(theta-lam)| := by congr 1 <;> ring
+      _ ≤ |mu-theta|+|theta-lam| := abs_add _ _
+      _ ≤ 2*B+r := by linarith
+  have hsum : |(theta-lam)+(mu-lam)| ≤ 4*B+r :=
+    (abs_add _ _).trans (by linarith)
+  have hid : (theta-lam)^2-(mu-lam)^2 =
+      (theta-mu)*((theta-lam)+(mu-lam)) := by ring
+  rw [hid, abs_mul]
+  exact mul_le_mul (by simpa [abs_sub_comm] using he) hsum
+    (abs_nonneg _) hr
+
+/-- Loss from the effective-count statistic at ONE cell, including estimate error. -/
+theorem qcell_ge_true_energy (a n v B r mu theta lam : ℝ)
+    (ha : 0 < a) (hn : 0 ≤ n) (hv : 0 < v)
+    (hB : 0 ≤ B) (hr : 0 ≤ r) (ht : |theta| ≤ B) (hl : |lam| ≤ B)
+    (he : |mu-theta| ≤ r) :
+    n*(theta-lam)^2/(2*v)
+      - (n*r*(4*B+r)+a*(2*B+r)^2)/(2*v)
+      ≤ n^2*(mu-lam)^2/(2*(a+n)*v) := by
+  have hden : 0 < a+n := by linarith
+  have hdiff := (abs_le.mp (sq_residual_difference B r mu theta lam hB hr ht hl he)).2
+  have herr : n*(theta-lam)^2 - n*(mu-lam)^2 ≤ n*r*(4*B+r) := by
+    have h := mul_le_mul_of_nonneg_left hdiff hn
+    nlinarith
+  have hc := effective_count_loss_le a n ha hn
+  have hs := sq_residual_bound B r mu theta lam hB hr ht hl he
+  have hreg : (n-n^2/(a+n))*(mu-lam)^2 ≤ a*(2*B+r)^2 :=
+    (mul_le_mul_of_nonneg_right hc.2 (sq_nonneg _)).trans
+      (mul_le_mul_of_nonneg_left hs ha.le)
+  have hnum : n*(theta-lam)^2 - (n*r*(4*B+r)+a*(2*B+r)^2)
+      ≤ (n^2/(a+n))*(mu-lam)^2 := by nlinarith
+  have h := div_le_div_of_nonneg_right hnum (by positivity : 0 ≤ 2*v)
+  convert h using 1 <;> field_simp <;> ring
+
+noncomputable def linearEnergy {E : Type*} [Fintype E]
+    (N var theta lam : E → ℝ) : ℝ :=
+  ∑ e, N e*(theta e-lam e)^2/(2*var e)
+
+noncomputable def perturbationCost {E : Type*} [Fintype E]
+    (a B r : ℝ) (N var : E → ℝ) : ℝ :=
+  ∑ e, (N e*r*(4*B+r)+a*(2*B+r)^2)/(2*var e)
+
+/-- Uniform in lambda. This is the missing deterministic comparison before taking infima. -/
+theorem Qstat_ge_linearEnergy {E : Type*} [Fintype E]
+    (a B r : ℝ) (N sigma mu theta lam : E → ℝ)
+    (ha : 0 < a) (hB : 0 ≤ B) (hr : 0 ≤ r)
+    (hN : ∀ e, 0 ≤ N e) (hs : ∀ e, sigma e ≠ 0)
+    (ht : ∀ e, |theta e| ≤ B) (hl : ∀ e, |lam e| ≤ B)
+    (he : ∀ e, |mu e-theta e| ≤ r) :
+    linearEnergy N (fun e => sigma e^2) theta lam
+      - perturbationCost a B r N (fun e => sigma e^2)
+      ≤ Qstat a sigma N mu lam := by
+  unfold linearEnergy perturbationCost Qstat
+  rw [← Finset.sum_sub_distrib]
+  apply Finset.sum_le_sum
+  intro e heuniv
+  exact qcell_ge_true_energy a (N e) (sigma e^2) B r (mu e) (theta e) (lam e)
+    ha (hN e) (sq_pos_of_ne_zero (hs e)) hB hr (ht e) (hl e) (he e)
+
+#print axioms effective_count_identity
+#print axioms effective_count_loss_le
+#print axioms sq_residual_bound
+#print axioms sq_residual_difference
+#print axioms qcell_ge_true_energy
+#print axioms Qstat_ge_linearEnergy
+end CIGAMF.P13.PaperACertificatePerturbation

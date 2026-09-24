@@ -1,7 +1,7 @@
 import «LeanPaperCEndgameV1»
 
 /-!
-DRAFT ENDGAME — not compiled. This does not repeat the circular-window calculation.
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. This does not repeat the circular-window calculation.
 It takes the existing odd_total_excess inequality to the ALL-PERMUTATIONS optimum,
 with a UNIFORM gap below eta=1. Thus no per-size bisection, rational certificate,
 compactness argument, or invalid 'pointwise strict implies infimum strict' is needed.
@@ -26,8 +26,8 @@ lemma plusItem_weight (m : ℕ) (hm : 3 ≤ m) : gFamily m (plusItem m hm)=3 := 
 lemma ranked_odd (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (σ : Perm m) :
     IsOddFamily (rankOf (gFamily m) σ) := by
   have hf : IsOddFamily (gFamily m) := by
-    convert gFamily_isOddFamily (m-2) (by omega) (by omega) using 1 <;>
-      simp [Nat.sub_add_cancel (by omega : 2 ≤ m)]
+    have hodd := gFamily_isOddFamily (m-2) (by omega) (by omega)
+    rwa [show m-2+2 = m from by omega] at hodd
   refine ⟨fun i => gFamily_weights m (σ i),?_⟩
   change (∑ i,gFamily m (σ i)) = -1
   rw [Equiv.sum_comp σ]
@@ -59,12 +59,14 @@ lemma budgets_eq_Ico (m : ℕ) : budgets m=Ico 1 m := by
 lemma total_eq_sum_regret (m : ℕ) (hm : 3 ≤ m) (σ : Perm m) :
     totalExcess (rankOf (gFamily m) σ) =
       denom m * ∑ k ∈ budgets m,regret (gFamily m) σ (denom m) k := by
+  have hD : denom m ≠ 0 := by unfold denom; positivity
   rw [budgets_eq_Ico]
   unfold totalExcess
   rw [mul_sum]
   apply sum_congr rfl
   intro k hk
-  simp [regret,denom,show (m:ℝ)+4 ≠ 0 from by positivity]
+  rw [regret]
+  field_simp
 
 /-- Summing across all budgets controls their maximum. No chosen construction in this step. -/
 lemma objective_ge_mean_total (m : ℕ) (hm : 3 ≤ m) (P : Perm m → ℝ) (c : ℝ)
@@ -72,23 +74,32 @@ lemma objective_ge_mean_total (m : ℕ) (hm : 3 ≤ m) (P : Perm m → ℝ) (c :
     c/(denom m*((m:ℝ)-1)) ≤ objective m (by omega) P := by
   classical
   have hD : 0 < denom m := by unfold denom; positivity
-  have hm1 : 0 < (m:ℝ)-1 := by have : (3:ℝ) ≤ m := by exact_mod_cast hm; linarith
+  have hmR : (3:ℝ) ≤ (m:ℝ) := by exact_mod_cast hm
+  have hm1 : 0 < (m:ℝ)-1 := by linarith
+  have hcard : (budgets m).card = m - 1 := by
+    unfold budgets; rw [Nat.card_Icc]; omega
   have heq : (∑ σ,P σ*totalExcess (rankOf (gFamily m) σ)) =
       denom m * ∑ k ∈ budgets m,∑ σ,P σ*regret (gFamily m) σ (denom m) k := by
     simp_rw [total_eq_sum_regret m hm, mul_sum]
     rw [sum_comm]
-    rw [mul_sum]
     apply sum_congr rfl
     intro k hk
-    rw [mul_sum]
     apply sum_congr rfl
     intro σ hσ
     ring
   have hmax : (∑ k ∈ budgets m,∑ σ,P σ*regret (gFamily m) σ (denom m) k)
       ≤ ((m:ℝ)-1)*objective m (by omega) P := by
-    calc _ ≤ ∑ _k ∈ budgets m,objective m (by omega) P := by
-            apply sum_le_sum; intro k hk; exact le_sup' _ hk
-      _ = _ := by simp [budgets,Nat.cast_sub (by omega : 1 ≤ m)]; ring
+    calc (∑ k ∈ budgets m,∑ σ,P σ*regret (gFamily m) σ (denom m) k)
+        ≤ ∑ _k ∈ budgets m,objective m (by omega) P := by
+          apply sum_le_sum
+          intro k hk
+          exact Finset.le_sup'
+            (fun k => ∑ σ, P σ * regret (gFamily m) (id σ) (denom m) k) hk
+      _ = ((m:ℝ)-1)*objective m (by omega) P := by
+          rw [Finset.sum_const, hcard, nsmul_eq_mul,
+            Nat.cast_sub (by omega : 1 ≤ m)]
+          push_cast
+          ring
   rw [heq] at hc
   rw [div_le_iff₀ (mul_pos hD hm1)]
   nlinarith [mul_le_mul_of_nonneg_left hmax hD.le]
@@ -99,9 +110,15 @@ lemma odd_mean_total (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1)
       ≤ ∑ σ,P σ*totalExcess (rankOf (gFamily m) σ) := by
   have h := sum_le_sum (fun σ (_ : σ ∈ (univ : Finset (Perm m))) =>
     mul_le_mul_of_nonneg_left (odd_rank_total m hm hmo σ) (hP σ))
-  convert h using 1
-  simp only [mul_add,sum_add_distrib,← sum_mul,← mul_sum,hP1]
-  ring
+  have hsplit : ∑ σ, P σ*(2+2*(if plusItem m hm=σ ⟨m-1,by omega⟩ then (1:ℝ) else 0))
+      = (∑ σ, P σ)*2
+        + 2*∑ σ, P σ*(if plusItem m hm=σ ⟨m-1,by omega⟩ then (1:ℝ) else 0) := by
+    rw [Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun σ _ => by ring
+  calc 2+2*(∑ σ,P σ*(if plusItem m hm=σ ⟨m-1,by omega⟩ then (1:ℝ) else 0))
+      = ∑ σ, P σ*(2+2*(if plusItem m hm=σ ⟨m-1,by omega⟩ then (1:ℝ) else 0)) := by
+        rw [hsplit, hP1]; ring
+    _ ≤ _ := h
 
 lemma last_plus_mass (m : ℕ) (hm : 3 ≤ m) (η : ℝ)
     (P : Perm m → ℝ) (hP : P ∈ FeasibleAt id η) :
@@ -112,6 +129,7 @@ lemma last_plus_mass (m : ℕ) (hm : 3 ≤ m) (η : ℝ)
   have h := (abs_le.mp (hP.2.2 (m-1) (by omega) (plusItem m hm))).2
   rw [Nat.cast_sub (by omega : 1 ≤ m)] at h
   norm_num at h
+  simp only [id_eq]
   linarith
 
 /-- The uniform lower gap already lives on each concrete feasible law. -/
@@ -127,7 +145,6 @@ theorem odd_law_gap (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (η : ℝ)
   convert h using 1
   unfold freeValue denom
   field_simp
-  ring
 
 /-- A positive gap survives the infimum over the ENTIRE feasible game. -/
 theorem odd_value_gap (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1) (η : ℝ) (hη : 0 ≤ η) :
@@ -161,8 +178,11 @@ theorem odd_breakpoint_iff (m : ℕ) (hm : 3 ≤ m) (hmo : m % 2=1)
   · intro heq
     by_contra hη1
     have hpos : 0 < 2*(1-η)/((m:ℝ)*denom m*((m:ℝ)-1)) := by
-      have : η < 1 := lt_of_not_ge hη1
-      unfold denom; positivity
+      have hlt : η < 1 := lt_of_not_ge hη1
+      have hm0 : (0:ℝ) < (m:ℝ) := by linarith
+      have hm1 : (0:ℝ) < (m:ℝ)-1 := by linarith
+      have hd : (0:ℝ) < denom m := by unfold denom; linarith
+      exact div_pos (by linarith) (mul_pos (mul_pos hm0 hd) hm1)
     have h := odd_value_gap m hm hmo η hη
     rw [heq] at h
     linarith

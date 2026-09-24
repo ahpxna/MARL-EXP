@@ -1,0 +1,83 @@
+{
+  "producer": "scripts/FIG_paperC_endpoints.py",
+  "producer_sha256": "5d4819a5affc9bb89fff1d621a2a052a3bc8c4ea605b483d63968907d3eef06d",
+  "inputs_sha256": {
+    "structural_frontier_corrected_v2.json": "7cc50ce4f674ccb76b000bb48d355c7fe0606bf41b1808761f4108fabf16e536",
+    "paperC_flow_lp.json": "262b43960e0e8fe5780364df67338b0ec8e9dbd814b91c69f29542b5120cdefb",
+    "paperC_breakpoint_certs.json": "8f10c0ca5b4d8ea1a949047ca4a6ee8b8a3161f746f4a2076142229ce1cc4d5a",
+    "paperC_exact_dual.json": "c9f306c801acfa6fb6687afdf1855b4db6a99b3bc7ae7132bea7732eeeef7f7f",
+    "paperC_perturbation.json": "b2f68b75c31d185ca5656d78b3e20df42f98bda88a87b29bfe00daa1a96f60ca",
+    "paperC_robustness.json": "29f3d28cecde5ae140925e778aedc63495f654776244c4ea93c5990a2b2162cb"
+  },
+  "resolved_any_optimisation": false,
+  "figures": [
+    "research/papers/_figures/paperC_price_boundary.pdf",
+    "research/papers/_figures/paperC_stability.pdf"
+  ],
+  "lean_formulas": {
+    "freeValue": "2/((m+4)(m-1))",
+    "even_frontier_all": "max(freeValue, 4(1-eta)/(m(m+4)))",
+    "etaStar": "(m-2)/(2(m-1))",
+    "odd_value_zero": "(m+3)/(m(m+4))",
+    "odd_breakpoint": "V = freeValue iff eta >= 1",
+    "family_value_robust": "|trueValue(g') - V_m(eta)| <= 3||g_m-g'||_1/d"
+  },
+  "diagnostics": {
+    "stale_baseline_over_lean_envelope": 0,
+    "fixed_normaliser_over_lean_envelope": 0,
+    "worst_drift_over_lean_envelope": 0.32242442882184275
+  },
+  "checks": [
+    {
+      "name": "C-F1: at even m the float LP lies on even_frontier_all at every stored band",
+      "ok": true,
+      "detail": "sizes [6, 8], worst |LP - theorem| = 1.39e-17"
+    },
+    {
+      "name": "C-F1: at odd m the LP reproduces both proved anchors -- odd_value_zero at eta=0 and freeValue at eta>=1 -- and the stored V_free strings equal 2/((m+4)(m-1))",
+      "ok": true,
+      "detail": "worst anchor deviation 1.94e-16"
+    },
+    {
+      "name": "C-F1: at odd m every stored band eta<1 is strictly above V_free, as the 'only if' half of odd_breakpoint requires",
+      "ok": true,
+      "detail": "12 points, smallest excess 1.923e-02"
+    },
+    {
+      "name": "C-F1: the flow-LP bisection breakpoints agree with the theorems (etaStar for even m, 1 for odd m) at every stored size",
+      "ok": true,
+      "detail": "sizes [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 21, 25, 31], worst |bisection - theorem| = 3.1e-06"
+    },
+    {
+      "name": "C-F1: every Farkas certificate's root equals the proved breakpoint exactly",
+      "ok": true,
+      "detail": "sizes [5, 6, 7, 8, 9, 10, 11]"
+    },
+    {
+      "name": "C-F1: the rational per-size certificates at the breakpoint equal V_free and the proved breakpoint exactly",
+      "ok": true,
+      "detail": "sizes [5, 6, 7, 8, 9, 10, 11]"
+    },
+    {
+      "name": "C-F2: the stored normaliser of g_m is m+4 and d = min(D0, D1) meets family_value_robust's hypotheses 0 < d <= m+4, d <= ||g'||_1, eta >= 0",
+      "ok": true,
+      "detail": "220 rows (160 group, 60 per-item)"
+    },
+    {
+      "name": "C-F2: EVERY stored perturbation of the theorem's object (recomputed baseline, moving normaliser) lies under 3||g_m - g'||_1/d -- a violation would refute family_value_robust",
+      "ok": true,
+      "detail": "220/220; worst drift/envelope = 0.322"
+    },
+    {
+      "name": "C-F2: no perturbation was silently dropped -- the producer skips solver failures without recording them, so the stored row counts are compared with its fixed grid (5 sizes x 4 bands x 8 radii; 3 sizes x 4 bands x 5 radii)",
+      "ok": true,
+      "detail": "group 160/160, per-item 60/60"
+    },
+    {
+      "name": "C-F2: every attained adversarial ratio in price_ratio_robust's domain is at or above the proved floor -- an attained ratio below it would refute the theorem; attained ratios above it are upper bounds on the worst case and do not measure the floor's slack",
+      "ok": true,
+      "detail": "8 in-domain cells of 21"
+    }
+  ],
+  "all_passed": true
+}

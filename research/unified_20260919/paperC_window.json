@@ -1,0 +1,180 @@
+{
+  "source_sha256": "4c05cb9d61d57c0d02f635814a7260660dfcd424b61614cd504c513e18924aa4",
+  "sizes": [
+    5,
+    7,
+    9,
+    11,
+    13,
+    15,
+    17,
+    19,
+    21
+  ],
+  "rows": [
+    {
+      "m": 5,
+      "D": 9,
+      "total": -1,
+      "raw_odd": 9,
+      "raw_even_at_last": 8,
+      "value_odd": "4/5",
+      "value_max": "8/5",
+      "argmax": [
+        4
+      ],
+      "V_m0": "8/45",
+      "V_m0_claimed": "8/45"
+    },
+    {
+      "m": 7,
+      "D": 11,
+      "total": -1,
+      "raw_odd": 11,
+      "raw_even_at_last": 10,
+      "value_odd": "4/7",
+      "value_max": "10/7",
+      "argmax": [
+        6
+      ],
+      "V_m0": "10/77",
+      "V_m0_claimed": "10/77"
+    },
+    {
+      "m": 9,
+      "D": 13,
+      "total": -1,
+      "raw_odd": 13,
+      "raw_even_at_last": 12,
+      "value_odd": "4/9",
+      "value_max": "4/3",
+      "argmax": [
+        8
+      ],
+      "V_m0": "4/39",
+      "V_m0_claimed": "4/39"
+    },
+    {
+      "m": 11,
+      "D": 15,
+      "total": -1,
+      "raw_odd": 15,
+      "raw_even_at_last": 14,
+      "value_odd": "4/11",
+      "value_max": "14/11",
+      "argmax": [
+        10
+      ],
+      "V_m0": "14/165",
+      "V_m0_claimed": "14/165"
+    },
+    {
+      "m": 13,
+      "D": 17,
+      "total": -1,
+      "raw_odd": 17,
+      "raw_even_at_last": 16,
+      "value_odd": "4/13",
+      "value_max": "16/13",
+      "argmax": [
+        12
+      ],
+      "V_m0": "16/221",
+      "V_m0_claimed": "16/221"
+    },
+    {
+      "m": 15,
+      "D": 19,
+      "total": -1,
+      "raw_odd": 19,
+      "raw_even_at_last": 18,
+      "value_odd": "4/15",
+      "value_max": "6/5",
+      "argmax": [
+        14
+      ],
+      "V_m0": "6/95",
+      "V_m0_claimed": "6/95"
+    },
+    {
+      "m": 17,
+      "D": 21,
+      "total": -1,
+      "raw_odd": 21,
+      "raw_even_at_last": 20,
+      "value_odd": "4/17",
+      "value_max": "20/17",
+      "argmax": [
+        16
+      ],
+      "V_m0": "20/357",
+      "V_m0_claimed": "20/357"
+    },
+    {
+      "m": 19,
+      "D": 23,
+      "total": -1,
+      "raw_odd": 23,
+      "raw_even_at_last": 22,
+      "value_odd": "4/19",
+      "value_max": "22/19",
+      "argmax": [
+        18
+      ],
+      "V_m0": "22/437",
+      "V_m0_claimed": "22/437"
+    },
+    {
+      "m": 21,
+      "D": 25,
+      "total": -1,
+      "raw_odd": 25,
+      "raw_even_at_last": 24,
+      "value_odd": "4/21",
+      "value_max": "8/7",
+      "argmax": [
+        20
+      ],
+      "V_m0": "8/175",
+      "V_m0_claimed": "8/175"
+    }
+  ],
+  "checks": [
+    {
+      "name": "raw window sums match win_abs_sum_odd (m+4 at odd k) and win_abs_sum_even (k+4 at even k), at every budget 0<k<m",
+      "ok": true,
+      "detail": "sizes 5..21 odd"
+    },
+    {
+      "name": "the prefix sequence takes only {0, 3, -1} and the period sums to -1 (preN_pattern, oddBase_total)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the value after subtracting the parity baseline b_k = k mod 2 is 4/m at odd budgets and (k+4)/m at even ones (winValue_odd, winValue_even)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the maximum over budgets is (m+3)/m and it is attained at k = m-1 AND NOWHERE ELSE -- the odd budgets carry the larger raw sum and the smaller value (winValue_le, winValue_at_last)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the budget k = m-1 agrees with the independent omit-one-item route (sum_rot_abs_prefix), which shares no step with the window recursion",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the window construction's base sequence is a REARRANGEMENT of g_m -- same weight multiset -- so the rotations are a law over rankings of the family and not over some other sequence (countVal_agree)",
+      "ok": true,
+      "detail": "counts (+3,-3,-1,+1) = (1, 1, (m-1)/2, (m-3)/2) on both sides"
+    },
+    {
+      "name": "V_m(0) from this family equals the value the manuscript records for odd m, (m+3)/m(m+4)",
+      "ok": true,
+      "detail": "checked at m = 5, 7, 9, 11, 13, 15, 17, 19, 21"
+    }
+  ],
+  "all_passed": true
+}

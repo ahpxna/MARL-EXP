@@ -12,12 +12,21 @@ Query `j` returns
 
 with `Z` a latent uniform sign cube the learner never sees.
 
-WHY A BOUNDED STATISTIC.  `cube_difference` gives the characteristic-function difference
-between the two mask values exactly:
+WHY A BOUNDED STATISTIC.  `cube_difference` / `parity_cf_difference` (LeanPaperBParityV1)
+give an UNNORMALISED sum over the `2^j` cube points,
 
     2^{j+1} * sinh(i t) * sinh(i t h / j)^j,
 
-whose magnitude is `2^{j+1} |sin t| |sin(th/j)|^j exp(-sigma^2 t^2/2)` -- order `h^j`.  The
+which is NOT yet a characteristic function: the cube is uniform, so each point carries
+probability `2^{-j}`, and the independent Gaussian noise contributes its own factor.  The
+characteristic-function difference of the two OBSERVATION laws is therefore
+
+    phi_{+,j}(t) - phi_{-,j}(t) = 2 i^{j+1} sin(t) sin(t h / j)^j exp(-sigma^2 t^2 / 2),
+
+magnitude `2 |sin t| |sin(th/j)|^j exp(-sigma^2 t^2/2)` -- order `h^j`.  The factor is `2`,
+not `2^{j+1}`: the `2^{-j}` normalisation cancels all but one power of two.  `closed_form_gap`
+below implements the normalised form, so the measured numbers are unaffected; it is the
+Lean statement and the manuscript that state the unnormalised sum and owe the link.  The
 `v`-dependent term is REAL when `j` is odd and IMAGINARY when `j` is even, so the statistic
 is `cos(t0 Y)` or `sin(t0 Y)` by parity.  Both are bounded by one, which is the whole point:
 the `Y^{j+1}` moment estimator has a variance that explodes with `j`, and this one does not.
@@ -28,15 +37,34 @@ THE TWO DECODERS.
   * IDENTIFICATION.  Must name the world, so it runs queries `1..m-1` and the budget is the
     SUM, not the per-test sample size.
 
-WHAT IS MEASURED AND HOW.  Per world, equal repetitions, Clopper-Pearson upper confidence
-bounds.  A budget is only reported as achieving error `<= delta` when the UPPER bound clears
+WHAT IS MEASURED AND HOW.  Per world, equal repetitions, Clopper-Pearson bounds.  A budget
+is only reported as achieving error `<= delta` when the worst-world UPPER bound clears
 `delta`.  Points that do not clear within the ladder are reported as censored rather than
 dropped.  Errors are plotted against `N` first and only then against `N h^2` and
 `N h^{2(m-1)}`.
 
-THE ZERO-QUERY FLOOR.  Guessing uniformly without any query is unsafe with probability
-exactly `1/m`.  So no positive sample requirement can hold for `delta >= 1/m`, and every
-claim below is restricted under that floor.
+A CERTIFIED BUDGET IS AN UPPER BOUND, AND NOTHING ELSE UNTIL THE LOWER SIDE ALSO CERTIFIES.
+A rung that failed to certify is a rung whose upper bound came out above `delta`; that is
+not evidence its true error EXCEEDS `delta`.  So "the grid has ratio two, therefore the
+minimal budget is known within a factor of two" does not follow, and no slope tolerance may
+be derived from it.  A budget is bracketed only when a CP LOWER bound at some smaller rung
+also exceeds `delta`, and only a CONTIGUOUS PREFIX of proved-failing rungs excludes anything
+-- a fixed decoder's error is not known to be monotone in `N`, so one failing rung below a
+success excludes nothing between them.  `failed_prefix`, `grid_min_lower_inclusive` and
+`bracketed` record this.  The resulting interval brackets the first SUCCESSFUL TESTED
+budget on this grid; it bounds neither the untested integers nor the minimum over all
+decoders, and a slope read across such intervals is not a confidence interval for an
+asymptotic exponent.  Both CP tails are budgeted, at `0.05/(2J)` each.
+
+THE ZERO-QUERY FLOOR, WHICH IS NOT THE SAME NUMBER FOR THE TWO TASKS.  For the SAFE
+decision, `A_w = [m] \\ {w}`, so a uniform guess made without any query is unsafe exactly
+when it names the true world: probability `1/m`.  That is the floor the Lean theorem
+`zero_query_floor` is about, and no positive sample requirement can hold for `delta >= 1/m`.
+For IDENTIFICATION the decoder must NAME the world, so a uniform guess is CORRECT with
+probability `1/m` and therefore WRONG with probability `1 - 1/m`; the floor is `1 - 1/m`.
+Recording `1/m` on an identification cell would attach the safe decision's floor to a task
+that does not have it, so the floor is stored per decoder and the task it belongs to is
+stored beside it.
 
 SELF-CHECKS.  The exact means are recomputed by enumerating the cube and matched against the
 closed form; the measured gap order is matched against `j`; the floor is checked; and the
@@ -134,6 +162,22 @@ def cp_upper(k, n, conf=0.95):
     return float(stats.beta.ppf(conf, k + 1, n - k))
 
 
+def cp_lower(k, n, conf=0.95):
+    """Clopper-Pearson LOWER confidence bound on the error probability.
+
+    This is the half a one-sided ladder does not give you.  A rung that failed to CERTIFY
+    `error <= delta` has only an upper bound that came out too big; that is not evidence
+    that its true error EXCEEDS `delta`.  Concluding "the minimal budget is above the
+    previous rung, so it is located within a factor of two" from a failure to certify is
+    invalid.  To bracket a budget from below one needs THIS bound at the lower rung to sit
+    strictly above the target."""
+    if n == 0:
+        return 0.0
+    if k <= 0:
+        return 0.0
+    return float(stats.beta.ppf(1.0 - conf, k, n - k + 1))
+
+
 def main():
     rng = np.random.default_rng(20260922)
     ms = [3, 4]
@@ -193,7 +237,11 @@ def main():
     # ---- the two decoders, per world, equal repetitions -----------------------------
     results = []
     for m in ms:
-        floor = 1.0 / m
+        # The safe decision's zero-query error is `1/m` (a uniform guess is unsafe only if
+        # it names the true world); identification's is `1 - 1/m` (a uniform guess is right
+        # only if it names the true world).  They are different numbers and are kept apart.
+        floor_safe = 1.0 / m
+        floor_id = 1.0 - 1.0 / m
         for h in hs:
             for w in range(1, m + 1):
                 # The ladder is extended to 25600 so the identification decoder has rungs
@@ -206,14 +254,16 @@ def main():
                         "total_budget": N, "reps": reps,
                         "bad": int(bad_safe),
                         "err": bad_safe / reps, "err_upper95": cp_upper(bad_safe, reps),
-                        "rescaled": N * h ** 2, "zero_query_floor": floor})
+                        "rescaled": N * h ** 2, "zero_query_floor": floor_safe,
+                        "floor_task": "safe decision: uniform guess unsafe w.p. 1/m"})
                     bad_id = sum(id_decoder_wrong(rng, m, w, h, N) for _ in range(reps))
                     results.append({
                         "decoder": "identification", "m": m, "h": h, "world": w,
                         "N_per_query": N, "total_budget": (m - 1) * N, "reps": reps,
                         "bad": int(bad_id),
                         "err": bad_id / reps, "err_upper95": cp_upper(bad_id, reps),
-                        "rescaled": N * h ** (2 * (m - 1)), "zero_query_floor": floor})
+                        "rescaled": N * h ** (2 * (m - 1)), "zero_query_floor": floor_id,
+                        "floor_task": "identification: uniform guess wrong w.p. 1 - 1/m"})
 
     # ---- self-check 3: certified budgets use a FAMILY-WISE upper bound --------------
     #
@@ -227,10 +277,17 @@ def main():
     #   J = 1        the old, unadjusted reading (kept only for comparison);
     #   J = 7 * m    the ladder inside one panel, over the m worlds;
     #   J = len(results)  every interval in the run -- the one the report uses.
+    #
+    # TWO TAILS, ONE BUDGET.  Once BOTH a lower and an upper Clopper-Pearson bound are used,
+    # each interval spends error on TWO tails.  Giving each tail `0.05/J` spends `0.10` in
+    # total by Bonferroni, not `0.05`.  The per-tail budget is therefore `0.05/(2J)`, so the
+    # family-wise statement over both tails of all J intervals holds at 95%.
     family_global = len(results)
-    conf_fw = 1.0 - (1.0 - 0.95) / family_global
+    tail_fw = (1.0 - 0.95) / (2.0 * family_global)
+    conf_fw = 1.0 - tail_fw
     for r in results:
         r["err_upper_fw"] = cp_upper(r["bad"], r["reps"], conf_fw)
+        r["err_lower_fw"] = cp_lower(r["bad"], r["reps"], conf_fw)
 
     rungs = 11
 
@@ -241,16 +298,44 @@ def main():
                 for dec in ("safe", "identification"):
                     conf = conf_of_panel(m)
                     worst = {}
+                    best = {}
                     for r in results:
                         if r["m"] == m and r["h"] == h and r["decoder"] == dec:
                             worst.setdefault(r["N_per_query"], []).append(
                                 cp_upper(r["bad"], r["reps"], conf))
+                            best.setdefault(r["N_per_query"], []).append(
+                                cp_lower(r["bad"], r["reps"], conf))
                     hit = None
                     for N in sorted(worst):
                         if max(worst[N]) <= delta_target:
                             hit = N
                             break
+                    # The lower side, which a ladder does NOT give for free, and which an
+                    # earlier version of this code got wrong in two ways.
+                    #
+                    # (1) A rung that merely failed to certify is not a rung proved too
+                    #     small; only a CP LOWER bound above delta proves failure.
+                    # (2) A fixed decoder's true error is NOT known to be monotone in N, so
+                    #     ONE proved-failing rung below `hit` excludes nothing about the
+                    #     rungs between them.  Taking the largest such rung -- as the first
+                    #     repair did -- is invalid.  What is excluded is a CONTIGUOUS
+                    #     PREFIX of the tested grid, all of whose rungs are proved to fail.
+                    #     The first rung after that prefix is then a lower bound on the
+                    #     first SUCCESSFUL TESTED budget.  It bounds neither the untested
+                    #     integers between rungs nor the minimum over all decoders.
+                    ns = sorted(best)
+                    failed_prefix = []
+                    for N in ns:
+                        if max(best[N]) > delta_target:
+                            failed_prefix.append(N)
+                        else:
+                            break
+                    grid_low = (ns[len(failed_prefix)]
+                                if len(failed_prefix) < len(ns) else None)
                     row = {"m": m, "h": h, "decoder": dec, "certified_N": hit,
+                           "failed_prefix": failed_prefix,
+                           "grid_min_lower_inclusive": grid_low,
+                           "bracketed": bool(hit is not None and failed_prefix),
                            "total_budget": None if hit is None else
                            (hit if dec == "safe" else (m - 1) * hit)}
                     (cert if hit is not None else cens).append(row)
@@ -279,38 +364,75 @@ def main():
 
     # ---- self-check 3b: the measured identification-rate curve ---------------------
     #
-    # With the ladder reaching 25600 the identification decoder certifies at several h for
-    # m = 3, so an empirical exponent can be read off instead of asserted. The predicted
-    # exponent is 2(m-1): the gap is Theta(h^{m-1}) and the budget is Theta(gap^{-2}).
-    # The ladder is a factor-2 grid, so a certified budget is only known to within a factor
-    # of two and the slope inherits that quantisation. That limit is reported, not hidden.
+    # WHAT A ONE-SIDED LADDER DOES AND DOES NOT GIVE.
+    #
+    # A certified rung `N` is an UPPER bound on the minimal budget: the decoder provably
+    # reaches error <= delta there.  It is NOT a two-sided localisation.  The earlier
+    # reading here -- "the grid has ratio 2, so the budget is known to within a factor of
+    # two, hence the slope is known to within a computable tolerance" -- rests on
+    # `N* > N/2`, i.e. on the previous rung being TOO SMALL.  But the previous rung merely
+    # FAILED TO CERTIFY: its CP upper bound came out above delta.  Failure to certify is
+    # not evidence that the true error exceeds delta, so `N* > N/2` does not follow and
+    # neither does any slope tolerance derived from it.
+    #
+    # A budget is localised only when BOTH sides certify:
+    #     upper: worst-world CP upper at N_high <= delta
+    #     lower: worst-world CP LOWER at N_low  >  delta
+    # Only `bracketed` points carry a factor-(N_high/N_low) localisation, and only those
+    # are used for a slope.  Points certified on one side are reported as upper bounds and
+    # are NOT called sample complexity.
     rate_rows = []
     for m in ms:
-        pts = [(r["h"], r["certified_N"]) for r in certified
-               if r["m"] == m and r["decoder"] == "identification"]
-        pts = sorted(p for p in pts if p[1] is not None)
+        pts = [(r["h"], r["certified_N"], r["grid_min_lower_inclusive"]) for r in certified
+               if r["m"] == m and r["decoder"] == "identification" and r["bracketed"]]
+        pts = sorted(p for p in pts if p[1] is not None and p[2] is not None)
         if len(pts) >= 2:
-            xs = [math.log(h) for h, _ in pts]
-            ys = [math.log(N) for _, N in pts]
+            xs = [math.log(h) for h, _, _ in pts]
+            ys = [math.log(N) for _, N, _ in pts]
+            # The localisation width is the ACTUAL bracket at each point, log(N_hi/N_lo),
+            # not a constant log 2: the ruled-out rung need not be the one immediately
+            # below, so the widths differ between points and are used as they are.
+            widths = [math.log(N / Nlo) for _, N, Nlo in pts]
             n = len(xs)
             mx, my = sum(xs) / n, sum(ys) / n
             den = sum((x - mx) ** 2 for x in xs)
             slope = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / den if den else None
-            rate_rows.append({"m": m, "points": pts, "measured_slope": slope,
-                              "predicted_slope": -2.0 * (m - 1),
-                              "ladder_factor": 2.0})
-    ok_rate = len(rate_rows) > 0 and all(
-        r["measured_slope"] is not None and
-        abs(r["measured_slope"] - r["predicted_slope"]) <= 2.0 for r in rate_rows)
-    check("an identification-rate curve is MEASURED, not asserted: at each m where the"
-          " identification decoder certifies at two or more h, the log-log slope of the"
-          " certified budget against h is within the ladder's own resolution of the"
-          " predicted -2(m-1).  A factor-2 ladder locates each budget only to within a"
-          " factor of two, so a tolerance of 2 in the exponent is the grid's, not a fitted"
-          " allowance", ok_rate,
-          "; ".join(f"m={r['m']}: points {r['points']}, slope {r['measured_slope']:.2f}"
-                    f" vs predicted {r['predicted_slope']:.1f}" for r in rate_rows)
-          or "no m certifies identification at two or more h")
+            grid_tol = (sum(abs(x - mx) * w for x, w in zip(xs, widths)) / den
+                        if den else None)
+            predicted = -2.0 * (m - 1)
+            # The substantive claim is that identification is dearer than the safe
+            # decision, whose exponent is -2.  Whether the grid can see that separation at
+            # all is recorded rather than assumed.
+            separates = (slope is not None and grid_tol is not None
+                         and abs(slope - (-2.0)) > grid_tol)
+            rate_rows.append({"m": m,
+                              "points_h_Nhigh_Nlow": pts,
+                              "measured_slope": slope,
+                              "predicted_slope": predicted,
+                              "bracket_log_widths": widths,
+                              "grid_slope_tolerance": grid_tol,
+                              "separates_from_safe_exponent": bool(separates)})
+    n_bracketed = sum(1 for r in certified if r["bracketed"])
+    n_upper_only = sum(1 for r in certified if not r["bracketed"])
+    ok_rate = all(
+        r["measured_slope"] is not None and r["grid_slope_tolerance"] is not None and
+        abs(r["measured_slope"] - r["predicted_slope"]) <= r["grid_slope_tolerance"]
+        for r in rate_rows)
+    check("no rate slope is read off budgets that are certified on ONE side only.  A rung"
+          " that failed to certify is not a rung proved too small, so it cannot bound the"
+          " minimal budget from below and cannot justify a factor-2 localisation.  A slope"
+          " is reported only where both a CP upper bound at the high rung and a CP LOWER"
+          " bound at a lower rung bracket the budget; where no such bracket exists the"
+          " budget is reported as an upper bound and NOT as sample complexity",
+          ok_rate,
+          f"{n_bracketed} two-sided bracketed, {n_upper_only} upper-bound-only; "
+          + ("; ".join(f"m={r['m']}: points {r['points_h_Nhigh_Nlow']},"
+                       f" slope {r['measured_slope']:.2f}"
+                       f" vs predicted {r['predicted_slope']:.1f}, grid tolerance"
+                       f" +/-{r['grid_slope_tolerance']:.2f},"
+                       f" separates from -2: {r['separates_from_safe_exponent']}"
+                       for r in rate_rows)
+             or "no slope claimed: no m has two or more BRACKETED identification budgets"))
 
     # ---- self-check 4: safe is cheaper than identification, and by a growing factor --
     ok_sep, sep_rows = True, []
@@ -329,11 +451,28 @@ def main():
           " budget -- the decision is not harder than naming the world", ok_sep,
           f"{len(sep_rows)} comparable cells" if sep_rows else "no comparable cell")
 
-    # ---- self-check 5: the zero-query floor is respected ----------------------------
-    ok_floor = all(r["zero_query_floor"] == 1.0 / r["m"] for r in results)
-    check("the zero-query floor 1/m is recorded on every cell, so no claim is made for"
-          " delta at or above it (uniform guessing already achieves that error)", ok_floor,
-          f"floors {sorted(set(round(r['zero_query_floor'], 4) for r in results))}")
+    # ---- self-check 5: the zero-query floor is respected, per TASK ------------------
+    #
+    # The two decoders do not share a floor.  Uniform guessing is unsafe with probability
+    # 1/m but names the world correctly with probability 1/m, so its identification error
+    # is 1 - 1/m.  Recording 1/m on an identification cell would import the safe decision's
+    # floor into a task that does not have it.
+    ok_floor = all(
+        r["zero_query_floor"] == (1.0 / r["m"] if r["decoder"] == "safe"
+                                  else 1.0 - 1.0 / r["m"])
+        for r in results)
+    # The target must sit strictly under the floor of the task it is used on, otherwise the
+    # certified budget for that task is not evidence of anything.
+    ok_target = all(delta_target < r["zero_query_floor"] for r in results)
+    check("the zero-query floor is recorded PER TASK -- 1/m for the safe decision, 1 - 1/m"
+          " for identification -- and the target delta sits strictly below both, so neither"
+          " certified budget is reporting an error a query-free guess already achieves",
+          ok_floor and ok_target,
+          "safe floors "
+          f"{sorted(set(round(r['zero_query_floor'], 4) for r in results if r['decoder'] == 'safe'))},"
+          " identification floors "
+          f"{sorted(set(round(r['zero_query_floor'], 4) for r in results if r['decoder'] != 'safe'))},"
+          f" target {delta_target}")
 
     # ---- self-check 6: the statistic is bounded ------------------------------------
     probe = sample_stat(rng, 3, 1, 0.3, 4000, True)

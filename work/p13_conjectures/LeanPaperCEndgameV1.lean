@@ -4,11 +4,14 @@ import «LeanPaperCBandValueBridgeV1»
 import «LeanPaperCFlowBandJoinV1»
 
 /-!
-DRAFT ENDGAME — not compiled. This is the downstream theorem assembly, not another witness
+ENDGAME ASSEMBLY. Compiles clean; axioms are {propext, Classical.choice, Quot.sound}. Compiling is NOT the endpoint: the named obligations below are still uninstantiated where marked. This is the downstream theorem assembly, not another witness
 construction. It uses ALL interior budgets and ALL permutations of the actual gFamily.
-Two upstream obligations remain named in EvenEndpointData: a concrete band-feasible free
-law and a per-ranking sum lower bound. No such object is constructed by this file; until
-an instance is supplied, even_frontier is a CONDITIONAL assembly, not a closed headline.
+EvenEndpointData names two upstream obligations: a concrete band-feasible free law and a
+per-ranking sum lower bound. The second (`rankSum`) is discharged DOWNSTREAM, in
+`LeanPaperCEvenRankSumV1.evenEndpointData_of_law`; it cannot be proved here because the
+lemma it needs lives in a module that imports this one. The first -- the endpoint law -- is
+not constructed by this file; until an instance is supplied, even_frontier is a CONDITIONAL
+assembly, not a closed headline.
 The zero-band parity theorems use the concrete joins already written in the earlier batch.
 -/
 namespace CIGAMF.P13.PaperCEndgame
@@ -49,9 +52,10 @@ lemma blend_feasible {m : ℕ} (P Q : Perm m → ℝ) (a b t : ℝ)
       rw [Finset.sum_congr rfl (fun σ _ => hpt σ), Finset.sum_add_distrib,
         ← Finset.mul_sum, ← Finset.mul_sum]
       ring
+    simp only [id_eq]
     rw [heq]
     calc _ ≤ |(1-t)*((∑ σ,P σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ))| +
-          |t*((∑ σ,Q σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ))| := abs_add _ _
+          |t*((∑ σ,Q σ*inPrefixInd σ k i)-(k:ℝ)/(m:ℝ))| := abs_add_le _ _
       _ ≤ (1-t)*(a/(m:ℝ))+t*(b/(m:ℝ)) := by
         rw [abs_mul, abs_mul, abs_of_nonneg ht, abs_of_nonneg (by linarith : 0 ≤ 1-t)]
         exact add_le_add (mul_le_mul_of_nonneg_left (hP.2.2 k hk i) (by linarith))
@@ -71,8 +75,12 @@ lemma objective_blend_le {m : ℕ} (hm : 2 ≤ m) (P Q : Perm m → ℝ) (t : �
     rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
     exact Finset.sum_congr rfl (fun σ _ => by unfold blend; ring)
   rw [hsplit]
-  exact add_le_add (mul_le_mul_of_nonneg_left (le_sup' _ hk) (by linarith))
-    (mul_le_mul_of_nonneg_left (le_sup' _ hk) ht)
+  exact add_le_add
+    (mul_le_mul_of_nonneg_left
+      (Finset.le_sup' (fun k => ∑ σ, P σ * regret (gFamily m) (id σ) (denom m) k) hk)
+      (by linarith))
+    (mul_le_mul_of_nonneg_left
+      (Finset.le_sup' (fun k => ∑ σ, Q σ * regret (gFamily m) (id σ) (denom m) k) hk) ht)
 
 lemma value_le_witness (m : ℕ) (hm : 3 ≤ m) (η : ℝ) (P : Perm m → ℝ)
     (hP : P ∈ FeasibleAt id η) : value m (by omega) η ≤ objective m (by omega) P := by
@@ -86,7 +94,7 @@ lemma value_le_witness (m : ℕ) (hm : 3 ≤ m) (η : ℝ) (P : Perm m → ℝ)
 lemma value_lower (m : ℕ) (hm : 3 ≤ m) (η c : ℝ) (hη : 0 ≤ η)
     (h : ∀ P ∈ FeasibleAt (id : Perm m → _) η, c ≤ objective m (by omega) P) :
     c ≤ value m (by omega) η := by
-  letI : NeZero m := ⟨by omega⟩
+  have : NeZero m := ⟨by omega⟩
   apply le_csInf ((allPerm_feasible_nonempty m η hη).image _)
   rintro _ ⟨P,hP,rfl⟩
   exact h P hP
@@ -112,13 +120,24 @@ lemma universal_free_lower (m : ℕ) (hm : 4 ≤ m) (E : EvenEndpointData m hm)
         apply sum_le_sum; intro σ hσ
         exact mul_le_mul_of_nonneg_left (E.rankSum σ) (hP σ)
       _ = _ := by simp_rw [mul_sum]
+  have hmR : (4:ℝ) ≤ (m:ℝ) := by exact_mod_cast hm
+  have hcard : (budgets m).card = m - 1 := by
+    unfold budgets; rw [Nat.card_Icc]; omega
   have hmax : (∑ k ∈ budgets m,∑ σ,P σ*regret (gFamily m) σ (denom m) k)
-      ≤ ((m:ℝ)-1)*objective m (by omega) P := by
-    calc _ ≤ ∑ _k ∈ budgets m, objective m (by omega) P := by
-            apply sum_le_sum; intro k hk; exact le_sup' _ hk
-      _ = _ := by simp [budgets, Nat.cast_sub (by omega : 1 ≤ m)]; try ring
+      ≤ objective m (by omega) P*((m:ℝ)-1) := by
+    calc (∑ k ∈ budgets m,∑ σ,P σ*regret (gFamily m) σ (denom m) k)
+        ≤ ∑ _k ∈ budgets m, objective m (by omega) P := by
+          apply sum_le_sum
+          intro k hk
+          exact Finset.le_sup'
+            (fun k => ∑ σ, P σ * regret (gFamily m) (id σ) (denom m) k) hk
+      _ = objective m (by omega) P*((m:ℝ)-1) := by
+          rw [Finset.sum_const, hcard, nsmul_eq_mul,
+            Nat.cast_sub (by omega : 1 ≤ m)]
+          push_cast
+          ring
   unfold freeValue
-  rw [← div_div, div_le_iff₀ (by first | positivity | linarith | nlinarith)]
+  rw [← div_div, div_le_iff₀ (by linarith)]
   exact hsum.trans hmax
 
 lemma even_value_zero (m : ℕ) (hm : 4 ≤ m) (heven : Even m) :
@@ -136,11 +155,22 @@ theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
     apply div_pos <;> linarith
   have hfree := value_lower m (by omega) η (freeValue m) hη
     (fun P hP => universal_free_lower m hm E P hP.1 hP.2.1)
+  have hDpos : (0:ℝ) < denom m := by unfold denom; linarith
+  have hpar : (m-2) % 2 = 0 := by
+    have := Nat.even_iff.mp heven
+    omega
+  have hmsub : m - 2 + 2 = m := by omega
+  have hcast : (((m-2 : ℕ)):ℝ) + 2 = (m:ℝ) := by
+    rw [Nat.cast_sub (by omega : 2 ≤ m)]
+    push_cast
+    ring
   have hband : 4*(1-η)/((m:ℝ)*denom m) ≤ value m (by omega) η := by
-    convert Vm_allPerm_ge_band (m-2) (by omega) (by omega) (denom m) η
-      (by first | positivity | (unfold denom; positivity) | linarith | nlinarith) hη (budgets m) (budgets_nonempty m (by omega))
-      (by simp [budgets]; try omega) (by simp [budgets]; try omega) using 1 <;>
-      simp [Nat.sub_add_cancel (by omega : 2 ≤ m), Nat.cast_sub (by omega : 2 ≤ m)]
+    have hb := Vm_allPerm_ge_band (m-2) (by omega) hpar (denom m) η hDpos hη
+      (budgets m) (budgets_nonempty m (by omega))
+      (by simp only [budgets, Finset.mem_Icc]; omega)
+      (by simp only [budgets, Finset.mem_Icc]; omega)
+    rw [hmsub, hcast] at hb
+    exact hb
   apply le_antisymm
   · by_cases hηs : η ≤ etaStar m
     · obtain ⟨P0,hP0,hV0⟩ := even_allPerm_witness m heven hm (budgets m)
@@ -151,10 +181,22 @@ theorem even_frontier (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
       have hPf : blend t P0 E.endpoint ∈ FeasibleAt id η := by
         have h := blend_feasible P0 E.endpoint 0 (etaStar m) t hP0 E.endpoint_band ht ht1
         simpa [t,ne_of_gt hs] using h
+      have hm0 : (0:ℝ) < (m:ℝ) := by linarith
+      have hm1 : (0:ℝ) < (m:ℝ)-1 := by linarith
+      have hm0' := ne_of_gt hm0
+      have hm1' := ne_of_gt hm1
+      have hD' := ne_of_gt hDpos
+      have hteq : t * etaStar m = η := by
+        dsimp only [t]; field_simp
       have hlinear : (1-t)*(4/((m:ℝ)*denom m))+t*freeValue m
           = 4*(1-η)/((m:ℝ)*denom m) := by
-        dsimp [t,etaStar,freeValue,denom]
-        field_simp; try ring
+        have hexp : (1-t)*(4/((m:ℝ)*denom m))+t*freeValue m
+            = 4/((m:ℝ)*denom m) - (t*etaStar m)*(4/((m:ℝ)*denom m)) := by
+          unfold freeValue etaStar
+          field_simp
+          ring
+        rw [hexp, hteq]
+        field_simp
       calc value m (by omega) η ≤ objective m (by omega) (blend t P0 E.endpoint) :=
           value_le_witness m (by omega) η _ hPf
         _ ≤ (1-t)*objective m (by omega) P0+t*objective m (by omega) E.endpoint :=
@@ -175,10 +217,10 @@ theorem even_breakpoint_iff (m : ℕ) (hm : 4 ≤ m) (heven : Even m)
     (E : EvenEndpointData m hm) (η : ℝ) (hη : 0 ≤ η) :
     value m (by omega) η = freeValue m ↔ etaStar m ≤ η := by
   rw [even_frontier m hm heven E η hη, max_eq_left_iff]
-  unfold etaStar freeValue
   have hmR : (4:ℝ) ≤ m := by exact_mod_cast hm
-  rw [div_le_div_iff₀ (by first | positivity | (unfold denom; positivity) | linarith | nlinarith) (by first | positivity | (unfold denom; positivity) | linarith | nlinarith), div_le_iff₀ (by first | positivity | (unfold denom; positivity) | linarith | nlinarith)]
-  unfold denom at *
+  have hp : (0:ℝ) < (m:ℝ)+4 := by linarith
+  unfold etaStar freeValue denom
+  rw [div_le_div_iff₀ (by nlinarith) (by nlinarith), div_le_iff₀ (by linarith)]
   constructor <;> intro h <;> nlinarith
 
 /-- The odd zero-band law is a concrete result from the earlier join, not an endpoint
