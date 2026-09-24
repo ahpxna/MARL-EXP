@@ -52,3 +52,22 @@ historical evidence; cite this note when quoting it.
 new Lean envelope `3‖g_m − g'‖₁/d`, with `d = min(D₀, D₁)`, from the stored norms. All 220
 `drift_movingD` values lie under it; the worst ratio is 0.322. Every in-domain attained ratio
 is at or above `proved_floor`. Either violation would have refuted the corresponding theorem.
+
+## Producer change after the audit (2026-09-24)
+
+`scripts/EXP_paperC_perturbation.py` now records every skipped cell (`skipped_cells`,
+`n_skipped`): a failed LP, or a perturbation that zeroes a weight. It also refuses to write
+without `--out NEW_PATH` or onto an existing file. Nothing else changed; the LPs, the grid,
+the RNG and the checks are as launched. The launch artifact `paperC_perturbation.json` was
+written by the launch source `89ccb1d4…` and is kept. The current source is `8df922ddeb2b…`.
+A smoke run of the new source (scratch output only) gave 0 skipped cells and passed its
+checks.
+
+## Correction to a Lean docstring and a map row
+
+`ratio_collapse_lower` / `collapse_two_sided` (`LeanPaperCCollapseV1`) bound the FLOOR
+expression `Rat(m, ε)`, between `(1/8)·min(m−1, 1/ε)` and `2/ε`. That locates where the
+GUARANTEE stops being linear in `m` (`ε_c = 1/(m−1)`). It does not locate where the
+PRICE collapses: that needs an upper bound on the true worst-case ratio, i.e. a proved
+destructive perturbation, which does not exist. The module docstring and THEOREM_MAP row C-H4
+read as if the price itself were `Θ(min(m, 1/ε))`; both are corrected to the floor.

@@ -22,9 +22,14 @@ after.  With the upper bound `Rat <= 2/eps` the two agree in order, and the cros
 
     eps_c = 1 / (m - 1),
 
-which is the collapse scale: below it the price is `Theta(m)`, above it `Theta(1/eps)` and
-therefore independent of the size.  `collapse_two_sided` states both halves together and
-`collapse_crossing` evaluates them at the crossing.
+which is the collapse scale OF THIS GUARANTEE: below it the proved floor is `Theta(m)`,
+above it `Theta(1/eps)` and therefore independent of the size.  `collapse_two_sided` states
+both halves together and `collapse_crossing` evaluates them at the crossing.
+
+SCOPE (corrected 2026-09-24).  Everything here is about the floor expression `Rat`, a LOWER
+bound on the true worst-case price ratio.  It does not say where the true price collapses:
+that needs an upper bound on the true ratio, i.e. a proved destructive perturbation, which
+this corpus does not contain.
 -/
 
 namespace CIGAMF.P13.PaperCCollapse

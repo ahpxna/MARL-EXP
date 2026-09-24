@@ -53,6 +53,12 @@ from fractions import Fraction as Fr
 from scipy.optimize import linprog
 
 CHECKS = []
+# Every skipped cell is RECORDED (added 2026-09-24, after the audit in
+# research/unified_20260919/paperC_robustness.AUDIT_NOTE.md): an LP that fails, or a
+# perturbation that zeroes a weight, used to be dropped with a bare `continue`, so the stored
+# row count was the only trace of it.  The launch artifact `paperC_perturbation.json` was
+# written by the earlier source and had no skip (its row counts equal the grid).
+SKIPS = []
 
 
 def check(name, ok, detail=""):
@@ -246,6 +252,7 @@ def main():
         for eta in etas:
             V0 = solve_value(m, eta, W0, base0, D0)
             if V0 is None:
+                SKIPS.append({"sweep": "group", "m": m, "eta": eta, "reason": "base LP failed"})
                 continue
             for dl in deltas:
                 pert = rng.normal(size=4)
@@ -253,6 +260,8 @@ def main():
                 pert = pert / float(np.sum(np.abs(pert) * gc)) * dl
                 W1 = W0 + pert
                 if np.any(np.abs(W1) < 1e-6):
+                    SKIPS.append({"sweep": "group", "m": m, "eta": eta, "l1_target": dl,
+                                  "reason": "perturbation zeroes a weight"})
                     continue
                 l1 = l1_between(W0, W1, m)
                 D1 = norm_D(W1, m)
@@ -263,6 +272,10 @@ def main():
                 V_new = solve_value(m, eta, W1, base1, D1)
                 V_stale = solve_value(m, eta, W1, base0, D0)   # stale baseline, fixed D
                 if V_new is None or V_stale is None or V_fix is None:
+                    SKIPS.append({"sweep": "group", "m": m, "eta": eta, "l1_target": dl,
+                                  "reason": "perturbed LP failed",
+                                  "failed": [k for k, v in (("fixedD", V_fix), ("movingD", V_new),
+                                                            ("stale", V_stale)) if v is None]})
                     continue
                 env = 2.0 * l1 / D0
                 # `K`: a bound on the UNNORMALISED objective, per `value_stable_
@@ -364,12 +377,15 @@ def main():
             if Vp is not None and Vg is not None:
                 agree.append(abs(Vp - Vg))
             if Vp is None:
+                SKIPS.append({"sweep": "item", "m": m, "eta": eta, "reason": "base LP failed"})
                 continue
             for dl in p_deltas:
                 u = rng.normal(size=m)
                 u = u / max(float(np.sum(np.abs(u))), 1e-15) * dl
                 w1 = w0 + u
                 if np.any(np.abs(w1) < 1e-6):
+                    SKIPS.append({"sweep": "item", "m": m, "eta": eta, "l1_target": dl,
+                                  "reason": "perturbation zeroes a weight"})
                     continue
                 l1 = float(np.sum(np.abs(u)))
                 D1i = float(np.sum(np.abs(w1)))
@@ -377,6 +393,10 @@ def main():
                 Vfix = solve_perm(m, eta, w1, b1, D0i)
                 Vmov = solve_perm(m, eta, w1, b1, D1i)
                 if Vfix is None or Vmov is None:
+                    SKIPS.append({"sweep": "item", "m": m, "eta": eta, "l1_target": dl,
+                                  "reason": "perturbed LP failed",
+                                  "failed": [k for k, v in (("fixedD", Vfix), ("movingD", Vmov))
+                                             if v is None]})
                     continue
                 env = 2.0 * l1 / D0i
                 K = unnormalised_sup_items(w1, b1)
@@ -424,8 +444,15 @@ def main():
            "formulation_agreement": [float(a) for a in agree],
            "scope": "two envelopes (fixed and moving normaliser), group and per-item"
                     " perturbation; the permutation LP cross-checks the flow LP",
+           "skipped_cells": SKIPS, "n_skipped": len(SKIPS),
            "checks": CHECKS, "all_passed": nfail == 0}
-    with open("research/unified_20260919/paperC_perturbation.json", "w") as f:
+    # A NEW path is required: the launch artifact is kept as recorded.
+    dest = pathlib.Path(sys.argv[sys.argv.index("--out") + 1]) if "--out" in sys.argv else None
+    if dest is None or dest.exists():
+        print("refusing to write: pass --out NEW_PATH (existing artifacts are not"
+              " overwritten)", file=sys.stderr)
+        return 2
+    with open(dest, "w") as f:
         json.dump(out, f, indent=2)
     if nfail:
         print("REFUSING to report: a self-check failed.", file=sys.stderr)
