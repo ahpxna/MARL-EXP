@@ -50,10 +50,10 @@ a certificate which is a weak-duality \emph{lower} bound, never a primal value.
 The separation reaches sample complexity for the design itself. The learner that tracks an
 exact surrogate optimum, with forced exploration at rate $1/\sqrt{s+1}$ and the true
 likelihood-ratio stop, pays $\Omega(\log^{2}(1/\delta))$ samples, while the ideal learner,
-defined and proved here, pays $\Theta(\log(1/\delta))$. That design is the surrogate's optimum
-at the true world, so this is an oracle-allocation statement. For a learner that recomputes
-the surrogate at its estimate, the separation would need a cumulative-exploration count bound
-whose oracle-error term is the surrogate oracle's, and we do not prove it. The measured panel is reported per confidence level under common random
+defined and proved here, pays $\Theta(\log(1/\delta))$. This holds for the deployable learner
+that re-solves the surrogate at its own estimate every round, not only for the surrogate's
+optimum at the true world. Its oracle sees only the estimate, and the rounds in which the
+estimate misleads it cost a constant in expectation. The measured panel is reported per confidence level under common random
 numbers, and supports the implementation, not the asymptotics.
 \end{abstract}
 
@@ -102,14 +102,17 @@ it after every allocation has been optimised.
 
 The contribution is a chain, and each link is load-bearing:
 real compression $\to$ its real alternative geometry $\to$ the \emph{optimal} surrogate
-design is still wrong by an unbounded factor $\to$ the cost of learning changes. The fifth
-link---that the algorithm of Section~\ref{sec:learner} \emph{reaches} the corrected
-benchmark---is \emph{not} claimed as proved end to end. What is proved is the rate law for a
-process satisfying named information-accumulation and expectation hypotheses, together with
-the repair of the one hypothesis the implementation violated outright (its threshold grows
-without bound in $t$; see the shift argument below). Discharging the remaining hypotheses for
-the algorithm as written, and joining the tail bound to a hitting time that may be infinite,
-are open. Concretely:
+design is still wrong by an unbounded factor $\to$ the cost of learning changes. The last
+link is proved for learners that are defined completely, and for no others. An
+\emph{ideal} learner, whose oracle value and stopping statistic are exact infima, is
+$\delta$-correct and reaches the corrected benchmark. The learner that re-solves the
+surrogate at its own estimate, with the same forcing and the same stop, pays a whole power of
+$\log(1/\delta)$ more (Section~\ref{sec:adaptive}). The implementation of
+Section~\ref{sec:learner} is a different algorithm, with finite precision and a bracketing oracle. For it the rate is proved only
+conditionally, on named information-accumulation and expectation hypotheses, together with
+the repair of the one hypothesis it violated outright (its threshold grows without bound in
+$t$; see the shift argument below), and it is reported as a finite-panel measurement.
+Concretely:
 \begin{enumerate}
 \item[1)] \textbf{An equality, not a decomposition found by search.} We prove the
 alternative set \emph{equals} the union of its regions, and we handle the strict inequality
@@ -126,18 +129,26 @@ a variance.
 themselves make the surrogate's policy more expensive. Theorem~\ref{thm:starve} shows the
 surrogate's optimum \emph{starves} the cells that carry the compression, and that an
 $\varepsilon$-optimal design still does, at rate $64\varepsilon/(9Mr)$.
+\item[5)] \textbf{Attainability, for an ideal learner.} A learner defined completely (a warm
+start, exact-value selection over a refining net, forcing at rate $1/\sqrt{s+1}$, and the
+exact generalised-likelihood-ratio stop) is $\delta$-correct, has
+$\mathbb{E}\tau_{\delta}<\infty$, and satisfies
+$\mathbb{E}\tau_{\delta}/\log(1/\delta)\to1/\Gamma_{\rm true}$ on the separating family, with no
+hypothesis beyond $M,r,a>0$.
+\item[6)] \textbf{The sample-cost separation, for the surrogate's design.} Tracking any exact
+surrogate optimum, with the same forcing and the same stop, costs
+$\mathbb{E}\tau_{\delta}\ge(KM/8)^{2}\log^{2}(1/\delta)$. The ratio to the ideal learner is
+unbounded. This holds for the surrogate's optimum at the true world, and for the deployable
+learner that re-solves the surrogate at its own estimate every round.
 \end{enumerate}
-That is a statement about \emph{information at a design}, and we stop there. It is the
-first step toward a sample-cost separation and not the separation itself: turning it into
-$\mathbb{E}\tau$ requires the cumulative-exploration count bound of
-Section~\ref{sec:alloc}, whose oracle-error term is the error of the \emph{surrogate's}
-oracle --- not the true oracle's bracket gap, which is what the panel of
-Section~\ref{sec:evidence} measures. Those are different quantities. This paper therefore
-claims a separation of the information game and of the design it selects, and claims
-\emph{no} separation of sample complexity.
-Theorems~\ref{thm:sepcentred} and~\ref{thm:starve} are the main results. The learner is reported
-in Section~\ref{sec:evidence} as a measurement on one finite panel, and carries no
-asymptotic claim.
+Items 1)--4) are statements about the game and the design it selects. Items 5) and 6) carry
+them to samples, for learners that are defined completely. None of them is the
+implementation of Section~\ref{sec:learner}. The count bound that 6) needs is proved
+directly: forcing and the rounds with a misleading estimate are the only sources of middle
+queries, and the latter are finitely many in expectation. The chain of
+Section~\ref{sec:alloc} is therefore not needed for 6). Theorems~\ref{thm:sepcentred}
+and~\ref{thm:starve} are the main results on the game. The implemented learner is reported in Section~\ref{sec:evidence} as a measurement on
+one finite panel, and carries no asymptotic claim.
 
 
 \paragraph{Which of our theorems does not follow.}
@@ -1006,8 +1017,10 @@ sampling rule satisfies $\mathbb{E}N_{\rm movable}(\tau)\le C_{r}+C'_{r}\mathbb{
 with $0<a<1$, Jensen gives
 $\mathbb{E}\tau\ge[(2r\,\mathrm{kl}(1-\alpha,\alpha)/d^{2}-C_{r})/C'_{r}]_{+}^{1/a}$ ---
 so $O(\sqrt t)$ exploration yields $\Omega(\log^{2}(1/\alpha))$ and linear exploration
-yields only $\Omega(\log(1/\alpha))$. The hard half is the count bound, not Jensen, and
-it is not proved here.}
+yields only $\Omega(\log(1/\alpha))$. The hard half is the count bound, not Jensen. It is
+proved in Section~\ref{sec:adaptive}, both for the learner that tracks an exact surrogate
+optimum fixed at the true world and for the learner that re-solves the surrogate at its
+estimate. That proof does not use the chain here: it bounds the middle count path by path.}
 
 \subsection{The alternative set is exactly a union of polyhedra}
 \label{sec:region}
@@ -1288,9 +1301,9 @@ bound.
 \NOTEPAR{This is a statement about a learner with \emph{this} oracle, \emph{this} exploration
 rate and \emph{this} tracker. It is not a statement about every method that uses a surrogate,
 and the change-of-measure input is exactly what must be supplied for the concrete policy
-before it becomes an algorithm-level claim. For the learner that tracks an exact surrogate optimum \emph{fixed at the true world}, both
-inputs are now supplied; see the paragraph ``What tracking the surrogate's optimum costs''
-below.}
+before it becomes an algorithm-level claim. Both inputs are now supplied, for the learner that tracks an exact surrogate optimum fixed
+at the true world and for the learner that re-solves the surrogate at its estimate; see the
+last two paragraphs of Section~\ref{sec:adaptive}.}
 
 \leanbox{\lean{surrogate\_cost\_quadratic}, \lean{kl\_at\_correctness},
 \lean{surrogate\_omega\_log\_squared}, \lean{separation\_diverges} in
@@ -1457,12 +1470,9 @@ into the square.
 
 \NOTEPAR{Scope: an ORACLE-ALLOCATION result. The tracked design is the surrogate's optimum
 AT THE TRUE WORLD, held fixed. The true extrema choose which cells starve, so the true
-parameter enters the allocation. This is a statement about the design the surrogate selects,
-paid for in samples. It is not yet a statement about a learner that recomputes the surrogate
-at its estimate. For that learner the cumulative-exploration route above, with its named
-inputs, is still the only one, and it is not closed. The stop is the true-alternative GLR, so
-the cost measured is the design's, not a weaker stopping rule's. The bound holds whether or
-not $\mathbb{E}\tau_{\delta}$ is finite.}
+parameter enters the allocation. The next paragraph removes this restriction. The stop is
+the true-alternative GLR, so the cost measured is the design's, not a weaker stopping
+rule's. The bound holds whether or not $\mathbb{E}\tau_{\delta}$ is finite.}
 
 \leanbox{\lean{klq\_pair}, \lean{starved\_lower\_at}, \lean{starved\_cost\_log\_sq},
 \lean{surrogate\_optimum\_cost}, \lean{surrogate\_optimum\_exists},
@@ -1470,6 +1480,41 @@ not $\mathbb{E}\tau_{\delta}$ is finite.}
 \lean{LeanPaperA6SurrogateCostV1}; \lean{fCount\_le\_amgm}, \lean{fCount\_le\_sqrt} in
 \lean{LeanPaperA6FixedDesignV1}; \lean{cnt\_eq\_at\_min}, \lean{ansEv\_alt\_leG},
 \lean{ansEv\_true\_geG} in \lean{LeanPaperA7StoppedGenV1}}
+
+\paragraph{The learner that re-solves the surrogate at its estimate.}
+The deployable surrogate learner pays the same order. Each round it solves the frozen
+surrogate at its current estimate $\hat\mu$ and tracks the result. At every estimate whose
+extrema are the four anchors and which retains $A$, the surrogate game has value
+$g(\hat\mu)^{2}/32$, with $g$ the frozen margin. There every exact optimum puts zero weight on
+every middle cell, and the uniform-anchor design is one. Run the tracking learner with that
+oracle, or with any oracle that returns an exact surrogate optimum at such estimates, with
+the same forcing and the same stop. Then
+$\mathbb{E}\tau_{\delta}\ge(KM/8)^{2}\log^{2}(1/\delta)$ for all $\delta<\delta_{0}$, and the ratio
+to the ideal learner is unbounded. The proof adds one term to the one above: the rounds in
+which some estimate is off by $1/16$ or more. Forcing gives every count order $\sqrt t$, so
+after a deterministic time $s_{0}$ the learner's own confidence event places every estimate
+within $1/16$ of the truth. That event fails at round $s$ with probability at most $s^{-4}$,
+by Ville at the learner's statistic. So the expected number of misleading rounds is at most
+$s_{0}+2$, at every horizon. It enters the pair's count additively and leaves the order
+unchanged.
+
+\NOTEPAR{Scope. The oracle sees only the estimate. The true world enters only as the law of
+the observations and, in the analysis, as the centre of the $1/16$ ball. Where the estimate
+misleads, the oracle is unconstrained (the implementation returns the uniform design), and
+those rounds are paid for inside $s_{0}+2$. The stop is the true-alternative GLR, the family
+is the separating one, and the forcing rate is $1/\sqrt{s+1}$. The threshold $\delta_{0}$ is
+explicit but very small, because $s_{0}$ is. The statement is about the order in
+$\log(1/\delta)$, not about any confidence level used in the experiments.
+Figure~\ref{fig:adeploy} shows this learner, and the two others, under one two-answer
+certificate at $\alpha=0.05$.}
+
+\leanbox{\lean{est\_cost\_log\_sq}, \lean{surrogate\_learner\_cost},
+\lean{exact\_oracle\_cost}, \lean{surrogate\_learner\_vs\_ideal}, \lean{est\_lower\_at} in
+\lean{LeanPaperA6EstCostV1}; \lean{frozenGameAt\_eq}, \lean{starvation\_at},
+\lean{surD\_exact}, \lean{optimal\_oracle\_middle\_zero}, \lean{close\_extreme} in
+\lean{LeanPaperA6SurrogateAtV1}; \lean{radius\_eventually}, \lean{close\_of\_good},
+\lean{badAll\_expect} in \lean{LeanPaperA6BadRoundsV1}; \lean{oCount\_le\_amgm},
+\lean{oCount\_ge} in \lean{LeanPaperA6OracleLearnerV1}}
 
 \section{Evidence}
 \label{sec:evidence}
@@ -1551,6 +1596,21 @@ $64/M$ exceeds $1$ and therefore says nothing.}
 \label{fig:margin}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperA_certified.pdf}
+\caption{A-F1: the centred separation from a numerical true-game computation that includes
+centring and every alternative region, certified in exact rational arithmetic
+(\texttt{EXP\_paperA\_certified\_separation}, 6/6; figure 3/3). The upper end comes from the dual of
+the outer LP over exactly-verified centred alternatives. The lower end is the minimum over
+all $|B|(|B|-1)$ regions of a Lagrangian dual value at a design with every weight positive.
+Relative widths are at most $4\times10^{-4}$: $\Gamma_{\rm true}/\Gamma_{\rm proxy}\in[0.8372,0.8374]$,
+$[0.7214,0.7216]$, $[0.5664,0.5667]$, $[0.3982,0.3982]$ at $r=1,2,4,8$, inside the proved
+bracket of Theorem~\ref{thm:sepcentred} (band). $\Gamma_{\rm proxy}=9/512$ is the theorem, not a
+computation.}
+\label{fig:acert}
+\end{figure}
+
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.92\textwidth]{paperA_mechanism.pdf}
@@ -1560,7 +1620,7 @@ Left: the band is the proved bracket $4/(4+2rM)\le\Gamma_{\rm true}/\Gamma_{\rm 
 64/(9rM)$. Each interval runs from the best attained LOWER certificate on the true value
 (floating point; the strict centred alternatives are relaxed to a union of polyhedra, which
 can only lower the infimum) up to the theorem's upper bound. No numerical upper bound is
-claimed. At $r=8$ the whole interval lies below $1$. Centre: the share of queries on the
+claimed here; Figure~\ref{fig:acert} gives a two-sided certified interval with centring. At $r=8$ the whole interval lies below $1$. Centre: the share of queries on the
 middle cells. The frozen proxy's optimum puts nothing there, and its runs sample the middles
 only through the forced exploration. Right: $\mathbb{E}[\min(\tau,B)]$ with its standard
 error. All proxy runs are censored at $B$, which does not show that they never stop. SCOPE:
@@ -1570,6 +1630,53 @@ diagnostic under one certificate, not a $\delta$-correct learner (for that quest
 Figure~\ref{fig:aswap}). Every stored number drawn was checked against the proved formula
 beside it before drawing (\texttt{FIG\_paperA\_mechanism}, 7/7).}
 \label{fig:amech}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_budget.pdf}
+\caption{The same stored panel on the axis A-F2 asks for: budget, not a single $B$. Nothing
+was re-solved or re-sampled. Left: the certificate rate $\Pr(\tau\le b)$ from the per-run
+stopping times. The surrogate-optimum rule certifies in none of its $24$ runs at any
+$b\le B$, for every $r$. Centre: the restricted mean $\mathbb{E}[\min(\tau,b)]$, which is
+exact for every $b\le B$ because a censored run has $\min(\tau,b)=b$. The surrogate-optimum
+rule lies on the diagonal. Right: $N_{\rm mid}(t)/t$ along the FIRST run of each rule only,
+for $r=1$ and $r=8$. The black curves are the pathwise forcing bound
+$2r\,(2+\sum_{n\le s<t}s^{-1/2}/n)$ of \lean{fCount\_le\_quota}, transcribed for the code's
+forcing $1/\sqrt t$. The surrogate-optimum run stays below it, within one query at $r=1$:
+forcing is its only source of middle queries. Line style marks $r$ in every panel. SCOPE: the
+surrogate-optimum rule is the Lean \lean{fixLearner} at \lean{wUnifC}, up to a one-step
+offset in the forcing. Its stop is the answer-$A$ certificate of Figure~\ref{fig:amech}, not
+the GLR stop of the theorem, and $\alpha=0.05$ lies outside the theorem's range
+$\delta<\delta_{0}$ (about $1.7\times10^{-4}$ at $r=1$, $M=1$). So the panel is consistent
+with the $\log^{2}$ separation in direction and is not a test of it
+(\texttt{FIG\_paperA\_budget}, 5/5 checks).}
+\label{fig:abudget}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_deployable.pdf}
+\caption{Deployable policies under ONE two-answer certificate: the true answer no longer
+enters the stop. Every rule is a tracking learner with forcing $\min(1,1/\sqrt t)$ whose
+oracle sees only the estimate. \emph{Surrogate at estimate} re-solves the frozen surrogate
+at the current estimate every round ($w_{e}\propto\sigma_{e}$ on the estimate's four frozen
+extremum cells, checked to be its exact optimum). \emph{True game at estimate} ascends the
+certificate of the answer the estimate retains. Each run stops when the certificate of that
+answer clears the threshold, and returns it. Left, centre: the certificate rate by budget,
+on the base world (answer $A$) and on the swapped world (answer $B$), for $r=1,2,4,8$.
+Right: $\mathbb{E}[\min(\tau,B)]$, $B=6\times10^{4}$, $\alpha=0.05$, 24 runs per cell. Of 505
+stopped runs, none returned the wrong answer. On the base world the surrogate learner
+certifies in 22 of 24 runs at $r=1$, 3 at $r=2$ and none at $r=4,8$, while the other two
+rules certify every run. On the swapped world, where the surrogate's frozen cells are the
+informative ones, it certifies every run, and is the fastest rule except at $r=2$, where it
+and the true-game rule are within $1\%$. Along every run the middle counts obey the forcing
+bound of \lean{oCount\_le\_bad}, with minimum slack $0.33$. SCOPE: the certificate is a valid
+lower bound on the likelihood ratio, not the exact infimum of the theorem's stop, and
+$\alpha=0.05$ is far above the theorem's $\delta_{0}$, so the panel shows these rules'
+behaviour. It is not a test of the $\log^{2}$ order (\texttt{EXP\_paperA\_deployable}, 6/6;
+\texttt{FIG\_paperA\_deployable}, 4/4).}
+\label{fig:adeploy}
 \end{figure*}
 
 \section{Limitations}
@@ -1586,18 +1693,23 @@ multipliers can be negative while admissible ones exist, and it is existence tha
 Theorem~\ref{thm:kkt} asks for. The residuals are floating-point, so this certifies
 the decomposition to solver precision and not in exact arithmetic. A region that failed
 would be reported and would fail the run's self-check, never dropped.
-\item[3)] \textbf{The stopping analysis is conditional, not absent.} Section~\ref{sec:margin}
-is an information-rate statement, and Section~\ref{sec:adaptive} now carries the whole
-deterministic chain that converts it: accumulation on a good window, the derived event
-inclusion, the union bound, the $\sqrt t$ window, the $t^{-3/2}$ tail, almost-sure
-finiteness, and the $\limsup$. Its single remaining input is the per-step confidence
-guarantee $\Pr(\text{fails at }s)\le s^{-4}$ for the algorithm's own statistic, which is a
-Ville application not yet instantiated. The assembly step
+\item[3)] \textbf{The implemented learner's rate is conditional.} For the ideal learner of
+Section~\ref{sec:adaptive} the stopping chain is complete. The per-step confidence guarantee
+$\Pr(\text{fails at }s)\le s^{-4}$ is Ville's inequality at the learner's own statistic, and
+the rate, finiteness and correctness are proved. For the implementation of
+Section~\ref{sec:learner} (finite precision, a bracketing oracle, periodic refresh) the same
+deterministic chain still takes the hypotheses named there. That learner is reported only as
+a finite-panel measurement. The assembly step
 $\mathbb{E}\tau\le t_{0}+\sum_{t\ge t_{0}}\Pr(\tau>t)$ is proved with no term discarded
 (\lean{expectation\_le\_split} in \lean{LeanPaperClosuresV1}).
 \item[4)] \textbf{The model is fixed, not derived} from the corpus definitions.
 \item[5)] \textbf{Finitely many support points and competitors}, and nothing bounds the
 number of regions, which is what decides whether enumeration is practical.
+\item[6)] \textbf{The sample-cost separation is for one family and one forcing rate.} It
+holds for the learner that re-solves the surrogate at its estimate, with forcing
+$1/\sqrt{s+1}$ and the true-alternative GLR stop, on the separating family, for
+$\delta<\delta_{0}$ with an explicit but very small $\delta_{0}$. Other forcing rates, other
+stops and other families are not covered.
 \end{enumerate}
 
 \section{Conclusion}
@@ -1607,11 +1719,11 @@ than approximated, its regional minima and its design can both be certified rath
 searched, and the surrogate that freezes the extrema is wrong in both directions by
 unbounded factors. Separately, certifying the margin that would justify a decision is up to
 three orders of magnitude more expensive than the decision, and past a threshold impossible
-while the decision stays easy. What remains owed is the bridge realising the two
-counterexample families inside the linear model, and the one probabilistic input --- a
-per-step confidence guarantee at level $s^{-4}$ --- that would make the stopping chain,
-which is otherwise complete, turn an information-rate separation into a statement about
-samples.
+while the decision stays easy. For the ideal learner the stopping chain is complete: it attains $1/\Gamma_{\rm true}$, and
+the learner that re-solves the surrogate at its estimate instead costs
+$\Omega(\log^{2}(1/\delta))$ samples. What remains owed is the bridge realising the two
+counterexample families inside the linear model, and the rate of the implemented
+finite-precision learner.
 
 \section*{Companion material}
 Two files accompany this paper and are part of the submission record.

@@ -67,3 +67,31 @@ found, but there is one scope fact every reader must carry.
 Figure `paperA_mechanism.pdf` (`scripts/FIG_paperA_mechanism.py`, checks in
 `paperA_mechanism_figure.json`, 7/7) draws this artifact with that label, and states it in
 the paper A caption.
+
+## Addendum 2 (2026-09-24, afternoon): the proxy rule is an oracle allocation; A-F2 by budget
+
+* **Correction to "Information access" above.** The proxy rule's design `w_proxy(r, M)` is
+  1/4 on the four anchor cells, the extrema OF THE TRUE WORLD, and it does not read the
+  estimate. So the true world enters that rule's allocation (which cells are extrema), not
+  only the simulated observations. It is an ORACLE ALLOCATION, the surrogate's optimum at
+  θ_C. The certificate is also built from the alternatives of the true answer A, as said above.
+  The geometry and uniform rules are as described.
+* **What the proxy rule is, against Lean.** `w_proxy` is `wUnifC r`, an exact optimum of the
+  frozen surrogate game (`surrogate_optimum_exists`, `LeanPaperA6SurrogateCostV1`). The run
+  loop matches `fixLearner (wUnifC r)` of `LeanPaperA6FixedDesignV1`: warm start of one query
+  per cell, quota `W` including the current round, first argmax of `W − N`. It differs in
+  three ways. (i) The forcing is `min(1, 1/√t)` with `t` samples so far; Lean uses `1/√(s+1)`.
+  (ii) The stop is the answer-A lower certificate checked every 50 rounds, not the GLR stop
+  `tauG`. (iii) α = 0.05 lies outside the theorem's range `δ < δ₀ = min(1/32,
+  exp(−4(2K+1)/(KM)))`, about 1.7·10⁻⁴ at r = 1, M = 1. So the 24/24 censored proxy runs
+  agree with the `Ω(log²(1/δ))` separation (`uniform_surrogate_cost`) in direction, and are
+  NOT a test of it.
+* **Theorem check that can fail.** Along the stored proxy trace (replicate 0),
+  `N_mid(t) ≤ 2r(2 + Σ_{n≤s<t} s^{−1/2}/n)`. This is the pathwise bound of `fCount_le_quota`
+  transcribed for the code's forcing. It holds at every stored time, with slack 0.7, 2.1, 5.5
+  and 12.9 queries at r = 1, 2, 4, 8. Forcing is the only source of middle queries. A leak of
+  the design onto the middles would break it.
+* **New figure, no resampling.** `paperA_budget.pdf` (`scripts/FIG_paperA_budget.py`, sha256
+  `6b8f38f0…`, checks in `paperA_budget_figure.json`, 5/5): the certificate rate
+  `P(τ ≤ b)` and `E[min(τ, b)]` for every budget `b ≤ B`, from `tau_per_run`, and `N_mid(t)/t`
+  from `traces` (replicate 0 only). This is the budget axis that spec A-F2 asks for.

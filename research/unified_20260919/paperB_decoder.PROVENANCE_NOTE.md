@@ -44,3 +44,24 @@ decoder's error count is at most the recorded count.
   refer to the script's rule.
 
 The safe-task counts measure the formalized safe decoder exactly.
+
+## Addendum (2026-09-24, afternoon): the paired rerun with the formalized fallback (deviation B-1)
+
+`scripts/EXP_paperB_decoder_leanfallback.py` (sha256 `e558349bfe65e939…`) is
+`EXP_paperB_decoder.py` with one change: when two or more identification tests fire, the guess
+is the default world 1, as in `decodeB`/`idCode`. It uses the same seed and the same order of
+draws. Output: `paperB_decoder_leanfallback.json` (sha256 `20dda063c3d5d527…`), 10/10
+self-checks, two of which are new and can fail:
+
+- **Pairing**: the same 616 cells, and every one of the 308 safe counts equals the stored one
+  exactly. So the draws are the stored run's draws, even though the current producer's bytes
+  differ from the launch source (`bb8d6f14…` is in no commit).
+- **`lean_wrong_imp_py_wrong` on data**: every identification count of the formalized decoder
+  is at most the script's. The fallback removes 13,831 identification errors in total.
+
+At the corrected family-wise level (per tail `0.05/(2·616)`, the level of the current
+producer; see `SUPERSEDED_FIELDS.md`), the fallback moves NO certified budget. The old counts
+and the new counts give the same smallest certified rung in every panel. So the certified
+identification budgets ARE measurements of the formalized decoder. The lower (CP) brackets of
+the new artifact refer to the formalized decoder; those drawn in `paperB_decoder.pdf` refer to
+the script's rule and are the conservative side. The stored `paperB_decoder.json` is unchanged.

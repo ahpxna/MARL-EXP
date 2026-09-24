@@ -13,34 +13,34 @@ Lawrenceville, NJ, USA}}
 \begin{abstract}
 A learner that must choose a compression does not have to identify the world it is in; it
 only has to separate worlds far enough that no set of them disagreeing on every answer
-survives unsplit. We make that quantitative for a measurement class in which the world is
-latent and every query is a bounded linear probe. On one explicit family the two costs come
-apart by a computable order: the decision is settled at order $h^{-2}$ and identification
-needs $h^{-2r}$, with $r$ a design parameter of the family. Three things support the claim.
-First, the moment law: for every admissible query of degree $d$ the mixed moments against
-the hidden character vanish below order $\lceil n/d\rceil$, and the averaged tail query
-attains that order with leading coefficient exactly $r!/r^{r}$---both proved. Second, the
-lower bound holds against every adaptive policy on a finite observation alphabet---and, on
-the Gaussian model, is reduced to a single per-step Hellinger bound, which we now
-\emph{prove}, obtaining $\int\Delta^{2}/\ell\le h^{2r}r^{-2r}C$ with $C$ explicit, leaving
-only the continuous-alphabet chain rule between the two---rather
-than against a chosen query: we build
-the transcript law from the policy and prove the divergence chain rule for it, so the
-per-query bound multiplies by the horizon and nothing else. Third, the combinatorial half of
-the general law: grouping worlds by equality of their observation coefficients up to order
-$s$---an equivalence by construction, not a union-find on an untested relation---every class
-has a common safe answer if and only if no obstruction lies inside a class, and against an
-obstruction every \emph{randomised} rule leaves unsafe mass at least $1/|H|$. Deciding
-without identifying, and signal appearing only at high moments, are both known; what we
-claim is the combined law relating safe-decision geometry, a query class, and adaptive
-transcripts. The two orders are matched \emph{on the constructed family of
-Section~\ref{sec:family}}, and in the confidence parameter; on that family the adaptive
-Gaussian instantiation, and the identification-rate curve, are open. On a second
-construction, the parity-mask channel with $m$ worlds and Gaussian noise, both rates are
-theorems against every randomised adaptive policy with a finite horizon: the minimax cost is
-$\Theta(\log(1/\delta)/h^{2})$ for the safe decision and
-$\Theta(\log(1/\delta)/h^{2(m-1)})$ for identification, uniformly on a rectangle in
-$(h,\delta)$ (Theorem~\ref{thm:endpoint}).
+survives unsplit. We make that quantitative, and on one channel we prove it end to end. On
+the parity-mask channel with $m$ worlds and Gaussian noise, both minimax rates are
+theorems. The safe decision costs $\Theta(\log(1/\delta)/h^{2})$ queries and identification
+costs $\Theta(\log(1/\delta)/h^{2(m-1)})$, uniformly on a rectangle in $(h,\delta)$. Both hold
+against every randomised adaptive policy whose stopping time is almost surely finite, with no
+bound on that time assumed (Theorem~\ref{thm:endpoint}). The lower sides are a change of
+measure at a hard pair of worlds together with a divergence bound for the adaptive
+transcript. The upper sides are explicit decoders whose budgets count every test they run.
+
+Two general results carry the law behind this instance. First, the combinatorial half:
+group worlds by equality of their observation coefficients up to order $s$ (an equivalence
+by construction, not a union-find on an untested relation). Then every class has a common
+safe answer if and only if no obstruction lies inside a class, and against an obstruction
+every \emph{randomised} rule leaves unsafe mass at least $1/|H|$. Second, the moment law: for
+every admissible query of degree $d$ the mixed moments against the hidden character vanish
+below order $\lceil n/d\rceil$, and the averaged tail query attains that order with leading
+coefficient exactly $r!/r^{r}$.
+
+The boundary is a second family, in which the world is latent and every query is a bounded
+linear probe. There the two orders are $h^{-2}$ and $h^{-2r}$, matched in the confidence
+parameter (Section~\ref{sec:family}). The lower bound holds against every adaptive policy on
+a finite observation alphabet. On the Gaussian model it is reduced to one per-step Hellinger
+bound, $\int\Delta^{2}/\ell\le h^{2r}r^{-2r}C$ with $C$ explicit, which we prove, leaving only
+the continuous-alphabet chain rule. The adaptive Gaussian instantiation on that family, and
+its identification-rate curve, are open. Deciding without identifying, and signal appearing
+only at high moments, are both known. What we claim is the combined law relating
+safe-decision geometry, a query class and adaptive transcripts, and its two-rate instance on
+one channel.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -99,6 +99,15 @@ below $\lceil n/d\rceil$ and attainment at it with an exact constant;
 \item[3)] an adaptive transcript bound, so the lower bound is against every policy.
 \end{enumerate}
 A reader who removes any one of the three gets a statement already in the literature.
+
+The headline instance is Theorem~\ref{thm:endpoint}. On the parity-mask channel both rates
+are proved, lower and upper, against every randomised adaptive policy that stops almost
+surely. The reading order that matches the argument is: Section~\ref{sec:law} (which
+groupings of worlds suffice), Sections~\ref{sec:geometry}--\ref{sec:decoder} (the query
+class, the per-query information and the decoder), and Section~\ref{sec:endpoint} (both
+rates on one channel). The family of Section~\ref{sec:family} and the adaptive analysis of
+Section~\ref{sec:adaptive} are the boundary. There the order law is proved, but the adaptive
+Gaussian instantiation is not.
 
 \NOTEPAR{The honest framing for the final version: if a masking theorem is found that
 already covers the admissible class as stated in Theorem~\ref{thm:vanish}, cite it as a tool
@@ -1105,10 +1114,14 @@ everywhere else: same channel, same bounded feature, same per-query sample size,
 strict nearest-mean test, with ties falling to ``not named''. On every outcome vector and at
 every world, a wrong formalized guess implies a wrong script guess. So on the same samples the
 recorded identification counts are a CONSERVATIVE UPPER BOUND on the formalized decoder's
-error. The upper-certified budgets therefore transfer to it, but the counts are not a
-measurement of it. The lower (dotted) brackets are lower bounds for the script's rule only.
-The safe-task counts measure the formalized safe decoder exactly, since its rule has no
-ambiguous branch.}
+error. A paired rerun settles the rest (\texttt{EXP\_paperB\_decoder\_leanfallback}). It uses the
+formalized decoder's fallback, the same seed and the same draws: every safe count equals the
+stored one, and every identification count is at most the stored one, as the theorem says.
+The fallback removes 13,831 identification errors in total. It moves no certified budget
+at the family-wise level used here. So the certified budgets in the figure are the formalized
+decoder's own, and the drawn lower (dotted) brackets remain the script rule's, which is the
+conservative side. The safe-task counts measure the formalized safe decoder exactly, since its
+rule has no ambiguous branch.}
 
 \leanbox{\lean{pyGuess}, \lean{decodeB\_of\_pyGuess}, \lean{lean\_wrong\_imp\_py\_wrong} in
 \lean{LeanPaperBDecoderMatchV1}}
@@ -1166,7 +1179,7 @@ the theorem is not vacuous.
 \lean{separation\_nonvacuous} in \lean{LeanPaperBTestV1}; \lean{decoder\_union\_bound},
 \lean{bounds\_same\_order} in \lean{LeanPaperBGeometryV1}}
 
-\subsection{The endpoint on the parity channel: both rates, every finite-horizon policy}
+\subsection{The endpoint on the parity channel: both rates, every almost-surely stopping policy}
 \label{sec:endpoint}
 
 On the parity-mask channel the pieces above are composed into one statement about the
@@ -1181,7 +1194,9 @@ probability at most $\delta$ for the task.
 \label{thm:endpoint}
 Fix $m\ge3$ and noise $\sigma>0$. Take the parity channel with the tip loss and tolerance
 $0$, so a safe answer at world $w$ is any $a\ne w$. The policy class is every randomised
-adaptive policy with a finite horizon whose answer and guess are measurable. There are
+adaptive policy with a measurable stopping rule that stops almost surely, and with
+measurable answer and guess read at the stopping time. The stopping time need not be
+bounded, and its expectation need not be finite. There are
 $0<c\le C$, $h_{0}>0$ and $\delta_{0}\in(0,1)$, depending on $m$ and $\sigma$ only, such that
 for all $0<h\le h_{0}$ and $0<\delta\le\delta_{0}$
 \[
@@ -1191,7 +1206,14 @@ c\,\frac{\log(1/\delta)}{h^{2(m-1)}}\le N^{*}_{\mathrm{id}}(h,\delta)\le C\,\fra
 \]
 \end{theorem}
 
-Both lower sides hold against every policy in the class. A correct safe policy's answer at
+The theorem is proved first for policies with a finite horizon, and then carried to the
+whole class by truncation. Run the stopped policy, which issues the free dummy query after
+stopping, for $n$ rounds, with $n$ chosen so that every world has stopped with probability at
+least $1-\delta$. The result is a finite-horizon policy that is correct at level $2\delta$ and
+costs no more than the original. The finite-horizon lower bound applied to it gives the same
+order, at level $2\delta$. Conversely, a finite-horizon decoder is a stopping policy that
+stops at its horizon, with the same cost. So the upper side, and the non-vacuity of the
+class, transfer too. Both lower sides hold against every policy in the class. A correct safe policy's answer at
 one world puts mass $(1-\delta)/(m-1)$ on an event of mass at most $\delta$ at another world,
 which forces the divergence to be at least $\log(1/\delta)/4(m-1)$. The transcript's
 divergence is at most the per-query $\chi^{2}$, of order $h^{2}$, times the expected number of
@@ -1206,15 +1228,22 @@ decoder runs.
 \lean{LeanPaperBParityExperimentV1}; \lean{transcript\_kl\_le} in
 \lean{LeanPaperBProtocolV1}; \lean{parChan\_chi\_le} in \lean{LeanPaperBParityChannelV1};
 \lean{event\_klDiv\_ge}, \lean{safe\_pair\_exists} in \lean{LeanPaperBObstructionV1};
-\lean{tip\_finish\_from\_protocols} in \lean{LeanPaperBRateClosureV1}}
+\lean{tip\_finish\_from\_protocols} in \lean{LeanPaperBRateClosureV1};
+\lean{stopped\_parity\_rates}, \lean{stopped\_lower\_log}, \lean{stopped\_safe\_lower},
+\lean{stopped\_id\_lower},
+\lean{trunc\_correct}, \lean{outT\_first}, \lean{ofPol\_correctS}, \lean{costS\_ofPol} in
+\lean{LeanPaperBStoppedParityV1}}
 
-\NOTEPAR{Scope. The policy class has a finite horizon, so stopping times are bounded, not
-merely almost surely finite; a policy stops early by issuing the zero-information dummy
-query, which is not counted. The constants are uniform in $h$ and $\delta$ on the rectangle,
+\NOTEPAR{Scope. The cost of a stopping policy is the supremum over horizons of the expected
+number of non-dummy queries, which is $\mathbb{E}\tau$ by monotone convergence. Almost-sure
+stopping is required uniformly over the $m$ worlds: for every $\varepsilon>0$ one horizon
+at which every world has stopped with probability at least $1-\varepsilon$. The lower bounds
+over this class are at level $2\delta$ and hold for $2\delta\le\min(\delta_{S},\delta_{I})$,
+which changes the constants and not the orders. A policy stops by issuing the
+zero-information dummy query, which is not counted. The constants are uniform in $h$ and $\delta$ on the rectangle,
 but depend on $m$ and $\sigma$. The theorem concerns this channel and this loss, not the
-general law of Section~\ref{sec:law}. The decoder experiment measures the script's rules;
-for identification its counts are a conservative upper bound on the formalized decoder
-(see the note after Figure~\ref{fig:bdecoder}).}
+general law of Section~\ref{sec:law}. The decoder budgets are the formalized decoders'
+own, established by a paired rerun (see the note after Figure~\ref{fig:bdecoder}).}
 
 \subsection{The crossover: the mechanism, not a sweep}
 \label{sec:crossover}
@@ -1261,17 +1290,20 @@ bound over it. The measured orders $5.93\to3.95$ are evidence, not proof.}
 \label{sec:limits}
 
 \begin{enumerate}
-\item[1)] \textbf{The general rate is not proved.} Matching orders are established on
-one family; Theorem~\ref{thm:classes} and Theorem~\ref{thm:floor} are the combinatorial half
-of the general law, not the law.
+\item[1)] \textbf{The general rate is not proved.} Both rates are theorems on one channel
+(Theorem~\ref{thm:endpoint}), and matching orders are established on the family of
+Section~\ref{sec:family}. Theorem~\ref{thm:classes} and Theorem~\ref{thm:floor} are the
+combinatorial half of the general law, not the law.
 \item[2)] \textbf{The transcript results are discrete.} Theorem~\ref{thm:chain} is proved
 for a finite observation alphabet, a deterministic policy and a fixed horizon. On the
 Gaussian model we do not run that argument at all; we run the affinity route of
 \eqref{eq:affinity}, whose arithmetic is proved and whose analytic input---a per-step
 Hellinger bound uniform over $g$, with an integrable envelope---is supplied by
 \lean{hellinger\_rate\_bound}. What remains open at this point is only the passage from a
-single step to an adaptive randomised transcript. Replacing $N$
-by $\mathbb{E}\tau$ needs a stopped-transcript identity and must not be done by substitution.
+single step to an adaptive randomised transcript on that family. Replacing $N$ by
+$\mathbb{E}\tau$ must not be done by substitution. On the parity channel it is done by
+truncation (Theorem~\ref{thm:endpoint} and the paragraph after it), for every policy that
+stops almost surely; on the family of Section~\ref{sec:family} it is not done.
 \item[3)] \textbf{Constants depend on $r$.} Nothing here is uniform as $r$ grows with a
 budget.
 \item[4')] \textbf{The estimator's error is now a statement about the measure.} Chebyshev
@@ -1300,16 +1332,18 @@ than proved is the estimator's concentration itself.
 
 \section{Conclusion}
 
-On one family the cost of choosing a safe compression and the cost of identifying the world
-separate by a computable order, and the separation is supported from both sides: the moment
-law is proved to vanish below the order and to be attained at it with an exact constant, and
-the lower bound is proved against every adaptive policy on a finite observation alphabet by
-building the transcript law from the policy, and on the Gaussian model is reduced, with the
-reduction proved, to a single per-step Hellinger bound uniform over the query class. The
-general law's combinatorial half---which groupings suffice, and why a surviving obstruction
-is costly even for randomised rules---is proved; the analytic half, which would turn an
-order into a rate for an arbitrary family, is not, and we have said so where the claim would
-otherwise be made.
+On the parity-mask channel the cost of choosing a safe compression and the cost of
+identifying the world are both determined, and they separate by a whole power of the
+signal: $\log(1/\delta)/h^{2}$ against $\log(1/\delta)/h^{2(m-1)}$. This holds against every
+randomised adaptive policy that stops almost surely, and each side is attained by an explicit
+decoder. The general law's combinatorial half, which groupings suffice and why a surviving
+obstruction is costly even for randomised rules, is proved. On a second family the moment
+law is proved to vanish below the order and to be attained at it with an exact constant. The
+lower bound there is proved against every adaptive policy on a finite observation alphabet,
+and on the Gaussian model it is reduced, with the reduction proved, to a single per-step
+Hellinger bound uniform over the query class. The analytic half of the general law, which
+would turn an order into a rate for an arbitrary family, is not proved, and we have said so
+where the claim would otherwise be made.
 
 \section*{Companion material}
 Two files accompany this paper and are part of the submission record.
