@@ -13,18 +13,24 @@ statuses, and they are not interchangeable:
 ## Corpus state at the last full gate
 
 ```
-last completed FULL gate   full2_20260923_201950   finished 2026-09-23 22:04
-modules = 143 (listed 128)   audited_theorems = 1293   failed = 0
+last completed FULL gate   full3_20260924_ideal    finished 2026-09-24 12:44
+modules = 188 (listed 173)   audited_theorems = 1505   failed = 0
 sorry = 0   native_decide = 0   axioms ⊆ {propext, Classical.choice, Quot.sound}
-VERIFY PASS   (drift note: LeanPaperAActualDecisionBridgeV1 was edited after that freeze;
-               the verdict is about the frozen bytes)
+VERIFY PASS   (drift note: LeanPaperCCollapseV1 was edited after that freeze -- docstring
+               only, the SCOPE paragraph; the verdict is about the frozen bytes)
+proof hashes: work/gate_runs/full3_20260924_ideal/report/MODULES.tsv (per-module source
+  and .olean sha256), SOURCES.sha256, RUNNER.sha256.  sha256(MODULES.tsv) =
+  979d9703cf217b5f17b70a36bde438991557d849650ae124835909a6d13b4f23
+previous FULL gate         full2_20260923_201950   143 modules, 1293 theorems, PASS
 
 latest SMOKE gate          smokeA_20260924_ideal   finished 2026-09-24 09:16
 closure of LeanPaperA7IdealFamilyV1: modules = 54   audited_theorems = 431
 failed = 0   sorry = 0   native_decide = 0   axioms ⊆ standard   drift = none
 SMOKE PASS
 
-running FULL gate          full3_20260924_ideal    188 modules frozen 2026-09-24
+running SMOKE gate         smokeA6_20260924        closure of the three A6 modules
+                           (LeanPaperA6FixedDesignV1, LeanPaperA7StoppedGenV1,
+                           LeanPaperA6SurrogateCostV1); not in full3
 ```
 
 ## One observation that shortens what is left of C
@@ -71,6 +77,7 @@ instantiated at the construction or algorithm the headline is about.
 | **A5.5** accumulated information → stopping statistic | **LEAN**, and joined to the rest | `good_window_accumulation`/`good_window_rate` give `Z_t/t ≥ Γ − 3Lr̄ − ē − Γρ̄ − 2Γn/t − C/t`; `LeanPaperA7ChainV1` composes it with the inclusion, the tail and the expectation | `ξ_t` (stopping solver) is still a *separate* error from `ζ_t` (allocation oracle), and neither is instantiated at the implementation |
 | **A5.6** tail, a.s. termination, expectation | **LEAN-COND; the `∞`-valued stopping time is now LEAN** | `expected_stopping_bound_general`, `rate_limsup_eta` (`LeanPaperA7EtaV1`) still consume the expected bound; `hitTime`/`truncAt` (`LeanPaperAStoppingV1`) give the `ℕ∞`-valued hitting time, its tail event, and the separation between the restricted quantity and the stopping time | **closed**: `chain_expected_bound` (`LeanPaperA7ChainV1`) derives `E τ ≤ (b + winBudget)/((1−ε)Γ) + 19` from the algorithm-level hypotheses, and `a7_chain_rate` feeds it to `rate_limsup_eta`. Joining the links exposed the window head — the crossing time is `b/G + O(√b)`, not `b/G + O(1)` — paid by `2Γ√t ≤ εGt + Γ²/(εG)` at the cost of a factor `(1−ε)` of the rate. The `s^{-4}` confidence step is still a hypothesis |
 | **A6** surrogate learner `Ω(log²(1/α))` | **assembled** | `surrogate_cost_quadratic`, `surrogate_omega_log_squared`, `separation_diverges` (`LeanPaperASurrogateV1`): Jensen on the square-root exploration budget plus `kl2_ge_log` gives the quadratic in `log(1/α)` | the stopped change-of-measure at a hidden pair is an input (`hchange`); supplying it for the concrete policy is what separates this from an algorithm-level claim. The swap panel (`paperA_swap.json`) measures the mechanism |
+| **A6′** tracking an exact surrogate optimum, `Ω(log²(1/δ))` | **LEAN (2026-09-24), oracle-allocation** | `surrogate_optimum_cost`, `surrogate_vs_ideal`, `starved_cost_log_sq`, `starved_lower_at`, `klq_pair`, `surrogate_optimum_exists`, `uniform_surrogate_cost` (`LeanPaperA6SurrogateCostV1`); `fCount_le_amgm` (`LeanPaperA6FixedDesignV1`); `cnt_eq_at_min` (`LeanPaperA7StoppedGenV1`). `E τ_δ ≥ (KM/8)² log²(1/δ)` for the DEFINED learner (warm start, `1/√(s+1)` forcing, `argmax(s w⋆ − N)`, true GLR stop), for EVERY exact frozen optimum `w⋆`; ratio to the ideal learner unbounded | the design is the surrogate optimum AT THE TRUE WORLD, fixed: the true extrema enter the allocation. A learner recomputing the surrogate at its estimate is still open (the A6 row above, cumulative-exploration route) |
 | **A7-II** the IDEAL learner, end to end: exact rate `1/Γ_actual` on the family | **LEAN** (2026-09-24; smoke gate `smokeA_20260924_ideal` PASS, 54 modules) | `ideal_family_finish` (`LeanPaperA7IdealFamilyV1`): `OperationalFinish streamMeasure (δ ↦ tauI famSpec a δ θC) (actualKLGame r M)` with NO hypothesis beyond `M>0`, `r>0`, `a>0`. Upper: `ideal_expect_bound`/`ideal_upper_rate`/`ideal_finite` (`LeanPaperA7IdealUpperV1`) from `ideal_direct` (`LeanPaperA7IdealDirect2V1`, box-free accumulation on the good window), `good_window_real` (Ville at the learner's own statistic, `s^{-4}`) and `expect_le`. Lower: the stopped learner on `Cell ⊕ Unit` (`LeanPaperA7IdealStoppedV1`: `runS_eq` pathwise coupling, `cnt_le_tau`, `ansEv_alt_le`, `ansEv_true_ge`) + `stream_eq_hist_fresh` + `family_policy_lower` at level `2δ`, horizon by Markov (`ideal_family_lower`, `lower_rate_of_bound`). `GamT_fam`: the learner's game IS `actualKLGame`. Correctness: `ideal_correct`/`ideal_family_correct` | **Scope.** The learner is IDEAL (reviewer spec §A.5 "exact asymptotic theorem"): its oracle maximises the exact value `J` over a refining ε-net (mesh `1/(s+1)`) and its stop is the exact GLR infimum, so `ν_t = 0` by construction. It is not the shipped learner: `EXP_paperA7_learner.py` (1e-6 floor, 80-iteration cap) is Theorem I's finite-precision algorithm and its rate stays conditional. No numerical artifact was produced by this learner |
 | A panel, per `α`, common random numbers | **NUM** | `paperA7_learner.json`, 22/22 checks, hash-matched | — |
 | A-F1 + A-F2: the centred separation interval and the allocation mechanism | **NUM + THEOREM, drawn 2026-09-24** | `paperA_mechanism.pdf` (`FIG_paperA_mechanism.py`, 7/7, from `paperA_mechanism.json` only; nothing re-solved). Interval: attained float LOWER certificate up to the theorem's upper bound; at `r=8` it lies below 1 | **scope, from the audit** (`paperA_mechanism.PROVENANCE_NOTE.md` addendum): the stop certifies answer A only, so these runs are an allocation diagnostic under one certificate, not δ-correct learners. A numerical UPPER bound for `Γ_true` (a model-aware producer with centring) is not built |

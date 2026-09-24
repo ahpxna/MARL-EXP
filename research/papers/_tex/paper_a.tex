@@ -47,10 +47,13 @@ levels, a regional KKT certificate and a dual over the whole query set, so ``opt
 never shorthand for ``optimal within the family we searched''; and a learner that stops under
 a certificate which is a weak-duality \emph{lower} bound, never a primal value.
 
-We state what we do not prove. This is a separation of the information game and of the design
-the surrogate selects; it is \emph{not} a separation of sample complexity, which would need a
-cumulative-exploration count bound whose oracle-error term is the surrogate oracle's, not the
-true oracle's. The measured panel is reported per confidence level under common random
+The separation reaches sample complexity for the design itself. The learner that tracks an
+exact surrogate optimum, with forced exploration at rate $1/\sqrt{s+1}$ and the true
+likelihood-ratio stop, pays $\Omega(\log^{2}(1/\delta))$ samples, while the ideal learner,
+defined and proved here, pays $\Theta(\log(1/\delta))$. That design is the surrogate's optimum
+at the true world, so this is an oracle-allocation statement. For a learner that recomputes
+the surrogate at its estimate, the separation would need a cumulative-exploration count bound
+whose oracle-error term is the surrogate oracle's, and we do not prove it. The measured panel is reported per confidence level under common random
 numbers, and supports the implementation, not the asymptotics.
 \end{abstract}
 
@@ -1285,7 +1288,9 @@ bound.
 \NOTEPAR{This is a statement about a learner with \emph{this} oracle, \emph{this} exploration
 rate and \emph{this} tracker. It is not a statement about every method that uses a surrogate,
 and the change-of-measure input is exactly what must be supplied for the concrete policy
-before it becomes an algorithm-level claim.}
+before it becomes an algorithm-level claim. For the learner that tracks an exact surrogate optimum \emph{fixed at the true world}, both
+inputs are now supplied; see the paragraph ``What tracking the surrogate's optimum costs''
+below.}
 
 \leanbox{\lean{surrogate\_cost\_quadratic}, \lean{kl\_at\_correctness},
 \lean{surrogate\_omega\_log\_squared}, \lean{separation\_diverges} in
@@ -1424,6 +1429,47 @@ proved at $\theta_{C}$ only.}
 \lean{ideal\_correct} in \lean{LeanPaperA7IdealUpperV1}; \lean{ideal\_direct} in
 \lean{LeanPaperA7IdealDirect2V1}; \lean{runS\_eq}, \lean{cnt\_le\_tau},
 \lean{ansEv\_alt\_le}, \lean{ansEv\_true\_ge} in \lean{LeanPaperA7IdealStoppedV1}}
+
+\paragraph{What tracking the surrogate's optimum costs.}
+Take any exact optimum $w^{\star}$ of the frozen surrogate game on the family. By the
+starvation theorem it puts zero weight on every middle cell, and one exists (the uniform
+design on the anchors). Run the learner that tracks it: the same warm start and forcing
+$\rho_{s}=1/\sqrt{s+1}$ as the ideal learner, the query
+$\arg\max_{e}(s\,w^{\star}_{e}-N_{e})$, and the same GLR stop at level $\delta$ against the
+TRUE alternatives. This learner is defined, and its $\tau_{\delta}$ is the hitting time of
+that stop. With $K=4+2r$ cells,
+\[
+\mathbb{E}\,\tau_{\delta}\ \ge\ \Bigl(\frac{KM}{8}\Bigr)^{2}\log^{2}(1/\delta)
+\qquad\text{for all }\delta<\delta_{0},
+\]
+against $O(\log(1/\delta))$ for the ideal learner on the same family, so for every $B$ the
+surrogate-tracking cost eventually exceeds $B$ times the ideal cost. The proof takes three
+steps, each proved. First, the world that moves one middle pair apart by $1$ is a strict
+alternative, and only that pair's queries separate it from $\theta_{C}$, each carrying
+divergence $1/(2M)$. Second, forcing is the only source of those queries, so along every
+path the pair's count up to $\min(n,\tau_{\delta})$ is at most
+$4+2(\tau_{\delta}/s+s)/K$ for every $s>0$; the stopped run's counts equal the unstopped
+run's at $\min(n,\tau_{\delta})$, cell by cell. Third, the stopped change of measure at level
+$2\delta$, with the horizon chosen by Markov, gives
+$\mathbb{E}N_{\rm pair}/(2M)\ge(1-2\delta)\log(1/(2\delta))-\log2$. Taking
+$s=\sqrt{\mathbb{E}\tau_{\delta}}+1$ turns $\sqrt{\mathbb{E}\tau_{\delta}}\gtrsim\log(1/\delta)$
+into the square.
+
+\NOTEPAR{Scope: an ORACLE-ALLOCATION result. The tracked design is the surrogate's optimum
+AT THE TRUE WORLD, held fixed. The true extrema choose which cells starve, so the true
+parameter enters the allocation. This is a statement about the design the surrogate selects,
+paid for in samples. It is not yet a statement about a learner that recomputes the surrogate
+at its estimate. For that learner the cumulative-exploration route above, with its named
+inputs, is still the only one, and it is not closed. The stop is the true-alternative GLR, so
+the cost measured is the design's, not a weaker stopping rule's. The bound holds whether or
+not $\mathbb{E}\tau_{\delta}$ is finite.}
+
+\leanbox{\lean{klq\_pair}, \lean{starved\_lower\_at}, \lean{starved\_cost\_log\_sq},
+\lean{surrogate\_optimum\_cost}, \lean{surrogate\_optimum\_exists},
+\lean{uniform\_surrogate\_cost}, \lean{surrogate\_vs\_ideal} in
+\lean{LeanPaperA6SurrogateCostV1}; \lean{fCount\_le\_amgm}, \lean{fCount\_le\_sqrt} in
+\lean{LeanPaperA6FixedDesignV1}; \lean{cnt\_eq\_at\_min}, \lean{ansEv\_alt\_leG},
+\lean{ansEv\_true\_geG} in \lean{LeanPaperA7StoppedGenV1}}
 
 \section{Evidence}
 \label{sec:evidence}

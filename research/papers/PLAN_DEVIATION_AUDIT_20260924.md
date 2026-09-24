@@ -112,3 +112,10 @@ import.
 6. **Cần quyết định trước khi chạy tính toán mới**: A-1(b), A-6, A-8, B-1, P-1, P-2.
 7. **Nâng cấp**: A6 / P-6 (đang làm); P-7 (tùy chọn).
 8. **Novelty**: X-4, giao researcher theo `novelty_briefs_20260924/`.
+
+## Cập nhật 2026-09-24, chiều
+
+| # | Trạng thái mới | Việc đã làm | Còn lại |
+|---|---|---|---|
+| A-10 / P-6 | **ĐÓNG MỘT PHẦN (oracle-allocation)** | `LeanPaperA6SurrogateCostV1`: learner bám một optimum chính xác bất kỳ của surrogate đóng băng (warm start, forcing `1/√(s+1)`, `argmax(s w⋆ − N)`, GLR stop thật) có `E τ_δ ≥ (KM/8)² log²(1/δ)`; learner lý tưởng `O(log(1/δ))`; tỉ số không bị chặn (`surrogate_vs_ideal`). Giả thiết thỏa được (`surrogate_optimum_exists`, `wUnifC`). Abstract A và đoạn mới trong paper A đã sửa, ghi rõ phạm vi. | Design là optimum của surrogate **tại world thật** (true extrema vào allocation). Learner tính lại surrogate tại ước lượng vẫn chưa có. |
+| X-2 | **ĐÓNG cho full3** | Bảng hash theo headline trong `THEOREM_MAP.md` ("Proof hashes"), lấy từ `report/MODULES.tsv` của `full3_20260924_ideal` (VERIFY PASS, 188 module, 1505 định lý). | Hash của 3 module A6 lấy từ smoke gate `smokeA6_20260924`. |

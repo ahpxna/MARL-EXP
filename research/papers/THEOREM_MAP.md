@@ -21,12 +21,14 @@ Those are the three places this table is for.
 The rows further down are kept as the record of how each claim was reached, including their
 retractions. Where a row below says "open", "owed" or "conditional" and a row here names a
 final theorem, this row is current. Gate: smoke `smokeA_20260924_ideal` PASS (54 modules;
-the closure of `LeanPaperA7IdealFamilyV1`); full gate `full3_20260924_ideal` (188 modules)
-running at the time of writing.
+the closure of `LeanPaperA7IdealFamilyV1`); full gate `full3_20260924_ideal` PASS
+(188 modules, 1505 audited theorems, standard axioms; proof hashes in its `report/MODULES.tsv`).
+The A-H5′ modules postdate that freeze: smoke gate `smokeA6_20260924`.
 
 | # | Status | Headline, on the paper's own object | Final theorem (module) | Hypotheses left | Scope that must travel with it |
 |---|---|---|---|---|---|
 | A-H4′ | **headline, for the IDEAL learner** | The defined learner attains the exact rate: `E τ_δ / log(1/δ) → 1/Γ_actual`, `E τ_δ < ∞` at every `δ`; wrong answer w.p. `≤ δ` | `ideal_family_finish`, `ideal_family_correct`, `GamT_fam` (`LeanPaperA7IdealFamilyV1`); `ideal_upper_rate`, `ideal_finite`, `ideal_correct` (`LeanPaperA7IdealUpperV1`); `ideal_direct` (`LeanPaperA7IdealDirect2V1`); lower via `runS_eq`, `cnt_le_tau`, `ansEv_alt_le`, `ansEv_true_ge` (`LeanPaperA7IdealStoppedV1`) + `stream_eq_hist_fresh` + `family_policy_lower` | `M>0`, `r>0`, `a>0` only | IDEAL: exact `J` over a refining net, exact GLR infimum (`ν_t = 0`). NOT `EXP_paperA7_learner.py`; the shipped learner stays under A-H4 (conditional). Rate and finiteness at `θ_C`; correctness at every world with one correct answer. No numerical artifact comes from this learner |
+| A-H5′ | **headline, ORACLE-ALLOCATION** | Tracking any exact optimum of the frozen surrogate costs `E τ_δ ≥ (KM/8)² log²(1/δ)` (`K = 4+2r`), against `O(log(1/δ))` for the ideal learner; the ratio is unbounded | `surrogate_optimum_cost`, `surrogate_vs_ideal`, `starved_cost_log_sq`, `starved_lower_at`, `klq_pair`, `surrogate_optimum_exists`, `uniform_surrogate_cost` (`LeanPaperA6SurrogateCostV1`); `fCount_le_amgm` (`LeanPaperA6FixedDesignV1`); `cnt_eq_at_min`, `ansEv_alt_leG`, `ansEv_true_geG` (`LeanPaperA7StoppedGenV1`) | `M>0`, `a>0`, `r>0`; `w⋆` an allocation with `frozenValueC₀ M w⋆ = frozenGameC₀ r M` (satisfiable: `surrogate_optimum_exists`) | the tracked design is the surrogate optimum AT THE TRUE WORLD, held fixed (true extrema enter the allocation). Supersedes A-H5's two remaining inputs FOR THIS LEARNER ONLY; a learner recomputing the surrogate at its estimate is not covered. Stop = true-alternative GLR. No numerical artifact |
 | A-F | **NUM + theorem** | Centred separation interval and allocation mechanism | `paperA_mechanism.pdf` (`FIG_paperA_mechanism.py`, 7/7) | — | the runs certify answer A only: allocation diagnostic under one certificate, not a learner (`paperA_mechanism.PROVENANCE_NOTE.md`, addendum) |
 | B-H5 | **headline, on the parity channel** | Both minimax rates on ONE channel: `Θ(log(1/δ)/h²)` safe, `Θ(log(1/δ)/h^{2(m−1)})` identification, uniform on a rectangle | `parity_tip_finish`, `parity_rates`, `safeCert`, `idCert` (`LeanPaperBParityFinishV1`); `safeLower`, `idLower` (`LeanPaperBParityExperimentV1`); `transcript_kl_le` (`LeanPaperBProtocolV1`) | `m≥3`, `σ>0` | randomised adaptive policies with a FINITE horizon (bounded stopping). Supersedes B-H3's "continuous alphabet open" and B-H4's "upper side in δ" for this channel; the `F_{u,v}` family's adaptive Gaussian instantiation is still open |
 | B-D | **provenance** | Decoder counts vs the formalized decoder | `lean_wrong_imp_py_wrong` (`LeanPaperBDecoderMatchV1`) | — | identification counts are a CONSERVATIVE UPPER bound on the formalized decoder's error, not a measurement of it (`paperB_decoder.PROVENANCE_NOTE.md`) |
@@ -35,6 +37,33 @@ running at the time of writing.
 | C-H3′ | **headline** | The ranking program and the four-type flow program have the SAME value, all bands carried | `actual_banded_infima` (`LeanPaperCFlowBandJoinV1`); `value_eq_flow`, `even_frontier_flow`, `odd_breakpoint_flow` (`LeanPaperCFlowObjectiveV1`) | — | a statement about the VALUE on `g_m`, not an algorithm for perturbed weights. Supersedes C-H3's "nothing in the gated corpus proves it" |
 | C-H4′ | **headline** | The physical optimum is the paper's value, and moves at most `3‖g−g'‖₁/d` | `familyBaselineIdentification_holds` (`LeanPaperCBaselineAttainV1`); `trueValue_family`, `family_value_robust`, `even_frontier_robust` (`LeanPaperCStabilityFamilyV1`); `trueValue_stable` (`LeanPaperCStabilityEndgameV1`) | `0 < d ≤ min(‖g_m‖₁, ‖g'‖₁)` | moving normaliser, recomputed baseline, per-item bands, feasible set fixed. An envelope; the collapse scale is a separate result (C-H4) |
 | C-F | **NUM + theorem** | C-F1 price/phase boundary, C-F2 stability | `paperC_price_boundary.pdf`, `paperC_stability.pdf` (`FIG_paperC_endpoints.py`, 10/10) | — | all 220 stored perturbations under the Lean envelope (worst 0.32); the robustness check name "floor is LOOSE" over-claims (`paperC_robustness.AUDIT_NOTE.md`) |
+
+
+### Proof hashes (gate `full3_20260924_ideal`, VERIFY PASS)
+
+sha256 of the frozen source and of the built `.olean`, first 16 hex digits; full digests in
+`work/gate_runs/full3_20260924_ideal/report/MODULES.tsv`. Every row: exit 0, no `sorryAx`.
+`LeanPaperCCollapseV1` drifted after the freeze (docstring only).
+
+| headline | module | source sha256 | olean sha256 |
+|---|---|---|---|
+| A-H4′ | `LeanPaperA7IdealFamilyV1` | `3fbfcaf2442b4c65` | `d294a0ea0c638ba6` |
+| A-H4′ | `LeanPaperA7IdealUpperV1` | `9b6509cc25a8a48e` | `ef016e840de64e88` |
+| A-H4′ | `LeanPaperA7IdealDirect2V1` | `8c3c7d862b227b33` | `c9fe1d471aefadbf` |
+| A-H4′ | `LeanPaperA7IdealStoppedV1` | `985ebb0d1069e499` | `36583be2877b477b` |
+| B-H5 | `LeanPaperBParityFinishV1` | `40365d730c496280` | `117343893e7c9d70` |
+| B-H5 | `LeanPaperBParityExperimentV1` | `084d825980f1485b` | `5ec896a1ec18145e` |
+| B-H5 | `LeanPaperBProtocolV1` | `61be5805df327c9e` | `85c59cd47b0d3ab4` |
+| B-D | `LeanPaperBDecoderMatchV1` | `e894a6f4d5df265b` | `c329af1af4feb237` |
+| C-H1′, C-H2′ | `LeanPaperCEndgameV1` | `5be5872c8c1cad0f` | `8e3d423d31531396` |
+| C-H1′, C-H2′ | `LeanPaperCEndpointLawV1` | `6e78d930ae3f89d9` | `1dd5320f4685106f` |
+| C-H3′ | `LeanPaperCFlowBandJoinV1` | `89f63f3431e672f4` | `1b63b5924d55d9d7` |
+| C-H3′ | `LeanPaperCFlowObjectiveV1` | `f5abebde8617fb50` | `26bc81a4d99d2ffb` |
+| C-H4′ | `LeanPaperCBaselineAttainV1` | `c3963a0ccfaf92ca` | `946c94fb13b5cef3` |
+| C-H4′ | `LeanPaperCStabilityFamilyV1` | `8f75b915d14a5b7e` | `346faa4c356eef8d` |
+| C-H4′ | `LeanPaperCStabilityEndgameV1` | `32de317c9e4b7c31` | `54cd079834bc1562` |
+| C-H4 (floor) | `LeanPaperCCollapseV1` | `c564c0a13b53738c` | `c97488472d41df0d` |
+| A-H5′ | the three A6 modules | not in this freeze | see smoke gate `smokeA6_20260924` |
 
 ---
 
