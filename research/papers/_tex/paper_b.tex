@@ -11,36 +11,31 @@ Lawrenceville, NJ, USA}}
 \maketitle
 
 \begin{abstract}
-A learner that must choose a compression does not have to identify the world it is in. It
-only has to separate worlds far enough that no surviving set of them disagrees on every
-answer. We turn that into a rate law and prove it.
-
-Call a set of worlds with no common safe answer an \emph{obstruction}. For a finite world
-set, take any safe-answer correspondence and any channel whose queries carry at most
-$\kappa(w,w')$ nats between two worlds. The cost of a safe decision is then governed by one
-number: $t^{*}$, the minimum over obstructions of the largest information among their pairs.
-Every finite-horizon policy that answers safely with probability $1-\delta$ spends, at some
-world, at least $\bigl(\frac{1-\delta}{|W|-1}\log\frac1\delta-\log2\bigr)/t^{*}$ queries in
-expectation, and every policy that stops almost surely obeys the same bound at level
-$2\delta$. On every channel, a tournament of block likelihood-ratio tests attains
-$O(|W|^{2}\log(|W|/\delta)/t^{*}_{H})$, where $t^{*}_{H}$ is the same obstruction value computed
-with the Hellinger information. The two sides match, up to factors that depend only on $|W|$,
-whenever the two informations are comparable.
-
-On a graded channel, with $\kappa\asymp h^{2\,\mathrm{sep}}$, this becomes an \emph{order law}:
-$t^{*}=Ch^{2s^{*}}$. Here $s^{*}$ is the least order at which every set of worlds the observer
-still confuses has a common safe answer, that is, the maximum over obstructions of their
-minimum separation order. Identification is the special case of singleton answer sets, and its
-order is the maximum separation.
-
-On two channels the law is tight, and both rates are theorems against every randomised adaptive
-policy that stops almost surely. On the parity-mask channel with $m$ worlds the safe decision
-costs $\Theta(\log(1/\delta)/h^{2})$ and identification $\Theta(\log(1/\delta)/h^{2(m-1)})$. On a
-family with a latent world, observed through every finite family of linear probes, they cost
-$\Theta(\log(1/\delta)/h^{2})$ and $\Theta(\log(1/\delta)/h^{2r})$, and the query class itself
-decides the order. On both channels the lower and the upper side of every rate are instances of
-the general law, because a feature gap forces Hellinger information. All theorems are
-machine-checked in Lean~4.
+A noisy compression decision may require less information than identification of the world.
+We quantify this gap by combining acceptable-answer geometry with the information supplied
+by admissible queries. An obstruction is a set of worlds with no common safe answer.
+For finite worlds and queries with positive real observation densities, the smallest
+best-pair information over obstructions gives an adaptive lower bound on the number of paid
+queries. Its Hellinger counterpart gives a constructive upper bound: likelihood-ratio tests
+that share a sample block whenever they use the same query need at most
+$|Q|\lceil\log(|W|/\delta)/t_H^*\rceil$ rounds.
+The bounds identify the signal exponent when the two informations are comparable and the
+world and query sets are fixed. We also show why the query factor cannot in general be
+removed, and strengthen the lower bound under a likelihood-ratio second-moment condition.
+On a graded channel, the sufficient observation order is the largest, over obstructions, of
+their smallest pairwise separation order. This yields matching safe-decision and identification
+rates on the same continuous noisy experiment: $\Theta(h^{-2}\log(1/\delta))$ and
+$\Theta(h^{-2(m-1)}\log(1/\delta))$ on a parity-mask family with $m$ worlds.
+A second latent family gives orders $1$ and $r$: lower bounds hold uniformly over every
+finite menu of admissible linear probes, and explicit decision and tail probes attain them.
+The lower bounds include randomised adaptive policies with almost-surely finite stopping.
+The characteristic game has two layers: the obstruction order fixes its exponent, and a finite
+critical game on the leading coefficients fixes its constant, which two channels of the same
+order show can differ by the menu size. Choosing a menu of queries to reach a target order is
+exactly an order-thresholded hitting-set problem, and NP-hard.
+The contribution is the link from a query-induced information hierarchy to the order needed
+for a common valid action. Lean~4 proofs accompany the core results; finite-budget decoder
+experiments are reported separately from minimax rate claims.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -71,17 +66,21 @@ worlds decides the order.
 \begin{enumerate}
 \item[1)] \textbf{The obstruction law} (Theorems~\ref{thm:lower}, \ref{thm:upper},
 \ref{thm:hellupper}). For every
-finite world set, safe-answer correspondence and channel, the minimax cost is governed by
-$t^{*}$, the minimum over obstructions of the largest per-query information among their pairs.
+finite world set, nonempty safe-answer correspondence and channel in the density model
+specified below, the obstruction value $t^{*}$ gives a lower bound on minimax cost.
+It is the minimum over obstructions of the largest per-query information among their pairs.
 The lower bound $\Omega(\log(1/\delta)/t^{*})$ holds for every channel and every policy that
 stops almost surely (Theorem~\ref{thm:lowerstop}). A
-tournament attains $O(|W|^{2}\log(|W|/\delta)/t^{*}_{H})$ on every channel, with $t^{*}_{H}$ the
-obstruction value of the Hellinger information (Theorem~\ref{thm:hellupper}). The two match,
-up to factors in $|W|$, when the informations are comparable. On both channels of this paper they do, so all four
+tournament attains $O(\min\{|Q|,|W|^{2}\}\log(|W|/\delta)/t^{*}_{H})$, with $t^{*}_{H}$ the
+obstruction value of the Hellinger information (Theorems~\ref{thm:hellupper},
+\ref{thm:sharedtests}). The two match in signal and error exponents for fixed $W,Q$ when the
+informations are comparable; a private-query construction shows why cardinality factors
+cannot simply be suppressed (Proposition~\ref{prop:privatequery}). On both channels of this paper they do, so all four
 rates below follow from the law on both sides (Theorem~\ref{thm:tight}).
 \item[2)] \textbf{The order law} (Theorem~\ref{thm:order}). On a graded channel $t^{*}=Ch^{2s^{*}}$,
-with $s^{*}$ the least safe order. For overlapping safe sets, $s^{*}$ is the minimum
-separation order. For identification it is the maximum.
+with $s^{*}$ the least safe order. For the particular overlapping correspondence
+$\mathrm{safe}(w)=W\setminus\{w\}$ it is the minimum separation order; arbitrary overlapping
+correspondences require the full obstruction formula. For identification it is the maximum.
 \item[3)] \textbf{Both rates on the parity channel} (Theorems~\ref{thm:endpoint},
 \ref{thm:parlaw}, \ref{thm:tight}). $\Theta(\log(1/\delta)/h^{2})$ for the safe decision and
 $\Theta(\log(1/\delta)/h^{2(m-1)})$ for identification, against every randomised adaptive policy
@@ -96,6 +95,15 @@ the linear class, and both rates, $\Theta(\log(1/\delta)/h^{2})$ and
 $\Theta(\log(1/\delta)/h^{2r})$, are theorems against every almost-surely stopping policy. A
 degree-capped class breaks the uniform bound, and one parameter of nonlinearity moves the order
 from $h^{6}$ to $h^{4}$.
+\item[5)] \textbf{Two layers of the characteristic game} (Proposition~\ref{prop:dorder},
+Theorem~\ref{thm:critical}, Proposition~\ref{prop:sameorder}). At a world the Degenne--Koolen
+value has the order of the world's decision order, and the hardest world has order $s^*$. After
+rescaling by $h^{-2s}$ the game converges to a finite critical game $G^*$ on the terms at the
+critical order. Two channels with the same order at every alternative have constants $1$ and
+$1/k$. So $s^*$ fixes the exponent and not the constant.
+\item[6)] \textbf{Query design} (Theorems~\ref{thm:hitting}, \ref{thm:hittingembed}). A menu reaches
+decision order $s$ exactly when it hits every obstruction with a query of order at most $s$.
+Every hitting-set instance is such a design problem, so minimum-cost design is NP-hard.
 \end{enumerate}
 
 \subsection{Prior work, and what does not follow from it}
@@ -129,13 +137,13 @@ bound at every $\delta$ and $h$ jointly, which the order law needs, the matching
 every channel, and the order of $t^{*}$.
 
 \begin{table}[h]
-\caption{Nearest sources, and a theorem of this paper that does not follow from each.}
+\caption{Closest research threads and the specific quantitative results compared here.}
 \label{tab:prior}
 \centering
 \footnotesize
 \begin{tabular}{@{}p{0.30\columnwidth}p{0.62\columnwidth}@{}}
 \toprule
-Nearest source & Theorem here that does not follow \\
+Nearest source & Specific result compared here \\
 \midrule
 Overlapping decision regions~\cite{javdani2014} & The lower law $\Omega(\log(1/\delta)/t^{*})$
 for every correspondence and channel, the upper law $O(|W|^{2}\log(|W|/\delta)/t^{*}_{H})$ on every
@@ -146,6 +154,11 @@ query-free constant (Thms.~\ref{thm:endpoint}, \ref{thm:unif}) \\
 Multiple-answer games~\cite{degenne2019,wangyou2026} & The lower bound at every $\delta$ and
 $h$ jointly, with the hard pair chosen from the policy's own output; its $\delta\to0$ limit
 follows from theirs (Thm.~\ref{thm:lower}) \\
+Characteristic time~\cite{degenne2019} & Its exponent at a world and at the hardest world, the
+limit $h^{-2s}D_h\to G^*$, and two channels of one order with constants $k$ apart
+(Prop.~\ref{prop:dorder}, Thm.~\ref{thm:critical}, Prop.~\ref{prop:sameorder}) \\
+Hyperedge cutting~\cite{javdani2014} & Static menus that reach a target order: exact hitting
+condition and a hitting-set embedding (Thms.~\ref{thm:hitting}, \ref{thm:hittingembed}) \\
 Tournaments and moduli~\cite{lecam1973,birge1983,donoho1991} & The obstruction value of a
 safe-answer correspondence, and its order on a graded channel (Thms.~\ref{thm:hellupper},
 \ref{thm:order}) \\
@@ -165,18 +178,19 @@ Three evidence classes appear, and they are never interchanged.
 \item \NUM: a floating-point or Monte Carlo result.
 \end{itemize}
 Each theorem carries one line naming its declaration. The supplement gives the proof
-architecture and every supporting declaration. All modules compile with no \texttt{sorry} and no
-\texttt{native\_decide}, and their axioms lie within \{\texttt{propext}, \texttt{Classical.choice},
-\texttt{Quot.sound}\}. A policy's \emph{cost} is its expected number of informative, that is
-non-dummy, queries. A dummy query has the same law in every world. The cost equals
-$\mathbb{E}\tau$ for a policy that issues no dummy before it stops, which every decoder here
-satisfies.
+architecture and every supporting declaration. Audited modules use no \texttt{sorry} or
+\texttt{native\_decide}, and their printed axioms lie within \{\texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound}\}. A policy's \emph{cost} is its expected
+number of paid, non-dummy queries. The dummy has the same law in every world; a non-dummy
+query need not distinguish every pair. Cost equals $\mathbb{E}\tau$ if no dummy is issued
+before stopping. Fixed schedules that also include a dummy block have no greater paid cost
+than their displayed horizon.
 
 \section{Safe-decision geometry and obstructions}
 \label{sec:geometry}
 
-Let $W$ be a finite set of worlds, $A$ a finite set of answers and
-$\mathrm{safe}:W\to 2^{A}$ the safe answers. $H\subseteq W$ is an obstruction when no answer is
+Let $W$ be a finite nonempty set of worlds, $A$ a finite set of answers and
+$\mathrm{safe}:W\to 2^{A}$ the nonempty safe answers at each world. $H\subseteq W$ is an obstruction when no answer is
 safe for all of $H$. Let $\mathrm{sep}(w,w')$ be the least order at which some admissible query
 separates two distinct worlds. A set is \emph{together at order $s$} when no pair in it is
 separated by order $s$.
@@ -189,6 +203,7 @@ order is
 \[
 s^{*}=\max_{H\ \text{obstruction}}\ \min_{w\ne w'\in H}\mathrm{sep}(w,w').
 \]
+The maximum formula assumes that an obstruction exists; otherwise order zero suffices.
 When $\mathrm{sep}$ is read off a separation predicate on queries, the law is a statement about
 queries.
 \end{theorem}
@@ -200,7 +215,7 @@ queries.
 Quantifying over all obstructions rather than minimal ones is not a weakening, because
 obstructions are upward closed. If no obstruction exists, order $0$ suffices and the decision
 costs nothing. Two cases matter below. For \emph{overlapping} safe sets,
-$\mathrm{safe}(w)=A\setminus\{w\}$ with $A=W$, every two safe sets meet, the whole world set is
+$\mathrm{safe}(w)=A\setminus\{w\}$ with $A=W$ and $|W|\ge3$, every two safe sets meet, the whole world set is
 the only obstruction, and $s^{*}=\min\mathrm{sep}$. For \emph{identification},
 $\mathrm{safe}(w)=\{w\}$, every pair is an obstruction and $s^{*}=\max\mathrm{sep}$.
 
@@ -218,8 +233,15 @@ when $a=w$, so the safe answers at tolerance $0$ are all $a\ne w$.
 \section{The obstruction law}
 \label{sec:law}
 
-Fix a channel: for each world and query a density, and one dummy query with the same law in
-every world. Let $\kappa(w,w')\ge0$ bound the per-query divergence between two worlds. The
+Fix finite nonempty sets of worlds and queries. A channel assigns to each $(w,q)$ a
+strictly positive measurable density $p_{w,q}$ on $\mathbb R$, with integral one relative
+to Lebesgue measure, and a dummy query whose density is independent of $w$.
+A randomised adaptive policy chooses its next query by a Markov kernel from the observed
+history; outputs and stopping events are measurable. These are the objects implemented by
+\lean{Channel} and \lean{Policy} in \lean{LeanPaperBProtocolV1}.
+Throughout, ``every channel'' means this density model, not arbitrary singular experiments.
+Unless stated otherwise $0<\delta<1/2$. Let $\kappa(w,w')\ge0$ bound the per-query divergence
+between two distinct worlds. The
 \emph{obstruction information} is
 \[
 t^{*}=\min_{H\ \text{obstruction}}\ \max_{w\ne w'\in H}\kappa(w,w').
@@ -279,6 +301,71 @@ has stopped with probability at least $1-\delta$, the truncation answers what th
 at its first stopping time. It is therefore correct at level $2\delta$, and
 Theorem~\ref{thm:lower} applies to it. Its cost is at most the unbounded cost.
 
+\begin{proposition}[With KL alone the factor is necessary]
+\label{prop:certchannel}
+Let $k\ge2$ and $\delta\le1/k$. Take worlds and answers $\mathrm{Fin}\,k$, where answer $a$ reads
+``not $a$''; then $\mathrm{Fin}\,k$ is an obstruction. One query returns a real observation
+whose region is a symbol $s$. The symbol has law $P_w(s=w)=\delta$ and
+$P_w(s=v)=(1-\delta)/(k-1)$ for $v\ne w$. Within a region the observation is the same restricted
+Gaussian in every world. The one-query policy ``answer the region'' is $\delta$-correct and pays
+one query. Every query carries at most $\log(1/((k-1)\delta))/(k-1)$ nats between any two
+worlds. So the lower law of Theorem~\ref{thm:lower} is attained to first order, factor
+$1/(|W|-1)$ included.
+\end{proposition}
+\leanbox{\lean{cert\_error}, \lean{cert\_cost}, \lean{klq\_cert\_le}, \lean{cert\_tight} in
+\lean{LeanPaperBCertificateChannelV1}}
+
+\subsection{A sharper lower bound under a second-moment condition}
+The factor $1/(|H|-1)$ in the event-pigeonhole proof is not inevitable once a stronger
+quantity than KL is controlled; Proposition~\ref{prop:certchannel} shows it is inevitable for
+KL alone. It can be removed
+from the leading logarithm when a stronger per-query quantity is controlled. This is an
+additional assumption, not a consequence of a finite KL bound.
+
+\begin{proposition}[Likelihood-ratio budget on an obstruction]
+\label{prop:chistar}
+Let $H$ be an obstruction, $w\in H$, $|H|\ge2$, and $t>0$. Suppose every $u\in H\setminus\{w\}$
+and non-dummy query satisfy
+\begin{equation}
+\int\frac{p_{w,q}(y)^2}{p_{u,q}(y)}\,dy
+=1+\chi^2(p_{w,q},p_{u,q})\le e^t.
+\label{eq:m2budget}
+\end{equation}
+For any finite-horizon randomised adaptive policy that is $\delta$-correct at every world,
+and its random paid count $N$,
+\begin{equation}
+\Pr_w(Nt\le y)\le\delta+2(|H|-1)\sqrt{\delta e^y}.
+\label{eq:chitail}
+\end{equation}
+In particular, for $0<\gamma<(1-\delta)/2$ and
+$y_\gamma=\log(\gamma^2/((|H|-1)^2\delta))\ge0$,
+\begin{equation}
+t\mathbb E_w N\ge(1-\delta-2\gamma)y_\gamma.
+\label{eq:chiexpect}
+\end{equation}
+\end{proposition}
+\begin{proof}
+Write $L_u=dP_w/dP_u$ for the transcript likelihood ratio. The common policy kernels
+cancel, and~\eqref{eq:m2budget} gives
+$\mathbb E_w[L_u e^{-tN}]\le1$ by induction on the history. For an event $S$ unsafe at $u$,
+$P_u(S)\le\delta$. Splitting at $L_u=c>0$ gives
+\[
+P_w(S\cap\{Nt\le y\})\le c\delta+e^y/c.
+\]
+On $\{Nt\le y\}$, the answer is either unsafe at $w$ or unsafe at another member of $H$.
+Union bound over $H\setminus\{w\}$ and set $c=\sqrt{e^y/\delta}$ to
+obtain~\eqref{eq:chitail}. Finally $Nt\ge y_\gamma\mathbf1_{\{Nt>y_\gamma\}}$ and
+\eqref{eq:chitail} give~\eqref{eq:chiexpect}.
+\end{proof}
+\leanbox{\lean{hist\_density}, \lean{m2\_eq\_one\_add\_chi}, \lean{lintegral\_Z\_exp\_le},
+\lean{one\_alt\_bound}, \lean{chi\_star\_tail}, \lean{chi\_star\_expect},
+\lean{chi\_star\_satisfiable} in \lean{LeanPaperBChiStarV1}}
+For fixed $H$ the cardinality now enters inside a logarithm. This proposition is stated for
+finite horizons, as formalized; the earlier stopped KL law retains its own hypotheses and
+constants. A uniform $\chi^2\le a h^{2s}$ implies~\eqref{eq:m2budget} with $t=a h^{2s}$,
+since $1+x\le e^x$.
+
+\subsection{Constructive upper bounds and the cost of sharing queries}
 \begin{theorem}[The tournament]
 \label{thm:upper}
 Let every obstruction contain a pair with $\kappa\ge t$. Test every pair with $\kappa\ge t$ by
@@ -337,6 +424,54 @@ identification is resolved at $t=1-e^{-1/2}>0$.
 
 \leanbox{\lean{gChan\_bc}, \lean{hellinger\_tournament\_satisfiable} in
 \lean{LeanPaperBHellingerTestV1}}
+
+\begin{theorem}[Sharing observations between pair tests]
+\label{thm:sharedtests}
+In the setting of Theorem~\ref{thm:hellupper}, let $t>0$ resolve every obstruction under
+$\kappa_H$, and let $n=\lceil\log(|W|/\delta)/t\rceil$.
+There is a measurable $\delta$-correct tournament with horizon $|Q|n$ and paid cost at most
+$|Q|n$: take one block of $n$ observations for each query and let every tested pair use the
+block of its best query. Consequently at $t=t_H^*>0$ one can achieve
+\[
+\min\{|Q|,|W|^2\}\left\lceil\frac{\log(|W|/\delta)}{t_H^*}\right\rceil
+\]
+by choosing between this schedule and the pair-block schedule.
+\end{theorem}
+\begin{proof}
+Choose the best query once for each unordered pair, so opposite orientations read the same
+block. Break likelihood ties by one fixed ordering of worlds. The tests are antisymmetric,
+and each has error at most $e^{-n\kappa_H(w,v)}$ on its block, by the proof of
+Theorem~\ref{thm:hellupper}. Tests sharing a block are dependent, but no independence between
+tests is needed: a union bound over the truth's tests still gives error at most $\delta$.
+The survivor argument is unchanged. There are $|Q|$ blocks rather than $|W|^2$.
+\end{proof}
+\leanbox{\lean{qS\_symm}, \lean{beatS\_anti}, \lean{beatS\_error},
+\lean{share\_tournament}, \lean{share\_tournament\_satisfiable} in
+\lean{LeanPaperBShareTournamentV1}. The minimum of the two budgets is a direct corollary.}
+
+\begin{proposition}[The obstruction scalar does not encode the number of queries]
+\label{prop:privatequery}
+Take worlds $\{0,1,\ldots,k\}$ and queries $\{0,1,\ldots,k\}$, where query zero is dummy.
+Query $j\ne0$ has law $\mathcal N(h,1)$ in world $j$ and $\mathcal N(0,1)$ in every other
+world. Every distinct pair has best-query KL $h^2/2$ and best-query Hellinger information
+$1-e^{-h^2/8}$. Nevertheless every finite-horizon $\delta$-correct identification policy obeys
+\[
+\mathbb E_0N\,\frac{h^2}{2}\ge
+k\bigl((1-\delta)\log(1/\delta)-\log2\bigr).
+\]
+\end{proposition}
+\begin{proof}
+Against alternative world $j$, only query $j$ distinguishes the transcript from world zero.
+The event ``output zero'' therefore forces
+$\mathbb E_0N_j h^2/2\ge(1-\delta)\log(1/\delta)-\log2$. Sum over $j=1,\ldots,k$.
+The Gaussian KL and affinity formulas give the stated pairwise informations.
+\end{proof}
+\leanbox{\lean{klq\_pq}, \lean{private\_query\_lower}, \lean{bc\_pq}, \lean{pq\_resolves},
+\lean{private\_query\_satisfiable} in \lean{LeanPaperBPrivateQueryV1}}
+The obstruction value identifies the small-signal exponent, but loses the allocation burden
+across private queries. Thus the order law is uniform in signal and confidence for fixed
+finite sets; it is not a dimension-free characterization of sample complexity. This example
+requires a linear cardinality factor, not the quadratic factor of the original pair schedule.
 
 \begin{theorem}[The order law]
 \label{thm:order}
@@ -504,7 +639,9 @@ first at $u=-1$, whatever $v$ is.
 \label{thm:famrates}
 Fix $r\ge2$ and $\sigma>0$, and let $0<h\le1$ and $0<\delta\le1$. Consider every finite family of
 probes with $\|a_{H}\|_{1}+\|a_{T}\|_{1}\le1$, every finite-horizon randomised adaptive policy
-over it, and every measurable output.
+over it, and every measurable output. The lower bounds below apply to every such menu.
+The upper bounds apply to menus containing the decision probe $z_1$ for safe decoding,
+and both $z_1$ and the averaged tail probe for identification.
 \begin{enumerate}
 \item[(i)] If the output is safe with probability at least $1-\delta$ in every world, then at
 $u=v=+1$ the expected number of informative queries is at least
@@ -519,7 +656,7 @@ identifies within $2\bigl(16\log(4/\delta)/(G_{I}h^{r})^{2}+2\bigr)$ queries.
 \end{enumerate}
 Here $G_{\rm dec}=\frac32\sin3\cos^{2}2\cos1\,e^{-\sigma^{2}/2}$ and
 $G_{I}=\min\bigl(G_{\rm dec},\,|\cos3|\cos^{2}2\cdot2\sin1\,(3/(4r))^{r}e^{-\sigma^{2}/2}\bigr)$.
-So on the finite-horizon class the safe decision costs $\Theta(\log(1/\delta)/h^{2})$ and
+For menus containing those probes, on the finite-horizon class the safe decision costs $\Theta(\log(1/\delta)/h^{2})$ and
 identification $\Theta(\log(1/\delta)/h^{2r})$. Both lower bounds hold, at level $2\delta$, for
 every policy that stops almost surely, and each decoder, stopped at its horizon, is such a
 policy with the same cost.
@@ -596,6 +733,141 @@ Theorem~\ref{thm:famrates} is the pair that does match.
 
 \leanbox{\lean{budget\_lower}, \lean{safe\_upper}, \lean{sides\_do\_not\_match} in
 \lean{LeanPaperBHeadlineV1}}
+
+\section{The characteristic game in two layers}
+\label{sec:twolayer}
+
+The obstruction order $s^*$ fixes the exponent of the minimax cost. What does it add to the
+characteristic game of Degenne and Koolen~\cite{degenne2019}, and what does it miss? This
+section answers both questions on a graded channel. The exponent is read from the orders
+alone. The constant comes from a finite game on the critical terms.
+
+\paragraph{The per-world game} Let $\mathrm{sq}_q(u,v)\in\mathbb N$ be the order of query $q$ on
+the pair, $\mathrm{sep}(u,v)=\min_q\mathrm{sq}_q(u,v)$, and
+$c\,h^{2\mathrm{sq}_q(u,v)}\le\kappa_q(u,v)\le C\,h^{2\mathrm{sq}_q(u,v)}$ for $u\ne v$ and
+$0<h\le1$. The characteristic value at a world is
+\[
+D_h(w)=\max_{a\ \text{safe at}\ w}\ \max_{\alpha\in\Delta(Q)}\
+\min_{\lambda:\,a\ \text{unsafe at}\ \lambda}\ \sum_q\alpha_q\kappa_q(w,\lambda).
+\]
+The \emph{decision order} $d(w)$ is the least $s$ such that $w$ and the worlds it cannot tell
+apart up to order $s$, $\{\lambda:\mathrm{sep}(w,\lambda)>s\}$, share a safe answer.
+
+\begin{proposition}[The exponent at a world, and the hardest world]
+\label{prop:dorder}
+For every world, $\frac{c}{|Q|}h^{2d(w)}\le D_h(w)\le Ch^{2d(w)}$, where the upper side needs
+$d(w)\ge1$. Suppose the order is an ultrametric:
+$\mathrm{sep}(u,v)\ge\min\{\mathrm{sep}(u,x),\mathrm{sep}(x,v)\}$. Then for every $s\ge1$, some
+world has $d(w)\ge s$ exactly when some obstruction has all its pairs at order at least $s$. So
+$\max_wd(w)=s^*$.
+\end{proposition}
+\leanbox{\lean{decision\_upper}, \lean{decision\_lower}, \lean{order\_ge\_obstruction},
+\lean{obstruction\_of\_order}, \lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}}
+
+These are two statements. The per-world benchmark $D_h(w)$ has order $d(w)$. The minimax
+benchmark, set by the hardest world, has order $s^*$. The ultrametric property holds on the
+parity channel, where $\mathrm{sep}=\min(u,v)+1$.
+
+\paragraph{The critical game} Suppose each query has an exact expansion
+$\kappa_q(\lambda;h)=c_{q\lambda}h^{2\mathrm{sq}_{q\lambda}}+o(h^{2\mathrm{sq}_{q\lambda}})$,
+with $c_{q\lambda}>0$ or $\kappa_q(\lambda;\cdot)\equiv0$. Let $\mathrm{ord}(\lambda)$ be the
+least order of a query that sees $\lambda$, and $s=\max_\lambda\mathrm{ord}(\lambda)$ over the
+alternatives of an answer. The \emph{critical game} keeps only the alternatives of order
+exactly $s$ and the coefficients of the queries that see them at that order:
+\[
+G^*=\max_{\alpha\in\Delta(Q)}\ \min_{\mathrm{ord}(\lambda)=s}\
+\sum_{q:\,\mathrm{sq}_{q\lambda}=s}\alpha_q c_{q\lambda}.
+\]
+
+\begin{theorem}[The limit of the rescaled game]
+\label{thm:critical}
+As $h\to0^+$, the rescaled game of an answer converges:
+$h^{-2s}\max_\alpha\min_\lambda\sum_q\alpha_q\kappa_q(\lambda;h)\to G^*$.
+\begin{itemize}
+\item Alternatives of lower order are seen at a diverging rescaled rate by every allocation of
+full support.
+\item Queries of higher order vanish.
+\item With several safe answers, the rescaled decision value converges to the best critical
+game among the answers at the decision order, and answers at a higher order vanish.
+\end{itemize}
+The hypotheses of the limit are general: rescaled information converging on a critical set
+and diverging, on some query, off it.
+\end{theorem}
+\leanbox{\lean{critical\_limit}, \lean{expansion\_hyps}, \lean{decision\_limit} in
+\lean{LeanPaperBCriticalGameV1}}
+
+The lower side moves a near-optimal critical allocation toward uniform. The upper side is
+uniform in the allocation, since $\sum_q\alpha_q=1$. So $s^*$ answers \emph{which power} of
+$h$, and $G^*$ answers \emph{which constant}. The two-step reading resembles a tropical
+limit: exponents first, then leading coefficients. We use it as a proof device and claim no
+more.
+
+\begin{proposition}[The exponent does not fix the constant]
+\label{prop:sameorder}
+Take $k$ queries and $k$ alternatives, all at order $s$ with unit coefficient.
+\begin{itemize}
+\item \emph{Private}: $\kappa_q(\lambda;h)=h^{2s}[q=\lambda]$. The game is $h^{2s}/k$ for every
+$h>0$, and $G^*=1/k$.
+\item \emph{Shared}: $\kappa_q(\lambda;h)=h^{2s}$. The game is $h^{2s}$ and $G^*=1$.
+\end{itemize}
+Both have order $s$ at every alternative, and the shared game is $k$ times the private one at
+every $h$.
+\end{proposition}
+\leanbox{\lean{gval\_smul}, \lean{private\_game}, \lean{shared\_game}, \lean{same\_order\_ratio}
+in \lean{LeanPaperBCriticalGameV1}}
+
+So $s^*$ determines the exponent, not the characteristic complexity: two problems with the same
+$s^*$ can differ by the menu size. This turns Proposition~\ref{prop:privatequery} from a
+counterexample into the constant layer of the law.
+
+\section{Query design}
+\label{sec:design}
+
+Which sub-menu of queries reaches a target order, and at what cost? For a sub-menu $M$, write
+$\mathrm{sep}_M(u,v)=\min_{q\in M}\mathrm{sq}_q(u,v)$. The menu has decision order at most $s$
+when every obstruction contains a pair with $\mathrm{sep}_M\le s$. It has identification order
+at most $s$ when every distinct pair has $\mathrm{sep}_M\le s$.
+
+\begin{theorem}[Query design as hitting]
+\label{thm:hitting}
+\begin{itemize}
+\item The menu $M$ has decision order at most $s$ exactly when, for every obstruction $H$, it
+contains a query that separates some pair of $H$ at order at most $s$.
+\item Identification order at most $s$ implies decision order at most $s$.
+\item Adding queries never raises the decision order.
+\end{itemize}
+With one query and three worlds whose answers read ``not $w$'', the decision order is $1$ and
+the identification order is $5$.
+\end{theorem}
+\leanbox{\lean{dec\_hitting}, \lean{id\_implies\_dec}, \lean{dec\_mono}, \lean{gap\_example} in
+\lean{LeanPaperBDecisionOrderV1}}
+
+\begin{theorem}[Every hitting set is a design problem]
+\label{thm:hittingembed}
+Given queries $Q$ and sets $F_1,\dots,F_r\subseteq Q$ with $r\ge1$, build the following
+instance:
+\begin{itemize}
+\item a pair of twin worlds per set, each world's only safe answer being itself;
+\item twins separated at order $1$ by the queries of $F_i$ and at order $2$ by the others;
+\item worlds of different pairs separated at order $0$.
+\end{itemize}
+Then:
+\begin{itemize}
+\item a nonempty menu has decision order at most $1$ exactly when it meets every $F_i$;
+\item no menu reaches order $0$;
+\item a menu that misses a set has order exactly $2$;
+\item on this instance the identification order obeys the same condition.
+\end{itemize}
+\end{theorem}
+\leanbox{\lean{twins\_unsafe}, \lean{hitting\_embeds}, \lean{order\_zero\_fails},
+\lean{order\_two}, \lean{id\_iff\_hitting} in \lean{LeanPaperBQueryDesignV1}}
+
+The instance has $2r$ worlds and $2r$ answers, so minimum-cost design at a target order contains
+minimum-cost hitting set. Hitting set is NP-hard~\cite{karp1972}, and the greedy rule attains
+the harmonic factor of set cover~\cite{johnson1974,chvatal1979}; these two facts are cited, not
+formalized. The splitting hyperedges of Javdani et al.~\cite{javdani2014} cut decision regions
+within a run. The present object is different: a static menu that changes the order at which
+the observer can resolve every obstruction.
 
 \section{Evidence}
 \label{sec:evidence}
@@ -684,23 +956,38 @@ unit $\ell_{1}$ norm, for $r\ge2$, where its safe sets are derived from its loss
 sides hold for every finite menu of such probes. The upper sides use the decoder's probes, so
 they hold for menus that contain them. Constants depend on $r$ and $\sigma$, and a policy that
 chooses probes from a continuum is not covered.
-\item[4)] \textbf{Constants depend on $|W|$, $m$, $r$ and $\sigma$.} The lower constant carries
-$\frac{1}{|W|-1}$ and the tournament $|W|^{2}\log|W|$. Nothing is uniform as these grow.
-\item[5)] \textbf{Finitely many worlds and queries}, throughout.
+\item[4)] \textbf{Dependence on problem size.} The KL-only lower law carries
+$1/(|W|-1)$. Proposition~\ref{prop:chistar} replaces that loss by logarithmic dependence
+under a stronger second-moment condition. The shared tournament uses $|Q|\log|W|$;
+Proposition~\ref{prop:privatequery} prevents a size-free conclusion. The constants in the
+continuous examples also depend on $m$, $r$ and $\sigma$.
+\item[5)] \textbf{The critical game.} Theorem~\ref{thm:critical} needs an exact expansion of every
+query's information, with a positive coefficient or none. Proposition~\ref{prop:dorder} needs
+the ultrametric property for the hardest-world identity. The critical constants of the parity
+channel and the latent family are not computed here. Query design is proved equivalent to
+hitting set; its hardness and the greedy guarantee are cited.
+\item[6)] \textbf{Channel scope.} Worlds and queries are finite and observations have strictly
+positive densities on $\mathbb R$. General singular observation kernels and continuum query
+selection are not covered by the protocol theorem used here.
 \end{enumerate}
 
 \section{Conclusion}
 
-A safe decision costs what its obstructions cost. Among the sets of worlds that share no safe
-answer, find the one whose best-separated pair is worst. Its per-query information $t^{*}$
-bounds the cost of every policy below by $\log(1/\delta)/t^{*}$. The same value computed with the
-Hellinger information bounds a tournament above, on every channel, and the two meet where the
-informations are comparable. On a graded channel $t^{*}$ becomes an order, $h^{2s^{*}}$. Identification is the case where every pair is an obstruction. On the parity
-channel both rates are proved against every almost-surely stopping policy, and they separate
-by a whole power of the signal, $h^{2}$ against $h^{2(m-1)}$. On a latent family the query
-class itself sets the order, and over the linear class both rates, $h^{2}$ and $h^{2r}$, are
-proved on its own Gaussian channel. On both channels, the lower and the upper side of every rate
-are instances of the one law.
+Acceptable-answer geometry determines which ambiguities must be removed; the query channel
+determines the order at which they can be removed. The obstruction information joins these
+two requirements. A transcript lower bound and a constructive Hellinger tournament establish
+matching signal exponents when the information quantities are comparable, for fixed finite
+world and query sets. Sharing observations avoids paying once per world pair, while private
+queries show why the remaining allocation burden is real.
+On the parity channel, safe compression and world identification have orders $1$ and $m-1$
+in the same experiment. On the latent family they have orders $1$ and $r$ for menus containing
+the attaining probes, with lower bounds uniform over all admissible finite linear menus.
+The order is the first layer of the characteristic game and a finite critical game is the
+second, so the order predicts exponents and not constants. Choosing the menu is a hitting-set
+problem at each order.
+The substantive separation is therefore not simply that deciding can be easier than
+identifying. It is that the observation hierarchy and the common-answer obstruction jointly
+predict different, provably attainable statistical exponents.
 
 \section*{Companion material}
 The supplement gives the proof architecture of every theorem, the finite-alphabet transcript and
@@ -766,6 +1053,16 @@ for parameters of multiple types in finite mixtures,'' arXiv:1501.02497, 2015.
 
 \bibitem{wangyou2026} Q. Wang and W. You, ``Ranking-and-selection with multiple correct
 answers and non-answerable estimates,'' arXiv:2606.21889, 2026.
+
+\bibitem{karp1972} R. M. Karp, ``Reducibility among combinatorial problems,'' in
+\emph{Complexity of Computer Computations}, R. E. Miller and J. W. Thatcher, Eds. New York:
+Plenum, 1972, pp.~85--103.
+
+\bibitem{johnson1974} D. S. Johnson, ``Approximation algorithms for combinatorial problems,''
+\emph{J. Comput. Syst. Sci.}, vol.~9, no.~3, pp.~256--278, 1974.
+
+\bibitem{chvatal1979} V. Chv\'atal, ``A greedy heuristic for the set-covering problem,''
+\emph{Math. Oper. Res.}, vol.~4, no.~3, pp.~233--235, 1979.
 
 \bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
 \emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,

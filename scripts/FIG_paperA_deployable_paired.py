@@ -60,7 +60,7 @@ plt.rcParams.update({
 })
 CHECKS = []
 COLS = {"surrogate_at_estimate": "#C44E52", "geometry": "#55A868", "uniform": "#4C72B0"}
-LABS = {"surrogate_at_estimate": "surrogate at estimate", "geometry": "true game at estimate",
+LABS = {"surrogate_at_estimate": "surrogate at estimate", "geometry": "geometry lower-certificate heuristic",
         "uniform": "uniform"}
 MSTY = {1.0: ("o", "-"), 4.0: ("s", "--")}
 BOOT = 10000

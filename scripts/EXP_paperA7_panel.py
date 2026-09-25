@@ -183,11 +183,16 @@ def main():
           all(m > 0 for m in margins) and len(margins) == sum(1 for x in all_runs
                                                                if not x["censored"]),
           f"{len(margins)} stops, smallest margin {min(margins, default=float('nan')):.3e}")
+    # delta-correctness bounds P(stop and wrong) <= alpha per LAUNCHED run, so the trials are the
+    # launched runs; wrong/stopped would test a conditional rate the theorem does not bound.
+    # (Before 2026-09-25 this used n_stop; that version is legacy/EXP_paperA7_panel_ca970305064dfaf3.py.)
     n_stop = sum(a["stopped"] for c in cells_out for a in c["arms"].values())
+    n_launched = sum(a["stopped"] + a["censored"] for c in cells_out for a in c["arms"].values())
     n_wrong = sum(a["stopped_wrong"] for c in cells_out for a in c["arms"].values())
-    tail = binom_tail(n_wrong, n_stop, ALPHA) if n_stop else 1.0
-    check("wrong answers among stopped runs are consistent with alpha", tail >= 1e-3,
-          f"{n_wrong} wrong of {n_stop} stopped, tail {tail:.3f}")
+    tail = binom_tail(n_wrong, n_launched, ALPHA) if n_launched else 1.0
+    check("wrong stopped answers among LAUNCHED runs are consistent with alpha:"
+          " P(Bin(launched, alpha) >= wrong) >= 1e-3", tail >= 1e-3,
+          f"{n_wrong} wrong of {n_launched} launched ({n_stop} stopped), tail {tail:.3f}")
     check("the truths are A on the base cells and B on the swapped cell",
           all(c["truth"] == ("B" if c["swapped"] else "A") for c in cells_out))
     reg = {c["name"]: c["regions_within_1pct_at_uniform_design"] for c in cells_out}

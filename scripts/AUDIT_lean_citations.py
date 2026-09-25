@@ -20,7 +20,7 @@ LEAN = ROOT / "work/p13_conjectures"
 PAPERS = ("paper_a", "paper_a_supplement", "paper_b", "paper_b_supplement", "paper_c", "paper_c_supplement")
 
 DECL = re.compile(
-    r"^(?:noncomputable )?(?:theorem|def|abbrev|instance|lemma) ([^\s(\[{:]+)", re.M)
+    r"^(?:noncomputable )?(?:theorem|def|abbrev|instance|lemma|structure|inductive|class) ([^\s(\[{:]+)", re.M)
 CITE = re.compile(r"\\lean\{([^}]*)\}")
 
 

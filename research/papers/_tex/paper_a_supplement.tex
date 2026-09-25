@@ -214,8 +214,7 @@ truncation's middle demand, and the middle mass of any allocation is at most its
 \lean{LeanPaperBStoppedLawV1}}
 
 \paragraph{Spreading the budget (Theorem ``Spreading the budget'')} The padded policy runs
-$\pi_{0}$'s kernels for $n$ rounds and then a deterministic round-robin over the four $A$
-cells. Its first $n$ rounds therefore have the law of $\pi_{0}$: the two policies share their
+$\pi_{0}$'s kernels for $n$ rounds and then a deterministic round-robin over the four frozen cells (two $A$ cells and two $B$ anchors). Its first $n$ rounds therefore have the law of $\pi_{0}$: the two policies share their
 kernels before round $n$, and the $n$-round marginal of the longer history law is the $n$-round
 law. The answer event read on the first $n$ rounds keeps its probabilities. The expected count of
 a cell grows at a padded round by the mass that round's kernel puts on it, which is one on the
@@ -254,8 +253,11 @@ It is compiled, takes that input, and is no longer needed.}
 costs'')}
 
 \paragraph{The ideal learner} Its oracle maximises the exact value $J$ over a refining net, and
-its stop uses the exact generalised likelihood ratio, so the stopping-certificate gap is zero
-by construction.
+its stop uses the exact infimum of the ridge statistic
+$\frac12\sum_e N_e^2(\widehat\theta_e-\lambda_e)^2/((a+N_e)\nu_e)$,
+so its stopping-certificate gap is zero by construction. This is \lean{glr} in
+\lean{LeanPaperA7GLRMeasV1}; despite that identifier, it is not the ordinary Gaussian
+log-GLR with coefficient $N_e/\nu_e$. The main text gives the full query and stopping rule.
 \begin{itemize}
 \item \emph{Correctness.} Ville's inequality applies at the learner's own statistic, so the
 probability of stopping with a wrong answer is at most $(|\mathrm{Ans}|-1)\delta$.
@@ -411,6 +413,24 @@ $u\Delta-\frac12u^{2}=\frac12\Delta^{2}-\frac12(u-\Delta)^{2}$.
 \lean{fixed\_grid\_rate\_negative}, \lean{tiltRate\_eq}, \lean{mesh\_grid\_attains\_rate},
 \lean{grid\_penalty\_negligible} in \lean{LeanPaperA7StreamV1}}
 
+\section*{Additional proof map: the general repair certificate}
+The main paper's certificate proposition uses \lean{exchange}, \lean{frontier\_upper},
+\lean{budget} and \lean{weak\_duality} in \lean{LeanPaperASacrificeDualityV1}.
+Its assumptions are inequalities for every allocation: a frozen upper certificate, true
+alternative loads, and a nonnegative cover of those loads by the frozen margins.
+They are not assumed for our example: \lean{cStar\_cert}, \lean{pairLoad\_cert},
+\lean{nuStar\_cover} and \lean{certificate\_pair\_satisfiable} construct them, and
+\lean{construction\_budget} takes the strict-alternative limit.
+The converse uses \lean{repair\_mix} with mixing coefficient
+$\lambda=\min\{1,b/s(v)\}$. Therefore its valid budget form is
+$R(b)\ge\min\{1,b/s(v)\}J_t(v)$, for $s(v)>0$ and $b\ge0$.
+The unclipped expression $bJ_t(v)/s(v)$ requires $b\le s(v)$.
+The module's introductory prose omits that restriction, but its actual theorem explicitly
+requires the mixing coefficient in $[0,1]$ and is the result used here.
+Exact bounds hold for every $r\ge1,M>0$. Statements with absolute constants using
+$\Theta(rM)$ or $\Theta(\beta/(rM))$ are restricted to $rM\ge1$; they are not joint limits
+as $rM\downarrow0$.
+
 \section{S8. Heteroscedastic families, the repair criterion, and the build}
 
 \paragraph{Two families at a fixed design (exact)} With one cheap cell of variance $M$ and all
@@ -448,6 +468,69 @@ design is not determined.
 \lean{certifiable\_fraction\_le\_sixtyfour\_over\_M}, \lean{design\_certificate\_insufficient} in
 \lean{LeanPaperARepairV1}}
 
+\section{S9. The repair law (Theorem ``The repair law'', Corollary ``The frontier is the optimal
+rate'', Propositions ``The classes are nested'' and ``Two arms'')}
+
+\paragraph{The classes} A count vector meets the budget in the homogeneous form
+$(1-b)\Gamma_f|N|\le\sum_qN_q\mathrm{KL}_q(\theta,\lambda)$ for every frozen alternative, stated in
+$\mathbb R_{\ge0}^\infty$, so no division by $|N|$ occurs. Integrating it against the history law
+gives $(1-b)\Gamma_f\,\mathbb E|N|\le\mathbb E|N|\cdot\mathrm{info}(\bar w,\lambda)$, by
+linearity of the lower integral and finiteness of every count. The infimum over $\lambda$ gives
+$J_f(\bar w)\ge(1-b)\Gamma_f$. On the eventual class the pathwise inequality holds up to
+$(1-b)\Gamma_ft_0$, since a short history has $|N|<t_0$ and nonnegative information.
+\leanbox{\lean{MeetsBudget}, \lean{PrefixClass}, \lean{TerminalClass}, \lean{EventualClass},
+\lean{lintegral\_budget\_lhs}, \lean{lintegral\_budget\_rhs}, \lean{terminal\_expected},
+\lean{eventual\_expected}, \lean{mean\_escapes} in \lean{LeanPaperAPolicyClassesV1}}
+
+\paragraph{Attainment} The learner is the oracle-tracking learner of Paper A6 with any
+measurable allocation-valued oracle of the estimate: warm start, forcing $1/\sqrt{s+1}$,
+post-warm quota, first maximiser of $W-N$. Its run is a warm-started tracking run. So the
+tracking discrepancy $2(K-1)/(K+k)$ and the count floor $\sqrt t/K-(K-1)$ hold on every path.
+The ideal learner's direct bound is re-proved with the oracle's selection step replaced by one
+hypothesis: on the confidence event, the oracle's design eventually has true information at
+least $\Gamma-\eta/4$. For a constant oracle this is immediate. The rest of the chain is
+unchanged:
+\begin{itemize}
+\item the window average of $(1-\rho_s)(\Gamma-\eta/4)$;
+\item the multiplicative tracking factor, the ridge factor and the raw-mean radius;
+\item the window failure probability $16/t^2$ at the truth;
+\item the layer-cake identity for $\mathbb E\tau$ on $\mathbb N\cup\{\infty\}$.
+\end{itemize}
+Correctness is Ville's inequality at the stop's own statistic, for every allocation rule.
+\leanbox{\lean{o\_count\_floor}, \lean{o\_hpost}, \lean{o\_track}, \lean{o\_radius\_run},
+\lean{oracle\_direct}, \lean{o\_goodWin\_compl\_le}, \lean{oracle\_expect\_bound},
+\lean{oracle\_correct}, \lean{constO}, \lean{fix\_expect\_bound}, \lean{fix\_upper\_rate} in
+\lean{LeanPaperABudgetUpperV1}}
+
+\paragraph{The realised design} With a constant oracle $w$ the average target is at least
+$(1-(K+2\sqrt t)/t)w$ cellwise. Multiplicative tracking loses a further $1-2K(K-1)/\sqrt t$. So the
+realised design dominates $(1-\varepsilon)w$ after a deterministic time. A game value is
+monotone and homogeneous in the design, so the frozen value of the realised design is at least
+$(1-\varepsilon)J_f(w)$. Its sacrifice is then at most $s(w)+\varepsilon J_f(w)/\Gamma_f$.
+\leanbox{\lean{avgTarget\_const\_ge}, \lean{fix\_design\_floor}, \lean{Jval\_ge\_scale},
+\lean{fix\_budget\_eventually} in \lean{LeanPaperABudgetUpperV1}}
+
+\paragraph{Two arms} The specification has unit noise and alternatives
+$\{\lambda:\lambda_T\le\lambda_{1-T}\}$. With unit noise the unit-variance coordinates are the
+identity, and the energy of a design against an alternative is the two-arm energy. So the
+stream game is the closed form $w_1w_2\Delta^2/2$ and the frozen game is $w_1\Delta^2/2$.
+\leanbox{\lean{twoSpec}, \lean{jw\_two}, \lean{jf\_two}, \lean{wb}, \lean{two\_arm\_budget\_rate},
+\lean{two\_arm\_eventually} in \lean{LeanPaperATwoArmRateV1}}
+
+\paragraph{The rate} $R$ is concave on $[0,\infty)$: take designs within $\varepsilon/2$ of each
+frontier value and mix them. So $R$ is continuous at every $b>0$. A design with sacrifice
+strictly below $b$ comes within $\varepsilon$ of $R(b)$, through a budget $b'<b$ close to $b$. On
+the lower side, the crude bound $R\le J_{\max}$ makes $\mathbb E|N|$ large. Then the excess
+$c/\mathbb E|N|$ lies in the continuity ball, and the ideal learner's lower-rate lemma applies at
+$R(b)+\eta_0$.
+\leanbox{\lean{Rfront}, \lean{R\_le}, \lean{R\_mono}, \lean{R\_concave}, \lean{R\_continuousAt},
+\lean{near\_design}, \lean{frontier\_lower\_rate} in \lean{LeanPaperARepairRateV1}}
+
+\paragraph{What is not formalized} The identification of the stream budget with the kernel class
+on Gaussian cells is written out in the main text. The coupling of the stopped learner with a kernel policy is formal
+(\lean{stoppedG}, \lean{runSG\_eq}, \lean{cnt\_eq\_at\_min} in \lean{LeanPaperA7StoppedGenV1}).
+The per-query Gaussian divergence identity is formal only on the family channel.
+
 \paragraph{Build record} The last full gate that passed, \texttt{full6\_20260925}, built $214$
 modules and audited $1666$ theorems, with no \texttt{sorry}, no \texttt{native\_decide}, the
 standard axioms, and frozen sources identical to the working copy afterwards. It includes every
@@ -459,5 +542,12 @@ them \lean{LeanPaperASacrificeV1}, \lean{LeanPaperASacrificeIdealV1} and
 Each compiles with the standard axioms and no \texttt{sorry}. The first is in the module list of the
 full gate \texttt{full7\_20260925}, and both are in the import closure of the smoke gate
 \texttt{smokeR2\_20260925}.
+The modules of Section~S9 were written after \texttt{full7\_20260925}. Each passes a smoke gate
+over its full import closure, with the standard axioms, no \texttt{sorry}, no
+\texttt{native\_decide}, and no drift. \lean{LeanPaperARepairLawV1} is covered by
+\texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems). \lean{LeanPaperAPolicyClassesV1} and
+\lean{LeanPaperABudgetUpperV1} are covered by \texttt{smokeUP2\_20260925} ($107$ modules, $934$
+theorems). \lean{LeanPaperATwoArmRateV1} and \lean{LeanPaperARepairRateV1} are covered by
+\texttt{smokeUP3\_20260925} ($106$ modules, $924$ theorems).
 
 \end{document}

@@ -397,6 +397,28 @@ satisfiable, since $g'=g_{m}$ meets it.
 \lean{physical\_price\_linear}, \lean{physical\_price\_linear\_self} in
 \lean{LeanPaperCRatioJoinV1}}
 
+\paragraph{Quantifiers in the robustness conclusion}
+The universal lower bound and the one-item upper construction combine into a statement about
+an infimum over a perturbation ball, not about every point in that ball. For odd $m$ define
+$\mathcal R_m(\varepsilon)=\inf_{\|g'-g_m\|_1\le\varepsilon,\ V(g';m)>0}
+V(g';0)/V(g';m)$. The main paper proves explicitly that, for $0<\varepsilon\le1/6$,
+\begin{gather*}
+\frac1{16}\min\{m-1,1/\varepsilon\}\le\mathcal R_m(\varepsilon),\\
+\mathcal R_m(\varepsilon)\le\min\{(m+3)(m-1)/(2m),10/\varepsilon\}.
+\end{gather*}
+The wrapper is \lean{robust\_ball} in \lean{LeanPaperCRobustBallV1}. The ball price
+\lean{robustPrice} is the infimum of the price ratio over the members of the ball with positive
+free value. Its feasible set contains $g_m$ (\lean{family\_mem}, with \lean{family\_free\_pos}).
+Every member keeps the lower bound (\lean{member\_lower}):
+\lean{physical\_price\_linear} below $1/(2m)$ and \lean{collapse\_all} above it. This gives
+boundedness below and \lean{robust\_lower}. The upper bound \lean{robust\_upper} applies the
+infimum separately to $g_m$ (\lean{family\_price}) and to the one-item construction at
+$\delta=\varepsilon$ (\lean{witness\_mem}). No minimiser of the ball problem is required.
+Positive scaling, $g'=(1+\varepsilon/(m+4))g_m$, preserves all normalised regrets
+(\lean{trueValue\_smul}). It is a member at distance exactly $\varepsilon$ that keeps the
+unperturbed price (\lean{rescaled\_keeps\_price}), a counterexample to the stronger, incorrect
+statement that every perturbation beyond $1/m$ forces the ratio to decay.
+
 \paragraph{The collapse, upper side} Move light item $1$ from $-1$ to $-1+\delta$,
 $0<\delta\le1$. Then $\|g_{m}-g'\|_{1}=\delta$ and $\|g'\|_{1}=m+4-\delta$. At odd budgets
 the best drop takes the moved item and costs at most $1-\delta$. At even budgets the best
@@ -451,7 +473,7 @@ instantiated version, for the physical program with the moving normaliser.}
 over the $m!$ permutation formulation, with baseline and normaliser recomputed at every
 step, at $m=5,6,7$ and $\varepsilon\le1.6$, over three families: adversarial, shrinking the
 heavy anchors, and a uniform shift (\texttt{EXP\_paperC\_robustness}, 4/4). A minimisation
-returns attained ratios, upper bounds on the worst case, so it can exhibit a collapse but
+returns attained ratios, upper bounds on the searched infimum, so it can exhibit a collapse but
 not exclude one. (\NUM)
 
 \section{S6. The ex-post values (Proposition ``Free ex-post value'' and Theorem ``Banded
@@ -490,7 +512,61 @@ of every order, so class-count feasibility gives per-item feasibility.
 \lean{insertion\_post}, \lean{odd\_rotation\_post}, \lean{even\_rotation\_post},
 \lean{expost\_even}, \lean{expost\_odd} in \lean{LeanPaperCExPostBandV1}}
 
-\section{S7. Build record}
+\section{S7. Any number of types (Theorems ``The flow program for every typed multiset'' and
+``The free threshold'', Proposition ``The additive price is stable'')}
+
+\paragraph{Typed flows} The core of the four-type flow equivalence, the agreement of banded
+vectors between rankings and count-feasible flows, holds for any type map and any cost on
+count states. It is instantiated at the physical cost of a typed multiset. On a ranking the prefix
+sum is the weighted composition count, so the count cost is the normalised regret exactly.
+\leanbox{\lean{typedG}, \lean{typedCost}, \lean{prefixSet\_sum\_eq}, \lean{typedCost\_eq},
+\lean{typed\_flow\_equivalence}, \lean{typed\_banded\_infima}, \lean{card\_state},
+\lean{family\_is\_typed} in \lean{LeanPaperCTypedFlowV1}}
+
+\paragraph{The box} The count-feasibility condition bounds every occupied state by the
+multiplicities. The box is a product of initial segments of $\{0,\dots,m\}$.
+\leanbox{\lean{mult\_le}, \lean{box}, \lean{support\_box}, \lean{card\_box} in
+\lean{LeanPaperCFreeBandV1}}
+
+\paragraph{The free threshold} The band-feasible set is closed and inside the unit ball, hence
+compact, and the objective is a finite maximum of linear forms. So the value is attained, and
+so is the minimum deviation over the compact set of free optima.
+\begin{itemize}
+\item If $V_g(\eta)=V^{\rm free}_g$, an optimal law at $\eta$ is a free optimum of deviation at
+most $\eta$.
+\item Conversely, a free optimum of deviation $\eta_{\rm free}\le\eta$ is feasible at $\eta$.
+\end{itemize}
+The flow form rewrites $V_g$ as the infimum of the same functional over the flow side.
+\leanbox{\lean{marg}, \lean{dev}, \lean{feasible\_iff\_dev}, \lean{feasible\_m\_eq},
+\lean{isCompact\_feasible}, \lean{attain\_value}, \lean{Vfree}, \lean{OptFree}, \lean{etaFree},
+\lean{attain\_eta}, \lean{free\_threshold}, \lean{flowValue}, \lean{trueValue\_eq\_flow},
+\lean{free\_threshold\_flow} in \lean{LeanPaperCFreeBandV1}}
+
+\paragraph{The additive price} Stability of $\Delta_g$ is two applications of the value
+Lipschitz bound, at $\eta$ and at $\eta=m$.
+\leanbox{\lean{gap}, \lean{gap\_nonneg}, \lean{gap\_antitone}, \lean{gap\_zero\_iff},
+\lean{gap\_stable} in \lean{LeanPaperCFreeBandV1}}
+
+\paragraph{One item of each type} The baselines are $b,0,b$ at budgets $1,2,3$: a single item costs at
+least $b$, the $a$-pair cancels, and a triple is minus its missing item. The prefixes of an order
+are $\{\sigma_0\}$, $\{\sigma_0,\sigma_1\}$ and the complement of $\{\sigma_3\}$. The six
+orders are given by their tables and inverses. Band feasibility is checked at every $k\le4$ and
+every item, and the budget costs are evaluated order by order.
+\leanbox{\lean{g4}, \lean{abs\_g4}, \lean{normMass\_g4}, \lean{sum\_compl\_single},
+\lean{prefix\_one}, \lean{prefix\_two}, \lean{prefix\_three}, \lean{raw\_one}, \lean{raw\_two},
+\lean{raw\_three}, \lean{marg\_one}, \lean{mkPerm}, \lean{law\_sum}, \lean{raw\_values} in
+\lean{LeanPaperCTwoMagFourV1}}
+
+\paragraph{The two-magnitude map} \texttt{scripts/EXP\_paperC\_typed\_frontier.py} (source
+SHA-256 prefix \texttt{2a572a64ce84}) wrote
+\texttt{research/unified\_20260919/paperC\_typed\_frontier.json}. It has $240$ count vectors,
+$4$ ratios and $41$ band values, and $3/3$ self-checks. HiGHS floating point. The refinement
+\texttt{scripts/EXP\_paperC\_typed\_transition.py} reuses that solver and wrote
+\texttt{paperC\_typed\_transition.json}. It covers counts $(1,1,2,2)$ and $(2,2,2,2)$, $21$
+ratios in $[2,3]$ and $49$ band values, with $3/3$ self-checks, one of which reproduces the
+stored rows at $a/b=2,3$. \NUM{}
+
+\section{S8. Build record}
 
 The corpus is verified by \texttt{verify\_all.sh}, which freezes its inputs, builds every
 listed module and every local import from an empty cache in import order, counts
@@ -513,6 +589,14 @@ over their full import closures:
 theorems.
 \item \texttt{smokeCC3\_20260924}: \lean{LeanPaperCCollapseScaleV1} and
 \lean{LeanPaperCExPostBandV1}; $52$ modules, $463$ theorems.
+\end{itemize}
+The modules of Section~S7 were written after \texttt{full7\_20260925}. Each passes a smoke gate
+over its full import closure, with the standard axioms, no \texttt{sorry}, no
+\texttt{native\_decide}, and no drift:
+\begin{itemize}
+\item \texttt{smokeUP1\_20260925}: \lean{LeanPaperCTypedFlowV1}; $79$ modules, $762$ theorems.
+\item \texttt{smokeUP2\_20260925}: \lean{LeanPaperCFreeBandV1}; $107$ modules, $934$ theorems.
+\item \texttt{smokeUP3\_20260925}: \lean{LeanPaperCTwoMagFourV1}; $106$ modules, $924$ theorems.
 \end{itemize}
 
 \end{document}

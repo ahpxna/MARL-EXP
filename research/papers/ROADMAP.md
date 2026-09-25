@@ -10,6 +10,20 @@ statuses, and they are not interchangeable:
 | **NUM** | measured by a self-checking script; an artifact, not a theorem |
 | **OPEN** | not done — including "argued in prose" |
 
+## Upgrade round 2026-09-25 evening (supersedes the smoke list below for the new modules)
+
+```
+smokeUP1_20260925  PASS  79 modules  762 theorems  CertificateChannel, RepairLaw, DecisionOrder, TypedFlow
+smokeUP2_20260925  PASS 107 modules  934 theorems  PolicyClasses, BudgetUpper, CriticalGame, QueryDesign, FreeBand
+smokeUP3_20260925  PASS 106 modules  924 theorems  TwoArmRate, RepairRate, TwoMagFour
+all: sorry = 0, native_decide = 0, axioms ⊆ {propext, Classical.choice, Quot.sound}, drift = none
+compiled, not yet gated or cited: LeanPaperCFlowCertV1 (weak duality for the banded flow LP),
+  LeanPaperCPathMixV1 (path mixtures, flow mixtures) -- tools for the C region laws in progress
+last full gate still full6_20260925 (214 modules); a full gate over the current MODS is owed
+```
+Targets and status: `PLAN_UPGRADE_ABC_20260925.md` (targets v2, open-math push),
+`THEOREM_MAP.md` (upgrade round), `OPEN_MATH_20260924.md`.
+
 ## Corpus state on 2026-09-25 (supersedes the gate block below)
 
 ```

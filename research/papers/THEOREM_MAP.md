@@ -238,3 +238,36 @@ can be.
 conclusion. **conditional** — the algebra is proved but a hypothesis carries part of the
 conclusion; the hypothesis is named in the last column. **partly closed** — some links
 proved, others named. Nothing in this table is upgraded because an audit count rose.
+
+---
+
+## Upgrade round 2026-09-25 (targets v2: `PLAN_UPGRADE_ABC_20260925.md`)
+
+| Paper | Statement (manuscript label) | Lean | Status |
+|---|---|---|---|
+| A | Budget classes nested; eventual class excess `(1-b)t₀/E\|N\|`; `E[s]` constraint escapes (`prop:classes`) | `LeanPaperAPolicyClassesV1`: `prefix_terminal`, `terminal_eventual`, `terminal_expected`, `eventual_expected`, `mean_escapes` | **LEAN** |
+| A | Repair law (i) lower, any channel (`thm:repairlaw`) | `terminal_budget_law`, `eventual_budget_law` on `budget_law` (`LeanPaperARepairLawV1`) | **LEAN** |
+| A | Repair law (ii) attainment, any eventually-informative oracle; fixed design | `LeanPaperABudgetUpperV1`: `oracle_direct`, `oracle_expect_bound`, `oracle_correct`, `fix_expect_bound`, `fix_upper_rate` | **LEAN** |
+| A | Repair law (iii) realised design enters the budget, every path | `fix_design_floor`, `Jval_ge_scale`, `fix_budget_eventually` | **LEAN** |
+| A | Frontier = optimal budgeted rate (`cor:repairrate`) | coupling `stoppedG`, `runSG_eq`, `cnt_eq_at_min` | **LEAN** for concavity and limit steps (`LeanPaperARepairRateV1`); the Gaussian identification of the two budget notions is a written step (stated in the paper) |
+| A | No threshold, linear repair (`prop:shape`) | `no_threshold`, `linear_repair` | **LEAN** |
+| A | Two arms: exact frontier and attained rate (`prop:twoarm`) | `two_arm_frontier` etc.; `LeanPaperATwoArmRateV1`: `jw_two`, `jf_two`, `two_arm_budget_rate`, `two_arm_eventually` | **LEAN** |
+| B | Certificate channel: KL factor `1/(\|W\|-1)` necessary (`prop:certchannel`) | `LeanPaperBCertificateChannelV1`: `cert_tight` | **LEAN** |
+| B | Decision order at a world; hardest world has order `s*` (`prop:dorder`) | `LeanPaperBDecisionOrderV1`: `decision_upper`, `decision_lower`, `max_order_iff` | **LEAN** (ultrametric hypothesis for the hardest-world identity) |
+| B | Critical game: `h^{-2s}·game → G*` (`thm:critical`) | `LeanPaperBCriticalGameV1`: `critical_limit`, `expansion_hyps`, `decision_limit` | **LEAN** |
+| B | Same order, constants `k` apart (`prop:sameorder`) | `private_game`, `shared_game`, `same_order_ratio` | **LEAN** |
+| B | Query design as hitting set (`thm:hitting`) | `dec_hitting`, `id_implies_dec`, `dec_mono`, `gap_example` | **LEAN** |
+| B | Every hitting set is a design problem (`thm:hittingembed`) | `LeanPaperBQueryDesignV1`: `hitting_embeds`, `order_zero_fails`, `order_two`, `id_iff_hitting` | **LEAN**; NP-hardness (Karp) and greedy `H_n` (Johnson, Chvátal) cited |
+| C | Flow program for every typed multiset, `∏(n_τ+1)` states (`thm:typedflow`) | `LeanPaperCTypedFlowV1`: `typed_flow_equivalence`, `typed_banded_infima`; `LeanPaperCFreeBandV1`: `support_box`, `card_box` | **LEAN** |
+| C | Free threshold, attained, read off the flow program (`thm:freeband`) | `attain_value`, `attain_eta`, `free_threshold`, `free_threshold_flow` | **LEAN** |
+| C | Additive price stable (`prop:gap`) | `gap_nonneg`, `gap_antitone`, `gap_zero_iff`, `gap_stable` | **LEAN** |
+| A | Frontier concave, continuous inside, near-optimal design strictly inside the budget, lower limit (`cor:repairrate`) | `LeanPaperARepairRateV1`: `R_concave`, `R_continuousAt`, `near_design`, `frontier_lower_rate` | **LEAN** |
+| C | `(a,-a,b,-b)`: `V(η) = ((a-b)/(2(a+b)))·max((1-η)/2, 1/3)` at every ratio (`thm:twomag`) | `LeanPaperCTwoMagFourV1`: `per_order`, `lower_band`, `lower_free`, `law_feasible`, `law_obj`, `twoMag_frontier`, `twoMag_price` | **LEAN** |
+| C | Two-magnitude phase map (`sec:typed`) | `scripts/EXP_paperC_typed_frontier.py` → `paperC_typed_frontier.json` (sha 2a572a64ce84, 3/3 checks) | **NUM**; region laws open |
+
+Gates, all PASS with standard axioms, no sorry and no drift:
+- `smokeUP1_20260925`: 79 modules, 762 theorems (CertificateChannel, RepairLaw, DecisionOrder,
+  TypedFlow);
+- `smokeUP2_20260925`: 107 modules, 934 theorems (PolicyClasses, BudgetUpper, CriticalGame,
+  QueryDesign, FreeBand);
+- `smokeUP3_20260925`: 106 modules, 924 theorems (TwoArmRate, RepairRate, TwoMagFour).

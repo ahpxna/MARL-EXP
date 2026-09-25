@@ -356,12 +356,17 @@ def main():
                       f" share={np.mean(share_l):.4f} bad_est={np.mean(bad_l):7.1f}"
                       f"   [{time.time() - t0:6.0f}s]", flush=True)
     check("every run is accounted for exactly once as stopped or censored", ok_count)
+    # `correctG` bounds P(stop and wrong) <= alpha per LAUNCHED run, so the trials are the launched
+    # runs; wrong/stopped would test a conditional rate the theorem does not bound.
+    # (Before 2026-09-25 this used n_stop; that version is legacy/EXP_paperA_deployable_1197faecbf9cdaeb.py,
+    # whose hash the paired run records as rules_module_sha256.)
     n_stop = sum(x["stopped"] for x in rows)
+    n_launched = sum(x["stopped"] + x["censored"] for x in rows)
     n_wrong = sum(x["stopped_wrong"] for x in rows)
-    tail = binom_tail(n_wrong, n_stop, alpha) if n_stop else 1.0
-    check("the wrong-answer rate among stopped runs is consistent with alpha (`correctG`):"
-          " P(Bin(stopped, alpha) >= wrong) >= 1e-3", tail >= 1e-3,
-          f"{n_wrong} wrong of {n_stop} stopped, tail {tail:.3f}")
+    tail = binom_tail(n_wrong, n_launched, alpha) if n_launched else 1.0
+    check("wrong stopped answers among LAUNCHED runs are consistent with alpha (`correctG`):"
+          " P(Bin(launched, alpha) >= wrong) >= 1e-3", tail >= 1e-3,
+          f"{n_wrong} wrong of {n_launched} launched ({n_stop} stopped), tail {tail:.3f}")
     check("THEOREM (`oCount_le_bad`, transcribed for the code's forcing): every middle cell of"
           " every run has N_e <= 2 + bad_e + q(t)", ok_thm, f"min slack {thm_slack:.2f}")
 

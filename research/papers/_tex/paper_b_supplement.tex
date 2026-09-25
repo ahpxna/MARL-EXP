@@ -33,7 +33,8 @@ Theorems ``The lower law'', ``The tournament'' and ``The order law'' of the main
 (\lean{parity\_safe\_from\_law}, \lean{parity\_id\_from\_law} in
 \lean{LeanPaperBObstructionParityV1}).
 \item \emph{The continuous adaptive transcript}, called the open middle link below, is carried
-for every channel given by densities by \lean{transcript\_kl\_le} and
+for every channel with strictly positive measurable real densities in protocol form by
+\lean{transcript\_kl\_le} and
 \lean{transcript\_kl\_le\_qsum}, which the general lower law uses.
 \item \emph{The latent family as a channel} (called open in the transcript and headline sections below). Its channel is now
 written in protocol form over every finite family of linear probes, and its two nuisance worlds
@@ -85,7 +86,10 @@ The single-coordinate responses are $Q_{1}(z_{1})=3uz_{1}$, $Q_{2}=-2z_{2}$, $Q_
 and $Q_{j}=0$ for $j\ge4$, and the losses on $K$, computed as half the oscillation of the
 retained residual, are
 \begin{equation}
-L_{K}(\{1\})=4,\quad L_{K}(\{2\})=L_{K}(\{3\})=|3u-2|,\quad L_{K}(\{j\})=|3u-4|
+\begin{gathered}
+L_{K}(\{1\})=4,\qquad L_{K}(\{2\})=L_{K}(\{3\})=|3u-2|,\\
+L_{K}(\{j\})=|3u-4|
+\end{gathered}
 \label{eq:losses}
 \end{equation}
 for $j\ge4$. Every entry is derived from~\eqref{eq:family} and~\eqref{eq:support}; no loss
@@ -157,7 +161,10 @@ $\mathbb{E}[\chi_{n}g^{n}]=n!/n^{n}\neq0$.
 The proof is a recurrence, not a bijection count: peeling one coordinate and expanding the
 binomial gives
 \begin{equation}
-\mathrm{cubeSum}(n{+}1,k)=\sum_{j}\binom{k}{j}\bigl(1+(-1)^{j+1}\bigr)\,\mathrm{cubeSum}(n,k{-}j),
+\begin{split}
+&\mathrm{cubeSum}(n{+}1,k)\\
+&\quad=\sum_{j}\binom{k}{j}\bigl(1+(-1)^{j+1}\bigr)\,\mathrm{cubeSum}(n,k{-}j),
+\end{split}
 \label{eq:rec}
 \end{equation}
 whose parity factor kills every even $j$, so the recursive index always drops strictly and a
@@ -281,12 +288,11 @@ chosen adaptively.}
 \end{quote}
 
 with the target
-\[
-N_{\rm safe}(h,\delta)\asymp h^{-2s_{\rm safe}}\log(1/\delta),
-\qquad
+\begin{gather*}
+N_{\rm safe}(h,\delta)\asymp h^{-2s_{\rm safe}}\log(1/\delta),\\
 N_{\rm id}(h,\delta)\asymp h^{-2s_{\rm id}}\log(1/\delta),
 \qquad s_{\rm safe}<s_{\rm id},
-\]
+\end{gather*}
 and three conditions that make it worth more than an easy-target-plus-hard-nuisance
 construction: the safe sets must come from the actual \lean{selectedRadius} geometry rather
 than an assigned answer table; they must genuinely \emph{overlap}, as in
@@ -376,12 +382,11 @@ whose moments against the tail character are exactly
 $\mathbb{E}[\chi g_{\eta}]=0$, $\mathbb{E}[\chi g_{\eta}^{2}]=2\eta/(3+\eta)^{2}$ and
 $\mathbb{E}[\chi g_{\eta}^{3}]=6/(3+\eta)^{3}$: at $\eta=0$ the signal first appears at the
 cube, and any $\eta>0$ opens a square channel. Writing the density difference as
-\[
-p_{+}-p_{-}=\frac{\eta h^{2}}{(3+\eta)^{2}}A-\frac{h^{3}}{(3+\eta)^{3}}B+R,
-\quad
-A=f''(\cdot-1)-f''(\cdot+1),\;
+\begin{gather*}
+p_{+}-p_{-}=\frac{\eta h^{2}}{(3+\eta)^{2}}A-\frac{h^{3}}{(3+\eta)^{3}}B+R,\\
+A=f''(\cdot-1)-f''(\cdot+1),\qquad
 B=f'''(\cdot-1)-f'''(\cdot+1),
-\]
+\end{gather*}
 the head density $f$ is even, so $A$ is odd, $B$ is even, the base density is even and
 $\int AB/p_{0}=0$: the $\eta h^{5}$ cross term drops out and the two channels are
 additive. The measured order in $h$ falls monotonically from $5.94$ at $\eta=0$ through
@@ -447,11 +452,10 @@ empty: the old composition said nothing wherever it was of interest.
 The repair is to stop asking one density to be its own difference, and to build the pair the
 difference actually comes from. Write $v(z)$ for the signed shift sum of a sign pattern $z$
 and $\mathrm{par}(z)$ for the product of its signs, and set
-\[
-Q=2^{-r}\sum_{z}M(\cdot-v(z)),
-\qquad
+\begin{gather*}
+Q=2^{-r}\sum_{z}M(\cdot-v(z)),\\
 P=2^{-r}\sum_{z}\bigl(1+\mathrm{par}(z)\bigr)\,M(\cdot-v(z)).
-\]
+\end{gather*}
 $P$ keeps the even patterns at double weight and drops the odd ones; $Q$ is the flat average.
 Both are non-negative combinations of translates of one base, both carry the same total mass,
 and $P-Q=\mathrm{iterDiff}\,M\,(\text{shifts})$ \emph{exactly}. The identification is now an
@@ -643,6 +647,7 @@ does not certify (iii) at all.}
 \label{tab:evidence}
 \centering
 \footnotesize
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}llr@{}}
 \toprule
 Package & Script & Checks \\
@@ -658,7 +663,7 @@ Query-class crossover, $g_{\eta}$ & \texttt{EXP\_paperB\_crossover} & 8/8 \\
 The two decoders, parity channel & \texttt{EXP\_paperB\_decoder} & 7/7 \\
 Query-order vanishing/attainment & \texttt{EXP\_unified\_query\_order} & 6/6 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 
 \vspace{2pt}
 {\footnotesize $^{\dagger}$This package measures the per-step bound on the \emph{linear-class}
@@ -758,11 +763,11 @@ most $s$ when it is a linear functional of the moments of order $1,\dots,s$. The
 \begin{theorem}[The order-$s$ classes are exactly the query-blind pairs]
 \label{thm:indist}
 For every $s$ and every pair of worlds $\theta,\lambda$,
-\[
+\begin{gather*}
 \theta\sim_{s}\lambda
-\quad\Longleftrightarrow\quad
+\quad\Longleftrightarrow\\
 q(\theta)=q(\lambda)\ \text{ for every query } q \text{ of order at most } s .
-\]
+\end{gather*}
 \end{theorem}
 
 Left to right is termwise: such a $q$ is supported where the two moment vectors agree.
@@ -1081,12 +1086,12 @@ By \eqref{eq:lrtexact} the two errors sum to $\sum_{t}\min(P(t),Q(t))$. Since
 $\min(a,b)^{2}\le ab$ for $a,b\ge0$, each summand is at most $\sqrt{P(t)Q(t)}$. Writing
 $P(t)=\prod_{i}p(t_{i})$ and likewise for $Q$, the square root of the product is the
 product of the square roots, and summing a product over all sequences factorises:
-\[
+\begin{align*}
 \sum_{t}\sqrt{P(t)Q(t)}
-=\sum_{t}\prod_{i}\sqrt{p(t_{i})q(t_{i})}
-=\Bigl(\sum_{o}\sqrt{p(o)q(o)}\Bigr)^{N}
+&=\sum_{t}\prod_{i}\sqrt{p(t_{i})q(t_{i})}\\
+&=\Bigl(\sum_{o}\sqrt{p(o)q(o)}\Bigr)^{N}
 =(1-H^{2})^{N}.
-\]
+\end{align*}
 Now $1-x\le e^{-x}$ gives $(1-H^{2})^{N}\le e^{-NH^{2}}\le e^{-Nc}$, and
 $N\ge\log(K/\delta)/c$ makes that at most $\delta/K$. Both error probabilities are
 non-negative and their sum is bounded, so each is bounded separately --- which is the form
@@ -1128,11 +1133,10 @@ measurable answer and guess read at the stopping time. The stopping time need no
 bounded, and its expectation need not be finite. There are
 $0<c\le C$, $h_{0}>0$ and $\delta_{0}\in(0,1)$, depending on $m$ and $\sigma$ only, such that
 for all $0<h\le h_{0}$ and $0<\delta\le\delta_{0}$
-\[
-c\,\frac{\log(1/\delta)}{h^{2}}\le N^{*}_{\mathrm{safe}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2}},
-\qquad
+\begin{gather*}
+c\,\frac{\log(1/\delta)}{h^{2}}\le N^{*}_{\mathrm{safe}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2}},\\
 c\,\frac{\log(1/\delta)}{h^{2(m-1)}}\le N^{*}_{\mathrm{id}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2(m-1)}} .
-\]
+\end{gather*}
 \end{theorem}
 
 The theorem is proved first for policies with a finite horizon, and then carried to the
@@ -1183,11 +1187,11 @@ shape, because it cannot see whether the two scales \emph{add} or \emph{interfer
 turns on a cross term. The algebra settles it.
 
 Against the hidden character $\chi=z_{4}z_{5}z_{6}$,
-\[
+\begin{gather*}
 \mathbb{E}[\chi g_{\eta}]=0,\qquad
-\mathbb{E}[\chi g_{\eta}^{2}]=\frac{2\eta}{(3+\eta)^{2}},\qquad
+\mathbb{E}[\chi g_{\eta}^{2}]=\frac{2\eta}{(3+\eta)^{2}},\\
 \mathbb{E}[\chi g_{\eta}^{3}]=\frac{6}{(3+\eta)^{3}},
-\]
+\end{gather*}
 all three exact. The density difference between $v=+1$ and $v=-1$ then expands with an odd
 channel $A(y)=f''(y-1)-f''(y+1)$ at coefficient $\eta h^{2}/(3+\eta)^{2}$ and an even
 channel $B(y)=f'''(y-1)-f'''(y+1)$ at coefficient $h^{3}/(3+\eta)^{3}$.
@@ -1254,6 +1258,33 @@ tournament law finishes it.
 \lean{resolved\_le\_scale}, \lean{gChan\_bc}, \lean{hellinger\_tournament\_satisfiable} in
 \lean{LeanPaperBHellingerTestV1}}
 
+\paragraph{Shared-query tournament and its limit}
+The current upper construction is \lean{share\_tournament} in
+\lean{LeanPaperBShareTournamentV1}. Queries are indexed once, with one block of length $n$
+per query. Both orientations of a pair choose the same best query (\lean{qS\_symm}),
+so the likelihood tests remain antisymmetric even when many pairs reuse observations.
+Each individual error bound is still $\mathrm{BC}^n$ (\lean{beatS\_error}); dependence
+between tests is harmless for the union bound. The horizon is $|Q|n$, including any dummy
+block, hence paid cost is at most that horizon.
+The module passed the frozen smoke gate \texttt{smokeSHARP2\_20260925}. The Gaussian private-query
+example in \lean{LeanPaperBPrivateQueryV1} is already a concrete instance: its
+\lean{private\_query\_lower} forces a cost proportional to the number of private queries,
+while \lean{bc\_pq} and \lean{pq\_resolves} instantiate the tournament's information threshold.
+It does not prove the old quadratic factor in the number of worlds necessary.
+
+\paragraph{Second-moment obstruction law}
+\lean{LeanPaperBChiStarV1} proves the actual history density ratio (\lean{hist\_density}),
+the identity $\int p_w^2/p_u=1+\chi^2(p_w,p_u)$ (\lean{m2\_eq\_one\_add\_chi}), and the
+history-recursion bound $\mathbb E_w[L_u e^{-tN}]\le1$ (\lean{lintegral\_Z\_exp\_le}).
+The unsafe-output events cover the event of insufficient information. Splitting each event
+at likelihood ratio $c$ gives $c\delta+e^y/c$ (\lean{one\_alt\_bound}), and optimising $c$
+gives \lean{chi\_star\_tail}. The nonnegative-count inequality on its complement yields
+\lean{chi\_star\_expect}. Thus the result is about probabilities and expected counts under
+the adaptive observation law, not an arithmetic lemma supplied with a transcript bound.
+It assumes the stronger finite second moment uniformly over queries; finite KL alone does
+not imply that condition. The released proposition is finite-horizon. The stopped KL
+proposition elsewhere retains its separately proved scope.
+
 \paragraph{The latent family's rates (Theorem ``Both rates on the latent family'')} The observation
 density of a probe is the exact Gaussian mixture over the $8\cdot2^{r}$ latent patterns. Its
 characteristic function factors over the latent coordinates, which gives the decision probe's mean
@@ -1300,6 +1331,55 @@ oscillation.
 \lean{resp\_eq}, \lean{F\_Kpt}, \lean{loss\_eq}, \lean{loss\_cases}, \lean{safeOf},
 \lean{famSafe\_derived} in \lean{LeanPaperBFamilySafeV1}}
 
+\section{The two layers, the certificate channel and query design}
+
+\paragraph{The decision order} $\mathrm{near}(w,s)$ is $\{w\}\cup\{\lambda:\mathrm{sep}(w,\lambda)>s\}$
+and $d(w)$ is the least $s$ at which it has a common safe answer; it exists because every world
+has a safe answer and orders are bounded. \emph{Upper side:} at $s=d(w)-1$ there is no common
+answer. So every answer safe at $w$ is unsafe at some $\lambda$ with $\mathrm{sep}\ge d(w)$, and
+every query sees that $\lambda$ at most $Ch^{2d(w)}$. \emph{Lower side:} a common safe answer $a$
+of $\mathrm{near}(w,d(w))$ is unsafe only at worlds of order at most $d(w)$. The best query sees
+each of them at least $ch^{2d(w)}$, and the uniform allocation loses $1/|Q|$. Under the
+ultrametric property, $\mathrm{near}(w,d(w)-1)$ is an obstruction whose pairs all have order at
+least $d(w)$.
+\leanbox{\lean{near}, \lean{dOrder}, \lean{dOrder\_spec}, \lean{dOrder\_min},
+\lean{decision\_upper}, \lean{decision\_lower}, \lean{order\_ge\_obstruction},
+\lean{obstruction\_of\_order}, \lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}}
+
+\paragraph{The critical limit} For an allocation $\alpha$ the inner value is a finite minimum, and
+the game value is its supremum over the simplex, bounded by a single alternative's row.
+\begin{itemize}
+\item \emph{Upper:} eventually $|f_h-\hat c|<\varepsilon/4$ on the critical alternatives, and
+$\sum_q\alpha_q=1$ makes the bound uniform in $\alpha$.
+\item \emph{Lower:} take a critical allocation within $\varepsilon/4$ of $G^*$ and mix in the
+uniform one with weight $\beta=\min\{\frac12,\varepsilon/(4(G^*+1))\}$. The critical rows move by
+at most $\beta G^*$, and every fast row eventually exceeds $G^*$ through its diverging query,
+which now has weight at least $\beta/|Q|$.
+\end{itemize}
+The expansion lemma splits $h^{2\mathrm{sq}}=h^{2s}h^{2(\mathrm{sq}-s)}$ on critical rows and
+$h^{2s}=h^{2\mathrm{sq}}h^{2(s-\mathrm{sq})}$ on fast rows.
+\leanbox{\lean{inner}, \lean{gval}, \lean{mixU}, \lean{critical\_limit}, \lean{pow\_tendsto\_zero},
+\lean{inv\_pow\_tendsto\_atTop}, \lean{expansion\_hyps}, \lean{decision\_limit},
+\lean{inner\_smul}, \lean{gval\_smul}, \lean{private\_game}, \lean{shared\_game},
+\lean{same\_order\_ratio} in \lean{LeanPaperBCriticalGameV1}}
+
+\paragraph{The certificate channel} The observation's region is a clamped floor. Inside a region
+the density is the same restricted Gaussian in every world, so the per-query KL is a finite sum
+over the $k$ symbols. For $\delta\le1/k$ that sum is at most $\log(1/((k-1)\delta))/(k-1)$.
+\leanbox{\lean{reg}, \lean{massR}, \lean{klq\_cert\_one}, \lean{kl\_sum\_eq}, \lean{klq\_cert\_le},
+\lean{certSafe\_unsafe}, \lean{cert\_error}, \lean{cert\_cost}, \lean{cert\_tight} in
+\lean{LeanPaperBCertificateChannelV1}}
+
+\paragraph{Query design} The hitting form is a rewriting of $\mathrm{sep}_M$ as a minimum over
+the menu. In the embedding, an obstruction contains two distinct worlds, since each world's
+only safe answer is itself. If they belong to different pairs every query separates them at
+order $0$. Otherwise they are twins, and only a query of their set separates them at order $1$.
+\leanbox{\lean{sepM}, \lean{DecLE}, \lean{IdLE}, \lean{dec\_hitting}, \lean{id\_implies\_dec},
+\lean{dec\_mono}, \lean{gap\_example} in \lean{LeanPaperBDecisionOrderV1}; \lean{hsSafe},
+\lean{hsSq}, \lean{twins}, \lean{twins\_unsafe}, \lean{twins\_pair}, \lean{hitting\_embeds},
+\lean{order\_zero\_fails}, \lean{order\_two}, \lean{id\_iff\_hitting} in
+\lean{LeanPaperBQueryDesignV1}}
+
 \section*{Build record}
 The corpus is verified by \texttt{verify\_all.sh}, which freezes its inputs, builds every listed
 module and every local import from an empty cache in import order, counts \texttt{sorry} and
@@ -1313,6 +1393,11 @@ written after it, passes the smoke gate \texttt{smokeHEL\_20260925} ($40$ module
 \lean{LeanPaperBHellingerFamilyV1}, \lean{LeanPaperBHellingerParityV1} and
 \lean{LeanPaperBFamilySafeV1} were written later. Each compiles with the standard axioms and no
 \texttt{sorry}, and they are the roots of the smoke gate \texttt{smokeR2\_20260925}.
+\lean{LeanPaperBCertificateChannelV1} and \lean{LeanPaperBDecisionOrderV1} pass the smoke gate
+\texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems). \lean{LeanPaperBCriticalGameV1} and
+\lean{LeanPaperBQueryDesignV1} pass \texttt{smokeUP2\_20260925} ($107$ modules, $934$ theorems).
+Both runs used the standard axioms, with no \texttt{sorry}, no \texttt{native\_decide}, and no
+drift.
 
 \begin{thebibliography}{00}
 
