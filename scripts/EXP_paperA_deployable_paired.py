@@ -17,16 +17,24 @@ the surrogate oracle's exactness, accounting, the alpha tail, and the transcribe
 
 Output (new file; refuses to overwrite): research/unified_20260919/paperA_deployable_paired.json.
 Smoke: `--smoke --out DIR`.
+
+Checkpoint (added for launch 3): every finished (r, M, world, rule) cell is appended to
+`<OUT stem>.partial.jsonl` and fsynced.  A restart resumes the finished cells from it, but only
+when its header carries the same locked-config hash, the same rules-module hash and the same
+smoke flag.  Seeds depend only on (seed_base, r, M, world, run index), so a resumed run is the
+run that would have happened uninterrupted.  The checkpoint is kept after the final write.
 """
 
 import hashlib
 import json
 import math
+import os
 import pathlib
 import sys
 import time
 
 import numpy as np
+from scipy.stats import binom
 
 sys.path.insert(0, "scripts")
 import EXP_paperA_deployable as D  # noqa: E402
@@ -60,6 +68,25 @@ def main():
     if smoke:
         cfg.update({"r_values": [1], "M_values": [1.0, 4.0], "n_runs": 2, "budget": 3000})
     cfg_sha = hashlib.sha256(json.dumps(CONFIG, sort_keys=True).encode()).hexdigest()
+    rules_sha = hashlib.sha256(pathlib.Path("scripts/EXP_paperA_deployable.py").read_bytes()).hexdigest()
+    ckpt = OUT.with_name(OUT.stem + ".partial.jsonl")
+    header = {"kind": "header", "locked_config_sha256": cfg_sha,
+              "rules_module_sha256": rules_sha, "smoke": smoke}
+    done = {}
+    if ckpt.exists():
+        lines = [json.loads(x) for x in ckpt.read_text().splitlines() if x.strip()]
+        if not lines or {k: lines[0].get(k) for k in header} != header:
+            print(f"refusing to resume: {ckpt} header does not match this configuration",
+                  file=sys.stderr)
+            return 2
+        for x in lines[1:]:
+            done[(x["row"]["r"], x["row"]["M"], x["row"]["swapped"], x["row"]["rule"])] = x
+        print(f"resuming {len(done)} finished cells from {ckpt}", flush=True)
+    else:
+        with open(ckpt, "w") as fh:
+            fh.write(json.dumps(header) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
     t0 = time.time()
     print("Paper A, P-2: locked deployable-policy panel, paired over rules", flush=True)
     rows, ok_count, ok_thm, thm_slack, ok_pair, ok_sides = [], True, True, math.inf, True, True
@@ -75,7 +102,20 @@ def main():
                 v_bad = D.value_at(w, var, theta, HSB if correct == "A" else HSA)
                 ok_sides &= (v_ok > 0.0) and (v_bad == 0.0)
                 for rule in cfg["rules"]:
+                    key = (r, M, swapped, rule)
+                    if key in done:
+                        row = done[key]["row"]
+                        thm_slack = min(thm_slack, done[key]["row_min_slack"])
+                        ok_thm &= done[key]["row_min_slack"] >= -1e-9
+                        ok_count &= row["stopped"] + row["censored"] == cfg["n_runs"]
+                        rows.append(row)
+                        print(f"  r={r} M={M} swapped={str(swapped):5s} {rule:22s}"
+                              f" E[min(tau,B)]={row['restricted_mean_tau']:8.0f}"
+                              f" stopped={row['stopped']:3d} wrong={row['stopped_wrong']}"
+                              f" censored={row['censored']:3d}   (resumed)", flush=True)
+                        continue
                     recs = []
+                    row_slack = math.inf
                     for ix in range(cfg["n_runs"]):
                         seed = [cfg["seed_base"], r, int(M), int(swapped), ix]
                         rng = np.random.default_rng(seed)
@@ -87,6 +127,7 @@ def main():
                         for e in range(4, n):
                             slack = 2.0 + bad_w[e] + q - N[e]
                             thm_slack = min(thm_slack, slack)
+                            row_slack = min(row_slack, slack)
                             ok_thm &= slack >= -1e-9
                         recs.append({"seed": seed, "tau": int(t), "answer": ans,
                                      "censored": bool(c),
@@ -102,6 +143,11 @@ def main():
                            "restricted_mean_tau": float(np.mean([x["tau"] for x in recs]))}
                     ok_count &= row["stopped"] + row["censored"] == cfg["n_runs"]
                     rows.append(row)
+                    with open(ckpt, "a") as fh:
+                        fh.write(json.dumps({"kind": "cell", "row": row,
+                                             "row_min_slack": row_slack}) + "\n")
+                        fh.flush()
+                        os.fsync(fh.fileno())
                     print(f"  r={r} M={M} swapped={str(swapped):5s} {rule:22s}"
                           f" E[min(tau,B)]={row['restricted_mean_tau']:8.0f}"
                           f" stopped={row['stopped']:3d} wrong={row['stopped_wrong']}"
@@ -115,18 +161,42 @@ def main():
     check("both certificates sit on the right sides at every truth", ok_sides)
     check("every run is accounted for exactly once as stopped or censored", ok_count)
     check("PAIRING: within a cell, every rule used the same seed for the same run", ok_pair)
-    n_stop = sum(x["stopped"] for x in rows)
-    n_wrong = sum(x["stopped_wrong"] for x in rows)
-    tail = D.binom_tail(n_wrong, n_stop, cfg["alpha"]) if n_stop else 1.0
-    check("wrong answers among stopped runs are consistent with alpha", tail >= 1e-3,
-          f"{n_wrong} wrong of {n_stop} stopped, tail {tail:.3f}")
+    # delta-correctness bounds P(stop AND wrong) <= alpha per run, not P(wrong | stopped).
+    # The event is counted over every LAUNCHED run.  Runs of one rule are independent across
+    # cells and replicates (distinct seeds); rules share seeds (common random numbers), so
+    # they are tested separately and never pooled.
+    alpha_tests = {}
+    ok_alpha = True
+    for rule in cfg["rules"]:
+        rr = [x for x in rows if x["rule"] == rule]
+        n_launch = sum(len(x["runs"]) for x in rr)
+        k_bad = sum(x["stopped_wrong"] for x in rr)
+        tail = float(binom.sf(k_bad - 1, n_launch, cfg["alpha"])) if k_bad > 0 else 1.0
+        alpha_tests[rule] = {"launched": n_launch, "stopped_and_wrong": k_bad,
+                             "censored": sum(x["censored"] for x in rr),
+                             "binomial_tail_P(X>=k)": tail}
+        ok_alpha &= tail >= 1e-3
+    check("P(stop and wrong) <= alpha, per rule over all launched runs (binomial tail >= 1e-3)",
+          ok_alpha, "; ".join(f"{r}: {v['stopped_and_wrong']}/{v['launched']}"
+                              for r, v in alpha_tests.items()))
     check("THEOREM (`oCount_le_bad`, transcribed): N_e <= 2 + bad_e + q(t) on every middle cell"
           " of every run", ok_thm, f"min slack {thm_slack:.2f}")
     out = {"producer": "scripts/EXP_paperA_deployable_paired.py",
            "source_sha256": hashlib.sha256(pathlib.Path(__file__).read_bytes()).hexdigest(),
-           "rules_module_sha256": hashlib.sha256(
-               pathlib.Path("scripts/EXP_paperA_deployable.py").read_bytes()).hexdigest(),
+           "rules_module_sha256": rules_sha,
+           "checkpoint": str(ckpt.relative_to(ROOT)) if ckpt.is_relative_to(ROOT) else str(ckpt),
+           "resumed_cells": len(done),
            "config": cfg, "locked_config_sha256": cfg_sha, "smoke": smoke, "rows": rows,
+           "alpha_tests": alpha_tests,
+           "launch_history": "launch 1 (source sha 70202bb3843ee8a5) finished every run and crashed"
+                             " in the alpha self-check (OverflowError in a float binomial tail);"
+                             " that check also conditioned on stopping. This launch uses the"
+                             " corrected per-rule test over launched runs; rules, seeds and the"
+                             " locked configuration are unchanged. Launch 2 (source sha"
+                             " 1a37ef8d51c1b35b) finished 31 of 36 cells and was killed with"
+                             " its terminal session (no nohup) before writing; it kept no"
+                             " per-run data. Launch 3 adds the per-cell checkpoint and"
+                             " recomputes every cell from the same seeds.",
            "scope": "deployable policies under one two-answer lower certificate; alpha far"
                     " above delta_0; paired (common random numbers) across rules",
            "wall_seconds": time.time() - t0,

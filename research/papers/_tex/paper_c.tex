@@ -11,26 +11,36 @@ Lawrenceville, NJ, USA}}
 \maketitle
 
 \begin{abstract}
-A ranking served to a consumer who reads an unknown prefix must be good at every budget
-at once. If, in addition, every item must be retained about equally often at every budget,
-what does that cost? We answer exactly for the signed-prefix family, in which the regret at
-budget $k$ is the excess of $|\sum_{\ell\le k}g_{\pi_\ell}|$ over the best achievable at
-that budget. Four results. (i)~\emph{Exact zero-band prices.} With exactly uniform
-retention the optimum is $4/m(m+4)$ for even $m$ and $(m+3)/m(m+4)$ for odd $m$, against
-the unconstrained $2/(m+4)(m-1)$: the price is bounded by $2$ in even size and grows
-linearly in odd size. (ii)~\emph{The frontier and its breakpoint.} For even $m$ the whole
-frontier in the band width $\eta$ is
-$\max\{2/(m+4)(m-1),\,4(1-\eta)/m(m+4)\}$; for odd $m$ the price vanishes exactly when
-$\eta\ge1$, and for every $\eta$ the odd optimum is at least $(m+3-(m+1)\eta)/m(m+4)$, so
-it stays a factor $\Omega(m)$ above the free value at any fixed $\eta<1$. (iii)~\emph{A
-polynomial-size program with the same value.} The game over all $m!$ rankings has exactly
-the value of a flow over $O(m^{2})$ prefix compositions, every per-item band carried.
-(iv)~\emph{Robustness beyond the symmetric family.} For arbitrary per-item weights the
-optimum moves by at most $3\|g-g'\|_{1}/d$, and an odd-size perturbation of $\ell_{1}$ size
-at most $1/2m$ keeps a price ratio of at least $(m-1)/4$. A separate timing factor appears
-if the budget is chosen after the ranking is drawn: the free value becomes exactly $m-1$
-times larger. Every theorem is stated for the paper's own objects and is machine-checked in
-Lean~4; numerical results are reported as such.
+A compression is often served as a removal order: a consumer who must shed $k$ items drops
+the first $k$ and keeps the rest, and $k$ is not known in advance. Suppose, in addition, that
+every item must be dropped about equally often at every budget. What does that cost, and how
+does the answer depend on when the budget is chosen and on how exactly the weights are known?
+We answer all three questions exactly for the signed-prefix family. There, dropping a set $S$
+costs $|\sum_{i\in S}g_{i}|$ above the best achievable at that budget.
+
+\emph{The frontier.} Widen the marginal band to $\eta/m$. The optimum $V_{m}(\eta)$ is then
+known in closed form at every size and every $\eta\ge0$. For even $m$ it is
+$\max\{\frac{2}{(m+4)(m-1)},\frac{4(1-\eta)}{m(m+4)}\}$. For odd $m$ it is the maximum of
+two lines that cross at $\eta_{t}=1-\frac{2}{m(m-1)}$. It starts at $\frac{m+3}{m(m+4)}$ and
+reaches the free value $\frac{2}{(m+4)(m-1)}$ exactly at $\eta=1$. So exact uniformity costs
+a factor below $2$ in even size and a factor linear in $m$ in odd size.
+
+\emph{A polynomial program.} The game over all $m!$ orders has exactly the value of a flow
+over $O(m^{2})$ prefix compositions, with every per-item band carried.
+
+\emph{Robustness.} For arbitrary weights the optimum is Lipschitz in $\|g-g'\|_{1}$. Perturb
+by $\ell_{1}$ size $\varepsilon$, in odd size. While $\varepsilon=O(1/m)$ the price ratio is
+linear in $m$, and beyond that it decays as $\Theta(1/\varepsilon)$. For every perturbation with
+a positive perturbed value it is at least $\frac1{16}\min(m-1,\frac1\varepsilon)$ on the whole
+range $0<\varepsilon\le\frac16$, and at least $\frac{m-1}{4}$ below $\frac{1}{2m}$. Moving one light
+item by $\varepsilon$ gives at most $\frac{10}{\varepsilon}$.
+
+\emph{Timing.} Suppose the budget is chosen after the order is drawn. The free value is then
+$\frac{2}{m+4}$, a factor $m-1$ larger. Under the band it is $\frac{2}{m+4}$ for even $m$
+and $\frac{2+2(1-\eta)_{+}/m}{m+4}$ for odd $m$. So ex post the band costs at most a factor
+$1+\frac1m$, and the two linear factors do not multiply.
+
+Every theorem is machine-checked in Lean~4 at the paper's own objects.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -42,77 +52,96 @@ ranking under constraints, prefix regret, linear programming duality, formal ver
 
 \subsection{The question}
 
-A served compression is often a \emph{ranking}: the system returns an order, and a
-downstream consumer takes a prefix whose length is not known in advance. Fairness or
-exposure requirements then constrain the ranking \emph{distribution}---each item should be
-retained about equally often at every budget. We ask what that constraint costs when the
-ranking must be good at every prefix length simultaneously.
+A served compression must often work at a size that is not known in advance. One way to
+serve it is as a \emph{removal order}. The system returns an order of the items, and a
+consumer who must shed $k$ of them drops the first $k$ and keeps the other $m-k$. Fairness or
+exposure requirements then constrain the distribution of the order: each item should be
+dropped about equally often at every budget. We ask what that constraint costs when the order
+must be good at every budget simultaneously.
 
-Fix weights $g=(g_{1},\dots,g_{m})$ and a normaliser $D>0$. For a permutation $\pi$ and a
-budget $k$, the per-budget optimum and the regret are
+Fix weights $g=(g_{1},\dots,g_{m})$ and a normaliser $D>0$. For an order $\pi$ and a budget
+$k$, the best achievable loss and the regret are
 \begin{equation}
-b_{k}(g)=\min_{|S|=k}\Bigl|\sum_{i\in S}g_{i}\Bigr|,\quad
+b_{k}(g)=\min_{|S|=k}\Bigl|\sum_{i\in S}g_{i}\Bigr|,\qquad
 r_{k}(\pi;g)=\frac{\bigl|\sum_{\ell\le k}g_{\pi_{\ell}}\bigr|-b_{k}(g)}{D}.
 \label{eq:regret}
 \end{equation}
-For a distribution $P$ over rankings, the constrained optimum is
+Here $\{\pi_{1},\dots,\pi_{k}\}$ is the \emph{dropped} set. In the physical model of the
+compression, keeping the complement of a set $S$ costs $|\sum_{i\in S}g_{i}|/2$. So with
+$D=\|g\|_{1}$, the regret~\eqref{eq:regret} is the loss of the compression that keeps the
+last $m-k$ items, above the best compression of that size, normalised by $\|g\|_{1}/2$.
+
+\leanbox{\lean{physical\_radius}, \lean{physical\_minimum}, \lean{physical\_normalized\_regret}
+in \lean{LeanPaperCStabilityEndgameV1}}
+
+For a distribution $P$ over orders, the constrained optimum is
 \begin{equation}
 V_{g}(\eta)=\inf_{P}\ \max_{0<k<m}\ \mathbb{E}_{\pi\sim P}\,r_{k}(\pi;g)
 \label{eq:value}
 \end{equation}
-subject to the retained-marginal band
+subject to the marginal band
 \begin{equation}
-\Bigl|\Pr\nolimits_{P}\bigl(i\in\mathrm{prefix}_{k}\bigr)-\tfrac{k}{m}\Bigr|\le\tfrac{\eta}{m}
+\Bigl|\Pr\nolimits_{P}\bigl(i\in\{\pi_{1},\dots,\pi_{k}\}\bigr)-\frac{k}{m}\Bigr|\le\frac{\eta}{m}
 \quad(\text{all }i,\ k\le m).
 \label{eq:band}
 \end{equation}
-The budget is fixed before the draw: the objective is $\max_{k}\mathbb{E}\,r_{k}$, not
-$\mathbb{E}\max_{k}r_{k}$. Section~\ref{sec:expost} shows the two differ by a factor $m-1$
-already without a band, so they are never interchanged below.
+The band reads the same whether it is stated for dropping or for keeping. An item is kept at
+size $m-k$ with probability within $\eta/m$ of $\frac{m-k}{m}$ exactly
+when~\eqref{eq:band} holds. The budget in~\eqref{eq:value} is fixed before the draw, so the
+objective is $\max_{k}\mathbb{E}\,r_{k}$. Section~\ref{sec:expost} treats the objective
+$\mathbb{E}\max_{k}r_{k}$, where the budget is chosen after the draw. The two objectives are
+never interchanged.
 
 \subsection{Results}
 
-We work on the family $g_{m}$ of~\eqref{eq:family} below and write
-$V_{m}(\eta)=V_{g_{m}}(\eta)$ and $V^{\mathrm{free}}_{m}=2/(m+4)(m-1)$.
-$V^{\mathrm{free}}_{m}$ is the unconstrained optimum: the band is vacuous for
-$\eta\ge m$, and Theorems~\ref{thm:even} and~\ref{thm:odd} give
-$V_{m}(\eta)=V^{\mathrm{free}}_{m}$ there.
+We work on the family $g_{m}$ of~\eqref{eq:family} below. We write
+$V_{m}(\eta)=V_{g_{m}}(\eta)$ and $V^{\mathrm{free}}_{m}=\frac{2}{(m+4)(m-1)}$. The latter is
+the unconstrained optimum, because the band is vacuous for $\eta\ge m$.
 
 \begin{enumerate}
-\item[1)] \textbf{Exact zero-band prices} (Theorem~\ref{thm:zero}). $V_{m}(0)$ in closed
-form at every $m$. The ratio to $V^{\mathrm{free}}_{m}$ is $2(m-1)/m<2$ for even $m$ and
-$(m+3)(m-1)/2m$ for odd $m$. Uniform retention is almost free in even size and costs a
-linear factor in odd size.
-\item[2)] \textbf{The frontier and its breakpoint} (Theorems~\ref{thm:even},
-\ref{thm:odd}, \ref{thm:relaxed}). The whole even frontier; the exact odd breakpoint
-$\eta_{*}=1$; and an odd lower bound, linear in $\eta$, that keeps the price $\Omega(m)$ at
-any fixed $\eta<1$. On an initial segment of $\eta$ that bound is the value, which we
-establish at twelve points by exact rational certificates.
-\item[3)] \textbf{Exact flow equivalence} (Theorem~\ref{thm:flow}). The value
-of~\eqref{eq:value} over all $m!$ rankings equals the value of a program over $O(m^{2})$
-prefix compositions, with every per-item band carried in both directions. This is what
-makes the frontier computable at all.
-\item[4)] \textbf{Robustness beyond the symmetric family} (Theorem~\ref{thm:robust}). For
-arbitrary weights $g'\in\mathbb{R}^{m}$, with baseline and normaliser recomputed, the
-optimum is Lipschitz in $\|g_{m}-g'\|_{1}$. For odd $m$ a perturbation of $\ell_{1}$ size at
-most $1/2m$ keeps a price ratio of at least $(m-1)/4$.
+\item[1)] \textbf{The whole frontier} (Theorems~\ref{thm:zero}, \ref{thm:even},
+\ref{thm:odd}). $V_{m}(\eta)$ in closed form for every $m\ge3$ and every $\eta\ge0$. At
+$\eta=0$ the price $V_{m}(0)/V^{\mathrm{free}}_{m}$ is $\frac{2(m-1)}{m}<2$ in even size and
+$\frac{(m+3)(m-1)}{2m}$ in odd size. It vanishes exactly at $\eta_{*}=\frac{m-2}{2(m-1)}$
+(even) and at $\eta_{*}=1$ (odd).
+\item[2)] \textbf{A polynomial-size program with the same value} (Theorem~\ref{thm:flow}).
+\item[3)] \textbf{Robustness, and where it ends} (Theorems~\ref{thm:robust},
+\ref{thm:collapse}). A Lipschitz envelope for arbitrary weights, and the collapse scale of
+the price. The price is linear exactly while the perturbation is $O(1/m)$, and it decays as
+$\Theta(1/\varepsilon)$ beyond, with the lower bound $\frac1{16}\min(m-1,\frac1\varepsilon)$
+holding at every size of perturbation up to $\frac16$.
+\item[4)] \textbf{Timing} (Proposition~\ref{prop:expost}, Theorem~\ref{thm:expostband}).
+Choosing the budget after the draw multiplies the free value by $m-1$. Under the band the
+ex-post value is known exactly, and there the band costs at most a factor $1+\frac1m$.
 \end{enumerate}
 
 \subsection{Prior work, and what does not follow from it}
 
 Randomised rankings with constrained position or exposure marginals are a studied object.
 Singh and Joachims~\cite{singh2018} introduce exposure constraints and optimise a linear
-utility over the Birkhoff polytope. Celis, Straszak and Vishnoi~\cite{celis2018} bound
-group representation in every prefix. Singh, Kempe and Joachims~\cite{singh2021} contrast
-ex-ante and ex-post guarantees, as Freeman, Shah and Vaish~\cite{freeman2020} do in
-allocation. We take that framing as given and do not claim the flow technique: reducing a
-permutation polytope to a compositions DAG is standard~\cite{schrijver2003}.
+utility over the Birkhoff polytope. Celis, Straszak and Vishnoi~\cite{celis2018} bound group
+representation in every prefix. Singh, Kempe and Joachims~\cite{singh2021} constrain, for every
+item and every $k$, the probability that the item is ranked in the top $k$, and contrast ex-ante
+and ex-post guarantees, as Freeman, Shah and Vaish~\cite{freeman2020} do in allocation. We
+take that framing as given. We do not claim the flow technique either: reducing a permutation
+polytope to a compositions DAG is standard~\cite{schrijver2003}. One ordering that serves every
+budget is the object of incremental maximization, with competitive ratios for monotone
+objectives~\cite{disser2023,bienkowski2026}. Choosing a dependence structure under fixed
+marginals so that sums over unknown subsets cancel is studied through joint
+mixes~\cite{koike2022}.
 
-What is new is the \emph{law} that the reduction lets us prove, for an objective these works
-do not treat. The signed-prefix regret~\eqref{eq:regret} is an absolute prefix sum net of
-the per-budget optimum, taken at every budget. It is not linear in the ranking, and the
-parity of $k$ enters through $b_{k}$. Table~\ref{tab:prior} states the difference at the
-level of theorems.
+What is new is the law that the reduction lets us prove, for an objective these works do not
+treat. The signed-prefix regret is an absolute sum net of the per-budget optimum, taken at
+every budget. It is not linear in the order, and the parity of $k$ enters through $b_{k}$. It
+depends on the joint law of each prefix, not only on the position marginals. With weights
+$(+1,+1,-1,-1)$ on items $1,2,3,4$, the four cyclic shifts of the order $(1,3,2,4)$, with signs
+$(+,-,+,-)$, and the four cyclic shifts of $(1,2,3,4)$, with signs $(+,+,-,-)$, each put every item
+at every position with probability $\frac14$. Their expected $|\text{prefix}_{2}|$ are $0$ and
+$1$. So the marginal rank matrix, which suffices for a linear utility, does not
+suffice here. Against incremental maximization, the values here are exact minimax values under
+marginal bands with signed cancellation and a per-budget optimum, not competitive ratios. The
+joint-mix theory does not restrict realisations to permutations of one multiset, nor subsets to
+nested prefixes, and it does not give the frontiers below.
 
 \begin{table}[h]
 \caption{Nearest sources, and a theorem of this paper that does not follow from each.}
@@ -123,30 +152,37 @@ level of theorems.
 \toprule
 Nearest source & Theorem here that does not follow \\
 \midrule
-Exposure-constrained rankings~\cite{singh2018} & The exact signed-prefix value at uniform
-marginals, with a $\Theta(m)$ parity split (Thm.~\ref{thm:zero}) \\
-Prefix-fair ranking~\cite{celis2018} & The exact breakpoint in the band width at every
-$m$, and the whole even frontier (Thms.~\ref{thm:even}, \ref{thm:odd}) \\
-Ex-ante vs.\ ex-post~\cite{singh2021,freeman2020} & The exact free ex-post value, a factor
-$m-1$ above the ex-ante one (Prop.~\ref{prop:expost}) \\
+Exposure-constrained rankings~\cite{singh2018} & The exact signed-prefix frontier at every
+size and band, with a $\Theta(m)$ parity split (Thms.~\ref{thm:zero}--\ref{thm:odd}) \\
+Prefix-fair ranking~\cite{celis2018} & The exact breakpoints and the crossing point
+$\eta_{t}$ of the odd frontier (Thm.~\ref{thm:odd}) \\
+Ex-ante vs.\ ex-post~\cite{singh2021,freeman2020} & The exact banded ex-post value, and the
+fact that the band and timing prices do not multiply (Thm.~\ref{thm:expostband}) \\
 Flow reductions~\cite{schrijver2003} & Value equality with every per-item band carried
 through relabelling (Thm.~\ref{thm:flow}) \\
+Incremental maximization~\cite{disser2023,bienkowski2026} & Exact values, not ratios, under
+marginal bands and signed cancellation (Thms.~\ref{thm:zero}--\ref{thm:odd}) \\
+Joint mixes~\cite{koike2022} & The prefix-nested, permutation-restricted frontiers
+(Thms.~\ref{thm:zero}--\ref{thm:odd}) \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{What is proved, and how}
 
-Three evidence classes appear and are never interchanged: \PROVED\ (a theorem, stated at the
-paper's objects and checked in Lean~4~\cite{demoura2021} against Mathlib~\cite{mathlib2020});
-\CERT\ (an exact rational certificate verified by a script); \NUM\ (a floating-point solve or
-search). Each theorem below carries one line naming the Lean declaration that states it. The
-proof architecture and every supporting declaration are in the supplement. All modules
-compile with no \texttt{sorry} and no \texttt{native\_decide}, and their axioms are within
-\{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}. A compiled theorem
-certifies its statement under its hypotheses; the hypotheses of each headline are either
-the model assumptions displayed in it or discharged, and the supplement shows each is
-satisfiable.
+Three evidence classes appear, and they are never interchanged.
+\begin{itemize}
+\item \PROVED: a theorem stated at the paper's objects and checked in
+Lean~4~\cite{demoura2021} against Mathlib~\cite{mathlib2020}.
+\item \CERT: an exact rational certificate verified by a script.
+\item \NUM: a floating-point solve or search.
+\end{itemize}
+Each theorem carries one line naming its Lean declaration. The proof architecture and every
+supporting declaration are in the supplement. All modules compile with no \texttt{sorry} and
+no \texttt{native\_decide}, and their axioms lie within \{\texttt{propext},
+\texttt{Classical.choice}, \texttt{Quot.sound}\}. A compiled theorem certifies its statement
+under its hypotheses. Every hypothesis of a headline is either a model assumption displayed
+in it or discharged.
 
 \section{Setting}
 \label{sec:setting}
@@ -154,82 +190,48 @@ satisfiable.
 The family studied throughout is
 \begin{equation}
 g_{m}=\bigl(-3,\underbrace{-1,\dots,-1}_{p},\underbrace{1,\dots,1}_{q},3\bigr),
-\quad D=m+4,
+\qquad D=m+4,
 \label{eq:family}
 \end{equation}
-with $p=\lceil(m-2)/2\rceil$ and $q=\lfloor(m-2)/2\rfloor$. The total is $0$ for even $m$
-and $-1$ for odd $m$, and $\|g_{m}\|_{1}=m+4=D$. Every weight is an odd integer, so a prefix
-sum of length $k$ has the parity of $k$ and cannot be smaller than $k\bmod2$ in absolute
-value. For $g_{m}$ the per-budget optimum is exactly that:
+with $p=\lceil\frac{m-2}{2}\rceil$ and $q=\lfloor\frac{m-2}{2}\rfloor$. The total is $0$ for
+even $m$ and $-1$ for odd $m$, and $\|g_{m}\|_{1}=m+4=D$. Every weight is an odd integer, so
+a sum of $k$ weights has the parity of $k$ and has absolute value at least $k\bmod2$. For
+$g_{m}$ the per-budget optimum is exactly that,
 \begin{equation}
 b_{k}(g_{m})=k\bmod 2\qquad(0<k<m),
 \label{eq:baseline}
 \end{equation}
-attained by an explicit subset at each budget. So~\eqref{eq:regret} on $g_{m}$ is the
-normalised parity excess, and the physical objective of Section~\ref{sec:robust}, with the
-baseline recomputed from its definition, agrees with it on $g_{m}$.
+attained by an explicit subset at each budget. So on $g_{m}$ the physical regret, with the
+baseline computed from its definition, is the normalised parity excess.
 
 \leanbox{\lean{familyBaselineIdentification\_holds} in \lean{LeanPaperCBaselineAttainV1};
 \lean{trueValue\_family} in \lean{LeanPaperCStabilityFamilyV1}}
 
-The structure of $g_{m}$ is what the parity split lives on: two heavy items of weight
-$\pm3$, and light items of weight $\pm1$ whose counts differ by one in odd size. A $+3$ step
-between two budgets of zero excess is impossible, because a zero-excess prefix has absolute
-value at most $1$. That single observation drives the odd lower bounds.
+The parity split lives on this structure. There are two heavy items of weight $\pm3$, and
+light items of weight $\pm1$ whose counts differ by one in odd size. A $+3$ step between two
+budgets of zero excess is impossible, because a zero-excess prefix sum has absolute value at
+most $1$. That observation drives every odd lower bound below.
 
-\section{Exact zero-band prices}
-\label{sec:zero}
+\section{The frontier}
+\label{sec:frontier}
 
-\begin{theorem}[Zero-band value]
+\begin{theorem}[Zero band]
 \label{thm:zero}
 For every even $m\ge4$ and every odd $m\ge3$,
-\begin{equation}
+\[
 V_{m}(0)=
 \begin{cases}
-4/m(m+4), & m\text{ even},\\
-(m+3)/m(m+4), & m\text{ odd},
+\dfrac{4}{m(m+4)}, & m\text{ even},\\[8pt]
+\dfrac{m+3}{m(m+4)}, & m\text{ odd},
 \end{cases}
-\label{eq:vzero}
-\end{equation}
-and the infimum is attained by an explicit law on all $m!$ permutations of $g_{m}$. Hence
-$V_{m}(0)/V^{\mathrm{free}}_{m}$ is $2(m-1)/m$ for even $m$ and $(m+3)(m-1)/2m$ for odd $m$.
+\]
+attained by an explicit law on all $m!$ orders of $g_{m}$. Hence
+$V_{m}(0)/V^{\mathrm{free}}_{m}$ is $\frac{2(m-1)}{m}$ for even $m$ and
+$\frac{(m+3)(m-1)}{2m}$ for odd $m$.
 \end{theorem}
 
 \leanbox{\lean{even\_value\_zero}, \lean{odd\_value\_zero}, \lean{odd\_uniform\_price\_ratio}
 in \lean{LeanPaperCEndgameV1}}
-
-\emph{Proof idea.} Each side is one budget and one construction.
-
-For even $m$, the lower side is budget $1$. The weights sum to zero, so the prefix of
-length $m-1$ is minus the last item, and $r_{1}+r_{m-1}=(2/D)$ times the number of heavy
-items at the two ends. Under exact uniformity each end is heavy with probability $2/m$, so
-$\mathbb{E}r_{1}+\mathbb{E}r_{m-1}=8/mD$. The upper side mixes the $m-1$ rankings that insert
-the heavy pair $(+3,-3)$ at each position of an alternating base with one more ranking,
-$(-3,+1,-1,\dots,+1,-1,+3)$, whose excess is exactly $2$ at every budget. The insertion
-rankings contribute a single excess spike each, and the spikes cover the budgets once, so the
-mixture is flat at $4/mD$. A sign flip at ratio $1/2$ and uniform relabelling within each
-weight class make every per-item marginal exactly $k/m$ without moving the objective.
-
-For odd $m$ the lower side is budget $m-1$, where the baseline vanishes and the loss is
-decided by the last item: an item of weight $w$ in last position costs $|1+w|/D$. Uniform
-retention makes the last item uniform, and averaging $|1+w|$ over $g_{m}$ gives $(m+3)/m$.
-The upper side is the uniform law on the $m$ cyclic shifts of the base ranking
-$(+3,-3,-1,+1,\dots,-1)$, relabelled within weight classes. Its expected excess at budget
-$k$ is a circular window sum: $(m+4)/m-1$ at odd $k$ and $(k+4)/m$ at even $k$. The maximum
-is $(m+3)/m$, at $k=m-1$ only. \hfill$\square$
-
-The two cases differ by a factor $\Theta(m)$ and point in opposite directions. In even size
-the heavy items can hide at the ends, where their cost is shared between the first and last
-budgets. In odd size the imbalance of the light items leaves a $-1$ that the last budget
-must pay, and uniformity forces every item, including $+3$, into last position $1/m$ of the
-time.
-
-\section{The frontier and its breakpoint}
-\label{sec:frontier}
-
-$V_{m}(\eta)$ is non-increasing and convex in $\eta$: the feasible sets are nested, and a
-convex combination of plans for two bands is feasible for the combined band while the
-objective, a maximum of linear functionals, is convex. We now determine it.
 
 \begin{theorem}[The even frontier]
 \label{thm:even}
@@ -237,127 +239,116 @@ For every even $m\ge4$ and every $\eta\ge0$,
 \[
 V_{m}(\eta)=\max\Bigl\{\frac{2}{(m+4)(m-1)},\ \frac{4(1-\eta)}{m(m+4)}\Bigr\},
 \]
-so the price vanishes exactly at $\eta_{*}=(m-2)/2(m-1)$.
+so the price vanishes exactly at $\eta_{*}=\frac{m-2}{2(m-1)}$.
 \end{theorem}
 
-\leanbox{\lean{even\_frontier\_all} in \lean{LeanPaperCEndpointLawV1}; shape:
-\lean{value\_antitone\_of\_nested}, \lean{value\_convex\_of\_convex\_feasible} in
-\lean{LeanPaperCFrontierV1}}
+\leanbox{\lean{even\_frontier\_all} in \lean{LeanPaperCEndpointLawV1}}
 
-\begin{theorem}[The odd breakpoint]
+\begin{theorem}[The odd frontier]
 \label{thm:odd}
-For every odd $m\ge3$ and every $\eta\ge0$, $V_{m}(\eta)=V^{\mathrm{free}}_{m}$ if and only
-if $\eta\ge1$.
-\end{theorem}
-
-\leanbox{\lean{odd\_breakpoint} in \lean{LeanPaperCEndpointLawV1}}
-
-\begin{theorem}[The odd price survives a band]
-\label{thm:relaxed}
 For every odd $m\ge3$ and every $\eta\ge0$,
-\begin{equation}
-V_{m}(\eta)\ \ge\ \frac{m+3-(m+1)\eta}{m(m+4)} .
-\label{eq:relaxed}
-\end{equation}
-In particular, for $\eta\le\eta_{0}<1$, $V_{m}(\eta)\ge(1-\eta_{0})/(m+4)=\Omega(1/m)$, against
-$V^{\mathrm{free}}_{m}=\Theta(1/m^{2})$.
+\begin{multline*}
+V_{m}(\eta)=\max\Bigl\{\frac{m+3-(m+1)\eta}{m(m+4)},\\
+\frac{2}{(m+4)(m-1)}+\frac{(1-\eta)_{+}}{m(m+4)}\Bigr\}.
+\end{multline*}
+The two lines cross at $\eta_{t}=1-\frac{2}{m(m-1)}$, where
+$V_{m}(\eta_{t})=\frac{2(m^{2}+1)}{m^{2}(m-1)(m+4)}$. In particular
+$V_{m}(\eta)=V^{\mathrm{free}}_{m}$ exactly when $\eta\ge1$, and for any fixed $\eta<1$ the
+odd price is $\Omega(m)$.
 \end{theorem}
 
-\leanbox{\lean{relaxed\_value\_odd}, \lean{relaxed\_value\_linear} in
-\lean{LeanPaperCRelaxedJoinV1}}
+\leanbox{\lean{odd\_frontier}, \lean{odd\_kink\_value} in \lean{LeanPaperCOddFrontierV1};
+\lean{odd\_breakpoint} in \lean{LeanPaperCEndpointLawV1}}
 
-\emph{Proof ideas.} The upper sides of Theorems~\ref{thm:even} and~\ref{thm:odd} are one
-construction: insert the heavy pair $(+3,-3)$ at a uniformly random position of the
-alternating base. Each such ranking has excess exactly $2$ at one budget and $0$ elsewhere,
-so the mixture attains $V^{\mathrm{free}}_{m}$ at every budget. Its retained marginals are
-read off by counting: $+3$ is in the prefix of length $k$ with probability $k/(m-1)$ and
-$-3$ with probability $(k-1)/(m-1)$. For odd $m$ both lie within $1/m$ of $k/m$, which is
-$\eta=1$. For even $m$ a sign flip at ratio $1/2$ averages them to $(2k-1)/2(m-1)$, whose
-worst deviation, at the two end budgets, is exactly $\eta_{*}/m$. Relabelling uniformly
-within weight classes turns these class marginals into the per-item band~\eqref{eq:band}
-on a law over all $m!$ permutations. The segment $4(1-\eta)/m(m+4)$ of the even frontier is
-the convex combination of this law with the zero-band law of Theorem~\ref{thm:zero}.
+\emph{Why the frontier has this shape.} Every lower side comes from one budget or from an
+average of budgets. Every upper side is one explicit law.
 
-The lower sides use two combinatorial facts about every ranking of $g_{m}$. For even $m$,
-$r_{1}+r_{m-1}=(2/D)\,\#\{\text{heavy items at the two ends}\}$. The band bounds each end
-probability below by $(1-\eta)/m$: the first position is the budget-$1$ prefix, and the
-last is the complement of the budget-$(m-1)$ prefix, which is where the band's upper side
-enters. For odd $m$, $\sum_{k}(|S_{k}|-b_{k})\ge2+2[\pi_{m}>0]$: the $+3$ step forces
-excess $2$ on the two budgets straddling it, and a positive last item forces two more.
-Averaged over budgets, every band-feasible law then exceeds the free value by
-$(1-\eta)/Dm$. Because the proofs use the free value only as an upper bound, the margin is
-uniform over the feasible set and survives the infimum, with no compactness argument and no
-window near the breakpoint.
+\emph{Zero band.} For even $m$ the weights sum to zero, so the prefix of length $m-1$ is minus
+the last item. Then $r_{1}+r_{m-1}$ equals $\frac{2}{D}$ times the number of heavy items at
+the two ends, and each end is heavy with probability $\frac{2}{m}$. For odd $m$ the prefix
+of length $m-1$ is $-1$ minus the last item, and $m-1$ is even, so an item of weight $w$ in
+last position costs $\frac{|1+w|}{D}$. Averaging over uniform last positions gives
+$\frac{m+3}{mD}$. The upper laws are the following, each relabelled uniformly within weight
+classes. For even $m$, the insertion mixture with one flat order. For odd $m$, the uniform
+law on the cyclic shifts of $(+3,-3,-1,+1,\dots,-1)$.
 
-Theorem~\ref{thm:relaxed} uses only budget $m-1$. The last-position law $\pi_{i}$ satisfies
-$|\pi_{i}-1/m|\le\eta/m$ by the band at $k=m-1$, and for any centre $a$,
+\emph{The first odd line.} Only budget $m-1$ is used. By the band at $k=m-1$, the
+last-position law satisfies $|\pi_{i}-\frac1m|\le\frac{\eta}{m}$. Hence for any centre $a$,
 $\sum_{i}\pi_{i}c_{i}\ge\frac1m\sum_{i}c_{i}-\frac{\eta}{m}\sum_{i}|c_{i}-a|$. With
-$c_{i}=|1+g_{i}|$ and $a=2$ the two sums are $m+3$ and $m+1$. The centre matters:
-$a=0$ would give $m+3$ in place of $m+1$ and a bound that is never tight.
-\hfill$\square$
+$c_{i}=|1+g_{i}|$ and $a=2$ the two sums are $m+3$ and $m+1$.
 
-\paragraph{The odd bound is the value on an initial segment}
-Theorem~\ref{thm:relaxed} is not merely a bound. For $m\in\{5,7,9\}$ and
-$\eta\in\{0,\tfrac14,\tfrac12,\tfrac34\}$ we exhibit a band-feasible flow with rational
-path masses whose objective equals the right-hand side of~\eqref{eq:relaxed} exactly, so at
-those twelve points $V_{m}(\eta)=(m+3-(m+1)\eta)/m(m+4)$. The solver only locates the
-candidate; feasibility and value are verified in exact rational arithmetic. (\CERT)
-Bisecting on the solved frontier, the largest $\eta$ at which equality holds agrees with
-$1-2/m(m-1)$ to seven digits at $m=5,\dots,15$ (odd). This is a measured law, not a theorem.
-(\NUM) The odd curve strictly between the tight segment and the breakpoint is not
-determined here.
+\emph{The second odd line.} Every order pays total excess at least $2+2[\pi_{m}>0]$. The
+$+3$ step forces excess $2$ on the two budgets around it, and a positive last item forces two
+more at budget $m-1$. The band puts each of the $\frac{m-1}{2}$ positive items last with
+probability at least $\frac{1-\eta}{m}$. So the average over budgets, and hence the maximum,
+is at least $V^{\mathrm{free}}_{m}+\frac{1-\eta}{mD}$.
+
+\emph{The upper side.} $V_{m}$ is convex in $\eta$, so three laws suffice:
+\begin{itemize}
+\item the zero-band law at $\eta=0$;
+\item the insertion mixture at $\eta=1$, whose value is $V^{\mathrm{free}}_{m}$;
+\item a law at the crossing point $\eta_{t}$, with value exactly
+$\frac{2(m^{2}+1)}{m^{2}(m-1)D}$.
+\end{itemize}
+The last law is new. For $m\ge7$ it is a mixture of explicit orders, with masses in units of
+$\frac{1}{m^{2}(m-1)}$:
+\begin{itemize}
+\item mass $m^{2}+1$ on each insertion slot $0,\dots,m-3$ ($m^{2}-m+4$ at slot $0$), split
+equally between two versions. Version~A is the insertion order. Version~B is its negation
+with the last item set to $-1$;
+\item $m(m-1)$ on version~A at slot $m-2$;
+\item $2$ on the order that puts the light items of slot $m-2$ first and ends with
+$(-3,+3)$;
+\item $m-3$ on version~A at slot $0$ with its last two light items swapped, which ends with
+$(-1,+1)$.
+\end{itemize}
+Every budget then carries expected excess exactly $\frac{2(m^{2}+1)}{m^{2}(m-1)}$, and the
+class counts of every prefix satisfy the band at $\eta_{t}$. At $m=3$ and $m=5$ an explicit
+finite law takes its place.
 
 \section{The flow program has the same value}
 \label{sec:flow}
 
-Enumerating rankings is hopeless past $m=11$. A prefix is characterised, for the objective
-and for the band alike after symmetrisation, by its \emph{composition}
-\begin{equation}
-v=(n_{-3},n_{-1},n_{+1},n_{+3})\le(1,p,q,1),
-\label{eq:state}
-\end{equation}
-of which there are $4(p+1)(q+1)=O(m^{2})$. Let $\mathcal{F}_{m}(\eta)$ be the set of unit
-flows on the layered DAG of compositions whose edges add one item, with the band imposed on
-the class occupancies.
+Enumerating orders is hopeless past $m=11$. After symmetrisation, a prefix is characterised,
+both for the objective and for the band, by its composition
+$v=(n_{-3},n_{-1},n_{+1},n_{+3})\le(1,p,q,1)$. There are $4(p+1)(q+1)=O(m^{2})$ of them. Let
+$\mathcal{F}_{m}(\eta)$ be the unit flows on the layered DAG of compositions whose edges add
+one item, with the band imposed on the class occupancies.
 
 \begin{theorem}[Flow equivalence]
 \label{thm:flow}
-For every $m\ge2$, every $\eta$, and every functional $\Phi$ of the budget vector
-$(\mathbb{E}r_{k})_{k}$, the infimum of $\Phi$ over band-feasible laws on all $m!$
-permutations of $g_{m}$ equals its infimum over $\mathcal{F}_{m}(\eta)$. In particular
-$V_{m}(\eta)$ is the value of the flow program, and Theorems~\ref{thm:even}
-and~\ref{thm:odd} hold for it verbatim.
+Fix $m\ge2$, $\eta$, and a functional $\Phi$ of the budget vector $(\mathbb{E}r_{k})_{k}$. The
+infimum of $\Phi$ over band-feasible laws on all $m!$ orders of $g_{m}$ equals its infimum
+over $\mathcal{F}_{m}(\eta)$. In particular $V_{m}(\eta)$ is the value of the flow program,
+and Theorems~\ref{thm:even} and~\ref{thm:odd} hold for it.
 \end{theorem}
 
 \leanbox{\lean{actual\_banded\_infima} in \lean{LeanPaperCFlowBandJoinV1};
 \lean{value\_eq\_flow}, \lean{even\_frontier\_flow}, \lean{odd\_breakpoint\_flow} in
 \lean{LeanPaperCFlowObjectiveV1}}
 
-Three maps make it exact. \emph{Ranking to flow:} a law induces the occupancy of each
-composition; conservation is the consistency of the marginals of one joint law, and the
-whole budget vector transports. \emph{Symmetrisation:} averaging a law over relabellings
-inside each weight class leaves every $r_{k}$ unchanged and replaces each item's marginal by
-its class average, which keeps the band. \emph{Flow to ranking:} a unit flow carries a
-Markov law on whole trajectories whose layer marginals are its occupancies; a trajectory of
-positive mass is a sequence of legal one-item steps, hence a type sequence with the right
-multiplicities, hence the layer map of an actual permutation; relabelling uniformly within
-each class recovers the per-item band. The two programs reach exactly the same set of budget
-vectors, not merely the same infimum, and that set is non-empty for every $\eta\ge0$.
-
-The theorem is about the \emph{value} of the four-type program on $g_{m}$. It gives no
-algorithm for arbitrary perturbed weights, which the four-type flow does not represent.
-Table~\ref{tab:agree} records the program sizes. Solving it reproduces both anchors
-of~\eqref{eq:vzero} and $V^{\mathrm{free}}_{m}$ at $m=5,\dots,11$, and agrees with the
-permutation LP at $m=5,\dots,9$ for $\eta\in\{0,\frac14,\frac12,1\}$. (\NUM)
+Three maps make it exact.
+\begin{itemize}
+\item A law induces the occupancy of each composition. Conservation is the consistency of the
+marginals of one joint law.
+\item Averaging over relabellings inside a weight class keeps every $r_{k}$. It replaces each
+item's marginal by its class average.
+\item A unit flow carries a Markov law on whole trajectories. A trajectory of positive mass is
+a sequence of one-item steps, hence the layer map of an actual order. Relabelling within
+classes then recovers the per-item band.
+\end{itemize}
+The two programs reach exactly the same set of budget vectors, and that set is non-empty for
+every $\eta\ge0$. The statement concerns the value of the four-type program on $g_{m}$. It
+gives no algorithm for perturbed weights.
 
 \begin{table}[t]
-\caption{Flow-program sizes against the permutation formulation. (\NUM)}
+\caption{Flow-program sizes against the order formulation. \NUM{}}
 \label{tab:agree}
 \centering
 \footnotesize
 \begin{tabular}{@{}rrrl@{}}
 \toprule
-$m$ & flow states & flow edges & permutations \\
+$m$ & flow states & flow edges & orders \\
 \midrule
 $11$ & $120$ & $316$ & $13{,}860$ type sequences \\
 $15$ & $224$ & $612$ & intractable \\
@@ -367,107 +358,149 @@ $31$ & $960$ & $2756$ & intractable \\
 \end{tabular}
 \end{table}
 
-\section{Robustness beyond the symmetric family}
+\section{Robustness, and where it ends}
 \label{sec:robust}
 
-The family $g_{m}$ is highly structured, and a reviewer is entitled to ask whether the
-factor-$m$ price lives on exact cancellation. Two different questions must be kept apart.
-\emph{Relaxing the constraint} is Theorem~\ref{thm:relaxed}. \emph{Perturbing the weights}
-is this section. The two are not combined.
+The family $g_{m}$ is highly structured, and it is fair to ask whether the factor-$m$ price
+depends on exact cancellation. Relaxing the constraint is Theorem~\ref{thm:odd}. Perturbing
+the weights is this section. The two are not combined.
 
-For an arbitrary $g'\in\mathbb{R}^{m}$ let $V(g';\eta)$ be the physical optimum:
-\eqref{eq:value} over every permutation law with the per-item band~\eqref{eq:band}, the
-baseline $b_{k}(g')$ recomputed from its definition, and $D=\|g'\|_{1}$. Perturbations that
-break the equal-weight groups are in scope. By~\eqref{eq:baseline},
-$V(g_{m};\eta)=V_{m}(\eta)$.
+For arbitrary $g'\in\mathbb{R}^{m}$, let $V(g';\eta)$ be the physical optimum. It
+is~\eqref{eq:value} over every order law with the per-item band~\eqref{eq:band}, with the
+baseline $b_{k}(g')$ computed from its definition and $D=\|g'\|_{1}$. Perturbations that break
+the equal-weight groups are in scope, and $V(g_{m};\eta)=V_{m}(\eta)$
+by~\eqref{eq:baseline}. The band is vacuous at $\eta=m$, so $V(g';m)$ is the unconstrained
+optimum of $g'$ and $V(g';0)/V(g';m)$ is its price ratio. The normaliser cancels in the
+ratio.
 
-\begin{theorem}[Robustness]
+\begin{theorem}[Envelope]
 \label{thm:robust}
-Let $m\ge3$, $g'\in\mathbb{R}^{m}$ and $0<d\le\min(m+4,\|g'\|_{1})$, and write
-$\varepsilon=\|g_{m}-g'\|_{1}$. Then:
-\begin{enumerate}
-\item[(a)] for every $\eta\ge0$, $|V(g';\eta)-V_{m}(\eta)|\le3\varepsilon/d$; for even
-$m\ge4$ this places $V(g';\eta)$ within $3\varepsilon/d$ of the frontier of
-Theorem~\ref{thm:even};
-\item[(b)] for odd $m\ge3$, whenever $V(g';m)>0$ and $3\varepsilon/d\le V_{m}(0)$,
+Let $m\ge3$, $g'\in\mathbb{R}^{m}$, $\varepsilon=\|g_{m}-g'\|_{1}$ and
+$0<d\le\min(m+4,\|g'\|_{1})$. Then $|V(g';\eta)-V_{m}(\eta)|\le\frac{3\varepsilon}{d}$ for
+every $\eta\ge0$. Let $m$ be odd. Whenever $V(g';m)>0$ and $\frac{3\varepsilon}{d}\le V_{m}(0)$,
 \[
-\frac{V(g';0)}{V(g';m)}\ \ge\ \frac{V_{m}(0)-3\varepsilon/d}{V^{\mathrm{free}}_{m}+3\varepsilon/d};
+\frac{V(g';0)}{V(g';m)}\ \ge\ \frac{V_{m}(0)-3\varepsilon/d}{V^{\mathrm{free}}_{m}+3\varepsilon/d},
 \]
-\item[(c)] for odd $m\ge3$ and $\varepsilon\le1/2m$, with no further condition,
-$V(g';0)/V(g';m)\ge(m-1)/4$.
+and for $\varepsilon\le\frac{1}{2m}$, with no further condition,
+$\frac{V(g';0)}{V(g';m)}\ge\frac{m-1}{4}$.
+\end{theorem}
+
+\leanbox{\lean{family\_value\_robust}, \lean{even\_frontier\_robust} in
+\lean{LeanPaperCStabilityFamilyV1}, from \lean{trueValue\_stable} in
+\lean{LeanPaperCStabilityEndgameV1}; \lean{physical\_price\_ratio}, \lean{physical\_price\_linear}
+in \lean{LeanPaperCRatioJoinV1}}
+
+The constant $3$ pays for three moving parts: the prefix sum, the recomputed baseline and the
+normaliser. The envelope alone cannot say where the price collapses, because at fixed
+$\varepsilon$ its floor is bounded in $m$. The next theorem locates the collapse from both
+sides.
+
+\begin{theorem}[Collapse scale, odd $m$]
+\label{thm:collapse}
+Let $m\ge3$ be odd.
+\begin{enumerate}
+\item[(a)] \emph{Upper side.} Take $\delta\in(0,1]$ and move one light item from $-1$ to
+$-1+\delta$. This perturbation has $\|g_{m}-g'\|_{1}=\delta$ and a positive unconstrained
+value, and its price ratio is at most $\frac{10}{\delta}$.
+\item[(b)] \emph{Lower side.} Every $g'$ with $\varepsilon=\|g_{m}-g'\|_{1}\in[\frac1m,\frac16]$
+and $V(g';m)>0$ has price ratio at least $\frac{1}{16\varepsilon}$. Every $g'$ with
+$\varepsilon\le\frac1m$ and $V(g';m)>0$ has price ratio at least $\frac{m-1}{8}$. So on the
+whole range $0<\varepsilon\le\frac16$ the ratio is at least
+$\frac1{16}\min\bigl(m-1,\frac1\varepsilon\bigr)$, with no gap in $\varepsilon$.
 \end{enumerate}
 \end{theorem}
 
-\leanbox{(a) \lean{family\_value\_robust}, \lean{even\_frontier\_robust} in
-\lean{LeanPaperCStabilityFamilyV1}, from \lean{trueValue\_stable} in
-\lean{LeanPaperCStabilityEndgameV1}; (b), (c) \lean{physical\_price\_ratio},
-\lean{physical\_price\_linear} in \lean{LeanPaperCRatioJoinV1}}
+\leanbox{\lean{collapse\_upper}, \lean{collapse\_lower} in \lean{LeanPaperCCollapseScaleV1};
+\lean{window\_arith}, \lean{collapse\_window}, \lean{collapse\_all},
+\lean{collapse\_window\_satisfiable} in \lean{LeanPaperCCollapseWindowV1}}
 
-Here $V(g';m)$ is the unconstrained optimum of $g'$, since the band is vacuous at
-$\eta=m$. The constant $3$ in (a) pays for three moving parts: the prefix sum, the
-recomputed baseline, and the normaliser. For (c), take $d=m+3$, which is admissible because
-$\|g'\|_{1}\ge\|g_{m}\|_{1}-\varepsilon$. Then (a) at $\eta=m$ gives
-$V(g';m)\ge V^{\mathrm{free}}_{m}-3\varepsilon/d>0$, and
-$4V_{m}(0)-(m-1)V^{\mathrm{free}}_{m}=(2m+12)/m(m+4)\ge3\varepsilon$ closes the arithmetic.
+Together with the last clause of Theorem~\ref{thm:robust}, this pins the worst price ratio
+over perturbations of size $\varepsilon$.
+\begin{itemize}
+\item For $\varepsilon\le\frac{1}{2m}$ it is at least $\frac{m-1}{4}$.
+\item For $\varepsilon\in(\frac{1}{2m},\frac1m)$ it is at least $\frac{m-1}{8}$, over
+perturbations with a positive unconstrained value.
+\item For $\varepsilon\in[\frac1m,\frac16]$ it lies between $\frac{1}{16\varepsilon}$ and
+$\frac{10}{\varepsilon}$. The lower side is over perturbations with a positive unconstrained
+value.
+\end{itemize}
+So the price is linear in $m$ exactly while the perturbation is $O(1/m)$.
 
-\paragraph{What the floor cannot say}
-Part (b) is a lower bound on the price, and at fixed $\varepsilon$ the floor itself is at
-most $V_{m}(0)\,d/3\varepsilon\le2/3\varepsilon$, bounded in $m$. So the theorem certifies a
-linear price for perturbations of size $O(1/m)$ and certifies nothing linear beyond that.
-That is a limit of the method. It does not show that the price collapses: locating a
-collapse needs a perturbation proved to destroy the price, and none is proved.
+The upper side is a parity argument. Every prefix sum of $g_{m}$ has the parity of its
+length, which is what makes the free value small. After the move, the best drop of odd size
+costs at most $1-\delta$ (drop the moved item), and the best drop of even size still costs
+$0$ (leave it out). An order then pays at least $\delta$ at every odd budget before the moved
+item and at every even budget from it on. Each pair of budgets $(2i+1,2i+2)$ contains one of
+the two. So every order pays at least $\delta\frac{m-1}{2}$ in total, and the free value is at
+least $\frac{\delta}{2\|g'\|_{1}}$. The envelope bounds the zero-band value from above.
 
 \paragraph{What a search finds}
-We searched for the perturbation that hurts the ratio most. The search used random restarts
-followed by coordinate descent, over the $m!$ permutation formulation, with baseline and
-normaliser recomputed at every step, at $m=5,6,7$ and $\varepsilon\le1.6$. A search returns
-\emph{attained} ratios, which are upper bounds on the worst case. It can exhibit a collapse
-but cannot rule one out. At $m=7$ the adversarial search keeps $43.5\%$ of the price at
-$\varepsilon=0.8$ and $30.1\%$ at $\varepsilon=1.6$, roughly ten times past the scale $1/2m$
-of part~(c). A family that shrinks the heavy anchors keeps $57\%$ at $\varepsilon=1.6$. At
-$m=5,6$ no family in the grid halved the price, and a uniform shift at $m=6$ \emph{raises}
-it to $2.5\times$. Since the search bounds the worst case from above only, the $m=5,6$
-outcome says nothing about robustness at those sizes. (\NUM) Between $\varepsilon=1/2m$,
-where a linear price is proved, and $\varepsilon\approx0.8$ at $m=7$, where a perturbation
-removing more than half of it is exhibited, nothing is determined.
+We searched for the worst perturbation at $m=5,6,7$, with random restarts and coordinate
+descent over the $m!$ formulation and with baseline and normaliser recomputed. A search returns
+attained ratios, which are upper bounds on the worst case. At $m=7$ the search keeps $43.5\%$
+of the price at $\varepsilon=0.8$ and $30.1\%$ at $\varepsilon=1.6$. At $m=5,6$ no family in
+the grid halved it. \NUM{} These sizes lie below the range where the constants of
+Theorem~\ref{thm:collapse} separate the two regimes. The search is reported as a consistency
+check, not as evidence of the scale.
 
 \section{Choosing the budget after the draw}
 \label{sec:expost}
 
-If the budget is chosen after the ranking is drawn, the regret is
-$\mathbb{E}_{P}[\max_{k}r_{k}]$. The free problem then has an exact answer, and it is
-larger by a factor linear in $m$.
+If the budget is chosen after the order is drawn, the regret is
+$\mathbb{E}_{P}[\max_{k}r_{k}]$, which is linear in $P$.
 
-\begin{proposition}[The ex-post free value]
+\begin{proposition}[Free ex-post value]
 \label{prop:expost}
-For every $m\ge3$, every ranking of $g_{m}$ has an interior budget with excess at least $2$,
-and some ranking has excess at most $2$ at every budget. Hence, over all laws on the $m!$
-permutations with no band,
-\[
-\inf_{P}\ \mathbb{E}_{P}\Bigl[\max_{0<k<m}r_{k}\Bigr]=\frac{2}{m+4}=(m-1)\,V^{\mathrm{free}}_{m},
-\]
-and for every law the ex-ante objective is at most the ex-post one.
+For every $m\ge3$, every order of $g_{m}$ has an interior budget with excess at least $2$,
+and some order has excess at most $2$ at every budget. Hence
+$\inf_{P}\mathbb{E}_{P}[\max_{0<k<m}r_{k}]=\frac{2}{m+4}=(m-1)V^{\mathrm{free}}_{m}$. For
+every law, the ex-ante objective is at most the ex-post one.
 \end{proposition}
 
 \leanbox{\lean{pathValue\_eq}, \lean{path\_over\_free}, \lean{exists\_defect},
 \lean{objective\_le\_pathObjective} in \lean{LeanPaperCExPostV1}}
 
-The lower bound is the $+3$ step again. One heavy item is not last. A budget of excess $0$
-has a prefix sum of absolute value at most $1$, so a step of size $3$ cannot join two such
-budgets. Excess is even because every weight is odd. The upper bound is attained by the
-flat ranking for even $m$ and by the base ranking, whose prefix sums take only the values
-$0$, $3$ and $-1$, for odd $m$. This is the free case only. The banded ex-post problem is
-open, and the band factor of Theorem~\ref{thm:zero} and this timing factor must not be
-multiplied into $m^{2}$.
+\begin{theorem}[Banded ex-post value]
+\label{thm:expostband}
+Let $V^{\mathrm{post}}_{m}(\eta)$ be the infimum of $\mathbb{E}_{P}[\max_{0<k<m}r_{k}]$ over laws
+satisfying~\eqref{eq:band}. For every $\eta\ge0$,
+\[
+V^{\mathrm{post}}_{m}(\eta)=
+\begin{cases}
+\dfrac{2}{m+4}, & m\ge4\text{ even},\\[8pt]
+\dfrac{2+2(1-\eta)_{+}/m}{m+4}, & m\ge3\text{ odd}.
+\end{cases}
+\]
+\end{theorem}
+
+\leanbox{\lean{expost\_even}, \lean{expost\_odd} in \lean{LeanPaperCExPostBandV1}}
+
+Ex ante, uniformity costs a factor $\Theta(m)$ in odd size. Ex post, the free value is
+already $m-1$ times larger, and the band adds at most a factor $1+\frac1m$. So the band price
+and the timing price do not multiply.
+
+The lower side is Proposition~\ref{prop:expost} plus one observation. An odd order with the
+$+3$ last pays $4$ at budget $m-1$, and the band puts the $+3$ last with probability at least
+$\frac{1-\eta}{m}$.
+
+The upper side uses rotations. A uniform law on the $m$ cyclic shifts of one order has exactly
+uniform marginals.
+\begin{itemize}
+\item Every shift of the flat even order $(-3,+1,-1,\dots,+1,-1,+3)$ pays at most $2$ at its
+worst budget.
+\item Every shift of the odd base order pays at most $2$, except the one that ends with $+3$,
+which pays at most $4$.
+\item The insertion mixture pays $2$ on every order at $\eta=1$, and blending covers $[0,1]$.
+\end{itemize}
 
 \section{Evidence}
 \label{sec:evidence}
 
-Every number is produced by a script that checks itself against a statement proved in Lean
-and refuses to write output if a check fails. Table~\ref{tab:evidence} lists the packages.
-Figures~\ref{fig:cprice} and~\ref{fig:cstab} are drawn from stored results without
-re-solving anything, after each stored number was checked against the proved formula beside
-it.
+Every number is produced by a script that checks itself against a statement proved in Lean,
+and refuses to write output if a check fails. Figure~\ref{fig:ctheorems} draws the three
+closed forms from the theorems. Its markers are floating-point LP solutions at $m\le9$; they
+land on the formulas to $10^{-16}$ and certify nothing. Figure~\ref{fig:cstab} checks the
+envelope against every stored perturbation.
 
 \begin{table}[t]
 \caption{Evidence packages. Each script self-checks against a Lean statement.}
@@ -479,14 +512,13 @@ it.
 \toprule
 Package & Script & Checks \\
 \midrule
+Formula cross-check (ex ante, ex post) & \texttt{EXP\_paperC\_formula\_check} & 2/2 \\
+Theorem figure & \texttt{FIG\_paperC\_theorems} & 3/3 \\
 Flow program, breakpoints & \texttt{EXP\_paperC\_flow\_lp} & 5/5 \\
-Frontier, stability & \texttt{EXP\_unified\_structural\_frontier} & 9/9 \\
 Breakpoint certificates & \texttt{EXP\_paperC\_breakpoint\_certs} & 5/5 \\
-Attainment, tight segment & \texttt{EXP\_paperC\_dual\_certificates} & 7/7 \\
 Exact Farkas roots & \texttt{EXP\_paperC\_exact\_dual} & 5/5 \\
-Breakpoint law, $m=4,\dots,24$ & \texttt{EXP\_paperC\_general\_m} & 9/9 \\
 Stored data vs.\ theorems & \texttt{FIG\_paperC\_endpoints} & 10/10 \\
-Perturbation & \texttt{EXP\_paperC\_perturbation} & 9/9 \\
+Perturbation, both normalisations & \texttt{EXP\_paperC\_perturbation} & 9/9 \\
 Adversarial price search & \texttt{EXP\_paperC\_robustness} & 4/4 \\
 Window sums, value & \texttt{EXP\_paperC\_window} & 7/7 \\
 \bottomrule
@@ -495,36 +527,34 @@ Window sums, value & \texttt{EXP\_paperC\_window} & 7/7 \\
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=0.92\textwidth]{paperC_price_boundary.pdf}
-\caption{The exact price and the phase boundary. Top left: for even $m$ the whole frontier
-$V_{m}(\eta)/V^{\mathrm{free}}_{m}=\max\{1,\,2(1-\eta)(m-1)/m\}$ (Theorem~\ref{thm:even},
-lines); the float LP at $m=6,8$ lies on it to $10^{-17}$ (open markers, \NUM). Top right: for
-odd $m$ only the zero-band value (stars) and the breakpoint $\eta_{*}=1$ (bar) are theorems;
-the dashed curves between them are LP solutions, not a proved frontier. Bottom left: the
-zero-band price by parity, $(m+3)(m-1)/2m$ for odd $m$ against $2(m-1)/m$ for even $m$
-(Theorem~\ref{thm:zero}). Bottom right: the breakpoint. Lines are the theorems; the flow-LP
-bisection points come from a selected set of sizes ($5$--$15$, $17$, $19$, $21$, $25$,
-$31$), not every integer through $31$; the diamonds are exact rational Farkas certificates
-at $m=5,\dots,11$ (\CERT). Stored numbers were checked against the theorems before drawing
-(\texttt{FIG\_paperC\_endpoints}, 10/10).}
-\label{fig:cprice}
+\includegraphics[width=0.95\textwidth]{paperC_theorems.pdf}
+\caption{The three closed forms, drawn from the theorems. Left: the whole frontier
+$V_{m}(\eta)/V^{\mathrm{free}}_{m}$ (Theorems~\ref{thm:even}, \ref{thm:odd}), odd sizes solid
+and even sizes dashed. Centre: the banded ex-post value over the free ex-post value
+$\frac{2}{m+4}$ (Theorem~\ref{thm:expostband}); it is at most $1+\frac1m$, and exactly $1$ for
+even $m$. Markers: floating-point LP solutions at $m\le9$ (\NUM), cross-checks only. Right:
+the collapse scale at $m=101$, theorem curves only. Black: the envelope floor of
+Theorem~\ref{thm:robust} with $d=m+4-\varepsilon$. Green: the linear guarantee $\frac{m-1}{4}$
+for $\varepsilon\le\frac{1}{2m}$. Blue: the lower side $\frac{1}{16\varepsilon}$ on
+$[\frac1m,\frac16]$. Dashed: the one-item construction $\frac{10}{\varepsilon}$. Dotted: the
+unperturbed ratio. (\texttt{FIG\_paperC\_theorems}, 3/3.)}
+\label{fig:ctheorems}
 \end{figure*}
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.92\textwidth]{paperC_stability.pdf}
-\caption{Robustness, from stored perturbations; nothing was re-solved. Left: all 220
-perturbations (160 group perturbations over the flow LP, 60 per-item perturbations over the
-$m!$ permutation LP) of the physical objective, against the envelope $3\|g_{m}-g'\|_{1}/d$
-of Theorem~\ref{thm:robust}(a), $d=\min(\|g_{m}\|_{1},\|g'\|_{1})$. None enters the shaded
-region, which would refute the theorem; the worst ratio is $0.32$. The producer skips solver
-failures without recording them, so row counts were compared with its fixed grid: none was
-dropped. Centre: the same drifts divided by the envelope. Objectives with the normaliser or
-the baseline frozen are drawn only to show which object is perturbed. Right: price ratios
-\emph{attained} by the adversarial search (markers), upper bounds on the worst case, against
-the fixed-normaliser floor $1/(4\varepsilon+4/(m-1))$ (lines, odd $m$; its status is stated
-in the supplement). No attained ratio is below the floor, and how far the markers sit above
-it measures nothing about the floor's slack.}
+\caption{The envelope against stored perturbations; nothing was re-solved. Left: all 220
+perturbations of the physical objective, 160 group perturbations over the flow LP and 60
+per-item perturbations over the $m!$ order LP. They are drawn against $3\|g_{m}-g'\|_{1}/d$
+with $d=\min(\|g_{m}\|_{1},\|g'\|_{1})$. A point in the shaded region would refute
+Theorem~\ref{thm:robust}; none enters it, and the worst ratio is $0.32$. The producer skips
+solver failures without recording them, so row counts were compared with its fixed grid, and
+none was dropped. Centre: the same drifts divided by the envelope. Objectives with the
+normaliser or the baseline frozen are drawn only to show which object moves. Right: price
+ratios attained by the adversarial search (markers), which are upper bounds on the worst case,
+against the fixed-normaliser floor $\frac{1}{4\varepsilon+4/(m-1)}$ (lines, odd $m$; its
+status is stated in the supplement).}
 \label{fig:cstab}
 \end{figure*}
 
@@ -532,40 +562,31 @@ it measures nothing about the floor's slack.}
 \label{sec:limits}
 
 \begin{enumerate}
-\item[1)] \textbf{One family.} Every exact result is for $g_{m}$ of~\eqref{eq:family}.
-Theorem~\ref{thm:robust} leaves it only through a Lipschitz envelope.
-\item[2)] \textbf{The odd curve between its anchors.} For odd $m$ we prove the zero-band
-value, the breakpoint and the linear lower bound~\eqref{eq:relaxed}; the value between the
-tight segment and $\eta=1$ is not determined, and the tight segment itself is exact only at
-twelve certified points.
+\item[1)] \textbf{One family.} Every exact value is for $g_{m}$ of~\eqref{eq:family}. Other
+weights enter only through Theorems~\ref{thm:robust} and~\ref{thm:collapse}.
+\item[2)] \textbf{Constants of the collapse.} Theorem~\ref{thm:collapse} pins the collapse
+scale in order. Its two sides differ by a constant factor, and its lower side needs a
+positive unconstrained value, which the unperturbed family has.
 \item[3)] \textbf{Value, not algorithm.} Theorem~\ref{thm:flow} equates two values on
-$g_{m}$. It gives no polynomial-size program for perturbed weights, and the LP entries
-remain floating-point solutions.
-\item[4)] \textbf{The collapse scale.} Theorem~\ref{thm:robust} certifies a linear price only
-for perturbations of size $O(1/m)$. Where the price actually collapses is measured only as
-an upper bound, at three sizes.
-\item[5)] \textbf{The ex-post objective.} For $\mathbb{E}\max_{k}r_{k}$ only the free value is
-proved. Its price under a band is unknown, and the band and timing factors are not
-multiplied.
+$g_{m}$. It gives no polynomial-size program for perturbed weights.
+\item[4)] \textbf{Two objectives, kept apart.} Every ex-ante statement concerns
+$\max_{k}\mathbb{E}r_{k}$, and every ex-post one concerns $\mathbb{E}\max_{k}r_{k}$.
 \end{enumerate}
 
 \section{Conclusion}
 
-Requiring uniform retention of a served ranking at every budget costs a bounded factor in
-even size and a linear factor in odd size, and both prices are exact. The even frontier is
-known in closed form, the odd price vanishes exactly at $\eta=1$, and before that it stays
-linear at any fixed band width below one. The value over all $m!$ rankings is the value of
-an $O(m^{2})$ flow, so the frontier can be traced far past enumeration. The price is stable
-under arbitrary per-item perturbations of the weights, and it provably survives
-perturbations of size $O(1/m)$. What remains open is named rather than hidden: the odd curve
-between its anchors, the scale at which the price collapses, and the banded ex-post problem.
+Suppose every item must be dropped about equally often at every budget. That costs a
+bounded factor in even size and a linear factor in odd size, and the whole frontier in the
+band width is known in closed form at every size. The value over all $m!$ orders is the value
+of an $O(m^{2})$ flow. The price survives perturbations of the weights exactly while they are
+$O(1/m)$, and it decays as $\Theta(1/\varepsilon)$ beyond. When the budget is chosen after
+the draw, the band is almost free, so the timing price and the band price do not multiply.
 
 \section*{Companion material}
 The supplement gives the full proof architecture of each theorem, every supporting Lean
-declaration, and the frozen build it was checked in. The claim map records, for each
-headline, its model and quantifiers, its declaration, its remaining assumptions, and its
-evidence. Corrections made during preparation are recorded in the project ledger, not in
-this text.
+declaration, and the frozen builds it was checked in. The claim map records, for each
+headline, its model, its declaration, its scope and its evidence. Corrections made during
+preparation are recorded in the project ledger, not in this text.
 
 \begin{thebibliography}{00}
 
@@ -580,6 +601,16 @@ constraints,'' in \emph{Proc. 45th Int. Colloq. Automata, Languages, and Program
 \bibitem{singh2021} A. Singh, D. Kempe, and T. Joachims, ``Fairness in ranking under
 uncertainty,'' in \emph{Advances in Neural Information Processing Systems 34}, 2021,
 pp.~11896--11908.
+
+\bibitem{disser2023} Y. Disser, M. Klimm, K. Schewior, and D. Weckbecker, ``Incremental
+maximization via continuization,'' in \emph{Proc. 50th Int. Colloq. Automata, Languages, and
+Programming (ICALP)}, LIPIcs vol.~261, 2023, art.~47.
+
+\bibitem{bienkowski2026} M. Bienkowski, J. Blikstad, J. Byrka, M. Costa, Y. Disser, and
+A. Lutz, ``Incremental submodular maximization: Better than greedy,'' arXiv:2606.28558, 2026.
+
+\bibitem{koike2022} T. Koike, L. Lin, and R. Wang, ``Joint mixability and notions of negative
+dependence,'' arXiv:2204.11438, 2022.
 
 \bibitem{freeman2020} R. Freeman, N. Shah, and R. Vaish, ``Best of both worlds: Ex-ante and
 ex-post fairness in resource allocation,'' in \emph{Proc. 21st ACM Conf. Economics and

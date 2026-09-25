@@ -1,0 +1,556 @@
+\input{preamble}
+
+\begin{document}
+
+\title{From Obstruction to Rate:\\The Observation Order of a Safe Compression Decision}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A learner that must choose a compression does not have to identify the world it is in. It
+only has to separate worlds far enough that no surviving set of them disagrees on every
+answer. We turn that into a rate law and prove it.
+
+Call a set of worlds with no common safe answer an \emph{obstruction}. For a finite world
+set, take any safe-answer correspondence and any channel whose queries carry at most
+$\kappa(w,w')$ nats between two worlds. The cost of a safe decision is then governed by one
+number: $t^{*}$, the minimum over obstructions of the largest information among their pairs.
+Every finite-horizon policy that answers safely with probability $1-\delta$ spends, at some
+world, at least $\bigl(\frac{1-\delta}{|W|-1}\log\frac1\delta-\log2\bigr)/t^{*}$ queries in
+expectation. A tournament that tests every pair of information at least $t^{*}$ attains
+$O(|W|^{2}\log(|W|/\delta)/t^{*})$ whenever pairwise tests have exponent comparable to
+$\kappa$.
+
+On a graded channel, with $\kappa\asymp h^{2\,\mathrm{sep}}$, this becomes an \emph{order law}:
+$t^{*}=Ch^{2s^{*}}$. Here $s^{*}$ is the least order at which every set of worlds the observer
+still confuses has a common safe answer, that is, the maximum over obstructions of their
+minimum separation order. Identification is the special case of singleton answer sets, and its
+order is the maximum separation.
+
+On the parity-mask channel with $m$ worlds both rates are theorems, against every randomised
+adaptive policy that stops almost surely. The safe decision costs
+$\Theta(\log(1/\delta)/h^{2})$ and identification costs $\Theta(\log(1/\delta)/h^{2(m-1)})$. Both
+lower sides are corollaries of the law. The boundary is a second family with a latent world,
+where the per-step information orders $h^{2}$ and $h^{2r}$ are proved uniformly over the linear
+query class, and the query class itself decides the order. All theorems are machine-checked in
+Lean~4.
+\end{abstract}
+
+\begin{IEEEkeywords}
+sequential design, adaptive lower bounds, decision regions, information orders, formal
+verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{The question}
+
+Identifying the world suffices for choosing an action, and it is usually far more than
+necessary. The question is how much more, and whether the gap can be predicted from the
+structure of the problem rather than measured after the fact.
+
+Fix $\varepsilon$, and let $\mathcal A(w)$ be the set of $\varepsilon$-safe compressions in
+world $w$. A set of worlds $H$ is an \emph{obstruction} when
+$\bigcap_{w\in H}\mathcal A(w)=\varnothing$. A learner that cannot yet tell apart the worlds of
+an obstruction cannot answer safely, whatever it randomises. This paper proves the law that
+turns obstructions and the information of the queries into a rate. It also proves the law's
+two-rate instance on one channel, and it maps the boundary where the query class, rather than
+the worlds, decides the order.
+
+\subsection{Results}
+
+\begin{enumerate}
+\item[1)] \textbf{The obstruction law} (Theorems~\ref{thm:lower}, \ref{thm:upper}). For every
+finite world set, safe-answer correspondence and channel, the minimax cost is governed by
+$t^{*}$, the minimum over obstructions of the largest per-query information among their pairs.
+The lower bound $\Omega(\log(1/\delta)/t^{*})$ holds for every channel and every policy. A
+tournament attains $O(\log(|W|/\delta)/t^{*})$ given pairwise tests of comparable exponent.
+\item[2)] \textbf{The order law} (Theorem~\ref{thm:order}). On a graded channel $t^{*}=Ch^{2s^{*}}$,
+with $s^{*}$ the least safe order. For overlapping safe sets, $s^{*}$ is the minimum
+separation order. For identification it is the maximum.
+\item[3)] \textbf{Both rates on one channel} (Theorems~\ref{thm:endpoint},
+\ref{thm:parlaw}). On the parity-mask channel: $\Theta(\log(1/\delta)/h^{2})$ for the safe
+decision and $\Theta(\log(1/\delta)/h^{2(m-1)})$ for identification, against every randomised
+adaptive policy that stops almost surely. The lower sides follow from the law.
+\item[4)] \textbf{The query class decides the order} (Theorems~\ref{thm:vanish},
+\ref{thm:attain}, \ref{thm:unif}). On a latent family, the signal against the hidden character
+vanishes below order $\lceil n/d\rceil$ for every query of degree $d$, and the averaged tail
+query attains that order with constant exactly $r!/r^{r}$. The per-step information is at most
+$Ch^{2r}$ uniformly over the linear class. A degree-capped class breaks it, and one parameter
+of nonlinearity moves the order from $h^{6}$ to $h^{4}$.
+\end{enumerate}
+
+\subsection{Prior work, and what does not follow from it}
+
+Deciding without identifying is not ours. Javdani et al.~\cite{javdani2014} formulate decisions
+with overlapping regions and give near-optimal Bayesian active learning for them. Signal that
+appears only at high moments is the masking mechanism of Grosso, Standaert and
+Prouff~\cite{grosso2014}, with moment expansions of leakage by Rioul, Cheng and
+Guilley~\cite{rioul2021}, and concrete masking bounds by Duc, Faust and Standaert~\cite{duc2015}.
+Keeping only decision-relevant information is itself established~\cite{poli2023}. Information
+games with several correct answers are developed by Degenne and Koolen~\cite{degenne2019}, and
+ranking-and-selection with multiple correct answers and non-answerable estimates by Wang and
+You~\cite{wangyou2026}. We use these as tools and do not claim them.
+
+What is ours is the law that joins them. Obstructions and per-query information determine the
+rate for every safe-answer correspondence and every channel, and a graded channel turns that
+into an order.
+
+\begin{table}[h]
+\caption{Nearest sources, and a theorem of this paper that does not follow from each.}
+\label{tab:prior}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.30\columnwidth}p{0.62\columnwidth}@{}}
+\toprule
+Nearest source & Theorem here that does not follow \\
+\midrule
+Overlapping decision regions~\cite{javdani2014} & The minimax law $\Theta(\log(1/\delta)/t^{*})$
+for every correspondence and channel, and the order law $t^{*}=Ch^{2s^{*}}$
+(Thms.~\ref{thm:lower}--\ref{thm:order}) \\
+High-moment masking~\cite{grosso2014,duc2015} & The two minimax rates on one channel against
+every almost-surely stopping policy, and uniformity over the linear class with a
+query-free constant (Thms.~\ref{thm:endpoint}, \ref{thm:unif}) \\
+Multiple-answer games~\cite{degenne2019,wangyou2026} & The obstruction-based lower bound, whose
+hard pair is chosen from the policy's own output (Thm.~\ref{thm:lower}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What is proved, and how}
+
+Three evidence classes appear, and they are never interchanged.
+\begin{itemize}
+\item \PROVED: a theorem checked in Lean~4~\cite{demoura2021} against Mathlib~\cite{mathlib2020}.
+\item \CERT: an exact rational certificate.
+\item \NUM: a floating-point or Monte Carlo result.
+\end{itemize}
+Each theorem carries one line naming its declaration. The supplement gives the proof
+architecture and every supporting declaration. All modules compile with no \texttt{sorry} and no
+\texttt{native\_decide}, and their axioms lie within \{\texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}\}. A policy's \emph{cost} is its expected number of informative, that is
+non-dummy, queries. A dummy query has the same law in every world. The cost equals
+$\mathbb{E}\tau$ for a policy that issues no dummy before it stops, which every decoder here
+satisfies.
+
+\section{Safe-decision geometry and obstructions}
+\label{sec:geometry}
+
+Let $W$ be a finite set of worlds, $A$ a finite set of answers and
+$\mathrm{safe}:W\to 2^{A}$ the safe answers. $H\subseteq W$ is an obstruction when no answer is
+safe for all of $H$. Let $\mathrm{sep}(w,w')$ be the least order at which some admissible query
+separates two distinct worlds. A set is \emph{together at order $s$} when no pair in it is
+separated by order $s$.
+
+\begin{theorem}[The safe-order law]
+\label{thm:safelaw}
+Order $s$ suffices, meaning every set together at order $s$ has a common safe answer, if and
+only if every obstruction contains a pair separated by order $s$. Hence the least sufficient
+order is
+\[
+s^{*}=\max_{H\ \text{obstruction}}\ \min_{w\ne w'\in H}\mathrm{sep}(w,w').
+\]
+When $\mathrm{sep}$ is read off a separation predicate on queries, the law is a statement about
+queries.
+\end{theorem}
+
+\leanbox{\lean{safeAt\_iff}, \lean{safeAt\_mono}, \lean{safeAt\_zero\_of\_no\_unsafe} in
+\lean{LeanPaperBSafeOrderV1}; \lean{together\_iff\_no\_separating\_query},
+\lean{safeAt\_iff\_query}, \lean{sep\_unique} in \lean{LeanPaperBSepDerivedV1}}
+
+Quantifying over all obstructions rather than minimal ones is not a weakening, because
+obstructions are upward closed. If no obstruction exists, order $0$ suffices and the decision
+costs nothing. Two cases matter below. For \emph{overlapping} safe sets,
+$\mathrm{safe}(w)=A\setminus\{w\}$ with $A=W$, every two safe sets meet, the whole world set is
+the only obstruction, and $s^{*}=\min\mathrm{sep}$. For \emph{identification},
+$\mathrm{safe}(w)=\{w\}$, every pair is an obstruction and $s^{*}=\max\mathrm{sep}$.
+
+\leanbox{\lean{coSafe\_pairwise\_meet}, \lean{coSafe\_univ\_unsafe}, \lean{coSafe\_proper\_safe},
+\lean{coSafe\_safeAt\_iff} in \lean{LeanPaperBSafeOrderV1}; \lean{id\_order} in
+\lean{LeanPaperBObstructionLawV1}}
+
+The safe sets of the parity channel below are not posited. They are computed from the
+compression loss. Retaining the singleton $\{a\}$ at world $w$ has loss $\frac{m-1}{2}$ exactly
+when $a=w$, so the safe answers at tolerance $0$ are all $a\ne w$.
+
+\leanbox{\lean{selectedRadius\_self}, \lean{selectedRadius\_other}, \lean{safe\_iff\_ne} in
+\lean{LeanPaperBTipV1}}
+
+\section{The obstruction law}
+\label{sec:law}
+
+Fix a channel: for each world and query a density, and one dummy query with the same law in
+every world. Let $\kappa(w,w')\ge0$ bound the per-query divergence between two worlds. The
+\emph{obstruction information} is
+\[
+t^{*}=\min_{H\ \text{obstruction}}\ \max_{w\ne w'\in H}\kappa(w,w').
+\]
+It exists whenever some obstruction exists and every world has a safe answer. It is the largest
+threshold $t$ at which every obstruction contains a pair with $\kappa\ge t$. Some obstruction
+has all its pairs at most $t^{*}$.
+
+\leanbox{\lean{obstruction\_value}, \lean{resolves\_iff\_le}, \lean{two\_le\_card\_of\_unsafe} in
+\lean{LeanPaperBObstructionLawV1}}
+
+\begin{theorem}[The lower law]
+\label{thm:lower}
+Take any channel with $\mathrm{KL}_{q}(w\|w')\le\kappa(w,w')$ for every non-dummy query, and
+any randomised adaptive policy with a finite horizon whose output is safe with probability at
+least $1-\delta$ in every world. Then some world $w_{0}$ satisfies
+\[
+\mathrm{cost}(w_{0})\cdot t^{*}\ \ge\ \frac{1-\delta}{|W|-1}\log\frac1\delta-\log2 .
+\]
+The same holds with the per-query $\chi^{2}$ in place of $\kappa$.
+\end{theorem}
+
+\leanbox{\lean{obstruction\_pigeonhole}, \lean{info\_le\_cost}, \lean{obstruction\_lower},
+\lean{obstruction\_lower\_star} in \lean{LeanPaperBObstructionLawV1};
+\lean{obstruction\_lower\_chi} in \lean{LeanPaperBObstructionParityV1}}
+
+\emph{Why.} Take an obstruction $H$ whose pairs all carry at most $t^{*}$, and a world
+$w_{0}\in H$. Whenever the output is safe for $w_{0}$ it is unsafe for some other world of $H$,
+because $H$ has no common safe answer. By pigeonhole, some $v\in H$ receives unsafe output with
+probability at least $\frac{1-\delta}{|H|-1}$ at $w_{0}$ and at most $\delta$ at $v$. So the pair
+is chosen from the policy's own output, not fixed in advance. An event of those two masses
+forces the transcript divergence past $\frac{1-\delta}{|H|-1}\log\frac1\delta-\log2$. The
+transcript divergence is at most the expected informative queries times the per-query bound.
+
+\begin{theorem}[The tournament]
+\label{thm:upper}
+Let every obstruction contain a pair with $\kappa\ge t$. Test every pair with $\kappa\ge t$ by
+an antisymmetric test, keep the worlds that win all their tests, and output a common safe
+answer of the survivors.
+\begin{itemize}
+\item The survivors always have a common safe answer.
+\item The output is safe at $w$ whenever $w$ wins its own tests.
+\item Suppose each test on $n$ samples errs at world $w$ with probability at most
+$e^{-cn\kappa(w,v)}$, and $n\ge\log(|W|/\delta)/(ct)$. Then the output is safe with probability
+at least $1-\delta$ at every world, at a cost of at most $|W|^{2}n$ queries.
+\end{itemize}
+\end{theorem}
+
+\leanbox{\lean{survivors\_untested}, \lean{decode\_safe}, \lean{decode\_error},
+\lean{test\_budget}, \lean{tournament\_law} in \lean{LeanPaperBObstructionLawV1};
+\lean{tournament\_satisfiable} in \lean{LeanPaperBObstructionParityV1}}
+
+Two survivors never form a tested pair, since one of them lost. So the survivors contain no
+tested pair, and every obstruction contains one, which means the survivors are not an
+obstruction. The truth survives unless one of its own tests fails, and a union bound over those
+tests gives the error. The test exponent is a property of a concrete decoder run. It is a
+hypothesis of this theorem and is satisfiable. So the upper law is unconditional in its
+combinatorics and conditional on the channel's pairwise testability.
+
+\begin{theorem}[The order law]
+\label{thm:order}
+On a graded channel, $\kappa(w,w')=Ch^{2\,\mathrm{sep}(w,w')}$ with $0<h<1$. Every obstruction
+contains a pair with $\kappa\ge Ch^{2s}$ if and only if order $s$ suffices. Hence
+$t^{*}=Ch^{2s^{*}}$, and the minimax cost is $\Theta(\log(1/\delta)/h^{2s^{*}})$ whenever the
+tests match the grading.
+\end{theorem}
+
+\leanbox{\lean{graded\_resolves\_iff}, \lean{graded\_tStar} in \lean{LeanPaperBObstructionLawV1};
+\lean{graded\_lower\_chi} in \lean{LeanPaperBObstructionParityV1}}
+
+\section{Both rates on one channel}
+\label{sec:parity}
+
+\paragraph{The channel} World $w\in\{1,\dots,m\}$ carries the mask $v(j,w)=-1$ if $j=w$ and $+1$
+otherwise. Query $j$ returns
+\[
+Y_{j}=v(j,w)\prod_{\ell\le j}Z_{\ell}+\frac hj\sum_{\ell\le j}Z_{\ell}+\xi,
+\]
+with $Z$ uniform on the sign cube and latent, and $\xi\sim\mathcal N(0,\sigma^{2})$. The
+characteristic functions of two worlds differ by $2\sin t\,(\sin(th/j))^{j}e^{-\sigma^{2}t^{2}/2}$
+in magnitude. So query $j$ separates world $j$ at order $j$, and two worlds separate at
+$\min(w,w')$.
+
+\leanbox{\lean{parity\_cf\_difference}, \lean{parity\_gap\_order}, \lean{query\_separates\_iff},
+\lean{parity\_s\_safe}, \lean{parity\_s\_id} in \lean{LeanPaperBParityV1};
+\lean{channel\_sep\_is\_read\_off} in \lean{LeanPaperBSepDerivedV1}}
+
+\begin{theorem}[The two rates]
+\label{thm:endpoint}
+Fix $m\ge3$ and $\sigma>0$, the tip loss at tolerance $0$, and the class of randomised adaptive
+policies with a measurable stopping rule that stops almost surely, with measurable outputs. The
+stopping time need not be bounded, nor its expectation finite. There are $0<c\le C$, $h_{0}>0$
+and $\delta_{0}\in(0,1)$, depending only on $m$ and $\sigma$, such that for $0<h\le h_{0}$ and
+$0<\delta\le\delta_{0}$
+\begin{gather*}
+c\,\frac{\log(1/\delta)}{h^{2}}\le N^{*}_{\rm safe}\le C\,\frac{\log(1/\delta)}{h^{2}},\\
+c\,\frac{\log(1/\delta)}{h^{2(m-1)}}\le N^{*}_{\rm id}\le C\,\frac{\log(1/\delta)}{h^{2(m-1)}},
+\end{gather*}
+where $N^{*}$ is the minimax worst-world expected number of informative queries.
+\end{theorem}
+
+\leanbox{\lean{parity\_tip\_finish}, \lean{parity\_rates}, \lean{safeCert}, \lean{idCert} in
+\lean{LeanPaperBParityFinishV1}; \lean{stopped\_parity\_rates}, \lean{stopped\_safe\_lower},
+\lean{stopped\_id\_lower}, \lean{trunc\_correct}, \lean{costS\_ofPol} in
+\lean{LeanPaperBStoppedParityV1}}
+
+\begin{theorem}[The lower sides, from the law]
+\label{thm:parlaw}
+The parity channel is graded: every non-dummy query has
+$\chi^{2}\le a_{m,\sigma}h^{2\,\mathrm{sep}(w,w')}$ with $\mathrm{sep}(w,w')=\min(w,w')$. Its least
+safe order is $1$ for the overlapping answers and $m-1$ for identification. Theorem~\ref{thm:order}
+therefore gives, for every finite-horizon policy that is safe with probability $1-\delta$, a
+world with cost at least
+$\bigl(\frac{1-\delta}{m-1}\log\frac1\delta-\log2\bigr)/(a_{m,\sigma}h^{2})$. For identification
+the same holds with $h^{2(m-1)}$.
+\end{theorem}
+
+\leanbox{\lean{parity\_graded}, \lean{parity\_coSafe\_order}, \lean{parity\_id\_order},
+\lean{parity\_safe\_from\_law}, \lean{parity\_id\_from\_law} in
+\lean{LeanPaperBObstructionParityV1}}
+
+\emph{The upper sides.} Two explicit decoders run bounded statistics, $\cos(t_{0}Y)$ or
+$\sin(t_{0}Y)$ by the parity of $j$. Their per-test budgets come from an exponential
+concentration bound proved on the channel. The safe decoder queries only order $1$. The
+identification decoder queries every order up to $m-1$, and its cost is the sum over all its
+tests. \emph{Unbounded stopping.} A stopping policy is truncated at a horizon by which every
+world has stopped with probability at least $1-\delta$. The truncation is correct at level
+$2\delta$ and costs no more. The finite-horizon lower bound then applies, and a finite-horizon
+decoder is itself a stopping policy.
+
+\leanbox{\lean{safe\_correct}, \lean{safe\_cost}, \lean{id\_correct}, \lean{id\_cost} in
+\lean{LeanPaperBParityDecoderV1}}
+
+\section{The query class decides the order}
+\label{sec:family}
+
+The parity channel's orders come from its queries. A second family shows the same law with the
+query class itself as the lever. For $r\ge2$ and $u,v\in\{\pm1\}$,
+\[
+F_{u,v}(z)=3uz_{1}-2z_{2}-2z_{3}+v\prod_{\ell=4}^{r+3}z_{\ell}
+\]
+on $\{\pm1\}^{r+3}$, with the uniform reference and support
+$K=\{(t,t,t,1,\dots,1)\}$. The losses on $K$, computed as half the oscillation of the retained
+residual, make the safe sets at $u=\pm1$ disjoint for $\varepsilon<1$, while $v$ does not move
+them. \CERT{} A query picks a linear probe $g(z)=a\cdot z$ with $\|a\|_{1}\le1$ and returns
+$Y=F_{u,v}(Z)+hg(Z)+\xi$, with $Z$ latent. So $u$ decides the answer and $v$ is a nuisance that
+identification must still resolve.
+
+\begin{theorem}[Moment vanishing]
+\label{thm:vanish}
+Let $\chi$ be the top character on $\{\pm1\}^{n}$ and $g$ a polynomial of degree at most $d$.
+Then $\mathbb{E}[\chi g^{j}]=0$ whenever $jd<n$.
+\end{theorem}
+
+\leanbox{\lean{moment\_vanishes\_below\_order}, \lean{top\_character\_orthogonal} in
+\lean{LeanUnifiedQueryOrderV1}}
+
+\begin{theorem}[Attainment]
+\label{thm:attain}
+For the averaged tail query, $\sum_{z}\bigl(\prod_{i}z_{i}\bigr)\bigl(\sum_{i}z_{i}\bigr)^{k}$
+vanishes for $k<n$ and equals $2^{n}n!$ at $k=n$, so $\mathbb{E}[\chi_{n}g^{n}]=n!/n^{n}\ne0$. On
+the family, the decision probe separates the two values of $u$ by $12h$ in the second moment,
+and the tail probe separates the two values of $v$ by $2(r+1)\,r!/r^{r}\,h^{r}$ in the
+$(r+1)$-st moment.
+\end{theorem}
+
+\leanbox{\lean{cubeSum\_below\_diag}, \lean{cubeSum\_diag}, \lean{tail\_query\_moment\_ne\_zero} in
+\lean{LeanPaperBAttainmentV1}; \lean{decision\_moment\_gap}, \lean{identification\_moment\_gap}
+in \lean{LeanPaperBRatesV1}}
+
+\begin{theorem}[Per-step information, uniform over the linear class]
+\label{thm:unif}
+Consider every probe with shifts inside the box $\sum_{i}|a_{i}|\le1$, $\sum_{i}|ha_{i}|\le h_{0}$,
+centres within $R$. Let $Q$ be the flat average, over the sign cube, of the probe's translates
+of one base Gaussian mixture, and let $P$ weight the even patterns double and drop the odd
+ones. Then $P-Q$ is exactly the $r$-fold difference, $P$ and $Q$ are densities up to one common
+normaliser, and
+\[
+\int\frac{(P-Q)^{2}}{\ell}\ \le\ h^{2r}r^{-2r}C(\sigma,R+h_{0},r),
+\]
+with $C$ explicit and independent of the probe. So $\chi^{2}(P,Q)$ and $\mathrm{KL}(P\|Q)$ are
+$O(h^{2r})$ uniformly over the class. The same bound, with a factor $4$, holds for pairs whose
+difference is the $r$-fold difference of $\varphi(\cdot-1)-\varphi(\cdot+1)$.
+\end{theorem}
+
+\leanbox{\lean{iterDiff\_mixture\_envelope}, \lean{hellinger\_rate\_bound} in
+\lean{LeanPaperBRatesV1}; \lean{worlds\_diff}, \lean{chi2\_uniform},
+\lean{kl\_uniform\_over\_queries} in \lean{LeanPaperBWorldsV1}; \lean{kl\_le\_envelope} in
+\lean{LeanPaperBKLV1}; \lean{pair\_chi2\_bound} in \lean{LeanPaperBPairRateV1}}
+
+On the parity channel the box is discharged from the construction. The channel's queries
+induce shifts with $\sum_{i}|a_{i}|=1$ exactly, and centres $\pm1$. On the latent family,
+identifying its two $v$-worlds with such a pair, with the box discharged, is a modelling step
+that is not done here.
+
+\leanbox{\lean{queries\_inside\_box}, \lean{channel\_kl\_uniform} in \lean{LeanPaperBQueryClassV1}}
+
+\emph{The class is the lever.} The restriction to the linear class is part of the theorem. At
+$r=3$ the degree-$2$ probe $g=\frac12(z_{4}z_{5}+z_{6})$ has $g^{2}=\frac12(1+\chi)$. Squaring it
+recreates the character a degree cap was meant to exclude, and
+$\mathbb{E}_{+}Y^{3}-\mathbb{E}_{-}Y^{3}=3h^{2}$ exactly. \CERT{} A bounded moment contrast forces a
+Hellinger separation, so $H^{2}\ge ch^{4}$ and no uniform $Ch^{6}$ bound holds on the
+degree-capped class.
+
+\leanbox{\lean{hellinger\_lower\_of\_moment\_contrast} in \lean{LeanPaperBHellingerV1}} One parameter of nonlinearity,
+$g_{\eta}=(z_{4}+z_{5}+z_{6}+\eta z_{4}z_{5})/(3+\eta)$, opens a square channel. Its density
+difference has an odd channel at $\eta h^{2}$ and an even one at $h^{3}$. The cross term
+vanishes by parity, so the two scales add: $\eta^{2}h^{4}+h^{6}$. The crossover sits at
+$\eta\asymp h$.
+
+\leanbox{\lean{moment\_two}, \lean{moment\_three}, \lean{cross\_term\_vanishes},
+\lean{two\_scale\_shape} in \lean{LeanPaperBCrossoverV1}}
+
+\emph{What is open on this family.} The obstruction law applies to any channel written in
+protocol form with finitely many queries. For this family the per-step bound is proved for the
+constructed pair, but the family's own channel is neither identified with that pair nor
+assembled in that form. So the adaptive lower bound is not instantiated here.
+Its upper side is proved with Chebyshev's $1/\alpha$ rather than $\log(1/\delta)$. The two
+exponents on this family are therefore per-step orders, not minimax rates.
+
+\leanbox{\lean{budget\_lower}, \lean{safe\_upper}, \lean{sides\_do\_not\_match} in
+\lean{LeanPaperBHeadlineV1}}
+
+\section{Evidence}
+\label{sec:evidence}
+
+Every script self-checks against a proved statement and refuses to write output if a check
+fails.
+
+\begin{table}[t]
+\caption{Evidence packages. Each script self-checks against a Lean statement.}
+\label{tab:evidence}
+\centering
+\footnotesize
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llr@{}}
+\toprule
+Package & Script & Checks \\
+\midrule
+The two decoders, parity channel & \texttt{EXP\_paperB\_decoder} & 7/7 \\
+\quad paired rerun, formalized fallback & \texttt{EXP\_paperB\_decoder\_leanfallback} & 10/10 \\
+\quad figure from the formalized counts & \texttt{FIG\_paperB\_decoder\_formal} & 4/4 \\
+Family, safe sets, moment identities & \texttt{EXP\_paperB\_construction} & 8/8 \\
+Hellinger orders, real law & \texttt{EXP\_paperB\_hellinger\_real} & 6/6 \\
+Per-step bound over the linear class & \texttt{EXP\_paperB\_uniform\_hellinger} & 6/6 \\
+Envelope chain & \texttt{EXP\_paperB\_envelope\_rate} & 8/8 \\
+Query-class crossover, $g_{\eta}$ & \texttt{EXP\_paperB\_crossover} & 8/8 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperB_decoder_formal.pdf}
+\caption{The two decoders on the parity channel, from the formalized decoders' own counts.
+The paired rerun used the formalized fallback with the same seed and draws, and no new sampling
+was done. Left and centre: worst-world error against the \emph{total} budget, which for
+identification sums over all $m-1$ tests, at $m=3$. The bounds are family-wise
+Clopper--Pearson, each tail at $0.05/(2J)$ with $J=616$: upper (solid) and lower (dotted). A
+budget counts as achieving $\delta=0.05$ only when its upper bound clears it. A budget is
+bracketed from below only by a \emph{contiguous prefix} of tested budgets whose lower bounds all
+exceed $\delta$, because a fixed decoder's error need not be monotone in $N$. Both the
+certificates and the brackets are computed from the formalized decoders' counts. They coincide
+with those of the script rule on all $16$ panels. Three $(m,h)$ cells certify both decoders,
+all at $m=3$, with total budgets $25\to6400$, $100\to12800$ and $100\to51200$. This is an
+achieved-cost separation and not an identification-rate curve. Right: the log--log slope of
+the mean gap converges to the query index $j$ (exact). (\texttt{FIG\_paperB\_decoder\_formal},
+4/4.)}
+\label{fig:bdecoder}
+\end{figure*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_envelope_rate.pdf}
+\caption{The proved envelope chain on the latent family. Left: $\int\Delta^{2}/\ell$ against
+$h$ for $r=2,3,4$, with measured orders $4.00$, $6.00$, $8.00$ and the proved bound dashed; the
+gap is the explicit constant, not claimed sharp (\NUM). Right: the envelope ratio under its
+dominating Gaussian.}
+\label{fig:envrate}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_crossover.pdf}
+\caption{The query class as the lever. Left: the measured order in $h$ against $\eta$, falling
+from six to four. Right: $H^{2}$ against $h$ with the two-channel form
+$c_{6}h^{6}+c_{4}\eta^{2}h^{4}$ fitted on the coarse half and drawn through the fine half (\NUM).
+The additivity of the two channels is Theorem-level (cross term zero by parity); the fitted
+constants are not.}
+\label{fig:crossover}
+\end{figure}
+
+\section{Limitations}
+\label{sec:limits}
+
+\begin{enumerate}
+\item[1)] \textbf{The upper law needs tests.} Theorem~\ref{thm:upper} assumes pairwise tests of
+exponent $c\kappa$. On the parity channel the rates are attained by its own decoders, whose
+concentration is proved. That a tournament's tests exist with that exponent on a general
+channel is a property of the channel.
+\item[2)] \textbf{Finite horizon in the general lower law.} Theorem~\ref{thm:lower} is stated
+for finite-horizon policies. On the parity channel the extension to every almost-surely
+stopping policy is proved by truncation. For a general channel the same truncation argument
+applies but is not formalised.
+\item[3)] \textbf{The latent family is a boundary.} There the per-step orders are proved
+uniformly over the linear class, while the adaptive instantiation and an exponential-tail upper
+bound are not. Its upper budget carries $1/\alpha$.
+\item[4)] \textbf{Constants depend on $|W|$, $m$ and $r$.} The lower constant carries
+$\frac{1}{|W|-1}$ and the tournament $|W|^{2}\log|W|$. Nothing is uniform as these grow.
+\item[5)] \textbf{Finitely many worlds and queries}, throughout.
+\end{enumerate}
+
+\section{Conclusion}
+
+A safe decision costs what its obstructions cost. Among the sets of worlds that share no safe
+answer, find the one whose best-separated pair is worst. Its per-query information $t^{*}$
+fixes the minimax cost at $\log(1/\delta)/t^{*}$, and on a graded channel it becomes an order,
+$h^{2s^{*}}$. Identification is the case where every pair is an obstruction. On the parity
+channel both rates are proved against every almost-surely stopping policy, and they separate
+by a whole power of the signal, $h^{2}$ against $h^{2(m-1)}$. On a latent family the query
+class itself sets the order.
+
+\section*{Companion material}
+The supplement gives the proof architecture of every theorem, the finite-alphabet transcript and
+test results, the change of measure on filtrations, the envelope and the density identification
+behind Theorem~\ref{thm:unif}, the geometry and density realisation of the orders, and the status
+of results superseded during preparation. The claim map records each headline's model,
+declaration, scope and evidence.
+
+\begin{thebibliography}{00}
+
+\bibitem{javdani2014} S. Javdani, Y. Chen, A. Karbasi, A. Krause, D. Bagnell, and
+S. Srinivasa, ``Near optimal Bayesian active learning for decision making,'' in
+\emph{Proc. 17th Int. Conf. Artificial Intelligence and Statistics (AISTATS)}, 2014,
+pp.~430--438.
+
+\bibitem{grosso2014} V. Grosso, F.-X. Standaert, and E. Prouff, ``Low entropy masking
+schemes, revisited,'' in \emph{Smart Card Research and Advanced Applications (CARDIS)},
+2013, pp.~33--43.
+
+\bibitem{rioul2021} O. Rioul, W. Cheng, and S. Guilley, ``Cumulant expansion of mutual
+information for quantifying leakage of a protected secret,'' in \emph{Proc. IEEE Int. Symp.
+Information Theory (ISIT)}, 2021, pp.~2596--2601.
+
+\bibitem{duc2015} A. Duc, S. Faust, and F.-X. Standaert, ``Making masking security
+proofs concrete,'' IACR ePrint 2015/119, 2015.
+
+\bibitem{poli2023} M. Poli et al., ``Ideal abstractions for decision-focused learning,''
+arXiv:2303.17062, 2023.
+
+\bibitem{degenne2019} R. Degenne and W. M. Koolen, ``Pure exploration with multiple correct
+answers,'' in \emph{Advances in Neural Information Processing Systems 32}, 2019,
+pp.~14591--14600.
+
+\bibitem{wangyou2026} Q. Wang and W. You, ``Ranking-and-selection with multiple correct
+answers and non-answerable estimates,'' arXiv:2606.21889, 2026.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\end{document}

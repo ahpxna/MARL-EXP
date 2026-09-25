@@ -10,6 +10,46 @@ statuses, and they are not interchangeable:
 | **NUM** | measured by a self-checking script; an artifact, not a theorem |
 | **OPEN** | not done — including "argued in prose" |
 
+## Corpus state on 2026-09-25 (supersedes the gate block below)
+
+```
+last completed FULL gate   full6_20260925          finished 2026-09-25 03:01 (started 00:44, J=2)
+modules = 214 (listed 199, dependencies 15)   audited_theorems = 1666   failed = 0
+sorry = 0   native_decide = 0   axioms ⊆ {propext, Classical.choice, Quot.sound}   VERIFY PASS
+drift = none (all 214 frozen sources byte-identical to the working copy after the run)
+proof hashes: work/gate_runs/full6_20260925/report/MODULES.tsv, sha256 6e1106bd7773b2fe…
+covers every module added on 2026-09-24/25: LeanPaperASacrificeV1, LeanPaperASacrificeIdealV1,
+  LeanPaperA6TwoSurrogatesV1, LeanPaperBObstructionLawV1, LeanPaperBObstructionParityV1,
+  LeanPaperBFamilyChannelV1, LeanPaperBFamilyLawV1, LeanPaperBFamilyDecoderV1,
+  LeanPaperBStoppedLawV1, and the C modules RelaxedJoin, RatioJoin, OddKink{,Law,Band},
+  OddFrontier, CollapseScale, ExPostBand
+smoke gates since full5: smokeNEWDIR_20260924 (81 modules, 673 thms), smokeFAM_20260925
+  (67 modules, 572 thms), all PASS
+cited-but-ungated modules found 2026-09-25: LeanUnifiedObstructionOrderV1 (paper B
+  supplement), LeanUnifiedStructuralRelaxedV1 (paper C supplement); added to MODS, smoke gate
+  smokeUNI_20260925 PASS (2 modules, 16 theorems, standard axioms)
+```
+
+| New item (2026-09-24/25) | Status | Where | What remains |
+|---|---|---|---|
+| **A-SAC** surrogate value given up to recover the decision (user priority) | **LEAN** lower for every δ-correct policy; upper at the ideal learner | `pair_demand`, `middle_demand`, `middle_le_sacrifice`, `sacrifice_cost_law` (`N·sacrifice(w̄) ≥ 8rM·D`), `exchange_strict`, `strict_frontier`, `upper_constant`, `constant_gap` (`LeanPaperASacrificeV1`); `ideal_sacrifice`, `sacrifice_hypotheses_satisfiable` (`LeanPaperASacrificeIdealV1`) | achievability of a SMALL sacrifice over a long run (a diluted learner) |
+| **A-DIL** spreading the budget over any run length | **LEAN** | `sacrifice_mix_le`, `padPol`, `pad_real`, `dilution`, `dilution_small` (`LeanPaperASacrificeDiluteV1`, compiled clean; in the MODS of the next full gate) | interleaving during the run; the constant gap |
+| **A-FORCE** forcing schedules (old Limitation 6) | **LEAN, as a law** | `forcing_law`, `power_forcing_law` (`LeanPaperASacrificeV1`) | whether a given learner meets the pathwise hypothesis is that learner's property |
+| **A-S** surrogate at an estimate vs centred surrogate | **LEAN** | `frozenGameAt_thetaC`, `frozenAt_unif_shift`, `centred_unif_shift_ge`, `two_surrogates_differ` (`LeanPaperA6TwoSurrogatesV1`) | — |
+| **A P-2** locked deployable panel, paired | **NUM, DONE 2026-09-25** | `paperA_deployable_paired.json` (5/5, sha256 `5d4a41dbea0264c0…`), figure `paperA_deployable_paired.pdf` (`FIG_paperA_deployable_paired.py`, 7/7, reproduces all 31 cells of the killed launch 2), `paperA_deployable_paired.PROVENANCE_NOTE.md`; paper A Fig. `fig:apaired` | — |
+| **B-LAW** obstruction → rate (user priority) | **LEAN** lower on every channel; upper conditional on a stated test hypothesis | `obstruction_value`, `obstruction_lower`, `obstruction_lower_star`, `tournament_law`, `graded_resolves_iff`, `graded_tStar` (`LeanPaperBObstructionLawV1`); `parity_safe_from_law`, `parity_id_from_law`, `tournament_satisfiable` (`LeanPaperBObstructionParityV1`) | the tournament's test exponent on a general channel |
+| **B-LAW′** the law for unbounded stopping, every channel | **LEAN** | `stopped_obstruction_lower`, `_chi`, `_star`, `trunc_correct`, `costSt_ofFinite`, `correctSt_ofFinite` (`LeanPaperBStoppedLawV1`) | level `2δ`; uniform a.s. stopping over the finite world set |
+| **B-FAM** both rates on the latent Gaussian family (old B1/B3's missing identification, B2's upper side) | **LEAN** | `famChan`, `famDens_vdiff`, `famDens_udiff`, `famChi_v_le`, `famChi_u_le`, `family_safe_lower`, `family_id_lower` (`LeanPaperBFamilyChannelV1`); `charFun_famLaw`, `decMean_eq`, `tailMean_eq` (`LeanPaperBFamilyLawV1`); `near_error`, `safe_decoder_error`, `id_decoder_error`, `family_safe_minimax`, `family_id_minimax` (`LeanPaperBFamilyDecoderV1`); `family_safe_stopped_rate`, `family_id_stopped_rate` (`LeanPaperBStoppedLawV1`) | constants uniform in `r`; `famSafe` is stated (it is the correspondence `EXP_paperB_construction` computes) |
+| **B-HEL** the upper law on every channel (discharges the tournament's test hypothesis) | **LEAN** | `block_error`, `lintegral_prod_sched`, `beatH_error`, `hellinger_tournament`, `hellinger_upper_star`, `resolved_le_scale`, `hellinger_tournament_satisfiable` (`LeanPaperBHellingerTestV1`, smoke `smokeHEL_20260925` PASS: 40 modules, 316 theorems) | KL-vs-Hellinger comparability on the parity channel and the latent family |
+| **B-TIGHT** the law tight on both channels | **LEAN** | `family_safe_general_upper`, `family_id_general_upper`, `parity_safe_general_upper`, `parity_id_general_upper` (`LeanPaperBHellingerFamilyV1`, `LeanPaperBHellingerParityV1`) | — |
+| **B-SAFE** `famSafe` derived | **LEAN** | `famSafe_derived` (`LeanPaperBFamilySafeV1`) | — |
+| **A-STOP** sacrifice law, unbounded stopping | **LEAN** | `sacrifice_law_stopped` (`LeanPaperASacrificeStoppedV1`) | forcing law stays finite-horizon |
+| **A-BOTH / A3** both directions; exact certificates | **LEAN + CERT** | `high_separation_at_world` (`LeanPaperASeparationV1`); `EXP_paperA_frozen_proxy_exact.py` 7/7 | closed forms for general M read off, not proved |
+| **C-ODD** odd frontier `V_m(η)` in closed form | **LEAN** | `odd_frontier`, `odd_kink_value`, `kink_law` (`LeanPaperCOddFrontierV1`); `relaxed_value_odd` (`LeanPaperCRelaxedJoinV1`); `odd_line2_value` (`LeanPaperCOddKinkV1`) | — |
+| **C-COLL** collapse scale of the PRICE | **LEAN** | `collapse_upper`, `collapse_lower` (`LeanPaperCCollapseScaleV1`); `physical_price_linear` (`LeanPaperCRatioJoinV1`): worst-case ratio `Θ(min(m, 1/ε))` | supersedes C-H4's "the price's collapse point is not located" |
+| **C-WIN** the collapse window `(1/2m, 1/m)` | **LEAN** | `collapse_window`, `collapse_all` (`LeanPaperCCollapseWindowV1`) | — |
+| **C-EXPOST-BAND** banded ex-post value | **LEAN** | `expost_even`, `expost_odd` (`LeanPaperCExPostBandV1`) | — |
+
 ## Corpus state at the last full gate
 
 ```

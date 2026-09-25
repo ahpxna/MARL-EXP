@@ -1,0 +1,89 @@
+{
+  "producer": "scripts/ANALYSE_paperA_alpha_launched.py",
+  "producer_sha256": "f4b0cb701806dca83d73fcdeddd58e18b6902f83e2b4568229f628a33b66e925",
+  "inputs": {
+    "paperA_deployable.json": "165c4ea009053b72a91618d97754fe69233dec522b49298f4571e09c050f88aa",
+    "paperA7_panel.json": "969c3e139c50c881280173a6747658a0f392b034a46137ecc810133feb36b8a5"
+  },
+  "tests": {
+    "paperA_deployable": {
+      "alpha": 0.05,
+      "per_rule": {
+        "surrogate_at_estimate": {
+          "launched": 192,
+          "stopped_and_wrong": 0,
+          "censored": 71,
+          "tail_P(X>=k)": 1.0
+        },
+        "geometry": {
+          "launched": 192,
+          "stopped_and_wrong": 0,
+          "censored": 0,
+          "tail_P(X>=k)": 1.0
+        },
+        "uniform": {
+          "launched": 192,
+          "stopped_and_wrong": 0,
+          "censored": 0,
+          "tail_P(X>=k)": 1.0
+        }
+      },
+      "pooled": {
+        "launched": 576,
+        "stopped_and_wrong": 0,
+        "tail_P(X>=k)": 1.0
+      }
+    },
+    "paperA7_panel": {
+      "alpha": 0.05,
+      "per_arm": {
+        "learner": {
+          "launched": 200,
+          "stopped_and_wrong": 0,
+          "censored": 1,
+          "tail_P(X>=k)": 1.0
+        },
+        "oracle": {
+          "launched": 200,
+          "stopped_and_wrong": 0,
+          "censored": 0,
+          "tail_P(X>=k)": 1.0
+        },
+        "uniform": {
+          "launched": 200,
+          "stopped_and_wrong": 0,
+          "censored": 0,
+          "tail_P(X>=k)": 1.0
+        }
+      },
+      "pooled": {
+        "launched": 600,
+        "stopped_and_wrong": 0,
+        "tail_P(X>=k)": 1.0
+      }
+    }
+  },
+  "checks": [
+    {
+      "name": "pilot: recounted wrong-and-stopped and censored equal the stored counts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "pilot: P(stop and wrong) <= alpha is not rejected, per rule and pooled",
+      "ok": true,
+      "detail": "0 of 576 launched"
+    },
+    {
+      "name": "A7 panel: recounted wrong-and-stopped equal the stored counts",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "A7 panel: P(stop and wrong) <= alpha is not rejected, per arm and pooled",
+      "ok": true,
+      "detail": "0 of 600 launched"
+    }
+  ],
+  "all_passed": true
+}
