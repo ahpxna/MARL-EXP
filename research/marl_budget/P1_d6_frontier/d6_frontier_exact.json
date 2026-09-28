@@ -1,0 +1,3996 @@
+{
+ "artifact": "P1 D6 m=6 revision frontier, exact",
+ "producer": "research/marl_budget/P1_d6_frontier/d6_frontier_exact.py",
+ "producer_sha256": "8ee52badc168a0368846ca0cf8f458f3aece1ed3d5938f991c1cadd39b460cad",
+ "argv": [],
+ "lean_sources_sha256": {
+  "LeanD6SharpnessM6V1.lean": "c336d1f6112ebf3858a275ed09a31d7e1bf791b93cadd39a1c2720d6c6ff9c90",
+  "LeanD6M6SharpnessBridgeV1.lean": "3298eba45cc5b681464cfda89c60948d9b948510d10bac79f004f2a598fa0369",
+  "LeanD6BinaryBridgeV1.lean": "bfe1d1b71cc6028585b76bf5a0c8c872f709e96affa801577b520bd89b191e26",
+  "LeanD6SmallSymmetricDifference.lean": "4872de20e923d6c424d6ae949b423ebdf6364e490a0375d8554d6db75d148eec",
+  "LeanD6MarginSensitiveExchangeV1.lean": "002269e188a14b6542a2450082880d1d69c80cf525e0e88f2719335f589a5444",
+  "LeanD6SharpMarginThresholdV1.lean": "1bdd9ccc7110fa13f44797df220aa73d7646cecaeb3c302581270493420d1590",
+  "LeanProductMixedDifferenceV4.lean": "8d362429b4757c70a796ae53de88e531eff850d07941cef81d9dca8671a87037",
+  "LeanD6H3Exchange.lean": "09511ea45db12ac5fe495f92ce3b6a4eab5d6658c151ea186b14e7528b705a07",
+  "LeanSupportGeometryV4.lean": "d08301e3e7fe1df43d2cc000614b11f2a6b21d5e1d0370c6598ed5af005041d9",
+  "LeanProductSurrogateV4.lean": "94887a7f8f9112973a6a0de7d2a559c34ad2d4bd3f129401136430138ec58cd9"
+ },
+ "evidence_class": "EXACT (rational arithmetic, finite enumeration); not a proof",
+ "model": "P1 step 1: exact revision frontier of the D6 compression loss on the m = 6 family.\n\nModel, transcribed from the Lean definitions (file:def):\n  * world F : (Fin 6 -> Fin 2) -> R.  Family Vb s = 2 s * Ib + Db\n      (LeanD6SharpnessM6V1.lean: Ib, Db, Vb; Ib and Db are PARSED from that file, not retyped).\n  * reference q : Fin 6 -> Fin 2 -> R, product weights jointWeight q c = prod_i q i (c i)\n      (LeanProductMixedDifferenceV4.lean: jointWeight).  The family uses the corner reference\n      cornerQ2 i u = if u = 0 then 1 else 0 (LeanD6BinaryBridgeV1.lean: cornerQ2).\n  * productResponse q F i u = sum_c jointWeight q c * F (update c i u)\n      (LeanProductMixedDifferenceV4.lean: productExpectation, productResponse).\n  * retainedResidual q F S x = F x - sum_{j in S} productResponse q F j (x j)\n      (LeanD6H3Exchange.lean: retainedResidual).\n  * loss l_S = productCompressionLoss F (productResponse q F) S = osc(retainedResidual S) / 2\n      (LeanProductMixedDifferenceV4.lean: productCompressionLoss; LeanSupportGeometryV4.lean: osc).\n  * mixedDifference F i x c = F x - F (update x i (c i)) - F (update c i (x i)) + F c\n      (LeanProductSurrogateV4.lean: mixedDifference);  delta_box = max_{i,x,c} |mixedDifference|,\n      the least delta satisfying the hdelta hypothesis of pair_loss_le_sdiff_card.\n  * score j = osc (productResponse q F j)  (response span; the IsTopKByScore score in\n      LeanD6SmallSymmetricDifference.pair_loss_le_sdiff_card and\n      LeanD6SharpMarginThresholdV1.margin_two_sufficient).\n  * Top-k sets: IsTopKByScore C S k := S.card = k and every k-set has score sum <= S's\n      (LeanSupportGeometryV4.lean: IsTopKByScore).  With ties there can be several; all are reported.\n\nQuantities, for each budget k = 1..5:\n  * l*_k = min over |S| = k of l_S, and the set of optimal k-sets;\n  * for each Top-k prefix P: d_k(P) = min over optimal T of |P \\ T|;\n    F_k(R) = min over |S'| = k, |S' \\ P| <= R of l_{S'} - l*_k,  R = 0..min(k, 6-k);\n  * G(R) = min over all 720 rankings pi of max_k min_{|S'| = k, |S' \\ pi_k| <= R} (l_{S'} - l*_k).\n\nSelf-checks (each can fail; the script refuses to write the JSON if any fails):\n  * Lean-proved numbers on Vb s: delta_box = 2s+2 (integer_family_interaction_exact),\n    2(l_{0,4,5} - l_{1,2,3}) = 12 s (twoD_eq), spans (2s+1, 2s-1, 2s-1, 2s-1, 2s+1, 2s+1)\n    (comp_eq, strict_topC_margin_two), unique Top-3 set {0,4,5} with margin 2, the residual\n    extremes gSelI/gSelD/gComI/gComD values, and 2D/delta_box = 6s/(s+1)\n    (normalized_family_bridge).\n  * pair_loss_le_sdiff_card on every (Top-k P, competitor T) pair;\n    pair_loss_le_sdiff_card_sub_score_surplus on every such pair.\n  * Monotonicity F_k(R+1) <= F_k(R), F_k(min(k,6-k)) = 0, G(R+1) <= G(R).\n\nExact arithmetic throughout (fractions.Fraction).  No solver, no tolerance.\n",
+ "self_checks": {
+  "n": 1702,
+  "all_ok": true,
+  "family_and_parse_checks": [
+   {
+    "check": "Ib, Db vanish at the corner (respI_zero, respD_zero)",
+    "ok": true
+   },
+   {
+    "check": "respI i 1 = oscSlope, respD i 1 = oscConst (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=1 P=[0]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=1 P=[4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=1 P=[5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=2 P=[0, 4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=2 P=[0, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=2 P=[4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=3 P=[0, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=4 P=[0, 1, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=4 P=[0, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=4 P=[0, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 F_k(min(k,m-k)) = 0 k=5 P=[0, 2, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 delta_box = 2s+2 (integer_family_interaction_exact)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 2D(S,T) = 12s (twoD_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 spans (2s+1,2s-1,2s-1,2s-1,2s+1,2s+1) (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 unique Top-3 = {0,4,5}",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 Top-C margin = 2 (strict_topC_margin_two)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 2D/delta_box = 6s/(s+1) (normalized_family_bridge)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 gSel max = 6s (gSelI_max, gSelD_max)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 gSel min = -8s-3",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 gCom max = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 gCom min = -1",
+    "ok": true
+   },
+   {
+    "check": "Vb s=1 mixedDifference 0 interactionX interactionC = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=1 P=[0]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=1 P=[4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=1 P=[5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=2 P=[0, 4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=2 P=[0, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=2 P=[4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=3 P=[0, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=4 P=[0, 1, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=4 P=[0, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=4 P=[0, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 F_k(min(k,m-k)) = 0 k=5 P=[0, 2, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 delta_box = 2s+2 (integer_family_interaction_exact)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 2D(S,T) = 12s (twoD_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 spans (2s+1,2s-1,2s-1,2s-1,2s+1,2s+1) (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 unique Top-3 = {0,4,5}",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 Top-C margin = 2 (strict_topC_margin_two)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 2D/delta_box = 6s/(s+1) (normalized_family_bridge)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 gSel max = 6s (gSelI_max, gSelD_max)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 gSel min = -8s-3",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 gCom max = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 gCom min = -1",
+    "ok": true
+   },
+   {
+    "check": "Vb s=2 mixedDifference 0 interactionX interactionC = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=1 P=[0]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=1 P=[4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=1 P=[5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=2 P=[0, 4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=2 P=[0, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=2 P=[4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=3 P=[0, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=4 P=[0, 1, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=4 P=[0, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=4 P=[0, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 F_k(min(k,m-k)) = 0 k=5 P=[0, 2, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 delta_box = 2s+2 (integer_family_interaction_exact)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 2D(S,T) = 12s (twoD_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 spans (2s+1,2s-1,2s-1,2s-1,2s+1,2s+1) (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 unique Top-3 = {0,4,5}",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 Top-C margin = 2 (strict_topC_margin_two)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 2D/delta_box = 6s/(s+1) (normalized_family_bridge)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 gSel max = 6s (gSelI_max, gSelD_max)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 gSel min = -8s-3",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 gCom max = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 gCom min = -1",
+    "ok": true
+   },
+   {
+    "check": "Vb s=6 mixedDifference 0 interactionX interactionC = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=1 P=[0]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=1 P=[4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=1 P=[5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=2 P=[0, 4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=2 P=[0, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=2 P=[4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=3 P=[0, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=4 P=[0, 1, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=4 P=[0, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=4 P=[0, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 F_k(min(k,m-k)) = 0 k=5 P=[0, 2, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 delta_box = 2s+2 (integer_family_interaction_exact)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 2D(S,T) = 12s (twoD_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 spans (2s+1,2s-1,2s-1,2s-1,2s+1,2s+1) (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 unique Top-3 = {0,4,5}",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 Top-C margin = 2 (strict_topC_margin_two)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 2D/delta_box = 6s/(s+1) (normalized_family_bridge)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 gSel max = 6s (gSelI_max, gSelD_max)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 gSel min = -8s-3",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 gCom max = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 gCom min = -1",
+    "ok": true
+   },
+   {
+    "check": "Vb s=20 mixedDifference 0 interactionX interactionC = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=1 P=[0]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=1 P=[4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=1 P=[5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=2 P=[0, 4]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=2 P=[0, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=2 P=[4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=3 P=[0, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=4 P=[0, 1, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=4 P=[0, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=4 P=[0, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 2, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=5 P=[0, 1, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 F_k(min(k,m-k)) = 0 k=5 P=[0, 2, 3, 4, 5]",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 delta_box = 2s+2 (integer_family_interaction_exact)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 2D(S,T) = 12s (twoD_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 spans (2s+1,2s-1,2s-1,2s-1,2s+1,2s+1) (comp_eq)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 unique Top-3 = {0,4,5}",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 Top-C margin = 2 (strict_topC_margin_two)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 2D/delta_box = 6s/(s+1) (normalized_family_bridge)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 gSel max = 6s (gSelI_max, gSelD_max)",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 gSel min = -8s-3",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 gCom max = 2s+2",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 gCom min = -1",
+    "ok": true
+   },
+   {
+    "check": "Vb s=100 mixedDifference 0 interactionX interactionC = 2s+2",
+    "ok": true
+   }
+  ]
+ },
+ "worlds": [
+  {
+   "label": "Vb s=1",
+   "delta_box": "4",
+   "scores": [
+    "3",
+    "1",
+    "1",
+    "1",
+    "3",
+    "3"
+   ],
+   "losses": {
+    "empty": "4",
+    "0": "11/2",
+    "1": "7/2",
+    "2": "7/2",
+    "3": "7/2",
+    "4": "11/2",
+    "5": "11/2",
+    "0,1": "5",
+    "0,2": "5",
+    "0,3": "5",
+    "0,4": "7",
+    "0,5": "7",
+    "1,2": "3",
+    "1,3": "3",
+    "1,4": "5",
+    "1,5": "5",
+    "2,3": "3",
+    "2,4": "5",
+    "2,5": "5",
+    "3,4": "5",
+    "3,5": "5",
+    "4,5": "7",
+    "0,1,2": "9/2",
+    "0,1,3": "9/2",
+    "0,1,4": "13/2",
+    "0,1,5": "13/2",
+    "0,2,3": "9/2",
+    "0,2,4": "13/2",
+    "0,2,5": "13/2",
+    "0,3,4": "13/2",
+    "0,3,5": "13/2",
+    "0,4,5": "17/2",
+    "1,2,3": "5/2",
+    "1,2,4": "9/2",
+    "1,2,5": "9/2",
+    "1,3,4": "9/2",
+    "1,3,5": "9/2",
+    "1,4,5": "13/2",
+    "2,3,4": "9/2",
+    "2,3,5": "9/2",
+    "2,4,5": "13/2",
+    "3,4,5": "13/2",
+    "0,1,2,3": "4",
+    "0,1,2,4": "6",
+    "0,1,2,5": "6",
+    "0,1,3,4": "6",
+    "0,1,3,5": "6",
+    "0,1,4,5": "8",
+    "0,2,3,4": "6",
+    "0,2,3,5": "6",
+    "0,2,4,5": "8",
+    "0,3,4,5": "8",
+    "1,2,3,4": "4",
+    "1,2,3,5": "4",
+    "1,2,4,5": "6",
+    "1,3,4,5": "6",
+    "2,3,4,5": "6",
+    "0,1,2,3,4": "11/2",
+    "0,1,2,3,5": "11/2",
+    "0,1,2,4,5": "15/2",
+    "0,1,3,4,5": "15/2",
+    "0,2,3,4,5": "15/2",
+    "1,2,3,4,5": "11/2",
+    "0,1,2,3,4,5": "7"
+   },
+   "per_k": [
+    {
+     "k": 1,
+     "lstar": "7/2",
+     "optimal_sets": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "lstar": "3",
+     "optimal_sets": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 3,
+     "lstar": "5/2",
+     "optimal_sets": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4,
+        5
+       ],
+       "d_k": 3,
+       "gap_R0": "6",
+       "F_k": [
+        "6",
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 3,
+       "rows": [
+        {
+         "R": 0,
+         "F": "6",
+         "F_over_delta": "3/2",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 3,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 4,
+     "lstar": "4",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       1,
+       2,
+       3,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        3,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "2",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "1",
+         "bound_(d-R)+delta": "8",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 5,
+     "lstar": "11/2",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       0,
+       1,
+       2,
+       3,
+       5
+      ],
+      [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        2,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        1,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "2",
+       "F_k": [
+        "2",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "2",
+         "F_over_delta": "1/2",
+         "bound_(d-R)+delta": "4",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "G": [
+    {
+     "R": 0,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      1,
+      2,
+      3,
+      0,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 1,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 2,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 3,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "R_star_G": 0,
+   "family": "Vb",
+   "s": 1
+  },
+  {
+   "label": "Vb s=2",
+   "delta_box": "6",
+   "scores": [
+    "5",
+    "3",
+    "3",
+    "3",
+    "5",
+    "5"
+   ],
+   "losses": {
+    "empty": "8",
+    "0": "21/2",
+    "1": "13/2",
+    "2": "13/2",
+    "3": "13/2",
+    "4": "21/2",
+    "5": "21/2",
+    "0,1": "9",
+    "0,2": "9",
+    "0,3": "9",
+    "0,4": "13",
+    "0,5": "13",
+    "1,2": "5",
+    "1,3": "5",
+    "1,4": "9",
+    "1,5": "9",
+    "2,3": "5",
+    "2,4": "9",
+    "2,5": "9",
+    "3,4": "9",
+    "3,5": "9",
+    "4,5": "13",
+    "0,1,2": "15/2",
+    "0,1,3": "15/2",
+    "0,1,4": "23/2",
+    "0,1,5": "23/2",
+    "0,2,3": "15/2",
+    "0,2,4": "23/2",
+    "0,2,5": "23/2",
+    "0,3,4": "23/2",
+    "0,3,5": "23/2",
+    "0,4,5": "31/2",
+    "1,2,3": "7/2",
+    "1,2,4": "15/2",
+    "1,2,5": "15/2",
+    "1,3,4": "15/2",
+    "1,3,5": "15/2",
+    "1,4,5": "23/2",
+    "2,3,4": "15/2",
+    "2,3,5": "15/2",
+    "2,4,5": "23/2",
+    "3,4,5": "23/2",
+    "0,1,2,3": "6",
+    "0,1,2,4": "10",
+    "0,1,2,5": "10",
+    "0,1,3,4": "10",
+    "0,1,3,5": "10",
+    "0,1,4,5": "14",
+    "0,2,3,4": "10",
+    "0,2,3,5": "10",
+    "0,2,4,5": "14",
+    "0,3,4,5": "14",
+    "1,2,3,4": "6",
+    "1,2,3,5": "6",
+    "1,2,4,5": "10",
+    "1,3,4,5": "10",
+    "2,3,4,5": "10",
+    "0,1,2,3,4": "17/2",
+    "0,1,2,3,5": "17/2",
+    "0,1,2,4,5": "25/2",
+    "0,1,3,4,5": "25/2",
+    "0,2,3,4,5": "25/2",
+    "1,2,3,4,5": "17/2",
+    "0,1,2,3,4,5": "11"
+   },
+   "per_k": [
+    {
+     "k": 1,
+     "lstar": "13/2",
+     "optimal_sets": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "lstar": "5",
+     "optimal_sets": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 3,
+     "lstar": "7/2",
+     "optimal_sets": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4,
+        5
+       ],
+       "d_k": 3,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 3,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "2",
+         "bound_(d-R)+delta": "18",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 3,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 4,
+     "lstar": "6",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       1,
+       2,
+       3,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        3,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "8",
+       "F_k": [
+        "8",
+        "4",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "8",
+         "F_over_delta": "4/3",
+         "bound_(d-R)+delta": "12",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 5,
+     "lstar": "17/2",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       0,
+       1,
+       2,
+       3,
+       5
+      ],
+      [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        2,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        1,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "4",
+       "F_k": [
+        "4",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "4",
+         "F_over_delta": "2/3",
+         "bound_(d-R)+delta": "6",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "G": [
+    {
+     "R": 0,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      1,
+      2,
+      3,
+      0,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 1,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 2,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 3,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "R_star_G": 0,
+   "family": "Vb",
+   "s": 2
+  },
+  {
+   "label": "Vb s=6",
+   "delta_box": "14",
+   "scores": [
+    "13",
+    "11",
+    "11",
+    "11",
+    "13",
+    "13"
+   ],
+   "losses": {
+    "empty": "24",
+    "0": "61/2",
+    "1": "37/2",
+    "2": "37/2",
+    "3": "37/2",
+    "4": "61/2",
+    "5": "61/2",
+    "0,1": "25",
+    "0,2": "25",
+    "0,3": "25",
+    "0,4": "37",
+    "0,5": "37",
+    "1,2": "13",
+    "1,3": "13",
+    "1,4": "25",
+    "1,5": "25",
+    "2,3": "13",
+    "2,4": "25",
+    "2,5": "25",
+    "3,4": "25",
+    "3,5": "25",
+    "4,5": "37",
+    "0,1,2": "39/2",
+    "0,1,3": "39/2",
+    "0,1,4": "63/2",
+    "0,1,5": "63/2",
+    "0,2,3": "39/2",
+    "0,2,4": "63/2",
+    "0,2,5": "63/2",
+    "0,3,4": "63/2",
+    "0,3,5": "63/2",
+    "0,4,5": "87/2",
+    "1,2,3": "15/2",
+    "1,2,4": "39/2",
+    "1,2,5": "39/2",
+    "1,3,4": "39/2",
+    "1,3,5": "39/2",
+    "1,4,5": "63/2",
+    "2,3,4": "39/2",
+    "2,3,5": "39/2",
+    "2,4,5": "63/2",
+    "3,4,5": "63/2",
+    "0,1,2,3": "14",
+    "0,1,2,4": "26",
+    "0,1,2,5": "26",
+    "0,1,3,4": "26",
+    "0,1,3,5": "26",
+    "0,1,4,5": "38",
+    "0,2,3,4": "26",
+    "0,2,3,5": "26",
+    "0,2,4,5": "38",
+    "0,3,4,5": "38",
+    "1,2,3,4": "14",
+    "1,2,3,5": "14",
+    "1,2,4,5": "26",
+    "1,3,4,5": "26",
+    "2,3,4,5": "26",
+    "0,1,2,3,4": "41/2",
+    "0,1,2,3,5": "41/2",
+    "0,1,2,4,5": "65/2",
+    "0,1,3,4,5": "65/2",
+    "0,2,3,4,5": "65/2",
+    "1,2,3,4,5": "41/2",
+    "0,1,2,3,4,5": "27"
+   },
+   "per_k": [
+    {
+     "k": 1,
+     "lstar": "37/2",
+     "optimal_sets": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "lstar": "13",
+     "optimal_sets": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 3,
+     "lstar": "15/2",
+     "optimal_sets": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4,
+        5
+       ],
+       "d_k": 3,
+       "gap_R0": "36",
+       "F_k": [
+        "36",
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 3,
+       "rows": [
+        {
+         "R": 0,
+         "F": "36",
+         "F_over_delta": "18/7",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 3,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 4,
+     "lstar": "14",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       1,
+       2,
+       3,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        3,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "24",
+       "F_k": [
+        "24",
+        "12",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "24",
+         "F_over_delta": "12/7",
+         "bound_(d-R)+delta": "28",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 5,
+     "lstar": "41/2",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       0,
+       1,
+       2,
+       3,
+       5
+      ],
+      [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        2,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        1,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "12",
+       "F_k": [
+        "12",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "12",
+         "F_over_delta": "6/7",
+         "bound_(d-R)+delta": "14",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "G": [
+    {
+     "R": 0,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      1,
+      2,
+      3,
+      0,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 1,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 2,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 3,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "R_star_G": 0,
+   "family": "Vb",
+   "s": 6
+  },
+  {
+   "label": "Vb s=20",
+   "delta_box": "42",
+   "scores": [
+    "41",
+    "39",
+    "39",
+    "39",
+    "41",
+    "41"
+   ],
+   "losses": {
+    "empty": "80",
+    "0": "201/2",
+    "1": "121/2",
+    "2": "121/2",
+    "3": "121/2",
+    "4": "201/2",
+    "5": "201/2",
+    "0,1": "81",
+    "0,2": "81",
+    "0,3": "81",
+    "0,4": "121",
+    "0,5": "121",
+    "1,2": "41",
+    "1,3": "41",
+    "1,4": "81",
+    "1,5": "81",
+    "2,3": "41",
+    "2,4": "81",
+    "2,5": "81",
+    "3,4": "81",
+    "3,5": "81",
+    "4,5": "121",
+    "0,1,2": "123/2",
+    "0,1,3": "123/2",
+    "0,1,4": "203/2",
+    "0,1,5": "203/2",
+    "0,2,3": "123/2",
+    "0,2,4": "203/2",
+    "0,2,5": "203/2",
+    "0,3,4": "203/2",
+    "0,3,5": "203/2",
+    "0,4,5": "283/2",
+    "1,2,3": "43/2",
+    "1,2,4": "123/2",
+    "1,2,5": "123/2",
+    "1,3,4": "123/2",
+    "1,3,5": "123/2",
+    "1,4,5": "203/2",
+    "2,3,4": "123/2",
+    "2,3,5": "123/2",
+    "2,4,5": "203/2",
+    "3,4,5": "203/2",
+    "0,1,2,3": "42",
+    "0,1,2,4": "82",
+    "0,1,2,5": "82",
+    "0,1,3,4": "82",
+    "0,1,3,5": "82",
+    "0,1,4,5": "122",
+    "0,2,3,4": "82",
+    "0,2,3,5": "82",
+    "0,2,4,5": "122",
+    "0,3,4,5": "122",
+    "1,2,3,4": "42",
+    "1,2,3,5": "42",
+    "1,2,4,5": "82",
+    "1,3,4,5": "82",
+    "2,3,4,5": "82",
+    "0,1,2,3,4": "125/2",
+    "0,1,2,3,5": "125/2",
+    "0,1,2,4,5": "205/2",
+    "0,1,3,4,5": "205/2",
+    "0,2,3,4,5": "205/2",
+    "1,2,3,4,5": "125/2",
+    "0,1,2,3,4,5": "83"
+   },
+   "per_k": [
+    {
+     "k": 1,
+     "lstar": "121/2",
+     "optimal_sets": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "lstar": "41",
+     "optimal_sets": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 3,
+     "lstar": "43/2",
+     "optimal_sets": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4,
+        5
+       ],
+       "d_k": 3,
+       "gap_R0": "120",
+       "F_k": [
+        "120",
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 3,
+       "rows": [
+        {
+         "R": 0,
+         "F": "120",
+         "F_over_delta": "20/7",
+         "bound_(d-R)+delta": "126",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 3,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 4,
+     "lstar": "42",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       1,
+       2,
+       3,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        3,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "80",
+       "F_k": [
+        "80",
+        "40",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "80",
+         "F_over_delta": "40/21",
+         "bound_(d-R)+delta": "84",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 5,
+     "lstar": "125/2",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       0,
+       1,
+       2,
+       3,
+       5
+      ],
+      [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        2,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        1,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "40",
+       "F_k": [
+        "40",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "40",
+         "F_over_delta": "20/21",
+         "bound_(d-R)+delta": "42",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "G": [
+    {
+     "R": 0,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      1,
+      2,
+      3,
+      0,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 1,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 2,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 3,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "R_star_G": 0,
+   "family": "Vb",
+   "s": 20
+  },
+  {
+   "label": "Vb s=100",
+   "delta_box": "202",
+   "scores": [
+    "201",
+    "199",
+    "199",
+    "199",
+    "201",
+    "201"
+   ],
+   "losses": {
+    "empty": "400",
+    "0": "1001/2",
+    "1": "601/2",
+    "2": "601/2",
+    "3": "601/2",
+    "4": "1001/2",
+    "5": "1001/2",
+    "0,1": "401",
+    "0,2": "401",
+    "0,3": "401",
+    "0,4": "601",
+    "0,5": "601",
+    "1,2": "201",
+    "1,3": "201",
+    "1,4": "401",
+    "1,5": "401",
+    "2,3": "201",
+    "2,4": "401",
+    "2,5": "401",
+    "3,4": "401",
+    "3,5": "401",
+    "4,5": "601",
+    "0,1,2": "603/2",
+    "0,1,3": "603/2",
+    "0,1,4": "1003/2",
+    "0,1,5": "1003/2",
+    "0,2,3": "603/2",
+    "0,2,4": "1003/2",
+    "0,2,5": "1003/2",
+    "0,3,4": "1003/2",
+    "0,3,5": "1003/2",
+    "0,4,5": "1403/2",
+    "1,2,3": "203/2",
+    "1,2,4": "603/2",
+    "1,2,5": "603/2",
+    "1,3,4": "603/2",
+    "1,3,5": "603/2",
+    "1,4,5": "1003/2",
+    "2,3,4": "603/2",
+    "2,3,5": "603/2",
+    "2,4,5": "1003/2",
+    "3,4,5": "1003/2",
+    "0,1,2,3": "202",
+    "0,1,2,4": "402",
+    "0,1,2,5": "402",
+    "0,1,3,4": "402",
+    "0,1,3,5": "402",
+    "0,1,4,5": "602",
+    "0,2,3,4": "402",
+    "0,2,3,5": "402",
+    "0,2,4,5": "602",
+    "0,3,4,5": "602",
+    "1,2,3,4": "202",
+    "1,2,3,5": "202",
+    "1,2,4,5": "402",
+    "1,3,4,5": "402",
+    "2,3,4,5": "402",
+    "0,1,2,3,4": "605/2",
+    "0,1,2,3,5": "605/2",
+    "0,1,2,4,5": "1005/2",
+    "0,1,3,4,5": "1005/2",
+    "0,2,3,4,5": "1005/2",
+    "1,2,3,4,5": "605/2",
+    "0,1,2,3,4,5": "403"
+   },
+   "per_k": [
+    {
+     "k": 1,
+     "lstar": "601/2",
+     "optimal_sets": [
+      [
+       1
+      ],
+      [
+       2
+      ],
+      [
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 2,
+     "lstar": "201",
+     "optimal_sets": [
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 3,
+     "lstar": "203/2",
+     "optimal_sets": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        4,
+        5
+       ],
+       "d_k": 3,
+       "gap_R0": "600",
+       "F_k": [
+        "600",
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 3,
+       "rows": [
+        {
+         "R": 0,
+         "F": "600",
+         "F_over_delta": "300/101",
+         "bound_(d-R)+delta": "606",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 3,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 4,
+     "lstar": "202",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3
+      ],
+      [
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       1,
+       2,
+       3,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        3,
+        4,
+        5
+       ],
+       "d_k": 2,
+       "gap_R0": "400",
+       "F_k": [
+        "400",
+        "200",
+        "0"
+       ],
+       "R_star": 2,
+       "rows": [
+        {
+         "R": 0,
+         "F": "400",
+         "F_over_delta": "200/101",
+         "bound_(d-R)+delta": "404",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 2,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "k": 5,
+     "lstar": "605/2",
+     "optimal_sets": [
+      [
+       0,
+       1,
+       2,
+       3,
+       4
+      ],
+      [
+       0,
+       1,
+       2,
+       3,
+       5
+      ],
+      [
+       1,
+       2,
+       3,
+       4,
+       5
+      ]
+     ],
+     "top_k_sets": [
+      {
+       "prefix": [
+        0,
+        1,
+        2,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        1,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      },
+      {
+       "prefix": [
+        0,
+        2,
+        3,
+        4,
+        5
+       ],
+       "d_k": 1,
+       "gap_R0": "200",
+       "F_k": [
+        "200",
+        "0"
+       ],
+       "R_star": 1,
+       "rows": [
+        {
+         "R": 0,
+         "F": "200",
+         "F_over_delta": "100/101",
+         "bound_(d-R)+delta": "202",
+         "F_le_bound": true
+        },
+        {
+         "R": 1,
+         "F": "0",
+         "F_over_delta": "0",
+         "bound_(d-R)+delta": "0",
+         "F_le_bound": true
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "G": [
+    {
+     "R": 0,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      1,
+      2,
+      3,
+      0,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 1,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 2,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    },
+    {
+     "R": 3,
+     "G": "0",
+     "G_over_delta": "0",
+     "argmin_ranking_example": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ]
+    }
+   ],
+   "R_star_G": 0,
+   "family": "Vb",
+   "s": 100
+  }
+ ]
+}

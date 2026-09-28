@@ -3,11 +3,15 @@ import «LeanStructuralScalarChi5WitnessV1»
 /-!
 # Kernel-checked replacement for the ten `native_decide` steps of the χ≥5 witness
 
-`LeanStructuralScalarChi5WitnessV1` proves ten arithmetic facts by
+Historical note: before the 2026-09-27 audit, `LeanStructuralScalarChi5WitnessV1` proved ten arithmetic facts by
 `native_decide`, a tactic this project rejects as a trust hole: it compiles the
 proposition to machine code, runs it, and records the answer through the axiom
-`Lean.ofReduceBool`.  Consequently the χ_prefix ≥ 5 claim is a COMPILED
-ARTIFACT, not PROVED, and the module is absent from the audited set.
+`Lean.ofReduceBool`.  Those original facts used the native evaluation trust path. The independent replacements
+below were already kernel proofs; a new frozen gate must check the patched import closure.
+
+The source witness now also uses kernel `decide`; its pre-audit bytes are preserved in legacy.
+The imported source therefore no longer contains the ten prohibited tactic uses.
+The old frozen smoke report remains FAIL and is not rewritten.
 
 Nothing is deleted here.  This module re-proves the same ten statements about
 the same definitions using kernel `decide`, so the corresponding axiom set is

@@ -22,15 +22,17 @@ Every surrogate-optimal design assigns zero mass to those pairs and has zero tru
 every $\varepsilon$-optimal design has true information at most $64\varepsilon/(9rM)$.
 Thus the failure persists at unit variance as the number of neglected directions grows.
 We quantify its repair. Sacrificing a fraction $\beta$ of surrogate value permits true
-information between $9\beta/[128(4+2rM)]$ and $\beta/(8rM)$.
+information between $9\beta/[128(4+2rM)]$ and $\beta/(8rM)$, and near $\beta=0$ the upper end
+is attained to second order, so the exchange rate $1/(8rM)$ is exact.
 A certificate based on the surrogate's dual margins extends this design tradeoff to a budget
 law for adaptive policies, including unbounded stopping: at expected cost $N$, the average
 design must pay $N\,\mathrm{sac}(\bar w)\ge8rM\log(1/\delta)(1-o(1))$.
-On any channel the repair frontier $R(b)$ is the optimal budgeted rate: a policy whose realised
-design honours a sacrifice budget $b$ pays $\mathbb E|N|\,R(b)\ge(1-\delta)\log(1/\delta)-\log2$,
-and a tracking
-learner holding a design inside the budget attains its rate; on two Gaussian arms
-$R(b)=b(1-b)\Delta^2/2$ exactly.
+On any channel the repair frontier $R(b)$ bounds the budgeted rate: a policy whose design
+honours a sacrifice budget $b$ pays $\mathbb E|N|\,R(b)\ge(1-\delta)\log(1/\delta)-\log2$, also
+for unbounded stopping. On Gaussian cells, over the same class of policies, each correct at the
+true world against its alternatives, a tracking learner holding a design inside the budget
+attains the rate $1/R(b)$, which is therefore optimal; on two
+Gaussian arms $R(b)=b(1-b)\Delta^2/2$ exactly for $b\le\frac12$.
 An ideal learner attains the true characteristic time, while a specified learner that
 re-solves the frozen surrogate at its estimate needs $\Omega(\log^2(1/\delta))$ samples under
 square-root forcing. The distinction is an optimised failure of alternative geometry, followed
@@ -77,23 +79,24 @@ zero weight on the cells that carry the decision. An approximate optimum leaks i
 to its suboptimality.
 \item[3)] \textbf{The price of repair} (Theorems~\ref{thm:frontier}, \ref{thm:sacrifice},
 \ref{thm:sacstop}, \ref{thm:dilute}, \ref{thm:forcing}). A design that sacrifices a fraction
-$\beta$ of surrogate value recovers $\Theta(\beta/rM)$ of true information when $rM\ge1$. The displayed finite-parameter bounds remain valid for every $M>0$. Operationally, every
+$\beta$ of surrogate value recovers $\Theta(\beta/rM)$ of true information when $rM\ge1$, and
+the frontier's slope at $\beta=0$ is exactly $\frac{1}{8rM}$ for every $r$ and $M$. The displayed finite-parameter bounds remain valid for every $M>0$. Operationally, every
 $\delta$-correct policy, including one that stops at an unbounded random time, must sacrifice a
 budget of $8rM\log(1/\delta)$ query-units of surrogate value to first order. The rate-optimal
 learner pays that budget up to a factor of at most $\frac{32}{9}+\frac{64}{9rM}$.
 The budget can be spread over any run length: the relative sacrifice falls as $N_{0}/N$ while
 the policy stays $\delta$-correct (Theorem~\ref{thm:dilute}).
 A learner that meets its demand for informative queries only through forcing at rate
-$t^{a-1}$ pays $\log^{1/a}(1/\delta)$.
+$t^{a-1}$ pays at least order $\log^{1/a}(1/\delta)$.
 \item[4)] \textbf{Learners} (Theorems~\ref{thm:ideal}, \ref{thm:surlearner}). A completely
 defined ideal learner attains the true rate. The learner that tracks the surrogate, at the
 truth or re-solved at its own estimate, pays a whole extra power of $\log(1/\delta)$.
-\item[5)] \textbf{The repair law} (Theorem~\ref{thm:repairlaw},
-Corollary~\ref{cor:repairrate}). On any channel, a policy whose realised design honours a
-sacrifice budget $b$ pays $\mathbb E|N|\,R(b)\ge(1-\delta)\log(1/\delta)-\log2$. A tracking
-learner that holds a
-design inside the budget attains its rate and enters the budget on every path. So the repair
-frontier $R(b)$ is the optimal budgeted rate. The budget classes are nested, while an
+\item[5)] \textbf{The repair law} (Theorems~\ref{thm:repairlaw}, \ref{thm:optrate}). On any
+channel, a policy whose realised design honours a sacrifice budget $b$ pays
+$\mathbb E|N|\,R(b)\ge(1-\delta)\log(1/\delta)-\log2$, at a horizon and, for the expected
+design of the whole run, at an unbounded stopping time. On Gaussian cells, over one class of
+policies, correct at the true world against its alternatives, the rate $1/R(b)$ is a lower bound
+and a tracking learner that holds a design inside the budget attains it. So the repair frontier $R(b)$ is the optimal budgeted rate. The budget classes are nested, while an
 expected-sacrifice constraint escapes them (Proposition~\ref{prop:classes}). On two Gaussian
 arms the law is exact: $R(b)=b(1-b)\Delta^2/2$ (Proposition~\ref{prop:twoarm}).
 \end{enumerate}
@@ -130,8 +133,11 @@ Pricing identification in a second currency is also known. Yang, Tan and Jin~\ci
 bound the regret incurred before a best-arm identification stops. Huang~\cite{huang2026}
 certifies representation adequacy at minimum incurred loss, with a cost-weighted
 characteristic time and a matching Track-and-Stop for a fixed observation kernel, and leaves
-representation repair open. Our budget is paid in the surrogate's own value, which is concave
-in the design rather than a per-query cost, and it prices the repair of a frozen geometry.
+representation repair open. Repair there means changing the representation, its kernels or its
+loss after certification; we do not address it. Here the observation model is fixed and only the
+allocation is repaired. The budget is paid in the surrogate's own information game, which is
+concave in the design rather than a per-query cost, and the results that price it are the
+geometry of this surrogate: the frontier, its exact slope and the sacrifice law.
 
 The generic statements are therefore taken. What remains is narrower. The model is correct,
 the test is valid and the decision is unchanged, and still the frozen geometry changes what a
@@ -160,7 +166,7 @@ $\Theta(\beta/rM)$ for $rM\ge1$ and the sacrifice budget $N\beta\ge8rM\log(1/\de
 (Thms.~\ref{thm:frontier}, \ref{thm:sacrifice}) \\
 Characteristic time, multiple answers~\cite{garivier2016,degenne2019} & The budgeted optimal rate
 $1/R(b)$ over the nested budget classes, and its attainment by a fixed-design tracking learner
-(Thm.~\ref{thm:repairlaw}, Cor.~\ref{cor:repairrate}) \\
+(Thm.~\ref{thm:repairlaw}, Thm.~\ref{thm:optrate}) \\
 Decision-focused design~\cite{wan2026} & The $\Omega(\log^{2}(1/\delta))$ cost of the
 learner that re-solves the surrogate at its estimate, against the ideal learner's
 $\Theta(\log(1/\delta))$ (Thms.~\ref{thm:ideal}, \ref{thm:surlearner}) \\
@@ -343,17 +349,33 @@ $\mathrm{sac}(w)\le\beta$ satisfies
 \]
 This holds on the strict game as well. Pointwise, every allocation has
 $J_{\rm true}(w)\le\mathrm{sac}(w)/(8rM)$. The design
-$w_{\beta}=(1-\beta)w_{\rm unif}+\beta w_{\rm cert}$ achieves at least the displayed lower bound;
-we do not assert equality with that bound or an exact formula for the repair frontier.
+$w_{\beta}=(1-\beta)w_{\rm unif}+\beta w_{\rm cert}$ achieves at least the displayed lower bound.
+Moreover, for $0<\beta\le\frac12$,
+\[
+\frac{\beta}{8rM+128\beta}\ \le\ \sup_{\mathrm{sac}(w)\le\beta}J_{\rm true}(w)\ \le\
+\frac{\beta}{8rM},
+\]
+and the two ends differ by at most $2\beta^{2}/(rM)^{2}$. So the frontier's slope at $\beta=0$ is
+exactly $\frac{1}{8rM}$. We do not assert an exact formula for the frontier at positive $\beta$.
 \end{theorem}
 
 \leanbox{\lean{value\_concave}, \lean{frontier\_two\_sided} in \lean{LeanPaperAFrontierV1};
-\lean{exchange\_strict}, \lean{strict\_frontier} in \lean{LeanPaperASacrificeV1}}
+\lean{exchange\_strict}, \lean{strict\_frontier} in \lean{LeanPaperASacrificeV1};
+\lean{vB\_isAlloc}, \lean{vB\_frozen}, \lean{trueValue\_vB\_ge}, \lean{frontier\_slope},
+\lean{slope\_gap} in \lean{LeanPaperARepairSlopeV1}; \lean{trueValueC₀\_le\_trueValueStrict} in
+\lean{LeanPaperAStrictV1}}
 
 Each game's value is an infimum of functions linear in the design, hence concave in it, so
 mixing two designs loses at most linearly. The upper side is Theorem~\ref{thm:starve}(ii) with
 $\varepsilon=\beta\Gamma_{\rm fr}$. The exchange rate is linear in the sacrifice, and it
-carries the same $\frac{1}{rM}$ as the separation.
+carries the same $\frac{1}{rM}$ as the separation. The sharp lower side mixes the uniform-anchor
+design, with weight $1-\beta$, and the uniform design on the $2r$ middle cells, with weight
+$\beta$. Against a strict
+alternative, the four frozen cells and the moved middle pair each must absorb part of a contrast;
+a weighted Cauchy--Schwarz over the cells that move, split by which cells realise arm $B$'s
+extrema, gives $\beta/(8rM+128\beta)$ in every case. The certificate constant $8rM$ of the
+sacrifice law below is therefore the exact first-order exchange rate, not an artefact of the
+bound.
 
 \subsection{A certificate that extends beyond this family}
 \label{sec:repaircertificate}
@@ -421,9 +443,13 @@ repair frontier has this form or that these bounds are always tight.
 A design frontier does not say what a learner must give up. That requires every policy, its
 own random sample sizes, and the correctness it must reach. Fix a randomised adaptive policy
 with a finite horizon, whose answer event has probability at least $1-\delta$ at $\theta_{C}$
-and at most $\delta$ at every strict alternative. Let $N_{e}$ be its expected number of queries
+and at most $\delta$ at every strict alternative. We call such a policy \emph{$\delta$-correct at
+$\theta_C$}. This is correctness at one world against its alternatives, the notion every
+change-of-measure lower bound uses; it is weaker than correctness at every world, so lower bounds
+over it are stronger. Let $N_{e}$ be its expected number of queries
 of cell $e$ at the truth, $N=\sum_{e}N_{e}$, and $\bar w=N_{\cdot}/N$ its average design. Put
-$D=(1-\delta)\log(1/\delta)-\log2$.
+$D=(1-\delta)\log(1/\delta)-\log2$, and take $\delta$ small enough that $D>0$; every
+$\delta<\frac18$ qualifies (\lean{hD\_of\_small}). For larger $\delta$ the bounds below are void.
 
 \begin{theorem}[The sacrifice law]
 \label{thm:sacrifice}
@@ -481,8 +507,9 @@ Let a randomised adaptive policy have a measurable stopping rule that stops almo
 $\theta_{C}$, with no bound on the stopping time. Suppose it answers $A$ with probability at least
 $1-\delta$ at $\theta_{C}$ and at most $\delta$ at every strict alternative, on its stopped runs.
 Let $N_{e}$ be its expected number of queries of cell $e$ over the whole run, assumed finite. Then
-$N\,\mathrm{sac}(\bar w)\ge8rMD'$, with $D'=(1-2\delta)\log\frac1{2\delta}-\log2$. A finite-horizon
-policy that satisfies Theorem~\ref{thm:sacrifice} is such a policy.
+$N\,\mathrm{sac}(\bar w)\ge8rMD'$, with $D'=(1-2\delta)\log\frac1{2\delta}-\log2>0$ (every
+$\delta<\frac1{16}$ qualifies). A finite-horizon policy that satisfies Theorem~\ref{thm:sacrifice}
+is such a policy.
 \end{theorem}
 
 \leanbox{\lean{outT\_unfired}, \lean{trunc\_A}, \lean{expCntSt}, \lean{sacrifice\_law\_stopped},
@@ -505,8 +532,9 @@ exploration. The sacrifice law then fixes its cost, whatever the schedule.
 
 \begin{theorem}[The forcing law]
 \label{thm:forcing}
-For a policy as above, let $T$ be the number of real queries and $\mathrm{Mid}$ the number of
-middle queries at the horizon. Suppose $\mathrm{Mid}\le\varphi(T)+B$ on every history, where
+For a policy as above, now with $D\ge0$, let $T$ be the number of real queries and $\mathrm{Mid}$
+the number of middle queries at the horizon. Suppose $\mathrm{Mid}\le\varphi(T)+B$ on every
+history, where
 $\varphi$ is continuous and concave on $[0,\infty)$ and $\mathbb{E}B\le b$. Then
 $\varphi(\mathbb{E}T)\ge8rMD-b$. For $\varphi(t)=ct^{a}$ with $0<a\le1$ and
 $b\le 8rMD$,
@@ -515,7 +543,17 @@ $b\le 8rMD$,
 \]
 \end{theorem}
 
-\leanbox{\lean{forcing\_law}, \lean{power\_forcing\_law} in \lean{LeanPaperASacrificeV1}}
+\leanbox{\lean{forcing\_law}, \lean{power\_forcing\_law} in \lean{LeanPaperASacrificeV1};
+\lean{forcing\_law\_stopped}, \lean{power\_forcing\_law\_stopped} in
+\lean{LeanPaperAForcingStopV1}}
+
+The law holds for unbounded stopping as well. If a policy stops almost surely at $\theta_C$ and is
+correct on its stopped runs, if every truncation has $\mathrm{Mid}\le\varphi(T)+B_n$ with
+$\mathbb EB_n\le b$, and if $\varphi$ is also nondecreasing, then
+$\varphi(\bar T)\ge8rMD'-b$ for every bound $\bar T$ on the expected real queries of the whole
+run, with $D'=(1-2\delta)\log\frac1{2\delta}-\log2\ge0$. The truncation at a horizon where at most
+$\delta$ of the runs are unstopped is correct at level $2\delta$, and its expected real queries are
+at most $\bar T$.
 
 At $a=\frac12$, this gives a $\Omega(\log^{2}(1/\delta))$ lower bound. At $a=1$, the
 same argument gives only a $\Omega(\log(1/\delta))$ lower bound; it does not by itself
@@ -674,13 +712,14 @@ $W_b=\{w:J_f(w)\ge(1-b)\Gamma_f\}$ is convex, because $J_f$ is an infimum of lin
 A count vector $N$ with informative total $|N|$ \emph{meets the budget} when
 $(1-b)\Gamma_f|N|\le\sum_qN_q\,\mathrm{KL}_q(\theta,\lambda)$ for every
 $\lambda\in\mathcal L_f$. This is the homogeneous form of $N/|N|\in W_b$, and it needs no
-division when $|N|=0$. For a policy with realised counts $N(\omega)$ and expected design
-$\bar w=\mathbb EN/\mathbb E|N|$, consider:
+division when $|N|=0$. A policy is run for $n$ rounds and queries a fresh, uninformative dummy
+after it stops; its counts at the horizon are those at $\min(n,\tau)$. For realised counts
+$N(\omega)$ at the horizon and expected design $\bar w=\mathbb EN/\mathbb E|N|$, consider:
 \begin{itemize}
 \item $\Pi_b^{\rm prefix}$: almost every history meets the budget at every prefix;
-\item $\Pi_b^{\rm term}$: almost every history meets it at the stop;
+\item $\Pi_b^{\rm term}$: almost every history meets it at the horizon;
 \item $\Pi_b^{\rm ev}(t_0)$: almost every history whose informative total reaches $t_0$ meets it
-at the stop;
+at the horizon;
 \item $\Pi_b^{\rm exp}$: $s(\bar w)\le b$.
 \end{itemize}
 
@@ -713,68 +752,133 @@ Write $D_\delta=(1-\delta)\log(1/\delta)-\log2$.
 
 \begin{theorem}[The repair law]
 \label{thm:repairlaw}
+Every channel below has finite per-query divergences $\mathrm{KL}_q(\theta,\lambda)$ at the
+alternatives used, and $0<\delta\le1$.
 \begin{enumerate}
 \item[(i)] \emph{Every policy, any channel.} Every policy whose answer event has probability at
 least $1-\delta$ at $\theta$ and at most $\delta$ at every true alternative, and which lies in
 $\Pi_b^{\rm term}$, satisfies $\mathbb E|N|\cdot R(b)\ge D_\delta$. In $\Pi_b^{\rm ev}(t_0)$ it
-satisfies $\mathbb E|N|\cdot R(b+(1-b)t_0/\mathbb E|N|)\ge D_\delta$.
-\item[(ii)] \emph{Attainment, Gaussian cells.} Let $w$ be an allocation with
+satisfies $\mathbb E|N|\cdot R(b+(1-b)t_0/\mathbb E|N|)\ge D_\delta$. Here $R$ is the frontier
+itself, a supremum over the simplex. No positivity of $\mathbb E|N|$ is assumed: with no
+informative query in expectation the change of measure gives $D_\delta\le0$.
+\item[(ii)] \emph{Unbounded stopping, any channel.} Let a policy stop almost surely at $\theta$,
+answer wrongly at $\theta$ with probability at most $\delta$ on its stopped runs, and give the
+answer at every true alternative with probability at most $\delta$ on its stopped runs. If the
+expected design of its whole run meets the budget, then $\mathbb E|N(\tau)|\cdot R(b)\ge D_\delta$.
+\item[(iii)] \emph{Attainment, Gaussian cells.} Let $w$ be an allocation with
 $J_{\rm true}(w)>0$. Hold the oracle of the learner of Section~\ref{sec:learners} at $w$, and
 keep its warm start, forcing, tracking and stop. This learner stops with a wrong answer with
-probability at most $(|\mathrm{Ans}|-1)\delta$ at every world. For every $\eta>0$ there is
-$A_\eta$ with
+probability at most $(|\mathrm{Ans}|-1)\delta$ at every world with a unique correct answer. For
+every
+$0<\eta<J_{\rm true}(w)$ there is $A_\eta$ with
 \[
 \mathbb E\tau_\delta\le\frac{\log(1/\delta)}{J_{\rm true}(w)-\eta}+A_\eta
 \qquad(\delta\in(0,1)).
 \]
-\item[(iii)] \emph{Its design enters the budget.} For every $\varepsilon>0$ there is a
+\item[(iv)] \emph{Its design enters the budget.} For every $\varepsilon>0$ there is a
 deterministic $T$ such that at every $t\ge T$, on every path, the realised design dominates
 $(1-\varepsilon)w$ cellwise. Hence, if $s(w)<b$, the realised design meets the budget $b$ at
 every $t\ge t_0$ on every path, for some deterministic $t_0$.
 \end{enumerate}
 \end{theorem}
-\leanbox{(i): \lean{terminal\_budget\_law}, \lean{eventual\_budget\_law} in
-\lean{LeanPaperAPolicyClassesV1}, on \lean{budget\_law} in \lean{LeanPaperARepairLawV1}.
-(ii): \lean{oracle\_direct}, \lean{oracle\_expect\_bound}, \lean{oracle\_correct},
-\lean{fix\_expect\_bound}, \lean{fix\_upper\_rate}. (iii): \lean{fix\_design\_floor},
+\leanbox{(i): \lean{event\_law0}, \lean{budget\_law\_alloc0}, \lean{eventual\_frontier\_law0}
+in \lean{LeanPaperARepairNoPosV1}, on \lean{ebar\_alloc}, \lean{event\_law},
+\lean{budget\_law\_alloc}, \lean{eventual\_frontier\_law} in \lean{LeanPaperARepairBridgeV1}, with
+\lean{terminal\_eventual} and \lean{eventual\_expected} in \lean{LeanPaperAPolicyClassesV1}.
+(ii): \lean{stopped\_budget\_law0}, \lean{stopped\_law\_satisfiable},
+\lean{stopped\_law\_satisfiable\_two} in \lean{LeanPaperARepairNoPosV1}, on \lean{trunc\_event},
+\lean{stopped\_info}, \lean{stopped\_budget\_law}, \lean{finStop\_hyps} in
+\lean{LeanPaperARepairStopV1}.
+(iii): \lean{oracle\_direct}, \lean{oracle\_expect\_bound}, \lean{oracle\_correct},
+\lean{fix\_expect\_bound}, \lean{fix\_upper\_rate}. (iv): \lean{fix\_design\_floor},
 \lean{Jval\_ge\_scale}, \lean{fix\_budget\_eventually}; all in \lean{LeanPaperABudgetUpperV1}}
 
-Part (ii) holds for any oracle that is eventually informative on the confidence event; the
+In (i) the frontier bound is used only at the expected design, which is an allocation. A
+bound over all nonnegative vectors would not do: $J_{\rm fr}$ and $J_{\rm true}$ are
+homogeneous, so scaling a design sends its sacrifice to $-\infty$ and its true information to
+$+\infty$, and no finite value of $R$ bounds it.
+
+Part (ii) is not obtained by truncating. A policy may break the budget early and repair it
+before it stops, so meeting the budget at the stop says nothing about a truncation: two queries
+of arm $2$ followed by two of arm $1$ meet the two-arm budget $b=\frac12$ at the stop but not
+after two rounds. The change of measure needs no budget. At a horizon where at most $\varepsilon$
+of the runs at $\theta$ are unstopped, the event ``stopped with the answer'' has probability at
+least $1-\delta-\varepsilon$ at $\theta$ and at most $\delta$ at every alternative. So
+$(1-\delta-\varepsilon)\log(1/\delta)-\log2$ is at most the truncation's expected information,
+which is at most that of the whole run, and $\varepsilon\to0$ gives $D_\delta$ itself. The budget
+is then used once, at the whole run's expected design. Only the informative counts need to be
+finite: after the stop the dummy is queried forever. A correct finite-horizon policy, stopped
+at its horizon, meets every correctness and finiteness hypothesis of (ii). The budget is met as
+well by the learners of Theorem~\ref{thm:optrate}: on Gaussian cells, the stopped fixed-design
+learner at a Markov horizon, embedded as a stopping policy, meets every hypothesis of (ii) with
+the budget $b+(1-b)t_0/\mathbb E|N(\tau)|$, one $t_0$ serving every $\delta<\frac18$; on two
+Gaussian arms this holds for every $b\in(0,\frac12]$.
+
+Part (iii) holds for any oracle that is eventually informative on the confidence event; the
 fixed design is the case where that hypothesis is immediate. The learner reads only the
 history. The design $w$ is chosen at $\theta$, as in the definition of an optimal cost
 $\inf_\pi\mathbb E_\theta\tau$, so it is an oracle design. Correctness at the other worlds does
 not depend on it.
 
-\begin{corollary}[The frontier is the optimal rate]
-\label{cor:repairrate}
-Let $R$ be continuous at $b$; since $R$ is nondecreasing and concave, this holds at every
-interior budget. Over the eventual classes, the optimal budgeted rate is $1/R(b)$:
+\begin{theorem}[The frontier is the optimal rate]
+\label{thm:optrate}
+Fix a specification with Gaussian cells, its channel with a fresh dummy, a true world $\theta$
+with a unique answer, frozen alternatives $\mathcal L_f$ and $\Gamma_f>0$ attained by a design.
+Let $0<b\le1$ with $R(b)>0$. On the kernel policies of this channel:
 \begin{itemize}
-\item every family of $\delta$-correct policies in $\Pi_b^{\rm ev}(t_0)$ has
-$\liminf_{\delta\to0}\mathbb E|N|/\log(1/\delta)\ge1/R(b)$;
-\item for every $\varepsilon>0$, some tracking learner of Theorem~\ref{thm:repairlaw}(ii),
-whose realised design meets the budget after a deterministic time, has
-$\limsup_{\delta\to0}\mathbb E\tau_\delta/\log(1/\delta)\le1/(R(b)-\varepsilon)$.
+\item every family of $\delta$-correct policies in $\Pi_b^{\rm ev}(t_0)$, with one burn-in $t_0$
+for all $\delta$, has $\liminf_{\delta\to0}\mathbb E|N|/\log(1/\delta)\ge1/R(b)$;
+\item for every $0<\varepsilon<R(b)$ the stopped fixed-design tracking learners, run to a Markov
+horizon, form such a family, with one burn-in and $\delta$-correct at $\theta$ at every
+$\delta\in(0,1)$, and
+$\limsup_{\delta\to0}\mathbb E|N|/\log(1/\delta)\le1/(R(b)-\varepsilon)$.
 \end{itemize}
-\end{corollary}
+Here $\delta$-correct at $\theta$ means that the answer event has probability at least $1-\delta$ at
+$\theta$ and at most $\delta$ at every alternative to $\theta$'s answer. So $1/R(b)$ is the optimal
+budgeted rate over this class, and the learner that holds a design inside the budget attains it.
+The design and the Markov horizon are both chosen at $\theta$, as in the definition of an optimal
+cost at a world; the truncated policy is not claimed to be correct at other worlds. Without the
+truncation, the same learner stops with a wrong answer with probability at most
+$(|\mathrm{Ans}|-1)\delta$ at every world with a unique correct answer
+(Theorem~\ref{thm:repairlaw}(iii)). That it stops at all is proved at $\theta$, where
+$J_{\rm true}(w)>0$; almost-sure stopping at every world, and in particular at ties where the game
+vanishes, is not claimed, so the learner is not asserted to be $\delta$-PAC in the sense that
+requires termination at every world. On two Gaussian arms every hypothesis holds for every
+$b\in(0,\frac12]$.
+\end{theorem}
 \begin{proof}
-\emph{Concavity.} Mixing two designs mixes their sacrifices convexly and their true
-information concavely.
-\emph{Lower side.} By (i), $\mathbb E|N|\ge D_\delta/\Gamma_{\rm true}\to\infty$, so the
-excess $(1-b)t_0/\mathbb E|N|$ vanishes. Continuity then gives the bound.
-\emph{Upper side.} Take $b'<b$ with $R(b')\ge R(b)-\varepsilon/2$. Take $w$ with $s(w)\le b'$
-and $J_{\rm true}(w)\ge R(b')-\varepsilon/2$. Apply (ii) and (iii).
-\emph{The bridge.} Part (i) is stated for kernel policies with a fresh dummy after the stop.
-The stopped learner is such a policy: by the proved coupling its real-cell counts within any
-horizon are its stream counts at $\min(n,\tau)$, and at most $\tau$. On Gaussian cells the
-per-query divergence is the unit-variance energy, so meeting the budget in (iii) is meeting it
-in (i).
+\emph{The channel.} The per-query divergence of the Gaussian channel is
+$(\theta_e-\lambda_e)^2/(2\sigma_e^2)$, and the dummy carries none. So the kernel information of a
+design is the stream energy of its cell part, and the kernel game is the stream game.
+\emph{Lower side.} This is (i) on the eventual class, with the frontier concave and hence
+continuous at $b$, and $\mathbb E|N|\ge D_\delta/\Gamma_{\rm true}\to\infty$, so that the excess
+$(1-b)t_0/\mathbb E|N|$ vanishes. No positivity of $\mathbb E|N|$ is assumed: a correct policy
+with no informative query would give the same transcript law at $\theta$ and at an alternative.
+\emph{The design.} A design within $b'<b$ and within $\varepsilon/2$ of $R(b)$ exists by
+concavity. If it puts mass $p<1$ on the dummy, its cell part divided by $1-p$ has both games
+multiplied by $1/(1-p)$, so its sacrifice does not increase and its true information does not
+decrease.
+\emph{The learner as a kernel policy.} The learner holding that design, stopped by its test and
+then querying the dummy, is a kernel policy whose transcript law is the stream law of the stopped
+run. At horizon $n$ its cell counts are the stream counts at some $m\le\min(n,\tau)$, and their
+total is $m$. By (iv), after a deterministic burn-in the realised design meets the budget on
+every path, so the policy lies in $\Pi_b^{\rm ev}(t_0)$ at every horizon, with one $t_0$ for all
+$\delta$. The count vector takes countably many values, so this pathwise statement is an almost
+sure one under the transcript law. At a Markov horizon the answer event of the test, run at level
+$\delta/|\mathrm{Ans}|$, has probability at least $1-\delta$ at $\theta$ and at most $\delta$ at
+every alternative, and $\mathbb E|N|\le\mathbb E\tau$. Part (iii) gives the rate.
 \end{proof}
-\leanbox{Concavity, continuity, the design strictly inside the budget, and the lower limit:
-\lean{R\_concave}, \lean{R\_continuousAt}, \lean{near\_design}, \lean{frontier\_lower\_rate} in
-\lean{LeanPaperARepairRateV1}. Coupling: \lean{stoppedG}, \lean{runSG\_eq},
-\lean{cnt\_eq\_at\_min} in \lean{LeanPaperA7StoppedGenV1}. The identification of the two budget
-notions for a general cell model is written out here and not formalized.}
+\leanbox{Lower side on any channel: \lean{frontier\_rate\_lower0} in
+\lean{LeanPaperARepairNoPosV1}; \lean{Jt\_concave}, \lean{Jt\_le\_sum},
+\lean{frontier\_rate\_lower} in \lean{LeanPaperARepairBridgeV1}, on \lean{R\_concave},
+\lean{R\_continuousAt}, \lean{frontier\_lower\_rate}, \lean{near\_design} in
+\lean{LeanPaperARepairRateV1}. The Gaussian channel and the class: \lean{gC}, \lean{klq\_gC\_inl},
+\lean{infoAt\_gC}, \lean{Jt\_gC}, \lean{normalize\_design}, \lean{ae\_map\_counts},
+\lean{real\_counts}, \lean{fix\_eventual}, \lean{fix\_etot\_le}, \lean{etot\_pos\_of\_correct},
+\lean{fix\_correct}, \lean{optimal\_lower}, \lean{optimal\_upper}, \lean{optimal\_satisfiable} in
+\lean{LeanPaperARepairGaussV1}. Coupling: \lean{stoppedG}, \lean{runSG\_eq},
+\lean{cnt\_eq\_at\_min} in \lean{LeanPaperA7StoppedGenV1}; \lean{stream\_eq\_hist\_fresh} in
+\lean{LeanPaperABridgeDummyV1}}
 
 \subsection{The shape of repair, and a second class}
 \begin{proposition}[No threshold, linear repair]
@@ -819,7 +923,9 @@ needed direction is the second arm, which the surrogate's optimum never measures
 law adds a price for it. Giving up a fraction $b$ of surrogate value buys decision information
 $b(1-b)\Delta^2/2$. That information fixes the best stopping time,
 $2\log(1/\delta)/(b(1-b)\Delta^2)$ to first order, over every policy that honours the budget
-eventually. A frozen learner with $b=0$ never decides.
+eventually. At $b=0$ the only design within the budget is the surrogate's optimum $(1,0)$, whose
+true information is zero, so no policy that holds that budget can certify the decision. A
+learner with forced exploration still decides, but only by spending samples outside the budget.
 
 \section{Evidence}
 \label{sec:evidence}
@@ -945,7 +1051,10 @@ allocation follows the tie-break answer. On the swapped world that answer is the
 learner selected the true answer in none of its refreshes, and it cost $3801$ queries against
 $1109$ for the oracle-allocation diagnostic and $1679$ for uniform. Its stop was still correct.
 SCOPE: cost estimation on a finite panel, not error certification
-(\texttt{EXP\_paperA7\_panel}, 6/6; \texttt{FIG\_paperA7\_panel}, 4/4).}
+(\texttt{EXP\_paperA7\_panel}, 6/6, run by the archived version
+\texttt{legacy/EXP\_paperA7\_panel\_ca970305064dfaf3.py}; the current script differs only in its
+error self-check, which now counts wrong stops over launched rather than stopped runs, and there
+were none; \texttt{FIG\_paperA7\_panel}, 4/4).}
 \label{fig:apanel}
 \end{figure*}
 
@@ -972,20 +1081,30 @@ designs on a second class, but its learners and rates are not studied here.
 paid budget over any run length by padding after the decision is made. The padded queries carry
 no information for the decision, so the spreading is an accounting fact. It does not show that
 interleaving surrogate-optimal queries \emph{during} the run lowers the budget below $N_{0}$.
-The lower bound $8rMD$ and the ideal learner's $N_{0}$ still differ by the constant of
-Theorem~\ref{thm:sacrifice}.
+At a design the constant is exact: the frontier's slope at zero is $\frac{1}{8rM}$
+(Theorem~\ref{thm:frontier}). At the level of policies the lower bound $8rMD$ is not matched.
+The ideal learner is time-optimal, not budget-optimal, and its budget exceeds $8rMD$ by at most
+the factor $\frac{32}{9}+\frac{64}{9rM}$ of Theorem~\ref{thm:sacrifice}. A learner whose budget is
+$8rM\log(1/\delta)(1+o(1))$ is not constructed here; Theorem~\ref{thm:optrate} is not
+instantiated on this family.
 \item[3)] \textbf{The implemented learner.} The learner of Figure~\ref{fig:apanel} has finite
-precision and a bracketing oracle. Its rate is conditional on named accumulation and
-confidence hypotheses (supplement), and its selection step did not narrow on the panel.
-\item[4)] \textbf{Stopping.} The sacrifice law holds for unbounded stopping at level $2\delta$
-(Theorem~\ref{thm:sacstop}). The forcing law is stated for finite-horizon policies.
-\item[5)] \textbf{The repair law.} Part (i) of Theorem~\ref{thm:repairlaw} is formal for kernel
-policies and parts (ii)--(iii) for the stream learner. The concavity and limit steps of
-Corollary~\ref{cor:repairrate} are formal. The step that identifies the two budget notions on
-Gaussian cells is written out, not formalized. The attaining design is chosen at
-the true world. A deployable learner that re-solves the budgeted game at its estimate needs
-continuity of the constrained maximiser and is not treated. With several correct answers, only
-the bound with $(1-\delta)/|\text{correct}|$ is proved (\lean{budget\_law\_multi}); the exact
+precision and a bracketing oracle. It works on the box model $[-8,8]^E$: its alternatives are
+cut to the box, so its stopping certificate is a certificate for worlds in the box, not for the
+unbounded class of the theorems, and no proof is given that the box leaves the relevant infima
+unchanged. It floors design weights at $10^{-9}$ and the bracket tolerance at $10^{-6}$ with an
+80-iteration cap. Its rate is conditional on named accumulation and confidence hypotheses
+(supplement), and its selection step did not narrow on the panel. These are missing guarantees,
+not observed errors: no run stopped with a wrong answer.
+\item[4)] \textbf{Stopping.} The sacrifice law and the forcing law hold for unbounded stopping at
+level $2\delta$ (Theorems~\ref{thm:sacstop}, \ref{thm:forcing}); the repair law at the stop holds
+at level $\delta$ (Theorem~\ref{thm:repairlaw}(ii)). The forcing law for stopping asks $\varphi$
+to be nondecreasing.
+\item[5)] \textbf{The repair law.} The attaining design of Theorem~\ref{thm:optrate} is chosen
+at the true world, as in the definition of an optimal cost. A deployable learner that re-solves
+the budgeted game at its estimate needs continuity of the constrained maximiser and is not
+treated. The optimal rate is proved on Gaussian cells; on other channels only the lower side is.
+With several correct answers only the bound with $(1-\delta)/|\text{correct}|$ is proved, for a
+policy with a positive expected informative count (\lean{budget\_law\_multi}); the exact
 multi-answer limit is not claimed.
 \item[6)] \textbf{Certificates at finitely many points.} The separation of
 Figure~\ref{fig:acert} is certified exactly at $r=1,2,4,8$. The two fixed-design families of the
@@ -1000,10 +1119,11 @@ On a realizable compression family, every exact and near-optimal frozen design l
 information needed by the actual decision. A dual-margin certificate turns that geometric
 failure into a design tradeoff and then into a policy-level budget. The family makes its
 scale explicit: for $rM\ge1$, repair costs $\Theta(rM\log(1/\delta))$ query-units of surrogate
-value. With square-root corrective exploration, the specified surrogate learner pays
+value, and at a design the exchange rate $1/(8rM)$ is exact. With square-root corrective exploration, the specified surrogate learner pays
 $\Omega(\log^2(1/\delta))$, while the ideal true-geometry learner attains its characteristic
-time. On any channel the frontier is also the optimal rate under a sacrifice budget, so the
-price of repair is paid in stopping time as well as in surrogate value. The finite panels
+time. On any channel the frontier bounds the rate under a sacrifice budget, and on Gaussian
+cells a tracking learner attains it within the same class, so the price of repair is paid in
+stopping time as well as in surrogate value. The finite panels
 support the mechanism and expose implementation weaknesses; they
 do not establish the asymptotic rates or universal superiority over uniform allocation.
 

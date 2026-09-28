@@ -303,7 +303,10 @@ bound must cover every adaptive policy with a matching upper bound on the same q
 \eqref{eq:affinity} on the linear class with explicit constants, and the
 $\log(1/\delta)$ side of the budget below. If the geometry half does not follow, this
 material belongs inside the Support paper as a supporting rate, not as a paper of its own.
-That is the honest reading and we do not argue against it.}
+That is the honest reading and we do not argue against it. \emph{Status 2026-09-26: superseded. All three are now delivered: safe sets computed from the
+loss (\lean{safe\_iff\_ne}), the overlapping correspondence (\lean{coSafe\_pairwise\_meet}), and
+matched adaptive rates on one query class (main text, Theorems ``The two rates'' and ``Both
+rates on the latent family'').}}
 
 \paragraph{The remaining obligation, measured.}
 Since everything after \eqref{eq:affinity} is proved, the whole adaptive lower bound turns
@@ -393,8 +396,10 @@ additive. The measured order in $h$ falls monotonically from $5.94$ at $\eta=0$ 
 $5.14$, $4.50$, $4.11$ to $3.95$ at $\eta=1.6$, and the two-channel form
 $c_{6}h^{6}+c_{4}\eta^{2}h^{4}$ fitted on the coarse half of the grid predicts the fine
 half within its small-$\eta$ regime. Figure~\ref{fig:crossover} shows both. The crossover therefore sits at
-$\eta\asymp h$: a nonlinear measurement capability of order $h$ already erases
-the advantage. \NUM{}
+$\eta\asymp h$, where the two displayed contributions have comparable size.
+Along $\eta=ch$ with fixed $c$, both terms remain of order $h^{6}$; this crossover
+therefore does not itself change the exponent to $4$. The order-$4$ regime refers
+to fixed positive $\eta$ as $h\to0$. \NUM{}
 
 \NOTEPAR{This is a law for the one probe $g_{\eta}$, and a probe bounds the supremum from
 below only. A crossover for a \emph{class} would need a uniform upper bound over that
@@ -474,7 +479,9 @@ $\sum_{i}|ha_{i}|\le h_{0}$, $\sum_{i}|a_{i}|\le1$. That a given observation mod
 \emph{induce} shifts inside that box is the modelling step and is not proved here. The
 constructed pair is unnormalised; the two worlds carry equal mass, so one common normaliser
 converts the statement, and the $\chi^{2}$ form needs no integrability hypothesis while the
-KL form needs two, both properties of the pair rather than modelling assumptions.}
+KL form needs three integrability conditions and $\int(P-Q)=0$, all properties of the pair
+rather than modelling assumptions. \emph{Status 2026-09-26: on the parity channel the box is
+now discharged from the construction (\lean{queries\_inside\_box}).}}
 
 \leanbox{\lean{self\_difference\_not\_a\_density}, \lean{worlds\_diff},
 \lean{worldQ\_floor}, \lean{mixDens\_floor}, \lean{chi2\_uniform},
@@ -612,7 +619,9 @@ pretends otherwise: the lower bound carries $\log(1/\delta)$ and the Chebyshev u
 carries $1/\alpha$, with the ratio $VC/36\alpha c_{\alpha}$ recorded as its own statement.
 There is no theorem in this corpus of the form $N^{*}=\Theta(h^{-2s}\log(1/\delta))$.
 Closing that gap needs a test whose error decays exponentially in $N$ --- the
-characteristic-function route --- which is not formalised.}
+characteristic-function route --- which is not formalised. \emph{Status 2026-09-26: superseded. The characteristic-function route is now formalized, and
+\lean{parity\_rates}, \lean{family\_safe\_minimax} and \lean{family\_id\_minimax} are theorems of
+that form. This note concerns the Chebyshev pair only.}}
 
 \leanbox{\lean{budget\_lower}, \lean{safe\_upper}, \lean{separation\_ratio},
 \lean{separation\_unbounded}, \lean{sides\_do\_not\_match} in \lean{LeanPaperBHeadlineV1}}
@@ -640,7 +649,8 @@ lower bound meeting at the same exponent on the same observation model. That is
 \emph{not} closed: the upper bound is assembled per pair and the two orders are proved on
 \emph{two constructions that are not yet joined}. \texttt{all\_passed} in an artifact
 certifies the checks of the script that wrote it. It does not certify (ii) from (i), and it
-does not certify (iii) at all.}
+does not certify (iii) at all. \emph{Status 2026-09-26: (iii) is now closed by the main text's Theorems ``The two rates'',
+``Both rates on the latent family'' and ``The general law is tight on both channels''.}}
 
 \begin{table}[t]
 \caption{Evidence packages for this paper.}
@@ -803,7 +813,8 @@ subset is the whole world set this gives $s_{\mathrm{safe}}=1$ and $s_{\mathrm{i
 actual densities. It does \emph{not} derive the parity-mask construction's own observation
 law; that its densities carry exactly these coefficients is the remaining modelling step, and
 until it is written the two exponents are established for the exhibited family and not for
-that construction.}
+that construction. \emph{Status 2026-09-26: superseded. The parity channel's own graded $\chi^2$ bound is proved
+(\lean{parChan\_chi\_le}, \lean{parity\_graded}).}}
 
 \leanbox{\lean{dens\_integral\_one}, \lean{dens\_vanishes\_below},
 \lean{dens\_separates\_at}, \lean{coefOf\_realised}, \lean{s\_safe\_eq\_one},
@@ -819,7 +830,8 @@ loss and an observation law. Second, the safe sets here are the real \lean{selec
 ones, but the obstruction experiment's four $(u,v)$ worlds have safe sets that are
 \emph{equal} within $u$ and disjoint across it --- a different family from the intersecting
 one this theorem is about, and the two must not be joined in prose. The two orders should
-still not be quoted as sample complexities.}
+still not be quoted as sample complexities. \emph{Status 2026-09-26: superseded on the parity channel and the latent family, where the
+orders are now sample complexities (main text).}}
 
 \subsection{The safe-observation-order law}
 \label{sec:safelaw}
@@ -859,7 +871,12 @@ obligation and is not done. The law says what follows \emph{from} a resolving-or
 not that the model has one; the parity-mask query showing that query $j$ resolves world $j$
 at order $j$ is the construction's other half and is likewise unproved. And at this family a
 query-free guess already has worst-case error $1/m$, so any positive sample-complexity lower
-bound must restrict $\delta$ below that floor --- we do not state one that does not.}
+bound must restrict $\delta$ below that floor --- we do not state one that does not. \emph{Status 2026-09-26: superseded. On the parity channel $\mathrm{sep}$ is read off the
+channel's mask (\lean{channel\_sep\_is\_read\_off}); query $j$ separates world $j$ at order $j$
+through the characteristic-function gap (\lean{query\_separates\_iff}, \lean{parity\_gap\_order});
+and the order is established as a graded $\chi^2$ upper bound (\lean{parChan\_chi\_le}) with a
+Hellinger lower bound at the separating query (\lean{parity\_hel\_sep}). An exact coefficient of
+$h^{k}$ for arbitrary families is not claimed.}}
 
 \leanbox{\lean{safeAt\_iff}, \lean{unsafe\_mono}, \lean{safeAt\_mono},
 \lean{safeAt\_zero\_of\_no\_unsafe}, \lean{coSafe\_pairwise\_meet},
@@ -890,7 +907,8 @@ remark: the chi-squared integrand exceeds the Hellinger one by $(\sqrt p+\sqrt q
 which is unbounded as $p/q$ grows. What remains, and it is the model-specific work: the
 density-difference identity, an envelope $|p-q|\le h^{s}B_{s}(y)$ \emph{uniform in the
 query}, and a floor with $\int B_{s}^{2}/\ell<\infty$ --- together with the integrability
-hypotheses the integral form above carries explicitly.}
+hypotheses the integral form above carries explicitly. \emph{Status 2026-09-26: done for the constructed pair and the latent family
+(\lean{worlds\_diff}, \lean{chi2\_uniform}, \lean{famChi\_v\_le}, \lean{famChi\_u\_le}).}}
 
 \leanbox{\lean{kl\_integrand\_le}, \lean{chi\_integrand\_mono},
 \lean{kl\_integrand\_le\_floor}, \lean{kl\_le\_envelope},
@@ -929,7 +947,9 @@ correctness of the \emph{output}, not of the tests.
 Hoeffding), the queries realising the separation at each order, and the \emph{total} sample
 budget. The number of distinct queries, the number of tests, and the per-test sample count
 are three different quantities; we do not report one in place of another, and none of the
-three is established here.}
+three is established here. \emph{Status 2026-09-26: superseded by \lean{safe\_cost}, \lean{id\_cost} in
+\lean{LeanPaperBParityDecoderV1} and \lean{safe\_decoder\_error}, \lean{id\_decoder\_error} in
+\lean{LeanPaperBFamilyDecoderV1}.}}
 
 \leanbox{\lean{composite\_test\_low}, \lean{composite\_test\_high},
 \lean{composite\_test\_separates}, \lean{separation\_of\_gap},
@@ -974,8 +994,8 @@ are both present. Since $|f|\le 1$, the centred statistic is sub-Gaussian with p
 midpoint test errs with probability at most $e^{-Ng^{2}/8}$, and $N\ge 8\log(1/\delta)/g^{2}$
 suffices; with $J$ tests, $N\ge 8\log(J/\delta)/g^{2}$. The ratio of the two sides of the
 headline is then bounded by a constant free of $\delta$. What still limits the claim is not
-the confidence parameter but the evidence: only one $(m,h)$ cell certifies both decoders, so
-there is no measured identification-rate curve.}
+the confidence parameter but the evidence: three $(m,h)$ cells, all at $m=3$, certify both
+decoders, so there is no measured identification-rate curve.}
 
 \leanbox{\lean{sin\_lower\_small}, \lean{gap\_at\_scale},
 \lean{bounded\_statistic\_variance}, \lean{threshold\_decoder\_correct},
@@ -1103,8 +1123,9 @@ With $c=c_{0}h^{2r}$ this is $N=O\bigl(h^{-2r}\log(K/\delta)\bigr)$: the \emph{s
 exponent in $h$ that the lower bound produces, so the two sides match in order. The
 $\delta$-dependence matches only up to a constant, which \lean{bounds\_same\_order} makes
 explicit. The separation $c_{0}h^{2r}\le H^{2}$ is an input to this theorem --- it is what
-Section~\ref{sec:law} supplies on the linear class --- and the two are not yet composed
-into a single statement; \lean{separation\_nonvacuous} exhibits laws with $0<H^{2}<1$ so
+Section~\ref{sec:law} supplies on the linear class --- and here the two are not composed into
+a single statement (the composition is \lean{hellinger\_tournament} and
+\lean{share\_tournament}); \lean{separation\_nonvacuous} exhibits laws with $0<H^{2}<1$ so
 the theorem is not vacuous.
 
 \leanbox{\lean{affinity\_prodLaw}, \lean{err\_eq\_sum\_min},
@@ -1309,7 +1330,8 @@ is non-negative integrals, so no integrability side condition appears. A bounded
 gap is at most $\int|p-q|$. On the latent family the two probes' gaps then bound the Hellinger
 information of every pair below. The decision probe covers pairs that differ in $u$, which every
 obstruction of the safe decision contains. The tail probe covers pairs that differ only in $v$. On
-the parity channel the separating query $\mathrm{sep}(w,v)=\min(w,v)+1$ has gap at least
+the parity channel the separating query, of order $\mathrm{sep}(w,v)=\min(w,v)$ in the paper's
+numbering ($\min(w,v)+1$ on the $0$-based indices of the Lean code), has gap at least
 $G_{\mathrm{sep}}h^{\mathrm{sep}}\ge G_{m-1}h^{\mathrm{sep}}$, because the gap constant is antitone. So the
 Hellinger information dominates the graded information $C_{H}h^{2\,\mathrm{sep}}$, and the proved safe
 orders resolve every obstruction at $C_{H}h^{2}$ and $C_{H}h^{2(m-1)}$.
@@ -1338,13 +1360,86 @@ and $d(w)$ is the least $s$ at which it has a common safe answer; it exists beca
 has a safe answer and orders are bounded. \emph{Upper side:} at $s=d(w)-1$ there is no common
 answer. So every answer safe at $w$ is unsafe at some $\lambda$ with $\mathrm{sep}\ge d(w)$, and
 every query sees that $\lambda$ at most $Ch^{2d(w)}$. \emph{Lower side:} a common safe answer $a$
-of $\mathrm{near}(w,d(w))$ is unsafe only at worlds of order at most $d(w)$. The best query sees
-each of them at least $ch^{2d(w)}$, and the uniform allocation loses $1/|Q|$. Under the
-ultrametric property, $\mathrm{near}(w,d(w)-1)$ is an obstruction whose pairs all have order at
-least $d(w)$.
+of $\mathrm{near}(w,d(w))$ is unsafe only at worlds of order at most $d(w)$. One query sees each
+of them at least $ch^{2\mathrm{sep}}\ge ch^{2d(w)}$, and the uniform allocation loses $1/|Q|$.
+Under the ultrametric property, $\mathrm{near}(w,d(w)-1)$ is an obstruction whose pairs all have
+order at least $d(w)$.
 \leanbox{\lean{near}, \lean{dOrder}, \lean{dOrder\_spec}, \lean{dOrder\_min},
-\lean{decision\_upper}, \lean{decision\_lower}, \lean{order\_ge\_obstruction},
-\lean{obstruction\_of\_order}, \lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}}
+\lean{decision\_upper}, \lean{order\_ge\_obstruction}, \lean{obstruction\_of\_order},
+\lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}; \lean{decision\_lower\_wit} in
+\lean{LeanPaperBVisibleV1}}
+
+\paragraph{Blind queries} The earlier form of the lower side, \lean{decision\_lower}, asked for
+$ch^{2\mathrm{sq}_q}\le\kappa_q$ at \emph{every} query and pair. On the parity channel a query
+that names neither world gives both worlds the same law, so $\kappa_q=0$ there and that
+hypothesis fails for $c,h>0$. The endpoint parity results never used it. The repaired form needs
+one witness query per pair. A channel whose queries either see a pair, with
+$ch^{2\mathrm{ord}}\le\kappa\le Ch^{2\mathrm{ord}}$, or are blind to it, with $\kappa=0$, meets
+both hypotheses once every pair is seen: give a blind query an order $N$ above all visible ones.
+If the best query of the table is blind, its order is $N$, which bounds the order of the visible
+query that exists. On the parity channel query $q\ge1$ sees $(w,w')$ exactly when the masks
+differ, which is when $q$ names one of them. Every pair is seen, because at most one of the two
+worlds is the unnamed world $m$. The pair's order is $\min(w,w')$ in the paper's numbering.
+\leanbox{\lean{decision\_lower\_wit}, \lean{visSq}, \lean{visible\_upper},
+\lean{visible\_witness}, \lean{decision\_order\_visible}, \lean{parVis}, \lean{par\_vis\_iff},
+\lean{par\_cover}, \lean{parSq}, \lean{par\_sep} in \lean{LeanPaperBVisibleV1}}
+
+\paragraph{The per-query lower bound on the parity channel} Pointwise
+$(\sqrt p-\sqrt q)^2\le(p-q)^2/q$, so $2H^2_q\le\chi^2_q$ for every channel and query. At a query
+$q$ that sees $(w,w')$ the masks of the two worlds differ at $q$, and the feature $\mathrm{feat}_q$,
+bounded by one, has means $c_\pm(q,h,\sigma)$ that differ by at least $G_q(\sigma)h^{q}$
+(\lean{gap\_ge}); a mean gap $\Delta$ of a feature bounded by one gives $\Delta^2\le8H^2$. Hence
+$\chi^2_q(w,w')\ge\frac14G_q^2h^{2q}\ge\frac14G_{m-1}^2h^{2q}$, the last step because $G_q$ decreases in
+$q$. With the upper bound $\chi^2_q\le C_qh^{2q}$ of \lean{parChan\_chi\_le} and $\chi^2_q=0$ at blind
+queries, \lean{decision\_order\_visible} applies with order $q$ and $N=m$. For identification the
+decision order of world $w$ (paper numbering) is $\min(w,m-1)$: below it the world $m$, or the
+world $m-1$ when $w=m$, is still inseparable from $w$. An instance ($m=3$, $\sigma=1$, $h=\frac12$)
+shows the hypotheses are met.
+\leanbox{\lean{sqrt\_sub\_sq\_le}, \lean{hel\_le\_chi}, \lean{par\_gap\_visible}, \lean{par\_chi\_visible},
+\lean{cW\_pos}, \lean{par\_chi\_visible\_unif}, \lean{parKap\_upper}, \lean{parKap\_blind}, \lean{parKap\_lower},
+\lean{parity\_world\_law}, \lean{parity\_id\_order}, \lean{parity\_id\_world\_law}, \lean{parity\_world\_instance} in
+\lean{LeanPaperBParityWorldV1}}
+
+\paragraph{The parity cancellation} Expand $(\sum_\ell z_\ell)^k$ as a sum over maps
+$f:[k]\to[j]$ of $\prod_iz_{f(i)}$. Summing over the cube factorises by coordinates:
+$\sum_z\prod_\ell z_\ell^{1+|f^{-1}(\ell)|}=\prod_\ell\bigl(1+(-1)^{1+|f^{-1}(\ell)|}\bigr)$. A
+factor vanishes when some fibre is empty. For $k<j$ every $f$ misses a coordinate. For $k=j$ only
+the surjections survive, each fibre has one element, each contributes $2^j$, and there are $j!$
+of them.
+\leanbox{\lean{sg}, \lean{pow\_sum\_expand}, \lean{prod\_fiber}, \lean{term\_eq},
+\lean{moment\_expand}, \lean{factor\_zero}, \lean{parity\_moment\_lt}, \lean{card\_surj},
+\lean{parity\_moment\_eq} in \lean{LeanPaperBVisibleV1}}
+
+\paragraph{The constants, numerically} \NUM{} In the expansion of the query-$j$ density in $h$,
+the $k$-th term averages $(\sum_\ell Z_\ell)^k\varphi_\sigma^{(k)}(y\mp\prod_\ell Z_\ell)$. Writing
+$\varphi_\sigma^{(k)}(y\mp s)$ for $s=\pm1$ as the average of its two values plus $s$ times half
+their difference, only the second part depends on the mask, and the cancellation leaves
+$p_+-p_-=h^ja_j+O(h^{j+1})$ with
+$a_j(y)=(-1)^jj^{-j}(\varphi_\sigma^{(j)}(y-1)-\varphi_\sigma^{(j)}(y+1))$. This step and its
+remainder are not formalized. With $p_0=\frac12(\varphi_\sigma(\cdot-1)+\varphi_\sigma(\cdot+1))$ and
+$c_j=\frac12\int a_j^2/p_0$, the prediction is $\mathrm{KL}\sim c_jh^{2j}$ in both directions and
+$H^2\sim c_jh^{2j}/4$. Quadrature (\texttt{paperB\_parity\_constants.json}, $4/4$ checks, among
+them the cube identity above by exact enumeration) gives:
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$j$ & $c_j$, $\sigma=1$ & $c_j$, $\sigma=\frac12$\\
+\midrule
+$1$ & $1.468$ & $7.827$\\
+$2$ & $0.1862$ & $2.455$\\
+$3$ & $1.172\times10^{-2}$ & $0.6558$\\
+$4$ & $4.794\times10^{-4}$ & $0.1252$\\
+$5$ & $1.472\times10^{-5}$ & $1.752\times10^{-2}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+At $h=0.025$ every ratio $\mathrm{KL}/(c_jh^{2j})$ and $4H^2/(c_jh^{2j})$ lies within $0.6\%$ of
+$1$, and the distance shrinks with $h$. Fed to the critical game with the visibility table, these
+give the identification constant at world $w$. For $w\le m-1$ the critical alternatives are the
+worlds $\lambda>w$, which only query $w$ sees at order $w$, so $G^*=c_w$. For $w=m$ the only
+critical alternative is $m-1$, so $G^*=c_{m-1}$. This instance of Theorem ``The limit of the
+rescaled game'' is derived here and not formalized.
 
 \paragraph{The critical limit} For an allocation $\alpha$ the inner value is a finite minimum, and
 the game value is its supremum over the simplex, bounded by a single alternative's row.
@@ -1384,20 +1479,27 @@ order $0$. Otherwise they are twins, and only a query of their set separates the
 The corpus is verified by \texttt{verify\_all.sh}, which freezes its inputs, builds every listed
 module and every local import from an empty cache in import order, counts \texttt{sorry} and
 \texttt{native\_decide} outside comments, and checks every audited axiom closure against
-\{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}. The last full gate that
-passed, \texttt{full6\_20260925}, built $214$ modules and audited $1666$ theorems, with frozen
-sources identical to the working copy afterwards. It includes every module this supplement
-cites except five. \lean{LeanUnifiedObstructionOrderV1} imports only Mathlib and passes the smoke
-gate \texttt{smokeUNI\_20260925} ($2$ modules, $16$ theorems). \lean{LeanPaperBHellingerTestV1},
-written after it, passes the smoke gate \texttt{smokeHEL\_20260925} ($40$ modules, $316$ theorems).
-\lean{LeanPaperBHellingerFamilyV1}, \lean{LeanPaperBHellingerParityV1} and
-\lean{LeanPaperBFamilySafeV1} were written later. Each compiles with the standard axioms and no
-\texttt{sorry}, and they are the roots of the smoke gate \texttt{smokeR2\_20260925}.
-\lean{LeanPaperBCertificateChannelV1} and \lean{LeanPaperBDecisionOrderV1} pass the smoke gate
-\texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems). \lean{LeanPaperBCriticalGameV1} and
-\lean{LeanPaperBQueryDesignV1} pass \texttt{smokeUP2\_20260925} ($107$ modules, $934$ theorems).
-Both runs used the standard axioms, with no \texttt{sorry}, no \texttt{native\_decide}, and no
-drift.
+\{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}. Every module cited in the
+paper and in this supplement, $52$ in all, passed a gate whose frozen copy is byte-identical, by
+hash, to the current source.
+\begin{itemize}
+\item The last full gate, \texttt{full7\_20260925} ($219$ modules, $1704$ theorems), covers $40$ of
+them, including \lean{LeanUnifiedObstructionOrderV1}, \lean{LeanUnifiedQueryOrderV1},
+\lean{LeanPaperBHellingerTestV1} and \lean{LeanPaperBStoppedLawV1}.
+\item \texttt{smokeR2\_20260925} ($96$ modules, $771$ theorems): \lean{LeanPaperBFamilySafeV1},
+\lean{LeanPaperBHellingerFamilyV1}, \lean{LeanPaperBHellingerParityV1}.
+\item \texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems):
+\lean{LeanPaperBCertificateChannelV1}, \lean{LeanPaperBChiStarV1}, \lean{LeanPaperBPrivateQueryV1},
+\lean{LeanPaperBShareTournamentV1}.
+\item \texttt{smokeUP2\_20260925} ($107$ modules, $934$ theorems): \lean{LeanPaperBCriticalGameV1},
+\lean{LeanPaperBQueryDesignV1}.
+\item \texttt{smokeUP4\_20260925} ($139$ modules, $1199$ theorems): \lean{LeanPaperBDecisionOrderV1},
+\lean{LeanPaperBVisibleV1}.
+\item \texttt{smokeB1\_20260926} ($44$ modules, $353$ theorems): \lean{LeanPaperBParityWorldV1}.
+\end{itemize}
+Each smoke gate freezes its roots with their full import closure and applies the same
+acceptance conditions: exit status $0$, no \texttt{sorry}, no \texttt{native\_decide}, standard
+axioms, no drift.
 
 \begin{thebibliography}{00}
 
@@ -1425,8 +1527,9 @@ Information Theory (ISIT)}, 2021, pp.~2596--2601.
 answers,'' in \emph{Advances in Neural Information Processing Systems 32}, 2019,
 pp.~14591--14600.
 
-\bibitem{wangyou2026} Z. Wang and K. You, ``Information games with multiple correct answers
-and piecewise-convex alternative sets,'' arXiv:2606.21889, 2026.
+\bibitem{wangyou2026} Q. Wang and W. You, ``Ranking-and-selection with multiple correct answers and non-answerable estimates,'' arXiv:2606.21889, 2026.
+%% previous (wrong) entry kept for the record: Z. Wang and K. You, ``Information games with multiple correct answers
+%% and piecewise-convex alternative sets,'' arXiv:2606.21889, 2026.
 
 \bibitem{odonnell2014} R. O'Donnell, \emph{Analysis of Boolean Functions}. Cambridge,
 U.K.: Cambridge Univ. Press, 2014.

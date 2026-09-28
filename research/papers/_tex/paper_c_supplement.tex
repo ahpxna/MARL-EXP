@@ -16,8 +16,8 @@ This supplement gives, for each result of the main paper, the proof architecture
 readable mathematics and every Lean~4 declaration it rests on, grouped by module. It also
 records the status of declarations that the main text does not use: superseded routes,
 arithmetic lemmas whose inputs are not instantiated, and one withdrawn theorem whose domain
-is empty. Section numbers S1--S7 follow the main text; theorems are named as in the main
-text.
+is empty. Sections S1--S8 follow the results of the main text and S9 is the build record;
+theorems are named as in the main text.
 \end{abstract}
 
 \section*{Conventions}
@@ -27,7 +27,7 @@ compiles with exit status $0$, contains no \texttt{sorry} and no \texttt{native\
 outside comments, and the axioms of every audited theorem lie within
 \{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}. Acceptance is checked by
 a frozen gate that copies every module and its local imports into a fresh directory and
-builds from an empty cache (S7). The paper's objects are \lean{gFamily} ($g_{m}$),
+builds from an empty cache (S9). The paper's objects are \lean{gFamily} ($g_{m}$),
 \lean{regret} ($r_{k}$), \lean{FeasibleAt} (the marginal band of the main text, read on
 the dropped prefix and equivalently on the kept complement, quantified over budgets
 $k\le m$), \lean{value} ($V_{m}(\eta)$), \lean{freeValue}
@@ -178,7 +178,7 @@ needing its own computation is the heavy item immediately before the end.
 
 \leanbox{\lean{two\_budget\_identity}, \lean{jump\_forces\_excess},
 \lean{odd\_total\_excess}, \lean{baseline\_first}, \lean{baseline\_last} in
-\lean{LeanPaperCRankingV1}; \lean{even\_total\_excess}, \lean{hineq\_for\_breakpoint};
+\lean{LeanPaperCRankingV1}; \lean{even\_total\_excess} in \lean{LeanPaperCEvenTotalV1}, \lean{hineq\_for\_breakpoint} in \lean{LeanPaperCRankingV1};
 \lean{even\_rankSum} in \lean{LeanPaperCEvenRankSumV1}}
 
 \paragraph{The band, at the two ends} The first position is the budget-$1$ prefix and the
@@ -219,12 +219,12 @@ feasible set and passes to the infimum.
 law (value $\frac{4}{mD}$, feasible at $0$) and the insertion law (value $V^{\mathrm{free}}_{m}$,
 feasible at $\eta_{*}$) with weight $\eta/\eta_{*}$ is feasible at $\eta$ with value at most
 $4(1-\eta)/mD$, since both sides are affine in $\eta$ and agree at the ends. The end budgets
-give the matching lower bound. Monotonicity is nesting; convexity holds because the band's
-right-hand side is affine in $\eta$ and the objective is a maximum of linear functionals.
+give the matching lower bound. Monotonicity is nesting. The Lean proof uses explicit blends of
+feasible laws rather than a general convexity lemma; convexity of $V_m$ also follows from the proved
+closed form.
 
 \leanbox{\lean{blend\_feasible}, \lean{objective\_blend\_le} in \lean{LeanPaperCEndgameV1};
-\lean{value\_antitone\_of\_nested}, \lean{value\_convex\_of\_convex\_feasible} in
-\lean{LeanPaperCFrontierV1}}
+\lean{value\_antitone\_of\_nested} in \lean{LeanPaperCFrontierV1}}
 
 \paragraph{The first odd line} For odd $m$ the prefix of
 length $m-1$ is $-1$ minus the last item and $m-1$ is even, so
@@ -512,8 +512,11 @@ of every order, so class-count feasibility gives per-item feasibility.
 \lean{insertion\_post}, \lean{odd\_rotation\_post}, \lean{even\_rotation\_post},
 \lean{expost\_even}, \lean{expost\_odd} in \lean{LeanPaperCExPostBandV1}}
 
-\section{S7. Any number of types (Theorems ``The flow program for every typed multiset'' and
-``The free threshold'', Proposition ``The additive price is stable'')}
+\section{S7. Any number of types (Theorems ``The flow program for every typed multiset'',
+``The free threshold'', ``Two magnitudes, one item each'', ``Two heavy pairs and one light pair'',
+``The price in the ratio, two repeated counts'', ``The band frontier for counts $(1,1,2,2)$'' and
+``The band frontier for counts $(2,2,2,2)$'',
+Proposition ``The additive price is stable'')}
 
 \paragraph{Typed flows} The core of the four-type flow equivalence, the agreement of banded
 vectors between rankings and count-feasible flows, holds for any type map and any cost on
@@ -557,46 +560,238 @@ every item, and the budget costs are evaluated order by order.
 \lean{raw\_three}, \lean{marg\_one}, \lean{mkPerm}, \lean{law\_sum}, \lean{raw\_values} in
 \lean{LeanPaperCTwoMagFourV1}}
 
+\paragraph{Two heavy pairs and one light pair (Theorem ``Two heavy pairs and one light pair'')}
+The six items are $a,a,-a,-a,b,-b$ with $D=4a+2b$. The dual side has two certificates: the band's
+upper side on the two light items at budget one, which puts a light item first with probability at
+most $\frac{1+\eta}3$, gives the line $\frac{(a-b)(2-\eta)}3$; the fact that every order pays at least
+$2(a-b)$ over the five budgets gives $\frac25(a-b)$. The primal side mixes a band-exact law on six
+orders with a law on seven orders of deviation $\frac45$ whose five budget costs all equal
+$\frac25(a-b)$; the mixture meets the first line up to $\eta=\frac45$, and the second law alone is
+optimal beyond.
+\leanbox{\lean{twoMag2211\_frontier}, \lean{twoMag2211\_price}, \lean{twoMag2211\_etaFree},
+\lean{lower\_band}, \lean{lower\_free}, \lean{band0}, \lean{band1}, \lean{obj0\_le}, \lean{obj1\_le} in
+\lean{LeanPaperCTwoMag2211V1}}
+
+\paragraph{Repeated light types (Theorem ``The price in the ratio'')} Both counts are handled on the
+count states of Theorem ``The flow program for every typed multiset''. For each ratio region the
+upper side is an explicit law on type sequences, fed to \lean{typed\_flow\_equivalence}; its budget
+costs are evaluated sequence by sequence from the prefix counts (\texttt{decide} tables) and the
+baselines, and are mixed with ratio-dependent weights. The lower side is \lean{cert\_lower} of
+\lean{LeanPaperCFlowCertV1}: budget
+weights $\mu$, band multipliers (none for the free value, taken at $\eta=m$) and potentials on the
+count states. The potentials are a shortest-path computation in exact rational arithmetic, and
+every edge inequality is proved on the whole ratio region; where $\mu$ depends on the ratio the
+edge slacks are quadratic and the proof uses products of the region constraints. For $(2,2,2,2)$
+the free value has three competing certificates: budget weights $(b,3b-a,b)$ on budgets $3,4,5$
+($Z=5b-a$), weights $(3b-a,3b-a,b,3b-a,b,3b-a,3b-a)$ ($Z=17b-5a$), and uniform weights. The
+matching mixture on $[2,5-2\sqrt2]$ has three sequences with weights proportional to
+$(5b-a,a-b,6b-2a)$; its budget slacks are $q=a^2-10ab+17b^2$ at budgets $1,2,6,7$ and $0$ at budgets
+$3,4,5$ (the band is vacuous at $\eta=m$), so it is feasible exactly while $q\ge0$. On $[5-2\sqrt2,\frac{17}7]$
+it has eight sequences with weights $11a^2-46ab+51b^2$, $-q$ and $2(a-b)(17b-7a)$. Each price is the
+quotient of two region values, taken on the intersection of their regions.
+\leanbox{\lean{g6} in \lean{LeanPaperCTwoMagSixV1}; \lean{cert6}, \lean{value\_le\_flow}, \lean{rawC\_L},
+\lean{rawC\_M}, \lean{rawC\_H} in \lean{LeanPaperCTwoMag1122BaseV1}; \lean{value\_le\_of}, \lean{vfree\_eq}, \lean{ratio\_mul} in
+\lean{LeanPaperCTwoMag1122PriceV1}; \lean{g8}, \lean{cert8}, \lean{value\_le\_of\_flow} in
+\lean{LeanPaperCTwoMag2222BaseV1}; \lean{lower\_T13}, \lean{lower\_F1}, \lean{lower\_F2},
+\lean{lower\_Um}, \lean{lower\_Uh} in \lean{LeanPaperCTwoMag2222FreeCertV1}; \lean{vfree8},
+\lean{ratio\_mul8} in \lean{LeanPaperCTwoMag2222PriceV1}; \lean{zero\_up\_I}, \lean{zero\_up\_II},
+\lean{zero\_up\_III} in \lean{LeanPaperCTwoMag2222ZeroV1}; \lean{free\_up\_R2}, \lean{free\_up\_R3} in
+\lean{LeanPaperCTwoMag2222FreeV1}}
+
+\paragraph{The band frontier for $(1,1,2,2)$ (Theorem ``The band frontier for counts $(1,1,2,2)$'')}
+Three more certificates cover the lines that are not a zero-band or free value: the middle line
+$M$ uses the budget weights of the free certificate on $[2,\frac73]$ and a band multiplier $(3b-a)^2$
+on the heavy types at budgets $2,4$; the line $L$ uses quadratic budget weights and a cubic
+multiplier, with normaliser $2(15ab-3a^2-16b^2)$, and its edge slacks are cubic forms, each a
+nonnegative combination of $(3a-7b)^i(13b-5a)^{3-i}$; the line $A$ on $[\frac52,\frac{13}5]$ reuses the
+certificate of $[2,\frac52]$. The kink flows are, with per-sequence weights over a common
+denominator: $\mathtt{AaBbBb}$ and $\mathtt{BBaAbb}$ in proportion $b:(3b-a)$ (band
+$\frac{2(a-2b)}{5b-a}$); $\mathtt{AaBbBb}$, $\mathtt{BaAbBb}$, $\mathtt{BBaAbb}$ in proportion
+$8b(3b-a):4b(3a-7b):2(a-b)(13b-5a)$; and $\mathtt{AbaBBb}$, $\mathtt{BaAbBb}$, $\mathtt{AaBbBb}$ in
+proportion $(13b-5a):(3a-7b):(3a-7b)$. The last two meet their cost bound at every budget. A segment
+lemma turns two flows on the same affine line into that line on the segment between their bands;
+the order of the kinks is two polynomial inequalities whose cross-multiplied differences are
+$6(13b-5a)(15ab-3a^2-16b^2)$ and $6(a-b)(13b-5a)(3b-a)$.
+\leanbox{\lean{lineA}, \lean{lineB}, \lean{lineM}, \lean{lineL2}, \lean{low\_AL}, \lean{low\_A},
+\lean{low\_A3}, \lean{low\_B}, \lean{low\_M}, \lean{low\_L2}, \lean{kinkK2\_pos},
+\lean{regions\_nonempty} in \lean{LeanPaperCTwoMag1122FrontierV1}; \lean{edge\_C2}, \lean{edge\_CL2},
+\lean{edge\_AM3} in \lean{LeanPaperCTwoMag1122CertV2}}
+
+\paragraph{The band frontier for $(2,2,2,2)$ (Theorem ``The band frontier for counts $(2,2,2,2)$'')}
+The lines $L_1$, $L_2$ and the zero-band and free values have the certificates used above; the free
+values, proved at $\eta=m$, hold at every band because the value is nonincreasing in the band. The
+new line $L_3$ on $[2,\frac{17}7]$ has budget weights $2(3b-a)(a-2b)$, $(a-b)(3b-a)$, $2b(a-b)$,
+$2b(3b-a)$, $2b(3b-a)$, $(a-b)(3b-a)$, $2(3b-a)(a-2b)$ on budgets $1,\dots,7$ (total $2(a-b)(10b-3a)$)
+and band multipliers $\pm2(a-b)(3b-a)^2$ on the two heavy types at budgets $2$ and $6$; its $216$ edge
+slacks are cubic forms, each a nonnegative combination of $(a-2b)^i(17b-7a)^{3-i}$, and its value
+at $\eta=0$ is $2(3b-a)(a^2-2ab+3b^2)$ over the total. The eleven kink flows are mixtures of
+sequences together with their sign flips, with weights polynomial in $(a,b)$ over a common
+denominator; each meets its band and all seven budget costs with equality. On the irrational
+ranges the weights that vanish at $q=0$ or at $a^2-14ab+25b^2=0$ carry those factors, and the
+other inequalities are checked on enclosing rational ranges derived from the sign conditions. A
+segment may reduce to a point (the kinks coincide at $r=2$, $\frac73$, $\frac{17}7$ and
+$\frac{53}{21}$), which the segment lemma allows. The kink orders are polynomial inequalities with
+nonnegative Bernstein coefficients on each range.
+\leanbox{\lean{lineL1}, \lean{lineL2}, \lean{lineL3}, \lean{ex\_zero\_I}, \lean{ex\_zero\_II},
+\lean{ex\_zero\_III}, \lean{ordA}, \lean{ordB}, \lean{ordC}, \lean{ordD}, \lean{ordE}, \lean{ordF},
+\lean{value\_le\_ex8}, \lean{regions8\_nonempty} in \lean{LeanPaperCTwoMag2222FrontierV1};
+\lean{edge\_L3}, \lean{lamL3\_nonneg} in \lean{LeanPaperCTwoMag2222FrontCertV1}; \lean{flow\_mixQ},
+\lean{flow\_mixQE} in \lean{LeanPaperCTwoMag2222KinkV1}}
+
 \paragraph{The two-magnitude map} \texttt{scripts/EXP\_paperC\_typed\_frontier.py} (source
 SHA-256 prefix \texttt{2a572a64ce84}) wrote
-\texttt{research/unified\_20260919/paperC\_typed\_frontier.json}. It has $240$ count vectors,
-$4$ ratios and $41$ band values, and $3/3$ self-checks. HiGHS floating point. The refinement
+\texttt{research/unified\_20260919/paperC\_typed\_frontier.json}. It has $60$ count vectors
+at $4$ ratios ($240$ instances) and $41$ band values, and $3/3$ self-checks. HiGHS floating point. The refinement
 \texttt{scripts/EXP\_paperC\_typed\_transition.py} reuses that solver and wrote
 \texttt{paperC\_typed\_transition.json}. It covers counts $(1,1,2,2)$ and $(2,2,2,2)$, $21$
 ratios in $[2,3]$ and $49$ band values, with $3/3$ self-checks, one of which reproduces the
 stored rows at $a/b=2,3$. \NUM{}
 
-\section{S8. Build record}
+\section{S8. Knowing the budget, and recourse (Propositions ``Knowing, editing, committing'' and
+``The count model is exact'', Theorems ``Knowing the budget is worth nothing on a band range'',
+``Four items'' and ``The value of the budget on the family, at every band'')}
+
+\paragraph{Objects} A subset law at budget $k$ is a probability vector on subsets, supported on
+$k$-sets, whose item marginals lie within $\eta/m$ of $k/m$. Its cost is
+$\sum_SQ(S)(|\sum_{i\in S}g_i|-b_k)/\|g\|_1$. The layer value is the infimum of the cost, and the
+budget-aware value is its maximum over the budgets. A recourse plan at budget $k$ is a
+nonnegative $J(\sigma,T)$ with $\sum_TJ(\sigma,T)=P(\sigma)$, supported on pairs with $|T|=k$ and
+$|S_k(\sigma)\setminus T|\le R$, whose final item marginals lie in the band. The recourse value
+is the infimum, over band-feasible $P$ and plans at each budget, of the worst budget's final cost.
+\leanbox{\lean{ind}, \lean{SubFeasible}, \lean{subCost}, \lean{layerValue}, \lean{awareValue},
+\lean{PlanFeasible}, \lean{planCost}, \lean{recourseSet}, \lean{recourseValue} in
+\lean{LeanPaperCBudgetAwareV1}}
+
+\paragraph{The sandwich} The push of $P$ to its budget-$k$ prefix, $S\mapsto\Pr_P(S_k=S)$, has the
+same marginals and the same cost; so every layer value is at most $\mathbb E_Pr_k$, and
+$B_g\le V_g$. The final-set law of a plan is a subset law in the band, so $B_g\le V^{(R)}_g$. The
+plan that keeps the prefix is feasible for every $R$, so $V^{(R)}_g\le V_g$. At $R=0$ a
+supported $T$ contains the prefix and has its size, so it is the prefix, and every plan has the
+cost of its base law: $V^{(0)}_g=V_g$. A plan for $R$ is a plan for $R'\ge R$. For the last
+statement, two $k$-sets $S,T$ have $|S\setminus T|\le|S|=k$ and $S\setminus T\subseteq T^{c}$,
+so $|S\setminus T|\le m-k$. Draw the final set independently from a subset law within
+$\varepsilon$ of each layer's infimum; the plan is feasible when $\min(k,m-k)\le R$, and its
+cost is that law's cost. Let $\varepsilon\to0$.
+\leanbox{\lean{subCost\_nonneg}, \lean{cost\_nonneg}, \lean{layer\_le}, \lean{layer\_nonneg},
+\lean{pushK}, \lean{push\_sum}, \lean{inPrefix\_eq\_ind}, \lean{push\_feasible}, \lean{push\_cost},
+\lean{layer\_le\_obj}, \lean{sub\_nonempty}, \lean{aware\_le\_true}, \lean{finalLaw},
+\lean{final\_feasible}, \lean{layer\_le\_plan}, \lean{idPlan}, \lean{idPlan\_feasible},
+\lean{idPlan\_cost}, \lean{aware\_le\_recourse}, \lean{recourse\_le\_true}, \lean{recourse\_zero},
+\lean{recourse\_mono}, \lean{sdiff\_card\_le}, \lean{indepPlan}, \lean{indep\_feasible},
+\lean{indep\_cost}, \lean{recourse\_full} in \lean{LeanPaperCBudgetAwareV1}}
+
+\paragraph{Linear certificates} If $\alpha+\sum_{i\in S}\beta_i\le f(S)$ on $k$-sets, then for a
+subset law $Q$ in the band,
+$\sum_SQ(S)f(S)\ge\alpha+\sum_i\beta_i\Pr_Q(i\in S)$, and each term obeys
+$\beta_i\Pr_Q(i\in S)\ge\beta_ik/m-|\beta_i|\eta/m$.
+\leanbox{\lean{linear\_lower}, \lean{layer\_ge\_of\_linear} in \lean{LeanPaperCBudgetAwareV1}}
+
+\paragraph{The family} The upper side is $B\le V$ and the frontiers of Theorems ``The even
+frontier'' and ``The odd frontier''. On the stated ranges the frontier is its first line: in even
+size $\frac{2}{(m+4)(m-1)}\le\frac{4(1-\eta)}{m(m+4)}$ exactly when $\eta\le\eta_*$, and in odd size
+the second line lies below the first exactly when $\eta\le\eta_t$. The lower side is one layer.
+\begin{itemize}
+\item Even $m$, budget one: $\beta_i=|g_i|-1$ and $\alpha=0$, an equality on singletons since
+$b_1=1$. The family sums give $\sum\beta_i=\sum|\beta_i|=4$, so the layer is at least
+$4(1-\eta)/(m(m+4))$.
+\item Odd $m$, budget $m-1$: a $k$-set is $\{j\}^{c}$, its sum is $-1-g_j$ and $b_{m-1}=0$. With
+$\beta_i=2-|-1-g_i|$ and $\alpha=5-m$, the certificate is an equality on every such set. The family
+sums give $\sum\beta_i=m-3$ and $\sum|\beta_i|=m+1$, so the layer is at least
+$(m+3-(m+1)\eta)/(m(m+4))$.
+\end{itemize}
+\leanbox{\lean{aware\_even}, \lean{aware\_odd} in \lean{LeanPaperCBudgetGmV1};
+\lean{sum\_fn\_gFamily} in \lean{LeanPaperCRelaxedJoinV1};
+\lean{familyBaselineIdentification\_holds} in \lean{LeanPaperCBaselineAttainV1}}
+
+\paragraph{Four items} Point-mass laws on explicit sets give the upper sides: singletons with
+weights $(h,h,\frac12-h,\frac12-h)$, $h=\max(1-\eta,0)/4$, at budget one; their complements at
+budget three; the two cancelling pairs at budget two. The lower side at budget one is the
+certificate $\beta=(a-b,a-b,0,0)$. The plan uses the base law of the four cyclic orders, pushed
+to permutations, which is feasible at band $0$. At budgets one and three the final set is drawn
+independently. At budget two a kernel keeps a cancelling prefix and sends a mixed one to each
+cancelling pair with probability $\frac12$. The cyclic prefixes of size two are $\{0,1\}$,
+$\{1,2\}$, $\{2,3\}$, $\{3,0\}$, so each final pair has probability $\frac12$ and every item
+marginal is $\frac12$. A mixed pair of size two differs from each cancelling pair in one item, by
+exhaustion over the subsets of four items.
+\leanbox{\lean{ptLaw}, \lean{ptLaw\_sum}, \lean{ptLaw\_feasible}, \lean{kerPlan},
+\lean{kerPlan\_feasible}, \lean{kerPlan\_cost}, \lean{Q1\_feasible}, \lean{Q2\_feasible},
+\lean{Q3\_feasible}, \lean{Q1\_cost}, \lean{Q2\_cost}, \lean{Q3\_cost}, \lean{lay1\_lower},
+\lean{aware\_twoMag}, \lean{advantage\_twoMag}, \lean{P0\_feasible}, \lean{P0\_expect},
+\lean{K2\_sum}, \lean{mixed\_close}, \lean{K2\_supp}, \lean{K2\_band}, \lean{K2\_cost},
+\lean{recourse\_one\_twoMag}, \lean{recourse\_zero\_twoMag}, \lean{exchange\_needed} in
+\lean{LeanPaperCBudgetFamiliesV1}}
+
+\paragraph{One exchange in even size (Theorem ``The value of the budget on the family'')} Let
+$m=2h+2$. The base rankings are the alternating light sequence with the heavy pair inserted at
+position $2s$, $s\in\{0,\dots,h\}$, and a global sign; the committed law relabels each base ranking
+uniformly within the four weight classes. A symmetrised plan built from base rankings and target
+sets has class-averaged final marginals, and plans over the same committed law mix, with the band
+mixing linearly. The committed law has exact marginals $\frac km$. At budgets $1$ and $m-1$ the
+final set is drawn independently from a near-optimal subset law. At an odd middle budget
+$k=2s'+1$ the prefix contains exactly one heavy item and costs $\frac2D$; the edit replaces it by
+the light item at position $2s'+2$, right after the heavy pair, one exchange, and costs $0$. It moves $\frac1m$ of mass off
+each heavy item and $\frac1{mh}$ onto each light one, so mixing the edit with probability
+$\theta=\min\{\eta,1\}$ stays in the band $\eta$, and the cost is $\frac{4(1-\theta)}{mD}=B_{g_m}$. Even
+middle budgets cost $0$.
+\leanbox{\lean{planJ}, \lean{sym\_plan}, \lean{plan\_mix}, \lean{pairLaw}, \lean{pair\_feasible},
+\lean{editT\_card}, \lean{editT\_sdiff}, \lean{editT\_band}, \lean{preT\_band}, \lean{editT\_cost},
+\lean{preT\_cost}, \lean{recourse\_one\_even} in \lean{LeanPaperCBudgetExchangeV1}}
+
+\paragraph{The numerical panel} \NUM{} \texttt{scripts/EXP\_paperC\_budget\_recourse.py} solves each
+layer as a linear program over count vectors with the type-marginal band, and the recourse value
+as the count flow of Theorem ``The flow program for every typed multiset'' plus, at each interior
+budget, a transport between count vectors of radius $R$ with the band and the regret on its
+output. It refuses to write unless the four-item formulas, the two family ranges, the chain
+$B\le V^{(R+1)}\le V^{(R)}\le V$ and $V^{(\lfloor m/2\rfloor)}=B$ all hold to $10^{-7}$. The run
+(\texttt{paperC\_budget\_recourse.json}, $136$ s) covers $g_m$ for $m=4,\dots,10$, all
+$R\le\lfloor m/2\rfloor$, and counts $(1,1,2,2)$ and $(2,2,2,2)$ at $a/b\in\{1.5,2,2.6,3,5\}$.
+\begin{itemize}
+\item On $g_m$ the first grid point with $A>10^{-6}$ is the first one past each proved range:
+$0.34,0.91,0.41,0.96,0.43,0.98,0.45$ for $m=4,\dots,10$.
+\item The least $R$ with $V^{(R)}=B$ is $0$ up to that point and $1$ after it, on every
+instance.
+\item With repeated types, the first gap is at $\eta=0$ for $a/b\le2$, near $0.26$--$0.29$ at
+$a/b=2.6$, and near $0.41$--$0.43$ at $a/b\ge3$.
+\end{itemize}
+Symmetrising a subset law within types does not change its cost and keeps its band, so the
+count layer has the item layer's value, and a count transport lifts to item exchanges by the same
+relabelling applied to the ranking and the final set; both reductions are proved
+(Proposition ``The count model is exact'' of the main text), so the recourse column is the item
+model's value up to the solver's floating point.
+\leanbox{\lean{symSub\_feasible}, \lean{symSub\_cost}, \lean{push\_countFeasible},
+\lean{lift\_feasible}, \lean{layer\_costs\_eq\_count} in \lean{LeanPaperCCountReductionV1};
+\lean{exists\_nested}, \lean{lift\_plan}, \lean{proj\_transport} in \lean{LeanPaperCCountRecourseV1}}
+
+\section{S9. Build record}
 
 The corpus is verified by \texttt{verify\_all.sh}, which freezes its inputs, builds every
 listed module and every local import from an empty cache in import order, counts
 \texttt{sorry} and \texttt{native\_decide} outside comments, checks every audited axiom
 closure against the whitelist, and compares the frozen bytes with the working directory at
 the end. The gate records per-module source and olean hashes. The last full gate that passed,
-\texttt{full6\_20260925}, built $214$ modules and audited $1666$ theorems, with no
+\texttt{full7\_20260925}, built $219$ modules and audited $1704$ theorems, with no
 \texttt{sorry}, no \texttt{native\_decide}, the standard axioms, and frozen sources identical to
-the working copy afterwards. It includes every module this supplement cites except two.
-\lean{LeanUnifiedStructuralRelaxedV1} imports only Mathlib and passes the smoke gate
-\texttt{smokeUNI\_20260925} ($2$ modules, $16$ theorems). \lean{LeanPaperCCollapseWindowV1} was
-written after it. It compiles with the standard axioms and no \texttt{sorry}, and it is in the
-module list of the full gate \texttt{full7\_20260925}. Before that full gate, the modules
-added after \texttt{full5\_20260924} ($197$ modules, $1553$ theorems) were covered by smoke gates
-over their full import closures:
+the working copy afterwards. Of the $76$ modules cited in the paper and this supplement, $48$ are
+in it. The others, the modules of Sections~S7 and~S8 and \lean{LeanPaperCRobustBallV1} of
+Section~S5, were written after it. Each passes a smoke gate over its full import closure, with the
+standard axioms, no \texttt{sorry}, no \texttt{native\_decide}, and no drift:
 \begin{itemize}
-\item \texttt{smokeCJ\_20260924}: \lean{LeanPaperCRelaxedJoinV1} and
-\lean{LeanPaperCRatioJoinV1}; $49$ modules, $449$ theorems.
-\item \texttt{smokeCOF\_20260924}: \lean{LeanPaperCOddFrontierV1}; $51$ modules, $459$
-theorems.
-\item \texttt{smokeCC3\_20260924}: \lean{LeanPaperCCollapseScaleV1} and
-\lean{LeanPaperCExPostBandV1}; $52$ modules, $463$ theorems.
-\end{itemize}
-The modules of Section~S7 were written after \texttt{full7\_20260925}. Each passes a smoke gate
-over its full import closure, with the standard axioms, no \texttt{sorry}, no
-\texttt{native\_decide}, and no drift:
-\begin{itemize}
+\item \texttt{smokeSHARP2\_20260925}: \lean{LeanPaperCRobustBallV1}; $88$ modules, $805$ theorems.
 \item \texttt{smokeUP1\_20260925}: \lean{LeanPaperCTypedFlowV1}; $79$ modules, $762$ theorems.
 \item \texttt{smokeUP2\_20260925}: \lean{LeanPaperCFreeBandV1}; $107$ modules, $934$ theorems.
 \item \texttt{smokeUP3\_20260925}: \lean{LeanPaperCTwoMagFourV1}; $106$ modules, $924$ theorems.
+\item \texttt{smokeUP4\_20260925}: \lean{LeanPaperCBudgetAwareV1}, \lean{LeanPaperCBudgetFamiliesV1},
+\lean{LeanPaperCBudgetGmV1}; $139$ modules, $1199$ theorems.
+\item \texttt{smokeC1\_20260926}: \lean{LeanPaperCTwoMag2211V1}, \lean{LeanPaperCBudgetSymV1},
+\lean{LeanPaperCBudgetSharpV1}, \lean{LeanPaperCCountReductionV1}, \lean{LeanPaperCCountRecourseV1};
+$65$ modules, $607$ theorems.
+\item \texttt{smokeC2\_20260926}: \lean{LeanPaperCTwoMag1122PriceV1}, \lean{LeanPaperCTwoMag2222PriceV1},
+\lean{LeanPaperCBudgetExchangeV1}, with the $(1,1,2,2)$ and $(2,2,2,2)$ base, certificate, flow,
+zero-band and free-value modules in their import closures; $74$ modules, $649$ theorems.
+\item \texttt{smokeC3\_20260926}: \lean{LeanPaperCTwoMag1122CertV2}, \lean{LeanPaperCTwoMag1122KinkV1},
+\lean{LeanPaperCTwoMag1122FrontierV1}; $51$ modules, $492$ theorems.
+\item \texttt{smokeC4\_20260926}: \lean{LeanPaperCTwoMag2222FrontCertV1}, \lean{LeanPaperCTwoMag2222KinkV1},
+\lean{LeanPaperCTwoMag2222FrontierV1}; $52$ modules, $486$ theorems.
 \end{itemize}
 
 \end{document}

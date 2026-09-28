@@ -1,0 +1,215 @@
+{
+  "status": "COMPLETE",
+  "evidence_class": "OFFLINE SELECTOR PILOT; frozen heuristic actor, NOT learned-MARL outcomes",
+  "limitations": [
+    "Full table calibration labels shared by all methods; acquisition advantage not tested",
+    "No online rollouts of the learned selector; test contexts from an exogenous collection policy",
+    "Held-phase short-horizon values, not long-run traffic performance",
+    "No timing/latency advantage or neural confidence guarantee",
+    "Tiny-data override enabled: wiring check only"
+  ],
+  "data": "/Users/phanan/cig-amf-main/research/marl_budget/cheap_screen_validation_20260927",
+  "data_table_sha256": "dd8b09426268f51b82fd81f7115582016513832588f93e1c408a33ea026f3dab",
+  "source_hashes": {
+    "scripts/MARL_cheap_pilot.py": "6b2b4106cc3c951194ea4b1f35d8cbb68114e189afa9c86db0c7c05c5a67505c",
+    "models/marl_screening.py": "c67564bd94a604c0f058847ea535ce648145c1a064a2be50c69111a9520f4d36",
+    "models/marl_revision_selector.py": "e3d7e1a1c303712b8f9269f2621e6266305506f30dd770d1bba4efc686e6f0dd"
+  },
+  "splits": {
+    "train": {
+      "records": 2,
+      "episodes": [
+        "seed11_load12"
+      ]
+    },
+    "val": {
+      "records": 2,
+      "episodes": [
+        "seed21_load12"
+      ]
+    },
+    "test": {
+      "records": 2,
+      "episodes": [
+        "seed31_load12"
+      ]
+    }
+  },
+  "config": {
+    "epochs": 2,
+    "hidden": 64,
+    "seeds": [
+      0
+    ],
+    "device": "cpu",
+    "torch_threads": 1
+  },
+  "runs": [
+    {
+      "seed": 0,
+      "training": {
+        "mean": [
+          0.07000000029802322,
+          1.0,
+          0.30000001192092896,
+          0.699999988079071,
+          0.10000000149011612,
+          0.05000000074505806,
+          0.029999999329447746,
+          0.019999999552965164,
+          0.009999999776482582,
+          0.019999999552965164,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.20000000298023224,
+          0.800000011920929,
+          0.10000000149011612,
+          0.05000000074505806,
+          0.05000000074505806,
+          0.019999999552965164,
+          0.03999999910593033,
+          0.019999999552965164,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.30000001192092896,
+          0.4000000059604645,
+          0.15000000596046448,
+          0.03500000014901161,
+          0.044999998062849045,
+          0.029999999329447746,
+          0.009999999776482582,
+          0.019999999552965164,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.20000000298023224,
+          0.30000001192092896,
+          0.20000000298023224,
+          0.02500000037252903,
+          0.04500000178813934,
+          0.03500000014901161,
+          0.019999999552965164,
+          0.0,
+          0.014999999664723873,
+          0.0,
+          0.004999999888241291
+        ],
+        "std": [
+          0.009999999776482582,
+          1.0,
+          0.10000000149011612,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.10000000894069672,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.10000000149011612,
+          0.29999998211860657,
+          0.05000000074505806,
+          0.03500000014901161,
+          0.014999999664723873,
+          1.0,
+          0.009999999776482582,
+          0.019999999552965164,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.10000000894069672,
+          0.20000000298023224,
+          0.10000000894069672,
+          0.02500000037252903,
+          0.04500000178813934,
+          0.004999999888241291,
+          0.009999999776482582,
+          1.0,
+          0.014999999664723873,
+          1.0,
+          0.004999999888241291
+        ],
+        "target_scale": 1.0,
+        "validation_history": [
+          {
+            "epoch": 0,
+            "validation": {
+              "score": 0.12795497477054596,
+              "value": 0.18520428240299225,
+              "direct": 0.5
+            }
+          },
+          {
+            "epoch": 1,
+            "validation": {
+              "score": 0.13893276453018188,
+              "value": 0.25167137384414673,
+              "direct": 0.5
+            }
+          }
+        ],
+        "seconds": 0.0541106672026217
+      },
+      "summary": {
+        "cached_queue_prefix": {
+          "mean_episode_regret": 2.1666666666666665,
+          "mean_episode_gain": -2.1666666666666665
+        },
+        "critic_unrestricted_search": {
+          "mean_episode_regret": 0.3333333333333333,
+          "mean_episode_gain": -0.3333333333333333
+        },
+        "direct_budget_network": {
+          "mean_episode_regret": 0.5,
+          "mean_episode_gain": -0.5
+        },
+        "learned_repair_R1": {
+          "mean_episode_regret": 0.3333333333333333,
+          "mean_episode_gain": -0.3333333333333333
+        },
+        "learned_repair_R2": {
+          "mean_episode_regret": 0.3333333333333333,
+          "mean_episode_gain": -0.3333333333333333
+        },
+        "learned_score_prefix": {
+          "mean_episode_regret": 0.0,
+          "mean_episode_gain": 0.0
+        },
+        "oracle_per_budget": {
+          "mean_episode_regret": 0.0,
+          "mean_episode_gain": 0.0
+        },
+        "oracle_repair_R1": {
+          "mean_episode_regret": 0.0,
+          "mean_episode_gain": 0.0
+        }
+      },
+      "parameter_counts": {
+        "score": 7620,
+        "value": 7681,
+        "direct": 7684
+      }
+    }
+  ]
+}

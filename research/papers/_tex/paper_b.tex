@@ -368,7 +368,8 @@ since $1+x\le e^x$.
 \subsection{Constructive upper bounds and the cost of sharing queries}
 \begin{theorem}[The tournament]
 \label{thm:upper}
-Let every obstruction contain a pair with $\kappa\ge t$. Test every pair with $\kappa\ge t$ by
+Let $\kappa$ be symmetric, for instance the larger of the two directed divergences, let
+$t>0$, and let every obstruction contain a pair with $\kappa\ge t$. Test every pair with $\kappa\ge t$ by
 an antisymmetric test, keep the worlds that win all their tests, and output a common safe
 answer of the survivors.
 \begin{itemize}
@@ -578,12 +579,13 @@ For the averaged tail query, $\sum_{z}\bigl(\prod_{i}z_{i}\bigr)\bigl(\sum_{i}z_
 vanishes for $k<n$ and equals $2^{n}n!$ at $k=n$, so $\mathbb{E}[\chi_{n}g^{n}]=n!/n^{n}\ne0$. On
 the family, the decision probe separates the two values of $u$ by $12h$ in the second moment,
 and the tail probe separates the two values of $v$ by $2(r+1)\,r!/r^{r}\,h^{r}$ in the
-$(r+1)$-st moment.
+$(r+1)$-st moment. The tail gap is computed in Lean over the sign cube for every value of the
+remaining signal; the second moment of the decision probe is computed by hand \CERT.
 \end{theorem}
 
 \leanbox{\lean{cubeSum\_below\_diag}, \lean{cubeSum\_diag}, \lean{tail\_query\_moment\_ne\_zero} in
-\lean{LeanPaperBAttainmentV1}; \lean{decision\_moment\_gap}, \lean{identification\_moment\_gap}
-in \lean{LeanPaperBRatesV1}}
+\lean{LeanPaperBAttainmentV1}; \lean{identification\_moment\_gap\_computed},
+\lean{decision\_moment\_gap} (arithmetic only) in \lean{LeanPaperBRatesV1}}
 
 \begin{theorem}[Per-step information, uniform over the linear class]
 \label{thm:unif}
@@ -595,8 +597,9 @@ normaliser, and
 \[
 \int\frac{(P-Q)^{2}}{\ell}\ \le\ h^{2r}r^{-2r}C(\sigma,R+h_{0},r),
 \]
-with $C$ explicit and independent of the probe. So $\chi^{2}(P,Q)$ and $\mathrm{KL}(P\|Q)$ are
-$O(h^{2r})$ uniformly over the class. The same bound, with a factor $4$, holds for pairs whose
+with $C$ explicit and independent of the probe. So $\chi^{2}(P,Q)$ is $O(h^{2r})$ uniformly over
+the class, by monotonicity in the floor, and so is $\mathrm{KL}(P\|Q)$ under three integrability
+conditions on the pair and $\int(P-Q)=0$ (supplement). The same bound, with a factor $4$, holds for pairs whose
 difference is the $r$-fold difference of $\varphi(\cdot-1)-\varphi(\cdot+1)$.
 \end{theorem}
 
@@ -606,9 +609,11 @@ difference is the $r$-fold difference of $\varphi(\cdot-1)-\varphi(\cdot+1)$.
 \lean{LeanPaperBKLV1}; \lean{pair\_chi2\_bound} in \lean{LeanPaperBPairRateV1}}
 
 On the parity channel the box is discharged from the construction. The channel's queries
-induce shifts with $\sum_{i}|a_{i}|=1$ exactly, and centres $\pm1$.
+induce shifts with $\sum_{i}|a_{i}|=1$ exactly, and centres $\pm1$. The channel's own
+per-query bound is $\chi^2\le Ch^{2j}$ for query $j$.
 
-\leanbox{\lean{queries\_inside\_box}, \lean{channel\_kl\_uniform} in \lean{LeanPaperBQueryClassV1}}
+\leanbox{\lean{queries\_inside\_box}, \lean{channel\_kl\_uniform} (for the constructed pair) in
+\lean{LeanPaperBQueryClassV1}; \lean{parChan\_chi\_le} in \lean{LeanPaperBParityChannelV1}}
 
 \paragraph{The family as a channel} On the latent family the same identification is exact. For
 a probe with head coefficients $a_{H}$ on $z_{1},z_{2},z_{3}$ and tail coefficients $a_{T}$, the
@@ -743,9 +748,11 @@ section answers both questions on a graded channel. The exponent is read from th
 alone. The constant comes from a finite game on the critical terms.
 
 \paragraph{The per-world game} Let $\mathrm{sq}_q(u,v)\in\mathbb N$ be the order of query $q$ on
-the pair, $\mathrm{sep}(u,v)=\min_q\mathrm{sq}_q(u,v)$, and
-$c\,h^{2\mathrm{sq}_q(u,v)}\le\kappa_q(u,v)\le C\,h^{2\mathrm{sq}_q(u,v)}$ for $u\ne v$ and
-$0<h\le1$. The characteristic value at a world is
+the pair, $\mathrm{sep}(u,v)=\min_q\mathrm{sq}_q(u,v)$. For $u\ne v$ and $0<h\le1$ assume
+$\kappa_q(u,v)\le C\,h^{2\mathrm{sq}_q(u,v)}$ for every query, and
+$\kappa_q(u,v)\ge c\,h^{2\mathrm{sep}(u,v)}$ for at least one query. The remaining queries may
+carry no information about the pair. On the parity channel a query that names neither world
+gives the same law in both, so a lower bound at every query would fail there. The characteristic value at a world is
 \[
 D_h(w)=\max_{a\ \text{safe at}\ w}\ \max_{\alpha\in\Delta(Q)}\
 \min_{\lambda:\,a\ \text{unsafe at}\ \lambda}\ \sum_q\alpha_q\kappa_q(w,\lambda).
@@ -761,12 +768,34 @@ $\mathrm{sep}(u,v)\ge\min\{\mathrm{sep}(u,x),\mathrm{sep}(x,v)\}$. Then for ever
 world has $d(w)\ge s$ exactly when some obstruction has all its pairs at order at least $s$. So
 $\max_wd(w)=s^*$.
 \end{proposition}
-\leanbox{\lean{decision\_upper}, \lean{decision\_lower}, \lean{order\_ge\_obstruction},
-\lean{obstruction\_of\_order}, \lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}}
+\leanbox{\lean{decision\_upper}, \lean{order\_ge\_obstruction}, \lean{obstruction\_of\_order},
+\lean{max\_order\_iff} in \lean{LeanPaperBDecisionOrderV1}; \lean{decision\_lower\_wit},
+\lean{visible\_upper}, \lean{visible\_witness}, \lean{decision\_order\_visible} in
+\lean{LeanPaperBVisibleV1}}
+
+A channel whose queries either see a pair, with graded information, or are blind to it
+($\kappa=0$), and in which every pair is seen by some query, meets both hypotheses: give a
+blind query any order above the visible ones. The parity channel has this visibility
+structure. Query $j$ sees the pair $(w,w')$ exactly when it names one of the two worlds; every
+pair is seen; and the pair's order is $\min(w,w')$ in the paper's numbering. On its own $\chi^2$,
+blind queries carry zero information and visible ones at most a constant times $h^{2\,\mathrm{ord}}$.
+At every visible query the information is also at least a constant times $h^{2\,\mathrm{ord}}$:
+the feature gap of query $q$ is at least $G_q h^{q}$, and a gap bounds Hellinger, which bounds
+$\chi^2$, so $\chi^2_q(w,w')\ge\frac14G_{m-1}^2h^{2q}$ for $0<h\le1$. The proposition therefore
+applies on the parity channel with $\kappa=\chi^2$: for identification,
+$\frac{c}{m}h^{2\min(w,m-1)}\le D_h(w)\le Ch^{2\min(w,m-1)}$, with $c=\frac14G_{m-1}^2$ and $C$ the
+sum of the per-query upper constants.
+
+\leanbox{\lean{par\_vis\_iff}, \lean{par\_cover}, \lean{par\_sep} in
+\lean{LeanPaperBVisibleV1}; \lean{parChan\_chi\_le} in \lean{LeanPaperBParityChannelV1};
+\lean{parity\_hel\_sep} in \lean{LeanPaperBHellingerParityV1}; \lean{hel\_le\_chi},
+\lean{par\_chi\_visible}, \lean{par\_chi\_visible\_unif}, \lean{parity\_world\_law},
+\lean{parity\_id\_order}, \lean{parity\_id\_world\_law}, \lean{parity\_world\_instance} in
+\lean{LeanPaperBParityWorldV1}}
 
 These are two statements. The per-world benchmark $D_h(w)$ has order $d(w)$. The minimax
 benchmark, set by the hardest world, has order $s^*$. The ultrametric property holds on the
-parity channel, where $\mathrm{sep}=\min(u,v)+1$.
+parity channel, where $\mathrm{sep}=\min(u,v)$.
 
 \paragraph{The critical game} Suppose each query has an exact expansion
 $\kappa_q(\lambda;h)=c_{q\lambda}h^{2\mathrm{sq}_{q\lambda}}+o(h^{2\mathrm{sq}_{q\lambda}})$,
@@ -819,6 +848,28 @@ in \lean{LeanPaperBCriticalGameV1}}
 So $s^*$ determines the exponent, not the characteristic complexity: two problems with the same
 $s^*$ can differ by the menu size. This turns Proposition~\ref{prop:privatequery} from a
 counterexample into the constant layer of the law.
+
+\paragraph{Where the parity order comes from} The critical game needs the leading coefficient of
+each query's information. On the parity channel the order of query $j$ is produced by one
+cancellation in the latent signs.
+
+\begin{proposition}[Parity cancellation]
+\label{prop:paritymoment}
+Let $Z$ be uniform on $\{\pm1\}^j$. Then $\mathbb E[(\prod_\ell Z_\ell)(\sum_\ell Z_\ell)^k]=0$ for
+$k<j$, and $=j!$ for $k=j$.
+\end{proposition}
+\leanbox{\lean{moment\_expand}, \lean{parity\_moment\_lt}, \lean{parity\_moment\_eq} in
+\lean{LeanPaperBVisibleV1}}
+
+Expand the density of query $j$ in $h$. The $k$-th term is an average of
+$(\sum_\ell Z_\ell)^k\varphi_\sigma^{(k)}(y\mp\prod_\ell Z_\ell)$, and only its part proportional to
+$\prod_\ell Z_\ell$ depends on the mask. By the proposition the two masks agree up to order
+$h^{j-1}$, and the first difference is $h^j$ times
+$a_j(y)=(-1)^jj^{-j}\bigl(\varphi_\sigma^{(j)}(y-1)-\varphi_\sigma^{(j)}(y+1)\bigr)$. The control of
+the Taylor remainder, and hence the constant
+$c_j=\frac12\int a_j^2/p_0$ with $p_0=\frac12(\varphi_\sigma(\cdot-1)+\varphi_\sigma(\cdot+1))$,
+is not formalized. The supplement computes $c_j$ by quadrature and checks it against the exact
+divergence.
 
 \section{Query design}
 \label{sec:design}
@@ -964,8 +1015,10 @@ continuous examples also depend on $m$, $r$ and $\sigma$.
 \item[5)] \textbf{The critical game.} Theorem~\ref{thm:critical} needs an exact expansion of every
 query's information, with a positive coefficient or none. Proposition~\ref{prop:dorder} needs
 the ultrametric property for the hardest-world identity. The critical constants of the parity
-channel and the latent family are not computed here. Query design is proved equivalent to
-hitting set; its hardness and the greedy guarantee are cited.
+channel are computed numerically in the supplement, from the formal parity cancellation; the
+Taylor remainder behind them is not formalized. The constants of the latent family are not
+computed. Query design is proved equivalent to hitting set; its hardness and the greedy
+guarantee are cited.
 \item[6)] \textbf{Channel scope.} Worlds and queries are finite and observations have strictly
 positive densities on $\mathbb R$. General singular observation kernels and continuum query
 selection are not covered by the protocol theorem used here.

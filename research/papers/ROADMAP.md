@@ -10,6 +10,71 @@ statuses, and they are not interchangeable:
 | **NUM** | measured by a self-checking script; an artifact, not a theorem |
 | **OPEN** | not done — including "argued in prose" |
 
+## Paper A closure, 2026-09-26 (supersedes the blocks below for Paper A)
+
+```
+smokeUP4_20260925  PASS 139 modules 1199 theorems  ARepairBridge (+ BVisible, C budget modules)
+smokeUP5_20260925  PASS 106 modules  835 theorems  ARepairStop, ARepairGauss, AForcingStop, ARepairSlope
+smokeUP6_20260925  PASS 102 modules  825 theorems  ARepairNoPos
+full8_20260926     RUNNING in the user's terminal (tab "full8 gate"), log work/run_logs/full8_20260926.log
+citation audit: paper A + supplement 628/628 cite a module whose exact source (sha256) passed a gate
+```
+Closed this round (all LEAN, standard axioms, hypotheses satisfiable):
+- repair law at unbounded stopping, level delta (`stopped_budget_law`, `stopped_budget_law0`),
+  its hypotheses including the budget (`stopped_law_satisfiable`, `_two`);
+- the frontier is the optimal budgeted rate on Gaussian cells (`optimal_lower`, `optimal_upper`,
+  `optimal_satisfiable`);
+- the repair laws need no `0 < E|N|` (`event_law0`, `budget_law_alloc0`, `eventual_frontier_law0`,
+  `frontier_rate_lower0`);
+- forcing law for unbounded stopping (`forcing_law_stopped`, `power_forcing_law_stopped`);
+- exact frontier slope 1/(8rM) at beta=0 (`frontier_slope`, `slope_gap`).
+Manuscript fidelity fixes 2026-09-26: D>0 stated (`hD_of_small`), finite per-query KL stated,
+two-arm frontier restricted to b<=1/2, forcing law worded as a lower bound, Huang distinction.
+Open for Paper A (stated as limitations, not claimed): policy-level budget constant on the
+compression family (instantiate `optimal_upper` on `famSpec`); implemented learner's rate;
+deployable re-solving of the budgeted game; closed forms in M of the two fixed-design families.
+Candidate upgrade (review of 2026-09-26, checked by hand, not formalised): general (a,b) family,
+slope L=min{a^2/(2rM),(2a-b)^2/(2M(2r-1))}, breakpoint rho_c(r)=2-sqrt(2-1/r).
+
+## Paper C closure, 2026-09-26 (supersedes the blocks below for Paper C)
+
+```
+smokeC1_20260926   PASS  65 modules  607 theorems  2211, BudgetSym, BudgetSharp, CountReduction, CountRecourse
+smokeC2_20260926   PASS  74 modules  649 theorems  1122 Price, 2222 Price, BudgetExchange + closures
+smokeC3_20260926   PASS  51 modules  492 theorems  1122 CertV2, KinkV1, FrontierV1 (full frontier)
+smokeC4_20260926   RUNNING (52 modules)  2222 FrontCertV1, KinkV1, FrontierV1 (full frontier)
+citation audit: paper C + supplement 752/752 cite a gated module (after the fidelity-audit fixes)
+```
+Closed this round (all LEAN, standard axioms, hypotheses satisfiable — each region is a nonempty
+ratio interval):
+- counts (2,2,1,1): full frontier `(a-b)/(4a+2b)·max((2-eta)/3, 2/5)`, price 5/3, eta_free 4/5
+  at every ratio (`twoMag2211_frontier`, `LeanPaperCTwoMag2211V1`);
+- counts (1,1,2,2): V(0), V_free and the price at every ratio, six regions with breakpoints
+  2, 7/3, 5/2, 13/5, 3; price non-monotone 4/3 -> 7/6 -> 5/3 (`price_L..price_H`,
+  `price_nonmonotone`, `LeanPaperCTwoMag1122PriceV1`, on Base/Cert/Flow);
+- counts (2,2,2,2): V(0), V_free and the price at every ratio, breakpoints 2, 5-2sqrt2, 7/3,
+  17/7, 3; irrational local maximum (1+sqrt2)/2 (`price2222_1..6`, `LeanPaperCTwoMag2222PriceV1`,
+  on Base/Cert/Zero/FreeCert/Free);
+- exact B_{g_m} at every band, both parities; both zero-value ranges sharp (`aware_even_exact`,
+  `aware_odd_exact`, `advantage_*_pos_iff`, `LeanPaperCBudgetSharpV1`);
+- count model exact for layers and recourse (`layer_eq_count`, `recourse_eq_count`);
+- one exchange reaches B_{g_m} at every band for even m (`recourse_one_even`,
+  `LeanPaperCBudgetExchangeV1`).
+Independent numeric cross-checks (LP JSONs): 2211 at 164 points, 1122 and 2222 at 50 ratios
+each, B_{g_m} at 847 points, all within 1e-16.
+- counts (1,1,2,2): the whole band frontier at every ratio and every eta, six regions, new
+  certificates C2/CL2/AM3 and kink flows K1/K2/K3 (`frontier_L..frontier_H`,
+  `LeanPaperCTwoMag1122FrontierV1`);
+- counts (2,2,2,2): the whole band frontier, seven regions, new cubic certificate L3
+  (`lower_L3`), eleven kink flows, kink-flow switch at the root 7-2sqrt6 of a^2-14ab+25b^2
+  (`frontier8_R1..R7`, `LeanPaperCTwoMag2222FrontierV1`); float LP cross-check at 600 points,
+  max error 1e-15.
+Fidelity audit of the C manuscripts (workflow, 5 auditors + adversarial verification, 2026-09-26):
+26 verified findings (stale text, one wrong "band slack" sentence, 240 vs 60 count vectors,
+S9 gate history, price-shape wording), all fixed; one unarchived numerical sentence removed.
+Open for Paper C (stated as limitations): one exchange for odd m past eta_t and for repeated
+types (numerical; an exploration workflow is running); other counts.
+
 ## Upgrade round 2026-09-25 evening (supersedes the smoke list below for the new modules)
 
 ```

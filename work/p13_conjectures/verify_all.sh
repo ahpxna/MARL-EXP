@@ -76,7 +76,16 @@ LeanPaperBShareTournamentV1 LeanPaperCRobustBallV1 \
 LeanPaperBCertificateChannelV1 LeanPaperARepairLawV1 LeanPaperBDecisionOrderV1 LeanPaperCTypedFlowV1 \
 LeanPaperAPolicyClassesV1 LeanPaperABudgetUpperV1 LeanPaperBCriticalGameV1 LeanPaperBQueryDesignV1 LeanPaperCFreeBandV1 \
 LeanPaperATwoArmRateV1 LeanPaperARepairRateV1 LeanPaperCTwoMagFourV1 \
+LeanPaperARepairBridgeV1 LeanPaperBVisibleV1 LeanPaperCFlowCertV1 LeanPaperCPathMixV1 \
+LeanPaperCBudgetAwareV1 LeanPaperCBudgetFamiliesV1 LeanPaperCBudgetGmV1 \
+LeanPaperARepairStopV1 LeanPaperARepairGaussV1 LeanPaperAForcingStopV1 LeanPaperARepairSlopeV1 LeanPaperARepairNoPosV1 \
+LeanPaperCTwoMag2211V1 LeanPaperCBudgetSymV1 LeanPaperCBudgetSharpV1 LeanPaperCCountReductionV1 LeanPaperCCountRecourseV1 \
+LeanPaperCTwoMagSixV1 LeanPaperCTwoMag1122BaseV1 LeanPaperCTwoMag1122CertV1 LeanPaperCTwoMag1122FlowV1 LeanPaperCTwoMag1122PriceV1 LeanPaperCBudgetExchangeV1 \
+LeanPaperCTwoMag2222BaseV1 LeanPaperCTwoMag2222CertV1 LeanPaperCTwoMag2222ZeroV1 LeanPaperCTwoMag2222FreeCertV1 LeanPaperCTwoMag2222FreeV1 LeanPaperCTwoMag2222PriceV1 \
+LeanPaperCTwoMag1122CertV2 LeanPaperCTwoMag1122KinkV1 LeanPaperCTwoMag1122FrontierV1 \
+LeanPaperCTwoMag2222FrontCertV1 LeanPaperCTwoMag2222KinkV1 LeanPaperCTwoMag2222FrontierV1 \
 LeanPaperBAttainmentV1 LeanPaperBHellingerV1 LeanPaperBTranscriptKLV1 LeanPaperBChangeV1 \
+LeanPaperBParityWorldV1 LeanPaperBDecisionMomentV1 LeanPaperBAssemblyV1 \
 LeanPaperBRatesV1 LeanPaperBHeadlineV1 LeanPaperBExactConstV1 LeanPaperBDecideV1 \
 LeanPaperBGeometryV1 LeanPaperBIndistV1 LeanPaperBDensityV1 LeanPaperBSafeOrderV1 \
 LeanPaperBCubeV1 LeanPaperBAttainV1 LeanPaperBParityV1 LeanPaperBDecoderV1 \
@@ -103,6 +112,9 @@ LeanPaperCFam13V1 LeanPaperCBreak3V1 LeanPaperCBandValueBridgeV1 LeanPaperCEvenW
 LeanPaperCOddWitnessJoinV1 LeanPaperCFlowBandJoinV1 LeanPaperCEndgameV1 LeanPaperCOddBreakpointEndgameV1 \
 LeanPaperCStabilityEndgameV1 LeanPaperCEvenTotalV1 LeanPaperCParityBaselineV1 LeanPaperCBaselineAttainV1 \
 LeanPaperCEvenRankSumV1 LeanPaperCRelabelBandJoinV1 LeanPaperCEndpointLawV1 LeanPaperCFlowObjectiveV1 LeanPaperCStabilityFamilyV1"
+
+# New roots audited 2026-09-27; smoke uses GATE_ONLY and reports its own scope.
+MODS="$MODS LeanMarlEstimatedRevisionV1 LeanMarlGenericRecourseV1 LeanMarlMenuRevisionV1 LeanMarlNestingDegreeGeneralV1 LeanMarlProxyBlindnessV1 LeanMarlRepairCalibrationV1 LeanMarlRevisionFrontierV1 LeanMarlSubsetFrontierV1 LeanMarlXorGameV1 LeanPaperCBudgetExchangeOddV1 LeanPaperCBudgetExchangeOddV2 LeanPaperBParityCriticalV1 LeanPaperBParityCriticalGameV1 LeanPaperBCrossoverRateV1 LeanMarlRevisionAuditBridgeV1"
 
 WHITELIST='propext|Classical.choice|Quot.sound'
 
@@ -189,7 +201,14 @@ ROOTS=$(tr '\n' ' ' < report/ROOTS.list)
 closed=1
 for m in $SEL; do
   for d in $(imports_all "$m.lean"); do
-    case "$d" in Mathlib|Mathlib.*) continue ;; esac
+    case "$d" in
+      Mathlib|Mathlib.*) continue ;;
+      Aesop|Aesop.*)
+        # Explicit pinned dependency, not a blanket exemption for missing local imports.
+        if grep -q '"name": "aesop"' lake-manifest.json && [ -f .lake/packages/aesop/Aesop.lean ]; then
+          continue
+        fi ;;
+    esac
     if ! in_list "$d" "$SEL"; then echo "IMPORT OUTSIDE GATE: $m imports $d"; closed=0; fi
   done
 done
@@ -269,3 +288,10 @@ badax=$(grep -vxE "$WHITELIST" report/AXIOMS.txt | tr '\n' ' ')
     [ "$ok" = "1" ] && echo "SMOKE PASS" || echo "SMOKE FAIL"
   fi
 } | tee report/SUMMARY.txt
+
+# A failed report must also fail the shell command used by automation.
+if [ "$MODE" = "full" ]; then
+  grep -qx "VERIFY PASS" report/SUMMARY.txt
+else
+  grep -qx "SMOKE PASS" report/SUMMARY.txt
+fi

@@ -16,7 +16,7 @@ This supplement gives, for each theorem of the main paper, the proof architectur
 Lean~4 declarations it rests on. It also collects the material the main text leaves out, each
 with its exact status: the conditional rate of the implemented learner, the confidence-sequence
 machinery, two heteroscedastic families, the repair criterion, and the older constructions that
-the centred theorem supersedes. Sections S1--S8 follow the main text; theorems are named as
+the centred theorem supersedes. Sections S1--S9 follow the main text, and S10 records the build; theorems are named as
 there.
 \end{abstract}
 
@@ -26,7 +26,7 @@ All declarations live in \texttt{work/p13\_conjectures}. A module is accepted wh
 with exit status $0$, contains no \texttt{sorry} and no \texttt{native\_decide}, and every audited
 axiom closure lies within \{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}.
 Acceptance is checked by a frozen gate that copies every module and its local imports into a
-fresh directory and builds from an empty cache (S8). A theorem that takes a hypothesis is
+fresh directory and builds from an empty cache (S10). A theorem that takes a hypothesis is
 reported with that hypothesis named. It is not called a result about an algorithm until the
 hypothesis is discharged at that algorithm.
 
@@ -169,6 +169,26 @@ $\frac12+d$, followed by $d\to0$.
 \lean{LeanPaperAFrontierV1}; \lean{limit\_shift}, \lean{exchange\_strict}, \lean{strict\_frontier}
 in \lean{LeanPaperASacrificeV1}}
 
+\paragraph{The exact slope} Let $v_\beta=(1-\beta)w_{\rm unif}+\beta u$, where $u$ is uniform on
+the $2r$ middle cells. Its frozen value is at least $(1-\beta)\frac{9}{512}$, by concavity, so
+$\mathrm{sac}(v_\beta)\le\beta$. Its weights are $\frac{1-\beta}{4}$ on each frozen cell and
+$\frac{\beta}{2r}$ on each middle cell, of variance $M$. A strict alternative reverses the order of
+the ranges. Split by which two arm-$B$ cells realise its extrema: two middle cells (the contrast
+to close is $1$), one anchor and one middle cell ($\frac78$), both anchors ($\frac34$), or a
+single cell, when the arm-$A$ cells alone must move by $1$. In each case the contrast is spread
+over at most four moved cells, and the weighted Cauchy--Schwarz inequality
+$g^{2}/\sum_i c_i^{-1}\le\sum_ic_ix_i^{2}$, with $c_i$ the weight over twice the variance, bounds
+the energy below. With $X=rM$ and $0<\beta\le\frac12$ every case is at least
+$\beta/(8X+128\beta)$. The upper side is the pointwise exchange. The two ends differ by
+$\frac{128\beta^{2}}{8X(8X+128\beta)}\le\frac{2\beta^{2}}{X^{2}}$, so the slope at zero is
+exactly $\frac1{8rM}$. On the strict game the lower side transfers, since restricting to strict
+alternatives raises the infimum.
+
+\leanbox{\lean{uMid}, \lean{uMid\_isAlloc}, \lean{vB}, \lean{vB\_isAlloc}, \lean{vB\_frozen},
+\lean{sq\_tangent}, \lean{weighted\_four}, \lean{weighted\_two}, \lean{bcell\_cases},
+\lean{trueValue\_vB\_ge}, \lean{frontier\_slope}, \lean{slope\_gap} in
+\lean{LeanPaperARepairSlopeV1}; \lean{trueValueC₀\_le\_trueValueStrict} in \lean{LeanPaperAStrictV1}}
+
 \paragraph{The sacrifice law} Fix pair $j$ and $d>0$. The world that shifts pair $j$ by
 $\frac12+d$ is a strict centred alternative. Only the two cells of pair $j$ separate it from
 $\theta_{C}$, each with divergence $\frac{(1/2+d)^{2}}{2M}$. The change of measure for any
@@ -179,6 +199,8 @@ $D\le N_{\rm pair}\frac{(1/2+d)^{2}}{2M}$ for every $d>0$, and $N_{\rm pair}\ge8
 the $r$ pairs gives $8rMD$ middle queries. The surrogate's value is at most $\Gamma_{\rm fr}$
 times the non-middle mass, so the middle mass of an allocation is at most its relative
 sacrifice. Applied to the average design $\bar w$, this gives $N\,\mathrm{sac}(\bar w)\ge8rMD$.
+The law is stated for $D>0$, which also makes $N$ positive and $\bar w$ an allocation; every
+$\delta<\frac18$ gives $D>0$ (\lean{hD\_of\_small} in \lean{LeanPaperARepairGaussV1}).
 
 \leanbox{\lean{demand}, \lean{sacrifice}, \lean{sacrifice\_eq\_relative},
 \lean{sacrifice\_le\_one}, \lean{middle\_le\_sacrifice}, \lean{expCnt}, \lean{demand\_le\_shift},
@@ -331,7 +353,9 @@ $\max_{S}l_{S}-2Lr_{t}$, tracks the selected answer's design with forced explora
 when a certified lower bound on every region's infimum exceeds the threshold. The certificate is
 weak duality, valid whatever the optimiser does. A primal objective is an upper bound and is
 never used to stop. The cutting-plane tolerance tightens as $1/n^{2}$ down to a floor of
-$10^{-6}$, with an 80-iteration cap. The true world is not in the scope of \texttt{run}, and the
+$10^{-6}$, with an 80-iteration cap, and weights are floored at $10^{-9}$. The alternatives are
+those of the box model $[-8,8]^E$, so the certificate is valid for worlds in the box. The true
+world is not in the scope of \texttt{run}, and the
 self-check inspects the signature.
 
 \paragraph{The conditional chain} For this learner the stopping chain is a composition of proved
@@ -431,7 +455,7 @@ Exact bounds hold for every $r\ge1,M>0$. Statements with absolute constants usin
 $\Theta(rM)$ or $\Theta(\beta/(rM))$ are restricted to $rM\ge1$; they are not joint limits
 as $rM\downarrow0$.
 
-\section{S8. Heteroscedastic families, the repair criterion, and the build}
+\section{S8. Heteroscedastic families and the repair criterion}
 
 \paragraph{Two families at a fixed design (exact)} With one cheap cell of variance $M$ and all
 others unit, two instances show the surrogate mispricing in opposite directions, at the unit
@@ -468,7 +492,7 @@ design is not determined.
 \lean{certifiable\_fraction\_le\_sixtyfour\_over\_M}, \lean{design\_certificate\_insufficient} in
 \lean{LeanPaperARepairV1}}
 
-\section{S9. The repair law (Theorem ``The repair law'', Corollary ``The frontier is the optimal
+\section{S9. The repair law (Theorems ``The repair law'' and ``The frontier is the optimal
 rate'', Propositions ``The classes are nested'' and ``Two arms'')}
 
 \paragraph{The classes} A count vector meets the budget in the homogeneous form
@@ -526,28 +550,132 @@ $R(b)+\eta_0$.
 \leanbox{\lean{Rfront}, \lean{R\_le}, \lean{R\_mono}, \lean{R\_concave}, \lean{R\_continuousAt},
 \lean{near\_design}, \lean{frontier\_lower\_rate} in \lean{LeanPaperARepairRateV1}}
 
-\paragraph{What is not formalized} The identification of the stream budget with the kernel class
-on Gaussian cells is written out in the main text. The coupling of the stopped learner with a kernel policy is formal
-(\lean{stoppedG}, \lean{runSG\_eq}, \lean{cnt\_eq\_at\_min} in \lean{LeanPaperA7StoppedGenV1}).
-The per-query Gaussian divergence identity is formal only on the family channel.
+\paragraph{The frontier inside the law} The budget laws of \lean{LeanPaperARepairLawV1} and
+\lean{LeanPaperAPolicyClassesV1} take a bound on $J_{\rm true}$ over every nonnegative vector
+within the budget. The frontier bounds it only on the simplex. Since $J_{\rm fr}$ and $J_{\rm true}$
+are homogeneous, the design $cv$ has sacrifice $1-cJ_{\rm fr}(v)/\Gamma_f\to-\infty$ and true
+information $cJ_{\rm true}(v)\to\infty$, so no finite $R$ meets that hypothesis. The repair: the
+expected design is an allocation that puts no mass on the dummy, so the bound is needed only on
+the simplex. With an event of probability $p$ at $\theta$ the law reads
+$p\log(1/\delta)-\log2\le\mathbb E|N|\,J_{\rm true}(\bar w)$, and on the eventual class
+$J_{\rm true}(\bar w)\le R(b+(1-b)t_0/\mathbb E|N|)$ with $R$ the frontier itself. An infimum of
+linear forms is concave and bounded by $\sum_q\mathrm{KL}_q(\theta,\lambda_0)$ on designs, which
+are the hypotheses of the frontier's concavity and continuity. So a family of $\delta$-correct
+policies of the eventual class with one burn-in has
+$\liminf\mathbb E|N|/\log(1/\delta)\ge1/R(b)$ on every channel.
 
-\paragraph{Build record} The last full gate that passed, \texttt{full6\_20260925}, built $214$
-modules and audited $1666$ theorems, with no \texttt{sorry}, no \texttt{native\_decide}, the
-standard axioms, and frozen sources identical to the working copy afterwards. It includes every
-module this supplement cites except the two named below, among
-them \lean{LeanPaperASacrificeV1}, \lean{LeanPaperASacrificeIdealV1} and
-\lean{LeanPaperA6TwoSurrogatesV1}. Before it, the first two were covered by the smoke gate
-\texttt{smokeNEWDIR\_20260924} and the third by \texttt{smokeFAM\_20260925}.
-\lean{LeanPaperASacrificeDiluteV1} and \lean{LeanPaperASacrificeStoppedV1} were written after it.
-Each compiles with the standard axioms and no \texttt{sorry}. The first is in the module list of the
-full gate \texttt{full7\_20260925}, and both are in the import closure of the smoke gate
-\texttt{smokeR2\_20260925}.
-The modules of Section~S9 were written after \texttt{full7\_20260925}. Each passes a smoke gate
-over its full import closure, with the standard axioms, no \texttt{sorry}, no
-\texttt{native\_decide}, and no drift. \lean{LeanPaperARepairLawV1} is covered by
-\texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems). \lean{LeanPaperAPolicyClassesV1} and
-\lean{LeanPaperABudgetUpperV1} are covered by \texttt{smokeUP2\_20260925} ($107$ modules, $934$
-theorems). \lean{LeanPaperATwoArmRateV1} and \lean{LeanPaperARepairRateV1} are covered by
-\texttt{smokeUP3\_20260925} ($106$ modules, $924$ theorems).
+\emph{No positivity.} These laws first took $\mathbb E|N|>0$. It is not needed. The expected
+informative total is a sum of nonnegative expected counts, so if it vanishes every informative
+count vanishes in expectation; the dummy has divergence zero; so the information against every
+alternative is zero, and the change of measure gives $p\log(1/\delta)-\log2\le0$, which is the
+law with a zero right side. For a $\delta$-correct family, positivity below $\delta<\frac18$ is a
+consequence, since there $D_\delta>0$.
+\leanbox{\lean{etot\_nonneg}, \lean{info\_zero}, \lean{event\_law0}, \lean{budget\_law\_alloc0},
+\lean{eventual\_frontier\_law0}, \lean{frontier\_rate\_lower0} in \lean{LeanPaperARepairNoPosV1};
+\lean{etot\_pos\_of\_correct} in \lean{LeanPaperARepairGaussV1}}
+\leanbox{\lean{ebar\_sum}, \lean{ebar\_dummy}, \lean{ebar\_alloc}, \lean{event\_law},
+\lean{budget\_law\_alloc}, \lean{eventual\_frontier\_law}, \lean{infoAt\_mix},
+\lean{Jt\_concave}, \lean{Jt\_le\_sum}, \lean{frontier\_rate\_lower} in
+\lean{LeanPaperARepairBridgeV1}}
+
+\paragraph{The law at the stopping time} Meeting the budget at the stop says nothing about a
+truncation, so the law for unbounded stopping does not go through truncated budgets. A stopping
+policy (kernels for every round, a measurable stop set after every number of rounds, an output
+read at the stop) queries the dummy after it stops, and one kernel policy serves every horizon.
+At a horizon where at most $\varepsilon$ of the runs at $\theta$ are unstopped, the complement of
+the event ``stopped with the answer'' lies in the union of the wrong stopped runs and the
+unstopped ones, so the event has probability at least $1-\delta-\varepsilon$. The change of
+measure at that horizon bounds $(1-\delta-\varepsilon)\log(1/\delta)-\log2$ by the truncation's
+expected information. The truncation's expected counts are at most the whole run's, which are
+the supremum over horizons. Taking $\varepsilon$ to zero, with the unstopped mass chosen at
+$\varepsilon/(\log(1/\delta)+1)$, gives $D_\delta\le\sum_qN_q\mathrm{KL}_q(\theta,\lambda)$ for the
+whole run's counts. The dummy is queried forever after the stop, so its count is infinite; its
+divergence is zero, and finiteness is asked of the informative queries only. The infimum over
+the alternatives and the budget at the whole run's expected design finish the proof. A correct
+finite-horizon policy, stopped at its horizon with the indicator of its answer event, meets every
+hypothesis: before the horizon it has not fired, after it the event of the first $N$ rounds keeps
+its probability, and its informative counts are constant after $N$ because the query kernel is
+the Dirac mass at the dummy. The same zero-total argument removes positivity from the stopped law.
+\emph{Satisfiability, budget included.} Embed the stopped fixed-design learner of the optimal-rate
+theorem, at its Markov horizon, as a stopping policy. Its whole-run expected counts are those of
+the finite-horizon policy, so its expected design and informative total are the same. That policy
+lies in the eventual class with one burn-in $t_0$, so its expected design has sacrifice at most
+$b+(1-b)t_0/\mathbb E|N|$, and $\mathbb E|N|>0$ below $\delta<\frac18$. Hence every hypothesis of the
+stopped law holds with that budget, for every $\delta<\frac18$; on two Gaussian arms for every
+$b\in(0,\frac12]$.
+\leanbox{\lean{stopAns}, \lean{cntSt}, \lean{ecnt\_le\_St}, \lean{trunc\_event},
+\lean{stopped\_info}, \lean{etotSt}, \lean{ebarSt}, \lean{ebarSt\_alloc}, \lean{stopped\_budget\_law},
+\lean{finStop}, \lean{finStop\_restr}, \lean{cnt\_mono}, \lean{finStop\_cnt\_after},
+\lean{finStop\_cnt\_before}, \lean{finStop\_cntSt}, \lean{finStop\_hyps} in
+\lean{LeanPaperARepairStopV1}; \lean{etotSt\_nonneg}, \lean{infoSt\_zero},
+\lean{stopped\_budget\_law0}, \lean{finStop\_term}, \lean{finStop\_etotSt}, \lean{finStop\_ebarSt},
+\lean{stopped\_law\_satisfiable}, \lean{stopped\_law\_satisfiable\_two} in
+\lean{LeanPaperARepairNoPosV1}}
+
+\paragraph{The optimal rate, on one class} The channel of a specification with Gaussian cells is
+the Gaussian channel on the cells plus a fresh dummy. Its per-query divergence is Mathlib's
+Gaussian $\mathrm{KL}$, $(\theta_e-\lambda_e)^2/(2\sigma_e^2)$, so the kernel information of a
+design is the energy of its cell part in unit-variance coordinates, and the kernel game of the
+lifted alternatives is the stream game, as infima of the same set. A design with mass $p<1$ on
+the dummy is renormalised: its cell part divided by $1-p$ has both games divided by $1-p$, by
+homogeneity. The stopped fixed-design learner is a kernel policy through the deterministic
+policy of its rule, and its transcript law is the image of the stream measure under the stopped
+run. At horizon $n$ its cell counts are the stream counts at some $m\le\min(n,\tau)$, and they
+sum to $m$ because every round queries one cell. After the burn-in of the design floor the
+realised design meets the budget on every path, which gives the homogeneous inequality for every
+frozen alternative at every horizon. The count vector takes values in a countable set, the image
+of $\mathbb N^{Q}$, so the event is measurable and the pathwise statement transfers to the
+transcript law. Markov's inequality gives a horizon where at most $\delta/|\mathrm{Ans}|$ of the
+runs at $\theta$ are unstopped; the test run at level $\delta/|\mathrm{Ans}|$ is then correct at
+level $\delta$ at $\theta$ against its alternatives. The horizon depends on $\theta$, like the
+design, so the truncated policy is a comparison policy for the optimal cost at $\theta$, not a
+learner correct at every world. The untruncated learner stops with a wrong answer with
+probability at most $(|\mathrm{Ans}|-1)\delta$ at every world with a unique correct answer
+(Ville); its termination is proved at $\theta$ only. The expected informative count at the horizon is at most $\mathbb E\tau$, and the
+learner's expected-stopping bound, with $\log(|\mathrm{Ans}|/\delta)=\log(1/\delta)+\log|\mathrm{Ans}|$,
+gives the upper rate. On the lower side a correct policy has a positive informative count:
+otherwise every informative expected count vanishes, the dummy carries no divergence, and the
+change of measure gives $D_\delta\le0$. On two Gaussian arms the frozen optimum $(1,0)$ attains
+$\Gamma=\Delta^2/2$, the answer is unique, and the design $(1-b,b)$ within the budget has true
+information $b(1-b)\Delta^2/2>0$, so every hypothesis holds.
+\leanbox{\lean{gC}, \lean{klq\_gC\_inl}, \lean{klq\_gC\_ne\_top}, \lean{infoAt\_gC}, \lean{Jt\_gC},
+\lean{Jval\_smul}, \lean{normalize\_design}, \lean{counts\_meas}, \lean{ae\_map\_counts},
+\lean{fixPol}, \lean{hist\_fixPol}, \lean{sum\_Nc}, \lean{real\_counts}, \lean{fix\_eventual},
+\lean{fix\_etot\_le}, \lean{etot\_pos\_of\_correct}, \lean{fix\_correct}, \lean{optimal\_lower},
+\lean{optimal\_upper}, \lean{optimal\_satisfiable} in \lean{LeanPaperARepairGaussV1}}
+
+\paragraph{Forcing, for unbounded stopping} The truncation of a policy that stops almost surely
+at $\theta_C$, at a horizon where at most $\delta$ of its runs are unstopped, is correct at level
+$2\delta$. The finite-horizon forcing law applies to it, and a nondecreasing $\varphi$ carries the
+bound from the truncation's expected real queries to any bound on the whole run's.
+\leanbox{\lean{forcing\_law\_stopped}, \lean{power\_forcing\_law\_stopped} in
+\lean{LeanPaperAForcingStopV1}}
+
+\section{S10. The build}
+
+\paragraph{The last full gate} \texttt{full7\_20260925} built $219$ modules and audited $1704$
+theorems, with exit status $0$, no \texttt{sorry}, no \texttt{native\_decide}, every axiom closure
+within the standard three, and frozen sources byte-identical to the working copy afterwards.
+It covers every module cited in the paper and in this supplement except the thirteen listed next.
+
+\paragraph{Smoke gates since} Each module written after \texttt{full7\_20260925} passes a smoke
+gate that freezes the module with its full import closure and applies the same acceptance
+conditions, with no drift.
+\begin{itemize}
+\item \lean{LeanPaperASacrificeStoppedV1}: \texttt{smokeR2\_20260925} ($96$ modules, $771$ theorems).
+\item \lean{LeanPaperARepairLawV1}: \texttt{smokeUP1\_20260925} ($79$ modules, $762$ theorems).
+\item \lean{LeanPaperAPolicyClassesV1}, \lean{LeanPaperABudgetUpperV1}: \texttt{smokeUP2\_20260925}
+($107$ modules, $934$ theorems).
+\item \lean{LeanPaperATwoArmRateV1}, \lean{LeanPaperARepairRateV1}: \texttt{smokeUP3\_20260925}
+($106$ modules, $924$ theorems).
+\item \lean{LeanPaperARepairBridgeV1}, with \lean{LeanPaperASacrificeDualityV1} in its closure:
+\texttt{smokeUP4\_20260925} ($139$ modules, $1199$ theorems).
+\item \lean{LeanPaperARepairStopV1}, \lean{LeanPaperARepairGaussV1}, \lean{LeanPaperAForcingStopV1},
+\lean{LeanPaperARepairSlopeV1}: \texttt{smokeUP5\_20260925} ($106$ modules, $835$ theorems).
+\item \lean{LeanPaperARepairNoPosV1}: \texttt{smokeUP6\_20260925} ($102$ modules, $825$ theorems).
+\end{itemize}
+Every citation of the paper and this supplement resolves to a declaration in a module whose
+exact source, by hash, passed one of these gates. All the modules above are in the module list of
+the next full gate.
 
 \end{document}

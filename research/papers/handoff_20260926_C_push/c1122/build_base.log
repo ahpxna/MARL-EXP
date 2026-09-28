@@ -1,0 +1,408 @@
+LeanPaperCTwoMag1122BaseV1.lean:140:15: warning: Variable name `hb` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _hb
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LeanPaperCTwoMag1122BaseV1.lean:147:24: error: linarith failed to find a contradiction
+a b : ℝ
+h3 : 3 * b ≤ a
+a✝ : a - 2 * b < 0
+⊢ False
+failed
+LeanPaperCTwoMag1122BaseV1.lean:321:92: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanPaperCTwoMag1122BaseV1.lean:355:21: error: Invalid `⟨...⟩` notation: The expected type of this term could not be determined
+LeanPaperCTwoMag1122BaseV1.lean:348:41: error: unsolved goals
+a b η : ℝ
+hη : 0 ≤ η
+L : ℝ
+h :
+  ∀ (F : LayeredFlow (CState 4 6)),
+    CountFeasibleH ty6 F → FlowBand ty6 F η → L ≤ K5.sup' K5_ne (flowObj (typedCost ty6 (wt a b)) F)
+P : Equiv.Perm (Fin 6) → ℝ
+hP : P ∈ FeasibleAt id η
+F : LayeredFlow (CState 4 6)
+hF : CountFeasibleH ty6 F
+hB : FlowBand ty6 F η
+⊢ ℝ
+LeanPaperCTwoMag1122BaseV1.lean:425:28: error: unsolved goals
+a b : ℝ
+hb : 0 < b
+hab : b < a
+q : ℝ
+hq : 0 < q
+M Lb : ℕ → ℝ
+R Ψ : ℕ → ℕ → ℕ → ℕ → ℝ
+hM : ∀ (k : ℕ), 0 ≤ M k
+hM0 : M 0 = 0
+hL0 : Lb 0 = 0
+hMsum : M 1 + M 2 + M 3 + M 4 + M 5 = q
+hR :
+  ∀ (x0 x1 x2 x3 : ℕ),
+    x0 ≤ 1 →
+      x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → M (x0 + x1 + x2 + x3) * rawC a b x0 x1 x2 x3 = M (x0 + x1 + x2 + x3) * R x0 x1 x2 x3
+hedge : ∀ (x0 x1 x2 x3 : ℕ), x0 ≤ 1 → x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → EdgeOK M Lb R Ψ x0 x1 x2 x3
+hend : Ψ 1 1 2 2 = 0
+η : ℝ
+hη : 0 ≤ η
+hD : 0 < 2 * a + 4 * b
+hqD : 0 < q * (2 * a + 4 * b)
+F : LayeredFlow (CState 4 6)
+hF : CountFeasibleH ty6 F
+hband : FlowBand ty6 F η
+μ : ℕ → ℝ := fun k => if k < 6 then M k / q else 0
+hμdef : μ = fun k => if k < 6 then M k / q else 0
+ℓ : ℕ → Fin 4 → ℝ := fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+hℓdef : ℓ = fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+φ : ℕ → CState 4 6 → ℝ := fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hφdef : φ = fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hμ0 : ∀ (k : ℕ), 0 ≤ μ k
+hk : (fun i => i) ⟨6, ⋯⟩ ∉ K5
+⊢ False
+LeanPaperCTwoMag1122BaseV1.lean:428:39: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanPaperCTwoMag1122BaseV1.lean:451:8: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  φ k
+LeanPaperCTwoMag1122BaseV1.lean:451:56: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  nodeCost ty6 (typedCost ty6 (wt a b)) μ ℓ k
+LeanPaperCTwoMag1122BaseV1.lean:451:65: error: Type mismatch
+  k + 1
+has type
+  ℝ
+but is expected to have type
+  ℕ
+LeanPaperCTwoMag1122BaseV1.lean:457:27: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  0 ≤ j ≤ 2
+  0 ≤ i ≤ 2
+  0 ≤ h ≤ 1
+  0 ≤ g ≤ 1
+  0 ≤ f ≤ 2
+  0 ≤ e ≤ 2
+  0 ≤ d ≤ 1
+  0 ≤ c ≤ 1
+where
+ c := ↑↑(v 0)
+ d := ↑↑(v 1)
+ e := ↑↑(v 2)
+ f := ↑↑(v 3)
+ g := ↑↑(w 0)
+ h := ↑↑(w 1)
+ i := ↑↑(w 2)
+ j := ↑↑(w 3)
+LeanPaperCTwoMag1122BaseV1.lean:458:30: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  Fin.ofNat 7 k
+LeanPaperCTwoMag1122BaseV1.lean:459:40: error: Application type mismatch: The argument
+  hk7
+has type
+  k < 7
+but is expected to have type
+  ?m.1714 < ?m.1715
+in the application
+  Nat.mod_eq_of_lt hk7
+LeanPaperCTwoMag1122BaseV1.lean:458:53: error: unsolved goals
+a b : ℝ
+hb : 0 < b
+hab : b < a
+q : ℝ
+hq : 0 < q
+M Lb : ℕ → ℝ
+R Ψ : ℕ → ℕ → ℕ → ℕ → ℝ
+hM : ∀ (k : ℕ), 0 ≤ M k
+hM0 : M 0 = 0
+hL0 : Lb 0 = 0
+hMsum : M 1 + M 2 + M 3 + M 4 + M 5 = q
+hR :
+  ∀ (x0 x1 x2 x3 : ℕ),
+    x0 ≤ 1 →
+      x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → M (x0 + x1 + x2 + x3) * rawC a b x0 x1 x2 x3 = M (x0 + x1 + x2 + x3) * R x0 x1 x2 x3
+hedge : ∀ (x0 x1 x2 x3 : ℕ), x0 ≤ 1 → x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → EdgeOK M Lb R Ψ x0 x1 x2 x3
+hend : Ψ 1 1 2 2 = 0
+η : ℝ
+hη : 0 ≤ η
+hD : 0 < 2 * a + 4 * b
+hqD : 0 < q * (2 * a + 4 * b)
+F : LayeredFlow (CState 4 6)
+hF : CountFeasibleH ty6 F
+hband : FlowBand ty6 F η
+μ : ℕ → ℝ := fun k => if k < 6 then M k / q else 0
+hμdef : μ = fun k => if k < 6 then M k / q else 0
+ℓ : ℕ → Fin 4 → ℝ := fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+hℓdef : ℓ = fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+φ : ℕ → CState 4 6 → ℝ := fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hφdef : φ = fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hμ0 : ∀ (k : ℕ), 0 ≤ μ k
+hμK : ∀ k ∉ K5, μ ↑k = 0
+hμm : ∀ (k : ℕ), 6 ≤ k → μ k = 0
+hμ1 : ∑ k ∈ range 6, μ k = 1
+hℓ0 : ∀ (k : ℕ) (τ : Fin 4), mult ty6 τ = 0 → ℓ k τ = 0
+hend' : ∀ (v : CState 4 6), InBox ty6 v → served v = 6 → φ 6 v = 0
+hstart : Ψ 0 0 0 0 / (q * (2 * a + 4 * b)) ≤ φ 0 0
+k : ℝ
+hk : k < 6
+v w : CState 4 6
+hv : InBox ty6 v
+hs : ↑(↑(v 0) + ↑(v 1) + ↑(v 2) + ↑(v 3)) = k
+hw : InBox ty6 w
+hstep : StepC v w
+h0 : ↑(v 0) ≤ 1
+h1 : ↑(v 1) ≤ 1
+h2 : ↑(v 2) ≤ 2
+h3 : ↑(v 3) ≤ 2
+g0 : ↑(w 0) ≤ 1
+g1 : ↑(w 1) ≤ 1
+g2 : ↑(w 2) ≤ 2
+g3 : ↑(w 3) ≤ 2
+hs' : ↑↑(v 0) + ↑↑(v 1) + ↑↑(v 2) + ↑↑(v 3) = k
+hk7 : k < 7
+⊢ ↑(sorry () % 7) = k
+LeanPaperCTwoMag1122BaseV1.lean:461:59: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  nodeCost ty6 (typedCost ty6 (wt a b)) μ ℓ k
+LeanPaperCTwoMag1122BaseV1.lean:462:13: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  M k
+LeanPaperCTwoMag1122BaseV1.lean:463:15: error: Application type mismatch: The argument
+  k
+has type
+  ℝ
+but is expected to have type
+  ℕ
+in the application
+  Lb k
+LeanPaperCTwoMag1122BaseV1.lean:466:31: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanPaperCTwoMag1122BaseV1.lean:463:97: error: unsolved goals
+a b : ℝ
+hb : 0 < b
+hab : b < a
+q : ℝ
+hq : 0 < q
+M Lb : ℕ → ℝ
+R Ψ : ℕ → ℕ → ℕ → ℕ → ℝ
+hM : ∀ (k : ℕ), 0 ≤ M k
+hM0 : M 0 = 0
+hL0 : Lb 0 = 0
+hMsum : M 1 + M 2 + M 3 + M 4 + M 5 = q
+hR :
+  ∀ (x0 x1 x2 x3 : ℕ),
+    x0 ≤ 1 →
+      x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → M (x0 + x1 + x2 + x3) * rawC a b x0 x1 x2 x3 = M (x0 + x1 + x2 + x3) * R x0 x1 x2 x3
+hedge : ∀ (x0 x1 x2 x3 : ℕ), x0 ≤ 1 → x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → EdgeOK M Lb R Ψ x0 x1 x2 x3
+hend : Ψ 1 1 2 2 = 0
+η : ℝ
+hη : 0 ≤ η
+hD : 0 < 2 * a + 4 * b
+hqD : 0 < q * (2 * a + 4 * b)
+F : LayeredFlow (CState 4 6)
+hF : CountFeasibleH ty6 F
+hband : FlowBand ty6 F η
+μ : ℕ → ℝ := fun k => if k < 6 then M k / q else 0
+hμdef : μ = fun k => if k < 6 then M k / q else 0
+ℓ : ℕ → Fin 4 → ℝ := fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+hℓdef : ℓ = fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+φ : ℕ → CState 4 6 → ℝ := fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hφdef : φ = fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hμ0 : ∀ (k : ℕ), 0 ≤ μ k
+hμK : ∀ k ∉ K5, μ ↑k = 0
+hμm : ∀ (k : ℕ), 6 ≤ k → μ k = 0
+hμ1 : ∑ k ∈ range 6, μ k = 1
+hℓ0 : ∀ (k : ℕ) (τ : Fin 4), mult ty6 τ = 0 → ℓ k τ = 0
+hend' : ∀ (v : CState 4 6), InBox ty6 v → served v = 6 → φ 6 v = 0
+hstart : Ψ 0 0 0 0 / (q * (2 * a + 4 * b)) ≤ φ 0 0
+k : ℝ
+hk : k < 6
+v w : CState 4 6
+hv : InBox ty6 v
+hs : ↑(↑(v 0) + ↑(v 1) + ↑(v 2) + ↑(v 3)) = k
+hw : InBox ty6 w
+hstep : StepC v w
+h0 : ↑(v 0) ≤ 1
+h1 : ↑(v 1) ≤ 1
+h2 : ↑(v 2) ≤ 2
+h3 : ↑(v 3) ≤ 2
+g0 : ↑(w 0) ≤ 1
+g1 : ↑(w 1) ≤ 1
+g2 : ↑(w 2) ≤ 2
+g3 : ↑(w 3) ≤ 2
+hs' : ↑↑(v 0) + ↑↑(v 1) + ↑↑(v 2) + ↑↑(v 3) = k
+hk7 : k < 7
+hval : ↑↑(Fin.ofNat 7 sorry) = k
+⊢ (q * a *
+                if sorry () < 6 then M (sorry ()) * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) * (q * a * 2 + q * b * 4)⁻¹
+                else 0) *
+              36 +
+            (q * b *
+                if sorry () < 6 then M (sorry ()) * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) * (q * a * 2 + q * b * 4)⁻¹
+                else 0) *
+              72 +
+          Lb (sorry ()) * ↑↑(v 0) * 18 -
+        Lb (sorry ()) * ↑(sorry ()) * 6 +
+      Lb (sorry ()) * ↑↑(v 1) * 18 =
+    M (sorry ()) * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) * 18 + Lb (sorry ()) * ↑↑(v 0) * 18 +
+        Lb (sorry ()) * ↑↑(v 1) * 18 -
+      Lb (sorry ()) * k * 6
+LeanPaperCTwoMag1122BaseV1.lean:476:8: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ↑↑(v 0) + ↑↑(v 1) + ↑↑(v 2) + ↑↑(v 3)
+in the target expression
+  EdgeOK M Lb R Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3)
+
+a b : ℝ
+hb : 0 < b
+hab : b < a
+q : ℝ
+hq : 0 < q
+M Lb : ℕ → ℝ
+R Ψ : ℕ → ℕ → ℕ → ℕ → ℝ
+hM : ∀ (k : ℕ), 0 ≤ M k
+hM0 : M 0 = 0
+hL0 : Lb 0 = 0
+hMsum : M 1 + M 2 + M 3 + M 4 + M 5 = q
+hR :
+  ∀ (x0 x1 x2 x3 : ℕ),
+    x0 ≤ 1 →
+      x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → M (x0 + x1 + x2 + x3) * rawC a b x0 x1 x2 x3 = M (x0 + x1 + x2 + x3) * R x0 x1 x2 x3
+hedge : ∀ (x0 x1 x2 x3 : ℕ), x0 ≤ 1 → x1 ≤ 1 → x2 ≤ 2 → x3 ≤ 2 → EdgeOK M Lb R Ψ x0 x1 x2 x3
+hend : Ψ 1 1 2 2 = 0
+η : ℝ
+hη : 0 ≤ η
+hD : 0 < 2 * a + 4 * b
+hqD : 0 < q * (2 * a + 4 * b)
+F : LayeredFlow (CState 4 6)
+hF : CountFeasibleH ty6 F
+hband : FlowBand ty6 F η
+μ : ℕ → ℝ := fun k => if k < 6 then M k / q else 0
+hμdef : μ = fun k => if k < 6 then M k / q else 0
+ℓ : ℕ → Fin 4 → ℝ := fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+hℓdef : ℓ = fun k τ => if ↑τ < 2 then Lb k / (q * (2 * a + 4 * b)) else 0
+φ : ℕ → CState 4 6 → ℝ := fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hφdef : φ = fun x v => Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) / (q * (2 * a + 4 * b))
+hμ0 : ∀ (k : ℕ), 0 ≤ μ k
+hμK : ∀ k ∉ K5, μ ↑k = 0
+hμm : ∀ (k : ℕ), 6 ≤ k → μ k = 0
+hμ1 : ∑ k ∈ range 6, μ k = 1
+hℓ0 : ∀ (k : ℕ) (τ : Fin 4), mult ty6 τ = 0 → ℓ k τ = 0
+hend' : ∀ (v : CState 4 6), InBox ty6 v → served v = 6 → φ 6 v = 0
+hstart : Ψ 0 0 0 0 / (q * (2 * a + 4 * b)) ≤ φ 0 0
+k : ℝ
+hk : k < 6
+v w : CState 4 6
+hv : InBox ty6 v
+hs : ↑(↑(v 0) + ↑(v 1) + ↑(v 2) + ↑(v 3)) = k
+hw : InBox ty6 w
+h0 : ↑(v 0) ≤ 1
+h1 : ↑(v 1) ≤ 1
+h2 : ↑(v 2) ≤ 2
+h3 : ↑(v 3) ≤ 2
+g0 : ↑(w 0) ≤ 1
+g1 : ↑(w 1) ≤ 1
+g2 : ↑(w 2) ≤ 2
+g3 : ↑(w 3) ≤ 2
+hs' : ↑↑(v 0) + ↑↑(v 1) + ↑↑(v 2) + ↑↑(v 3) = k
+hk7 : k < 7
+hval : ↑↑(Fin.ofNat 7 sorry) = k
+hnode :
+  nodeCost ty6 (typedCost ty6 (wt a b)) μ ℓ sorry v =
+    (M sorry * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) + Lb sorry * (↑↑(v 0) + ↑↑(v 1) - k / 3)) / (q * (2 * a + 4 * b))
+τ : Fin 4
+hτ : ↑(w τ) = ↑(v τ) + 1
+hrest : ∀ (τ' : Fin 4), τ' ≠ τ → w τ' = v τ'
+hE : EdgeOK M Lb R Ψ ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3)
+hRk :
+  M (↑(v 0) + ↑(v 1) + ↑(v 2) + ↑(v 3)) * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) =
+    M (↑(v 0) + ↑(v 1) + ↑(v 2) + ↑(v 3)) * R ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3)
+⊢ φ sorry v ≤
+    (M sorry * rawC a b ↑(v 0) ↑(v 1) ↑(v 2) ↑(v 3) + Lb sorry * (↑↑(v 0) + ↑↑(v 1) - k / 3)) / (q * (2 * a + 4 * b)) +
+      φ sorry w
+LeanPaperCTwoMag1122BaseV1.lean:466:31: warning: This simp argument is unused:
+  if_pos hk
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [hμdef, hℓdef, Fin.sum_univ_four]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanPaperCTwoMag1122BaseV1.lean:546:60: error: Application type mismatch: The argument
+  k
+has type
+  ℕ
+but is expected to have type
+  Fin 7
+in the application
+  tab j k
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanPaperCTwoMag1122BaseV1.lean:551:29: error: unsolved goals
+a b : ℝ
+hb : 0 < b
+hab : b < a
+P : ℕ
+s : Fin P → Fin 6 → Fin 4
+tab : Fin P → Fin 7 → Fin 4 → ℕ
+hspec : ∀ (j : Fin P) (k : ℕ) (τ : Fin 4), ↑(stC (s j) k τ) = tab j sorry τ
+w : Fin P → ℝ
+hw : ∀ (j : Fin P), 0 ≤ w j
+k : Fin 7
+hsum : ∀ (j : Fin P), tab j k 0 + tab j k 1 + tab j k 2 + tab j k 3 = ↑k
+j : Fin P
+x✝ : j ∈ univ
+⊢ w j * rawC a b (tab j sorry 0) (tab j sorry 1) (tab j sorry 2) (tab j sorry 3) * (a * 2 + b * 4)⁻¹ =
+    w j * (a * 2 + b * 4)⁻¹ * rawC a b (tab j k 0) (tab j k 1) (tab j k 2) (tab j k 3)
+LeanPaperCTwoMag1122BaseV1.lean:559:60: error: Application type mismatch: The argument
+  k
+has type
+  ℕ
+but is expected to have type
+  Fin 7
+in the application
+  tab j k
+'CIGAMF.P13.PaperCTwoMag1122.base_bl' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.cost_coord' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.rawC_L' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.rawC_M' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.rawC_H' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.rawC_off3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.value_le_flow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.value_ge' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.cert6' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.mix_cost' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.PaperCTwoMag1122.mix_band' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+lake env lean -o .lake/build/lib/lean/LeanPaperCTwoMag1122BaseV1.olean   37.97s user 15.38s system 63% cpu 1:24.33 total
+done

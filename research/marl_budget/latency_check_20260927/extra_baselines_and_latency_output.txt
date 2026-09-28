@@ -1,0 +1,135 @@
+36:SPLIT = 'test'
+52:        idx = splits[SPLIT]
+90:    SPLIT = sys.argv[2] if len(sys.argv) > 2 else 'test'
+== TEST
+{
+ "critic_chain": {
+  "mean_over_seeds": 24.502604166666668,
+  "by_seed": [
+   22.846,
+   25.286,
+   25.375
+  ]
+ },
+ "critic_chain_R1": {
+  "mean_over_seeds": 24.29513888888889,
+  "by_seed": [
+   22.883,
+   25.328,
+   24.674
+  ]
+ },
+ "critic_unrestricted": {
+  "mean_over_seeds": 24.29513888888889,
+  "by_seed": [
+   22.883,
+   25.328,
+   24.674
+  ]
+ },
+ "direct_budget_network": {
+  "mean_over_seeds": 23.4296875,
+  "by_seed": [
+   22.406,
+   24.091,
+   23.792
+  ]
+ },
+ "learned_repair_R1": {
+  "mean_over_seeds": 24.34548611111111,
+  "by_seed": [
+   22.891,
+   26.331,
+   23.815
+  ]
+ },
+ "learned_score_prefix": {
+  "mean_over_seeds": 22.764756944444443,
+  "by_seed": [
+   21.497,
+   25.615,
+   21.182
+  ]
+ },
+ "oracle_per_budget": {
+  "mean_over_seeds": 0.0,
+  "by_seed": [
+   0.0,
+   0.0,
+   0.0
+  ]
+ }
+}
+critic evaluations after grant (unrestricted can be tabulated before the grant in one forward pass): {1: {'R1': 9, 'unrestricted': 9}, 2: {'R1': 15, 'unrestricted': 36}, 3: {'R1': 19, 'unrestricted': 84}, 4: {'R1': 21, 'unrestricted': 126}, 5: {'R1': 21, 'unrestricted': 126}, 6: {'R1': 19, 'unrestricted': 84}, 7: {'R1': 15, 'unrestricted': 36}, 8: {'R1': 9, 'unrestricted': 9}}
+== TRAIN
+{
+ "critic_chain": {
+  "mean_over_seeds": 22.208767361111114,
+  "by_seed": [
+   21.096,
+   22.927,
+   22.603
+  ]
+ },
+ "critic_chain_R1": {
+  "mean_over_seeds": 22.065104166666668,
+  "by_seed": [
+   21.092,
+   22.879,
+   22.224
+  ]
+ },
+ "critic_unrestricted": {
+  "mean_over_seeds": 22.06423611111111,
+  "by_seed": [
+   21.092,
+   22.879,
+   22.221
+  ]
+ },
+ "direct_budget_network": {
+  "mean_over_seeds": 6.7039930555555545,
+  "by_seed": [
+   7.697,
+   3.902,
+   8.513
+  ]
+ },
+ "learned_repair_R1": {
+  "mean_over_seeds": 19.15234375,
+  "by_seed": [
+   19.562,
+   19.477,
+   18.418
+  ]
+ },
+ "learned_score_prefix": {
+  "mean_over_seeds": 16.574652777777775,
+  "by_seed": [
+   16.625,
+   16.697,
+   16.402
+  ]
+ },
+ "oracle_per_budget": {
+  "mean_over_seeds": 0.0,
+  "by_seed": [
+   0.0,
+   0.0,
+   0.0
+  ]
+ }
+}
+critic evaluations after grant (unrestricted can be tabulated before the grant in one forward pass): {1: {'R1': 9, 'unrestricted': 9}, 2: {'R1': 15, 'unrestricted': 36}, 3: {'R1': 19, 'unrestricted': 84}, 4: {'R1': 21, 'unrestricted': 126}, 5: {'R1': 21, 'unrestricted': 126}, 6: {'R1': 19, 'unrestricted': 84}, 7: {'R1': 15, 'unrestricted': 36}, 8: {'R1': 9, 'unrestricted': 9}}
+== LATENCY
+pre-grant us {'priority': 23.7, 'critic_table': 209.9, 'direct_table': 64.5}
+k 1 {'R1': 9, 'R2': 9, 'all': 9} {'prefix': 0.3, 'table_lookup': 0.1, 'repair_R1_indexed': 6.8, 'repair_R1_fresh': 35.9, 'repair_R2_fresh': 35.6, 'unrestricted_fresh': 35.5}
+k 2 {'R1': 15, 'R2': 36, 'all': 36} {'prefix': 0.3, 'table_lookup': 0.1, 'repair_R1_indexed': 11.4, 'repair_R1_fresh': 37.4, 'repair_R2_fresh': 47.6, 'unrestricted_fresh': 47.5}
+k 3 {'R1': 19, 'R2': 64, 'all': 84} {'prefix': 0.4, 'table_lookup': 0.0, 'repair_R1_indexed': 14.9, 'repair_R1_fresh': 43.5, 'repair_R2_fresh': 54.2, 'unrestricted_fresh': 59.1}
+k 4 {'R1': 21, 'R2': 81, 'all': 126} {'prefix': 0.4, 'table_lookup': 0.1, 'repair_R1_indexed': 17.4, 'repair_R1_fresh': 44.5, 'repair_R2_fresh': 58.6, 'unrestricted_fresh': 69.2}
+k 5 {'R1': 21, 'R2': 81, 'all': 126} {'prefix': 0.4, 'table_lookup': 0.1, 'repair_R1_indexed': 19.1, 'repair_R1_fresh': 44.2, 'repair_R2_fresh': 58.4, 'unrestricted_fresh': 69.1}
+k 6 {'R1': 19, 'R2': 64, 'all': 84} {'prefix': 0.5, 'table_lookup': 0.1, 'repair_R1_indexed': 19.1, 'repair_R1_fresh': 43.6, 'repair_R2_fresh': 54.3, 'unrestricted_fresh': 59.1}
+k 7 {'R1': 15, 'R2': 36, 'all': 36} {'prefix': 0.5, 'table_lookup': 0.1, 'repair_R1_indexed': 16.4, 'repair_R1_fresh': 37.5, 'repair_R2_fresh': 47.5, 'unrestricted_fresh': 47.6}
+k 8 {'R1': 9, 'R2': 9, 'all': 9} {'prefix': 0.5, 'table_lookup': 0.1, 'repair_R1_indexed': 10.8, 'repair_R1_fresh': 35.6, 'repair_R2_fresh': 35.4, 'unrestricted_fresh': 35.4}
+
+[exited with code 0]
