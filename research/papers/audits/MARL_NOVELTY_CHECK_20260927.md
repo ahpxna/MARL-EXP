@@ -26,7 +26,7 @@
   - the interaction-parameterised theory of universal nested priorities: zero price under a 2δ cut
     margin, sharp constant, the revision frontier 2(δ+u)(d−R)₊ + 2ε + ν + ζ, blockwise per-receiver
     frontiers;
-  - nesting degree ⌊(m+1)/4⌋ and the higher-order obstructions;
+  - nesting degree: linear lower bound ⌊(m+1)/4⌋ (`nesting_degree_lower`, `distance_regret_lower`); equality is a CONJECTURE supported by the exhaustive search for m ≤ 8 (corrected 23:56), and the higher-order obstructions;
   - the two-cost law, stated on the reachable-repair geometry.
 - **Instantiations of known theory**, which must be cited as such:
   - the change of measure and multiple answers;

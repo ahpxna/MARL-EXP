@@ -1,0 +1,13 @@
+Figure 3. Fresh panel 1101-1116 (frozen B2 models; indep = independently tuned direct). Closed loop on 32 episodes (cl_baselines_20260927_232931); frozen MP2 actor on every method; 3x3 CityFlow; one broadcast with heterogeneous receiver decoding budgets (i.i.d.); cap +84 B over the prefix bytes, bids charged inside the cap; zero delivery delay. One operating point, not a multi-budget frontier. Lower is better. Hollow marker: reference, not deployable.
+  Prefix: cached-queue priority, R = 0 (committed order); 0.0 edited steps/episode, init seeds 1.
+  Direct: learned direct budget-conditioned selector, no bid; 1.3 edited steps/episode, init seeds 3.
+  indep: Direct: learned direct budget-conditioned selector, no bid; 1.5 edited steps/episode, init seeds 3.
+  Fresh-queue: HEURISTIC, 1 B fresh own-queue weight per sender orders the stream (not learned SchedNet); 0.0 edited steps/episode, init seeds 1.
+  Response-bid: learned direct selector + 1 B receiver bid (top-2 MP2 phases, gap bin) with a stage-A response model; 2.1 edited steps/episode, init seeds 3.
+  indep: Response-bid: learned direct selector + 1 B receiver bid (top-2 MP2 phases, gap bin) with a stage-A response model; 2.3 edited steps/episode, init seeds 3.
+  Oracle: held-phase oracle choice over the same candidates (reference, not deployable); 19.4 edited steps/episode, init seeds 1.
+  Request: HEURISTIC request rule on the same 1 B bid (not learned; not Where2comm); 113.0 edited steps/episode, init seeds 1.
+Latency table (CPU compute only, post-grant scheduler; no uplink or network delay; measured on this host):
+  Prefix: median 0.007 ms, p95 0.012 ms, max 0.033 ms (research/marl_budget/latency_b2_idle_20260928_000900/latency.json)
+  Response-bid: median 14.765 ms, p95 16.071 ms, max 45.573 ms (research/marl_budget/latency_b2_idle_20260928_000900/latency.json)
+  Idle machine. Paired with the busy run latency_b2_20260927_232749 (same seeds 601-604, same 208 steps): busy median 16.56 ms.

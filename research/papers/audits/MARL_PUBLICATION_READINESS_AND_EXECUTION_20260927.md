@@ -366,3 +366,51 @@ Dữ liệu hiện tại chỉ buộc hạ một số claim, không buộc quy�
 Trong lúc chờ: viết manuscript và claim map ngay; sửa exact nesting claim; giữ request baseline v4; không còn “η certificate”; không đòi học Where2comm perception nguyên bản; không mở theorem tùy chọn.
 
 Đọc bản này cùng MARL_E1_INDEPENDENT_AUDIT_20260927.md và MARL_CRITICAL_PATH_INDEPENDENT_RECHECK_20260927.md. Bản status mới đã sửa nhiều lỗi, nhưng chưa giải quyết các mắt nối protocol/byte/continuation/learned actor trên đây.
+
+
+## 10. Cập nhật theo báo cáo worker vừa gửi và thứ tự bàn giao cuối
+
+Đã đọc lại bản status cập nhật và BASELINES_DIRECT_STAGEA2_RESULTS; bốn correction đã được worker tiếp nhận. Không yêu cầu làm lại chúng. Kiểm lúc 23:52 EDT: controls B4 đã có 8/9 job, còn bid_queue seed 2; chưa có cl_dev/cl_test lúc kiểm. Đây là trạng thái trên đĩa, không phải ước lượng “còn 4 job” trong báo cáo trước.
+
+Các quyết định nên giao thẳng, để tránh thêm vòng xin phép cho việc không chặn khoa học:
+
+1. **Aesop/OLD7:** tách khỏi đường găng. Import tactic Aesop không tự là axiom bổ sung; kiểm dependency/axiom policy khác với cấm token tên tactic. Các gate MARL hiện hành đã PASS. Ghi OLD7 là historical tool-policy issue; sửa classifier lúc rảnh, không đổi gate đang chạy.
+2. **Paper B supplement:** giữ nội dung correction toán tại dòng 398–402: eta=ch làm cả h^6 và eta^2 h^4 có order h^6. Không revert một correction đúng chỉ vì session khác sửa. Phần này không chặn MARL; nếu review cả diff lúc 14:02 thì chỉ giữ các thay đổi đã đối chiếu.
+3. **Manuscript:** bắt đầu working draft ngay, ghi rõ kết quả chờ và limitation. Không có lý do đợi E3 mới viết problem/method/related work. Scope “formal theorem đã gate” vẫn được giữ.
+4. **Git:** không git add toàn bộ cây. Lần kiểm này git status --porcelain --untracked-files=all thấy 18,655 untracked files và 17 tracked changes; đơn vị đếm có thể khác báo cáo 2,951. Chia danh sách: source/theory/docs/config nhỏ cần snapshot; model/data/results lớn cần manifest + nơi lưu; temp/build/runtime không đưa vào commit. Untracked nghĩa là chưa được Git bảo vệ, không chứng minh không tồn tại backup khác. Không xóa dữ liệu lịch sử hay tự commit công việc session khác.
+
+### Checklist tuần tự, mỗi bước có output để review
+
+| Thứ tự | Worker làm | Artifact/điều kiện xong |
+|---|---|---|
+| 0 | Xác nhận với thầy track, deadline, khả năng nộp muộn | Một dòng target chính xác; faculty/student không lẫn |
+| 1 | Snapshot source/docs đang hoàn chỉnh, giữ nguyên producer chạy | Danh sách hash/commit chọn lọc; không gộp 18k file mù |
+| 2 | Viết claim map + skeleton manuscript | .tex có Problem, Methodology, Theory, Experimental Design, Results, Limitations |
+| 3 | Thu B4 theo endpoint khóa sẵn | Verdict + raw rows + every-seed report |
+| 4 | Chốt protocol decode-budget/byte model, target continuation, R1/direct | Một định nghĩa toán và một runtime implementation cùng object |
+| 5 | Nếu cần, diagnostic target mismatch trên development cố định | Hai bảng label cùng state, actor, randomness và horizon; không test fishing |
+| 6 | Actor communication-aware một seed smoke | Checkpoint + runtime access checks + message-use diagnostics |
+| 7 | Port local bid/response/evaluator sang actor mới | Train/runtime parity, không còn MP2 oracle coefficients |
+| 8 | Freeze actor; tune method/direct/learned scheduler trên cùng tài nguyên | Config/model hashes và validation choices |
+| 9 | Main runs nhiều actor seeds, fixed primary endpoint | Closed-loop outcome, bytes, paired uncertainty; không chỉ gain H=3 |
+| 10 | Ablation bid vs no-bid/queue bid; R1 vs direct | Biết thành phần nào tạo lợi, kể cả kết quả âm |
+| 11 | Một shift và compute benchmark rảnh máy | Phạm vi robust/latency được nói đúng; delay thật chỉ nếu giữ claim đó |
+| 12 | Chốt 3–4 hình và bảng kết quả | Mọi số tái tạo từ manifest/raw data |
+| 13 | Viết kết luận theo kết quả, anonymous PDF, release nhỏ | Bản gửi đúng track + script reproduce + limitations |
+
+Không có bước “đợi full gate A/B/C” chen trước bước 2–10. Full gate toàn MODS là việc release/proof-corpus riêng; làm sau B4 khi máy rảnh nếu cần, không phải điều kiện để bắt đầu bản MARL.
+
+### Figure 3 đã được nhìn trực tiếp
+
+Bản v3 hiện có đúng nhãn fixed MP2 và corrected request baseline. Để đưa vào manuscript:
+- Rút tên dài trong legend thành Prefix / Direct / Response-bid / Fresh-queue / Request / Oracle; giải thích ở caption.
+- Chuyển run directory, hardware note và danh sách latency chưa đo sang caption/bảng. Hiện notes dài tràn khỏi vùng panel; font nhỏ không phù hợp bản in.
+- Để legend ngoài vùng dữ liệu; giữ error bars và oracle ký hiệu rỗng.
+- Ghi rõ lower waiting is better và đây là một operating point.
+- Panel latency chỉ có hai điểm; cân nhắc thay bằng bảng để dành diện tích cho bid/no-bid và offline-to-closed-loop gap.
+
+Lệnh tính lại bảng audit đã có, không train hay rollout:
+    cd /Users/phanan/cig-amf-main
+    python3 research/papers/audits/MARL_PUBLICATION_AUDIT_RECALC_20260927.py
+
+Không đưa lệnh chạy E3 giả khi runner/input adapter chưa viết. Worker hoàn thành bước 6–7 phải cung cấp command thật từ CLI --help, config đã freeze và một smoke log trước khi giao người dùng chạy batch dài.

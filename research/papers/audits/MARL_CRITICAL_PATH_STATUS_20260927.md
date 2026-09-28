@@ -32,9 +32,15 @@
    - tabulation dominates prepared priority in value, at equal latency;
    - revision helps only a worse score.
 
-   The mechanism was therefore studied where nesting is FORCED: one broadcast stream,
-   heterogeneous receiver capacities (`PROTOCOL_HETERO_v0`). That protocol is named as a
-   different model, as step 1.1 requires.
+   The mechanism was therefore studied on one shared broadcast with heterogeneous receiver
+   DECODING budgets (`PROTOCOL_HETERO_v0`). That protocol is named as a different model, as
+   step 1.1 requires.
+   - Corrected 23:56: nesting is NOT forced there.
+     - `profile_cost` allows an explicit profile.
+     - The env decodes exactly |S_i| = K_i payloads of the union; it does not model a receiver
+       that listens to a time prefix and is cut off.
+   - R0 is therefore the committed-order model. Direct selection is a legitimate comparator
+     inside the same policy class, and measures the price of commitment.
 2. **f_joint.** ✅ Every hetero label is the value of the JOINT action when all receivers act on
    their restricted views together.
 3. **Pre-grant context z.** ✅ Paid cache and time, plus the legal receiver mirror
@@ -86,11 +92,13 @@ R ≤ 2, 24 unrestricted), not exact enumeration.
 **3.6 Latency, bytes, deadlines.**
 - Bytes ✅.
 - Post-grant latency ✅ for PROTOCOL_v1: this is the refutation of the latency premise.
-- 🟡 B2 method latency is measured, COMPUTE ONLY (`latency_b2_20260927_232749`):
-  - median 16.6 ms, p95 17.9 ms, max 48 ms;
-  - it was measured under CPU contention from three other jobs, so it is upward-biased;
-  - no bid uplink round, no network delay;
-  - 0% misses at 50 ms is therefore not an end-to-end guarantee.
+- 🟡 B2 method latency is measured, COMPUTE ONLY.
+  - **Idle** (`latency_b2_idle_20260928_000900`): median 14.8 ms, p95 16.1 ms, max 45.6 ms.
+  - **Busy** (`latency_b2_20260927_232749`): median 16.6 ms, p95 17.9 ms, max 48 ms.
+  - The two runs use the same seeds 601–604 and the same 208 steps, so contention raised the
+    median by about 12%.
+  - No bid uplink round and no network delay are modelled, so 0% misses at 50 ms is not an
+    end-to-end guarantee.
 - The baselines' latency is not measured.
 
 **3.7 Delay consuming simulation time.** ❌ Zero delivery delay only.
@@ -99,13 +107,28 @@ R ≤ 2, 24 unrestricted), not exact enumeration.
 - Held phase: yes (B2).
 - **Closed loop: B3 FAIL.** −0.26% [−1.20%, +0.62%] against the control, while the oracle gets
   −14.5%.
-  - Diagnosed as covariate shift induced by the policy itself: parity holds to 5e-6; the shadow
-    run would edit at 13–16 of 16 steps, but the live selector stops editing.
+  - CONSISTENT WITH distribution shift induced by the policy itself (corrected 23:56; it was
+    "diagnosed as"):
+    - parity holds to 5e-6;
+    - the shadow run would edit at 13–16 of 16 steps, but the live selector stops editing.
+  - A second hypothesis is still live: held-phase target mismatch. The labels hold the joint
+    action fixed for H = 3, while the live loop re-senses, re-selects and re-acts.
+  - Parity rules out some wiring errors. It does not prove a single cause.
 - **Second fresh panel 1101–1116** (descriptive, not preregistered): the frozen B2 design gets
   −0.28% [−1.65, +1.18] against the prefix. It edits 1–3 of 26 steps, against 19 for the oracle
   (−14.4%). Same symptom as B3.
-- **B4 (DAgger)**: retraining is done for top2_joint; the controls are still training at 23:50.
-  The closed-loop dev and the test on 801–816 follow.
+- **B4 (DAgger), preregistered test on 801–816: PASS** (`B4_DAGGER_RESULTS_20260928.md`).
+  - Retrained bid against retrained ctrl: −1.49% [−2.75, −0.23].
+  - Against the prefix: −0.68% [−2.87, +1.37], not significant.
+  - Against the frozen B2 design: +0.10%.
+  - Part of the pass comes from the retrained control drifting to +0.89% against the prefix.
+  - The retrained selectors edit 16–21 of 26 steps, like the oracle (19.5), but realise about
+    4.5% of its −15.0%.
+- **Target diagnostic** (`TARGET_DIAG_RESULTS_20260928.md`; 16 development states; self-checks
+  PASS).
+  - The held-phase argmax matches the continuation argmax in 1 of 16 states.
+  - It captures 49% of the one-step continuation headroom, and is worse than the prefix in 4.
+  - The target mismatch is real. Estimation error is still the larger factor.
 - Latency: compute only (see 3.6).
 
 **If the budget-conditioned selector is as good or better:** ⛔ applied. The claim of practical
@@ -143,12 +166,14 @@ superiority of a precommitted priority was dropped for the global-budget protoco
 - **Main outcomes:** ✅ the closed-loop report now covers Σ waiting, throughput,
   finished/unfinished, travel time of finished trips (biased) AND CityFlow's censored travel time,
   bytes, and an oracle-access self-check (`MARL_hetero_closed_loop_report.py`; B3 reported).
-- **Pareto (quality against bytes and latency):** 🟡 working version
-  `figures_20260927_v3/fig3_closed_loop_cl_baselines_20260927_232931.png`.
-  - Closed loop, 32 episodes, episode CIs.
-  - Direct selectors shown; the heuristic baselines are labelled as such.
-  - Latency panel: prefix and B2 only.
-  - To be redrawn after B4.
+- **Pareto (quality against bytes and latency):** 🟡 fig3 v4 (`figures_20260928_v4/`), redrawn
+  after the readiness audit's figure notes.
+  - Two figures:
+    - `fig3v4_panel1101`: panel 1101–1116, including the independently tuned direct selectors;
+    - `fig3v4_b4test`: the B4 test panel.
+  - Short legend names; notes and the latency table are in `.caption.txt`.
+  - One operating point (+84); it is not a multi-budget frontier. A frontier needs at least 3 byte
+    budgets on the same design.
 - **Traffic acquisition ablation:** ❌. Only the controlled one (E1b, fig4) exists.
 
 ## §4 Step 6 — assemble the submission: ❌ (Lean ✅)
@@ -161,9 +186,11 @@ superiority of a precommitted priority was dropped for the global-budget protoco
   - fig1 ✅ (oracle best-gain illustration);
   - fig2 ✅;
   - fig4 ✅ (controlled only);
-  - fig3 🟡 (old pilot panel).
-- **Manuscript:** ❌ not started. No MARL claim enters a manuscript before its gate and its
-  experiment exist.
+  - fig3 🟡 (v4, fixed MP2, one operating point).
+- **Manuscript:** 🟡 working draft `research/papers/_tex/paper_marl.tex` (compiles with tectonic).
+  - Content: problem/protocol, methodology, theory citing gated modules only, experimental
+    design, and preliminary fixed-MP2 results with their artifacts. Learned-actor results are TBD.
+  - The venue template waits for the track to be confirmed.
 
 ## §5 table ("hard items")
 
@@ -187,7 +214,8 @@ superiority of a precommitted priority was dropped for the global-budget protoco
 1. **"A prepared priority is faster than table lookup / has a practical advantage."** Refuted by
    measurement (post-grant 0.1 µs for tabulation against 0.3–0.5 µs for the prefix). Dropped.
 2. **Global broadcast as the main learned-selector setting.** Nesting is nearly free there, so the
-   setting was moved to heterogeneous receivers, where nesting is forced. Reframed.
+   setting was moved to heterogeneous receiver decoding budgets. Nesting is not forced there
+   either (explicit profiles are allowed); R0 is the committed-order model. Reframed.
 3. **"Certified no-repair" for the neural selector.** No uniform coverage exists. Dropped, as the
    critical path anticipated.
 4. **"Legal information is insufficient in principle."** Replaced by the weaker supported
@@ -210,8 +238,8 @@ CityFlow itself is not dropped. No result forces it.
 
 ## What still blocks a submittable MARL paper (in order)
 
-1. **B4 closed-loop result** (running). Without a closed-loop win on fresh seeds, the method claim
-   stays "held-phase only".
+1. **B4 closed-loop result: PASS, weak** (see above). The method claim on fixed MP2 is
+   "held-phase benefit, marginal closed-loop benefit".
 2. **Step 2: a learned communication-aware actor**, frozen for comparisons. Waits for B4 by the
    user's instruction.
 3. **Strong comparators.**
@@ -219,8 +247,35 @@ CityFlow itself is not dropped. No result forces it.
    - Missing: LEARNED SchedNet / Where2comm adaptations with the same information and bytes. The
      current ones are heuristics.
 4. **End-to-end latency.**
-   - Missing: uplink/network delay acting on traffic, and a clean-machine latency re-measure.
+   - Missing: uplink/network delay acting on traffic. The clean-machine re-measure is done.
    - fig3 Pareto exists as a working version.
 5. **Learned-MARL runs** (5 training seeds, fixed/bursty/shifted, held-out load) and the traffic
    acquisition ablation.
-6. **The manuscript.**
+6. **The manuscript**: a working draft exists; it needs the track/template and the E3 results.
+
+## Claim map (28/09, 00:10; readiness audit P0.3)
+
+- **Status legend:**
+  - LEAN: compiled, smoke-gated, standard axioms, hypotheses satisfiable;
+  - NUM: self-checking artifact;
+  - OPEN: not established;
+  - WITHDRAWN.
+- No claim below is a traffic guarantee unless the row says so.
+
+| # | claim (as it may be stated) | theorem / assumptions | code | artifact | status |
+|---|---|---|---|---|---|
+| 1 | Deployable regret of a committed order with R revisions ≤ 2(δ+u)(d−R)₊ + 2ε + ν + ζ; the constants 2u and 2ε are sharp | `LeanMarlEstimatedRevisionV1`; ScoreLocal(δ), score error u, estimation ε, search ν, coverage ζ | — | smokeMARL17 | LEAN (abstract). Traffic instantiation OPEN (row 12) |
+| 2 | Per-receiver block frontier 2η Σ_i (d_i − R)₊ | `LeanMarlBlockFrontierV1`; needs hTop (prefix = top-score of the same vector) and ScoreLocal | — | smokeMARL4 | LEAN. In traffic, hTop is not checked: the runtime order is cached-queue |
+| 3 | Zero commitment price under a 2δ cut margin; sharp constant | `LeanMarlRevisionFrontierV1`, `LeanMarlSubsetFrontierV1` | — | smokeMARL17 | LEAN |
+| 4 | Nesting degree grows linearly: ≥ ⌊(m+1)/4⌋ | `LeanMarlNestingDegreeGeneralV1` (`nesting_degree_lower`, `distance_regret_lower`) | P1_d6_frontier search | smokeMARL17 | LEAN lower bound; equality is a CONJECTURE (m ≤ 8) |
+| 5 | Exact non-nested team game: randomised price p(1−2p), deterministic min(p, ½−p), one revision closes it | `LeanMarlXorGameV1` | — | smokeMARL17 | LEAN |
+| 6 | Calibration of ambiguous repairs on one Gaussian query channel: lower bound, constructive upper bound, pair version | `LeanMarlRepairCalibrationV1`, `LeanMarlCalibrationGapV1`, `LeanMarlPairCalibrationV1` | `MARL_E1a_two_stage_v2.py` | smokeMARL17 / smokeMARL4; E1 results | LEAN for the needle class. NUM: E1a measured cost lies between the bounds |
+| 7 | E1b executable task: R = 2 is worse than R = 1 until about 25k rollouts, then better | a strategy result on the E1b channel (not the Gaussian channel) | E1b scripts | `E1_CONTROLLED_RESULTS_20260927.md`, figures v2 | NUM. Targeted ≡ uniform is a negative control |
+| 8 | Under PROTOCOL_v1, tabulation is as fast as a prefix (the latency premise is refuted) | `LeanMarlTabulationV1` | latency premise check | LATENCY_PREMISE_CHECK | LEAN + NUM. The "priority is faster" claim is WITHDRAWN |
+| 9 | Heterogeneous decoding budgets: the oracle R = 1 recovers 88% of the private gap | exact oracle over F_R (preregistered) | `HETERO_EXACT` producer | `HETERO_EXACT_RESULTS_20260927.md` | NUM (oracle) |
+| 10 | A charged 1 B receiver bid improves held-phase selection for a direct selector, fixed MP2 | preregistered B2 | `MARL_hetero_b2_confirm_v2.py` | `B2_CONFIRMATION_RESULTS` | NUM PASS: +1.85 [+0.95, +2.84], 18% of the oracle |
+| 11 | Closed-loop benefit on fixed MP2 | preregistered B3/B4 | closed_loop_v2 | B3 (FAIL), `B4_DAGGER_RESULTS_20260928.md` (PASS against the retrained control: −1.49% [−2.75, −0.23]) | NUM. Weak: −0.68% against the prefix (n.s.); no gain over the frozen design; about 4.5% of the oracle |
+| 12 | T1 → traffic bridge (η) | would need an UPPER bound on one consistent score vector | `MARL_hetero_eta_bridge.py` | `eta_bridge_20260927.relabelled.json` | OPEN. The one-swap diagnostic is a lower bound only; the "certified" wording is WITHDRAWN |
+| 13 | Bounded repair R1 beats direct selection | — | direct_indep | `BASELINES_DIRECT_STAGEA2_RESULTS` §2 | WITHDRAWN (development: direct ≥ R1) |
+| 14 | Beats SchedNet / Where2comm | — | closed_loop_v3/v4 heuristics | same doc §1 | WITHDRAWN. Only heuristics exist; learned baselines are OPEN (E3) |
+| 15 | Learned communication-aware MARL actor | — | none | none | OPEN (E3) |

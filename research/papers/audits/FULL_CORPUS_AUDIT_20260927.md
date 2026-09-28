@@ -1186,3 +1186,86 @@ finding against the code.
      - the two directories still being written (`b4_run_20260927_230436`,
        `gate_runs/smokeAESOP_20260927`), to be committed when they finish.
    - `*.pt` stays ignored by the repository's `.gitignore`.
+
+### 23.16 Corrections from `MARL_PUBLICATION_READINESS_AND_EXECUTION_20260927.md` §4 (verified 23:56)
+
+- **§4.3.** The exact nesting degree is a conjecture. Lean has the lower bound ⌊(m+1)/4⌋
+  (`LeanMarlNestingDegreeGeneralV1`, lines 19–34 say so). `MARL_NOVELTY_CHECK` line 29 is
+  corrected.
+- **§4.4.** "Nesting is forced" in PROTOCOL_HETERO_v0 is wrong.
+  - `profile_cost` (`models/marl_hetero_selector.py:38–50`) allows explicit profiles.
+  - The env decodes exactly |S_i| = K_i payloads of the union, so capacity is a DECODING budget,
+    not a listening-time prefix.
+  - R0 is the committed-order model; direct selection is a legitimate comparator.
+  - The status doc (§4 step 1, drop list item 2) is corrected. The cardinality is exact
+    (|S_i| = K_i, not ≤).
+- **§4.5, open.** T1's BlockFrontier needs a top-score prefix of the same score vector and
+  ScoreLocal on the relevant sets. The runtime order is the cached-queue order, and the R bound
+  does not pay the coupled union-payload cost. These stay terms to be measured; they are not
+  claimed to be zero.
+- **§4.6.** B3's "covariate shift" becomes "consistent with". Held-phase target mismatch is a
+  second hypothesis. `B3_CLOSED_LOOP_RESULTS` has an appended correction, and the status and
+  results docs are corrected.
+- **§4.7.** The independent direct selector is the same critic family plus candidate argmax. It
+  is not a different subset-generating architecture.
+- **§4.8.**
+  - The provenance supplement is RETROSPECTIVE.
+  - The latency bias under contention is not measured, so "upward-biased" is withdrawn.
+  - Fig 3 compares operating points at one cap; it is not a Pareto frontier.
+
+### 23.17 Gate, B4 verdict, target diagnostic, and the rest of the auditors' list (28/09, 00:00–00:20)
+
+- **Gate `smokeAESOP_20260927`: SMOKE PASS** (finished 00:07).
+  - Roots: `LeanD6AllocationFiniteBridgeV1`, `LeanStructuralScalarChi5WitnessV1`,
+    `LeanStructuralScalarChi5KernelV1`.
+  - 18 modules, 0 failed, 31 audited theorems.
+  - `imports_closed=1`: the pinned Aesop is accepted.
+  - `native_decide=0`, standard axioms, DRIFT empty.
+  - Both classification flags of OLD7 are resolved for their modules. `...KernelV1` has no
+    `#print axioms` lines; its ten facts are now audited through the Witness module's ten prints.
+- **B4 preregistered test (801–816): PASS on all three criteria, and weak**
+  (`research/marl_budget/B4_DAGGER_RESULTS_20260928.md`).
+  - Checked:
+    - manifest hashes equal the current sources;
+    - the test seeds appear in no other manifest;
+    - no oracle access by any deployable method;
+    - the frozen-B2 prefix reproduces;
+    - the endpoints were recomputed.
+  - Retrained bid against retrained ctrl: −1.49% [−2.75, −0.23].
+  - Against the prefix: −0.68% [−2.87, +1.37]. Against the frozen B2 design: +0.10%.
+  - The retrained ctrl drifted to +0.89%.
+  - Edits are now 16–21 steps per episode (oracle 19.5). The edit-rate symptom is cured, the
+    benefit is not.
+- **Target diagnostic** (`TARGET_DIAG_RESULTS_20260928.md`, producer
+  `scripts/MARL_hetero_target_diag.py`).
+  - Setup: 16 development states, 2,810 candidates; three self-checks that can fail, all PASS.
+  - The held-phase argmax matches the continuation argmax in 1 of 16 states.
+  - It captures 49% of the continuation headroom and is worse than the prefix in 4 of 16.
+  - Mean Spearman correlation 0.41.
+  - Reading: the target mismatch is real, but estimation error dominates, since the held-phase
+    oracle still gives −15% in closed loop.
+- **Independently tuned direct selectors in closed loop** (`cl_direct_indep_20260928_000001`,
+  1101–1116):
+  - no bid +0.68%, bid +0.34% against the prefix;
+  - 1.5–2.3 edits per episode;
+  - self-check PASS.
+- **Idle latency** (`latency_b2_idle_20260928_000900`): median 14.8 ms against 16.6 ms busy, on the
+  same seeds and steps. Compute only.
+- **Readiness-audit items done:**
+  - claim map in the status doc;
+  - working draft `research/papers/_tex/paper_marl.tex` (compiles; theory cites gated modules
+    only; results TBD beyond fixed MP2);
+  - fig3 v4 (`figures_20260928_v4/`, producer `MARL_make_fig3_v4.py`);
+  - `eta_bridge_20260927.relabelled.json` (corrected field names; the source JSON is unchanged);
+  - `PROTOCOL_HETERO_v0.md` Amendment 1 (decoding budget, exact cardinality, explicit profiles,
+    bid charging; descriptive);
+  - `UNCOMMITTED_ARTIFACTS_MANIFEST_20260928.json` (92 checkpoints and 84 scenario trees kept
+    out of git, with hashes; the partial first version is in legacy/);
+  - the auditor's `MARL_PUBLICATION_AUDIT_RECALC_20260927.py`, run as a scratch copy so its output
+    file is not overwritten, reproduces its numbers exactly;
+  - the E1 figure captions already met P0.6.
+- **Not done, with reasons:**
+  - Stage A v2 closed-loop inference path (recheck finding 4): only needed before a v2 test, and
+    none is planned, because v2 did not help at +84.
+  - The venue template: the track is unconfirmed.
+  - The E3 actor pilot is next (P2).

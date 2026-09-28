@@ -37,8 +37,11 @@ profile differs from the prefix. For where2comm, the number of receiver swaps.
 
 **Reading.**
 1. The frozen B2 design again gives no closed-loop benefit, now on a second fresh panel. It edits in 1–3 of
-   26 steps against 19 for the oracle. This is the same symptom as B3 (covariate shift, see
-   `B3_CLOSED_LOOP_RESULTS_20260927.md`).
+   26 steps against 19 for the oracle. This is the same symptom as B3.
+   - It is consistent with policy-induced distribution shift, but that is not proved.
+   - Held-phase target mismatch (a fixed joint action for H = 3, against the live
+     re-select loop) remains a second hypothesis. See `B3_CLOSED_LOOP_RESULTS_20260927.md`,
+     correction.
 2. Neither heuristic communication baseline helps.
    - Ordering the stream by fresh own queue is WORSE than the cached-queue priority. A plausible
      cause, not tested: senders with low queues are never refreshed.
@@ -164,12 +167,19 @@ So v2 helps the restricted policy and the low cap, and not the B2 operating poin
 - **Latency** (`latency_b2_20260927_232749/latency.json`, 208 steps):
   - scheduler median 16.6 ms, p95 17.9 ms, max 48 ms;
   - it is COMPUTE ONLY: no uplink round, no network delay, and delay does not act on traffic;
-  - it was measured while three other training/evaluation jobs ran, so it is upward-biased.
+  - it was measured while three other training/evaluation jobs ran. The size and sign of that
+    effect were not measured (no idle-versus-busy pair).
+  - Fig 3 compares operating points at ONE cap (+84). It is not a multi-budget Pareto frontier.
+  - The latency panel covers two methods only. No runtime ranking of the others is implied.
   - 0% misses at 50 ms is not an end-to-end guarantee.
   - The heuristic baselines' latency is not measured.
 
 ## 7. Provenance supplement
 
+- This is a RETROSPECTIVE supplement, not a prospective source freeze. An mtime earlier than the
+  launch supports provenance but does not prove absolutely that a file never changed. The final
+  round must freeze the whole dependency closure: wrappers, coefficient JSON, config, and
+  data/model hashes.
 - `PROVENANCE_SUPPLEMENT_20260927.json` records the sha256 of
   - the behaviour-changing wrappers (`MARL_hetero_top2_joint_v2_dev.py`,
     `MARL_hetero_direct_indep_dev.py`);

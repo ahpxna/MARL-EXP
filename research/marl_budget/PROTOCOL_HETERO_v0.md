@@ -92,3 +92,26 @@ Also reported without a decision rule:
 - π_adv uses the true value table of the snapshot, so it is a best-case advance order.
 - The result is an oracle mechanism diagnostic. It says nothing about learnability, learned actors
   or closed-loop traffic.
+
+## Amendment 1 (28/09/2026) — descriptive, following the independent readiness audit §4.4
+
+This amendment adds no new rule. It states what the implementation has done since the start and
+corrects wording used elsewhere ("nesting is forced").
+
+- **Capacity is a DECODING budget.**
+  - k_i counts the payloads receiver i decodes out of the broadcast union.
+  - It is not a listening-time prefix: no receiver is modelled as hearing a time prefix of the
+    stream and being cut off (`envs/external/cityflow_hetero.py`).
+- **Exact cardinality.** Every profile has |S_i| = k_i, not ≤ k_i.
+  - With a fixed, non-monotone actor, extra information can hurt, so full communication is not
+    assumed to be an upper bound.
+  - A skip option would be a new protocol with matched baselines.
+- **Explicit profiles are allowed for every method.**
+  - `models/marl_hetero_selector.py:profile_cost` charges each profile the cheaper of the patched
+    description (25·|T| + 3·replacements) and the explicit one (25·|⋃S_i| + 2 bytes per
+    receiver).
+  - So nesting is NOT forced inside the policy class.
+  - R = 0 is the committed-order model. Direct (unrestricted candidate) selection is a
+    legitimate comparator and measures the price of commitment.
+- **Byte accounting in closed loop.** Bids (10 B) are charged inside the same total cap, including
+  steps where the chosen profile is the prefix. Delivery delay is zero.

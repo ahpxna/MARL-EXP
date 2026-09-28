@@ -1,0 +1,281 @@
+% WORKING DRAFT of the MARL paper (readiness audit P0.4, 28/09/2026).
+% Venue template NOT chosen: the track (CCSC Eastern faculty/student or other) is unconfirmed.
+% This draft uses a neutral article class with the corpus macros; switch to the venue template
+% once the track is confirmed.  Every number below is copied from a named artifact; nothing is
+% a learned-actor result yet.  Build: tectonic -X compile paper_marl.tex --keep-logs
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx,booktabs,url,xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{newunicodechar}
+\newunicodechar{₀}{\textsubscript{0}}
+\graphicspath{{../../marl_budget/figures_20260928_v4/}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\lean}[1]{\textsf{\footnotesize #1}}
+\newcommand{\leanbox}[1]{\par\vspace{2pt}\noindent{\raggedright\footnotesize\textsf{Lean: #1}\par}\vspace{2pt}}
+\newcommand{\PROVED}{\textsc{proved}}
+\newcommand{\NUM}{\textsc{numerical}}
+\newif\ifshownotes\shownotestrue
+\definecolor{notecol}{RGB}{0,70,190}
+\definecolor{todocol}{RGB}{190,20,20}
+\newcommand{\NOTE}[1]{\ifshownotes{\color{notecol}\,\textsf{\footnotesize[N: #1]}}\fi}
+\newcommand{\TODO}[1]{\ifshownotes{\color{todocol}\,\textsf{\footnotesize[TODO: #1]}}\fi}
+\newcommand{\TODOPAR}[1]{\ifshownotes\par\vspace{2pt}\noindent%
+  {\color{todocol}\textsf{\footnotesize\textbf{To decide.}\;#1}}\par\vspace{2pt}\fi}
+
+\begin{document}
+\title{Committed Priorities, Bounded Revision, and Paid Bids\\for Budgeted Multi-Agent Communication}
+\author{\TODO{authors and affiliation after the track is confirmed}}
+\date{Working draft, 28 September 2026}
+\maketitle
+
+\TODOPAR{Confirm venue and track (CCSC Eastern faculty or student track, page limit, anonymity) with
+the advisor before any layout work. The headline claim depends on the learned-actor experiments
+(E3), which do not exist yet; every result in Section~\ref{sec:prelim} uses a fixed max-pressure
+actor.}
+
+\begin{abstract}
+When several receivers share one broadcast but can each decode a different number of messages,
+a scheduler that commits to one priority before the budgets are known pays a price whenever the
+joint value of messages interacts. We separate three sources of loss: the geometric cost of
+commitment, which a bounded number $R$ of post-reveal revisions reduces; the cost of choosing
+revisions without knowing how the actors will respond; and the cost of the byte budget
+itself. The geometry is proved in Lean: a deployable regret bound with every error named, a
+per-receiver block frontier, an exact non-nested team game, and a linear lower bound on the
+nesting degree. Calibration of ambiguous repairs has lower and upper bounds that agree up to a
+logarithmic factor on a stated Gaussian needle class. On CityFlow with a fixed max-pressure actor, a one-byte receiver
+bid, charged inside the same byte cap, improves held-phase selection on fresh traffic, but its
+closed-loop benefit is small. \TODO{learned-actor result; rewrite the last sentence from data.}
+\end{abstract}
+
+\section{Introduction}
+\TODO{concrete example scene (F1): same budget, the prefix gives a poor joint decision, one
+revision fixes it; plus a scene where no revision is needed.}
+
+The question we keep is: when receivers have different decoding budgets, is coordination lost
+through commitment, through the limited repair budget, or because the scheduler does not know
+how the actors will react; and what can a small paid bid buy back?
+
+\paragraph{Contributions (scoped to what is established).}
+\begin{enumerate}
+\item A protocol for one shared broadcast with heterogeneous receiver decoding budgets, committed
+  order, $R$ post-reveal revisions, explicit byte accounting and a legal/privileged information
+  split (Section~\ref{sec:protocol}).
+\item Revision geometry with every deployable error named (Theorem~\ref{thm:t1}), and its
+  per-receiver form (Theorem~\ref{thm:block}); both machine-checked.
+\item The calibration cost of ambiguous repairs on a stated class (Theorem~\ref{thm:t2}).
+\item An empirical audit on CityFlow that measures oracle headroom, what legal information can
+  learn, and closed-loop transfer, including the negative results (Section~\ref{sec:prelim}).
+\end{enumerate}
+\NOTE{Novelty is written narrowly: learned scheduling (SchedNet) and request/confidence
+communication (Where2comm) already exist; one ordering for all cardinalities exists in
+incremental maximisation. Our object is the interaction-dependent quantitative cost of committed
+priorities and bounded revision, separated from the information needed to choose revisions.}
+
+\section{Related work}
+Learned communication scheduling under a shared bandwidth~\cite{schednet}; confidence-based
+request communication for cooperative perception~\cite{where2comm}; one ordering for every
+cardinality in incremental maximisation~\cite{bernstein2022,bienkowski2026}; nested top-$N$
+selection by an additive surrogate~\cite{densecoverage}; traffic-signal MARL on
+CityFlow~\cite{cityflow,colight}; max-pressure control~\cite{varaiya2013}; dataset aggregation
+against covariate shift~\cite{dagger}.
+\TODO{verify every bibliographic entry against the primary source; position each in one sentence.}
+
+\section{Problem, protocol and information}\label{sec:protocol}
+Senders and receivers are the $m$ intersections. At every decision step:
+(1) the public context $z$ holds the payloads paid in earlier steps and the time;
+(2) the scheduler commits a base order $\pi$ before the capacity vector $K$ is known;
+(3) $K$ is revealed, $k_i$ being the number of other payloads receiver $i$ decodes;
+(4) each receiver gets a set $S_i$ with $|S_i|=k_i$ exactly, and $|S_i\setminus P_i|\le R$, where $P_i$ is
+the first $k_i$ entries of $\pi$ without $i$;
+(5) the union is broadcast once, each receiver decodes exactly $S_i$, and the actors act.
+
+\paragraph{Bytes.} A profile is charged the cheaper of its patched description
+($25|T| + 3\cdot\#\text{replacements}$, with $T$ the stream prefix plus patches) and its explicit
+description ($25|\bigcup_i S_i| + 2$ bytes per receiver). Explicit profiles are therefore allowed:
+capacity is a \emph{decoding} budget, not a listening-time prefix, and nesting is not forced
+inside the policy class. $R=0$ is the committed-order model and direct (unrestricted) selection is
+a legitimate comparator that measures the price of commitment. Receiver bids are charged inside
+the same total cap at every step. Delivery delay is zero.
+\NOTE{PROTOCOL\_HETERO\_v0.md and its Amendment 1.}
+
+\paragraph{Information.} Legal scheduler information is the paid cache $z$, a receiver mirror of
+every receiver's cache (asserted equal after every transmission), the public topology and the
+known actor code. Privileged quantities (fresh states, counterfactual actions, oracle rollouts)
+may generate labels or diagnostics only; every deployable run is wrapped so that any oracle call
+fails, and closed-loop reports check the access log.
+
+\section{Methodology}
+\paragraph{Receiver bid.} Before transmission each receiver computes, from its own view, the best
+and runner-up phases of its actor and a 2-bit gap bin (1 byte, plus a 1-byte header).
+\paragraph{Response model and evaluator.} A stage-A model predicts, for every candidate profile and
+receiver, whether the actor will play the first or the second phase of its bid or another phase (three
+classes); it is trained on privileged counterfactual actions as training labels only. A critic scores candidates from $z$, $K$, the bid and the
+predicted soft joint action, anchored to the prefix; a threshold $\tau$ chosen on a select split
+decides when to edit.
+\paragraph{Candidates and policies.} The candidate family is every one-swap plus random profiles
+with radius $\le 1$, $\le 2$ and unrestricted; ``R1'' restricts the output to radius 1 and
+``direct'' does not. Exact enumeration of $F_R$ is infeasible at $m=9$ receivers and is not
+claimed.
+\paragraph{Learning target.} Labels are held-phase values: the joint action of a profile is held
+for $H=3$ decisions. \NOTE{Section~\ref{sec:prelim} shows that this target captures about half of
+the one-step continuation headroom; the learned-actor evaluator must use a declared continuation
+target $f_X^{\pi,c}(S)$.}
+
+\section{Theory}\label{sec:theory}
+Let $f$ be any set function (the team decision value of a broadcast set, fixed controller,
+fixed state), $w$ any score, and $\mathrm{ScoreLocal}(f,w,\eta)$ the hypothesis that every
+marginal $f(A\cup\{i\})-f(A)$ is within $\eta$ of $w_i$.
+
+\begin{theorem}[Deployable regret, \PROVED]\label{thm:t1}
+Suppose the true local interaction is $\delta$ and the score is within $u$ of the true first-order
+gains, $P$ is top-$k$ by the score, the selector returns $\hat S$ in a candidate family $C$ with
+$\hat f(\hat S)\ge \hat f(S')-\nu$ on $C$, $|\hat f-f|\le\varepsilon$ on $C$, and every set reachable
+with $R$ replacements is within $\zeta$ of some candidate. Then for every $k$-set $T$,
+\[ f(T)-f(\hat S)\;\le\;2(\delta+u)\,(|P\setminus T|-R)_+ + 2\varepsilon+\nu+\zeta. \]
+The coefficients of $u$ and $\varepsilon$ are attained.
+\end{theorem}
+\leanbox{LeanMarlEstimatedRevisionV1.deployed\_regret, score\_error\_sharp, eval\_error\_sharp,
+hypotheses\_satisfiable (gate smokeMARL17\_20260927)}
+
+\begin{theorem}[Per-receiver block frontier, \PROVED]\label{thm:block}
+Encode a profile as a set of receiver--sender edges with receiver blocks. If
+$\mathrm{ScoreLocal}(f,w,\eta)$ holds and $P$ is top-$k_b$ by $w$ inside every block, then for
+every block-feasible $T$ some block-feasible $S$ with at most $R$ replacements per block has
+$f(T)-f(S)\le 2\eta\sum_b(|P_b\setminus T_b|-R)_+$; a per-block cut margin $2\eta$ makes the
+prefix optimal.
+\end{theorem}
+\leanbox{LeanMarlBlockFrontierV1.block\_frontier, block\_zero\_price,
+block\_hypotheses\_satisfiable (gate smokeMARL4\_20260927)}
+
+\begin{remark}[Where the deployed loss goes]
+For a fixed value $f$ and nonempty families $F_{\rm all}\supseteq F_R\supseteq F_{R,B}\supseteq C$
+(all profiles; radius $R$; radius $R$ and byte cost $\le B$; the scored candidates), with
+$V_D=\max_{S\in D}f(S)$ and output $\hat S\in C$,
+\[ V_{\rm all}-f(\hat S) = (V_{\rm all}-V_R) + (V_R-V_{R,B}) + (V_{R,B}-V_C) + (V_C-f(\hat S)), \]
+the commitment (geometric) loss, the byte-feasibility loss, the candidate-coverage loss and the
+estimation/search loss. The last term is at most $2\varepsilon+\nu$ (the argument of
+Theorem~\ref{thm:t1}). The first is bounded by Theorem~\ref{thm:block} only when its hypotheses
+hold; the runtime order in our experiments is a cached-queue order, not a top-score order of the
+same vector, so we do not claim that bound in traffic. A bid of $B_{\rm bid}$ bytes leaves
+$B-B_{\rm bid}$ for payloads and adds information: a trade-off, not a theorem that bids help.
+\end{remark}
+\NOTE{This identity is telescoping algebra; the $2\varepsilon+\nu$ part is \lean{deployed\_regret}.
+Not a new Lean module.}
+
+\begin{theorem}[Calibration of ambiguous repairs, \PROVED]\label{thm:t2}
+On the needle class over one Gaussian query channel (known first-order gains, interaction $\beta$
+on one unknown reachable set), every protocol acceptable with probability $1-\alpha$ spends at
+least $|\mathrm{Amb}|\,((1-\alpha)\log(1/\alpha)-\log 2)/(\beta^2/2)$ expected rollouts at the null
+world, and a protocol that never queries some ambiguous repair cannot be acceptable. If every
+reachable $T\ne P$ has first-order deficit above $\varepsilon$, block tests with
+$\lceil 8\log(|\mathrm{Amb}|/\alpha)/\beta^2\rceil$ rollouts per ambiguous repair are acceptable at every
+world of the class.
+\end{theorem}
+\leanbox{LeanMarlRepairCalibrationV1.calibration\_lower, zero\_allocation\_impossible,
+calibration\_upper (gate smokeMARL17\_20260927); fixed schedules: LeanMarlCalibrationGapV1;
+shared pairs: LeanMarlPairCalibrationV1 (gate smokeMARL4\_20260927)}
+
+\paragraph{Also proved.} Zero price under a $2\delta$ cut margin with a sharp constant
+(\lean{LeanMarlSubsetFrontierV1}); an exact non-nested three-message team game with randomised
+price $p(1-2p)$ closed by one revision (\lean{LeanMarlXorGameV1}); the nesting degree is at least
+$\lfloor (m+1)/4\rfloor$ (\lean{LeanMarlNestingDegreeGeneralV1}); equality is a conjecture supported
+by exhaustive search for $m\le 8$.
+
+\section{Experimental design}
+\paragraph{Controlled calibration (E1).} E1a is the exact T2 needle model; E1b is an executable
+Bayes-decoder task with a hidden interacting pair, which is \emph{not} the Gaussian channel of
+Theorem~\ref{thm:t2}. \NOTE{E1\_CONTROLLED\_RESULTS\_20260927.md; targeted $\equiv$ uniform is a
+negative control.}
+\paragraph{Traffic.} CityFlow $3\times3$ grid, two headways, i.i.d.\ capacities
+$k_i\sim U\{1,\dots,7\}$, cap $+84$ bytes over the prefix bytes. Splits by traffic seed: train
+301--364, select 401--408, development 501--508, fresh confirmation panels 601--616 (B2/B3),
+801--816 (B4), 1101--1116 (descriptive). Endpoints: sum of waiting (primary), finished and
+unfinished trips, throughput, censored travel time, total bytes. Paired by episode; bootstrap over
+episodes; selector init seeds averaged per episode.
+\TODO{learned actor: architecture, CTDE critic, message adapter, $\ge 3$ actor seeds, frozen
+checkpoints, matched learned SchedNet adaptation, at least 3 byte budgets for a frontier.}
+
+\section{Preliminary results on a fixed max-pressure actor}\label{sec:prelim}
+\NOTE{Every number here uses the frozen MP2 actor. None is the learned-MARL headline.}
+
+\paragraph{Oracle headroom.} With the exact oracle over $F_R$, $R=1$ recovers 88\% of the gap to
+private unrestricted sets on 16/16 episodes \NUM.
+\NOTE{HETERO\_EXACT\_RESULTS\_20260927.md}
+
+\paragraph{Held phase, preregistered (B2).} On fresh seeds 601--616, the frozen response-bid
+direct selector beats the better no-bid learned control by $+1.85$ $[+0.95,+2.84]$, about 18\% of
+the oracle gain \NUM. \NOTE{B2\_CONFIRMATION\_RESULTS\_20260927.md}
+
+\paragraph{Closed loop, preregistered (B3, B4).} The frozen models give no closed-loop benefit
+(B3: $-0.26\%$ $[-1.20,+0.62]$ against the control) and edit in about 2 of 26 steps per episode (range 1--5), against 19 for the oracle. After one
+DAgger iteration (B4, fresh seeds 801--816) the registered comparison passes: $-1.49\%$
+$[-2.75,-0.23]$ in waiting against the retrained control. Against the prefix the change is
+$-0.68\%$ $[-2.87,+1.37]$, no better than the frozen design, while the held-phase oracle reaches
+$-15.0\%$ (Figure~\ref{fig:b4}) \NUM.
+\NOTE{B3\_CLOSED\_LOOP\_RESULTS\_20260927.md, B4\_DAGGER\_RESULTS\_20260928.md}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig3v4_b4test.pdf}
+\caption{Closed loop on the preregistered B4 panel (32 episodes, frozen MP2 actor, one operating
+point, lower is better). Direct and Response-bid are the DAgger-retrained selectors; hollow:
+held-phase oracle reference. \NOTE{caption file fig3v4\_b4test.caption.txt}}
+\label{fig:b4}
+\end{figure}
+
+\paragraph{Target mismatch.} On 16 development states, the held-phase argmax coincides with the
+continuation argmax in 1 state, captures 49\% of the one-step continuation headroom and is worse
+than the prefix in 4 states \NUM. The held-phase target therefore caps what a perfect learner of
+that label can achieve, while estimation error remains the larger factor.
+\NOTE{TARGET\_DIAG\_RESULTS\_20260928.md}
+
+\paragraph{Comparators.} An independently tuned direct selector does not change the $+84$
+operating point, and bounded repair (R1) is below it at $+56$ and $+84$ bytes on development data,
+so we make no claim that bounded repair beats direct selection. Two heuristic communication
+baselines (a fresh-queue sender weight and a request rule on the same bid) give no closed-loop
+benefit. \NOTE{BASELINES\_DIRECT\_STAGEA2\_RESULTS\_20260927.md; heuristics, not learned SchedNet or
+Where2comm.}
+
+\paragraph{Latency.} Post-grant scheduler compute for the response-bid selector: median 14.8 ms,
+p95 16.1 ms on an idle CPU; the prefix takes 0.007 ms. No uplink or network delay is modelled, so
+this is not an end-to-end deadline claim. \NOTE{latency\_b2\_idle\_20260928\_000900}
+
+\section{Results with a learned actor}
+\TODO{E3: all numbers pending. Do not fill from fixed-MP2 results.}
+
+\section{Limitations}
+Fixed MP2 actor in every traffic result; one $3\times3$ grid; i.i.d.\ capacities (the design does not
+transfer to fixed, bursty or low capacity processes in the held phase); held-phase target; zero
+delivery delay; candidate-set search, not exact enumeration; one DAgger iteration; the T1
+bridge to traffic is open (a one-swap fit gives only a lower bound on $\eta$); topology transfer is
+not tested because the selectors have a fixed input width.
+
+\begin{thebibliography}{9}
+\bibitem{schednet} D.~Kim et al., ``Learning to schedule communication in multi-agent reinforcement
+learning,'' ICLR 2019, arXiv:1902.01554.
+\bibitem{where2comm} Y.~Hu et al., ``Where2comm: Communication-efficient collaborative perception via
+spatial confidence maps,'' NeurIPS 2022.
+\bibitem{bernstein2022} A.~Bernstein, Y.~Disser, M.~Gro{\ss}, S.~Himburg, ``General bounds for
+incremental maximization,'' Mathematical Programming, 2022. \TODO{verify volume/pages}
+\bibitem{bienkowski2026} M.~Bienkowski et al., ``Incremental submodular maximization: better than
+greedy,'' arXiv:2606.28558. \TODO{verify authors}
+\bibitem{densecoverage} ``Dense coverage, sparse refinement,'' arXiv:2609.29456. \TODO{authors, title
+exactly as published}
+\bibitem{cityflow} H.~Zhang et al., ``CityFlow: A multi-agent reinforcement learning environment for
+large scale city traffic scenario,'' WWW 2019.
+\bibitem{colight} H.~Wei et al., ``CoLight: Learning network-level cooperation for traffic signal
+control,'' CIKM 2019.
+\bibitem{varaiya2013} P.~Varaiya, ``Max pressure control of a network of signalized intersections,''
+Transportation Research Part C, 2013.
+\bibitem{dagger} S.~Ross, G.~Gordon, J.~A.~Bagnell, ``A reduction of imitation learning and structured
+prediction to no-regret online learning,'' AISTATS 2011.
+\end{thebibliography}
+\end{document}

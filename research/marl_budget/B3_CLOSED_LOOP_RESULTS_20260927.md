@@ -42,3 +42,18 @@ On-policy (DAgger-style) data: label snapshots along the selectors' OWN closed-l
 - The oracle held-phase values of the same candidate family are the expert labels.
 - Aggregate these with the prefix-trajectory data, retrain, and test in closed loop again on a
   fresh panel under a new preregistration.
+
+## Correction (27/09, 23:56; independent readiness audit §4.6, verified)
+
+- The "Conclusion: covariate shift induced by the policy itself" above is stronger than the
+  evidence. The supported wording is **consistent with policy-induced distribution shift**.
+- **A second hypothesis is still open: held-phase target mismatch.**
+  - The labels (`oracle_rollout_value`) score a joint action held fixed for H = 3.
+  - The live loop re-senses, re-selects and re-acts at every step.
+- Parity (5e-6) and shadow mode rule out some wiring errors. They do not identify a single cause.
+- B4 (on-policy data) tests only the first hypothesis. If B4 fails, the one planned diagnostic
+  is the target comparison on fixed development states:
+  - held-phase labels against "first action from S, then a declared common closed-loop
+    continuation";
+  - same simulator randomness, same H, actor fixed;
+  - reported as top-choice disagreement and realised gain.
