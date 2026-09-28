@@ -16,6 +16,56 @@
   diagnostic, B1 verdict, E1) changed the setting. Those changes are recorded below as reframings
   where they apply.
 
+## Update 28/09, 09:15 (the previous version is in legacy/MARL_CRITICAL_PATH_STATUS_20260927_v0010.md)
+
+**Step 2 (learned communication-aware actor): ❌ → 🟡.**
+- **Code.**
+  - Actor side: `models/marl_comm_actor.py`, with the adapter (mask, age, fresh, heard, static
+    topology; missing differs from zero), a shared actor and a centralised critic.
+  - Trainers: `MARL_e3_actor_train.py` (MAPPO from scratch) and `_v2.py` (BC from MP2, then
+    MAPPO).
+  - Checks and evaluation: `MARL_e3_message_use.py`, `MARL_e3_continuation_labels.py` (the
+    declared-continuation target), `MARL_e3_selector_train.py`, `MARL_e3_closed_loop.py` (+ v2 with
+    cap, load and capacity shift).
+  - Runners: `RUN_marl_e3_long*.sh`, resume and watchdog.
+- **Protocols (written first).** `PROTOCOL_E3_PILOT_20260928.md` and
+  `PROTOCOL_E3_SCRATCH_20260928.md`.
+- **Development results so far** (`E3_INTERIM_RESULTS_20260928.md`).
+  - Every finished learned actor beats MP2: select −15% to −24%, and on development MP2 is 12–23%
+    worse (CI > 0).
+  - G1 message use:
+    - scratch s3 PASS (none +7.3%, shuffle +5.1%);
+    - BC s3 PASS;
+    - **BC pilot s0 FAIL**, so that chain's selector results are not read as a method result.
+- **Blocked at 09:15.** The E3 processes deadlocked inside CityFlow's thread barrier around
+  01:00–03:18. Stopping them needs the user (`pkill -9 -f "scripts/MARL_e3_"`). The resume runners
+  with the watchdog are ready.
+
+**Step 3.4 comparators.**
+- The learned SchedNet adaptation exists (`MARL_e3_schednet_train.py`; v2 uses genuinely 1-byte
+  weights).
+- v1, with float weights: +1.1% and +1.9% against the prefix. It does not beat the committed
+  cached-queue order.
+
+**Step 5.**
+- The frontier (caps +28/+56/+84/+140) and shift (headway 12; bursty capacities) runner and figure
+  are ready: `RUN_marl_e3_frontier.sh`, `MARL_make_e3_frontier.py`.
+- F4 mechanism figure: `figures_20260928_v4/fig4_mechanism_mp2`. Held-phase 18% of the oracle
+  against 2–5% in closed loop; about a third of the edits harm; the target captures 49%.
+
+**Step 6.**
+- **Gates.**
+  - `full9_20260928` VERIFY PASS: 301 modules, 2,382 theorems. It is the first full gate since
+    full7, and MODS now holds every module the manuscripts cite.
+  - `smokeOLD7b_20260928` SMOKE PASS: 251 modules, `imports_closed=1`, `native_decide=0`.
+- **New Lean.** `LeanMarlE1bUniformV1` (the uniform shift halves the E1b constant without knowing
+  the pair; readiness audit §5). smokeE1bU_20260928 SMOKE PASS; cited in paper_marl.
+- **Paper.** `paper_marl.tex` has a learned-actor section with development numbers, F4, and TBD
+  slots for the selector, frontier and shift.
+- **One-command reproduction.**
+  `SMOKE=1 bash scripts/RUN_marl_e3_long.sh <dir> 0` runs the whole E3 chain on tiny settings in
+  about 2 minutes.
+
 ## §3 Items the auditor handed over
 
 | item | status |

@@ -56,8 +56,17 @@ closed-loop benefit is small. \TODO{learned-actor result; rewrite the last sente
 \end{abstract}
 
 \section{Introduction}
-\TODO{concrete example scene (F1): same budget, the prefix gives a poor joint decision, one
-revision fixes it; plus a scene where no revision is needed.}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\linewidth]{fig1_scene.pdf}
+\caption{Two real decision states (3$\times$3 grid, decoding budgets $k$, fixed max-pressure actor,
+development seeds). A single swap for one receiver (green: sender added; red: dropped) gains 31 units
+of waiting over the next three decisions although no action changes at the current step: the benefit
+arrives through what the receiver caches for later decisions, which a held-phase label scores as zero.
+In the right state the best single swap gains little. \NOTE{scripts/MARL\_make\_fig1\_scene.py;
+target\_diag\_20260928\_000455}}
+\label{fig:scene}
+\end{figure}
 
 The question we keep is: when receivers have different decoding budgets, is coordination lost
 through commitment, through the limited repair budget, or because the scheduler does not know
@@ -183,6 +192,11 @@ world of the class.
 calibration\_upper (gate smokeMARL17\_20260927); fixed schedules: LeanMarlCalibrationGapV1;
 shared pairs: LeanMarlPairCalibrationV1 (gate smokeMARL4\_20260927)}
 
+\paragraph{Scores that do not know the interaction.} On the executable E1b task the mean value is
+edge-local with scores $g_i^2$ and constant $\beta^2$; the uniform score $g_i^2+\beta^2/2$ for \emph{every}
+message halves the constant without knowing which pair interacts, and preserves every ranking \PROVED.
+\leanbox{LeanMarlE1bUniformV1.e1b\_scoreLocal\_uniform, uniform\_shift\_order, e1b\_uniform\_satisfiable (gate smokeE1bU\_20260928)}
+
 \paragraph{Also proved.} Zero price under a $2\delta$ cut margin with a sharp constant
 (\lean{LeanMarlSubsetFrontierV1}); an exact non-nested three-message team game with randomised
 price $p(1-2p)$ closed by one revision (\lean{LeanMarlXorGameV1}); the nesting degree is at least
@@ -231,6 +245,18 @@ held-phase oracle reference. \NOTE{caption file fig3v4\_b4test.caption.txt}}
 \label{fig:b4}
 \end{figure}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig4_mechanism_mp2.pdf}
+\caption{Mechanism on the fixed max-pressure actor. (a) Held-phase gain on the preregistered B2 panel
+(+84 bytes, direct), with edit rate and the share of edits that harm; dashed: oracle over the same
+candidates. (b) Share of the oracle's improvement realised by the response-bid selector, held phase
+against three closed-loop panels (95\% episode bootstrap). (c) Continuation gain of the held-phase
+argmax against the continuation-best gain on 16 development states; the dashed line is no mismatch.
+\NOTE{producer scripts/MARL\_make\_fig4\_mechanism.py; numbers in fig4\_mechanism\_mp2.json}}
+\label{fig:mech}
+\end{figure}
+
 \paragraph{Target mismatch.} On 16 development states, the held-phase argmax coincides with the
 continuation argmax in 1 state, captures 49\% of the one-step continuation headroom and is worse
 than the prefix in 4 states \NUM. The held-phase target therefore caps what a perfect learner of
@@ -248,8 +274,36 @@ Where2comm.}
 p95 16.1 ms on an idle CPU; the prefix takes 0.007 ms. No uplink or network delay is modelled, so
 this is not an end-to-end deadline claim. \NOTE{latency\_b2\_idle\_20260928\_000900}
 
-\section{Results with a learned actor}
-\TODO{E3: all numbers pending. Do not fill from fixed-MP2 results.}
+\section{Results with a learned actor}\label{sec:e3}
+\NOTE{Interim, development split 501--508 (16 episodes, opened); protocols PROTOCOL\_E3\_PILOT\_20260928.md and
+PROTOCOL\_E3\_SCRATCH\_20260928.md written before these results; E3\_INTERIM\_RESULTS\_20260928.md. Not a test: seeds
+1301--1316 are reserved for the preregistered test after the design freeze.}
+
+\paragraph{Actor.} Each receiver's actor reads only its own view through an adapter that encodes, per
+other agent, whether a message is fresh, whether the agent was ever heard, the message age, the
+payload and static public topology; a missing message is distinct from a zero payload. It is
+trained by MAPPO on the team reward with a centralised critic that sees a privileged global state
+during training only; one recipe warm-starts it by behaviour cloning of max pressure on the same
+restricted views, the other trains from scratch.
+
+\paragraph{Competence and message use.} Every finished learned actor beats max pressure with the
+same communication: on development episodes max pressure has 12\% to 23\% more total waiting (all
+95\% intervals above zero) \NUM. Removing all messages from the actor's input costs the
+from-scratch actor $+7.3\%$ $[+4.1,+10.6]$ and scrambling sender identities $+5.1\%$ $[+2.3,+7.9]$; for
+the warm-started recipe the effect varies by seed ($+0.4\%$, not significant, for the pilot seed;
+$+5.7\%$ $[+2.1,+9.6]$ for another), so the pilot seed fails the preregistered message-use gate and
+that recipe's selector results are not read as a method result. Actors trained on at most seven
+decoded messages degrade when all eight are delivered, an instance of the train/deploy shift that
+makes ``more information'' not automatically better for a fixed actor.
+
+\paragraph{Learned scheduling baseline.} A SchedNet-style scheduler that learns each sender's
+one-byte weight from its own sensor by policy gradient on the team reward does not beat the
+committed cached-queue priority with the same actor (two init seeds: $+1.1\%$ and $+1.9\%$, both
+intervals covering zero) \NUM. \TODO{rerun with the 1-byte-quantised weights (v2) and three seeds;
+the numbers above used full-precision weights.}
+
+\TODO{selector (bid / no bid, R1 / direct), frontier over caps +28/+56/+84/+140 and the load/capacity
+shift: pending the resumed chains.}
 
 \section{Limitations}
 Fixed MP2 actor in every traffic result; one $3\times3$ grid; i.i.d.\ capacities (the design does not

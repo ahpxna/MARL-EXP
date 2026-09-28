@@ -115,6 +115,8 @@ LeanPaperCEvenRankSumV1 LeanPaperCRelabelBandJoinV1 LeanPaperCEndpointLawV1 Lean
 
 # New roots audited 2026-09-27; smoke uses GATE_ONLY and reports its own scope.
 MODS="$MODS LeanMarlEstimatedRevisionV1 LeanMarlGenericRecourseV1 LeanMarlMenuRevisionV1 LeanMarlNestingDegreeGeneralV1 LeanMarlProxyBlindnessV1 LeanMarlRepairCalibrationV1 LeanMarlRevisionFrontierV1 LeanMarlSubsetFrontierV1 LeanMarlXorGameV1 LeanPaperCBudgetExchangeOddV1 LeanPaperCBudgetExchangeOddV2 LeanPaperBParityCriticalV1 LeanPaperBParityCriticalGameV1 LeanPaperBCrossoverRateV1 LeanMarlRevisionAuditBridgeV1"
+# Smoke-gated 27/09 (smokeMARL4, smokeMARL17, smokeMARL1_E1b) and cited by paper_marl / paper_b; added 28/09 for the full gate.
+MODS="$MODS LeanMarlBlockFrontierV1 LeanMarlStarvationV1 LeanMarlCalibrationGapV1 LeanMarlPairCalibrationV1 LeanMarlTabulationV1 LeanMarlProfileSearchV1 LeanMarlE1bRealizationV1 LeanUnifiedQueryOrderV1 LeanMarlE1bUniformV1"
 
 WHITELIST='propext|Classical.choice|Quot.sound'
 
