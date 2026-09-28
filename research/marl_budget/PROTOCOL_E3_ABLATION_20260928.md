@@ -35,3 +35,22 @@
 
 **Known gap.** A queue bid with the same bytes cannot be built from the stored labels, which do not
 contain the receiver's fresh own queue. It is deferred to the labelling round of the confirmatory test.
+
+## Amendment 1 (28/09, 10:20; written after the first ablation result, before any dense-label result)
+
+**Why.** The first ablation (scratch s3) shows no selector gain, even offline. Its training set is
+768 states and its select split 48 states. This amendment adds DATA, not features, in the spirit of
+the B1 learning curve.
+
+**Dense labels for the same actor.**
+- Snapshots at every step t ∈ {4, …, 22} (19 per episode) on train, select and development.
+  That gives about 2,432 train states and about 304 select and 304 development states.
+- Same producer (`MARL_e3_continuation_labels.py`), same candidate family, same continuation.
+- New directories `labels_dense_*`; the original labels are kept.
+
+**Selectors.** The same four variants with the same code (`MARL_e3_selector_train_v2.py`); the same
+reading rules and contrasts; closed loop on the same pilot panel 901–916.
+
+**Additional reading rule.** Compare the realised development gain against the original labels on
+the same variants. If the dense labels still give ≤ 0 offline, the E3 selector question is recorded
+as open for this actor, and the method claim stays with the fixed-MP2 held-phase result (B2).

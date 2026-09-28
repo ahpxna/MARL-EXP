@@ -1,8 +1,9 @@
 % WORKING DRAFT of the MARL paper (readiness audit P0.4, 28/09/2026).
 % Venue template NOT chosen: the track (CCSC Eastern faculty/student or other) is unconfirmed.
 % This draft uses a neutral article class with the corpus macros; switch to the venue template
-% once the track is confirmed.  Every number below is copied from a named artifact; nothing is
-% a learned-actor result yet.  Build: tectonic -X compile paper_marl.tex --keep-logs
+% once the track is confirmed.  Every number below is copied from a named artifact.  The
+% learned-actor (E3) numbers are DEVELOPMENT results; no confirmatory E3 run exists yet (28/09 self-audit:
+% research/papers/audits/MARL_SELF_AUDIT_LEDGER_20260928.md).  Build: tectonic -X compile paper_marl.tex --keep-logs
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath,amssymb,amsfonts,amsthm}
@@ -37,9 +38,11 @@
 \maketitle
 
 \TODOPAR{Confirm venue and track (CCSC Eastern faculty or student track, page limit, anonymity) with
-the advisor before any layout work. The headline claim depends on the learned-actor experiments
-(E3), which do not exist yet; every result in Section~\ref{sec:prelim} uses a fixed max-pressure
-actor.}
+the advisor before any layout work. Section~\ref{sec:prelim} uses a fixed max-pressure actor;
+Section~\ref{sec:e3} reports learned-actor DEVELOPMENT results only. On those, the method-scope
+condition (an incremental benefit of the proposed selector under fair accounting) is NOT met; the
+confirmatory run (seeds 1301--1316, after a freeze) has not been made. Whether to keep the method
+framing or change the scope is the authors' decision, not the draft's.}
 
 \begin{abstract}
 When several receivers share one broadcast but can each decode a different number of messages,
@@ -52,7 +55,10 @@ per-receiver block frontier, an exact non-nested team game, and a linear lower b
 nesting degree. Calibration of ambiguous repairs has lower and upper bounds that agree up to a
 logarithmic factor on a stated Gaussian needle class. On CityFlow with a fixed max-pressure actor, a one-byte receiver
 bid, charged inside the same byte cap, improves held-phase selection on fresh traffic, but its
-closed-loop benefit is small. \TODO{learned-actor result; rewrite the last sentence from data.}
+closed-loop benefit is small. With learned MAPPO actors that beat max pressure by 9--23\%, no legal
+selector variant improves on the committed prefix on development data, although an oracle over the
+same candidates gains substantially; single- and multi-receiver loss decompositions place most of the
+loss in estimation, with smaller but nonzero costs of bounded revision and candidate coverage. \TODO{confirmatory run after the freeze (F6); rewrite from it.}
 \end{abstract}
 
 \section{Introduction}
@@ -89,13 +95,26 @@ incremental maximisation. Our object is the interaction-dependent quantitative c
 priorities and bounded revision, separated from the information needed to choose revisions.}
 
 \section{Related work}
-Learned communication scheduling under a shared bandwidth~\cite{schednet}; confidence-based
-request communication for cooperative perception~\cite{where2comm}; one ordering for every
-cardinality in incremental maximisation~\cite{bernstein2022,bienkowski2026}; nested top-$N$
-selection by an additive surrogate~\cite{densecoverage}; traffic-signal MARL on
-CityFlow~\cite{cityflow,colight}; max-pressure control~\cite{varaiya2013}; dataset aggregation
-against covariate shift~\cite{dagger}.
-\TODO{verify every bibliographic entry against the primary source; position each in one sentence.}
+\paragraph{Learned communication.} Learning who talks under a shared bandwidth is established:
+SchedNet learns a scheduler, encoder and actor end to end~\cite{schednet}; NDQ minimises messages
+while keeping action-relevant value decompositions~\cite{ndq}; CASEC prunes coordination-graph edges
+while preserving Max-Sum action choices~\cite{casec}; M2I2 selects informative state dimensions and
+infers teammates' joint actions with an inverse model~\cite{m2i2}; MUTE values messages
+counterfactually and preserves joint return with a conditional bound~\cite{mute}; Where2comm
+requests spatially confident features in cooperative perception~\cite{where2comm}. Action relevance,
+joint-action prediction and decision-preserving pruning are therefore not claimed as new here; our
+object is the price of \emph{committing} one order before heterogeneous budgets are revealed, what
+a bounded number of revisions buys back, and what information and calibration are needed to choose
+revisions. Our SchedNet comparison is a frozen-actor adaptation (learned one-byte sender weights),
+not a reproduction of the original joint training.
+\paragraph{One order for all budgets.} Incremental maximisation studies one ordering good for every
+cardinality with competitive ratios for monotone and submodular classes~\cite{bernstein2022,bienkowski2026}.
+Dense Coverage, Sparse Refinement uses a nested top-$N$ selection of an additive surrogate within a
+fused perception model~\cite{densecoverage}; our theory instead parameterises the price of nesting by
+the interaction of the decision value and covers non-submodular losses.
+\paragraph{Traffic.} Traffic-signal MARL on CityFlow~\cite{cityflow,colight}; max-pressure
+control~\cite{varaiya2013}; dataset aggregation against covariate shift~\cite{dagger}; MAPPO with a
+centralised critic~\cite{mappo}.
 
 \section{Problem, protocol and information}\label{sec:protocol}
 Senders and receivers are the $m$ intersections. At every decision step:
@@ -122,22 +141,32 @@ may generate labels or diagnostics only; every deployable run is wrapped so that
 fails, and closed-loop reports check the access log.
 
 \section{Methodology}
-\paragraph{Receiver bid.} Before transmission each receiver computes, from its own view, the best
-and runner-up phases of its actor and a 2-bit gap bin (1 byte, plus a 1-byte header).
-\paragraph{Response model and evaluator.} A stage-A model predicts, for every candidate profile and
-receiver, whether the actor will play the first or the second phase of its bid or another phase (three
-classes); it is trained on privileged counterfactual actions as training labels only. A critic scores candidates from $z$, $K$, the bid and the
-predicted soft joint action, anchored to the prefix; a threshold $\tau$ chosen on a select split
-decides when to edit.
-\paragraph{Candidates and policies.} The candidate family is every one-swap plus random profiles
-with radius $\le 1$, $\le 2$ and unrestricted; ``R1'' restricts the output to radius 1 and
-``direct'' does not. Exact enumeration of $F_R$ is infeasible at $m=9$ receivers and is not
-claimed.
-\paragraph{Learning target.} Labels are held-phase values: the joint action of a profile is held
-for $H=3$ decisions. \NOTE{Section~\ref{sec:prelim} shows that this target captures about half of
-the one-step continuation headroom; the learned-actor evaluator must use a declared continuation
-target $f_X^{\pi,c}(S)$.}
-
+The same protocol is run with two actors; the selector recipe differs only where the actor does.
+\paragraph{Receiver bid (both).} Before transmission each receiver computes, from its own view, its
+actor's best and runner-up phases and a 2-bit gap bin (1 byte, plus a 1-byte header), charged inside
+the total cap at every step.
+\paragraph{Candidates and policies (both).} The candidate family is every one-swap plus random
+profiles with radius $\le 1$, $\le 2$ and unrestricted; ``R1'' restricts the output to radius 1 and
+``direct'' does not. Exact enumeration of $F_R$ is infeasible at $m=9$ receivers and is not claimed.
+Scores are anchored to the prefix; a threshold $\tau$ chosen on a select split decides whether to
+edit. For the closed-loop selectors the grid is $\{-\infty, 0\}$ plus two score quantiles, with no
+``always keep the prefix'' option; the development diagnostics of Section~\ref{sec:e3} add
+$\tau=+\infty$.
+\paragraph{Recipe M (fixed max-pressure actor).} Target: the held-phase value (the joint action of a
+profile held for $H=3$ decisions). A stage-A model predicts, per candidate and receiver, whether the
+actor plays the first or second phase of its bid or another (three classes), trained on privileged
+counterfactual actions as training labels only; a critic scores candidates from $z$, $K$, the bid and
+the predicted soft joint action.
+\paragraph{Recipe L (learned actor).} The actor is trained by MAPPO with a centralised critic on the
+team reward, from scratch or warm-started by behaviour cloning of max pressure on the same restricted
+views (Section~\ref{sec:e3}). Target: a declared continuation value
+$f^{\pi,c}_X(S)$ --- profile $S$ at the current step, then three decisions of the committed prefix
+with the same frozen actor --- because the held-phase target captures only about half of the
+continuation headroom (Section~\ref{sec:prelim}). A binary response head predicts, per candidate and
+receiver, whether the actor's current action changes from its action under the prefix, trained on the
+actor's stored joint actions (training labels only); the critic receives the predicted change
+probabilities. Variants: no bid, bid, head without bid, bid and head; a same-byte queue bid as the
+alternative-information control.
 \section{Theory}\label{sec:theory}
 Let $f$ be any set function (the team decision value of a broadcast set, fixed controller,
 fixed state), $w$ any score, and $\mathrm{ScoreLocal}(f,w,\eta)$ the hypothesis that every
@@ -173,7 +202,8 @@ the commitment (geometric) loss, the byte-feasibility loss, the candidate-covera
 estimation/search loss. The last term is at most $2\varepsilon+\nu$ (the argument of
 Theorem~\ref{thm:t1}). The first is bounded by Theorem~\ref{thm:block} only when its hypotheses
 hold; the runtime order in our experiments is a cached-queue order, not a top-score order of the
-same vector, so we do not claim that bound in traffic. A bid of $B_{\rm bid}$ bytes leaves
+same vector, so we do not assume that bound in traffic; Section~\ref{sec:e3} measures every term
+on a reduced, fully enumerated panel. A bid of $B_{\rm bid}$ bytes leaves
 $B-B_{\rm bid}$ for payloads and adds information: a trade-off, not a theorem that bids help.
 \end{remark}
 \NOTE{This identity is telescoping algebra; the $2\varepsilon+\nu$ part is \lean{deployed\_regret}.
@@ -214,8 +244,16 @@ $k_i\sim U\{1,\dots,7\}$, cap $+84$ bytes over the prefix bytes. Splits by traff
 801--816 (B4), 1101--1116 (descriptive). Endpoints: sum of waiting (primary), finished and
 unfinished trips, throughput, censored travel time, total bytes. Paired by episode; bootstrap over
 episodes; selector init seeds averaged per episode.
-\TODO{learned actor: architecture, CTDE critic, message adapter, $\ge 3$ actor seeds, frozen
-checkpoints, matched learned SchedNet adaptation, at least 3 byte budgets for a frontier.}
+\paragraph{Learned actors (E3).} Protocols are written before results: actor seeds per recipe; gates G1
+(the actor uses messages: removing them changes at least 10\% of actions and worsens closed-loop
+waiting) and G2 (within 10\% of max pressure on the select split); the warm-started recipe is gated
+on its pilot seed, the scratch recipe per seed, and every actor outcome is reported. Selector labels
+and tuning use train/select/development seeds only; closed-loop development uses a pilot panel
+(901--916); seeds 1301--1316 are reserved for one frozen confirmatory run. Comparators on the SAME
+frozen actor: committed prefix, direct selector without bid, response-bid selector, R1, learned
+SchedNet-style adaptation, same-byte queue bid, and an oracle diagnostic. Costs: total charged bytes
+(payload, control, bid) and compute; frontier at caps $+28$, $+56$, $+84$, $+140$.
+\TODO{final protocol and freeze manifest (handoff F6) before the confirmatory run.}
 
 \section{Preliminary results on a fixed max-pressure actor}\label{sec:prelim}
 \NOTE{Every number here uses the frozen MP2 actor. None is the learned-MARL headline.}
@@ -275,9 +313,28 @@ p95 16.1 ms on an idle CPU; the prefix takes 0.007 ms. No uplink or network dela
 this is not an end-to-end deadline claim. \NOTE{latency\_b2\_idle\_20260928\_000900}
 
 \section{Results with a learned actor}\label{sec:e3}
-\NOTE{Interim, development split 501--508 (16 episodes, opened); protocols PROTOCOL\_E3\_PILOT\_20260928.md and
-PROTOCOL\_E3\_SCRATCH\_20260928.md written before these results; E3\_INTERIM\_RESULTS\_20260928.md. Not a test: seeds
-1301--1316 are reserved for the preregistered test after the design freeze.}
+\NOTE{Development evidence only: labels and message use on split 501--508, closed loop on the pilot
+panel 901--916, both opened. Protocols PROTOCOL\_E3\_PILOT, \_SCRATCH, \_ABLATION (Amendment 1),
+\_DELAY\_ACQ and \_MIXACTOR were written before their results. Actor seeds 3 and 4 of both recipes
+were launched before any E3 result but are not in the protocols' seed lists (declared:
+MARL\_SELF\_AUDIT\_LEDGER\_20260928.md, L-25). Seeds 1301--1316 are untouched. Sources:
+E3\_INTERIM\_RESULTS\_20260928.md.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_e3.pdf}
+\caption{Learned actors, development data. (a) Actor improvement: max pressure's extra total waiting
+against each finished learned actor with the same communication (filled: the actor passes the
+message-use gate G1 on its own; the warm-started recipe is gated on its pilot seed s0, which fails).
+(b) Selector increment on the SAME actor: each variant against that actor's committed prefix, closed
+loop, +84 bytes, three init seeds averaged per episode (grey: the warm-started pilot actor, recorded
+under its failed gate). (c) Realised gain of the profile each evaluator chooses on the same 48 held-out
+development states of two actors; hollow: an evaluator told the actor's actual joint actions
+(privileged, diagnostic only). The oracle over the same candidates gains $+15.4$ and $+12.3$. All
+intervals: 95\% bootstrap over episodes. \NOTE{scripts/MARL\_make\_fig\_e3.py; numbers in
+fig\_e3.json; panel (c) from MARL\_e3\_paired\_eval.py (e3\_dev\_arms.json).}}
+\label{fig:e3}
+\end{figure}
 
 \paragraph{Actor.} Each receiver's actor reads only its own view through an adapter that encodes, per
 other agent, whether a message is fresh, whether the agent was ever heard, the message age, the
@@ -286,31 +343,156 @@ trained by MAPPO on the team reward with a centralised critic that sees a privil
 during training only; one recipe warm-starts it by behaviour cloning of max pressure on the same
 restricted views, the other trains from scratch.
 
-\paragraph{Competence and message use.} Every finished learned actor beats max pressure with the
-same communication: on development episodes max pressure has 12\% to 23\% more total waiting (all
-95\% intervals above zero) \NUM. Removing all messages from the actor's input costs the
-from-scratch actor $+7.3\%$ $[+4.1,+10.6]$ and scrambling sender identities $+5.1\%$ $[+2.3,+7.9]$; for
-the warm-started recipe the effect varies by seed ($+0.4\%$, not significant, for the pilot seed;
-$+5.7\%$ $[+2.1,+9.6]$ for another), so the pilot seed fails the preregistered message-use gate and
-that recipe's selector results are not read as a method result. Actors trained on at most seven
-decoded messages degrade when all eight are delivered, an instance of the train/deploy shift that
+\paragraph{Competence and message use.} Six actors have finished: the warm-started recipe with seeds
+0--4, and the from-scratch recipe with seed 3 (its seeds 0, 1, 2 and 4 are still training).
+With the same communication, max pressure has 9.5\% to 23\% more total waiting than each of them, every
+95\% interval above zero (Figure~\ref{fig:e3}a) \NUM. Removing all messages from the input costs the
+from-scratch actor $+7.3\%$ $[+4.1,+10.6]$ and scrambling sender identities $+5.1\%$ $[+2.3,+7.9]$.
+In the warm-started recipe message use varies by seed: $+0.4\%$ (not significant) for the pilot seed
+and $+3.0\%$ to $+17.5\%$ for the other four. The pilot seed therefore fails the preregistered gate G1,
+and that recipe's selector results are recorded, not read as a method result. Actors trained on at most
+seven decoded messages degrade when all eight are delivered, an instance of the train/deploy shift that
 makes ``more information'' not automatically better for a fixed actor.
 
-\paragraph{Learned scheduling baseline.} A SchedNet-style scheduler that learns each sender's
-one-byte weight from its own sensor by policy gradient on the team reward does not beat the
-committed cached-queue priority with the same actor (two init seeds: $+1.1\%$ and $+1.9\%$, both
-intervals covering zero) \NUM. \TODO{rerun with the 1-byte-quantised weights (v2) and three seeds;
-the numbers above used full-precision weights.}
+\paragraph{Delayed observations (stress test).} When every receiver acts on the messages it held $d$
+decisions earlier (ages increased; scheduler, mirror and bytes unchanged), the from-scratch actor loses
+$+3.9\%$ $[+1.8,+6.2]$ at 20\,s and $+5.6\%$ $[+3.3,+8.3]$ at 30\,s, the warm-started seed-3 actor is
+insensitive, and max pressure \emph{improves} by 3--7\%. Max pressure's excess over the from-scratch actor
+shrinks from $+24\%$ to $+9.5\%$ $[+5.8,+13.1]$ at 30\,s but stays positive \NUM. This delays the
+receivers' observations under an idealised scheduler; it is not a network-delay test of the
+bid--select--transmit loop. \NOTE{e3\_delay\_v2\_20260928, pilot panel, 32 episodes; the $d=0$ encoding
+and max-pressure identities and a causality assertion on payload times hold.}
 
-\TODO{selector (bid / no bid, R1 / direct), frontier over caps +28/+56/+84/+140 and the load/capacity
-shift: pending the resumed chains.}
+\paragraph{Learned scheduling baseline.} A SchedNet-style scheduler that learns each sender's one-byte
+weight from its own sensor by policy gradient on the team reward does not beat the committed
+cached-queue priority with the same actor. For the gated from-scratch actor and the warm-started seed-3
+actor, with three init seeds each, the learned schedule changes total waiting by $+0.4\%$ to $+4.8\%$
+(worse in every run, significantly so in two of six) \NUM. \NOTE{e3\_schednet\_v2\_20260928; weights
+quantised to one byte before the stream is ordered; trained on float scores.}
+
+\paragraph{Selection on top of a learned actor.} We ported the selector of Section~\ref{sec:prelim} to
+the learned actor with a declared-continuation target and four variants: no bid, the one-byte bid (the
+actor's own top-two actions and logit gap), a response head without the bid, and bid plus head. For
+the from-scratch actor that passes both gates, no variant changes closed-loop waiting against the
+committed prefix (bid plus head $-0.46\%$ $[-1.33,+0.41]$; the others within $\pm0.5\%$;
+Figure~\ref{fig:e3}b), although an oracle over the same candidates gains $+15.4$ units per state on
+held-out labels \NUM. For the warm-started actors (recorded under their recipe's failed gate) every variant is worse than the
+prefix at $+84$ bytes: 1.8--2.9\% for the pilot seed and 2.5--4.1\% for seed 1, and at caps of $+56$ bytes and more the warm-started
+actors' selectors are up to 4\% worse. The bid does carry response information (the head's recall of
+action changes rises from 0.006 to 0.15 with it), but the critic cannot order candidates within a
+state: on candidate pairs whose true gains differ it orders 40--48\% correctly (below chance), its
+tie-aware rank correlation with the true gains is between $-0.04$ and $+0.04$, and 43--75\% of its
+edits harm; the 90\% quantile of its gain error ($\approx 13$, a diagnostic, not a certified bound) is
+of the order of the gains themselves \NUM. Editing on such scores is editing on noise: an argmax of an
+estimate with per-value error $\varepsilon$ can lose $2\varepsilon$ against the prefix, the rule ``edit
+only if the estimated gain exceeds $2\varepsilon$'' never loses, and every smaller threshold, including
+positive ones, can harm \PROVED; no valid bound $\varepsilon$ is available for the learned critic, so
+the rule is not instantiated here.
+\leanbox{LeanMarlSafeEditV1.argmax\_harm\_le, argmax\_harm\_sharp, safe\_rule\_never\_harms,
+threshold\_sharp, threshold\_sharp\_positive (gate smokeSafeEdit2\_20260928)}
+\NOTE{e3\_selector\_diag\_v2\_scratch\_s3.json (tie-aware; edits counted by chosen index).}
+
+\paragraph{Where the loss is.} Figure~\ref{fig:e3}c compares evaluators on the same 48 development
+states of two actors (the gated from-scratch actor and the warm-started seed-3 actor). No legal
+evaluator realises a positive gain. The bid-plus-head evaluator gives $-0.19$ $[-1.18,+0.84]$ and
+$-1.31$ $[-2.32,-0.20]$. Its alternatives all lie between $-2.3$ and $-0.3$ \NUM:
+\begin{itemize}
+\item no bid;
+\item a same-byte (10-byte) queue bid instead of the response bid;
+\item a multi-class head that predicts the actor's phase distribution;
+\item training on 24 labels per state, chosen near bid ties or uniformly.
+\end{itemize}
+Of the 21 pairwise differences between legal arms per actor, one is significant (on the warm-started
+actor, uniform labelling is 1.4 worse than the multi-class head). The response bid minus the queue bid
+is $+0.49$ and $+0.45$, and the multi-class minus the binary head is $-0.60$ and $+0.41$. An evaluator that is
+told the actor's actual joint action under every candidate (privileged, diagnostic only) realises
+$+1.9$ and $+1.5$. That is better than the legal evaluator by $+2.1$ $[+0.1,+4.5]$ and $+2.8$
+$[+1.0,+4.7]$; clustered by traffic seed the intervals are $[-0.2,+4.6]$ and $[+1.1,+4.7]$. Yet it is
+still only about 12\% of the oracle's gain over the same candidates. Response information is therefore
+part of the bottleneck, the legal predictors we tried do not recover it, and even perfect response
+information leaves most of the headroom unused.
+\NOTE{selectors\_v3 (privileged), v4 (same byte), v5 (multi-class head), acquisition\_v2 (legal
+2-bit bins, B = 24 on every training state); f2b\_paired\_dev.json and e3\_dev\_arms.json per actor.}
+
+\paragraph{Bridge to the theory (reduced panel).} To test whether Theorem~\ref{thm:t1} explains the
+traffic object, we took 16 development states per actor and one receiver per state (the smallest bid
+gap). Every other receiver keeps its prefix, and we evaluated the continuation value $f$ of all 256
+sets the receiver could decode. On this whole space two linear programs give two constants: the
+smallest ScoreLocal constant $\eta^\star$, and the smallest constant $\eta_{\rm top}$ under which the
+deployed prefix is also top-$k$ by the same score, i.e.\ both hypotheses of the theorem at one $w$.
+\begin{itemize}
+\item At the smallest constant $\eta^\star$ the prefix is also top-$k$ in 5 of 16 states per actor; at
+  $\eta_{\rm top}$ every state (16 of 16) has a valid instance of both hypotheses. The scores are fitted
+  after the whole value table is seen, so this is a numerical instantiation on reduced objects, not a
+  deployable certificate.
+\item $\eta_{\rm top}$ has median 7.0 and 6.0, about the spread of $f$ over the $k$-sets (9.6 and
+  8.5): first-order scores explain these values poorly.
+\item The optimum is within one revision of the prefix in 15 and 13 of 16 states. The geometric loss
+  at $R=1$ therefore averages 0.3 and 0.8, the $+84$-byte cap never binds, and the scored candidate
+  family contains the global optimum in 15 and 13 states.
+\item The valid instance of the theorem, $2\eta_{\rm top}(d-R)_+$, holds in every state (checked). It
+  is zero wherever the optimum is one revision away, and 2.8 to 6.7 times the realised loss in the four
+  states where it is not \NUM.
+\end{itemize}
+On these single-receiver objects, commitment geometry and bytes cost little and are correctly bounded,
+which is consistent with an estimation bottleneck; it does not show that a selector editing several
+receivers at once loses only through estimation (next paragraph).
+\NOTE{scripts/MARL\_e3\_bridge\_panel\_v2.py; e3\_bridge\_v2\_\{scratch,bc\}\_s3\_20260928 (f.json holds every
+value). The earlier v1 panel omitted the empty and full sets and read hTop at one LP minimiser; its
+``hTop false in 16/16'' is withdrawn (self-audit L-01..L-04, L-34).}
+
+\paragraph{All receivers at once (development panel).} The reduced panel varies one receiver; a
+selector edits several. On the 48 development states of each actor we therefore decomposed the loss
+on the actual multi-receiver objects. The stored labels score a candidate family whose best member
+edits about six receivers. We extended it by a rollout local search over single sender swaps at any
+receiver within the cap, started from the family's best profile and, separately, from the prefix.
+This search is a diagnostic: it uses the simulator. The best profile found gains $+20.1$ and $+16.0$
+over the prefix. Measured from that profile the losses are \NUM:
+\begin{itemize}
+\item outside the scored family, at least $+4.7$ and $+3.7$ (a lower bound, since the search is local);
+\item the radius-one restriction inside the family, $+2.7$ and $+2.5$;
+\item the byte cap, about $0.1$;
+\item the legal selectors' choice inside the family, $+15.6$ and $+13.7$, the largest term by far.
+\end{itemize}
+A local search from the prefix alone reaches 88\% and 86\% of the best found, with about 2.5 single swaps
+on 2.5 receivers. The gain of a multi-receiver edit exceeds the sum of its single-receiver parts in 22 of
+40 and 19 of 38 states, and falls below it in 15 and 12. Estimation is thus the dominant loss on the
+tested objects. Commitment geometry and candidate coverage are smaller but not zero once all receivers
+move, and receivers interact. A few swaps would suffice; the obstacle is choosing them from legal
+information.
+\NOTE{scripts/MARL\_e3\_multireceiver\_decomp.py and MARL\_e3\_mrdecomp\_report.py; e3\_mrdecomp\_20260928.
+48 of 48 states for both actors; one shard reran after a CityFlow deadlock; report.json.}
+
+\paragraph{Reading.} On development data the method-scope condition is not met. No legal selector
+variant improves on the committed prefix of a learned actor, in closed loop or offline. Every grounded
+adaptation we registered left the realised gain at or below zero: response information, a multi-class
+response head, a same-byte alternative bid and decision-targeted labelling. The dense-label round, the
+from-scratch actors of other seeds and the mixed-profile actor are still running, and none of them is a
+confirmatory test either.
+\TODO{dense-label result (F1); scratch seeds 0, 1, 2, 4; mixed-profile actor (F2-C); frontier and shift for the from-scratch actors.}
 
 \section{Limitations}
-Fixed MP2 actor in every traffic result; one $3\times3$ grid; i.i.d.\ capacities (the design does not
-transfer to fixed, bursty or low capacity processes in the held phase); held-phase target; zero
-delivery delay; candidate-set search, not exact enumeration; one DAgger iteration; the T1
-bridge to traffic is open (a one-swap fit gives only a lower bound on $\eta$); topology transfer is
-not tested because the selectors have a fixed input width.
+\begin{itemize}
+\item Scope of the positive results: the paid bid helps selection on the fixed max-pressure actor in
+the held phase (preregistered) and only marginally in closed loop. On learned actors no selector
+variant has improved on the committed prefix; this is development evidence from two actors offline and
+one gated actor in closed loop.
+\item Seeds: one gated from-scratch actor so far; the warm-started recipe fails its pilot gate. Actor
+seeds 3 and 4 were added outside the protocols' seed lists, before any result.
+\item Actors were trained with the committed prefix; conclusions concern post-hoc scheduling on such
+actors, not joint actor--scheduler co-training (a mixed-profile actor pilot is running).
+\item One $3\times3$ grid; i.i.d.\ capacities as the main process (a bursty and a held-out load shift are
+tested on the warm-started actors); fixed input width, so no topology transfer.
+\item The delay experiment delays the receivers' observations with an idealised scheduler; it is not
+a network-delay test of the bid--select--transmit loop (no loss, jitter or bandwidth queue).
+\item Candidate-set search, not exact enumeration: the scored family misses at least 3.7--4.7 units of
+head-room that a rollout search finds; H $=3$ continuation, not the full-episode return.
+\item The theorems are conditional. On a reduced, fully enumerated single-receiver panel, with scores
+fitted after seeing all values, every state has a valid instance of Theorem~\ref{thm:t1} (at the
+optimal constant in 5 of 16), and the bound, never violated, is loose where it is nonzero. No valid pointwise error bound is available
+for the learned critic.
+\item The learned SchedNet comparator is a frozen-actor adaptation, not the original method.
+\end{itemize}
 
 \begin{thebibliography}{9}
 \bibitem{schednet} D.~Kim et al., ``Learning to schedule communication in multi-agent reinforcement
@@ -318,17 +500,27 @@ learning,'' ICLR 2019, arXiv:1902.01554.
 \bibitem{where2comm} Y.~Hu et al., ``Where2comm: Communication-efficient collaborative perception via
 spatial confidence maps,'' NeurIPS 2022.
 \bibitem{bernstein2022} A.~Bernstein, Y.~Disser, M.~Gro{\ss}, S.~Himburg, ``General bounds for
-incremental maximization,'' Mathematical Programming, 2022. \TODO{verify volume/pages}
-\bibitem{bienkowski2026} M.~Bienkowski et al., ``Incremental submodular maximization: better than
-greedy,'' arXiv:2606.28558. \TODO{verify authors}
-\bibitem{densecoverage} ``Dense coverage, sparse refinement,'' arXiv:2609.29456. \TODO{authors, title
-exactly as published}
+incremental maximization,'' Mathematical Programming, 2022, arXiv:1705.10253.
+\bibitem{bienkowski2026} Bienkowski et al., ``Incremental submodular maximization: better than
+greedy,'' arXiv:2606.28558, 2026.
+\bibitem{densecoverage} Yazgan, Mueller, Zoellner, ``Dense coverage, sparse refinement: byte-constrained
+cooperative perception,'' arXiv:2609.29456, 2026.
 \bibitem{cityflow} H.~Zhang et al., ``CityFlow: A multi-agent reinforcement learning environment for
 large scale city traffic scenario,'' WWW 2019.
 \bibitem{colight} H.~Wei et al., ``CoLight: Learning network-level cooperation for traffic signal
 control,'' CIKM 2019.
 \bibitem{varaiya2013} P.~Varaiya, ``Max pressure control of a network of signalized intersections,''
 Transportation Research Part C, 2013.
+\bibitem{ndq} T.~Wang, J.~Wang, C.~Zheng, C.~Zhang, ``Learning nearly decomposable value functions via
+communication minimization,'' ICLR 2020.
+\bibitem{casec} T.~Wang, L.~Zeng, W.~Dong, Q.~Yang, Y.~Yu, C.~Zhang, ``Context-aware sparse deep coordination
+graphs,'' ICLR 2022, arXiv:2106.02886.
+\bibitem{m2i2} C.~Sun, P.~He, Q.~Ji, Z.~Zang, J.~Li, R.~Wang, W.~Wang, ``M2I2: Learning efficient multi-agent
+communication via masked state modeling and intention inference,'' AAAI 2026, arXiv:2501.00312.
+\bibitem{mute} R.~Zuo, Q.~Huang, M.~Li, Z.~Zhang, S.~Khan, Q.~Qiu, ``MUTE: Return-preserving communication
+unlearning for efficient multi-agent coordination,'' arXiv:2607.03473, 2026 (preprint).
+\bibitem{mappo} C.~Yu et al., ``The surprising effectiveness of PPO in cooperative multi-agent games,''
+NeurIPS 2022 Datasets and Benchmarks.
 \bibitem{dagger} S.~Ross, G.~Gordon, J.~A.~Bagnell, ``A reduction of imitation learning and structured
 prediction to no-regret online learning,'' AISTATS 2011.
 \end{thebibliography}

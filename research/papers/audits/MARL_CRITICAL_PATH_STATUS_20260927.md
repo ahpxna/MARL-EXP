@@ -1,5 +1,11 @@
 # Critical path status vs `MARL_SUBMISSION_CRITICAL_PATH_20260927.md` — 27/09/2026, updated 23:50
 
+> **HISTORICAL from here on (28/09, about 12:25).** The CURRENT claim map is
+> `research/papers/audits/MARL_CURRENT_CLAIMS_20260928.md`. Sections below are kept as the record of what was believed
+> when; where they disagree with the current file (e.g. 'no learned actor exists', 'baselines are heuristics only'),
+> the current file wins.
+
+
 - Read line by line against the artifacts. This file is not a ledger.
 - **Update 23:50.**
   - The 23:35 version is archived at `legacy/MARL_CRITICAL_PATH_STATUS_20260927_v2335.md`.
@@ -327,5 +333,6 @@ CityFlow itself is not dropped. No result forces it.
 | 11 | Closed-loop benefit on fixed MP2 | preregistered B3/B4 | closed_loop_v2 | B3 (FAIL), `B4_DAGGER_RESULTS_20260928.md` (PASS against the retrained control: −1.49% [−2.75, −0.23]) | NUM. Weak: −0.68% against the prefix (n.s.); no gain over the frozen design; about 4.5% of the oracle |
 | 12 | T1 → traffic bridge (η) | would need an UPPER bound on one consistent score vector | `MARL_hetero_eta_bridge.py` | `eta_bridge_20260927.relabelled.json` | OPEN. The one-swap diagnostic is a lower bound only; the "certified" wording is WITHDRAWN |
 | 13 | Bounded repair R1 beats direct selection | — | direct_indep | `BASELINES_DIRECT_STAGEA2_RESULTS` §2 | WITHDRAWN (development: direct ≥ R1) |
-| 14 | Beats SchedNet / Where2comm | — | closed_loop_v3/v4 heuristics | same doc §1 | WITHDRAWN. Only heuristics exist; learned baselines are OPEN (E3) |
-| 15 | Learned communication-aware MARL actor | — | none | none | OPEN (E3) |
+| 14 | Beats SchedNet / Where2comm | — | closed_loop_v3/v4 heuristics; `MARL_e3_schednet_train_v2.py` | same doc §1; `E3_INTERIM_RESULTS_20260928.md` | WITHDRAWN as a win. Learned SchedNet v2 (1-byte weights, 2 actors × 3 seeds) is +0.4% to +4.8% WORSE than the committed prefix. The committed order beats learned scheduling here (NUM, development) |
+| 15 | Learned communication-aware MARL actor | MAPPO with a CTDE critic (standard) | `models/marl_comm_actor.py`, `MARL_e3_actor_train*.py` | `E3_INTERIM_RESULTS_20260928.md` | NUM (development): every actor beats MP2 by 12–24%, robust to load and capacity shifts. Message use: scratch s3 and BC s3 pass G1; the BC pilot s0 fails |
+| 16 | A legal selector improves the LEARNED actor | continuation target | `MARL_e3_selector_train*.py`, closed loop v1–v3 | same | OPEN, negative so far. No variant gains, even offline, against a +15.4 oracle headroom; at caps ≥ +56 the selectors are worse than the prefix. Dense-label learning-curve step running |

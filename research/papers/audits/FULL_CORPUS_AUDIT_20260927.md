@@ -1269,3 +1269,39 @@ finding against the code.
     none is planned, because v2 did not help at +84.
   - The venue template: the track is unconfirmed.
   - The E3 actor pilot is next (P2).
+
+### 23.18 E3 learned actor, gates, and the CityFlow hang (28/09, 00:20–09:30)
+
+- **Gates.**
+  - `full9_20260928` VERIFY PASS: 301 modules, 2,382 audited theorems, standard axioms, drift 0.
+    It is the first full gate since full7; MODS now holds every module the manuscripts cite.
+  - `smokeOLD7b_20260928` SMOKE PASS: 251 modules, 1,465 theorems (OLD7's 1,455 plus the 10 new
+    Chi5 prints), `imports_closed=1`, `native_decide=0`.
+  - `smokeE1bU_20260928` SMOKE PASS: the new `LeanMarlE1bUniformV1`, a uniform shift halves the
+    E1b constant without knowing the pair (readiness audit §5).
+- **E3.**
+  - Protocols written before results: PILOT, SCRATCH, ABLATION.
+  - Every finished learned actor beats MP2: select −15% to −24%, development +12% to +23% for MP2
+    (CI > 0).
+  - G1 message use: scratch s3 and BC s3 pass; the BC pilot s0 FAILS, so the BC chain's selector
+    results are recorded and not read.
+  - Details in `research/marl_budget/E3_INTERIM_RESULTS_20260928.md`.
+- **Learned SchedNet (v1).** +1.1% and +1.9% against the prefix; it does not beat the committed
+  order.
+- **Audit fix (my own code).** v1 sorted by float weights although only 1 byte is declared. v2
+  quantises to 256 levels; the v1 rows are labelled.
+- **Audit fix (my own code).** Closed-loop v2 at caps other than +84 must recompute feasibility
+  with the run's cap. Fixed before any real run.
+- **Hang.** CityFlow's engine barrier deadlocked (`pthread_cond_wait`, GIL held) in every E3
+  process around 01:00–03:18.
+  - `scripts/run_with_watchdog.py` and resume runners were added.
+  - Relaunched at 09:13 alongside the 8 deadlocked PIDs. They are listed in
+    `e3_hung_pids_at_relaunch.txt`; killing them needs the user.
+- **Also done.**
+  - F1 scene: a single swap gains +31 in continuation with held-phase 0 and no immediate action
+    change.
+  - F4 mechanism figure.
+  - Selector v2 with a response head and closed-loop v3; the ablation runner.
+  - `REPRODUCE_MARL_20260928.md`.
+  - The draft updated.
+  - Commit `3ae456b`.
