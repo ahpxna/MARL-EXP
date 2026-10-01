@@ -109,6 +109,13 @@ def main(a):
 
 
 if __name__ == '__main__':
+    # RETIRED 28/09 19:18 (handoff MARL_REMAINING_WORK_HANDOFF_20260928_1910 W1; ledger L-58): the pair order accuracy of this
+    # entry point is STRICT (a predicted tie counts as wrong), so it must not be read against 0.5 or a tie-half rule.  The
+    # functions stay importable unchanged; new runs use scripts/MARL_e3_selector_diag_v3.py.  E3_ALLOW_STRICT_DIAG_V2=1 reproduces a historical artifact.
+    import os
+    if os.environ.get('E3_ALLOW_STRICT_DIAG_V2') != '1':
+        sys.exit('refusing: this diagnostic is retired (strict pair metric); run scripts/MARL_e3_selector_diag_v3.py '
+                 '(or E3_ALLOW_STRICT_DIAG_V2=1 to reproduce a historical artifact)')
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--actor-dir', required=True); p.add_argument('--selectors', default='selectors_v2'); p.add_argument('--out', required=True)
     main(p.parse_args())

@@ -24,7 +24,9 @@ import matplotlib.pyplot as plt
 M = Path(__file__).resolve().parents[1] / 'research/marl_budget'
 ACTORS = [('BC s0 (pilot)', 'e3_run_20260928_003858/actor_s0'), ('BC s1', 'e3_run_20260928_003858/actor_s1'), ('BC s2', 'e3_run_20260928_003858/actor_s2'),
           ('BC s3', 'e3_run_seeds34_20260928/actor_s3'), ('BC s4', 'e3_run_seeds34_20260928/actor_s4'),
-          ('scratch s3', 'e3_scratch_seeds34_20260928/actor_s3')]
+          ('scratch s0', 'e3_scratch_rs_20260928/actor_s0'), ('scratch s1', 'e3_scratch_rs_20260928/actor_s1'),
+          ('scratch s2', 'e3_scratch_rs_20260928/actor_s2'), ('scratch s3', 'e3_scratch_seeds34_20260928/actor_s3'),
+          ('scratch s4', 'e3_scratch_rs_20260928/actor_s4'), ('mix s3', 'e3_mixactor_20260928/actor_s3')]
 CL = [('scratch s3 (gated)', 'e3_scratch_seeds34_20260928/actor_s3'), ('BC s0 (recorded, gate failed)', 'e3_run_20260928_003858/actor_s0')]
 ARMS = [('legal', 'legal\nbid+head'), ('no_bid', 'no bid'), ('top2_bid', 'top-2 bid\n(10 B)'), ('queue_bid', 'queue bid\n(10 B)'),
         ('multi_head', 'multi-class\nhead'), ('acq_targeted', 'targeted\nacq. B=24'), ('acq_uniform', 'uniform\nacq. B=24'),
@@ -72,13 +74,13 @@ def main(a):
         diag = json.loads((M / d / 'selectors_v3_diag.json').read_text())
         orc = diag['legal_bid_resp_s0']['direct']['dev']['oracle_best']
         dev[name] = dict(states=J['states'], oracle=orc, arms={k: J['arms'][k] for k, _ in ARMS}, source=str((M / d / 'e3_dev_arms.json').relative_to(M)))
-    fig, ax = plt.subplots(1, 3, figsize=(15.5, 4.4), gridspec_kw=dict(width_ratios=[1, 1.1, 1.9]))
+    fig, ax = plt.subplots(1, 3, figsize=(17.0, 4.6), gridspec_kw=dict(width_ratios=[1.45, 1.05, 1.9]))
     for x, r in enumerate(act):
         ax[0].errorbar(x, r['mp2'], yerr=[[r['mp2'] - r['ci'][0]], [r['ci'][1] - r['mp2']]], fmt='o', ms=8, capsize=3,
                        color='tab:green', mfc='tab:green' if r['g1'] else 'white')
-    ax[0].axhline(0, color='gray', lw=0.8); ax[0].set_xticks(range(len(act))); ax[0].set_xticklabels([r['actor'] for r in act], fontsize=8, rotation=20)
+    ax[0].axhline(0, color='gray', lw=0.8); ax[0].set_xticks(range(len(act))); ax[0].set_xticklabels([r['actor'].replace(' (pilot)', '*') for r in act], fontsize=7.5, rotation=45, ha='right')
     ax[0].set_ylabel('max pressure vs learned actor, Σ waiting (%)\nhigher = the actor is better')
-    ax[0].set_title('(a) actor improvement (development 501-508)\nfilled: the actor passes G1 on its own', fontsize=9)
+    ax[0].set_title('(a) actor improvement (development 501-508)\nfilled: passes G1 on its own; * = BC pilot seed', fontsize=9)
     names = ['sel_nobid', 'sel_bid', 'sel_resp', 'sel_bid_resp']; w = 0.38
     for k, (cname, (res, _)) in enumerate(cl.items()):
         xs = np.arange(len(names)) + (k - 0.5) * w

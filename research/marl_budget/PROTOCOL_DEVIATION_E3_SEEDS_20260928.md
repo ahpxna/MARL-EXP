@@ -74,3 +74,9 @@ The replicas use `scripts/MARL_e3_actor_train_resume.py`, which is bitwise-equiv
 - scratch s0 lane-2 run: hung at iteration ~1943, restarted from scratch at 15:25:36 on its last retry; parked in
   `legacy/actor_s0_stalled_2_20260928_152536`.
 The resumable replicas continue; their traces were identical to the lane runs while both lived. BC s2 is finished and passes G1.
+
+**Update 16:54.** Gate results for the scratch recipe (per-seed gate; the replicas are the runs of record):
+- s0, s1, s2 and s4 all PASS G1 and G2. Selects 1318 / 1341 / 1365 / 1315. None vs actual: +4.3% / +6.3% / +7.9% / +8.7%, every
+  seed-cluster CI above 0. Together with s3 the scratch pass rate is 5/5.
+- The mix pilot s3 FAILS G1 (none −0.9% [−2.3, +0.6]), so its downstream is diagnostic only.
+- BC: 4/5 pass on their own, but the recipe gate (pilot s0) failed.

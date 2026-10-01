@@ -1,0 +1,22 @@
+PRIMARY iid  : mean e = -2.29 % [-3.25, -1.39]  (sensitivity, shared traffic resample: [-3.30, -1.35])
+PRIMARY cap4 : mean e = -2.04 % [-3.03, -1.10]  (sensitivity, shared traffic resample: [-3.06, -1.07])
+PRIMARY low  : mean e = -1.26 % [-2.08, -0.50]  (sensitivity, shared traffic resample: [-2.12, -0.45])
+RULE (upper < 0 in all three conditions): SUPPORTED
+  s0: mean -1.58 %  iid -2.48[-3.30,-1.68]  cap4 -1.48[-2.24,-0.72]  low -0.79[-1.58,-0.01]
+  s1: mean -3.04 %  iid -3.47[-4.37,-2.57]  cap4 -3.57[-4.50,-2.67]  low -2.08[-2.85,-1.32]
+  s2: mean -4.64 %  iid -5.09[-6.00,-4.22]  cap4 -5.02[-5.94,-4.12]  low -3.80[-4.67,-2.93]
+  s3: mean -1.56 %  iid -1.97[-2.77,-1.15]  cap4 -2.05[-2.77,-1.36]  low -0.66[-1.49,+0.14]
+  s4: mean -3.35 %  iid -4.12[-4.92,-3.30]  cap4 -3.54[-4.34,-2.72]  low -2.37[-3.08,-1.65]
+  s5: mean -0.17 %  iid -0.78[-1.72,+0.22]  cap4 +0.22[-0.55,+0.96]  low +0.05[-0.80,+0.90]
+  s6: mean -0.44 %  iid -0.81[-1.63,+0.03]  cap4 -0.66[-1.59,+0.32]  low +0.14[-0.66,+0.95]
+  s7: mean -2.28 %  iid -2.40[-3.02,-1.80]  cap4 -2.31[-3.05,-1.60]  low -2.11[-2.81,-1.42]
+  s8: mean -0.36 %  iid -0.56[-1.26,+0.18]  cap4 -0.56[-1.32,+0.20]  low +0.05[-0.73,+0.82]
+  s9: mean -1.21 %  iid -1.20[-2.12,-0.27]  cap4 -1.39[-2.10,-0.65]  low -1.03[-1.91,-0.10]
+SECONDARY Spearman(e_s, H_s) over [1, 2, 3, 4, 5, 6, 7, 8, 9]: 0.870 (predicted >= 0.5)
+DIRECTION A  Spearman(N_s, gain_s) = 0.685  P-A1 (>= 0.5): SUPPORTED | Spearman(D_s, gain_s) = -0.152  P-A2 (N beats D): SUPPORTED
+SECONDARY congestion order vs Z  iid   on 10 seeds: -2.00 % [-2.87, -1.17]  below 0: 10/10
+SECONDARY congestion order vs Z  cap4  on 10 seeds: +0.15 % [-0.84, +1.10]  below 0: 3/10
+SECONDARY congestion order vs Z  low   on 10 seeds: +0.38 % [-0.57, +1.36]  below 0: 4/10
+SECONDARY age-first vs Zrep      iid   on 10 seeds: -2.11 % [-3.01, -1.25]  below 0: 10/10
+SECONDARY age-first vs Zrep      cap4  on 10 seeds: -1.86 % [-2.78, -0.93]  below 0: 9/10
+SECONDARY age-first vs Zrep      low   on 10 seeds: -1.08 % [-1.88, -0.31]  below 0: 8/10

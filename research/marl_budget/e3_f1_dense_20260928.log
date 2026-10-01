@@ -1,0 +1,88 @@
+F1 plan for research/marl_budget/e3_scratch_seeds34_20260928/actor_s3: registered v2 ablation if missing; v3 arms on research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/dense; paired eval on research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/labels_dev and research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/dense/labels_dev; diag v3; resources; acquisition v2 (diag v3) on research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/dense  Mon Sep 28 23:42:09 EDT 2026
+ablation done research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/dense Tue Sep 29 00:05:21 EDT 2026
+== resources
+{
+ "original": {
+  "train_states": 768,
+  "labelled_candidates": 138535,
+  "distinct_traffic_episodes": 128
+ },
+ "dense": {
+  "train_states": 2432,
+  "labelled_candidates": 439021,
+  "distinct_traffic_episodes": 128
+ }
+}
+== F1 on the original 48 development states (one table)
+orig_legal         n_ckpt 3 states 48: gain -0.19 [-1.18,+0.84] edit 0.19
+dense_legal_origsel n_ckpt 3 states 48: gain +1.58 [+0.49,+2.81] edit 0.44
+dense_legal_matched n_ckpt 3 states 48: gain +0.33 [-0.06,+0.89] edit 0.10
+dense_legal_full   n_ckpt 3 states 48: gain +0.17 [-1.27,+1.57] edit 0.40
+orig_priv          n_ckpt 3 states 48: gain +1.93 [-0.53,+4.88] edit 0.69
+dense_priv         n_ckpt 3 states 48: gain +3.94 [+1.21,+7.05] edit 0.84
+  dense_legal_origsel - orig_legal: +1.77  episode CI [+0.72,+2.82] (n=16)  seed CI [+0.65,+2.74] (n=8)
+  dense_legal_matched - orig_legal: +0.52  episode CI [-0.67,+1.76] (n=16)  seed CI [-0.97,+1.85] (n=8)
+  dense_legal_full - orig_legal: +0.35  episode CI [-0.72,+1.38] (n=16)  seed CI [-0.72,+1.47] (n=8)
+  orig_priv - orig_legal: +2.12  episode CI [+0.10,+4.49] (n=16)  seed CI [-0.21,+4.56] (n=8)
+  dense_priv - orig_legal: +4.12  episode CI [+1.49,+7.19] (n=16)  seed CI [+1.44,+6.48] (n=8)
+  dense_legal_matched - dense_legal_origsel: -1.25  episode CI [-2.49,-0.18] (n=16)  seed CI [-2.72,+0.09] (n=8)
+  dense_legal_full - dense_legal_origsel: -1.42  episode CI [-2.64,-0.28] (n=16)  seed CI [-2.69,-0.11] (n=8)
+  orig_priv - dense_legal_origsel: +0.35  episode CI [-1.82,+2.99] (n=16)  seed CI [-1.93,+2.91] (n=8)
+  dense_priv - dense_legal_origsel: +2.35  episode CI [-0.15,+5.37] (n=16)  seed CI [+0.32,+4.42] (n=8)
+  dense_legal_full - dense_legal_matched: -0.17  episode CI [-1.69,+1.35] (n=16)  seed CI [-1.81,+1.40] (n=8)
+  orig_priv - dense_legal_matched: +1.60  episode CI [-0.84,+4.61] (n=16)  seed CI [-1.28,+4.92] (n=8)
+  dense_priv - dense_legal_matched: +3.60  episode CI [+0.87,+6.81] (n=16)  seed CI [+0.90,+6.03] (n=8)
+  orig_priv - dense_legal_full: +1.76  episode CI [-0.39,+4.33] (n=16)  seed CI [-0.73,+4.37] (n=8)
+  dense_priv - dense_legal_full: +3.77  episode CI [+0.97,+6.80] (n=16)  seed CI [+0.98,+6.03] (n=8)
+  dense_priv - orig_priv: +2.01  episode CI [+0.07,+4.26] (n=16)  seed CI [-0.19,+4.17] (n=8)
+== F1 on the full dense development panel (one table)
+orig_legal         n_ckpt 3 states 304: gain +0.20 [-0.16,+0.61] edit 0.16
+dense_legal_origsel n_ckpt 3 states 304: gain +0.14 [-0.48,+0.77] edit 0.39
+dense_legal_matched n_ckpt 3 states 304: gain +0.17 [-0.04,+0.39] edit 0.09
+dense_legal_full   n_ckpt 3 states 304: gain +0.31 [-0.38,+1.00] edit 0.36
+orig_priv          n_ckpt 3 states 304: gain +1.88 [+0.92,+2.85] edit 0.62
+dense_priv         n_ckpt 3 states 304: gain +2.38 [+1.31,+3.50] edit 0.79
+  dense_legal_origsel - orig_legal: -0.05  episode CI [-0.51,+0.40] (n=16)  seed CI [-0.47,+0.35] (n=8)
+  dense_legal_matched - orig_legal: -0.03  episode CI [-0.31,+0.23] (n=16)  seed CI [-0.26,+0.19] (n=8)
+  dense_legal_full - orig_legal: +0.11  episode CI [-0.39,+0.64] (n=16)  seed CI [-0.25,+0.47] (n=8)
+  orig_priv - orig_legal: +1.69  episode CI [+0.93,+2.48] (n=16)  seed CI [+0.92,+2.46] (n=8)
+  dense_priv - orig_legal: +2.19  episode CI [+1.35,+3.03] (n=16)  seed CI [+1.33,+3.04] (n=8)
+  dense_legal_matched - dense_legal_origsel: +0.03  episode CI [-0.48,+0.54] (n=16)  seed CI [-0.46,+0.51] (n=8)
+  dense_legal_full - dense_legal_origsel: +0.17  episode CI [-0.14,+0.51] (n=16)  seed CI [-0.11,+0.41] (n=8)
+  orig_priv - dense_legal_origsel: +1.74  episode CI [+1.07,+2.41] (n=16)  seed CI [+1.10,+2.36] (n=8)
+  dense_priv - dense_legal_origsel: +2.24  episode CI [+1.54,+2.94] (n=16)  seed CI [+1.60,+2.79] (n=8)
+  dense_legal_full - dense_legal_matched: +0.14  episode CI [-0.47,+0.76] (n=16)  seed CI [-0.23,+0.59] (n=8)
+  orig_priv - dense_legal_matched: +1.71  episode CI [+0.85,+2.60] (n=16)  seed CI [+0.97,+2.46] (n=8)
+  dense_priv - dense_legal_matched: +2.21  episode CI [+1.24,+3.18] (n=16)  seed CI [+1.30,+3.16] (n=8)
+  orig_priv - dense_legal_full: +1.57  episode CI [+0.86,+2.28] (n=16)  seed CI [+0.82,+2.29] (n=8)
+  dense_priv - dense_legal_full: +2.07  episode CI [+1.34,+2.80] (n=16)  seed CI [+1.25,+2.79] (n=8)
+  dense_priv - orig_priv: +0.50  episode CI [-0.10,+1.06] (n=16)  seed CI [-0.01,+1.04] (n=8)
+== diagnostic v3 (tie-half) of the dense v3 arms (dense select/dev)
+selftest PASS (all-tie 0.5, perfect 1, reversed 0)
+legal_bid_resp_matched_s0 dev: gain +0.05 [-0.2565789473684211, 0.34210526315789475] | pair-acc (tie-half) 0.522 (strict v2 0.418, ties 0.209) | spearman +0.056
+legal_bid_resp_matched_s1 dev: gain +0.21 [-0.0033717105263157614, 0.4671874999999988] | pair-acc (tie-half) 0.518 (strict v2 0.393, ties 0.252) | spearman +0.049
+legal_bid_resp_matched_s2 dev: gain +0.24 [-0.15460526315789475, 0.6645559210526304] | pair-acc (tie-half) 0.510 (strict v2 0.377, ties 0.267) | spearman +0.027
+legal_bid_resp_origsel_s0 dev: gain +0.18 [-0.6875822368421053, 1.0032894736842106] | pair-acc (tie-half) 0.529 (strict v2 0.439, ties 0.180) | spearman +0.077
+legal_bid_resp_origsel_s1 dev: gain +0.08 [-0.8486842105263158, 1.0625] | pair-acc (tie-half) 0.516 (strict v2 0.405, ties 0.222) | spearman +0.041
+legal_bid_resp_origsel_s2 dev: gain +0.16 [-0.0756578947368421, 0.4243421052631579] | pair-acc (tie-half) 0.525 (strict v2 0.450, ties 0.151) | spearman +0.064
+legal_bid_resp_s0      dev: gain +0.45 [-0.473766447368421, 1.3027138157894724] | pair-acc (tie-half) 0.525 (strict v2 0.427, ties 0.197) | spearman +0.066
+legal_bid_resp_s1      dev: gain +0.08 [-0.9638980263157895, 1.174342105263158] | pair-acc (tie-half) 0.513 (strict v2 0.430, ties 0.165) | spearman +0.036
+legal_bid_resp_s2      dev: gain +0.40 [-0.23026315789473684, 1.019736842105263] | pair-acc (tie-half) 0.518 (strict v2 0.433, ties 0.170) | spearman +0.051
+priv_only_s0           dev: gain +2.42 [1.2992598684210528, 3.5657894736842106] | pair-acc (tie-half) 0.565 (strict v2 0.523, ties 0.085) | spearman +0.168
+priv_only_s1           dev: gain +2.54 [1.361842105263158, 3.776315789473684] | pair-acc (tie-half) 0.554 (strict v2 0.486, ties 0.136) | spearman +0.137
+priv_only_s2           dev: gain +2.19 [0.9341282894736842, 3.4473684210526314] | pair-acc (tie-half) 0.560 (strict v2 0.481, ties 0.158) | spearman +0.160
+== research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/dense/acquisition_v2 (selector diagnostic v3, tie-half)
+selftest PASS (all-tie 0.5, perfect 1, reversed 0)
+acq2_full_s0           dev: gain +0.45 [-0.473766447368421, 1.3027138157894724] | pair-acc (tie-half) 0.525 (strict v2 0.427, ties 0.197) | spearman +0.066
+acq2_full_s1           dev: gain +0.08 [-0.9638980263157895, 1.174342105263158] | pair-acc (tie-half) 0.513 (strict v2 0.430, ties 0.165) | spearman +0.036
+acq2_full_s2           dev: gain +0.40 [-0.23026315789473684, 1.019736842105263] | pair-acc (tie-half) 0.518 (strict v2 0.433, ties 0.170) | spearman +0.051
+acq2_singleton_s0      dev: gain +0.30 [-0.18758223684210523, 0.8157894736842105] | pair-acc (tie-half) 0.512 (strict v2 0.448, ties 0.128) | spearman +0.030
+acq2_singleton_s1      dev: gain +0.23 [-0.3323190789473684, 0.7598684210526315] | pair-acc (tie-half) 0.524 (strict v2 0.454, ties 0.139) | spearman +0.060
+acq2_singleton_s2      dev: gain -0.12 [-1.3884046052631578, 1.075657894736842] | pair-acc (tie-half) 0.510 (strict v2 0.402, ties 0.216) | spearman +0.024
+acq2_targeted_s0       dev: gain -0.23 [-1.180921052631579, 0.819078947368421] | pair-acc (tie-half) 0.520 (strict v2 0.395, ties 0.250) | spearman +0.057
+acq2_targeted_s1       dev: gain +0.25 [-0.7632401315789474, 1.2599506578947357] | pair-acc (tie-half) 0.530 (strict v2 0.374, ties 0.312) | spearman +0.080
+acq2_targeted_s2       dev: gain -0.03 [-0.680921052631579, 0.5953947368421053] | pair-acc (tie-half) 0.518 (strict v2 0.308, ties 0.420) | spearman +0.050
+acq2_uniform_s0        dev: gain +0.42 [-0.20723684210526316, 1.0] | pair-acc (tie-half) 0.525 (strict v2 0.353, ties 0.343) | spearman +0.071
+acq2_uniform_s1        dev: gain +0.38 [-0.12171052631578948, 0.9243421052631579] | pair-acc (tie-half) 0.517 (strict v2 0.391, ties 0.251) | spearman +0.044
+acq2_uniform_s2        dev: gain +0.22 [-0.7073190789473685, 1.3223684210526316] | pair-acc (tie-half) 0.521 (strict v2 0.393, ties 0.256) | spearman +0.061
+F1 done research/marl_budget/e3_scratch_seeds34_20260928/actor_s3 Tue Sep 29 01:00:23 EDT 2026

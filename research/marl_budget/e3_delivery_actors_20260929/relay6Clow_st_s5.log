@@ -1,0 +1,20 @@
+
+[watchdog] attempt 0 Thu Oct  1 01:44:29 2026: external_envs/runtime/bin/python -u scripts/MARL_e3_actor_distill_v6.py --teacher research/marl_budget/e3_delivery_actors_20260929/set_full_s5/ckpt_best.pt --student-delivery prefix --relay age --seed 5 --iters 500 --quant 4 --capacity low --out research/marl_budget/e3_delivery_actors_20260929/relay6Clow_st_s5
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_distill_v6.py", line 176, in <module>
+    main(a)
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_distill_v6.py", line 108, in main
+    sc = Scenarios(out); env0, topo0, _, _ = sc.env(*TRAIN[0])
+                                             ^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_train.py", line 46, in env
+    self.cache[(seed, load)] = scenario(self.out, seed, load)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_hetero_target_diag.py", line 50, in scenario
+    return make_grid_scenario(out / 'scenarios' / f'seed{seed}_load{load:g}', rows=ROWS, cols=COLS, traffic_seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/envs/external/cityflow_budgeted.py", line 883, in make_grid_scenario
+    p.write_text(json.dumps(obj), encoding="utf-8")
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1048, in write_text
+    return f.write(data)
+           ^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device

@@ -556,3 +556,230 @@ Traffic-seed intervals are in the report JSON and agree.
   22/40 multi-receiver edits are superadditive.
 - BC s3: unchanged from the table above (it was already 48/48).
 - The reading is unchanged.
+
+## Update 16:2x — F5b corrections N1 and N2 (independent recheck 16:11), from saved data only
+
+Producer: `scripts/MARL_e3_mrdecomp_report_v2.py`, output `e3_mrdecomp_20260928/report_v2.{json,txt}`. v1's `report.json`
+is kept.
+
+Self-checks, all PASS:
+- the recomputed thresholded choice equals the trainers' `dev_chosen` for all 30 checkpoints × 48 states;
+- the own-family best equals the shard rows;
+- each arm's realised gain equals the rows.
+
+It reproduces the auditor's per-checkpoint table exactly.
+
+**N1: best found = max(family-start search, prefix-start search) per state.**
+
+| | scratch s3 | BC s3 |
+|---|---|---|
+| best found (v1 value) | +20.75 (+20.08) | +16.29 (+16.04) |
+| states where the prefix search is better | 8 / 48 | 6 / 48 |
+| coverage lower bound | +5.31 | +3.96 |
+| prefix-start search share of the best found | 84.7% (not 88%) | 84.7% (not 86%) |
+
+**N2: selection regret = critic ranking loss + signed threshold effect** (legal bid + head; three init seeds averaged
+per state; seed-cluster CIs).
+
+| | scratch s3 | BC s3 |
+|---|---|---|
+| selection regret (v1 "estimation") | +15.63 | +13.65 |
+| ranking loss, family best − y(critic argmax) | +15.24 | +14.17 |
+| threshold effect, y(argmax) − y(chosen) | +0.38 [−2.14, 3.08] | −0.53 [−1.29, 0.29] |
+| share of choices changed by the threshold | 69% | 24% |
+| predicted gap, max f̂ − f̂(chosen) | 3.00 | 0.37 |
+
+- The same split holds for every arm. Every threshold effect is n.s.; the privileged diagnostic's is +0.73 / +0.15.
+- Six of the 30 checkpoints select τ = −∞, and none selects +∞.
+- **Reading:** the within-family loss is mostly the critic's ranking. It is estimation plus the decision rule, not
+  2ε alone, and the deployed rule's ν is not zero.
+- Removing the threshold does not rescue the selector: the argmax realises ≤ +0.44 for every legal checkpoint.
+
+The paper (§E3 "All receivers at once", abstract, Limitations) and CLAIMS S9 have been updated.
+
+**Dense shard 3.**
+- It died at 15:56:42: its 4th attempt stalled and the default watchdog retries were exhausted.
+- I checked that no writer was left, then relaunched it in place with v3 at 16:18:54 (`--retries 50`).
+- Consequence: `RUN_marl_e3_dense.sh` will report "a label job failed" and will NOT start the registered v2 ablation.
+  That ablation must be started by hand after all dense shards complete, before `RUN_marl_e3_dense_f1.sh`.
+
+## Update 16:55 — every scratch seed passes the gates; mix actor G1; the double-writer incident
+
+**Scratch recipe: 5/5 actors pass G1 and G2** (development 501–508; seed-cluster CIs from `MARL_e3_seed_cluster.py`).
+s0, s1, s2 and s4 are the resumable replicas `e3_scratch_rs_20260928`, the runs of record by the pre-declared rule.
+
+| actor | select (MP2 1730) | MP2 vs actor | none vs actual (G1) | stale | shuffle | full |
+|---|---|---|---|---|---|---|
+| scratch s0 | 1318 | +24.2% | +4.25% [+1.49, +6.64] | +1.7% | +5.3% | +1.7% |
+| scratch s1 | 1341 | +22.4% | +6.28% [+4.17, +8.48] | +3.9% | +11.6% | +4.1% |
+| scratch s2 | 1365 | +17.6% | +7.86% [+5.61, +9.90] | +3.3% | +3.7% | +1.1% |
+| scratch s3 | 1316 | +23.1% | +7.31% [+4.16, +10.27] | +1.1% | +5.1% | +2.5% |
+| scratch s4 | 1315 | +23.4% | +8.67% [+6.35, +10.99] | +0.7% | +3.1% | +7.8% |
+| mix s3 (pilot) | 1352 | +22.4% | **−0.90% [−2.31, +0.62] → G1 FAIL** | **+7.51% [+5.66, +9.50]** | +4.9% | −1.85% (n.s.) |
+
+Mix actor notes:
+- Mix vs scratch s3 on paired dev episodes: +0.57% [−1.77, +3.07]. That is no advantage, and it does not show
+  equivalence either.
+- "none" removes messages from the actor INPUT only (the prefix is still sent and cached). It is not a zero-byte
+  deployment.
+- The mix actor's downstream continues and is DIAGNOSTIC after its G1 failure.
+
+**Double-writer incident (ledger L-51..L-54).**
+- At 16:40 my downstream launch collided with another session's `RUN_marl_e3_resume_v4.sh`, which had started at
+  16:38 for the same four actors. Every label directory had two writers.
+- A CityFlow segfault (16:40:27) followed from a scenario directory being moved under a running process.
+- Fix, run by the user:
+  1. all of my writers were killed;
+  2. the other session's 20 producers were killed, and their watchdogs (retries 50) restarted them in place;
+  3. each resumed from the union of all partial files.
+- Now there is one writer per directory. The label audit runs on these 20 directories before any use.
+- My `MARL_e3_mrdecomp_report_v3.py` overwrote the other session's `MARL_e3_mrdecomp_report_v2.py`; its source is
+  lost. Its outputs `report_v2.{json,txt}` are kept, and v3 reproduces them exactly.
+
+## Update 18:49 — ranking diagnostics [SUPERSEDED at 18:57: strict-tie metric bug (ledger L-56); the reading below is WITHDRAWN, see the correction further down]
+
+**`scripts/MARL_e3_ranking_diag.py`** (`e3_ranking_diag_{scratch_s3,bc_s3}_{legal,priv}.json`; saved checkpoints;
+feasible candidates; pairs whose true gains differ).
+
+| pair order accuracy | TRAIN (in-sample) | SELECT | DEV |
+|---|---|---|---|
+| legal critic, scratch s3 (3 ckpts) | 0.60–0.64 | 0.41–0.45 | 0.40–0.48 |
+| same, EQUAL edit size only | 0.44–0.55 | 0.29–0.39 | 0.26–0.44 |
+| privileged critic, scratch s3 | 0.64–0.68 | 0.47–0.51 | 0.48–0.49 |
+| legal critic, BC s3 | 0.59–0.66 | 0.50–0.55 | 0.45–0.53 |
+| same, EQUAL edit size only | 0.46–0.61 | 0.38–0.54 | 0.33–0.51 |
+| rule "fewer replaced senders is better" | 0.52 | 0.51–0.52 | 0.53 |
+
+Other measurements:
+- The true gain correlates weakly and negatively with edit size (Spearman −0.03 to −0.08). The critic's
+  prediction correlates with edit size inconsistently across checkpoints (−0.37 to +0.30).
+- 34% (scratch s3) and 42% (BC s3) of candidates tie with the prefix exactly.
+
+**`scripts/MARL_e3_additive_transfer.py`**: a CONTEXT-FREE additive model, one coefficient per (receiver, sender)
+addition and per drop, ridge.
+
+| scratch s3 (overall / equal-size) | additive model |
+|---|---|
+| train → dev | 0.520 / 0.512 |
+| train → select | 0.513 / 0.526 |
+| train half A → half B (by traffic seed) | 0.516 / 0.511 |
+| in-sample, train | 0.532 / 0.517 |
+| coefficient correlation, half A vs half B | 0.19–0.20 |
+
+**Reading.**
+- The neural critics OVERFIT: in-sample 0.59–0.72, held-out mostly below 0.5.
+- The sub-chance ordering is a LEARNING failure, not a property of the data. A context-free additive model
+  transfers slightly ABOVE chance across episodes (0.51–0.52), and so does the trivial fewer-edits rule.
+- The transferable per-sender signal is weak: coefficients correlate only 0.2 across disjoint episode halves.
+  So a better-regularised evaluator can at best order candidates slightly better than chance with this data.
+  This is consistent with the privileged diagnostic realising only ~12% of the oracle.
+- It motivates F1 (more data against overfitting) as registered. It is NOT a new method and NOT a
+  development win. BC s3's additive run is pending.
+
+## Correction 18:57 — ranking metric (independent recheck 18:50; ledger L-55, L-56, L-57)
+
+The 18:49 critic pair accuracies were STRICT: a predicted tie scored as wrong. The fewer-edits rule was given
+half credit for ties. Under ONE tie-half metric the auditor's DEV values are:
+- scratch s3: 0.4954 [0.4823, 0.5090];
+- BC s3: 0.5264 [0.4860, 0.5671].
+
+Both CIs contain 0.5. The fewer-edits rule scores 0.529 and 0.557.
+
+**Withdrawn:**
+- "below chance" and "systematic inversion";
+- "learning failure, not data";
+- "at best slightly better than chance".
+
+**Current wording:** out-of-sample ranking ability is weak; the cause is not isolated.
+
+The same strict metric is in `MARL_e3_selector_diag_v2.py`, so every earlier "pair-order accuracy 0.40–0.48, below
+chance" statement is recomputed with `MARL_e3_selector_diag_v3.py` before it is used again. Selected gains,
+choices and closed-loop results are unaffected.
+
+**Additive probe v2 (19:01; `MARL_e3_additive_transfer_v2.py`, `e3_additive_transfer_v2_{scratch_s3,bc_s3}.json`).**
+Context-free additive evaluator; λ and τ chosen on SELECT; DEV reported; traffic-seed CIs. The +84 B and +74 B
+masks give identical results.
+
+| | scratch s3 | BC s3 |
+|---|---|---|
+| DEV pair accuracy (tie-half) | 0.520 [0.504, 0.537] | 0.546 [0.510, 0.578] |
+| τ chosen on SELECT | +∞ (never edit) | 1.95 (λ = 1000) |
+| DEV selected gain | 0.000 (always the prefix) | **−0.917 [−1.875, −0.188]** |
+| DEV oracle regret; harmful edits | 15.44; — | 13.25; 0.70 |
+
+**Reading.**
+- A slightly-above-chance ordering does NOT become a positive selected gain. Tuned on SELECT, the additive
+  evaluator either abstains (scratch) or edits harmfully (BC).
+- This is a diagnostic of weak transferable ordering. It is not evidence about the cause of the neural critic's
+  weakness, and not a baseline win.
+
+**Ranking diagnostic v2 (19:04; `MARL_e3_ranking_diag_v2.py`, `e3_ranking_diag_v2_{scratch_s3,bc_s3}_{legal,priv}.json`).**
+Tie-half credit for every scorer; each checkpoint's own feasible set; every train state (768); traffic-seed CIs;
+self-test PASS. The numbers reproduce the independent recheck exactly: scratch legal DEV 0.4954, BC 0.5264.
+
+| pair accuracy (mean of 3 ckpts) | TRAIN | SELECT | DEV [seed CI] | equal-size DEV | fewer-edits rule DEV | critic − rule DEV |
+|---|---|---|---|---|---|---|
+| scratch s3, legal | 0.653 | 0.484 | 0.495 [0.482, 0.509] | 0.498 | 0.529 | −0.034 [−0.081, +0.010] |
+| scratch s3, privileged | 0.693 | 0.530 | 0.531 [0.507, 0.556] | 0.526 | 0.530 | +0.002 [−0.045, +0.051] |
+| BC s3, legal | 0.672 | 0.563 | 0.526 [0.486, 0.567] | 0.528 | 0.557 | −0.030 [−0.041, −0.018] |
+| BC s3, privileged | 0.735 | 0.588 | 0.563 [0.528, 0.597] | 0.551 | 0.557 | +0.006 [−0.011, +0.025] |
+
+**Reading.**
+- There is a large train-to-held-out gap in ordering (0.65–0.73 in-sample vs 0.50–0.56 held-out).
+- Held-out, the legal critic is at chance (both CIs contain 0.5). On BC it is slightly WORSE than the fewer-edits
+  rule. The privileged evaluator is modestly above chance.
+- The cause of the gap is not isolated. Candidates include overfitting, the label noise of an H = 3 target, and
+  missing state information.
+- This does not change any selected gain or closed-loop result.
+
+**Selector diagnostic v3 (19:07; tie-half pair accuracy; `e3_selector_diag_v3_{scratch_s3,bc_s3}_{selectors_v2,selectors_v3}.json`).**
+
+| actor / selector set | checkpoints | DEV pair accuracy | DEV realised gain |
+|---|---|---|---|
+| scratch s3 / v2 ablation (4 variants × 3) | 12 | 0.482–0.516 (mean 0.502) | −0.98 … +0.31 |
+| BC s3 / v2 ablation | 12 | 0.491–0.539 (mean 0.513) | −2.33 … +0.08 |
+| scratch s3 / v3 (legal + privileged) | 9 | 0.482–0.550 (mean 0.523) | −0.88 … +2.71 |
+| BC s3 / v3 (legal + privileged) | 9 | 0.516–0.581 (mean 0.543) | −1.75 … +2.04 |
+
+- The positive maxima in the v3 sets are the PRIVILEGED diagnostic arms.
+- The legal arms order candidates at chance.
+- The old strict values (0.40–0.48) are withdrawn everywhere.
+
+## Update 20:14 — handoff 19:10 W1–W3; DFL round prepared (Amendment 1); a full reread
+
+**W1 (metric).** The strict v2 selector diagnostic and the v1 ranking diagnostic now refuse to run (ledger L-58).
+- Runners use `RUN_marl_e3_diag_v3.sh` or the new `*_dv3.sh` versions.
+- v3 JSONs were backfilled for every saved selector set of both s3 actors. They reproduce the earlier v3 files field
+  for field.
+- Every legal set is at chance on DEV:
+  - same-byte bids v4: 0.47–0.52;
+  - multi-class v5: 0.47–0.52;
+  - acquisition v1/v2: 0.48–0.52.
+
+**W2 (reporter).** `scripts/MARL_e3_panel_report.py` asserted 248 checks PASS on the four finished `cl_v3_direct`
+panels. Its numbers agree with the earlier ablation readings.
+
+**W3 (freeze package, draft).** `E3_FREEZE_PACKAGE_DRAFT_20260928_2011.json`:
+- run of record per scratch seed;
+- hashes of 11 actors;
+- selector sets;
+- runtime sources;
+- byte rules;
+- seeds;
+- stalls/retries per actor;
+- six OPEN items for the authors.
+
+Blocking: the downstream of scratch s0/1/2/4. Nothing is frozen.
+
+**DFL (PROTOCOL_E3_DFL_20260928.md, Amendment 1, 20:08–20:13).**
+- Arms: MSE-all, MSE-feasible and DFL (T = 1), equal lr grid; 27 fits per actor.
+- Screen: sign-flip under a stated symmetry assumption, intersection-union with the prefix contrast.
+- Development only; two smokes printed DEV values, which are disclosed.
+
+**Cause of the weak ranking.** It is NOT isolated (see the 18:57 correction); the DFL round tests only the objective.
+
+**Relaunches.**
+- Dense shards 0 and 4 exhausted their watchdog retries and were relaunched in place with `--retries 50` after a
+  writer check. Shard 0 has since COMPLETED.
+- BC s4 downstream (resume v4) COMPLETE at 19:50.
+- BC s2 shard 0 is running under resume v4.

@@ -1,0 +1,126 @@
+LeanMarlFloorAttainV1.lean:59:10: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanMarlFloorAttainV1.lean:100:12: error: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.596 \ ?m.595) = #?m.596 - #(?m.595 ∩ ?m.596)
+
+Note: Expected a function because this term is being applied to the argument
+  (subset_univ _)
+LeanMarlFloorAttainV1.lean:103:2: error: linarith failed to find a contradiction
+m : ℕ
+U : ℕ → Finset (Fin m)
+L : ℕ
+H : AgeFirstL U L
+t1 d : ℕ
+j : Fin m
+h1 : j ∈ U t1
+t2 : ℕ := t1 + d + 1
+h2 : j ∈ U t2
+hgap : ∀ (u : ℕ), t1 < u → u < t2 → j ∉ U u
+ht2 : t2 = t1 + d + 1
+W : Finset (Fin m) := (Icc t1 (t1 + d)).biUnion U
+hW✝ : W = (Icc t1 (t1 + d)).biUnion U
+O : Finset (Fin m) := univ \ W
+hO : O = univ \ W
+htauj : tau U t2 j = t1 + 1
+hO_sub : insert j O ⊆ U t2
+hjO : j ∉ O
+hcardO : m - #W + 1 ≤ L
+hW : #W ≤ (d + 1) * L
+hOc : #O = m - #W
+this : m ≤ #W + L - 1
+a✝ : (d + 2) * L ≤ m
+⊢ False
+failed
+LeanMarlFloorAttainV1.lean:115:8: error: linarith failed to find a contradiction
+case pos
+m : ℕ
+U : ℕ → Finset (Fin m)
+L : ℕ
+H : AgeFirstL U L
+d : ℕ
+ih : ∀ m_1 < d, ∀ (t1 : ℕ), ∀ j ∈ U t1, j ∈ U (t1 + m_1 + 1) → m < (m_1 + 2) * L
+t1 : ℕ
+j : Fin m
+h1 : j ∈ U t1
+h2 : j ∈ U (t1 + d + 1)
+u : ℕ
+hu1 : t1 < u
+hu2 : u < t1 + d + 1
+hu : j ∈ U u
+this : m < (t1 + d - u + 2) * L
+a✝ : (d + 2) * L ≤ m
+⊢ False
+failed
+LeanMarlFloorAttainV1.lean:116:8: warning: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+LeanMarlFloorAttainV1.lean:181:22: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanMarlFloorAttainV1.lean:181:34: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanMarlFloorAttainV1.lean:184:6: error: Function expected at
+  card_sdiff
+but this term has type
+  #(?m.112 \ ?m.111) = #?m.112 - #(?m.111 ∩ ?m.112)
+
+Note: Expected a function because this term is being applied to the argument
+  hsubU
+LeanMarlFloorAttainV1.lean:168:57: error: unsolved goals
+m : ℕ
+U : ℕ → Finset (Fin m)
+L : ℕ
+H : AgeFirstL U L
+t : ℕ
+j : Fin m
+hj : j ∉ U t
+hsubU : U t ⊆ ahead U t j
+hsub : ahead U (t + 1) j ⊆ ahead U t j \ U t
+h1 : #(ahead U (t + 1) j) ≤ #(ahead U t j \ U t)
+⊢ #(ahead U (t + 1) j) + L ≤ #(ahead U t j)
+LeanMarlFloorAttainV1.lean:193:2: warning: `push_neg` has been deprecated. Prefer using `push Not` instead.
+If you'd rather continue using `push_neg` in your project, you can implement it as follows:
+```
+open Lean.Parser.Tactic in
+macro "push_neg" cfg:optConfig loc:(location)? : tactic =>
+  `(tactic| push $cfg:optConfig Not $[$loc]?)
+```
+LeanMarlFloorAttainV1.lean:212:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  e ≥ 0
+  d ≥ 0
+  d ≤ 0
+  c ≥ 1
+  b ≥ 0
+  b ≥ 0
+  b - d + e ≤ 0
+  b ≤ 0
+  a ≥ 1
+where
+ a := ↑L
+ b := ↑q * ↑L
+ c := ↑q
+ d := ↑(#(ahead U t0 j))
+ e := ↑(#(ahead U (t0 + q) j))
+LeanMarlFloorAttainV1.lean:253:12: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanMarlFloorAttainV1.lean:255:12: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanMarlFloorAttainV1.lean:255:75: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 1
+  0 ≤ b - 2*c ≤ 1
+  a - c ≥ 0
+  -2 ≤ 2*a - b ≤ -1
+where
+ a := ↑(t - 1) / 2
+ b := ↑t
+ c := ↑t / 2
+'CIGAMF.P13.MarlFloorAttain.tau_succ_eq_lastTx' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.no_repeat' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.layer_exact' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.recent_within' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.floor_attained' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.alt_hyps' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CIGAMF.P13.MarlFloorAttain.alt_floor' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+exit 1

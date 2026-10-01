@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 175, in <module>
+    main(p.parse_args())
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 149, in main
+    ep = f'seed{seed}_load{load:g}'; q, rr = run(sc, seed, load, cks, a.rule, a.order, a.capacity, book)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 109, in run
+    env, pol = make(sc, seed, load, cks['relay'], capacity)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_zero_loss_truncation.py", line 47, in make
+    env, topo, _, _ = sc.env(seed, load)
+                      ^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_train.py", line 46, in env
+    self.cache[(seed, load)] = scenario(self.out, seed, load)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_hetero_target_diag.py", line 50, in scenario
+    return make_grid_scenario(out / 'scenarios' / f'seed{seed}_load{load:g}', rows=ROWS, cols=COLS, traffic_seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/envs/external/cityflow_budgeted.py", line 883, in make_grid_scenario
+    p.write_text(json.dumps(obj), encoding="utf-8")
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1048, in write_text
+    return f.write(data)
+           ^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device
