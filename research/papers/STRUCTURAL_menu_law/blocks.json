@@ -20,8 +20,31 @@
  {
   "kind": "prose",
   "lines": [
-   "An ordering is a permutation; the retained prefix at budget k has sum s_k, and the normalised regret is (|s_k| \u2212 k mod 2)/D, because every g_i is odd and so the minimum of |\u03a3 g_i| over subsets of size k equals k mod 2 by parity.",
-   "Signed cancellation changes the problem qualitatively. With non-negative weights, adding an item never hurts, and a single well-chosen order degrades gracefully across budgets. Here a prefix can overshoot and then be corrected, so a schedule that is excellent at one budget can be poor at the next, and the question of how many schedules a menu needs becomes sharp."
+   "An ordering is a permutation; the retained prefix at budget k has sum s_k, and the normalised regret is (|s_k| \u2212 k mod 2)/D, because every g_i is odd and so the minimum of |\u03a3 g_i| over subsets of size k equals k mod 2 by parity. Signed cancellation changes the problem qualitatively. With non-negative weights, adding an item never hurts, and a single well-chosen order degrades gracefully across budgets."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Here a prefix can overshoot and then be corrected, so a schedule that is excellent at one budget can be poor at the next, and the question of how many schedules a menu needs becomes sharp."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
+   "What the literature leaves open"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The literature therefore leaves a specific opening. Incremental maximisation prices non-negative objectives but excludes signed ones; K-adaptability bounds menu size by uncertainty dimension but requires a concavity the prefix constraint destroys; competitive analysis supplies a ratio that the parity floor makes ill-defined."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "No existing treatment simultaneously: (i) handles signed weights that cancel; (ii) proves a menu law as an identity with both sides attained rather than as a bound; (iii) constructs the attaining menu rather than showing it exists; and (iv) establishes that the difficulty survives normalisation and a quantified amount of slack."
   ]
  },
  {
@@ -60,12 +83,13 @@
  {
   "kind": "prose",
   "lines": [
-   "HOW THEY ARE CLOSED. The first bounds a maximum below by an average over budgets; the second bounds an expectation below by moving a per-schedule maximum inside. Each is a finite-sum inequality with no structure of the family used, so they apply to any non-negative regret.",
-   "STEP 4 \u2014 BOTH ARE ATTAINED  (C1, C4).",
-   "WHY THIS FOLLOWS FROM STEP 3. Bounds alone do not give a ratio. The uniform mixture over one-defect schedules attains the averaged bound at c/|Bud| and the path bound at c, so neither is loose and the ratio between them is exact.",
-   "STEP 5 \u2014 THE CONSTRUCTION  (C3).",
-   "WHY THIS FOLLOWS FROM STEP 4. Step 4 needs one-defect schedules to exist for every budget. Step 5 builds them: a greedy alternation maintaining the invariant |s| \u2264 1 \u2227 |s \u2212 a + b| \u2264 1 produces, for every m \u2265 5 and every j, an ordering of the multiset paying exactly 2 and paying it exactly at j.",
-   "STEP 6 \u2014 THE RATIO  (C1)."
+   "HOW THEY ARE CLOSED. The first bounds a maximum below by an average over budgets; the second bounds an expectation below by moving a per-schedule maximum inside. Each is a finite-sum inequality with no structure of the family used, so they apply to any non-negative regret. STEP 4 \u2014 BOTH ARE ATTAINED  (C1, C4). WHY THIS FOLLOWS FROM STEP 3. Bounds alone do not give a ratio."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The uniform mixture over one-defect schedules attains the averaged bound at c/|Bud| and the path bound at c, so neither is loose and the ratio between them is exact. STEP 5 \u2014 THE CONSTRUCTION  (C3). WHY THIS FOLLOWS FROM STEP 4. Step 4 needs one-defect schedules to exist for every budget."
   ]
  },
  {
@@ -110,9 +134,13 @@
  {
   "kind": "prose",
   "lines": [
-   "THE RATIO IS EXACTLY m \u2212 1, AND BOTH LEVELS FALL. Over m = 5 to 20 the two values decrease like 1/m while their ratio grows linearly. The growth of the ratio and the decay of the level are simultaneous, so a fixed-\u03b5 unbounded separation is NOT claimed and is not implied.",
-   "THE CONSTRUCTION COVERS EVERY BUDGET. For each m \u2265 5 and each budget j the built ordering pays exactly 2 and pays it exactly at j, so a menu of m \u2212 1 schedules covers every budget for free in the averaged sense \u2014 while Step 2 shows no single schedule can.",
-   "THE COLUMN SUM IS A BUDGET, FOR EVERY MENU. The retained trajectory satisfies \u03a3_i x*_{i,k} = min(k,n) identically. No menu can change this count, which is why it cannot by itself distinguish menus."
+   "THE RATIO IS EXACTLY m \u2212 1, AND BOTH LEVELS FALL. Over m = 5 to 20 the two values decrease like 1/m while their ratio grows linearly. The growth of the ratio and the decay of the level are simultaneous, so a fixed-\u03b5 unbounded separation is NOT claimed and is not implied. THE CONSTRUCTION COVERS EVERY BUDGET."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "For each m \u2265 5 and each budget j the built ordering pays exactly 2 and pays it exactly at j, so a menu of m \u2212 1 schedules covers every budget for free in the averaged sense \u2014 while Step 2 shows no single schedule can. THE COLUMN SUM IS A BUDGET, FOR EVERY MENU. The retained trajectory satisfies \u03a3_i x*_{i,k} = min(k,n) identically. No menu can change this count, which is why it cannot by itself distinguish menus."
   ]
  },
  {
@@ -138,6 +166,12 @@
   ]
  },
  {
+  "kind": "prose",
+  "lines": [
+   "Reporting Protocol All m in range are reported with no exclusions, and the law is tabulated for m=5 to 20 alongside. Every Ordering Pays, Checked Exhaustively The minimum total defect is 2 at every m from 5 to 120, so no ordering is free. The minimum path defect is also 2, so no ordering escapes by spreading a total of 2 across several budgets at lower cost each \u2014 which Corollary already forbids and which the sweep confirms the implementation respects."
+  ]
+ },
+ {
   "kind": "header",
   "lines": [
    "IV.  Discussion"
@@ -146,7 +180,19 @@
  {
   "kind": "prose",
   "lines": [
-   "EXHAUSTIVE, NOT SAMPLED \u2014 AND FAR PAST ENUMERATION. Enumerating orderings costs m! tuples, so m = 14 alone is 8.7\u00d710\u00b9\u2070. Every value of g\u2098 is odd, so a partial ordering is summarised completely by how many copies of each value it has used, and every quantity here becomes a path functional on a graph with O(m\u00b2) nodes. That certifies every ordering for 5 \u2264 m \u2264 120 \u2014 6.9\u00d710\u00b3\u2078 of them \u2014 in two minutes, agreeing with brute force everywhere the two overlap. HOW RARE AN OPTIMAL ORDERING IS. The theorems say the bound is attained; the census says how nearly it is missed. The fraction of orderings attaining defect 2 falls from one in five at m = 5 to three in 10\u00b9\u2079 at m = 120, and the bulk of orderings pay tens of units at m = 40 and hundreds at m = 80. The construction does not close a gap between good and slightly better. IS THE FAMILY SPECIAL? Over every balanced family of odd values: forcing a defect turns out to be GENERIC, 98 to 100 per cent, not rare as expected. What is rare is covering every budget \u2014 one or two families per size. And g\u2098 is not the cheapest witness (m+2 suffices) but is exactly the cheapest MENU (m+4), at every size tested."
+   "EXHAUSTIVE, NOT SAMPLED \u2014 AND FAR PAST ENUMERATION. Enumerating orderings costs m! tuples, so m = 14 alone is 8.7\u00d710\u00b9\u2070. Every value of g\u2098 is odd, so a partial ordering is summarised completely by how many copies of each value it has used, and every quantity here becomes a path functional on a graph with O(m\u00b2) nodes."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The theorems say the bound is attained; the census says how nearly it is missed. The fraction of orderings attaining defect 2 falls from one in five at m = 5 to three in 10\u00b9\u2079 at m = 120, and the bulk of orderings pay tens of units at m = 40 and hundreds at m = 80. The construction does not close a gap between good and slightly better. IS THE FAMILY SPECIAL?"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "What is rare is covering every budget \u2014 one or two families per size. And g\u2098 is not the cheapest witness (m+2 suffices) but is exactly the cheapest MENU (m+4), at every size tested."
   ]
  },
  {
@@ -163,13 +209,43 @@
  {
   "kind": "header",
   "lines": [
+   "Limitations \u2014 what is not established"
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "The law is for one family. Assumption 2 generalises \u2014 the lower side holds for any odd family containing an element above the band \u2014 but assumption 3 does not, since Theorem uses the specific counts the equation above. A setting satisfying the mechanism's hypotheses inherits the impossibility and not the identity. The column identity singles out no menu."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "A prescribed non-uniform trajectory may exclude the witness and change the value, and that case is open. The cyclic menu is not shown optimal. It is chosen for computability. The assembly carries two hypotheses. Theorem needs balance and concentration on the support of the mixture. Both hold for the witness, but the law as stated is not hypothesis-free. No algorithm and no competitive ratio."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "Nothing here is an online algorithm, and for the reason given in the Background the usual competitive currency is unavailable. The tolerance band is narrow. Theorem covers \u03b5<1/114 and says nothing above it; the difficulty does collapse for larger slack."
+  ]
+ },
+ {
+  "kind": "header",
+  "lines": [
    "V.  Conclusions"
   ]
  },
  {
   "kind": "prose",
   "lines": [
-   "One schedule cannot serve every budget, and the cost of serving them all is exactly the menu size m\u22121. Every ordering pays at least two, verified for every m from 5 to 120 rather than argued asymptotically. The construction is not merely a witness: among all balanced families of odd values it has the least total variation of any that covers every budget, though not of any that merely forces a defect. And an ordering chosen without regard to the law pays a defect that grows with the population, while the menu pays two at every size."
+   "One schedule cannot serve every budget, and the cost of serving them all is exactly the menu size m\u22121. Every ordering pays at least two, verified for every m from 5 to 120 rather than argued asymptotically. The construction is not merely a witness: among all balanced families of odd values it has the least total variation of any that covers every budget, though not of any that merely forces a defect."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "And an ordering chosen without regard to the law pays a defect that grows with the population, while the menu pays two at every size."
   ]
  },
  {
@@ -181,7 +257,13 @@
  {
   "kind": "prose",
   "lines": [
-   "EXHAUSTIVE AND EXACT, WITH NO FLOATING POINT ANYWHERE. Counts are unbounded integers; the census of orderings by total defect is exact. There is no seed and no confidence interval in this section because there is no sampling in it. THE FAST METHOD IS CHECKED AGAINST THE SLOW ONE. Every m the brute-force enumeration could reach \u2014 up to 13 \u2014 is recomputed by the dynamic programme, and the two agree in every column. That agreement is what licenses the rows beyond it, out to m = 120. AND THE GENERAL EVALUATOR IS CHECKED AGAINST THE SPECIFIC ONE. The family sweep runs g\u2098 itself through its general code path and requires the published answer back at every m before reporting anything about other families."
+   "EXHAUSTIVE AND EXACT, WITH NO FLOATING POINT ANYWHERE. Counts are unbounded integers; the census of orderings by total defect is exact. There is no seed and no confidence interval in this section because there is no sampling in it. THE FAST METHOD IS CHECKED AGAINST THE SLOW ONE. Every m the brute-force enumeration could reach \u2014 up to 13 \u2014 is recomputed by the dynamic programme, and the two agree in every column."
+  ]
+ },
+ {
+  "kind": "prose",
+  "lines": [
+   "AND THE GENERAL EVALUATOR IS CHECKED AGAINST THE SPECIFIC ONE. The family sweep runs g\u2098 itself through its general code path and requires the published answer back at every m before reporting anything about other families."
   ]
  },
  {
@@ -193,7 +275,7 @@
  {
   "kind": "caption",
   "lines": [
-   "[1] Y. Disser, M. Klimm, K. Schewior and D. Weckbecker, \u201cIncremental maximization,\u201d arXiv:2305.01310. [2] A. Bernstein, Y. Disser, M. Gro\u00df and S. Himburg, \u201cGeneral bounds for incremental maximization,\u201d in Proc. ICALP, 2017."
+   "[1] A. Bernstein, Y. Disser, M. Gro, and S. Himburg, \u201cGeneral bounds for incremental maximization,\u201d in Proc. 44th Int. Colloq. Automata, Languages, and Programming (ICALP), 2017. [2] Y. Disser, M. Klimm, K. Schewior, and D. Weckbecker, \u201cIncremental maximization,\u201d arXiv:2305.01310, 2023. [3] J. Kurtz, \u201cBounding the optimal number of policies for robust K-adaptability,\u201d Math. Program., 2026. [4] A. Borodin and R. El-Yaniv, Online Computation and Competitive Analysis. Cambridge, U.K.: Cambridge Univ. Press, 1998. [5] G. L. Nemhauser, L. A. Wolsey, and M. L. Fisher, \u201cAn analysis of approximations for maximizing submodular set functions \u2014 I,\u201d Math. Program., vol.~14, pp.~265\u2013294, 1978. [6] The mathlib Community, \u201cThe Lean mathematical library,\u201d in Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP), 2020, pp.~367\u2013381. [7] L. de Moura and S. Ullrich, \u201cThe Lean 4 theorem prover and programming language,\u201d in Proc. 28th Int. Conf. Automated Deduction (CADE), 2021, pp.~625\u2013635."
   ]
  }
 ]

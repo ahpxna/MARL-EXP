@@ -1,0 +1,764 @@
+\input{preamble}
+
+\begin{document}
+
+\title{The Price of a Frozen Surrogate in Support-Aware Compression:\\
+Separation, Starvation and the Cost of Repair}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A compression is chosen by comparing losses. A learner that chooses one under noise faces an
+information game whose alternatives are the worlds in which its choice would be wrong. That
+alternative set is routinely replaced by a surrogate: the extrema realising each loss are
+frozen at their current cells and the ordering constraints are dropped. We ask what this
+costs, and what it costs to undo. The model is correct, the stopping test is valid and the
+decision is unchanged; only the geometry used to score designs is frozen.
+
+\emph{Separation after optimisation.} Take a construction with four extremum cells and $r$
+pairs of middle cells at variance $M$, and let both games range over the same centred class.
+The frozen game has value exactly $\frac{9}{512}$, while the true game lies between
+$\frac{9}{128(4+2rM)}$ and $\frac{1}{8rM}$. The ratio is therefore $\Theta(\frac{1}{rM})$, and
+the gap is present at $M=1$. On a second compression class the surrogate also \emph{under}prices,
+by a factor $M/96$, so no constant relates it to the truth.
+
+\emph{Starvation.} Every design that attains the surrogate's optimum puts zero weight on the
+middle cells, and so collects no information against the alternatives the decision turns on.
+A design within $\varepsilon$ of that optimum collects at most $\frac{64\varepsilon}{9rM}$.
+
+\emph{The price of repair.} Giving up a fraction $\beta$ of the surrogate's value buys back
+$\Theta(\frac{\beta}{rM})$ of true information, on the game the decision defines. Operationally,
+every $\delta$-correct policy, including one with an unbounded stopping time, must give up a
+\emph{budget} of surrogate value. Let $N$ be the expected number of queries and $\beta$ the
+relative sacrifice of the average design. Then $N\beta\ge8rM\log(1/\delta)(1-o(1))$. The
+rate-optimal learner pays at most $\frac{128(4+2rM)}{9}\log(1/\delta)(1+o(1))$, so the budget is
+$\Theta(rM\log(1/\delta))$, and a paid budget can be spread over any run length. The
+same bound gives a forcing law: a learner whose informative queries grow like $cT^{a}$ needs
+$\mathbb{E}T\gtrsim\log^{1/a}(1/\delta)$.
+
+\emph{Learners.} An ideal learner, defined and proved here, is $\delta$-correct and attains
+$\mathbb{E}\tau_{\delta}/\log(1/\delta)\to1/\Gamma_{\rm true}$. The learner that tracks the
+surrogate needs $\Omega(\log^{2}(1/\delta))$ samples, both when it tracks the surrogate's optimum
+at the true world and when it re-solves the surrogate at its own estimate.
+
+All theorems are machine-checked in Lean~4. Measurements on finite panels are reported as such.
+\end{abstract}
+
+\begin{IEEEkeywords}
+compression, alternative sets, experimental design, surrogate objectives, sequential testing,
+formal verification
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+\subsection{The question}
+
+Let a world be $\theta$, let $T$ be a retained coordinate set, and let $L_{\theta,K}(T)$ be the
+compression loss of $T$ on the deployment support $K$. A learner must return a $T$ whose
+regret is at most $\varepsilon$, and it pays for observations. Its cost is governed by an
+information game. The inner infimum of that game ranges over the \emph{alternatives}: the
+worlds in which the returned $T$ would be wrong.
+
+Computing that infimum requires the alternative set. The natural shortcut freezes the cells
+realising each maximum and minimum, and asks how far the observations must move to reverse
+one linear contrast. We call this the \emph{frozen surrogate}. The observation model stays
+correct, the stopping test stays valid and the decision is unchanged. Only the geometry used
+to score designs is altered. This paper measures what that alteration costs, and what it
+costs to undo.
+
+\subsection{Results}
+
+Four results carry the paper.
+\begin{enumerate}
+\item[1)] \textbf{Separation after optimisation} (Theorem~\ref{thm:sep}). Both games optimise
+the allocation and range over the same centred class. Even so, the true game is a factor
+$\Theta(rM)$ below the frozen one, and the factor is already present at unit variance. The
+error has no fixed sign: on a second compression class the surrogate underprices by a factor
+$M/96$, so no constant relates it to the truth.
+\item[2)] \textbf{Starvation} (Theorem~\ref{thm:starve}). Every optimum of the surrogate puts
+zero weight on the cells that carry the decision. An approximate optimum leaks in proportion
+to its suboptimality.
+\item[3)] \textbf{The price of repair} (Theorems~\ref{thm:frontier}, \ref{thm:sacrifice},
+\ref{thm:sacstop}, \ref{thm:dilute}, \ref{thm:forcing}). A design that sacrifices a fraction
+$\beta$ of surrogate value recovers $\Theta(\beta/rM)$ of true information. Operationally, every
+$\delta$-correct policy, including one that stops at an unbounded random time, must sacrifice a
+budget of $8rM\log(1/\delta)$ query-units of surrogate value to first order. The rate-optimal
+learner pays that budget up to a factor of at most $\frac{32}{9}+\frac{64}{9rM}$.
+The budget can be spread over any run length: the relative sacrifice falls as $N_{0}/N$ while
+the policy stays $\delta$-correct (Theorem~\ref{thm:dilute}).
+A learner that meets its demand for informative queries only through forcing at rate
+$t^{a-1}$ pays $\log^{1/a}(1/\delta)$.
+\item[4)] \textbf{Learners} (Theorems~\ref{thm:ideal}, \ref{thm:surlearner}). A completely
+defined ideal learner attains the true rate. The learner that tracks the surrogate, at the
+truth or re-solved at its own estimate, pays a whole extra power of $\log(1/\delta)$.
+\end{enumerate}
+Three further facts are what make these statements about compression rather than about a
+parameter class: the construction is an observation model, the alternative set is exactly a
+union of polyhedra, and a margin certificate is not a decision (Section~\ref{sec:model}).
+
+\subsection{Prior work, and what does not follow from it}
+
+Information games with several correct answers, and alternative sets that decompose into
+finitely many convex regions, are developed in the literature. Degenne and
+Koolen~\cite{degenne2019} treat multiple correct answers, with a lower bound and an algorithm
+that attains it. The characteristic time and Track-and-Stop are due to Garivier and
+Kaufmann~\cite{garivier2016}, the change-of-measure inequality to Kaufmann, Capp\'e and
+Garivier~\cite{kaufmann2016}, and Jourdan et al.~\cite{jourdan2021} separate the answer set from
+the action set in combinatorial pure exploration. We inherit that machinery and do not claim
+it. Convex relaxations of the alternative geometry, used to make such algorithms tractable,
+appear in~\cite{shukla2024}; the surrogate studied here is not a relaxation, and it misprices in
+both directions. Wang and You~\cite{wangyou2026} study ranking-and-selection with multiple
+correct answers and non-answerable estimates. That an information proxy can select a design
+lacking identifiability, at every one of its optima under a stated condition, is
+known~\cite{overstall2022}. So is the fact that acquisition should target the decision rather
+than the predictor~\cite{filstroff2021}, error amplification under
+misspecification~\cite{tang2026}, and decision-focused sequential design with a failing
+prediction-focused instance~\cite{wan2026}. When a proxy suffices for a decision is studied
+directly~\cite{schutte2026}. Bennouna, Bennouna, Amin and Ozdaglar characterise exactly when a
+noiseless linear dataset determines the optimal decision: the decision-relevant directions must
+lie in its span~\cite{bennouna2025}. They also study data informativeness under
+uncertainty~\cite{bennouna2026}. We ask a different question: what those directions cost to
+measure under noise, and what a surrogate that drops them costs to repair.
+
+Pricing identification in a second currency is also known. Yang, Tan and Jin~\cite{yang2024}
+bound the regret incurred before a best-arm identification stops. Huang~\cite{huang2026}
+certifies representation adequacy at minimum incurred loss, with a cost-weighted
+characteristic time and a matching Track-and-Stop for a fixed observation kernel, and leaves
+representation repair open. Our budget is paid in the surrogate's own value, which is concave
+in the design rather than a per-query cost, and it prices the repair of a frozen geometry.
+
+The generic statements are therefore taken. What remains is narrower. The model is correct,
+the test is valid and the decision is unchanged, and still the frozen geometry changes what a
+design can learn and what a learner pays. Table~\ref{tab:prior} states the difference at the
+level of theorems.
+
+\begin{table}[h]
+\caption{Nearest sources, and a theorem of this paper that does not follow from each.}
+\label{tab:prior}
+\centering
+\footnotesize
+\begin{tabular}{@{}p{0.30\columnwidth}p{0.62\columnwidth}@{}}
+\toprule
+Nearest source & Theorem here that does not follow \\
+\midrule
+Proxy insufficiency~\cite{schutte2026,overstall2022} & The bracket
+$\frac{4}{4+2rM}\le\Gamma_{\rm true}/\Gamma_{\rm fr}\le\frac{64}{9rM}$ after optimisation, and
+the leak $J_{\rm true}\le\frac{64\varepsilon}{9rM}$ of every $\varepsilon$-optimal design
+(Thms.~\ref{thm:sep}, \ref{thm:starve}); the every-optimum form alone is known \\
+Data sufficiency~\cite{bennouna2025} & The noisy price of the directions a surrogate drops: the
+frontier and the budget (Thms.~\ref{thm:frontier}, \ref{thm:sacrifice}) \\
+Cost-weighted certification~\cite{huang2026,yang2024} & A budget in the surrogate's concave
+value, and its repair price; spreading it (Thms.~\ref{thm:sacrifice}, \ref{thm:dilute}) \\
+Multiple-answer track-and-stop~\cite{degenne2019} & The repair frontier
+$\Theta(\beta/rM)$ and the sacrifice budget $N\beta\ge8rM\log(1/\delta)(1-o(1))$
+(Thms.~\ref{thm:frontier}, \ref{thm:sacrifice}) \\
+Decision-focused design~\cite{wan2026} & The $\Omega(\log^{2}(1/\delta))$ cost of the
+learner that re-solves the surrogate at its estimate, against the ideal learner's
+$\Theta(\log(1/\delta))$ (Thms.~\ref{thm:ideal}, \ref{thm:surlearner}) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What is proved, and how}
+
+Three evidence classes appear, and they are never interchanged.
+\begin{itemize}
+\item \PROVED: a theorem stated at the paper's objects and checked in
+Lean~4~\cite{demoura2021} against Mathlib~\cite{mathlib2020}.
+\item \CERT: an exact rational certificate.
+\item \NUM: a floating-point or Monte Carlo result.
+\end{itemize}
+Each theorem carries one line naming its Lean declaration. The supplement gives the proof
+architecture, every supporting declaration, and the status of results superseded during
+preparation. All modules compile with no \texttt{sorry} and no \texttt{native\_decide}, and
+their axioms lie within \{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}.
+Every hypothesis of a headline is either a model assumption displayed in it or discharged.
+
+\section{The model, the decision and its alternatives}
+\label{sec:model}
+
+\paragraph{The loss} Parametrise the world linearly, $F_{\theta}(x)=\phi(x)^{\top}\theta$ on a
+finite domain with a fixed reference and a deployment support $K$. For a retained set $T$ the
+residual at a support point is a linear form $a_{T}(x)^{\top}\theta$, and
+\begin{equation}
+L_{\theta,K}(T)=\tfrac12\Bigl[\max_{x\in K}a_{T}(x)^{\top}\theta
+-\min_{x\in K}a_{T}(x)^{\top}\theta\Bigr].
+\label{eq:loss}
+\end{equation}
+Query $e$ returns $Y_{e}\sim\mathcal N(\theta_{e},\nu_{e})$, and a design is an allocation
+$w\in\Delta$. For a set of alternatives $\mathcal A$, the value of a design and the game are
+\begin{equation}
+J(w)=\inf_{\lambda\in\mathcal A}\ \tfrac12\sum_{e}\frac{w_{e}(\lambda_{e}-\theta_{e})^{2}}{\nu_{e}},
+\qquad \Gamma=\sup_{w\in\Delta}J(w).
+\label{eq:game}
+\end{equation}
+The summand is the per-query Gaussian divergence, so $1/\Gamma$ is the rate of a
+$\delta$-correct learner.
+
+\leanbox{\lean{residual\_eq\_inner}, \lean{loss\_eq\_half\_range},
+\lean{selectedRadius\_eq\_compressionLoss} in \lean{LeanPaperAModelBridgeV1};
+\lean{energy\_eq\_sum\_gaussKL} in \lean{LeanPaperAStrictV1}}
+
+\paragraph{The construction} Two arms, $A$ with cells $a_{0},a_{1}$ and $B$ with anchors
+$b_{2},b_{3}$ and $2r$ middle cells grouped in $r$ pairs. The response is additive,
+$F_{\lambda}(a,b)=\lambda_{A}(a)+\lambda_{B}(b)$. Anchors and arm-$A$ cells have variance $1$
+and middle cells variance $M>0$. The world $\theta_{C}$ puts arm $A$ at $(-\frac12,\frac12)$,
+the anchors at $(-\frac18,\frac18)$ and every middle cell at $0$. The class $\Theta_{0}$
+requires each arm's cells to sum to zero.
+
+\begin{theorem}[The construction is an observation model]
+\label{thm:bridge}
+$\lambda\in\Theta_{0}$ if and only if both uniform-product marginals recover their coordinates.
+On $\Theta_{0}$, $L_{\lambda}(\{A\})=\frac12\mathrm{range}(\lambda_{B})$ and
+$L_{\lambda}(\{B\})=\frac12\mathrm{range}(\lambda_{A})$. Retaining $A$ is $\varepsilon$-unsafe
+if and only if $\mathrm{range}(\lambda_{B})>\mathrm{range}(\lambda_{A})+2\varepsilon$, and this
+set is exactly the union over pairs $(p,q)$ of arm-$B$ cells of the polyhedra
+$\{\lambda_{1}-\lambda_{0}+2\varepsilon<\lambda_{p}-\lambda_{q},\
+\lambda_{0}-\lambda_{1}+2\varepsilon<\lambda_{p}-\lambda_{q}\}$.
+\end{theorem}
+
+\leanbox{\lean{centred\_iff\_marginals}, \lean{lossRetainA\_eq}, \lean{unsafeA\_iff\_range\_gap}
+in \lean{LeanPaperACentredModelV1}; \lean{unsafe\_iff\_union\_of\_polyhedra} in
+\lean{LeanPaperARegionV1}}
+
+The unsafe condition is strict. Its closure contains ties, which are not unsafe. The game the
+decision defines is therefore taken over the \emph{strict} alternatives
+$\mathcal A_{\rm true}=\{\mathrm{range}(\lambda_{A})<\mathrm{range}(\lambda_{B})\}\cap\Theta_{0}$,
+and every bound below is approached from inside that strict set.
+
+\paragraph{The two games} The true game uses $\mathcal A_{\rm true}$. The frozen surrogate
+keeps arm $A$'s cells and arm $B$'s anchors as the extrema and tests the one contrast
+$(\lambda_{a_{1}}-\lambda_{a_{0}})-(\lambda_{b_{3}}-\lambda_{b_{2}})\le0$ over $\Theta_{0}$. The
+two sets are not nested. The surrogate admits parameters that break the ordering, and it
+misses alternatives that move a middle cell past an anchor.
+
+\paragraph{A margin certificate is not a decision} Suppose the certificate condition implies
+that $T$ is safe. Then the certificate's alternatives contain the decision's, so certifying is
+never cheaper than deciding. On $F=ax_{1}+bx_{2}+cx_{1}x_{2}$ the decision is the sign of $a-b$,
+while the usual margin certificate asks $a-b\ge2c$. At $a=3$, $b=1$, $\varepsilon=0.1$ the
+certificate costs $19.4$ times the decision at $c=0.25$ and $1089$ times at $c=0.9$. It is
+unattainable for $c\ge1$, where the decision is still settled. \NUM{}
+
+\leanbox{\lean{certification\_costs\_at\_least\_as\_much} in
+\lean{LeanPaperAOracleCertificateV1}}
+
+\section{Separation after the allocation is optimised}
+\label{sec:separation}
+
+\begin{theorem}[Separation]
+\label{thm:sep}
+For every $r\ge1$ and $M>0$,
+\[
+\Gamma_{\rm fr}=\frac{9}{512},\qquad
+\frac{9}{128(4+2rM)}\ \le\ \Gamma_{\rm true}\ \le\ \frac{1}{8Mr},
+\]
+and hence
+\[
+\frac{4}{4+2rM}\ \le\ \frac{\Gamma_{\rm true}}{\Gamma_{\rm fr}}\ \le\ \frac{64}{9rM}.
+\]
+The same bounds hold for the game over the strict alternatives. There, the Gaussian divergence
+of the observation law is the energy of~\eqref{eq:game} for every centred candidate.
+\end{theorem}
+
+\leanbox{\lean{frozenGameC₀\_eq}, \lean{trueGameC₀\_le}, \lean{trueGameC₀\_ge},
+\lean{centred\_separation} in \lean{LeanPaperACentredV1}; \lean{strict\_game\_bounds},
+\lean{actualKLValue\_eq} in \lean{LeanPaperAEndgameV1}; \lean{gaussianKLIdentification\_holds}
+in \lean{LeanPaperAGaussianKLV1}}
+
+\emph{Why.} The upper bound is a pigeonhole. Some pair of middle cells carries at most $1/r$
+of any design, and moving that pair apart by $\frac12+d$ reverses the decision. The move is a
+strict alternative inside $\Theta_{0}$ for every $d>0$. The lower bound is the
+variance-proportional design $w_{e}=\nu_{e}/(4+2rM)$, at which the energy is the plain squared
+distance. Reversing the decision forces a contrast of at least $g=\frac34$ across four cells,
+and Cauchy--Schwarz turns that into $\frac{9}{64}$ of squared distance. The same $g$ gives
+$\Gamma_{\rm fr}=g^{2}/32$. Both infima are restricted to $\Theta_{0}$, and restricting an
+infimum can only raise it. So neither bound is inherited from a larger set: each witness is
+proved to lie in the class.
+
+\emph{The surrogate can also underprice.} The centred construction shows one direction. A second
+compression class shows both, again after the sup over designs. It has two relations of four
+cells, the decision compares their ranges, every table is the response table of an additive
+world, and one cheap cell has variance $M$. On one centred world of this class
+$\Gamma_{\rm true}/\Gamma_{\rm fr}\le64/M$, and on another $\Gamma_{\rm true}/\Gamma_{\rm fr}\ge M/96$.
+Both games exist, and no constant factor relates the surrogate to the truth on the class.
+
+\leanbox{\lean{low\_separation\_at\_world}, \lean{high\_separation\_at\_world},
+\lean{exists\_low\_games}, \lean{exists\_high\_games}, \lean{no\_constant\_factor\_on\_families},
+\lean{additive\_response\_shift} in \lean{LeanPaperASeparationV1}}
+
+\section{The surrogate misdesigns}
+\label{sec:starve}
+
+A ratio of optimal values can diverge while both objectives select the same design. What
+matters is the design the surrogate selects.
+
+\begin{theorem}[Starvation]
+\label{thm:starve}
+For every allocation $w$, $J_{\rm fr}(w)\le\frac{9}{512}\,a(w)$, where $a(w)$ is the mass on
+arm $A$ and the anchors. Consequently:
+\begin{enumerate}
+\item[(i)] every $w$ with $J_{\rm fr}(w)=\Gamma_{\rm fr}$ puts zero mass on the middle cells,
+and $J_{\rm true}(w)=0$;
+\item[(ii)] every $w$ with $J_{\rm fr}(w)\ge\Gamma_{\rm fr}-\varepsilon$ puts at most
+$\frac{512}{9}\varepsilon$ on the middle cells, and $J_{\rm true}(w)\le\frac{64\varepsilon}{9rM}$.
+\end{enumerate}
+\end{theorem}
+
+\leanbox{\lean{frozenValueC₀\_le}, \lean{starvation\_at\_optimum₀}, \lean{near\_optimal\_starvation₀},
+\lean{near\_optimal\_trueValueC₀\_le} in \lean{LeanPaperACentredV1};
+\lean{frozen\_optimum\_trueValueStrict\_zero} in \lean{LeanPaperAStrictV1}}
+
+Solving the surrogate more accurately therefore drives the design towards one that cannot
+distinguish the alternatives the compression turns on. Part~(ii) is what a learner running on
+the surrogate actually has: an approximate optimum, which leaks in proportion to its own
+suboptimality.
+
+\section{The price of repair}
+\label{sec:repair}
+
+Write the \emph{relative sacrifice} of a design as
+$\mathrm{sac}(w)=1-J_{\rm fr}(w)/\Gamma_{\rm fr}$. It is a diagnostic of a design, evaluated at
+the true world, and it never enters a learner.
+
+\subsection{At a design}
+
+\begin{theorem}[The repair frontier]
+\label{thm:frontier}
+For every $r\ge1$, $M>0$ and $\beta\in[0,1]$, the best true information of a design with
+$\mathrm{sac}(w)\le\beta$ satisfies
+\[
+\frac{9\beta}{128(4+2rM)}\ \le\ \sup_{\mathrm{sac}(w)\le\beta}J_{\rm true}(w)\ \le\
+\frac{\beta}{8rM}.
+\]
+This holds on the strict game as well. Pointwise, every allocation has
+$J_{\rm true}(w)\le\mathrm{sac}(w)/(8rM)$. The lower bound is attained by
+$w_{\beta}=(1-\beta)w_{\rm unif}+\beta w_{\rm cert}$.
+\end{theorem}
+
+\leanbox{\lean{value\_concave}, \lean{frontier\_two\_sided} in \lean{LeanPaperAFrontierV1};
+\lean{exchange\_strict}, \lean{strict\_frontier} in \lean{LeanPaperASacrificeV1}}
+
+Each game's value is an infimum of functions linear in the design, hence concave in it, so
+mixing two designs loses at most linearly. The upper side is Theorem~\ref{thm:starve}(ii) with
+$\varepsilon=\beta\Gamma_{\rm fr}$. The exchange rate is linear in the sacrifice, and it
+carries the same $\frac{1}{rM}$ as the separation.
+
+\subsection{For a policy}
+
+A design frontier does not say what a learner must give up. That requires every policy, its
+own random sample sizes, and the correctness it must reach. Fix a randomised adaptive policy
+with a finite horizon, whose answer event has probability at least $1-\delta$ at $\theta_{C}$
+and at most $\delta$ at every strict alternative. Let $N_{e}$ be its expected number of queries
+of cell $e$ at the truth, $N=\sum_{e}N_{e}$, and $\bar w=N_{\cdot}/N$ its average design. Put
+$D=(1-\delta)\log(1/\delta)-\log2$.
+
+\begin{theorem}[The sacrifice law]
+\label{thm:sacrifice}
+Every such policy queries each middle pair at least $8MD$ times in expectation, and the middle
+cells at least $8rMD$ times in total. Each middle query is paid for in surrogate value: the
+middle mass of any allocation is at most its relative sacrifice. Hence
+\[
+N\cdot\mathrm{sac}(\bar w)\ \ge\ 8\,r\,M\,D .
+\]
+The hypotheses are satisfiable. The ideal learner of Theorem~\ref{thm:ideal}, truncated at a
+Markov horizon, satisfies them at level $2\delta$. For that learner
+$N\,\mathrm{sac}(\bar w)\le N\le\mathbb{E}\tau_{\delta}$, and
+$1/\Gamma_{\rm true}\le\frac{128(4+2rM)}{9}$.
+\end{theorem}
+
+\leanbox{\lean{pair\_demand}, \lean{middle\_demand}, \lean{middle\_le\_sacrifice},
+\lean{sacrifice\_cost\_law}, \lean{upper\_constant}, \lean{constant\_gap} in
+\lean{LeanPaperASacrificeV1}; \lean{ideal\_sacrifice}, \lean{sacrifice\_hypotheses\_satisfiable}
+in \lean{LeanPaperASacrificeIdealV1}}
+
+\emph{What this says.} To make the true decision, a policy must give up a \emph{budget} of
+surrogate value, $8rM\log(1/\delta)$ query-units to first order. It is not a fraction. A policy
+may spend the budget slowly, with a small sacrifice over a long run, or quickly, but it cannot
+avoid it. The rate-optimal learner spends at most $\frac{128(4+2rM)}{9}\log(1/\delta)$ to first
+order. So the budget is $\Theta(rM\log(1/\delta))$, and the two constants differ by
+$\frac{32}{9}+\frac{64}{9rM}$.
+
+\begin{theorem}[Spreading the budget]
+\label{thm:dilute}
+Let $\pi_{0}$ be a policy as above with $N_{0}$ expected real queries and average design
+$\bar w_{0}$. Run it for its $n$ rounds, then query the four $A$ cells round-robin for $4k$ more
+rounds and answer from the first $n$. For every $k$, this policy is $\delta$-correct with the same
+answer event. It has $N=N_{0}+4k$ expected real queries, it obeys the sacrifice law, and it spends
+no more budget than $\pi_{0}$:
+\[
+8rMD\ \le\ N\,\mathrm{sac}(\bar w)\ \le\ N_{0}\,\mathrm{sac}(\bar w_{0}),\qquad
+\mathrm{sac}(\bar w)\ \le\ \frac{N_{0}}{N_{0}+4k}.
+\]
+\end{theorem}
+
+\leanbox{\lean{sacrifice\_mix\_le}, \lean{padPol}, \lean{pad\_real}, \lean{lintegral\_cnt\_pad},
+\lean{padCnt\_A}, \lean{dilution}, \lean{dilution\_small} in \lean{LeanPaperASacrificeDiluteV1}}
+
+With $\pi_{0}$ the truncated ideal learner, $N_{0}\le\mathbb{E}\tau_{\delta}
+=O(rM\log(1/\delta))$. So for every run length $N\ge N_{0}$, in steps of four, a
+$\delta$-correct policy gives up a relative surrogate value of at most $N_{0}/N$. The budget
+$N\,\mathrm{sac}(\bar w)$ stays between $8rMD$ and $N_{0}$. The padding is surrogate-optimal, and
+concavity of the frozen value turns the mixture of designs into
+$\mathrm{sac}\le\beta\,\mathrm{sac}(\bar w_{0})$ with $\beta=N_{0}/N$.
+
+\begin{theorem}[The law for unbounded stopping]
+\label{thm:sacstop}
+Let a randomised adaptive policy have a measurable stopping rule that stops almost surely at
+$\theta_{C}$, with no bound on the stopping time. Suppose it answers $A$ with probability at least
+$1-\delta$ at $\theta_{C}$ and at most $\delta$ at every strict alternative, on its stopped runs.
+Let $N_{e}$ be its expected number of queries of cell $e$ over the whole run, assumed finite. Then
+$N\,\mathrm{sac}(\bar w)\ge8rMD'$, with $D'=(1-2\delta)\log\frac1{2\delta}-\log2$. A finite-horizon
+policy that satisfies Theorem~\ref{thm:sacrifice} is such a policy.
+\end{theorem}
+
+\leanbox{\lean{outT\_unfired}, \lean{trunc\_A}, \lean{expCntSt}, \lean{sacrifice\_law\_stopped},
+\lean{correctA\_ofFinite} in \lean{LeanPaperASacrificeStoppedV1}}
+
+An unstopped run answers ``not $A$'', so no uniform stopping over the alternatives is needed.
+Truncating at a horizon where at most $\delta$ of the truth's runs are still running gives a
+finite-horizon policy that is correct at level $2\delta$. Its counts are at most the unbounded
+run's, and the middle mass of any design is at most its sacrifice.
+
+\emph{Why.} Each middle pair is moved by a strict alternative that only that pair's queries can
+detect. The change of measure at the shift $\frac12+d$, with $d\to0$, gives the per-pair demand.
+The surrogate's value is at most $\Gamma_{\rm fr}$ times the non-middle mass, which gives the
+exchange.
+
+\subsection{Forcing schedules}
+
+A learner that follows the surrogate meets the demand for middle queries only through its
+exploration. The sacrifice law then fixes its cost, whatever the schedule.
+
+\begin{theorem}[The forcing law]
+\label{thm:forcing}
+For a policy as above, let $T$ be the number of real queries and $\mathrm{Mid}$ the number of
+middle queries at the horizon. Suppose $\mathrm{Mid}\le\varphi(T)+B$ on every history, where
+$\varphi$ is continuous and concave on $[0,\infty)$ and $\mathbb{E}B\le b$. Then
+$\varphi(\mathbb{E}T)\ge8rMD-b$. For $\varphi(t)=ct^{a}$ with $0<a\le1$ and
+$b\le 8rMD$,
+\[
+\mathbb{E}T\ \ge\ \Bigl(\frac{8rMD-b}{c}\Bigr)^{1/a}.
+\]
+\end{theorem}
+
+\leanbox{\lean{forcing\_law}, \lean{power\_forcing\_law} in \lean{LeanPaperASacrificeV1}}
+
+At $a=\frac12$, square-root forcing costs $\Omega(\log^{2}(1/\delta))$. At $a=1$, linear
+forcing costs only $\Omega(\log(1/\delta))$, and the learner is no longer following the
+surrogate. Whether a given learner satisfies the pathwise hypothesis is a property of that
+learner. Section~\ref{sec:learners} proves it for the two surrogate learners.
+
+\section{Learners}
+\label{sec:learners}
+
+\begin{theorem}[The ideal learner]
+\label{thm:ideal}
+There is a completely defined learner with the following steps. It starts warm, with one query
+per cell. At round $s$ it selects an answer and a design by an exact maximiser of $J$ over a
+grid of mesh $\frac{1}{s+1}$. It mixes in the uniform design with weight
+$\frac{1}{\sqrt{s+1}}$ and tracks the result. It stops when some answer's generalised
+likelihood ratio exceeds $\log(1/\delta)+\frac12\sum_{e}\log(1+N_{e}/a)$. On the construction,
+for every $a>0$:
+\begin{itemize}
+\item it stops with a wrong answer with probability at most $\delta$;
+\item for every $\eta\in(0,\Gamma_{\rm true})$ there is $A_{\eta}$ such that, for every
+$\delta\in(0,1)$, $\mathbb{E}\tau_{\delta}\le\frac{\log(1/\delta)}{\Gamma_{\rm true}-\eta}+A_{\eta}$;
+\item every finite-horizon policy that is $\delta$-correct against the strict alternatives
+makes at least $\frac{(1-\delta)\log(1/\delta)-\log2}{\Gamma_{\rm true}}$ real queries in
+expectation, and the stopped learner meets this bound at level $2\delta$.
+\end{itemize}
+Hence $\mathbb{E}\tau_{\delta}/\log(1/\delta)\to1/\Gamma_{\rm true}$, where $\Gamma_{\rm true}$ is
+the Gaussian-divergence game over the strict alternatives.
+\end{theorem}
+
+\leanbox{\lean{ideal\_family\_finish}, \lean{ideal\_family\_correct}, \lean{ideal\_family\_lower},
+\lean{GamT\_fam} in \lean{LeanPaperA7IdealFamilyV1}; \lean{ideal\_expect\_bound},
+\lean{ideal\_upper\_rate} in \lean{LeanPaperA7IdealUpperV1}; \lean{family\_policy\_lower} in
+\lean{LeanPaperAFamilyLowerV1}}
+
+The world enters the learner only as the law of its observations. Correctness is Ville's
+inequality at the learner's own statistic. The upper bound comes from box-free accumulation of
+the statistic on the rounds where the confidence event holds, and that event fails at round
+$s$ with probability at most $s^{-4}$. The lower bound couples the stopped learner, path by
+path, with a policy that queries a fresh dummy after stopping. This learner is not the
+implementation measured in Section~\ref{sec:evidence}: that one has finite precision and a
+bracketing oracle, and its rate is only conditional (supplement).
+
+\begin{theorem}[What following the surrogate costs]
+\label{thm:surlearner}
+Let $K=4+2r$. Consider the learner with the same warm start, forcing $\frac{1}{\sqrt{s+1}}$,
+tracking and stop as the ideal learner, whose oracle returns an exact optimum of the frozen
+surrogate. There are two cases:
+\begin{itemize}
+\item the surrogate is solved at the true world and held fixed;
+\item the unrestricted surrogate is re-solved at the learner's current estimate every round.
+The oracle must be exact at every estimate whose extrema are the four anchors and which
+retains $A$. Elsewhere it is unconstrained.
+\end{itemize}
+In both cases there is $\delta_{0}>0$ with
+\[
+\mathbb{E}\tau_{\delta}\ \ge\ \Bigl(\frac{KM}{8}\Bigr)^{2}\log^{2}(1/\delta)
+\qquad(\delta<\delta_{0}),
+\]
+so the ratio to the ideal learner is unbounded.
+\end{theorem}
+
+\leanbox{\lean{surrogate\_optimum\_cost}, \lean{surrogate\_vs\_ideal} in
+\lean{LeanPaperA6SurrogateCostV1}; \lean{est\_cost\_log\_sq}, \lean{surrogate\_learner\_vs\_ideal}
+in \lean{LeanPaperA6EstCostV1}; \lean{starvation\_at} in \lean{LeanPaperA6SurrogateAtV1}}
+
+\emph{Why.} By starvation the oracle puts nothing on the middle cells, so forcing is the only
+source of middle queries. The first case is an \emph{oracle-allocation} result: the true
+extrema choose the starved cells. In the second case the oracle sees only the estimate. Forcing
+gives every count order $\sqrt t$, so after a deterministic time every estimate lies within
+$\frac1{16}$ of the truth, except on rounds where the learner's confidence event fails. Those
+rounds number at most a constant in expectation at every horizon. Along every path the middle
+count is then at most a multiple of $\sqrt{\tau}$ plus that count. This is the shape the
+forcing law assumes at $a=\frac12$. The Lean proofs of this theorem establish it for these two
+learners directly, with the stopped change of measure at level $2\delta$ (supplement).
+
+\emph{Which surrogate.} The estimate-time learner solves the \emph{unrestricted} frozen game at
+its estimate, without centring. At the truth this game has the same value, $\frac{9}{512}$, as
+the centred game of Theorem~\ref{thm:sep}. Elsewhere the two differ. Shift both arm-$A$ cells
+of the truth by $u$. The unrestricted surrogate of the uniform-anchor design stays at
+$\frac{9}{512}$, while the centred one is at least $\frac{9}{512}+\frac{u^{2}}{4}$. The
+theorems above are about the object they name.
+
+\leanbox{\lean{frozenGameAt\_thetaC}, \lean{frozenAt\_unif\_shift}, \lean{centred\_unif\_shift\_ge},
+\lean{two\_surrogates\_differ} in \lean{LeanPaperA6TwoSurrogatesV1}}
+
+\section{Evidence}
+\label{sec:evidence}
+
+Every number below is produced by a script that checks itself against a statement proved in
+Lean, and refuses to write output if a check fails. Oracle arms read the true world. They are
+labelled as oracle-allocation diagnostics and are never competitors. Error rates are tested on
+the right quantity: $\delta$-correctness bounds $\Pr(\text{stop and wrong})$ over launched runs,
+not the error rate among stopped runs, and censoring is reported separately.
+
+\begin{table}[t]
+\caption{Evidence packages. Each script self-checks against a Lean statement.}
+\label{tab:evidence}
+\centering
+\footnotesize
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llr@{}}
+\toprule
+Package & Script & Checks \\
+\midrule
+Certified separation, $r=1,2,4,8$ & \texttt{EXP\_paperA\_certified\_separation} & 6/6 \\
+\quad its figure & \texttt{FIG\_paperA\_certified} & 3/3 \\
+Allocation mechanism, one certificate & \texttt{EXP\_paperA\_mechanism} & 5/5 \\
+\quad its figures & \texttt{FIG\_paperA\_mechanism}, \texttt{FIG\_paperA\_budget} & 7/7, 5/5 \\
+Deployable rules, two-answer certificate & \texttt{EXP\_paperA\_deployable} & 6/6 \\
+\quad its figure & \texttt{FIG\_paperA\_deployable} & 4/4 \\
+\quad locked paired panel, $r\le4$, $M\in\{1,4\}$ & \texttt{EXP\_paperA\_deployable\_paired} & 5/5 \\
+\quad its figure and paired table & \texttt{FIG\_paperA\_deployable\_paired} & 7/7 \\
+Shipped learner, four-cell panel & \texttt{EXP\_paperA7\_panel} & 6/6 \\
+\quad its figure & \texttt{FIG\_paperA7\_panel} & 4/4 \\
+Error over launched runs & \texttt{ANALYSE\_paperA\_alpha\_launched} & 4/4 \\
+Does the rule learn the answer? & \texttt{EXP\_paperA\_swap} & 7/7 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperA_certified.pdf}
+\caption{The separation, certified. A numerical true-game computation with centring and every
+alternative region, certified in exact rational arithmetic (\CERT). The upper end is the dual of
+the outer LP over exactly verified centred alternatives. The lower end is the minimum over all
+regions of a Lagrangian dual value at a design with every weight positive.
+$\Gamma_{\rm true}/\Gamma_{\rm fr}$ lies in $[0.8372,0.8374]$, $[0.7214,0.7216]$,
+$[0.5664,0.5667]$ and $[0.3982,0.3982]$ at $r=1,2,4,8$ ($M=1$), inside the band of
+Theorem~\ref{thm:sep}. $\Gamma_{\rm fr}=\frac{9}{512}$ is the theorem.}
+\label{fig:acert}
+\end{figure}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_mechanism.pdf}
+\caption{The mechanism, from one stored panel ($M=1$, $\alpha=0.05$, 24 runs per rule and $r$,
+budget $B=6\times10^{4}$); nothing was re-solved or re-sampled. Left: attained lower
+certificates of the true value, up to the theorem's upper bound. Centre: the share of queries
+on the middle cells. The surrogate optimum puts nothing there, and its runs reach the middles
+only through forcing. Right: $\mathbb{E}[\min(\tau,B)]$. Every surrogate run is censored at $B$,
+which does not show that it never stops. SCOPE: the stopping test certifies answer $A$ only,
+so this is an allocation diagnostic under one certificate, not a $\delta$-correct learner
+(\texttt{FIG\_paperA\_mechanism}, 7/7).}
+\label{fig:amech}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_deployable.pdf}
+\caption{Deployable rules under one two-answer certificate. Each rule is a tracking learner
+with forcing $\min(1,1/\sqrt t)$, and its oracle sees only the estimate. \emph{Surrogate at
+estimate} re-solves the unrestricted frozen surrogate at the estimate every round.
+\emph{Geometry} ascends the certificate of the answer the estimate retains. Left, centre: the
+certificate rate by budget on the base world (answer $A$) and the swapped world (answer $B$),
+for $r=1,2,4,8$. Right: $\mathbb{E}[\min(\tau,B)]$, $B=6\times10^{4}$, $\alpha=0.05$, 24 runs per
+cell. None of the 576 launched runs stopped with a wrong answer. The 71 censored runs are all
+surrogate-at-estimate runs on the base world, and the other two rules certify every run. On the
+swapped world the surrogate's frozen cells are the informative ones, and it certifies every
+run. SCOPE: the certificate is a valid lower bound on the likelihood ratio, not the exact
+infimum, and $\alpha=0.05$ lies far above the $\delta_{0}$ of Theorem~\ref{thm:surlearner}. The
+panel shows these rules' behaviour; it does not test the $\log^{2}$ order
+(\texttt{EXP\_paperA\_deployable}, 6/6; \texttt{FIG\_paperA\_deployable}, 4/4). The locked
+paired panel of Figure~\ref{fig:apaired} repeats it at scale.}
+\label{fig:adeploy}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA_deployable_paired.pdf}
+\caption{The locked panel. The same three rules, certificate and stop as
+Figure~\ref{fig:adeploy}, with the configuration fixed and hashed before launch. There are
+200 paired runs per cell: run $i$ of every rule in a cell uses the same seed. The grid is
+$r\in\{1,2,4\}$, $M\in\{1,4\}$, both worlds, $B=6\times10^{4}$ and $\alpha=0.05$. Left, centre:
+$\mathbb{E}[\min(\tau,B)]$ on the base and swapped worlds, with $M=1$ solid and $M=4$ dashed.
+Right: the fraction certified by $B$, with exact 95\% intervals. Of 7200 launched runs, 6258
+stopped, and none stopped with a wrong answer (0/2400 per rule). On the base world the
+surrogate-at-estimate rule certifies 167, 41, 44, 2, 4 and 0 of 200 runs across the six
+$(r,M)$ cells, while the other two rules certify every run. Its paired excess over geometry is
+$1.9\times10^{4}$ to $5.4\times10^{4}$ rounds, with a bootstrap interval excluding $0$ in every
+cell. Its median middle share is $0.05$, against $0.47$ for geometry. On the swapped world
+every rule certifies every run, and the surrogate rule is the \emph{fastest} in every cell,
+since there its frozen cells are the informative ones. SCOPE: $\min(\tau,B)$ is a restricted
+mean, so where the surrogate rule is censored its mean and its excess are lower bounds. The
+certificate is a lower bound and $\alpha$ lies far above $\delta_{0}$, so this measures these
+rules and does not test the $\log^{2}$ order. All 31 cell summaries of an interrupted earlier
+launch are reproduced exactly (\texttt{EXP\_paperA\_deployable\_paired}, 5/5;
+\texttt{FIG\_paperA\_deployable\_paired}, 7/7).}
+\label{fig:apaired}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{paperA7_panel.pdf}
+\caption{The shipped learner on a four-cell panel: base world at $M=16$ and $M=64$, a smaller
+gap, and the $A/B$-swapped world. 50 runs per cell and arm, $\alpha=0.05$. Left:
+$\mathbb{E}[\min(\tau,B)]$, censored runs counted. Centre: the certified lower value of the true
+game at the empirical design $N/\tau$, over the game's value. Offline truth evaluates it; it
+never enters the learner. Right: selection. None of the 600 launched runs stopped with a wrong
+answer; one learner run on the swapped world was censored. The panel exposes an algorithmic
+weakness. The learner's kept set never narrowed to a single answer in any cell, so its
+allocation follows the tie-break answer. On the swapped world that answer is the wrong one, the
+learner selected the true answer in none of its refreshes, and it cost $3801$ queries against
+$1109$ for the oracle-allocation diagnostic and $1679$ for uniform. Its stop was still correct.
+SCOPE: cost estimation on a finite panel, not error certification
+(\texttt{EXP\_paperA7\_panel}, 6/6; \texttt{FIG\_paperA7\_panel}, 4/4).}
+\label{fig:apanel}
+\end{figure*}
+
+\section{Limitations}
+\label{sec:limits}
+
+\begin{enumerate}
+\item[1)] \textbf{One construction for the rates.} Theorems~\ref{thm:sep}--\ref{thm:surlearner}
+are about the centred construction. Both directions of mispricing are proved after the sup over
+designs on a second class, but its learners and rates are not studied here.
+\item[2)] \textbf{Spreading the budget, not reducing it.} Theorem~\ref{thm:dilute} spreads a
+paid budget over any run length by padding after the decision is made. The padded queries carry
+no information for the decision, so the spreading is an accounting fact. It does not show that
+interleaving surrogate-optimal queries \emph{during} the run lowers the budget below $N_{0}$.
+The lower bound $8rMD$ and the ideal learner's $N_{0}$ still differ by the constant of
+Theorem~\ref{thm:sacrifice}.
+\item[3)] \textbf{The implemented learner.} The learner of Figure~\ref{fig:apanel} has finite
+precision and a bracketing oracle. Its rate is conditional on named accumulation and
+confidence hypotheses (supplement), and its selection step did not narrow on the panel.
+\item[4)] \textbf{Stopping.} The sacrifice law holds for unbounded stopping at level $2\delta$
+(Theorem~\ref{thm:sacstop}). The forcing law is stated for finite-horizon policies.
+\item[5)] \textbf{Certificates at finitely many points.} The separation of
+Figure~\ref{fig:acert} is certified exactly at $r=1,2,4,8$. The two fixed-design families of the
+supplement are certified exactly, in all 81 regions, at six values of $M$. Their closed forms for
+general $M$ are read off those points and not proved.
+\end{enumerate}
+
+\section{Conclusion}
+
+A frozen surrogate is not a small error in a correct model. After the allocation is optimised
+it overstates the available information by a factor $\Theta(rM)$. Its optima collect nothing
+about the decision, and a learner that follows it pays a whole extra power of $\log(1/\delta)$.
+Undoing it has a definite price. At a design, true information comes back linearly in the
+sacrifice, at the separation's own rate. For a policy, the true decision requires a budget of
+$\Theta(rM\log(1/\delta))$ query-units of surrogate value, which no schedule avoids and the
+rate-optimal learner attains in order.
+
+\section*{Companion material}
+The supplement gives the proof architecture of every theorem, the supporting Lean declarations,
+the conditional status of the implemented learner's rate, the heteroscedastic families, the
+repair criterion and the confidence-sequence machinery, with each superseded statement marked.
+The claim map records each headline's model, declaration, scope and evidence.
+
+\begin{thebibliography}{00}
+
+\bibitem{degenne2019} R. Degenne and W. M. Koolen, ``Pure exploration with multiple correct
+answers,'' in \emph{Advances in Neural Information Processing Systems 32}, 2019,
+pp.~14591--14600.
+
+\bibitem{wangyou2026} Q. Wang and W. You, ``Ranking-and-selection with multiple correct
+answers and non-answerable estimates,'' arXiv:2606.21889, 2026.
+
+\bibitem{bennouna2026} O. Bennouna, A. Bennouna, S. Amin, and A. Ozdaglar, ``Data
+informativeness in linear optimization under uncertainty,'' arXiv:2602.15365, 2026.
+
+\bibitem{bennouna2025} O. Bennouna, A. Bennouna, S. Amin, and A. Ozdaglar, ``What data enables
+optimal decisions? An exact characterization for linear optimization,'' arXiv:2505.21692, 2025.
+
+\bibitem{garivier2016} A. Garivier and E. Kaufmann, ``Optimal best arm identification with
+fixed confidence,'' in \emph{Proc. 29th Conf. Learning Theory (COLT)}, PMLR 49, 2016,
+pp.~998--1027.
+
+\bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
+best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.}, vol.~17,
+no.~1, pp.~1--42, 2016.
+
+\bibitem{jourdan2021} M. Jourdan, M. Mutn\'y, J. Kirschner, and A. Krause, ``Efficient pure
+exploration for combinatorial bandits with semi-bandit feedback,'' in \emph{Proc. 32nd Int.
+Conf. Algorithmic Learning Theory (ALT)}, PMLR 132, 2021, pp.~805--849.
+
+\bibitem{shukla2024} A. Shukla and D. Basu, ``Preference-based pure exploration,''
+arXiv:2412.02988, 2024.
+
+\bibitem{yang2024} J. Yang, V. Y. F. Tan, and T. Jin, ``Best arm identification with minimal
+regret,'' arXiv:2409.18909, 2024.
+
+\bibitem{huang2026} Z. Huang, ``Self-certification of representation adequacy: Sequential
+certification at minimum task loss,'' arXiv:2608.02267, 2026.
+
+\bibitem{schutte2026} N. Schutte, G. Veviurko, K. Postek, and N. Yorke-Smith, ``Sufficient
+decision proxies for decision-focused learning,'' arXiv:2505.03953, 2026.
+
+\bibitem{overstall2022} A. M. Overstall, ``Properties of using Fisher information gain for
+Bayesian design of experiments,'' arXiv:2003.07315, 2021.
+
+\bibitem{filstroff2021} L. Filstroff, I. Sundin, P. Mikkola, A. Tiulpin, J. Kylm\"{a}oja,
+and S. Kaski, ``Targeted active learning for Bayesian decision-making,'' arXiv:2106.04193,
+2021.
+
+\bibitem{tang2026} R. Tang, S. J. Sloman, and S. Kaski, ``Representative, informative, and
+de-amplifying: Requirements for robust Bayesian active learning under model misspecification,''
+in \emph{Proc. Int. Conf. Artificial Intelligence and Statistics (AISTATS)}, 2026,
+arXiv:2506.07805.
+
+\bibitem{wan2026} B. Wan, M. Liu, P. Grigas, and Z.-J. M. Shen, ``Decision-focused
+sequential experimental design: A directional uncertainty-guided approach,'' arXiv:2602.05340,
+2026.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\end{document}

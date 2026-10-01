@@ -1,0 +1,95 @@
+{
+  "source_sha256": "3029019f78c7c1b390176e576749020f9156f6ac6ea8554df2312b0fc4a57a39",
+  "evidence_class": "COMBINATORIAL_ASSIGNED_ORDER_DIAGNOSTIC",
+  "same_world_loss_observation_join": false,
+  "sample_complexity_proved": false,
+  "cost_rows_meaning": "unit_constant_exponent_proxies_only",
+  "obstruction_search_max_size": 4,
+  "n": 6,
+  "m": 4,
+  "eps": 0.2,
+  "n_worlds": 63,
+  "n_minimal_obstructions": 36,
+  "r_safe": 1,
+  "r_id": 2,
+  "cost": [
+    {
+      "h": 0.3,
+      "cost_decide": 11.111111111111112,
+      "cost_identify": 123.45679012345681,
+      "ratio": 11.111111111111112
+    },
+    {
+      "h": 0.2,
+      "cost_decide": 24.999999999999996,
+      "cost_identify": 624.9999999999999,
+      "ratio": 25.0
+    },
+    {
+      "h": 0.1,
+      "cost_decide": 99.99999999999999,
+      "cost_identify": 9999.999999999998,
+      "ratio": 100.0
+    },
+    {
+      "h": 0.05,
+      "cost_decide": 399.99999999999994,
+      "cost_identify": 159999.99999999997,
+      "ratio": 400.0
+    },
+    {
+      "h": 0.02,
+      "cost_decide": 2500.0,
+      "cost_identify": 6249999.999999999,
+      "ratio": 2499.9999999999995
+    }
+  ],
+  "checks": [
+    {
+      "name": "safe sets are non-empty (the best answer is always safe)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "safe sets genuinely overlap across worlds, so deciding is easier than identifying",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "there is at least one obstruction (the task is not free)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "obstructions are upward closed  [Lean: isObstruction_mono]",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "deciding needs a strictly lower order than identifying",
+      "ok": true,
+      "detail": "r_safe=1 < r_id=2"
+    },
+    {
+      "name": "classes resolve at r_safe but not below  [Lean: classes_resolve_iff]",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every randomized rule leaves unsafe mass >= 1/|H| somewhere in the obstruction  [Lean: obstruction_error_floor_randomized]",
+      "ok": true,
+      "detail": "smallest observed worst-case mass 0.5115"
+    },
+    {
+      "name": "the identification penalty diverges as h shrinks",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "at a large enough eps there are no obstructions and the decision is free  [Lean: no_obstruction_iff_global_answer]",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "all_passed": true
+}

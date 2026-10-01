@@ -1,0 +1,20 @@
+import Mathlib
+open Finset
+#check @Finset.sum_fiberwise
+#check @Finset.sum_fiberwise_of_maps_to
+#check @Finset.exists_subset_card_eq
+#check @Finset.mem_map_equiv
+#check @Finset.filter_map
+#check @Equiv.subtypeCongr
+#check @Equiv.subtypeCongr_apply
+#check @Fintype.equivOfCardEq
+#check @Finset.card_eq_sum_card_fiberwise
+#check @Fintype.card_subtype_compl
+#check @Finset.sup'_singleton
+#check @Equiv.Perm.inv_def
+#check @Finset.sum_ite_eq
+#check @Finset.exists_ne_zero_of_sum_ne_zero
+#check @Finset.card_sdiff
+#check @Finset.map_sdiff
+#check @Int.natAbs
+example : True := trivial

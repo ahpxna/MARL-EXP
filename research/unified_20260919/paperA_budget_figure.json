@@ -1,0 +1,38 @@
+{
+  "producer": "scripts/FIG_paperA_budget.py",
+  "producer_sha256": "6b8f38f0f506e4792cee935a344281064b7258637bb17a513c1209bb306a055d",
+  "input": "paperA_mechanism.json",
+  "input_sha256": "5f3772d4b965a930f583b5e9013c23ba0f20392423ed9ab81eefec7577b0ca50",
+  "input_launch_source_sha256": "66b6507ad061eb43e7de37040748a3ab0694258d5436679c1c80a62f7a2a390e",
+  "resolved_or_resampled_anything": false,
+  "figure": "research/papers/_figures/paperA_budget.pdf",
+  "scope": "allocation diagnostic under one fixed A-certificate, alpha = 0.05; the proxy rule is fixLearner (wUnifC r) up to the forcing offset, with a different stop; outside the delta range of uniform_surrogate_cost; traces are replicate 0 only",
+  "checks": [
+    {
+      "name": "the artifact is the launch record described by its provenance note",
+      "ok": true,
+      "detail": "source_sha256 66b6507ad061..."
+    },
+    {
+      "name": "restricted means, censored counts and the certified fraction at b = B recomputed from tau_per_run equal the stored ones",
+      "ok": true,
+      "detail": "worst restricted-mean deviation 0.0e+00"
+    },
+    {
+      "name": "P(tau <= b) and E[min(tau,b)] are nondecreasing in b, E[min(tau,b)] <= b, and E[min(tau,b)] grows by at most the budget increment",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "each stored trace belongs to replicate 0 (ends at or before its tau, within one trace period of it unless censored)",
+      "ok": true,
+      "detail": "r=1 geometry: last 1500 vs tau_0 1850; r=1 proxy: last 60000 vs tau_0 60000; r=1 uniform: last 1500 vs tau_0 1600; ..."
+    },
+    {
+      "name": "THEOREM (fCount_le_quota / fCount_le_sqrt, transcribed for the code's forcing): along the proxy trace N_mid(t) <= 2r(2 + q(t)) <= 2r(2 + 2 sqrt(t)/n) -- forcing is the only source of middle queries",
+      "ok": true,
+      "detail": "r=1: min slack 0.7 queries; r=2: min slack 2.1 queries; r=4: min slack 5.5 queries; r=8: min slack 12.9 queries"
+    }
+  ],
+  "all_passed": true
+}

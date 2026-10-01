@@ -1,0 +1,86 @@
+% DRAFT (01/10/2026, 01:2x EDT) -- NOT INPUT BY paper_marl_v2.tex.  To be merged only after the frozen smoke gate
+% smokeMARLDD_20261001 passes (ledger L-194); until then every claim stays \LEANC, never \PROVED.
+% Placement: new subsection after \subsection{Freshness under prefix decoding} (sec:fresh), before sec:policies.
+
+\subsection{Decision depth under prefix decoding}\label{sec:depth}
+The freshness results say how old a receiver's copies are. They do not say how much of the stream a receiver
+\emph{needs} in order to act well. That is a decision question, and the corpus's obstruction law answers it once it is
+read on the prefix channel.
+
+Fix a receiver $i$ with local observation $o_i(F)$ of the global state $F$, and let $\mathrm{safe}(F)$ be the set of
+acceptable actions in $F$ (for instance those within $\varepsilon$ of the team optimum; the teacher's action is
+\emph{not} this set). A set $H$ of states is an \emph{obstruction} if no action is acceptable in all of $H$, and it is
+\emph{local} if $o_i$ is constant on $H$. Sender $j$ \emph{splits} $H$ if its record differs on two states of $H$.
+
+\begin{claim}[Hitting law]\label{cl:hit}
+A policy on the view of a decoded set $D$ is acceptable in every state iff every local obstruction is split by a sender
+of $D$. Choosing $D$ is therefore a hitting-set problem over the sets of senders that split the local obstructions.
+\LEANC{LeanMarlDecisionDepthV1.decode\_safe\_iff; from LeanUnifiedObstructionOrderV1.classes\_resolve\_iff (\PROVED)}
+\end{claim}
+\emph{Proof.} A policy on the view is a function of the view's class; a class admits an action acceptable throughout iff
+no obstruction lies inside it; a local obstruction lies inside a class exactly when no decoded sender splits it.
+$\square$
+
+On a prefix broadcast with positions $\mathrm{pos}$, a receiver of capacity $K$ decodes $\{j:\mathrm{pos}(j)<K\}$. Let
+$\mathrm{sep}(F,G)$ be $0$ if $o_i$ separates $F,G$, and otherwise $1$ plus the earliest position of a sender whose records
+differ.
+
+\begin{claim}[Decision depth is the safe order]\label{cl:depth}
+Capacity $K$ suffices iff every obstruction contains a pair with $\mathrm{sep}\le K$; the least such $K$ is
+$s^\ast=\max_H\min_{F\ne G\in H}\mathrm{sep}(F,G)$, the safe order of~\cite{paperB} on this channel. $\mathrm{sep}$ is
+ultrametric, so a receiver that decodes in stream order and stops as soon as its view admits an action acceptable
+throughout stops at the per-state decision order of~\cite{paperB}, whose maximum over states is $s^\ast$: adaptive
+stopping saves on average and never in the worst case.
+\LEANC{LeanMarlDecisionDepthV1.prefix\_safe\_iff\_safeAt; LeanMarlAdaptiveDepthV1.sepPos\_ultrametric, near\_iff\_view,
+worst\_anytime\_depth\_iff; from LeanPaperBSafeOrderV1.safeAt\_iff and LeanPaperBDecisionOrderV1.max\_order\_iff (\PROVED)}
+\end{claim}
+
+\begin{claim}[One order, many capacities]\label{cl:nest}
+(i) Two receivers of capacities $1$ and $2$ can each be served by a decode set of their own size while no nested pair
+$D_1\subseteq D_2$, $|D_2|\le2$, serves both. (ii) If every requirement is a forced sender, one order serves every
+receiver iff for every $k$ at most $k$ senders are forced by receivers of capacity at most $k$, and the
+earliest-deadline order attains it. (iii) In general the question contains hitting set.
+\LEANC{LeanMarlDecisionDepthV1.nesting\_price, hitting\_embeds\_decode; LeanMarlPrefixEDFV1.serves\_iff\_counting}
+\end{claim}
+Part (ii) is Jackson's rule for unit jobs with deadlines read on the broadcast; the ordering problem behind (i) and (iii)
+is the feasibility version of ranking with multiple intents~\cite{azar2009,feige2004}.
+
+\begin{claim}[Relay and revision close the nesting price]\label{cl:relaydepth}
+If every receiver decodes the head and the head forwards the records $R$ it decoded one hop earlier, every receiver is
+served iff all requirements lie in $\{h\}\cup R$; the nested condition of Claim~\ref{cl:nest} becomes one inclusion at the
+head. Without relay, $R$ exchanges after the capacities are revealed serve every receiver whose hitting number is at most
+$R$, whatever the committed order. \LEANC{LeanMarlPrefixEDFV1.relay\_serves\_iff;
+LeanMarlDecisionDepthV1.relay\_closes\_nesting; LeanMarlRevisionDepthV1.revision\_serves}
+\end{claim}
+
+\begin{claim}[Acting is not identifying]\label{cl:actid}
+With indicator records and answers ``any state but the true one'', one decoded sender suffices to act, while
+identification fails whenever two senders are undecoded. \LEANC{LeanMarlDecisionDepthV1.decide\_one\_sender,
+identify\_needs\_all\_but\_one}
+\end{claim}
+
+\begin{claim}[Compiled silence, quantitatively]\label{cl:mass}
+For any law $p$ on states, every randomised policy on an observation is unacceptable with probability at least
+$\sum_H\min_{F\in H}p(F)$ over any disjoint family of obstructions inside its observation classes; the bound is attained.
+\LEANC{LeanMarlObstructionMassV1.obstruction\_mass\_floor, floor\_witness}
+\end{claim}
+For the zero-byte student the classes are its local observations; for a relay or byte-budget receiver they are its
+decoded views, and only the obstructions its decoded senders do not split remain.
+
+\begin{claim}[From relay freshness to the relay action]\label{cl:h7}
+Under the hypotheses of the strong one-step bound every relayed copy is at most one step older than the agent's last
+transmission; with an injection bound $\Phi$ and a fresh margin above $2(e_0+\nu(\Phi+1))$ the relay action equals the
+fresh action. \LEANC{LeanMarlRelayDecisionV1.relay\_age\_le\_inj, relay\_action\_fresh}
+\end{claim}
+
+% ---------------------------------------------------------------------------------------------------------------
+% Results subsection (numbers to be filled from research/marl_budget/e3_decision_depth_v2_report_20261001.txt)
+\subsection{Decision depth, measured}\label{sec:res-depth}
+On the development panel, at every receiver step we count how many fresh senders of a given order the teacher needs
+before its action is in $A_\varepsilon=\{a: L(a)\ge\max L-\varepsilon\}$ of its own full-view logits (an oracle diagnostic
+with a teacher-defined acceptable set; it is not ground truth), with an empty base (nothing else decoded) and on top of
+the receiver's direct cache. [Numbers pending v2.]  On the cache base (v1, two seeds, $\varepsilon=0.25$): identification
+needs all eight senders, while the teacher's action needs at most two on 87--95\% of receiver steps; the per-receiver
+minimum is below the stream depth on 16--20\% of steps (the price of one order); within a run, the congestion order is
+shallower than a random order and the age-first order is deeper, so the order that is optimal for freshness is
+anti-aligned with decisions, and relay is what decouples the two.

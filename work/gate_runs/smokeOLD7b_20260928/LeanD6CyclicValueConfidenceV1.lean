@@ -1,0 +1,97 @@
+import «LeanD6OracleValueStabilityV1»
+import «LeanD6CyclicConfidenceSequenceV1»
+import «LeanD6CyclicMeanSquareV1»
+
+/-! A06 -> A07 on the actual infinite query stream. Estimation is clipped only
+to [0,1], the model domain, never to a true allocation phase. This proves
+coverage of information regret for a fixed/correctly revalidated label A.
+The solver accuracy premise involves A; an erroneous decoded A is not ignored.
+No stopping time, termination, or expected Gamma limit is asserted here.
+-/
+namespace CIGAMF.P13.D6CyclicValueConfidence
+open scoped BigOperators ENNReal
+open Finset MeasureTheory ProbabilityTheory
+open CIGAMF.P13.D6Threshold CIGAMF.P13.D6AllocationDualBridge
+open CIGAMF.P13.D6AllocationRiskBridge CIGAMF.P13.D6LocalOracleRegret
+open CIGAMF.P13.D6AllocationTrackingStability CIGAMF.P13.D6OracleValueStability
+open CIGAMF.P13.D6CyclicConfidenceSequence CIGAMF.P13.D6CyclicMeanSquare
+open CIGAMF.P13.D6GaussianQueryDominance CIGAMF.P13.D6CyclicPhaseDesign
+noncomputable section
+variable {n : ℕ} {C : Type*} [Fintype C] [DecidableEq C]
+
+def modelEstimate (q L0 s : ℕ) (x : Sample C) : ℝ :=
+  clip 0 1 (pathEstimate q (epochLength L0 s) x)
+
+theorem model_estimate_mem (q L0 s : ℕ) (x : Sample C) :
+    0 ≤ modelEstimate q L0 s x ∧ modelEstimate q L0 s x ≤ 1 :=
+  clip_mem 0 1 _ (by norm_num)
+
+/-- Actual regret inherits CS coverage at all epochs, including across boundaries. -/
+theorem cyclic_value_confidence (G : C → Finset (I n)) (A : Finset (I n)) (j : I n)
+    (hj : j ∉ A) (halt : ∃ A' nu,Admissible A A' j nu)
+    (q L0 : ℕ) (hq : 1 ≤ q) (hL : 0 < L0) (hC : 0 < Fintype.card C)
+    (mu : ℝ) (hmu : 0 ≤ mu) (hmu1 : mu ≤ 1)
+    (hm : (∑ t,actualMean A j mu (.inr (G t,false))) = Fintype.card C+(q:ℝ)^2*(1-mu))
+    (delta : ℝ) (hd : 0 < delta) (hd1 : delta ≤ 1)
+    (E : Finset (Measurement n)) (w v : ℕ → Sample C → Measurement n → ℝ)
+    (tau : ℕ → Sample C → ℝ) (ht : ∀ s x,0 ≤ tau s x)
+    (hf : ∀ s x,Feasible j q E (w s x)) (hv : ∀ s x e,e ∈ E → 0 ≤ v s x e)
+    (hopt : ∀ s x,oracleValue A j q (modelEstimate q L0 s x) ≤
+      allocationValue A j (modelEstimate q L0 s x) E (w s x)+tau s x) :
+    (path G A j mu) (⋃ s : ℕ,{x |
+      2*marginModulus q*width (C:=C) q L0 s delta+tau s x+
+        informationCap q*(∑ e ∈ E,|w s x e-v s x e|) < oracleRegret A j q mu E (v s x)})
+      ≤ ENNReal.ofReal delta := by
+  apply le_trans (measure_mono ?_)
+    (cyclic_confidence_sequence G A j q L0 (by omega) hL hC mu hm delta hd hd1)
+  intro x hx
+  obtain ⟨s,hs⟩ := Set.mem_iUnion.mp hx
+  refine Set.mem_iUnion.mpr ⟨s,?_⟩
+  by_contra hn
+  have herr : |mu-modelEstimate q L0 s x| ≤ width (C:=C) q L0 s delta := by
+    have hclip := clip_error 0 1 mu (pathEstimate q (epochLength L0 s) x) hmu hmu1
+    rw [abs_sub_comm (clip 0 1 _) mu] at hclip
+    exact hclip.trans (le_of_lt (lt_of_not_ge hn))
+  have hr := estimated_tracked_regret A j hj halt q mu (modelEstimate q L0 s x) (tau s x)
+    (by exact_mod_cast hq) hmu hmu1 (model_estimate_mem q L0 s x).1
+    (model_estimate_mem q L0 s x).2 (ht s x) E (w s x) (v s x) (hf s x) (hv s x) (hopt s x)
+  have hcoef : 0 ≤ 2*marginModulus (q:ℝ) := by unfold marginModulus; positivity
+  have hbound := mul_le_mul_of_nonneg_left herr hcoef
+  simp only [Set.mem_setOf_eq] at hs
+  linarith
+
+/-- A-free legal cyclic design, actual worlds, no supplied Gaussian/path identity. -/
+theorem actual_world_value_confidence (q : ℕ) (hq : 3 ≤ q) (j : I (2*q+1)) :
+    ∃ G : ZMod (2*q+1) → Finset (I (2*q+1)),
+      (∀ t,Legal j q (.inr (G t,false)) ∧ (G t).card=q) ∧
+      ∀ A : Finset (I (2*q+1)), A ∈ worlds q j →
+      ∀ L0 : ℕ,0 < L0 → ∀ mu delta : ℝ,0 ≤ mu → mu ≤ 1 → 0 < delta → delta ≤ 1 →
+      ∀ (E : Finset (Measurement (2*q+1)))
+        (w v : ℕ → Sample (ZMod (2*q+1)) → Measurement (2*q+1) → ℝ)
+        (tau : ℕ → Sample (ZMod (2*q+1)) → ℝ),
+      (∀ s x,0 ≤ tau s x) → (∀ s x,Feasible j q E (w s x)) →
+      (∀ s x e,e ∈ E → 0 ≤ v s x e) →
+      (∀ s x,oracleValue A j q (modelEstimate q L0 s x) ≤
+        allocationValue A j (modelEstimate q L0 s x) E (w s x)+tau s x) →
+      (path G A j mu) (⋃ s : ℕ,{x |
+        2*marginModulus q*width (C:=ZMod (2*q+1)) q L0 s delta+tau s x+
+          informationCap q*(∑ e ∈ E,|w s x e-v s x e|) < oracleRegret A j q mu E (v s x)})
+        ≤ ENNReal.ofReal delta := by
+  obtain ⟨G,hlegal,hm⟩ := design_exists q hq j
+  refine ⟨G,hlegal,?_⟩
+  intro A hA L0 hL mu delta hmu hmu1 hd hd1 E w v tau ht hf hv hopt
+  have hp := world_parameters q j (by omega) hA
+  have hB : (others A j).card=q := by
+    change (Aᶜ.erase j).card=q
+    rw [Finset.card_erase_of_mem (by simp [hp.1]),hp.2.2.1,hp.2.1]
+    omega
+  apply cyclic_value_confidence G A j hp.1
+    (D6ConstructiveTracking.world_has_alternative q j (by omega) A hA)
+    q L0 (by omega) hL (by simp) mu hmu hmu1 ?_ delta hd hd1 E w v tau ht hf hv hopt
+  simpa using hm A hp.1 hB mu
+
+#print axioms model_estimate_mem
+#print axioms cyclic_value_confidence
+#print axioms actual_world_value_confidence
+end
+end CIGAMF.P13.D6CyclicValueConfidence

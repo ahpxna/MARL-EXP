@@ -117,7 +117,12 @@ def build(layout_path, meta_path, out_path):
     # which runs under the logo at x = 1.7; shift it clear and narrow it to match.
     set_text(shapes[TITLE_SHAPE], meta['title'], uniform=False)
     shapes[TITLE_SHAPE].left = Emu(int(9.3 * 914400))
-    shapes[TITLE_SHAPE].width = Emu(int(37.6 * 914400))
+    # narrowing the title box while leaving its left edge alone pushed the whole
+    # title and byline four inches off centre; set the width, then centre it on
+    # the slide rather than assuming the template's left edge still applies
+    _t = shapes[TITLE_SHAPE]
+    _t.width = Emu(int(37.6 * 914400))
+    _t.left = Emu(int((prs.slide_width - _t.width) / 2))
 
     # everything except the title and the logo is replaced by computed blocks
     keep = {TITLE_SHAPE, LOGO_SHAPE}

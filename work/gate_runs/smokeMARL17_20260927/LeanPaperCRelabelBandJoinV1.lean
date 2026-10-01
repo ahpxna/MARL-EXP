@@ -1,0 +1,138 @@
+import «LeanPaperCRelabelV1»
+import «LeanPaperCLawPushV1»
+
+/-!
+Supervisor draft of 2026-09-23, COMPILED unchanged on 2026-09-23; axioms
+{propext, Classical.choice, Quot.sound}. No new endpoint law is assumed proved.
+
+The existing relabelling API only exports a zero-band witness. The insertion constructions
+need a NONZERO band: eta=1 for odd m and eta=(m-2)/(2(m-1)) for even m.
+This file derives that band from the explicit prefix count of each weight class, and then
+pushes the SAME law onto all permutations while preserving its budget-wise objective.
+
+The worker must instantiate `hcounts` using mixCount/O1_odd or mixCountEven/O1_even and
+`hvalue` using insMixture_free_value or insMixtureEven_free_value. These are finite arithmetic
+identities still to connect, not a new assumption of endpoint feasibility. Empty classes are
+never divided by: the band theorem is indexed by an actual item i.
+-/
+namespace CIGAMF.P13.PaperCRelabelBandJoin
+open Finset
+open scoped Classical
+open CIGAMF.P13.PaperCRanking CIGAMF.P13.PaperCEndpoint
+open CIGAMF.P13.PaperCInstantiation CIGAMF.P13.PaperCValueSet
+open CIGAMF.P13.PaperCBreakpoint CIGAMF.P13.PaperCRelabel
+open CIGAMF.P13.PaperCLawPush
+
+variable {m : ℕ} {R : Type*} [Fintype R]
+
+noncomputable def weightClass (g : Ranking m) (w : ℝ) : Finset (Fin m) :=
+  univ.filter (fun i => g i = w)
+
+noncomputable def prefixClassCount (g : Ranking m) (base : R → Equiv.Perm (Fin m))
+    (q : R → ℝ) (k : ℕ) (w : ℝ) : ℝ :=
+  ∑ x, q x * ∑ p ∈ univ.filter (fun p : Fin m => p.val < k),
+    (if g (base x p) = w then (1 : ℝ) else 0)
+
+theorem class_occupancy_eq_count (g : Ranking m) (base : R → Equiv.Perm (Fin m))
+    (q : R → ℝ) (k : ℕ) (w : ℝ) :
+    (∑ i ∈ weightClass g w, baseMarg base q k i) = prefixClassCount g base q k w := by
+  classical
+  unfold weightClass baseMarg prefixClassCount
+  rw [Finset.sum_comm]
+  apply Finset.sum_congr rfl
+  intro x hx
+  rw [← Finset.mul_sum, class_count_eq_prefix_count]
+
+/-- Actual symmetrised marginal, without a zero-band hypothesis. -/
+theorem relMarg_eq_count_div (g : Ranking m) (base : R → Equiv.Perm (Fin m))
+    (q : R → ℝ) (k : ℕ) (i : Fin m) :
+    relMarg (fun c : WPerm g => c.val) base q k i =
+      prefixClassCount g base q k (g i) / ((weightClass g (g i)).card : ℝ) := by
+  classical
+  let C := weightClass g (g i)
+  have hi : i ∈ C := by simp [C, weightClass]
+  have hconst : ∀ a ∈ C, ∀ b ∈ C,
+      relMarg (fun c : WPerm g => c.val) base q k a =
+        relMarg (fun c : WPerm g => c.val) base q k b := by
+    intro a ha b hb
+    have ha' : g a = g i := by simpa [C, weightClass] using ha
+    have hb' : g b = g i := by simpa [C, weightClass] using hb
+    obtain ⟨c, hc⟩ := wperm_orbit g a b (ha'.trans hb'.symm)
+    rw [← hc, relMarg_const_of_orbit _ _ _ _ (wperm_trans g) c a]
+  have hocc : (∑ j ∈ C, relMarg (fun c : WPerm g => c.val) base q k j) =
+      prefixClassCount g base q k (g i) := by
+    change (∑ j ∈ univ.filter (fun j : Fin m => g j = g i),
+      relMarg (fun c : WPerm g => c.val) base q k j) = _
+    rw [relMarg_class_sum g (fun c : WPerm g => c.val) (fun c => c.property)]
+    exact class_occupancy_eq_count g base q k (g i)
+  exact marginal_eq_occupancy_div_card C ⟨i, hi⟩ _ _ hconst hocc i hi
+
+noncomputable def symLaw (g : Ranking m) (q : R → ℝ) : WPerm g × R → ℝ :=
+  fun p => q p.2 / (Fintype.card (WPerm g) : ℝ)
+
+noncomputable def symPerm (g : Ranking m) (base : R → Equiv.Perm (Fin m)) :
+    WPerm g × R → Equiv.Perm (Fin m) := fun p => p.1.val * base p.2
+
+theorem symLaw_nonneg (g : Ranking m) (q : R → ℝ) (hq : ∀ x, 0 ≤ q x) :
+    ∀ x, 0 ≤ symLaw g q x := by
+  intro x
+  exact div_nonneg (hq x.2) (Nat.cast_nonneg _)
+
+theorem symLaw_sum (g : Ranking m) (q : R → ℝ) (hq : ∑ x, q x = 1) :
+    ∑ x, symLaw g q x = 1 := by
+  have hcard : (Fintype.card (WPerm g) : ℝ) ≠ 0 := by
+    have hp : 0 < Fintype.card (WPerm g) := Fintype.card_pos
+    exact_mod_cast hp.ne'
+  unfold symLaw
+  rw [Fintype.sum_prod_type]
+  simp_rw [← Finset.sum_div, hq]
+  simp [hcard]
+
+/-- A count bound for each NONEMPTY weight class gives every individual item's band. -/
+theorem band_of_prefix_counts (g : Ranking m) (base : R → Equiv.Perm (Fin m))
+    (q : R → ℝ) (η : ℝ) (hq : ∀ x, 0 ≤ q x) (hq1 : ∑ x, q x = 1)
+    (hcounts : ∀ k, k ≤ m → ∀ i : Fin m,
+      |prefixClassCount g base q k (g i) / ((weightClass g (g i)).card : ℝ)
+        - (k : ℝ) / (m : ℝ)| ≤ η / (m : ℝ)) :
+    symLaw g q ∈ FeasibleAt (symPerm g base) η := by
+  refine ⟨symLaw_nonneg g q hq, symLaw_sum g q hq1, ?_⟩
+  intro k hk i
+  change |relMarg (fun c : WPerm g => c.val) base q k i - _| ≤ _
+  rw [relMarg_eq_count_div]
+  exact hcounts k hk i
+
+theorem symLaw_budget_value (g : Ranking m) (base : R → Equiv.Perm (Fin m))
+    (q : R → ℝ) (D : ℝ) (k : ℕ) :
+    (∑ p, symLaw g q p * regret g (symPerm g base p) D k) =
+      ∑ x, q x * regret g (base x) D k := by
+  exact regret_relabel_sum g (fun c : WPerm g => c.val)
+    (fun c => c.property) base q D k
+
+/-- The emitted law is on ALL permutations; no optimum over the insertion menu is used. -/
+theorem actual_banded_witness_of_counts
+    (g : Ranking m) (base : R → Equiv.Perm (Fin m)) (q : R → ℝ)
+    (η D V : ℝ) (K : Finset ℕ) (hK : K.Nonempty)
+    (hq : ∀ x, 0 ≤ q x) (hq1 : ∑ x, q x = 1)
+    (hcounts : ∀ k, k ≤ m → ∀ i : Fin m,
+      |prefixClassCount g base q k (g i) / ((weightClass g (g i)).card : ℝ)
+        - (k : ℝ) / (m : ℝ)| ≤ η / (m : ℝ))
+    (hvalue : ∀ k ∈ K, (∑ x, q x * regret g (base x) D k) ≤ V) :
+    ∃ P ∈ FeasibleAt (id : Equiv.Perm (Fin m) → _) η,
+      maxRegret P g id D K hK ≤ V := by
+  refine ⟨pushLaw (symPerm g base) (symLaw g q),
+    feasible_push _ _ _ (band_of_prefix_counts g base q η hq hq1 hcounts), ?_⟩
+  rw [maxRegret_push]
+  unfold maxRegret
+  apply Finset.sup'_le
+  intro k hk
+  rw [symLaw_budget_value]
+  exact hvalue k hk
+
+#print axioms class_occupancy_eq_count
+#print axioms relMarg_eq_count_div
+#print axioms symLaw_nonneg
+#print axioms symLaw_sum
+#print axioms band_of_prefix_counts
+#print axioms symLaw_budget_value
+#print axioms actual_banded_witness_of_counts
+end CIGAMF.P13.PaperCRelabelBandJoin

@@ -57,31 +57,35 @@ def opt3 : Finset (Fin 7) := {0, 1, 6}
 def opt4 : Finset (Fin 7) := {0, 1, 2, 4}
 def opt5 : Finset (Fin 7) := {0, 2, 4, 5, 6}
 
-@[simp] theorem opt1_abs : complementAbs7 opt1 = 1 := by native_decide
-@[simp] theorem opt2_abs : complementAbs7 opt2 = 0 := by native_decide
-@[simp] theorem opt3_abs : complementAbs7 opt3 = 1 := by native_decide
-@[simp] theorem opt4_abs : complementAbs7 opt4 = 2 := by native_decide
-@[simp] theorem opt5_abs : complementAbs7 opt5 = 0 := by native_decide
+-- Kernel evaluation bounds match the existing replacement module.
+set_option maxRecDepth 100000
+set_option maxHeartbeats 4000000
+
+@[simp] theorem opt1_abs : complementAbs7 opt1 = 1 := by decide
+@[simp] theorem opt2_abs : complementAbs7 opt2 = 0 := by decide
+@[simp] theorem opt3_abs : complementAbs7 opt3 = 1 := by decide
+@[simp] theorem opt4_abs : complementAbs7 opt4 = 2 := by decide
+@[simp] theorem opt5_abs : complementAbs7 opt5 = 0 := by decide
 
 private theorem unique_abs1 :
     ∀ S : Finset (Fin 7), S.card = 1 → complementAbs7 S ≤ 1 → S = opt1 := by
-  native_decide
+  decide
 
 private theorem unique_abs2 :
     ∀ S : Finset (Fin 7), S.card = 2 → complementAbs7 S ≤ 0 → S = opt2 := by
-  native_decide
+  decide
 
 private theorem unique_abs3 :
     ∀ S : Finset (Fin 7), S.card = 3 → complementAbs7 S ≤ 1 → S = opt3 := by
-  native_decide
+  decide
 
 private theorem unique_abs4 :
     ∀ S : Finset (Fin 7), S.card = 4 → complementAbs7 S ≤ 2 → S = opt4 := by
-  native_decide
+  decide
 
 private theorem unique_abs5 :
     ∀ S : Finset (Fin 7), S.card = 5 → complementAbs7 S ≤ 0 → S = opt5 := by
-  native_decide
+  decide
 
 private theorem abs_le_of_eps_optimal
     (S target : Finset (Fin 7)) (k threshold : ℕ)
@@ -199,5 +203,16 @@ theorem STRUCT_SCALAR_CHI5_prefix_cover_not_at_most_four :
   have hcardLower := Finset.card_le_card hsubset
   rw [hfive] at hcardLower
   omega
+
+#print axioms opt1_abs
+#print axioms opt2_abs
+#print axioms opt3_abs
+#print axioms opt4_abs
+#print axioms opt5_abs
+#print axioms unique_abs1
+#print axioms unique_abs2
+#print axioms unique_abs3
+#print axioms unique_abs4
+#print axioms unique_abs5
 
 end CIGAMF.P13.StructuralScalarChi5Witness

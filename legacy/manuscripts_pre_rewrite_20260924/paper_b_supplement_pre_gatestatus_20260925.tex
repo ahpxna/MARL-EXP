@@ -1,0 +1,1393 @@
+\input{preamble}
+
+\begin{document}
+
+\title{Supplement to ``From Obstruction to Rate: The Observation Order of a Safe Compression
+Decision'':\\ Full Development, Formal Declarations and Status}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+This supplement carries the full development behind the main paper: the latent family and its
+safe sets, the moment law, the adaptive transcript on finite alphabets and on filtrations, the
+affinity route, the envelope and the density identification, the combinatorial law and its
+error floor, the $\log(1/\delta)$ side, the headline assembly, the geometry and its density
+realisation, the composite test and decoder, the per-pair likelihood-ratio test, the parity
+channel and its decoders, and the crossover mechanism, each with its Lean declarations. Nothing
+of the pre-rewrite text is dropped. Where a later theorem of the main paper supersedes a
+statement or closes an item called open here, the list below says so; the body is kept as the
+record, with one correction made in place (the decoder note).
+\end{abstract}
+
+\section*{Status map (2026-09-25)}
+\begin{itemize}
+\item \emph{The general rate law}, called open in the combinatorial section below, is now
+Theorems ``The lower law'', ``The tournament'' and ``The order law'' of the main paper
+(\lean{obstruction\_lower\_star}, \lean{tournament\_law}, \lean{graded\_tStar} in
+\lean{LeanPaperBObstructionLawV1}).
+\item \emph{The parity rates} are also corollaries of that law
+(\lean{parity\_safe\_from\_law}, \lean{parity\_id\_from\_law} in
+\lean{LeanPaperBObstructionParityV1}).
+\item \emph{The continuous adaptive transcript}, called the open middle link below, is carried
+for every channel with strictly positive measurable real densities in protocol form by
+\lean{transcript\_kl\_le} and
+\lean{transcript\_kl\_le\_qsum}, which the general lower law uses.
+\item \emph{The latent family as a channel} (called open in the transcript and headline sections below). Its channel is now
+written in protocol form over every finite family of linear probes, and its two nuisance worlds
+are identified exactly with the iterated-difference pair (\lean{famChan}, \lean{famDens\_vdiff},
+\lean{famDens\_udiff}, \lean{famChi\_v\_le}, \lean{famChi\_u\_le} in
+\lean{LeanPaperBFamilyChannelV1}). Both adaptive lower bounds hold on it
+(\lean{family\_safe\_lower}, \lean{family\_id\_lower}).
+\item \emph{Upper bounds on the Gaussian model} (the Chebyshev side of the headline section below). Explicit decoders with
+$\log(1/\delta)$ budgets replace the Chebyshev $1/\alpha$ side (\lean{safe\_decoder\_error},
+\lean{id\_decoder\_error}, \lean{family\_safe\_minimax}, \lean{family\_id\_minimax} in
+\lean{LeanPaperBFamilyDecoderV1}). The statements of \lean{LeanPaperBHeadlineV1} remain true,
+and they are superseded as the rates on this family.
+\item \emph{Unbounded stopping on every channel.} The truncation argument, proved below only
+on the parity channel, is now proved for every channel in protocol form
+(\lean{stopped\_obstruction\_lower\_star}, \lean{trunc\_correct}, \lean{correctSt\_ofFinite}
+in \lean{LeanPaperBStoppedLawV1}), and on the latent family
+(\lean{family\_safe\_stopped\_rate}, \lean{family\_id\_stopped\_rate}).
+\item \emph{The tournament's tests on every channel.} Block likelihood-ratio tests discharge the
+test hypothesis of the upper law with the Hellinger information (\lean{block\_error},
+\lean{hellinger\_tournament}, \lean{hellinger\_upper\_star}, \lean{resolved\_le\_scale},
+\lean{hellinger\_tournament\_satisfiable} in \lean{LeanPaperBHellingerTestV1}).
+\item \emph{The general law is tight on both channels.} A bounded feature's mean gap is at most
+$\int|p-q|\le\sqrt8\,H$, so the channels' own feature gaps bound their Hellinger information
+below, and the general tournament attains all four rates (\lean{tvs\_sq\_le},
+\lean{gap\_sq\_le\_hel}, \lean{family\_safe\_general\_upper}, \lean{family\_id\_general\_upper} in
+\lean{LeanPaperBHellingerFamilyV1}; \lean{parity\_safe\_general\_upper},
+\lean{parity\_id\_general\_upper} in \lean{LeanPaperBHellingerParityV1}).
+\item \emph{The latent family's safe sets are derived}, not stated (\lean{famSafe\_derived} in
+\lean{LeanPaperBFamilySafeV1}), for $r\ge2$.
+\item \emph{Scope, not open}: the constants depend on $r$ explicitly and are not uniform in it.
+\emph{Optional}: a two-sided bound on the information over the class $Q_{\eta}$.
+\item \emph{The decoder brackets} are corrected in place (note after the decoder figure).
+\end{itemize}
+
+\section{The family, and its safe sets}
+\label{sec:family}
+
+For $r\ge2$ and $u,v\in\{-1,1\}$ put $X=\{-1,1\}^{r+3}$ and
+\begin{equation}
+F_{u,v}(z)=3u z_{1}-2z_{2}-2z_{3}+v\prod_{\ell=4}^{r+3}z_{\ell},
+\label{eq:family}
+\end{equation}
+with the uniform product reference and the deployment support
+\begin{equation}
+K=\bigl\{(t,t,t,1,\dots,1):t=\pm1\bigr\}.
+\label{eq:support}
+\end{equation}
+The single-coordinate responses are $Q_{1}(z_{1})=3uz_{1}$, $Q_{2}=-2z_{2}$, $Q_{3}=-2z_{3}$
+and $Q_{j}=0$ for $j\ge4$, and the losses on $K$, computed as half the oscillation of the
+retained residual, are
+\begin{equation}
+\begin{gathered}
+L_{K}(\{1\})=4,\qquad L_{K}(\{2\})=L_{K}(\{3\})=|3u-2|,\\
+L_{K}(\{j\})=|3u-4|
+\end{gathered}
+\label{eq:losses}
+\end{equation}
+for $j\ge4$. Every entry is derived from~\eqref{eq:family} and~\eqref{eq:support}; no loss
+table is declared. \CERT{}
+
+Two consequences matter. For $\varepsilon<1$ the safe sets at $u=+1$ and $u=-1$ are
+\emph{disjoint}---at $u=-1$ only $\{1\}$ is safe, at $u=+1$ every other singleton is---so a
+safe compression rule also decides $u$. And $v$ does not move the safe set at all: the
+interaction sign is decision-irrelevant.
+
+\subsection{The observation model, which is where the content is}
+
+A query picks a linear $g$ with $\|g\|_{\infty}\le1$ and returns
+\begin{equation}
+Y=F_{u,v}(Z)+h\,g(Z)+\xi,\qquad Z\sim\mathrm{Unif}(X),\ \xi\sim N(0,\sigma^{2}).
+\label{eq:obs}
+\end{equation}
+Three conditions are not decoration:
+\begin{itemize}
+\item $Z$ is \emph{latent} and is never returned;
+\item queries may sample on $X$ while the compression is judged on $K$;
+\item no query reads $F$ directly, and $g$ may not be amplified by $1/h$.
+\end{itemize}
+
+\TODOPAR{If $Z$ were observed, or the class were richer than bounded linear probes, the
+lower bound can collapse. If an application forces measurement on $K$ only, the construction
+must change; that difference must not be hidden in notation. State this beside the model in
+the final version, not in a remark.}
+
+A fact worth isolating: $u$ is \emph{invisible} at order zero. The law of $F$ alone does not
+depend on $\mathrm{sign}(u)$, because $z_{1}$ is symmetric; only the probe $h\,g$ breaks that
+symmetry. This is why the decision costs $h^{-2}$ rather than $O(1)$, and it is a property of
+the construction rather than an assumption. \CERT{}
+
+\section{The order law}
+\label{sec:order}
+
+\subsection{Vanishing}
+
+\begin{theorem}[Moment vanishing]
+\label{thm:vanish}
+Let $\chi$ be the top character on $\{-1,1\}^{n}$ and let $g$ be any polynomial of degree at
+most $d$. Then $\mathbb{E}[\chi\,g^{j}]=0$ for every $j$ with $jd<n$, in particular for every
+$j<\lceil n/d\rceil$.
+\end{theorem}
+
+\leanbox{\lean{moment\_vanishes\_below\_order}, \lean{moment\_vanishes\_below\_s}, with
+\lean{chiS\_mul}, \lean{HasDeg\_mul}, \lean{top\_character\_orthogonal}, in
+\lean{LeanUnifiedQueryOrderV1}}
+
+The proof is short and is the reason the statement is about \emph{every} admissible query
+rather than a chosen one: characters multiply to the character of the symmetric difference,
+so degrees add under multiplication, and the only set surviving against the top character is
+the full one, which needs $jd\ge n$.
+
+\subsection{Attainment, with the exact constant}
+
+\begin{theorem}[Attainment]
+\label{thm:attain}
+For the averaged tail query,
+$\displaystyle\sum_{z\in\{-1,1\}^{n}}\Bigl(\prod_{i}z_{i}\Bigr)\Bigl(\sum_{i}z_{i}\Bigr)^{k}$
+vanishes for $k<n$ and equals $2^{n}\,n!$ for $k=n$. Normalising,
+$\mathbb{E}[\chi_{n}g^{n}]=n!/n^{n}\neq0$.
+\end{theorem}
+
+\leanbox{\lean{cubeSum\_below\_diag}, \lean{cubeSum\_diag}, \lean{tail\_query\_moment},
+\lean{tail\_query\_moment\_ne\_zero} in \lean{LeanPaperBAttainmentV1}}
+
+The proof is a recurrence, not a bijection count: peeling one coordinate and expanding the
+binomial gives
+\begin{equation}
+\begin{split}
+&\mathrm{cubeSum}(n{+}1,k)\\
+&\quad=\sum_{j}\binom{k}{j}\bigl(1+(-1)^{j+1}\bigr)\,\mathrm{cubeSum}(n,k{-}j),
+\end{split}
+\label{eq:rec}
+\end{equation}
+whose parity factor kills every even $j$, so the recursive index always drops strictly and a
+single induction gives both lines. Theorems~\ref{thm:vanish} and~\ref{thm:attain} together
+turn an $\Omega$ into a $\Theta$.
+
+\subsection{Both scales, on the real family}
+
+On~\eqref{eq:family}, the decision probe $g=z_{1}$ gives
+$\mathbb{E}[Y^{2}]=18+\sigma^{2}+6uh+h^{2}$ exactly, so the two values of $u$ sit $12h$
+apart; and the order-$(r{+}1)$ moment contrast between $v=\pm1$ under the tail query is
+exactly $2(r{+}1)\,r!/r^{r}\,h^{r}$---an identity, not a leading term. \CERT{}
+
+Measuring the squared Hellinger distance of the \emph{actual} observation laws by
+deterministic quadrature gives log--log slopes $1.983$ for the decision pair against a
+predicted $2$, and $3.959$ and $5.962$ for the identification pair at $r=2,3$ against
+predicted $4$ and $6$. \NUM{} Under the wrong probe the identification pair is not merely
+higher-order but \emph{exactly} indistinguishable: $H^{2}<10^{-12}$ at every $h$, because
+flipping $v$ is a measure-preserving relabelling of the tail coordinates and $z_{1}$ is
+independent of them. The order is a property of the query class, not only of the worlds.
+
+\section{Against every adaptive policy}
+\label{sec:adaptive}
+
+A per-query bound says nothing about a learner that chooses its next query from what it has
+seen. The step that makes the lower bound legitimate is the transcript chain rule, and we
+prove it for a transcript law built from the policy rather than assumed to be a product.
+
+\begin{theorem}[Transcript chain rule and horizon bound]
+\label{thm:chain}
+For a policy $\mathrm{pol}$ mapping histories to queries,
+\begin{equation}
+\mathrm{KL}_{n+1}(h)=\mathrm{kl}\bigl(P_{\mathrm{pol}(h)},P'_{\mathrm{pol}(h)}\bigr)
++\sum_{o}P_{\mathrm{pol}(h)}(o)\,\mathrm{KL}_{n}(h\!\cdot\!o),
+\label{eq:chain}
+\end{equation}
+and hence $\mathrm{KL}_{N}\le N\sup_{q}\mathrm{kl}(P_{q},P'_{q})$.
+\end{theorem}
+
+\leanbox{\lean{klPath\_chain}, \lean{klPath\_le\_horizon}, with \lean{sumPaths\_mass} and
+\lean{klPath\_nonneg}, in \lean{LeanPaperBTranscriptKLV1}}
+
+\paragraph{The same bound without a finite alphabet.}
+The chain rule above sums over every length-$n$ list of observations, so it needs a finite
+observation alphabet --- and the construction's observation is Gaussian. The object that
+carries the argument without that assumption is the likelihood ratio on the filtration,
+$L_{t}=\mathrm{d}P|_{\mathcal F_{t}}/\mathrm{d}Q|_{\mathcal F_{t}}$. Four facts, none of which
+needs the alphabet to be finite: $\int f\,\mathrm{d}P=\int L_{t}f\,\mathrm{d}Q$ for every
+$\mathcal F_{t}$-measurable $f$; $\int_{A}L_{t+1}\,\mathrm{d}Q=\int_{A}L_{t}\,\mathrm{d}Q$ for
+every $A\in\mathcal F_{t}$, because both compute $P(A)$; that consistency \emph{is} the tower
+property $L_{t}=\mathbb{E}_{Q}[L_{t+1}\mid\mathcal F_{t}]$; and with $L_{0}=1$ the divergence
+telescopes, $\mathbb{E}_{P}\log L_{n}=\sum_{t<n}\mathbb{E}_{P}\log(L_{t+1}/L_{t})$, giving the
+horizon bound $nB$ under a per-step bound $B$. The policy never appears: it is inside the
+filtration, so a policy reading the entire past is already covered --- a strengthening over
+the list formulation, where cancelling the policy is a step of the proof.
+
+\NOTEPAR{What is still owed is the bridge, not the analysis: that the transcript law of a
+concrete adaptive Gaussian policy admits such an $L_{t}$, built from that policy's own
+kernels. Until that is written the continuous adaptive transcript is not carried, and this
+paragraph must not be read as saying it is. Integrability of each $\log L_{t}$ under $P$ is a
+hypothesis.}
+
+\leanbox{\lean{change\_of\_measure}, \lean{setIntegral\_L\_succ}, \lean{condExp\_L},
+\lean{kl\_eq\_sum\_increments}, \lean{kl\_le\_horizon} in \lean{LeanPaperBChangeV1}}
+
+The policy contributes nothing because it is the same map under both worlds. With the
+per-query bound of Theorem~\ref{thm:vanish} this gives $N\gtrsim h^{-2r}$ for identification
+against every adaptive policy \emph{on a finite observation alphabet}. The observation model
+of this paper has Gaussian noise, so Theorem~\ref{thm:chain} does not close the lower bound
+on the model we actually use, and we do not claim that it does.
+
+\subsection{What would close it, and what is already proved of that}
+
+The route that does close it runs on the Hellinger \emph{affinity}
+$\rho(P,Q)=\int\sqrt{pq}=1-H^{2}(P,Q)$, because a policy that uses the same query kernel
+under both worlds contributes a factor of one at every step, so
+\begin{equation}
+\rho\bigl(\mathbb{P}^{\pi,N}_{+},\mathbb{P}^{\pi,N}_{-}\bigr)\ \ge\
+\bigl(1-C_{r}h^{2r}\bigr)^{N},
+\label{eq:affinity}
+\end{equation}
+\emph{provided} the per-step bound $\sup_{g}H^{2}(P^{g}_{+,h},P^{g}_{-,h})\le C_{r}h^{2r}$
+holds uniformly over the query class. Two-point testing then gives
+$\mathrm{err}_{N}\ge\tfrac14\rho^{2}$.
+
+Everything after that per-step bound is arithmetic, and it is proved: the product in
+\eqref{eq:affinity} from a per-step floor, Bernoulli's inequality, and the conclusion that no
+budget below $(1-2\sqrt{\delta_{0}})/(C_{r}h^{2r})$ reaches error $\delta_{0}$. The same
+statement with $h^{2}$ in place of $h^{2r}$ gives the decision side. So the general adaptive
+lower bound is reduced to \emph{one} analytic obligation---a per-step Hellinger bound
+uniform over the query class---and to nothing else.
+
+\leanbox{\lean{affinity\_pow\_lower}, \lean{affinity\_bernoulli},
+\lean{budget\_lower\_from\_affinity}, \lean{two\_exponents\_from\_affinity} in
+\lean{LeanPaperBRatesV1}}
+
+\paragraph{Where this sits, and what it is not.}
+The \emph{phenomenon} behind \eqref{eq:affinity} has a clear precedent. The masking and
+side-channel literature has studied exactly this mechanism for years: low moments carry no
+information, the signal appears only at high order, a coupling or a nonlinearity lowers
+the protective order, and changing the noise level changes which regime
+dominates~\cite{duc2015}. Duc, Faust and Standaert discuss non-independent leakage
+directly. Their treatment has heuristic components and does not contain the adaptive
+theorem proved here --- but it does mean that
+\[
+H^{2}\asymp h^{2r},\qquad N\asymp h^{-2r},
+\]
+and even the $h^{6}+\eta^{2}h^{4}$ crossover, are \textbf{not} strong enough on their own
+to carry a paper. They are recorded here as supporting results.
+
+Likewise, keeping only decision-relevant information is itself an established
+idea~\cite{poli2023}. What would have to be new is the \emph{exponent law and its
+geometric characterisation}, not the slogan.
+
+The question we therefore keep is:
+
+\begin{quote}
+\emph{the order of information needed to find a safe compression can differ from the order
+needed to identify the world, already when the safe answer sets overlap and the queries are
+chosen adaptively.}
+\end{quote}
+
+with the target
+\begin{gather*}
+N_{\rm safe}(h,\delta)\asymp h^{-2s_{\rm safe}}\log(1/\delta),\\
+N_{\rm id}(h,\delta)\asymp h^{-2s_{\rm id}}\log(1/\delta),
+\qquad s_{\rm safe}<s_{\rm id},
+\end{gather*}
+and three conditions that make it worth more than an easy-target-plus-hard-nuisance
+construction: the safe sets must come from the actual \lean{selectedRadius} geometry rather
+than an assigned answer table; they must genuinely \emph{overlap}, as in
+$\{1,2\},\{2,3\},\{1,3\}$, so that no single nuisance bit can be discarded; and the lower
+bound must cover every adaptive policy with a matching upper bound on the same query class.
+
+\NOTEPAR{None of those three is delivered here. What is delivered is the analytic half:
+\eqref{eq:affinity} on the linear class with explicit constants, and the
+$\log(1/\delta)$ side of the budget below. If the geometry half does not follow, this
+material belongs inside the Support paper as a supporting rate, not as a paper of its own.
+That is the honest reading and we do not argue against it.}
+
+\paragraph{The remaining obligation, measured.}
+Since everything after \eqref{eq:affinity} is proved, the whole adaptive lower bound turns
+on one number, and that number can be computed. Both densities are exact finite Gaussian
+mixtures, so $\sup_{g}H^{2}$ is a quadrature over the mixtures themselves, with the
+supremum attacked by many restarts of a projected ascent over the probe class, with the
+canonical construction probe $(z_{4}+z_{5}+z_{6})/3$ seeded as a mandatory baseline rather
+than left for the random restarts to rediscover. On the \emph{linear} class the fitted
+identification orders are $3.79$ at $r=2$ and $5.80$ at $r=3$ against the claimed $2r=4$
+and $6$, and $1.91$ in the decision direction against the claimed $2$. Fitting $C_{r}$ on
+the coarse half and testing it on the fine half gives worst ratios $1.089$ at $r=2$ and
+$0.126$ at $r=3$. That test is an \emph{upper-envelope} check and nothing more: a ratio
+well below one means the measured order \emph{exceeds} $2r$, so the envelope holds with
+room; it is not a two-sided approximation and is not reported as one.
+
+\NOTEPAR{Two implementation faults produced an earlier $r=3$ slope of $8.13$, and both are
+repaired. The squared Hellinger distance was formed as $1-\rho$ with $\rho$ the affinity;
+at $H^{2}\sim10^{-8}$ that subtracts two numbers agreeing to eight digits and discards half
+the double-precision mantissa before quadrature error is even counted. It is now computed as
+$\tfrac12\int(p-q)^{2}/(\sqrt p+\sqrt q)^{2}$, which has no such cancellation. And the probe
+seeded as ``canonical'' was a flat vector over every coefficient, which spreads the same mass
+over the head coordinates $z_{1},z_{2},z_{3}$; the construction's attaining probe is the
+tail average $(1/r)\sum_{\ell\ge4}z_{\ell}$ alone, now recovered from the basis by least
+squares with the residual checked ($6\cdot10^{-16}$) and recorded. With both repaired the
+slope is $5.80$. \emph{This is better evidence, not a proof:} the ascent still fails to
+improve on its best seed at every $h$, so the value remains a lower bound on the supremum
+and must not be read as evidence for an $h^{6}$ optimum law. The artifact records this per $h$ as
+\texttt{sup\_equals\_best\_random} and \texttt{n\_search\_limited}. What
+\eqref{eq:affinity} consumes is only the domination by $C_{r}h^{2r}$ over the measured
+range, and a value attained by a legal probe is a \emph{lower} bound on the supremum ---
+the direction that can refute an upper-bound law and can never certify one.}
+
+\paragraph{The query class must be the linear one, and that is a theorem-level
+restriction.}
+It is tempting to state \eqref{eq:affinity} for the wider class of probes of degree at
+most $r-1$, on the reasoning that a probe below degree $r$ cannot contain the degree-$r$
+tail character. \emph{That reasoning is wrong}, because the Hellinger distance sees powers
+of the probe and degrees add. At $r=3$ take
+\[
+g(z)=\tfrac{1}{2}\bigl(z_{4}z_{5}+z_{6}\bigr),
+\qquad \|g\|_{\infty}=1,\qquad \deg g=2\le r-1 .
+\]
+With $\chi=z_{4}z_{5}z_{6}$ one computes $g^{2}=\tfrac{1}{2}(1+\chi)$, so
+$\mathbb{E}[\chi g^{2}]=\tfrac12$: squaring the probe \emph{recreates} the character the
+cap was meant to exclude. On this model that is visible in a bounded statistic,
+\[
+\mathbb{E}_{+}\bigl[Y^{3}\bigr]-\mathbb{E}_{-}\bigl[Y^{3}\bigr]=3h^{2}
+\qquad\text{exactly,}
+\]
+and since the sixth moments are bounded uniformly for $h\le1$, \eqref{eq:cs} with $f=Y^{3}$
+forces $H^{2}\ge c\,h^{4}$ with $c>0$. No uniform $H^{2}\le Ch^{6}$ can hold on the
+degree-capped class. Measured on that single probe the order is $3.94$ and
+$H^{2}/h^{4}$ settles at $1.74\times10^{-2}$ while $H^{2}/h^{6}$ diverges. \NUM{}
+
+So the class in \eqref{eq:affinity} is the \emph{linear} one, $g(z)=a\cdot z$ with
+$\|g\|_{\infty}\le1$, and that is the class Theorem~\ref{thm:vanish} and
+\lean{mixture\_hellinger\_rate} are stated for. Figure~\ref{fig:unih} shows the linear
+class against the unrestricted one.
+
+\NOTEPAR{A local ascent returns a value \emph{attained} by a legal probe, so it is a lower
+bound on the supremum. A lower bound can refute an upper-bound law and can never certify
+one. On the degree-capped class it refutes; on the linear class it fails to refute, which
+is consistent with the law but is not what establishes it --- the theorem is. An earlier
+version of this measurement searched the degree-capped class at random, missed the probe
+above, and reported an order of $7.12$; the exhibited probe is the reason the class is now
+pinned in the statement rather than chosen for convenience.}
+
+\paragraph{How little nonlinearity destroys the separation.}
+The gap between order $2r$ and order $4$ is not a cliff. Widen the class by a single
+parameter,
+\[
+g_{\eta}(z)=\frac{z_{4}+z_{5}+z_{6}+\eta\,z_{4}z_{5}}{3+\eta},
+\qquad\|g_{\eta}\|_{\infty}=1,
+\]
+whose moments against the tail character are exactly
+$\mathbb{E}[\chi g_{\eta}]=0$, $\mathbb{E}[\chi g_{\eta}^{2}]=2\eta/(3+\eta)^{2}$ and
+$\mathbb{E}[\chi g_{\eta}^{3}]=6/(3+\eta)^{3}$: at $\eta=0$ the signal first appears at the
+cube, and any $\eta>0$ opens a square channel. Writing the density difference as
+\begin{gather*}
+p_{+}-p_{-}=\frac{\eta h^{2}}{(3+\eta)^{2}}A-\frac{h^{3}}{(3+\eta)^{3}}B+R,\\
+A=f''(\cdot-1)-f''(\cdot+1),\qquad
+B=f'''(\cdot-1)-f'''(\cdot+1),
+\end{gather*}
+the head density $f$ is even, so $A$ is odd, $B$ is even, the base density is even and
+$\int AB/p_{0}=0$: the $\eta h^{5}$ cross term drops out and the two channels are
+additive. The measured order in $h$ falls monotonically from $5.94$ at $\eta=0$ through
+$5.14$, $4.50$, $4.11$ to $3.95$ at $\eta=1.6$, and the two-channel form
+$c_{6}h^{6}+c_{4}\eta^{2}h^{4}$ fitted on the coarse half of the grid predicts the fine
+half within its small-$\eta$ regime. Figure~\ref{fig:crossover} shows both. The crossover therefore sits at
+$\eta\asymp h$: a nonlinear measurement capability of order $h$ already erases
+the advantage. \NUM{}
+
+\NOTEPAR{This is a law for the one probe $g_{\eta}$, and a probe bounds the supremum from
+below only. A crossover for a \emph{class} would need a uniform upper bound over that
+class, which is not attempted and is not claimed.}
+
+\paragraph{The proof route, now complete.}
+The route to \eqref{eq:affinity} that avoids checking Taylor coefficients one at a time has
+four steps: separate head from tail; replace the alternating sum over the tail cube by an
+$r$-th order finite difference; bound it by $h^{r}\prod|a_{i}|\le h^{r}r^{-r}$; and convert
+the density gap into a Hellinger bound against a lower envelope. All four are now proved.
+
+The first step rests on the one-dimensional identity
+\[
+f(x-b)-f(x+b)=-b\int_{-1}^{1}f'(x-bt)\,dt,
+\]
+from the fundamental theorem of calculus, and on the exact expansion of the iterate as an
+alternating sum over the sign cube,
+$D_{b_{1}}\cdots D_{b_{r}}f(x)=2^{-r}\sum_{z\in\{\pm1\}^{r}}\chi(z)f(x-b\cdot z)$.
+
+The $h^{r}$ factor comes from the $r$-fold difference bound, which has to be
+\emph{localised}: the global version would need a uniform bound on $\varphi^{(r)}$, which a
+Gaussian envelope is not. Only the values of the $r$-th derivative within
+$\sum_{i}|b_{i}|$ of the base point matter, and paying for that window widens the centre
+range from $R$ to $R+h_{0}$ --- nothing else changes.
+
+The envelope is built from the Hermite-like recursion $\varphi^{(n)}=P_{n}\varphi$ with
+$\deg P_{n}\le n$, giving $|\varphi^{(n)}(y)|\le A_{n}(1+|y|)^{n}\varphi(y)$ with $A_{n}$
+the coefficient mass. Finiteness of $\int B_{r}^{2}/\ell$ then needs no
+polynomial-times-Gaussian integrability lemma at all: $1+x\le e^{x}$ absorbs the
+polynomial, completing the square absorbs both linear exponentials --- the one from the
+upper envelope and the one from the lower --- and what is left is $e^{-y^{2}/4\sigma^{2}}$.
+The conclusion is
+\[
+\int \frac{\Delta^{2}}{\ell}\;\le\;h^{2r}\,r^{-2r}\,C(\sigma,R+h_{0},r),
+\qquad C<\infty \text{ explicit.}
+\]
+Figure~\ref{fig:envrate} shows both halves: the measured order is $2r$ to two decimals at
+$r=2,3,4$, and the envelope ratio sits under its dominating Gaussian at every point of the
+grid. \NUM{}
+
+\leanbox{\lean{finite\_difference\_one}, \lean{iterDiff\_eq\_signSum},
+\lean{iterDiff\_abs\_le\_window}, \lean{gaussDeriv\_envelope},
+\lean{envRatio\_integrable}, \lean{iterDiff\_mixture\_envelope},
+\lean{hellinger\_rate\_bound}, \lean{hellinger\_le\_of\_gap} in \lean{LeanPaperBRatesV1}}
+
+\paragraph{The identification the envelope needed, and why its old form was empty.}
+The composition above took the density-difference identification as a hypothesis:
+$p-q=\mathrm{iterDiff}\,q\,(\text{shifts})$, with $q$ the same mixture on both sides,
+together with $p\ge0$. \emph{That pair of hypotheses is contradictory.} With one Gaussian
+component and one shift $s>0$ we have $p(y)=q(y)+\tfrac12\bigl(q(y-s)-q(y+s)\bigr)$, and at
+$y=-T$ with $T=\frac{s^{2}+4\sigma^{2}}{2s}$ the tail ratio is $q(T-s)/q(T)=e^{2}>3$ while
+$q(T+s)\le q(T)$, so $p(-T)<0$. The hypotheses hold only at $h=0$, where the conclusion is
+empty: the old composition said nothing wherever it was of interest.
+
+The repair is to stop asking one density to be its own difference, and to build the pair the
+difference actually comes from. Write $v(z)$ for the signed shift sum of a sign pattern $z$
+and $\mathrm{par}(z)$ for the product of its signs, and set
+\begin{gather*}
+Q=2^{-r}\sum_{z}M(\cdot-v(z)),\\
+P=2^{-r}\sum_{z}\bigl(1+\mathrm{par}(z)\bigr)\,M(\cdot-v(z)).
+\end{gather*}
+$P$ keeps the even patterns at double weight and drops the odd ones; $Q$ is the flat average.
+Both are non-negative combinations of translates of one base, both carry the same total mass,
+and $P-Q=\mathrm{iterDiff}\,M\,(\text{shifts})$ \emph{exactly}. The identification is now an
+identity about a constructed pair rather than a hypothesis about a hoped-for one, and $p\ge0$
+is free. Every centre $c_{j}+v(z)$ lies within $R+h_{0}$, so $Q$ inherits the base's floor and
+the envelope bound applies with $\ell=\mathrm{envLo}$:
+\[
+\int\frac{(P-Q)^{2}}{\mathrm{envLo}}\ \le\ h^{2r}r^{-2r}\,C(\sigma,R+h_{0},r),
+\]
+with no integrability hypothesis at all. $C$ mentions neither the weights, nor the centres,
+nor the shift profile --- one constant, every admissible query, which is the uniformity the
+per-query bound owed.
+
+\NOTEPAR{Uniform over the class \emph{as the box constraints define it}: centres within $R$,
+$\sum_{i}|ha_{i}|\le h_{0}$, $\sum_{i}|a_{i}|\le1$. That a given observation model's queries
+\emph{induce} shifts inside that box is the modelling step and is not proved here. The
+constructed pair is unnormalised; the two worlds carry equal mass, so one common normaliser
+converts the statement, and the $\chi^{2}$ form needs no integrability hypothesis while the
+KL form needs two, both properties of the pair rather than modelling assumptions.}
+
+\leanbox{\lean{self\_difference\_not\_a\_density}, \lean{worlds\_diff},
+\lean{worldQ\_floor}, \lean{mixDens\_floor}, \lean{chi2\_uniform},
+\lean{kl\_uniform\_over\_queries} in \lean{LeanPaperBWorldsV1}}
+
+\NOTEPAR{Still do not write that the two exponents are proved for continuous adaptive
+randomised policies. What the analysis above closes is exactly one link: the per-step
+Hellinger bound $H^{2}\le C_{r}h^{2r}$ on the construction, with every constant explicit
+and no assumed tail. The link it does \emph{not} close is the one before it. Both
+\lean{affinity\_pow\_lower} and \lean{budget\_lower\_from\_affinity} take the transcript
+affinity's per-step multiplicative step as a \emph{hypothesis}; supplying that step for an
+adaptive randomised policy on a \emph{continuous} observation space is the chain-rule
+statement that \lean{LeanPaperBTranscriptKLV1} proves only for a finite alphabet. So the
+chain reads: per-step bound (now proved) $\to$ transcript affinity product (proved for
+finite alphabets only) $\to$ sample budget (proved arithmetic). The middle link is the
+open one, and it is limitation~2).}
+
+A complementary route avoids evaluating any integral: a bounded statistic that separates two
+laws in expectation forces a Hellinger separation,
+\begin{equation}
+\bigl(\mathbb{E}_{P}f-\mathbb{E}_{Q}f\bigr)^{2}\le 4H^{2}(P,Q)\bigl(\mathbb{E}_{P}f^{2}+\mathbb{E}_{Q}f^{2}\bigr),
+\label{eq:cs}
+\end{equation}
+so the exact moment contrasts above give $H^{2}\gtrsim h^{2}$ and $H^{2}\gtrsim h^{2r}$ from
+a non-zero leading coefficient alone.
+
+\leanbox{\lean{abs\_pow\_add\_le}, \lean{integrable\_abs\_pow\_gaussian},
+\lean{gaussian\_shift\_moment\_le} in \lean{LeanPaperBRatesV1}}
+
+\leanbox{\lean{hellinger\_lower\_of\_moment\_contrast},
+\lean{hellinger\_pos\_of\_contrast\_ne\_zero}, with \lean{cauchy\_schwarz}, in
+\lean{LeanPaperBHellingerV1}}
+
+\section{The law beyond the witness}
+\label{sec:law}
+
+Four worlds are a witness. The general statement is about obstructions, and its
+combinatorial half is proved.
+
+\begin{theorem}[Classes resolve iff no obstruction hides]
+\label{thm:classes}
+For any grouping of worlds into classes, every class has a common safe answer if and only if
+no obstruction is contained in a class.
+\end{theorem}
+
+\leanbox{\lean{classes\_resolve\_iff}, with \lean{hasCommon\_mono} and
+\lean{isObstruction\_mono}, in \lean{LeanUnifiedObstructionOrderV1}}
+
+The classes must be built correctly. We group worlds by equality of their \emph{entire}
+coefficient vector up to order $s$, over every admissible query: that is equality of a tuple,
+hence an equivalence relation by construction. Taking a pairwise ``indistinguishable at order
+$s$'' relation and closing it by union-find is not the same thing and is not used.
+
+\begin{theorem}[Randomised error floor]
+\label{thm:floor}
+Let $H$ be an obstruction and $p$ any distribution over decisions. Then some $F\in H$
+receives unsafe mass at least $1/|H|$.
+\end{theorem}
+
+\leanbox{\lean{obstruction\_total\_unsafe\_mass},
+\lean{obstruction\_error\_floor\_randomized} in \lean{LeanUnifiedObstructionOrderV1}}
+
+The argument is a fibre count: every decision is unsafe somewhere in $H$, so assigning each
+decision to such a world gives disjoint fibres whose masses sum to one. It covers randomised
+rules, which is what converts ``the obstruction survived'' into a lower bound on risk.
+
+On the family of Section~\ref{sec:family} at $r=3$, with orders computed from the
+$h$-expansion of the real law, the classes behave exactly as the law predicts
+(Table~\ref{tab:classes}), giving $r_{\rm safe}=1$ and $r_{\rm id}=3$. \CERT{}
+
+\begin{table}[t]
+\caption{Classes by coefficient equality up to order $s$, on the real family at $r=3$.}
+\label{tab:classes}
+\centering
+\footnotesize
+\begin{tabular}{@{}rrl@{}}
+\toprule
+$s$ & classes & every class has a common safe answer \\
+\midrule
+$0$ & $1$ & no \\
+$1$ & $2$ (split by $u$) & yes $\Rightarrow r_{\rm safe}=1$ \\
+$3$ & $4$ (split by $v$) & yes $\Rightarrow r_{\rm id}=3$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\TODOPAR{What is \emph{not} proved: that $N_{\rm safe}(h)=\Theta(h^{-2r_{\rm safe}})$ in
+general. Section~\ref{sec:law} supplies the combinatorics and the error floor; converting an
+order-$s$ indistinguishability into a sample count for an arbitrary family is the analytic
+half and is open. The matching orders are established on the family of
+Section~\ref{sec:family}, and that is the scope of the rate claim.}
+
+\paragraph{The $\log(1/\delta)$ side, proved.}
+A Chebyshev upper bound gives $1/\delta$, not $\log(1/\delta)$, so the two-parameter law
+needs its lower side from a change of measure --- and it does \emph{not} need two worlds
+with disjoint safe sets. Let $H$ be a class of worlds indistinguishable below the relevant
+order with $\bigcap_{\theta\in H}\mathcal{A}_{\varepsilon}(\theta)=\varnothing$, and let
+there be $K$ answers. At $\theta$ some answer $a$ is returned with probability at least
+$(1-\delta)/K$; because the safe intersection is empty there is $\lambda\in H$ at which $a$
+is unsafe, so $\Pr_{\lambda}(\hat a=a)\le\delta$. Data processing onto that single event
+and the chain rule then give
+\[
+N\;\ge\;\frac{\frac{1-\delta}{K}\log(1/\delta)-2e^{-1}}{C\,h^{2s}} .
+\]
+Every step is proved from scratch: the two-term log-sum inequality from $\log y\ge1-1/y$
+alone, hence data processing for a two-cell partition; $x\log x\ge-1/e$; the pigeonhole on
+the answers; and the assembly, with the $h$ dependence confined to the denominator so no
+constant hides a dependence on either parameter.
+
+\leanbox{\lean{log\_sum\_two}, \lean{mul\_log\_ge\_neg\_inv\_e}, \lean{kl2\_ge\_log},
+\lean{exists\_heavy\_answer}, \lean{decision\_budget\_log\_delta},
+\lean{decision\_budget\_two\_parameter} in \lean{LeanPaperBRatesV1}}
+
+\paragraph{The headline, assembled --- and which half is a theorem.}
+The two exponents bound different quantities, and assembling them is what makes visible
+which half is a theorem. On the lower side,
+$\mathrm{lowerBudget}$ names the bound above: with a per-step divergence at most
+$Ch^{2s}$, any rule correct with probability $1-\delta$ needs
+$N\ge\bigl((1-\delta)K^{-1}\log(1/\delta)-2/e\bigr)/C\,h^{-2s}$, the constant depending on
+the family and on the number of answers alone --- never on $h$ or $\delta$. It is applied at
+$s_{\mathrm{safe}}$ and at $s_{\mathrm{id}}$ with nothing differing but the exponent. On the
+upper side, $\mathrm{safeSufficient}$ names the Chebyshev budget, which scales as
+$h^{-2}/\alpha$.
+
+The separation between the exponents is then an \emph{identity}, not an estimate: at
+$s_{\mathrm{safe}}=1$ and $s_{\mathrm{id}}=t+1$,
+\[
+\mathrm{lowerBudget}(t+1)
+=\frac{36\alpha\,c_{\delta}}{CV}\cdot\frac{1}{h^{2t}}\cdot\mathrm{safeSufficient},
+\]
+and that factor exceeds any $M$ once $h<\sqrt{A/M}$, with $A$ written down.
+
+\NOTEPAR{The two sides do \emph{not} match in the confidence parameter, and nothing here
+pretends otherwise: the lower bound carries $\log(1/\delta)$ and the Chebyshev upper bound
+carries $1/\alpha$, with the ratio $VC/36\alpha c_{\alpha}$ recorded as its own statement.
+There is no theorem in this corpus of the form $N^{*}=\Theta(h^{-2s}\log(1/\delta))$.
+Closing that gap needs a test whose error decays exponentially in $N$ --- the
+characteristic-function route --- which is not formalised.}
+
+\leanbox{\lean{budget\_lower}, \lean{safe\_upper}, \lean{separation\_ratio},
+\lean{separation\_unbounded}, \lean{sides\_do\_not\_match} in \lean{LeanPaperBHeadlineV1}}
+
+\NOTEPAR{The chain rule from a per-query bound to the transcript is the same open middle
+link as in limitation~2): proved for a finite alphabet, not for an adaptive randomised
+policy on a continuous observation space. So the display above is a theorem about the
+budget \emph{given} that link, and the $\log(1/\delta)$ factor is the part that is new
+here.}
+
+\section{Evidence}
+\label{sec:evidence}
+
+Every script self-checks against a proved statement and refuses to write output if a check
+fails. Evidence classes are printed on every figure and never mixed.
+
+\NOTEPAR{Three claims are in play here and a passing check certifies only one of them at a
+time. \textsc{(i) A numerical search} for the probe maximising $H^{2}$: a value attained by
+a legal probe is a \emph{lower} bound on the supremum, so it can refute an upper-bound law
+and never certify one, and at $r=3$ the search is seed-limited (recorded per $h$).
+\textsc{(ii) A theorem uniform over the query class}: the per-step Hellinger bound holds
+for every probe in the linear class, which is what \eqref{eq:affinity} consumes --- and
+which the search does not establish. \textsc{(iii) A matching rate}: an upper bound and a
+lower bound meeting at the same exponent on the same observation model. That is
+\emph{not} closed: the upper bound is assembled per pair and the two orders are proved on
+\emph{two constructions that are not yet joined}. \texttt{all\_passed} in an artifact
+certifies the checks of the script that wrote it. It does not certify (ii) from (i), and it
+does not certify (iii) at all.}
+
+\begin{table}[t]
+\caption{Evidence packages for this paper.}
+\label{tab:evidence}
+\centering
+\footnotesize
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llr@{}}
+\toprule
+Package & Script & Checks \\
+\midrule
+Family, safe sets, moment identities & \texttt{EXP\_paperB\_construction} & 8/8 \\
+Hellinger orders, real law & \texttt{EXP\_paperB\_hellinger\_real} & 6/6 \\
+Per-step bound, over the query class$^{\dagger}$ & \texttt{EXP\_paperB\_uniform\_hellinger} & 6/6 \\
+Obstruction law, classes & \texttt{EXP\_paperB\_obstruction\_law} & 9/9 \\
+Moment law, degree-graded queries & \texttt{EXP\_paperB\_moment\_tests} & 8/8 \\
+Estimator error, Chebyshev budget & \texttt{EXP\_paperB\_estimator\_error} & 7/7 \\
+Envelope chain, the (B4) rate & \texttt{EXP\_paperB\_envelope\_rate} & 8/8 \\
+Query-class crossover, $g_{\eta}$ & \texttt{EXP\_paperB\_crossover} & 8/8 \\
+The two decoders, parity channel & \texttt{EXP\_paperB\_decoder} & 7/7 \\
+Query-order vanishing/attainment & \texttt{EXP\_unified\_query\_order} & 6/6 \\
+\bottomrule
+\end{tabular}}
+
+\vspace{2pt}
+{\footnotesize $^{\dagger}$This package measures the per-step bound on the \emph{linear-class}
+observation family of Section~\ref{sec:family}. It is \emph{not} evidence about the
+constructed pair $(\mathrm{worldP},\mathrm{worldQ})$ of the uniformity theorem, nor about the
+decoder's own pair, whose difference is
+$D_{b_{1}}\cdots D_{b_{r}}[\varphi(\cdot-1)-\varphi(\cdot+1)]$ by
+\lean{channel\_pair\_diff}. An earlier draft cited it as though the three were one family;
+they are three, and only the identity between the last two is proved.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_crossover.pdf}
+\caption{Left: the measured order in $h$ against $\eta$, falling from six to four. Right:
+$H^{2}$ against $h$ at several $\eta$, with the two-channel form
+$c_{6}h^{6}+c_{4}\eta^{2}h^{4}$ fitted on the coarse half and drawn through the fine half.
+The crossover is at $\eta\asymp h$.}
+\label{fig:crossover}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_envelope_rate.pdf}
+\caption{The proved envelope chain. Left: $\int\Delta^{2}/\ell$ against $h$ for
+$r=2,3,4$, with the measured orders $4.00$, $6.00$, $8.00$ and the proved bound
+$h^{2r}r^{-2r}C$ dashed; the vertical gap is the explicit constant, which is not claimed
+sharp. Right: the envelope ratio $\mathrm{envUp}^{2}/\mathrm{envLo}$ and the Gaussian
+$C\,e^{-y^{2}/4\sigma^{2}}$ that dominates it, which is what makes the integral finite
+without any polynomial-times-Gaussian integrability lemma.}
+\label{fig:envrate}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_uniform_hellinger.pdf}
+\caption{Left: the per-step separation over the query class, for both directions. Right:
+the same quantity with every class restriction removed --- the separation collapses, so
+the restriction is what creates it. The degree-capped class is not shown: it is refuted in
+the text by an exhibited probe, not by a search.}
+\label{fig:unih}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paperB_orders.pdf}
+\caption{Left: squared Hellinger against $h$. Right: the attained leading coefficient
+against $r!/r^{r}$, in exact rational arithmetic.}
+\label{fig:orders}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\columnwidth]{paperB_two_scales.pdf}
+\caption{The two scales on one family. Marked as an illustration of the proved orders; the
+empirical sample counts are reported separately.}
+\label{fig:scales}
+\end{figure}
+
+\section{The two orders, on the real geometry, and a matching upper bound}
+\label{sec:geometry}
+
+The separation this paper is about is between two \emph{observation orders}: the order at
+which a decision becomes safe, and the order at which the world becomes identified. Both
+are defined on the real \lean{selectedRadius} geometry rather than on a stand-in.
+
+Write $\theta\sim_{s}\lambda$ for indistinguishability at order $s$, and
+$\mathrm{class}_{s}(\theta)$ for the class it induces. Two facts pin the orders.
+
+\begin{theorem}[The two orders separate]
+\label{thm:orders}
+For $m\ge3$: every class at order $1$ has a common safe answer, no class at order $0$ does,
+and identification holds at order $s$ if and only if $s\ge m-1$. Hence
+$s_{\mathrm{safe}}=1$ while $s_{\mathrm{id}}=m-1$, and the gap grows with $m$.
+\end{theorem}
+
+The identification half is an \emph{iff}, so $m-1$ is tight on both sides rather than an
+upper estimate. Two further facts say the geometry is the interesting one and not a
+degenerate case: any two worlds share a safe answer at $m\ge3$
+(\lean{safe\_sets\_overlap}), while no answer is safe for all of them
+(\lean{no\_common\_safe\_all}). Overlapping-but-not-nested safe sets are exactly what makes
+the safe order small and the identification order large. The order-$0$ class is an
+obstruction (\lean{obstruction\_at\_order\_zero}), which is the hypothesis the
+$\log(1/\delta)$ lower bound consumes, so the lower side is applied to a geometry that
+verifiably satisfies it.
+
+\leanbox{\lean{identifiableAt\_iff}, \lean{decidableAt\_of\_one\_le},
+\lean{not\_decidableAt\_zero}, \lean{decide\_order\_lt\_identify\_order},
+\lean{safe\_sets\_overlap}, \lean{no\_common\_safe\_all},
+\lean{obstruction\_at\_order\_zero} in \lean{LeanPaperBGeometryV1}}
+
+\paragraph{The partition is the observational one, on an explicit moment family.}
+$\sim_{s}$ was \emph{defined} on the world index --- ``equal, or both at index at least
+$s$'' --- so Theorem~\ref{thm:orders} was conditional on that being the relation an
+observer faces. On the family whose world $i$ has its first non-vanishing moment at order
+$i+1$, it is the observational relation, in both directions. Call $q$ a query of order at
+most $s$ when it is a linear functional of the moments of order $1,\dots,s$. Then
+
+\begin{theorem}[The order-$s$ classes are exactly the query-blind pairs]
+\label{thm:indist}
+For every $s$ and every pair of worlds $\theta,\lambda$,
+\begin{gather*}
+\theta\sim_{s}\lambda
+\quad\Longleftrightarrow\\
+q(\theta)=q(\lambda)\ \text{ for every query } q \text{ of order at most } s .
+\end{gather*}
+\end{theorem}
+
+Left to right is termwise: such a $q$ is supported where the two moment vectors agree.
+Right to left is a construction: if $\theta\not\sim_{s}\lambda$ then $\theta\ne\lambda$
+and one of them, say $\theta$, has index below $s$, and the indicator at order $\theta+1$
+is a query of order at most $s$ taking the value $1$ at $\theta$ and $0$ at $\lambda$.
+
+\leanbox{\lean{agreeUpTo\_iff\_indistAt}, \lean{query\_blind\_of\_indistAt},
+\lean{exists\_query\_separating}, \lean{indistAt\_iff\_no\_separating\_query} in
+\lean{LeanPaperBIndistV1}}
+
+\paragraph{The table, realised by densities.}
+Read as a table of raw moments the coefficient table is not realisable by any law --- world
+$0$ would need $\mathbb EX=1$ and $\mathbb EX^{2}=0$. It is meant as the table of expansion
+coefficients in the perturbation scale, and until a family of densities realises it the
+partition rests on a table nobody has exhibited. So we exhibit one. For any density
+$\varphi$, put
+\[
+p_{i}(h)\;=\;(1-h^{i+1})\,\varphi\;+\;h^{i+1}\,\varphi(\cdot-1).
+\]
+Each $p_{i}(h)$ is a genuine probability density for $0\le h\le1$ --- a two-point mixture, so
+non-negativity and unit mass need no delicate integral --- and its expansion has coefficient
+$[k=i+1]\cdot(\varphi(\cdot-1)-\varphi)$ at order $k\ge1$, which is the table with one fixed
+profile.
+
+The resolving order then follows \emph{from the densities}, in both directions:
+$|p_{i}(h)-p_{j}(h)|\le h^{\min(i,j)+1}|\text{profile}|$ everywhere, so nothing separates
+earlier; and $\ge\tfrac12h^{\min(i,j)+1}|\text{profile}|$ at a point once $h$ is small, so
+something separates there. Hence $r(i,j)=\min(i,j)+1$, and at a family whose only unsafe
+subset is the whole world set this gives $s_{\mathrm{safe}}=1$ and $s_{\mathrm{id}}=m-1$.
+
+\NOTEPAR{This settles that the reading is consistent and supplies the orders both ways from
+actual densities. It does \emph{not} derive the parity-mask construction's own observation
+law; that its densities carry exactly these coefficients is the remaining modelling step, and
+until it is written the two exponents are established for the exhibited family and not for
+that construction.}
+
+\leanbox{\lean{dens\_integral\_one}, \lean{dens\_vanishes\_below},
+\lean{dens\_separates\_at}, \lean{coefOf\_realised}, \lean{s\_safe\_eq\_one},
+\lean{s\_id\_eq} in \lean{LeanPaperBDensityV1}}
+
+\NOTEPAR{What Theorem~\ref{thm:orders} is and is not, after Theorem~\ref{thm:indist}. The
+partition is no longer posited, but two things stand between
+$s_{\mathrm{safe}}=1$, $s_{\mathrm{id}}=m-1$ and a pair of \emph{sample} complexities.
+First, the moment vectors of Theorem~\ref{thm:indist} are \emph{prescribed}: no
+distribution realising them is constructed, and joining this to the moment-matching laws of
+Section~\ref{sec:law} is what would make it one family with $F_{\theta}$, a support, a
+loss and an observation law. Second, the safe sets here are the real \lean{selectedRadius}
+ones, but the obstruction experiment's four $(u,v)$ worlds have safe sets that are
+\emph{equal} within $u$ and disjoint across it --- a different family from the intersecting
+one this theorem is about, and the two must not be joined in prose. The two orders should
+still not be quoted as sample complexities.}
+
+\subsection{The safe-observation-order law}
+\label{sec:safelaw}
+
+The question the paper is for: how deep must an observer resolve worlds before every class
+it can still confuse admits one answer that is safe across it? Write $\mathrm{sep}(\theta,
+\lambda)$ for the first order at which some admissible query separates two worlds. Call a
+set of worlds \emph{together at level $s$} when no pair in it is resolved by order $s$, and
+\emph{unsafe} when its worlds share no safe answer.
+
+\begin{theorem}[The safe order is a statement about obstructions]
+\label{thm:safelaw}
+Order $s$ suffices --- every set together at level $s$ has a common safe answer --- if and
+only if every unsafe set already contains a pair resolved by order $s$. Equivalently
+\[
+s_{\rm safe}=\max_{H\ \text{unsafe}}\ \min_{\theta\ne\lambda\in H}\mathrm{sep}(\theta,\lambda).
+\]
+\end{theorem}
+
+Quantifying over \emph{all} unsafe sets rather than minimal ones is not a weakening:
+unsafety is upward closed and enlarging a set can only lower its pairwise minimum, so the
+maximum is attained on minimal obstructions anyway --- and stating it this way removes the
+need to define minimality. Two edge cases the law names: if no set is unsafe then order zero
+suffices, the decision costing no observation at all; and the property is monotone in $s$.
+
+\paragraph{The overlapping construction, geometry half.}
+With at least three worlds and $\mathrm{safe}(w)$ every answer but $w$: each pair of safe
+sets meets, the total intersection is empty, and the whole world set is the \emph{only}
+unsafe set. Theorem~\ref{thm:safelaw} then reads
+$\mathrm{SafeAt}(s)\iff\min_{\theta,\lambda}\mathrm{sep}(\theta,\lambda)\le s$, the
+simplest instance it has.
+
+\NOTEPAR{What is an input here, and it is the substance. $\mathrm{sep}$ is \emph{given}.
+Deriving it from the densities of an actual observation model --- the coefficient of $h^{k}$
+in the expansion, uniformly over the admissible query class --- is this paper's central
+obligation and is not done. The law says what follows \emph{from} a resolving-order table,
+not that the model has one; the parity-mask query showing that query $j$ resolves world $j$
+at order $j$ is the construction's other half and is likewise unproved. And at this family a
+query-free guess already has worst-case error $1/m$, so any positive sample-complexity lower
+bound must restrict $\delta$ below that floor --- we do not state one that does not.}
+
+\leanbox{\lean{safeAt\_iff}, \lean{unsafe\_mono}, \lean{safeAt\_mono},
+\lean{safeAt\_zero\_of\_no\_unsafe}, \lean{coSafe\_pairwise\_meet},
+\lean{coSafe\_univ\_unsafe}, \lean{coSafe\_proper\_safe}, \lean{coSafe\_safeAt\_iff} in
+\lean{LeanPaperBSafeOrderV1}}
+
+\subsection{From an envelope to a divergence bound}
+\label{sec:envelope2kl}
+
+The lower bound needs $\mathrm{KL}$, and the envelope work bounds
+$\int(p-q)^{2}/\ell$. A Hellinger bound does not give a $\mathrm{KL}$ bound, and neither
+does the envelope by itself; one extra inequality is needed, and it is elementary.
+
+\begin{theorem}[Envelope to divergence]
+\label{thm:env2kl}
+For $p\ge0$ and $q>0$,
+$p\log(p/q)\le(p-q)^{2}/q+(p-q)$, the right-hand side being an \emph{identity} for
+$p(p/q)-p$; and $(p-q)^{2}/q\le(p-q)^{2}/\ell$ for any floor $0<\ell\le q$. Integrating
+against a common measure, the linear term contributes $\int p-\int q=0$ for two densities,
+so
+\[
+\mathrm{KL}(p\|q)\;\le\;\int\frac{(p-q)^{2}}{\ell}.
+\]
+\end{theorem}
+
+\NOTEPAR{Why the Hellinger route does not substitute, stated as arithmetic rather than as a
+remark: the chi-squared integrand exceeds the Hellinger one by $(\sqrt p+\sqrt q)^{2}/q$,
+which is unbounded as $p/q$ grows. What remains, and it is the model-specific work: the
+density-difference identity, an envelope $|p-q|\le h^{s}B_{s}(y)$ \emph{uniform in the
+query}, and a floor with $\int B_{s}^{2}/\ell<\infty$ --- together with the integrability
+hypotheses the integral form above carries explicitly.}
+
+\leanbox{\lean{kl\_integrand\_le}, \lean{chi\_integrand\_mono},
+\lean{kl\_integrand\_le\_floor}, \lean{kl\_le\_envelope},
+\lean{hellinger\_integrand\_le\_chi} in \lean{LeanPaperBKLV1}}
+
+\subsection{The decoder, and the uniformity a class test needs}
+\label{sec:decoder}
+
+An upper bound needs a decoder, not a collection of pairwise error bounds. Two things have to
+be right, and the second is easy to skip.
+
+A test between two \emph{classes} is not a test between two representatives: what must hold
+is $\sup_{\theta\in C}\Pr_{\theta}(\text{says }D)\le\delta'$ and symmetrically,
+\emph{uniformly over each class}. Choosing one world from each and testing those two says
+nothing about the rest.
+
+\begin{theorem}[Uniform composite test]
+\label{thm:composite}
+Let $m(\theta)$ be a statistic's mean at $\theta$. If $|m(\theta)-\mu_{C}|\le R$ for
+\emph{every} $\theta\in C$, $|m(\lambda)-\mu_{D}|\le R$ for every $\lambda\in D$, and
+$\mu_{C}+2R+2\,\mathrm{tol}<\mu_{D}$, then the threshold at $(\mu_{C}+\mu_{D})/2$ places
+every world of $C$ strictly below it and every world of $D$ strictly above, whenever the
+empirical mean is within $\mathrm{tol}$ of its own world's mean.
+\end{theorem}
+
+The only probabilistic input is per-world concentration, through $\mathrm{tol}$; the class
+uniformity is carried by $R$, not by a representative.
+
+The output must also exist. After elimination the survivors are still together at level $s$,
+and Theorem~\ref{thm:safelaw} is exactly the statement that such a set shares a safe answer
+--- so the decoder has something to return, and since the truth is among the survivors, what
+it returns is safe at the truth. That is the step a pairwise-error accounting does not give:
+correctness of the \emph{output}, not of the tests.
+
+\NOTEPAR{What this does not include. The concentration itself (a bounded statistic and
+Hoeffding), the queries realising the separation at each order, and the \emph{total} sample
+budget. The number of distinct queries, the number of tests, and the per-test sample count
+are three different quantities; we do not report one in place of another, and none of the
+three is established here.}
+
+\leanbox{\lean{composite\_test\_low}, \lean{composite\_test\_high},
+\lean{composite\_test\_separates}, \lean{separation\_of\_gap},
+\lean{decoder\_output\_exists}, \lean{decoder\_is\_safe\_at\_truth} in
+\lean{LeanPaperBDecoderV1}}
+
+\paragraph{The lower bound at an unresolved class --- and the floor it is conditional on.}
+Take a class $H$ still unresolved at order $s-1$ whose worlds share no safe answer. Under
+$\theta_{0}\in H$ some answer is returned with probability at least $(1-\delta)/K$; it is
+wrong at some $\lambda\in H$; and data processing on the binary event
+$\{\widehat a = a\}$ turns the transcript divergence into a bound on the binary divergence,
+which the budget arithmetic converts into $\Omega(h^{-2s}\log(1/\delta))$.
+
+The bound is conditional on $\delta$, and not as a technicality. With
+$\mathcal A_{w}=[m]\setminus\{w\}$ a decoder that asks \emph{nothing} and guesses uniformly is
+unsafe with probability exactly $1/m$. So a claim of the form ``$N=\Omega(h^{-2s}\log(1/\delta))$
+for every $\delta<1/2$'' is \emph{false} for this geometry, and the theorem restricts $\delta$
+below the floor.
+
+On the decoder side, elimination needs two inclusions --- the truth survives, and nothing
+outside its class does --- and the output then exists by the definition of
+$s_{\mathrm{safe}}$. The cost is the \emph{sum} over tests, not the per-test sample size.
+
+\leanbox{\lean{decision\_lower\_from\_class}, \lean{zero\_query\_floor},
+\lean{no\_lower\_bound\_above\_floor}, \lean{candidate\_contains\_truth},
+\lean{candidate\_within\_class}, \lean{decoder\_output\_exists\_of\_common},
+\lean{union\_bound\_tests} in \lean{LeanPaperBDecideV1}}
+
+\paragraph{Attainment by a bounded statistic.}
+On $(0,1]$ we have $\sin x\ge 3x/4$, so the tail factor's $r$-th power is at least
+$(3x/4)^{r}$: the mean gap is $\Theta(h^{r})$ with an explicit constant, a theorem about the
+characteristic function rather than a fitted slope. The statistic $\cos(t_{0}Y)$ or
+$\sin(t_{0}Y)$ is bounded by one whatever $r$ is, so its variance is at most one --- which is
+the whole reason to use it, since the $Y^{r+1}$ moment estimator's variance grows with $r$.
+The midpoint threshold then classifies correctly once both empirical means are within half the
+gap.
+
+\NOTEPAR{An earlier version of this paragraph said a Hoeffding-type inequality was not
+available in the library we formalise against, and stopped at Chebyshev's $1/\delta$. That was
+wrong: Hoeffding's lemma and the Hoeffding inequality for independent sub-Gaussian summands
+are both present. Since $|f|\le 1$, the centred statistic is sub-Gaussian with proxy $1$, the
+midpoint test errs with probability at most $e^{-Ng^{2}/8}$, and $N\ge 8\log(1/\delta)/g^{2}$
+suffices; with $J$ tests, $N\ge 8\log(J/\delta)/g^{2}$. The ratio of the two sides of the
+headline is then bounded by a constant free of $\delta$. What still limits the claim is not
+the confidence parameter but the evidence: only one $(m,h)$ cell certifies both decoders, so
+there is no measured identification-rate curve.}
+
+\leanbox{\lean{sin\_lower\_small}, \lean{gap\_at\_scale},
+\lean{bounded\_statistic\_variance}, \lean{threshold\_decoder\_correct},
+\lean{budget\_from\_gap} in \lean{LeanPaperBAttainV1}}
+
+\paragraph{The parity-mask channel, and the orders read off it.}
+$K_{w}=\{0,\mathrm{tip}_{w}\}$ gives $\mathrm{tip}_{j}\in K_{w}$ exactly when $j=w$, so the
+mask $v(j,w)=1-2\mathbf1\{j=w\}$ is $-1$ precisely at the named world. Query $j$ returns
+\[
+Y_{j}=v(j,w)\prod_{\ell\le j}Z_{\ell}+\frac hj\sum_{\ell\le j}Z_{\ell}+\xi ,
+\]
+a Gaussian mixture over the sign cube. The cube identity \lean{parity\_cf\_difference} gives
+the \emph{unnormalised} difference over the $2^{j}$ cube points,
+$2^{j+1}\sinh(it)\sinh(ith/j)^{j}$; it is not yet a characteristic function. The cube is
+uniform, so each point carries mass $2^{-j}$, and the additive noise contributes its own
+Gaussian factor. Supplying both, the characteristic-function difference of the two
+\emph{observation} laws is
+\[
+\varphi_{+,j}(t)-\varphi_{-,j}(t)
+=2\,i^{\,j+1}\sin t\,\bigl(\sin (th/j)\bigr)^{j}e^{-\sigma^{2}t^{2}/2},
+\]
+of magnitude $\Theta(h^{j})$ --- the leading constant is $2$, not $2^{j+1}$, because the
+$2^{-j}$ normalisation cancels all but one power of two. The decoder experiment implements
+this normalised form, so no measured number depends on the distinction; the $h$-dependence,
+which is what the order claim uses, is the $j$-th power either way. The $v$-dependent term is real for odd $j$ and imaginary for even
+$j$, which is why the statistic is chosen by parity. Query $j$ therefore decides $w=j$ at
+order $j$, a pair resolves at $\min(w,w')$, and the classes at level $s$ are
+$\{1\},\dots,\{s\},\{s+1,\dots,m\}$: $s_{\mathrm{safe}}=1$ and $s_{\mathrm{id}}=m-1$.
+
+\NOTEPAR{This is a \emph{second} observation channel, on support membership. It is not the
+raw-$F$ query law of the four-world family, and both are instantiations of the same order law;
+writing it as one model would be wrong.}
+
+\leanbox{\lean{maskVal\_eq\_neg\_one\_iff}, \lean{parity\_cf\_difference},
+\lean{parity\_gap\_order}, \lean{query\_separates\_iff}, \lean{parity\_s\_safe},
+\lean{parity\_s\_id}, \lean{parity\_classes} in \lean{LeanPaperBParityV1}}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{paperB_decoder.pdf}
+\caption{The two decoders on one channel. Left and centre: worst-world error against the
+\emph{total} budget --- for identification that is the sum over the $m-1$ queries, not the
+per-test sample size --- with Clopper--Pearson bounds from the saved counts (\texttt{paperB\_decoder\_grid\_v2}; no
+resampling). A budget counts as achieving $\delta$ only when the upper bound clears it. The
+reported budget of a panel is the first rung of an eleven-rung ladder that clears the target,
+which is a selection over $J=616$ intervals, so BOTH tails of every interval are budgeted at
+$0.05/(2J)$ and all bounds hold simultaneously at $95\%$. Eleven of the sixteen panels have an
+upper certificate, six of those also have a failed prefix, and five have none. THREE $(m,h)$
+cells certify both decoders, all at $m=3$: at $h=0.6$, $0.45$, $0.32$ the total budgets are
+$25\to6400$, $100\to12800$ and $100\to51200$ --- ratios $256$, $128$, $512$; five of the
+eight identification panels remain censored. So the panel shows that the safe decoder is
+cheaper where both certify, and is \emph{not} an identification-rate curve.
+A certified budget is an \emph{upper} bound and nothing more: a rung that failed to certify
+is a rung whose upper bound came out above $\delta$, which is \emph{not} evidence that its
+true error exceeds $\delta$. Nor is a fixed decoder's error known to be monotone in $N$, so
+one failing rung below a success excludes nothing between them --- only a \emph{contiguous
+prefix} of tested budgets whose LOWER bounds all exceed $\delta$ bounds the first successful
+\emph{tested} budget from below (dotted curves). That bracket concerns this grid; it bounds
+neither the untested integers between rungs nor the minimum over all decoders. At $m=3$ the
+identification slope interval is $[-5.59,\,-1.07]$, which contains both $-2(m-1)=-4$ and the
+safe decoder's $-2$: this panel establishes an achieved-cost separation and \emph{cannot}
+separate the two exponents. The ratios above are ratios of rungs meeting the ladder's
+standard, not measured complexity ratios. Right: the log-log slope of the mean gap
+converges to the query index $j$ as $h$ shrinks; the coarse grid sits below it because of the
+sine's cubic term, and the drag is shown rather than hidden.}
+\label{fig:bdecoder}
+\end{figure*}
+
+\NOTEPAR{Which identification decoder the counts measure (corrected 2026-09-24). The script's
+identification rule returns no answer, counted as an error, when two or more tests fire; the
+formalized decoder returns a default world there. On every outcome vector and at every world a
+wrong formalized guess implies a wrong script guess, so the script's counts are an UPPER bound
+on the formalized decoder's error, and its upper certificates are conservative for it. Its
+LOWER confidence bounds are not: a lower bound on the script rule's error does not bound the
+formalized decoder's error from below. An earlier version of this note called the script's
+lower brackets ``the conservative side''; that was wrong. Both bounds are now computed from the
+formalized decoder's own counts (the paired rerun \texttt{EXP\_paperB\_decoder\_leanfallback},
+same seed and draws, 10/10), and they coincide with the script rule's on all $16$ panels
+(\texttt{FIG\_paperB\_decoder\_formal}, 4/4). The figure of the main text is drawn from those
+counts.}
+
+\leanbox{\lean{pyGuess}, \lean{decodeB\_of\_pyGuess}, \lean{lean\_wrong\_imp\_py\_wrong} in
+\lean{LeanPaperBDecoderMatchV1}}
+
+\subsection{The upper bound, with its per-pair input derived}
+
+An upper bound that \emph{assumes} a per-pair test bound assumes the result. Here the test
+is exhibited and its error computed. Let $P,Q$ be the $N$-fold product laws of two
+candidate worlds on a finite observation alphabet, and let the test declare the first world
+exactly on the sequences it makes at least as likely. Its two error probabilities satisfy
+\begin{equation}
+\tfrac12\bigl(\mathrm{err}_{\mathrm{I}}+\mathrm{err}_{\mathrm{II}}\bigr)
+=\tfrac12\sum_{t}\min\bigl(P(t),Q(t)\bigr),
+\label{eq:lrtexact}
+\end{equation}
+an \emph{identity}, not a bound: the two sums recombine term by term. Bounding the minimum
+by the geometric mean and tensorising the Hellinger affinity,
+$\sum_{t}\sqrt{P(t)Q(t)}=\bigl(\sum_{o}\sqrt{p(o)q(o)}\bigr)^{N}=(1-H^{2})^{N}$, gives
+
+\begin{theorem}[Per-pair test bound]
+\label{thm:lrt}
+If $H^{2}(p,q)\ge c$ then \emph{each} of the test's two error probabilities is at most
+$\delta/K$ once $N\ge\log(K/\delta)/c$; over $K$ pairs each sums to at most $\delta$.
+\end{theorem}
+
+\begin{proof}
+By \eqref{eq:lrtexact} the two errors sum to $\sum_{t}\min(P(t),Q(t))$. Since
+$\min(a,b)^{2}\le ab$ for $a,b\ge0$, each summand is at most $\sqrt{P(t)Q(t)}$. Writing
+$P(t)=\prod_{i}p(t_{i})$ and likewise for $Q$, the square root of the product is the
+product of the square roots, and summing a product over all sequences factorises:
+\begin{align*}
+\sum_{t}\sqrt{P(t)Q(t)}
+&=\sum_{t}\prod_{i}\sqrt{p(t_{i})q(t_{i})}\\
+&=\Bigl(\sum_{o}\sqrt{p(o)q(o)}\Bigr)^{N}
+=(1-H^{2})^{N}.
+\end{align*}
+Now $1-x\le e^{-x}$ gives $(1-H^{2})^{N}\le e^{-NH^{2}}\le e^{-Nc}$, and
+$N\ge\log(K/\delta)/c$ makes that at most $\delta/K$. Both error probabilities are
+non-negative and their sum is bounded, so each is bounded separately --- which is the form
+the union bound over the $K$ pairs consumes. Note the bound is on the sum, not on the
+average: an earlier version halved it, which bounds neither world's own error.
+\end{proof}
+
+With $c=c_{0}h^{2r}$ this is $N=O\bigl(h^{-2r}\log(K/\delta)\bigr)$: the \emph{same}
+exponent in $h$ that the lower bound produces, so the two sides match in order. The
+$\delta$-dependence matches only up to a constant, which \lean{bounds\_same\_order} makes
+explicit. The separation $c_{0}h^{2r}\le H^{2}$ is an input to this theorem --- it is what
+Section~\ref{sec:law} supplies on the linear class --- and the two are not yet composed
+into a single statement; \lean{separation\_nonvacuous} exhibits laws with $0<H^{2}<1$ so
+the theorem is not vacuous.
+
+\leanbox{\lean{affinity\_prodLaw}, \lean{err\_eq\_sum\_min},
+\lean{err\_le\_affinity\_pow}, \lean{lrt\_error\_le},
+\lean{identify\_sample\_complexity}, \lean{decoder\_total\_error},
+\lean{separation\_nonvacuous} in \lean{LeanPaperBTestV1}; \lean{decoder\_union\_bound},
+\lean{bounds\_same\_order} in \lean{LeanPaperBGeometryV1}}
+
+\subsection{The endpoint on the parity channel: both rates, every almost-surely stopping policy}
+\label{sec:endpoint}
+
+On the parity-mask channel the pieces above are composed into one statement about the
+minimax cost itself. It uses the continuous Gaussian observation model and adaptive
+randomised policies, so it does not rest on the finite-alphabet transcript or the
+finite-alphabet test. Write $N^{*}_{\mathrm{safe}}(h,\delta)$ and $N^{*}_{\mathrm{id}}(h,\delta)$
+for the minimax worst-world expected number of non-dummy queries. The minimum is over
+$\delta$-correct policies: every world has non-termination probability zero and error
+probability at most $\delta$ for the task.
+
+\begin{theorem}[The two rates on one channel]
+\label{thm:endpoint}
+Fix $m\ge3$ and noise $\sigma>0$. Take the parity channel with the tip loss and tolerance
+$0$, so a safe answer at world $w$ is any $a\ne w$. The policy class is every randomised
+adaptive policy with a measurable stopping rule that stops almost surely, and with
+measurable answer and guess read at the stopping time. The stopping time need not be
+bounded, and its expectation need not be finite. There are
+$0<c\le C$, $h_{0}>0$ and $\delta_{0}\in(0,1)$, depending on $m$ and $\sigma$ only, such that
+for all $0<h\le h_{0}$ and $0<\delta\le\delta_{0}$
+\begin{gather*}
+c\,\frac{\log(1/\delta)}{h^{2}}\le N^{*}_{\mathrm{safe}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2}},\\
+c\,\frac{\log(1/\delta)}{h^{2(m-1)}}\le N^{*}_{\mathrm{id}}(h,\delta)\le C\,\frac{\log(1/\delta)}{h^{2(m-1)}} .
+\end{gather*}
+\end{theorem}
+
+The theorem is proved first for policies with a finite horizon, and then carried to the
+whole class by truncation. Run the stopped policy, which issues the free dummy query after
+stopping, for $n$ rounds, with $n$ chosen so that every world has stopped with probability at
+least $1-\delta$. The result is a finite-horizon policy that is correct at level $2\delta$ and
+costs no more than the original. The finite-horizon lower bound applied to it gives the same
+order, at level $2\delta$. Conversely, a finite-horizon decoder is a stopping policy that
+stops at its horizon, with the same cost. So the upper side, and the non-vacuity of the
+class, transfer too. Both lower sides hold against every policy in the class. A correct safe policy's answer at
+one world puts mass $(1-\delta)/(m-1)$ on an event of mass at most $\delta$ at another world,
+which forces the divergence to be at least $\log(1/\delta)/4(m-1)$. The transcript's
+divergence is at most the per-query $\chi^{2}$, of order $h^{2}$, times the expected number of
+queries. For identification the pair of worlds is named only by query $m-1$, whose
+information is of order $h^{2(m-1)}$. The upper sides are the two decoders of
+Figure~\ref{fig:bdecoder}. They use the bounded statistic $\cos(t_{0}Y)$ or $\sin(t_{0}Y)$,
+per-test budgets from a concentration bound, and the total budget summed over every test the
+decoder runs.
+
+\leanbox{\lean{parity\_tip\_finish}, \lean{parity\_rates}, \lean{safeCert},
+\lean{idCert} in \lean{LeanPaperBParityFinishV1}; \lean{safeLower}, \lean{idLower} in
+\lean{LeanPaperBParityExperimentV1}; \lean{transcript\_kl\_le} in
+\lean{LeanPaperBProtocolV1}; \lean{parChan\_chi\_le} in \lean{LeanPaperBParityChannelV1};
+\lean{event\_klDiv\_ge}, \lean{safe\_pair\_exists} in \lean{LeanPaperBObstructionV1};
+\lean{tip\_finish\_from\_protocols} in \lean{LeanPaperBRateClosureV1};
+\lean{stopped\_parity\_rates}, \lean{stopped\_lower\_log}, \lean{stopped\_safe\_lower},
+\lean{stopped\_id\_lower},
+\lean{trunc\_correct}, \lean{outT\_first}, \lean{ofPol\_correctS}, \lean{costS\_ofPol} in
+\lean{LeanPaperBStoppedParityV1}}
+
+\NOTEPAR{Scope. The cost of a stopping policy is the supremum over horizons of the expected
+number of non-dummy queries, which is $\mathbb{E}\tau$ by monotone convergence. Almost-sure
+stopping is required uniformly over the $m$ worlds: for every $\varepsilon>0$ one horizon
+at which every world has stopped with probability at least $1-\varepsilon$. The lower bounds
+over this class are at level $2\delta$ and hold for $2\delta\le\min(\delta_{S},\delta_{I})$,
+which changes the constants and not the orders. A policy stops by issuing the
+zero-information dummy query, which is not counted. The constants are uniform in $h$ and $\delta$ on the rectangle,
+but depend on $m$ and $\sigma$. The theorem concerns this channel and this loss, not the
+general law of Section~\ref{sec:law}. The decoder budgets are the formalized decoders'
+own, established by a paired rerun (see the note after Figure~\ref{fig:bdecoder}).}
+
+\subsection{The crossover: the mechanism, not a sweep}
+\label{sec:crossover}
+
+Widening the probe to $g_{\eta}=(z_{4}+z_{5}+z_{6}+\eta z_{4}z_{5})/(3+\eta)$ is expected
+to give $H^{2}\asymp h^{6}+\eta^{2}h^{4}$. A sweep of fitted slopes cannot decide that
+shape, because it cannot see whether the two scales \emph{add} or \emph{interfere}: that
+turns on a cross term. The algebra settles it.
+
+Against the hidden character $\chi=z_{4}z_{5}z_{6}$,
+\begin{gather*}
+\mathbb{E}[\chi g_{\eta}]=0,\qquad
+\mathbb{E}[\chi g_{\eta}^{2}]=\frac{2\eta}{(3+\eta)^{2}},\\
+\mathbb{E}[\chi g_{\eta}^{3}]=\frac{6}{(3+\eta)^{3}},
+\end{gather*}
+all three exact. The density difference between $v=+1$ and $v=-1$ then expands with an odd
+channel $A(y)=f''(y-1)-f''(y+1)$ at coefficient $\eta h^{2}/(3+\eta)^{2}$ and an even
+channel $B(y)=f'''(y-1)-f'''(y+1)$ at coefficient $h^{3}/(3+\eta)^{3}$.
+
+\begin{theorem}[The cross term vanishes by parity]
+\label{thm:parity}
+If $A$ is odd, $B$ is even and the base density $p_{0}$ is even, then $AB/p_{0}$ is odd and
+$\int AB/p_{0}=0$. Consequently
+$\int(\alpha A+\beta B)^{2}/p_{0}=\alpha^{2}\int A^{2}/p_{0}+\beta^{2}\int B^{2}/p_{0}$,
+and substituting the two coefficients gives exactly $\eta^{2}h^{4}$ plus $h^{6}$.
+\end{theorem}
+
+Numerically, on the model's own baseline --- the mixture $p_{0}(y)=\tfrac12[f(y-1)+f(y+1)]$
+over the $z_{1}$ channel, not the head density $f$ alone, which an earlier version of the
+check used --- the normalised cross term is $6.6\times10^{-15}$.
+
+\NOTEPAR{Three things stand between this mechanism and the law, and none is proved: that
+$A$ and $B$ are not identically zero, that the two integrals are finite, and that the
+remainder is bounded \emph{uniformly in} $(h,\eta)$. It is also a law for the single probe
+$g_{\eta}$; a class-level crossover needs the widened class defined and a uniform upper
+bound over it. The measured orders $5.93\to3.95$ are evidence, not proof.}
+
+\leanbox{\lean{moment\_one}, \lean{moment\_two}, \lean{moment\_three},
+\lean{integral\_odd\_eq\_zero}, \lean{cross\_term\_vanishes},
+\lean{quadratic\_splits}, \lean{two\_scale\_shape}, \lean{crossover\_balance} in
+\lean{LeanPaperBCrossoverV1}}
+
+
+\section{The general law's newer sides, and the latent family}
+\label{sec:newer}
+
+\paragraph{Unbounded stopping (Theorem ``The lower law for unbounded stopping'')} A stopping
+policy has query kernels for every round, a measurable stop set after every number of rounds, and
+an output read at the stopping time. After its stop it issues the dummy, which is free and
+carries no information. One kernel policy therefore serves every horizon, and the law of its
+first $n$ rounds is the $n$-round history law. The output at horizon $n$ is the output at the
+first stopping time, if the stop has fired. A horizon at which every world has stopped with
+probability at least $1-\delta$ makes the truncation correct at level $2\delta$. Its cost is at most
+the supremum of the truncated costs. A finite-horizon policy embeds as a stopping policy with the
+same cost, since after its horizon it spends nothing.
+
+\leanbox{\lean{hRestr}, \lean{fired}, \lean{stoppedPol}, \lean{outT}, \lean{outT\_first},
+\lean{hist\_congr}, \lean{hist\_map\_restr}, \lean{costSt}, \lean{CorrectSt}, \lean{trunc\_correct},
+\lean{trunc\_two}, \lean{stopped\_obstruction\_lower\_chi}, \lean{ofFinite},
+\lean{costSt\_ofFinite}, \lean{correctSt\_ofFinite} in \lean{LeanPaperBStoppedLawV1}}
+
+\paragraph{The Hellinger tournament (Theorem ``The upper law on every channel'')} The
+Bhattacharyya coefficient of a query is at most one by $\sqrt{ab}\le\frac{a+b}{2}$ and unit mass,
+and it equals one at the dummy. Under world $w$ the mean of $\sqrt{p_{v}/p_{w}}$ at one round is the
+coefficient, by the density of the observation law. On a scheduled policy the history law
+integrates a product of per-round functions of the observations to the product of their means. The
+proof is by induction on the history recursion, through the deterministic query kernel and the
+observation kernel. The tournament gives each oriented pair a block of $n$ rounds. The block of a
+tested pair asks the pair's best query, which attains the maximum of $H^{2}$ over the finite query
+set. The test on a block compares the two likelihoods, with ties broken by a fixed rank of the
+worlds, which makes it antisymmetric. Markov's inequality on the square root of the block's
+likelihood ratio bounds the error by $\mathrm{BC}^{n}\le e^{-nH^{2}}$, and the combinatorial
+tournament law finishes it.
+
+\leanbox{\lean{bc}, \lean{bc\_le\_one}, \lean{bc\_dummy}, \lean{hel}, \lean{bc\_pow\_le},
+\lean{lintegral\_sqrt\_ratio}, \lean{lintegral\_prod\_sched}, \lean{block\_error}, \lean{kH},
+\lean{qStar}, \lean{tSched}, \lean{beatH}, \lean{beatH\_anti}, \lean{card\_block},
+\lean{beatH\_error}, \lean{hellinger\_tournament}, \lean{hellinger\_upper\_star},
+\lean{resolved\_le\_scale}, \lean{gChan\_bc}, \lean{hellinger\_tournament\_satisfiable} in
+\lean{LeanPaperBHellingerTestV1}}
+
+\paragraph{Shared-query tournament and its limit}
+The current upper construction is \lean{share\_tournament} in
+\lean{LeanPaperBShareTournamentV1}. Queries are indexed once, with one block of length $n$
+per query. Both orientations of a pair choose the same best query (\lean{qS\_symm}),
+so the likelihood tests remain antisymmetric even when many pairs reuse observations.
+Each individual error bound is still $\mathrm{BC}^n$ (\lean{beatS\_error}); dependence
+between tests is harmless for the union bound. The horizon is $|Q|n$, including any dummy
+block, hence paid cost is at most that horizon.
+This new module needs inclusion in the release's frozen gate. The Gaussian private-query
+example in \lean{LeanPaperBPrivateQueryV1} is already a concrete instance: its
+\lean{private\_query\_lower} forces a cost proportional to the number of private queries,
+while \lean{bc\_pq} and \lean{pq\_resolves} instantiate the tournament's information threshold.
+It does not prove the old quadratic factor in the number of worlds necessary.
+
+\paragraph{Second-moment obstruction law}
+\lean{LeanPaperBChiStarV1} proves the actual history density ratio (\lean{hist\_density}),
+the identity $\int p_w^2/p_u=1+\chi^2(p_w,p_u)$ (\lean{m2\_eq\_one\_add\_chi}), and the
+history-recursion bound $\mathbb E_w[L_u e^{-tN}]\le1$ (\lean{lintegral\_Z\_exp\_le}).
+The unsafe-output events cover the event of insufficient information. Splitting each event
+at likelihood ratio $c$ gives $c\delta+e^y/c$ (\lean{one\_alt\_bound}), and optimising $c$
+gives \lean{chi\_star\_tail}. The nonnegative-count inequality on its complement yields
+\lean{chi\_star\_expect}. Thus the result is about probabilities and expected counts under
+the adaptive observation law, not an arithmetic lemma supplied with a transcript bound.
+It assumes the stronger finite second moment uniformly over queries; finite KL alone does
+not imply that condition. The released proposition is finite-horizon. The stopped KL
+proposition elsewhere retains its separately proved scope.
+
+\paragraph{The latent family's rates (Theorem ``Both rates on the latent family'')} The observation
+density of a probe is the exact Gaussian mixture over the $8\cdot2^{r}$ latent patterns. Its
+characteristic function factors over the latent coordinates, which gives the decision probe's mean
+of $\cos Y$ and the tail probe's mean of the parity feature in closed form, with gaps at least
+$G_{\rm dec}h$ and $G_{\rm tail}h^{r}$. A nearest-mean test on a bounded feature over the rounds a
+schedule gives one query errs with probability at most $2\exp(-(n\,\mathrm{gap}/2)^{2}/(2H))$, by the
+concentration bound on the history law. The lower sides are the general law with the per-query
+$\chi^{2}$ bounds of the family's channel.
+
+\leanbox{\lean{famLaw}, \lean{charFun\_famLaw}, \lean{head\_factor}, \lean{decMean\_eq},
+\lean{tailMean\_eq} in \lean{LeanPaperBFamilyLawV1}; \lean{rawS}, \lean{cntS}, \lean{near\_error},
+\lean{dChan}, \lean{safeOut}, \lean{idOut}, \lean{safe\_decoder\_error}, \lean{id\_decoder\_error},
+\lean{family\_safe\_minimax}, \lean{family\_id\_minimax} in \lean{LeanPaperBFamilyDecoderV1};
+\lean{family\_safe\_stopped\_rate}, \lean{family\_id\_stopped\_rate} in \lean{LeanPaperBStoppedLawV1}}
+
+\paragraph{Tightness on both channels (Theorem ``The general law is tight on both channels'')} For
+$t>0$ the pointwise bound
+$|p-q|\le\frac t2(\sqrt p-\sqrt q)^{2}+\frac1{2t}(\sqrt p+\sqrt q)^{2}$ integrates to
+$\int|p-q|\le tH^{2}+\frac2t$, since $\int(\sqrt p-\sqrt q)^{2}=2H^{2}$ and
+$\int(\sqrt p+\sqrt q)^{2}\le4$. The choice $t=4/\int|p-q|$ gives $(\int|p-q|)^{2}\le8H^{2}$. All of this
+is non-negative integrals, so no integrability side condition appears. A bounded feature's mean
+gap is at most $\int|p-q|$. On the latent family the two probes' gaps then bound the Hellinger
+information of every pair below. The decision probe covers pairs that differ in $u$, which every
+obstruction of the safe decision contains. The tail probe covers pairs that differ only in $v$. On
+the parity channel the separating query $\mathrm{sep}(w,v)=\min(w,v)+1$ has gap at least
+$G_{\mathrm{sep}}h^{\mathrm{sep}}\ge G_{m-1}h^{\mathrm{sep}}$, because the gap constant is antitone. So the
+Hellinger information dominates the graded information $C_{H}h^{2\,\mathrm{sep}}$, and the proved safe
+orders resolve every obstruction at $C_{H}h^{2}$ and $C_{H}h^{2(m-1)}$.
+
+\leanbox{\lean{tvs}, \lean{abs\_sub\_le\_amgm}, \lean{lint\_sqdiff}, \lean{lint\_sqsum},
+\lean{tvs\_bound}, \lean{tvs\_sq\_le}, \lean{feature\_gap\_le}, \lean{gap\_sq\_le\_hel},
+\lean{fam\_hel\_u}, \lean{fam\_hel\_v}, \lean{fam\_resolves\_safe}, \lean{fam\_resolves\_id} in
+\lean{LeanPaperBHellingerFamilyV1}; \lean{Gc\_anti}, \lean{int\_feat\_eq}, \lean{parity\_hel\_sep},
+\lean{parity\_kH\_graded}, \lean{resolves\_of\_le} in \lean{LeanPaperBHellingerParityV1}}
+
+\paragraph{The derived safe sets} The family's responses are cube averages. Flipping one
+coordinate is an involution of the cube, so a sum whose summand changes sign under some flip is
+zero. A coordinate other than $z_{j}$ therefore averages to zero on $\{z_{j}=b\}$, and so does the
+tail product when $r\ge2$, since a second tail coordinate is free. The support $K$ has two points,
+and the residual of retaining $z_{j}$ at $(t,t,t,1,\dots,1)$ is $(3u-4-c_{j})t+v$, so $v$ cancels in the
+oscillation.
+
+\leanbox{\lean{flip}, \lean{sum\_zero\_of\_flip}, \lean{sum\_ind\_coord}, \lean{sum\_ind\_tail},
+\lean{resp\_eq}, \lean{F\_Kpt}, \lean{loss\_eq}, \lean{loss\_cases}, \lean{safeOf},
+\lean{famSafe\_derived} in \lean{LeanPaperBFamilySafeV1}}
+
+\section*{Build record}
+The corpus is verified by \texttt{verify\_all.sh}, which freezes its inputs, builds every listed
+module and every local import from an empty cache in import order, counts \texttt{sorry} and
+\texttt{native\_decide} outside comments, and checks every audited axiom closure against
+\{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}. The last full gate that
+passed, \texttt{full6\_20260925}, built $214$ modules and audited $1666$ theorems, with frozen
+sources identical to the working copy afterwards. It includes every module this supplement
+cites except five. \lean{LeanUnifiedObstructionOrderV1} imports only Mathlib and passes the smoke
+gate \texttt{smokeUNI\_20260925} ($2$ modules, $16$ theorems). \lean{LeanPaperBHellingerTestV1},
+written after it, passes the smoke gate \texttt{smokeHEL\_20260925} ($40$ modules, $316$ theorems).
+\lean{LeanPaperBHellingerFamilyV1}, \lean{LeanPaperBHellingerParityV1} and
+\lean{LeanPaperBFamilySafeV1} were written later. Each compiles with the standard axioms and no
+\texttt{sorry}, and they are the roots of the smoke gate \texttt{smokeR2\_20260925}.
+
+\begin{thebibliography}{00}
+
+\bibitem{duc2015} A. Duc, S. Faust, and F.-X. Standaert, ``Making masking security
+proofs concrete,'' IACR ePrint 2015/119, 2015.
+
+\bibitem{poli2023} M. Poli et al., ``Ideal abstractions for decision-focused learning,''
+arXiv:2303.17062, 2023.
+
+
+\bibitem{javdani2014} S. Javdani, Y. Chen, A. Karbasi, A. Krause, D. Bagnell, and
+S. Srinivasa, ``Near optimal Bayesian active learning for decision making,'' in
+\emph{Proc. 17th Int. Conf. Artificial Intelligence and Statistics (AISTATS)}, 2014,
+pp.~430--438.
+
+\bibitem{grosso2014} V. Grosso, F.-X. Standaert, and E. Prouff, ``Low entropy masking
+schemes, revisited,'' in \emph{Smart Card Research and Advanced Applications (CARDIS)},
+2013, pp.~33--43.
+
+\bibitem{rioul2021} O. Rioul, W. Cheng, and S. Guilley, ``Cumulant expansion of mutual
+information for quantifying leakage of a protected secret,'' in \emph{Proc. IEEE Int. Symp.
+Information Theory (ISIT)}, 2021, pp.~2596--2601.
+
+\bibitem{degenne2019} R. Degenne and W. M. Koolen, ``Pure exploration with multiple correct
+answers,'' in \emph{Advances in Neural Information Processing Systems 32}, 2019,
+pp.~14591--14600.
+
+\bibitem{wangyou2026} Z. Wang and K. You, ``Information games with multiple correct answers
+and piecewise-convex alternative sets,'' arXiv:2606.21889, 2026.
+
+\bibitem{odonnell2014} R. O'Donnell, \emph{Analysis of Boolean Functions}. Cambridge,
+U.K.: Cambridge Univ. Press, 2014.
+
+\bibitem{tsybakov2009} A. B. Tsybakov, \emph{Introduction to Nonparametric Estimation}.
+New York, NY: Springer, 2009.
+
+\bibitem{mathlib2020} The mathlib Community, ``The Lean mathematical library,'' in
+\emph{Proc. 9th ACM SIGPLAN Int. Conf. Certified Programs and Proofs (CPP)}, 2020,
+pp.~367--381.
+
+\bibitem{demoura2021} L. de Moura and S. Ullrich, ``The Lean 4 theorem prover and
+programming language,'' in \emph{Proc. 28th Int. Conf. Automated Deduction (CADE)}, 2021,
+pp.~625--635.
+
+\end{thebibliography}
+
+\end{document}

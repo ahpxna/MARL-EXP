@@ -24,17 +24,17 @@ configurations, exhibited in exact rational arithmetic, on which every ordinary 
 identical means in two worlds whose answers differ, so the attainable value is exactly zero
 and no quantity of ordinary sampling recovers it. Second, an exact price law: once a
 calibration query is admitted, the optimal value under a unit budget is
-$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$, proved as a lower bound
+$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{vm}+\sqrt{\nu\kappa})^{2}\bigr)$, proved as a lower bound
 on every group, as an upper bound quantified over every unit-budget design rather than over
 a parametric family, and as attained by an explicit symmetric design. The two prices
-combine through their square roots, which yields the operational crossover $\kappa=m$ at
+combine through their square roots, which yields the operational crossover $\nu\kappa=vm$ at
 which the two query types consume equal shares of each group's budget. A third result
 certifies, on one explicit instance in exact rationals, that no anchor-free design matches
 an anchored one. Every displayed theorem is machine-checked in Lean~4 with no
 \texttt{sorry} and with axioms confined to
 $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$. Numerical sweeps over
 $32$ parameter cells reproduce the closed form to a worst relative gap of
-$2.5\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
+$2.2\times10^{-16}$, and the same sweeps separate the two failure modes: removing the
 calibration query returns exactly zero, while a merely uniform allocation still reaches
 $73.5$--$100\%$ of the optimum. A separate simulation asks whether the law predicts a
 decision and not only a design: over $240$ randomly drawn instances the realised error of a
@@ -74,12 +74,22 @@ argued in a limit, so the failure can be reproduced and tested against.
 
 Having established that the query is sometimes mandatory, the paper computes what it costs.
 Writing $\Delta$ for the separation between the two worlds to be distinguished, $m$ for the
-group size and $\kappa$ for the price of a calibration query in units of an ordinary one,
-the optimal value under a unit budget is
+group size, $\kappa$ for the price of a calibration query in units of an ordinary one, and
+$v,\nu$ for the two observation variances, the optimal value under a unit budget is
 \begin{equation}
-\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(\sqrt{m}+\sqrt{\kappa})^{2}} .
+\Gamma^{*} \;=\; \frac{\Delta^{2}}{2K\,(s_{m}+s_{\kappa})^{2}},
+\qquad s_{m}=\sqrt{vm},\quad s_{\kappa}=\sqrt{\nu\kappa} .
 \label{eq:pricelaw}
 \end{equation}
+\NOTEPAR{The law is written in the noise-weighted prices because that is what the Lean
+theorem proves: \lean{calibration\_rate\_upper} is stated in free $s_{m},s_{\kappa}$ and the
+budget it carries is $\sum_{g}(s_{m}^{2}x_{g}+s_{\kappa}^{2}z_{g})\le1$ with $x,z$
+\emph{precisions}. Writing $\sqrt{m},\sqrt{\kappa}$ instead is the $v=\nu=1$ special case. An
+earlier draft printed the special case as the general law, and Section~IV-F compounded it by
+giving the cost as $mx+\kappa z$; both are corrected here.}
+The prices that enter are noise-weighted, because what a budget buys is precision and a
+noisier channel buys less of it per unit spent. Writing the law in $\sqrt{m}$ and
+$\sqrt{\kappa}$ alone is the special case $v=\nu=1$.
 This is an identity rather than an order of magnitude: it is matched by a lower bound on
 every group, by an upper bound quantified over \emph{every} unit-budget design rather than
 over a parametric family, and by an explicit design that attains it. The two query prices
@@ -89,9 +99,9 @@ trade-off, and neither type can be dropped without losing the group entirely.
 The paper makes four contributions. First, it exhibits a necessity dichotomy with an exact
 witness, showing that an additional \emph{type} of measurement can be a precondition rather
 than an optimisation. Second, it computes the exact price of one unit of information in a
-group, $(\sqrt{m}+\sqrt{\kappa})^{2}$, and the split that attains it. Third, it proves the
+group, $(s_{m}+s_{\kappa})^{2}$, and the split that attains it. Third, it proves the
 price law \eqref{eq:pricelaw} on both sides and exhibits the attaining design, from which
-the operational crossover $\kappa=m$ follows. Fourth, it certifies on an explicit instance
+the operational crossover $\nu\kappa=vm$ follows. Fourth, it certifies on an explicit instance
 that no anchor-free design matches an anchored one, with both sides in exact rationals.
 
 The scope of the claim is deliberately bounded. This paper does not solve the heterogeneous
@@ -176,6 +186,26 @@ matching incorrect implementation agree perfectly. That guarantee is why the num
 in Section~\ref{sec:results} is deliberately narrow.
 
 \subsection{The Gap}
+\NOTEPAR{Where this strand belongs, and one merge it must \emph{not} be given. It is
+tempting to join this paper to a range-estimation problem by saying an anchor is mandatory
+there too. It is not, and the reason is one line: a common offset leaves a range alone,
+\[
+\operatorname{range}(\theta+b\mathbf{1})=\operatorname{range}(\theta),
+\]
+so an unknown shared offset is invisible to any range objective and no calibration query is
+needed for it. What the offset does move is an \emph{absolute} threshold. That dependence on
+the task is the real content---calibration is required exactly when the decision is not
+invariant under the nuisance---and it is the correct way to connect this strand to any
+other: as a statement about which tasks need an anchor, not as a claim that anchoring is
+universally necessary.}
+\NOTEPAR{Positioning, for the final version. Square-root allocation under unequal
+sampling costs is classical---Neyman allocation with costs---so the price
+$(s_{m}+s_{\kappa})^{2}$ should not be sold as the novelty; a reviewer will say so
+immediately, and Section~II-B already concedes that cost-constrained design is standard. The
+part with no clear precedent is the \emph{dichotomy}: an unknown shared offset makes the
+ordinary channel non-identifiable, so the attainable value is exactly zero rather than merely
+small, and the query type becomes a precondition rather than an object of optimisation. The
+title and the abstract should lead with that.}
 
 The literature therefore leaves a specific opening. Discrimination design prices allocations
 but not query types; cost-constrained design prices support points but admits no zero-value
@@ -212,7 +242,7 @@ the query type entirely?
 \item \textbf{H1.} A configuration exists in which two worlds with different answers induce
 identical means for every ordinary query, so no ordinary sampling rule separates them.
 \item \textbf{H2.} The exact price of one unit of profiled information in a group is
-$(\sqrt{m}+\sqrt{\kappa})^{2}$, so the two prices combine through their square roots rather
+$(s_{m}+s_{\kappa})^{2}$, so the two prices combine through their square roots rather
 than additively.
 \item \textbf{H3.} The resulting bound is attained by a symmetric design that saturates the
 budget, making \eqref{eq:pricelaw} an identity.
@@ -417,7 +447,15 @@ next subsection into a statement about cost rather than about information.
 \label{sec:groupcost}
 
 A group required to deliver profiled information $h$ must satisfy $h(x+z)\le xz$, which is
-\eqref{eq:profile} rearranged. Its cost at prices $m$ and $\kappa$ is $m\,x+\kappa\,z$. We
+\eqref{eq:profile} rearranged in the precisions $x=n_{\mathrm{ord}}/v$ and
+$z=n_{\mathrm{cal}}/\nu$. Its cost is therefore not $m\,x+\kappa\,z$: a unit of precision on
+the ordinary channel takes $v$ observations and each costs $m$, so the group's spend is
+\begin{equation}
+s_{m}^{2}\,x + s_{\kappa}^{2}\,z, \qquad s_{m}^{2}=vm,\quad s_{\kappa}^{2}=\nu\kappa .
+\label{eq:groupcost}
+\end{equation}
+Reading $x$ and $z$ as counts rather than precisions is what turns \eqref{eq:pricelaw} into
+its $v=\nu=1$ special case, and it is the one substitution the development does not make. We
 bound that cost below, and then exhibit the allocation that meets the bound.
 
 \begin{theorem}[Group cost, lower bound]
@@ -474,14 +512,14 @@ former by $h$ gives the latter.
 The split \eqref{eq:groupsplit} takes this form because the two channels must be bought in
 inverse proportion to the square roots of their prices: substituting anything else into
 \eqref{eq:cs} leaves slack. Writing $s_{m}=\sqrt{m}$ and $s_{\kappa}=\sqrt{\kappa}$, the
-exact price of one unit of profiled information in a group is $(\sqrt{m}+\sqrt{\kappa})^{2}$
+exact price of one unit of profiled information in a group is $(s_{m}+s_{\kappa})^{2}$
 and the optimal split satisfies $z^{\star}/x^{\star}=\sqrt{m/\kappa}$.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{master_fig7_unitprice.png}
 \caption{The price of one unit of profiled information in a group,
-$(\sqrt{m}+\sqrt{\kappa})^{2}$ from Theorem~\ref{thm:groupattained}, against the additive
+$(s_{m}+s_{\kappa})^{2}$ from Theorem~\ref{thm:groupattained}, against the additive
 price $m+\kappa$ that treats the two query types as separate purchases (dotted). The two
 differ by exactly the cross term $2\sqrt{m\kappa}$, which is the part of the cost that
 arises because neither type is useful without the other. An additive accounting therefore
@@ -494,7 +532,7 @@ the two prices are equal. Exact evaluation of \eqref{eq:groupsplit}; nothing is 
 \centering
 \includegraphics[width=\columnwidth]{master_fig5_crossover.png}
 \caption{The optimal split $z^{\star}/x^{\star}=\sqrt{m/\kappa}$ at three group sizes.
-Open circles mark $\kappa=m$, the only price at which the two query types are bought in
+Open circles mark $\nu\kappa=vm$, the only price at which the two query types are bought in
 equal numbers. To the left of its circle a group should buy \emph{more} calibration than
 ordinary observations, and to the right fewer; the ratio is a square root, so it moves an
 order of magnitude for every two orders of magnitude in price. Exact evaluation of
@@ -562,129 +600,59 @@ $V=h\Delta^{2}/2$, the right-hand side of \eqref{eq:upper}.
 
 \noindent\textbf{S\,1}\quad\lean{calibration\_rate\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{sm} \mathit{sk} \mathit{D} \mathit{V} : \mathbb{R}\\
-&\quad ),\; (\mathit{x} \mathit{z} : \mathit{Fin}\\
-&\quad \mathit{K} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hsm} : 0 < \mathit{sm}),\;\\
-&\quad (\mathit{hsk} : 0 <\\
-&\quad \mathit{sk}),\; (\mathit{hD} : 0 <\\
-&\quad \mathit{D}),\; (\mathit{hV} : 0 <\\
-&\quad \mathit{V}),\; (\mathit{hK} : 0 <\\
-&\quad \mathit{K}),\; (\mathit{hx} : \forall \mathit{g},\\
-&\quad 0 < \mathit{x}\\
-&\quad \mathit{g}),\; (\mathit{hz} : \forall \mathit{g},\\
-&\quad 0 < \mathit{z}\\
-&\quad \mathit{g}),\; (\mathit{hbudget} :\\
-&\quad \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} * \mathit{x}\\
-&\quad \mathit{g} + \mathit{sk} ^{2} * \mathit{z}\\
-&\quad \mathit{g}) \leq 1),\; (\mathit{hinfo} :\\
-&\quad \forall \mathit{g}, 2 * \mathit{V} /\\
-&\quad \mathit{D} ^{2} * (\mathit{x} \mathit{g} + \mathit{z}\\
-&\quad \mathit{g}) \leq \mathit{x} \mathit{g} *\\
-&\quad \mathit{z}\\
-&\quad \mathit{g})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{V} \leq \mathit{D} ^{2} / (2 * (\mathit{K} : \mathbb{R}\\
-&\quad ) * (\mathit{sm} + \mathit{sk})\\
-&\quad ^{2})
+&(\mathit{sm} \mathit{sk} \mathit{D} \mathit{V} : \mathbb{R} ),\; (\mathit{x} \mathit{z} : \mathit{Fin} \mathit{K} \to \mathbb{R} ),\; (\mathit{hsm} : 0 < \mathit{sm}),\\
+&\quad \; (\mathit{hsk} : 0 < \mathit{sk}),\; (\mathit{hD} : 0 < \mathit{D}),\; (\mathit{hV} : 0 < \mathit{V}),\; (\mathit{hK} : 0 < \mathit{K}),\\
+&\quad \; (\mathit{hx} : \forall \mathit{g}, 0 < \mathit{x} \mathit{g}),\; (\mathit{hz} : \forall \mathit{g}, 0 < \mathit{z} \mathit{g}),\; (\mathit{hbudget} : \textstyle\sum \mathit{g}, (\mathit{sm} ^{2} * \mathit{x} \mathit{g}\\
+&\quad + \mathit{sk} ^{2} * \mathit{z} \mathit{g}) \leq 1),\; (\mathit{hinfo} : \forall \mathit{g}, 2 * \mathit{V} / \mathit{D} ^{2} * (\mathit{x} \mathit{g} + \mathit{z} \mathit{g}) \leq\\
+&\quad \mathit{x} \mathit{g} * \mathit{z} \mathit{g})\\
+\vdash\;&\mathit{V} \leq \mathit{D} ^{2} / (2 * (\mathit{K} : \mathbb{R} ) * (\mathit{sm} + \mathit{sk}) ^{2})
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{group\_cost\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{h} \mathit{sm} \mathit{sk} : \mathbb{R}\\
-&\quad ),\; (\mathit{hsm} : 0 <\\
-&\quad \mathit{sm}),\; (\mathit{hsk} : 0 <\\
-&\quad \mathit{sk}),\; (\mathit{hh} : 0 <\\
-&\quad \mathit{h})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{sm} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) /\\
-&\quad \mathit{sm}) + \mathit{sk} ^{2} * (\mathit{h}\\
-&\quad * (\mathit{sm} +\\
-&\quad \mathit{sk}) / \mathit{sk}) = \mathit{h} *\\
-&\quad (\mathit{sm} +\\
-&\quad \mathit{sk})\\
-&\quad ^{2}) \wedge \mathit{h} * ((\mathit{h} * (\mathit{sm} +\\
-&\quad \mathit{sk}) / \mathit{sm}) + (\mathit{h} *\\
-&\quad (\mathit{sm} +\\
-&\quad \mathit{sk}) /\\
-&\quad \mathit{sk})) = (\mathit{h} * (\mathit{sm} +\\
-&\quad \mathit{sk}) /\\
-&\quad \mathit{sm}) * (\mathit{h} * (\mathit{sm} +\\
-&\quad \mathit{sk}) /\\
-&\quad \mathit{sk})
+&(\mathit{h} \mathit{sm} \mathit{sk} : \mathbb{R} ),\; (\mathit{hsm} : 0 < \mathit{sm}),\; (\mathit{hsk} : 0 < \mathit{sk}),\; (\mathit{hh} : 0 < \mathit{h})\\
+\vdash\;&(\mathit{sm} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sm}) + \mathit{sk} ^{2} * (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sk}) = \mathit{h}\\
+&\quad * (\mathit{sm} + \mathit{sk}) ^{2}) \wedge \mathit{h} * ((\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sm}) + (\mathit{h} * (\mathit{sm} + \mathit{sk})\\
+&\quad / \mathit{sk})) = (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sm}) * (\mathit{h} * (\mathit{sm} + \mathit{sk}) / \mathit{sk})
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{hidden\_shift\_answers}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((1:\mathbb{Q} )/2 < \mathit{theta0} 0 \wedge \neg ((1:\mathbb{Q}\\
-&\quad )/2 < \mathit{lam}\\
-&\quad 0)) \wedge ((1:\mathbb{Q} )/2 <\\
-&\quad \mathit{theta0} 3 \wedge (1:\mathbb{Q} )/2\\
-&\quad < \mathit{lam}\\
-&\quad 3)
+\vdash\;&((1:\mathbb{Q} )/2 < \mathit{theta0} 0 \wedge \neg ((1:\mathbb{Q} )/2 < \mathit{lam} 0)) \wedge\\
+&\quad ((1:\mathbb{Q} )/2 < \mathit{theta0} 3 \wedge (1:\mathbb{Q} )/2 < \mathit{lam} 3)
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{hidden\_shift\_answers\_differ}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
-&\quad \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 <\\
-&\quad \mathit{theta0}\\
-&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
-&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
-&\quad )/2 < \mathit{lam}\\
-&\quad \mathit{i}))
+\vdash\;&(\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{theta0} \mathit{i}\\
+&\quad )) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 <\\
+&\quad \mathit{lam} \mathit{i}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,5}\quad\lean{hidden\_shift\_means}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0}\\
-&\quad \mathit{i} + \mathit{off0} (\mathit{grp} \mathit{i})\\
-&\quad = \mathit{lam} \mathit{i} + \mathit{off1} (\mathit{grp}\\
-&\quad \mathit{i})
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0} \mathit{i} + \mathit{off0} (\mathit{grp} \mathit{i}) = \mathit{lam} \mathit{i} + \mathit{off1} (\mathit{grp} \mathit{i}) \]}
 
 \noindent\textbf{S\,6}\quad\lean{hidden\_shift\_witness}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0} \mathit{i}\\
-&\quad + \mathit{off0} (\mathit{grp} \mathit{i}) = \mathit{lam}\\
-&\quad \mathit{i} + \mathit{off1} (\mathit{grp}\\
-&\quad \mathit{i})) \wedge (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
-&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
-&\quad )/2 < \mathit{theta0}\\
-&\quad \mathit{i})) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter}\\
-&\quad (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q}\\
-&\quad )/2 < \mathit{lam}\\
-&\quad \mathit{i}))
+\vdash\;&(\forall \mathit{i} : \mathit{Fin} 4, \mathit{theta0} \mathit{i} + \mathit{off0} (\mathit{grp} \mathit{i}) = \mathit{lam} \mathit{i} + \mathit{off1} (\mathit{grp} \mathit{i})) \wedge\\
+&\quad (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 < \mathit{theta0} \mathit{i}\\
+&\quad )) \neq (\mathit{Finset}.\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} : \mathit{Fin} 4 => (1:\mathbb{Q} )/2 <\\
+&\quad \mathit{lam} \mathit{i}))
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{profiled\_information}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R}\\
-&\quad ),\; (\mathit{ha} : 0 <\\
-&\quad \mathit{a}),\; (\mathit{hb} : 0 < \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{t} : \mathbb{R} , \mathit{a} * \mathit{b} *\\
-&\quad \mathit{D} ^{2} / (2 * (\mathit{a} +\\
-&\quad \mathit{b})) \leq \mathit{a}\\
-&\quad * (\mathit{D} - \mathit{t}) ^{2} / 2 +\\
-&\quad \mathit{b} * \mathit{t}\\
-&\quad ^{2} /\\
-&\quad 2) \wedge \mathit{a} * (\mathit{D} -\\
-&\quad \mathit{a} * \mathit{D} / (\mathit{a} +\\
-&\quad \mathit{b})) ^{2} / 2 + \mathit{b} *\\
-&\quad (\mathit{a} * \mathit{D} / (\mathit{a} +\\
-&\quad \mathit{b})) ^{2} / 2 = \mathit{a} * \mathit{b} *\\
-&\quad \mathit{D} ^{2} / (2 * (\mathit{a} + \mathit{b}))
+&(\mathit{a} \mathit{b} \mathit{D} : \mathbb{R} ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hb} : 0 < \mathit{b})\\
+\vdash\;&(\forall \mathit{t} : \mathbb{R} , \mathit{a} * \mathit{b} * \mathit{D} ^{2} / (2 * (\mathit{a} + \mathit{b})) \leq \mathit{a} * (\mathit{D} - \mathit{t}) ^{2} / 2 + \mathit{b} * \mathit{t} ^{2}\\
+&\quad / 2) \wedge \mathit{a} * (\mathit{D} - \mathit{a} * \mathit{D} / (\mathit{a} + \mathit{b})) ^{2} / 2 + \mathit{b} * (\mathit{a} * \mathit{D} / (\mathit{a} + \mathit{b}))\\
+&\quad ^{2} / 2 = \mathit{a} * \mathit{b} * \mathit{D} ^{2} / (2 * (\mathit{a} + \mathit{b}))
 \end{aligned} \]}
 
 
 Three readings of \eqref{eq:pricelaw} follow immediately and carry its practical content.
 As $\kappa\to0$ the value tends to $\Delta^{2}/(2Km)$, the cost of the ordinary queries
 alone. As $\kappa\to\infty$ it behaves as $\Delta^{2}/(2K\kappa)$, so the calibration query
-dominates the budget and the group size becomes irrelevant. At $\kappa=m$ the two square
+dominates the budget and the group size becomes irrelevant. At $\nu\kappa=vm$ the two square
 roots are equal and, by \eqref{eq:groupsplit}, $z^{\star}=x^{\star}$: each query type
 consumes exactly half of each group's budget. That crossover is the operational form of the
 law. Below it, ordinary sampling dominates the budget and calibration is cheap insurance;
@@ -696,7 +664,7 @@ reconsidered.
 \includegraphics[width=\columnwidth]{master_fig1_rate.png}
 \caption{The closed form \eqref{eq:pricelaw} against an independent bisection optimiser over
 the same feasible set. The curves coincide to floating-point precision at every cell; the
-decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted rate.}
+decay in $\kappa$ is the $1/(s_{m}+s_{\kappa})^{2}$ envelope, not a fitted rate.}
 \label{fig:rate}
 \end{figure}
 
@@ -707,7 +675,7 @@ decay in $\kappa$ is the $1/(\sqrt{m}+\sqrt{\kappa})^{2}$ envelope, not a fitted
 $m=4$, $\Delta=1$, with the two one-channel readings it is often replaced by: the cheap-%
 calibration limit $\Delta^{2}/(2Km)$ and the expensive-calibration limit
 $\Delta^{2}/(2K\kappa)$. The exact value lies strictly below both at every price, and
-furthest below at $\kappa=m$, where it is a factor of four under either. The regime in
+furthest below at $\nu\kappa=vm$, where it is a factor of four under either. The regime in
 which a one-channel rule of thumb is least safe is therefore the balanced one, not an
 extreme. Exact evaluation of the proved formula.}
 \label{fig:limits}
@@ -736,157 +704,69 @@ $\tfrac18<\tfrac{261}{1520}$, the anchor is mandatory on this instance.
 
 \noindent\textbf{S\,15}\quad\lean{anchor\_free\_upper}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{v} \mathit{kap} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{dd} : \mathit{J} \to \mathit{E}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R}\\
-&\quad ),\; (\mathit{tj} : \mathit{J} \to \mathbb{R}\\
-&\quad ),\; (\mathit{x} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R}\\
-&\quad ),\; (\mathit{Jval} \mathit{U0} : \mathbb{R}\\
-&\quad ),\; (\mathit{hlam} : \forall \mathit{j}, 0\\
-&\quad \leq \mathit{lam}\\
-&\quad \mathit{j}),\; (\mathit{hlamsum} :\\
-&\quad \textstyle\sum \mathit{j}, \mathit{lam}\\
-&\quad \mathit{j} =\\
-&\quad 1),\; (\mathit{hx} : \forall \mathit{e}, 0\\
-&\quad \leq \mathit{x}\\
-&\quad \mathit{e}),\; (\mathit{hbudget} :\\
-&\quad \textstyle\sum \mathit{e}, \mathit{kap}\\
-&\quad \mathit{e} * \mathit{x} \mathit{e} =\\
-&\quad 1),\; (\mathit{hIe} : \forall \mathit{j},\\
-&\quad \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e},\\
-&\quad \mathit{x} \mathit{e} / \mathit{v} \mathit{e}\\
-&\quad * (\mathit{dd}\\
-&\quad \mathit{j} \mathit{e} - \mathit{tj} \mathit{j})\\
-&\quad ^{2}) /\\
-&\quad 2),\; (\mathit{hJval} : \forall \mathit{j},\\
-&\quad \mathit{Jval} \leq \mathit{Ival}\\
-&\quad \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e},\\
-&\quad (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} *\\
-&\quad ((\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj} \mathit{j})\\
-&\quad ^{2} / (2 * \mathit{v} \mathit{e})))\\
-&\quad \leq \mathit{U0} * \mathit{kap}\\
-&\quad \mathit{e})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{v} \mathit{kap} : \mathit{E} \to \mathbb{R} ),\; (\mathit{dd} : \mathit{J} \to \mathit{E} \to \mathbb{R} ),\; (\mathit{lam} : \mathit{J} \to \mathbb{R} ),\\
+&\quad \; (\mathit{tj} : \mathit{J} \to \mathbb{R} ),\; (\mathit{x} : \mathit{E} \to \mathbb{R} ),\; (\mathit{Ival} : \mathit{J} \to \mathbb{R} ),\\
+&\quad \; (\mathit{Jval} \mathit{U0} : \mathbb{R} ),\; (\mathit{hlam} : \forall \mathit{j}, 0 \leq \mathit{lam} \mathit{j}),\; (\mathit{hlamsum} : \textstyle\sum \mathit{j}, \mathit{lam} \mathit{j}\\
+&\quad = 1),\; (\mathit{hx} : \forall \mathit{e}, 0 \leq \mathit{x} \mathit{e}),\; (\mathit{hbudget} : \textstyle\sum \mathit{e}, \mathit{kap} \mathit{e} * \mathit{x} \mathit{e} = 1),\\
+&\quad \; (\mathit{hIe} : \forall \mathit{j}, \mathit{Ival} \mathit{j} \leq (\textstyle\sum \mathit{e}, \mathit{x} \mathit{e} / \mathit{v} \mathit{e} * (\mathit{dd} \mathit{j} \mathit{e} - \mathit{tj} \mathit{j}) ^{2}) / 2),\\
+&\quad \; (\mathit{hJval} : \forall \mathit{j}, \mathit{Jval} \leq \mathit{Ival} \mathit{j}),\; (\mathit{hU0} : \forall \mathit{e}, (\textstyle\sum \mathit{j}, \mathit{lam} \mathit{j} * ((\mathit{dd} \mathit{j} \mathit{e} -\\
+&\quad \mathit{tj} \mathit{j}) ^{2} / (2 * \mathit{v} \mathit{e}))) \leq \mathit{U0} * \mathit{kap} \mathit{e})\\
 \vdash\;&\mathit{Jval} \leq \mathit{U0}
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{anchor\_mandatory}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{Design} : \mathit{Type}*\},\; (\mathit{value} :\\
-&\quad \mathit{Design} \to \mathbb{R}\\
-&\quad ),\; (\mathit{anchorFree} : \mathit{Design}\\
-&\quad \to \mathit{Prop}),\; (\mathit{U0} \mathit{L1}\\
-&\quad : \mathbb{R}\\
-&\quad ),\; (\mathit{hgap} : \mathit{U0} <\\
-&\quad \mathit{L1}),\; (\mathit{hcert} : \forall \mathit{D},\\
-&\quad \mathit{anchorFree} \mathit{D} \to \mathit{value}\\
-&\quad \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} :\\
-&\quad \mathit{Design}),\; (\mathit{hD1} :\\
-&\quad \mathit{L1} \leq \mathit{value}\\
-&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
-&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
-&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
-&\quad \mathit{Dopt})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{Design} : \mathit{Type}*\},\; (\mathit{value} : \mathit{Design} \to \mathbb{R} ),\; (\mathit{anchorFree} :\\
+&\quad \mathit{Design} \to \mathit{Prop}),\; (\mathit{U0} \mathit{L1} : \mathbb{R} ),\; (\mathit{hgap} : \mathit{U0} < \mathit{L1}),\; (\mathit{hcert} : \forall \mathit{D},\\
+&\quad \mathit{anchorFree} \mathit{D} \to \mathit{value} \mathit{D} \leq \mathit{U0}),\; (\mathit{D1} : \mathit{Design}),\; (\mathit{hD1} : \mathit{L1} \leq\\
+&\quad \mathit{value} \mathit{D1}),\; (\mathit{Dopt} : \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D}, \mathit{value} \mathit{D} \leq \mathit{value} \mathit{Dopt})\\
 \vdash\;&\neg \mathit{anchorFree} \mathit{Dopt}
 \end{aligned} \]}
 
 \noindent\textbf{S\,17}\quad\lean{energy\_completed}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\;\\
-&\quad (\mathit{hK} : \mathit{Kcap} \mathit{v}\\
-&\quad \mathit{x} \mathit{x0} \mathit{v0} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{energy} \mathit{v} \mathit{d} \mathit{x}\\
-&\quad \mathit{x0} \mathit{v0} \mathit{t} = \mathit{Dval}\\
-&\quad \mathit{v} \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v}\\
-&\quad \mathit{d}\\
-&\quad \mathit{x}) ^{2} / (2 * \mathit{Kcap}\\
-&\quad \mathit{v} \mathit{x} \mathit{x0}\\
-&\quad \mathit{v0}) + \mathit{Kcap} \mathit{v} \mathit{x}\\
-&\quad \mathit{x0} \mathit{v0} / 2 * (\mathit{t} - \mathit{Mval}\\
-&\quad \mathit{v} \mathit{d} \mathit{x} /\\
-&\quad \mathit{Kcap} \mathit{v}\\
-&\quad \mathit{x} \mathit{x0}\\
-&\quad \mathit{v0}) ^{2}
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R} ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R} ),\; (\mathit{hv0} : \mathit{v0} \neq 0),\\
+&\quad \; (\mathit{hK} : \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0} \neq 0)\\
+\vdash\;&\mathit{energy} \mathit{v} \mathit{d} \mathit{x} \mathit{x0} \mathit{v0} \mathit{t} = \mathit{Dval} \mathit{v} \mathit{d} \mathit{x} - (\mathit{Mval} \mathit{v} \mathit{d} \mathit{x}) ^{2} / (2 * \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0}) +\\
+&\quad \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0} / 2 * (\mathit{t} - \mathit{Mval} \mathit{v} \mathit{d} \mathit{x} / \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0}) ^{2}
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{energy\_expand}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R}\\
-&\quad ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R}\\
-&\quad ),\; (\mathit{hv0} : \mathit{v0} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{energy} \mathit{v} \mathit{d} \mathit{x}\\
-&\quad \mathit{x0} \mathit{v0} \mathit{t} = \mathit{Dval}\\
-&\quad \mathit{v} \mathit{d} \mathit{x} - \mathit{Mval}\\
-&\quad \mathit{v} \mathit{d} \mathit{x} * \mathit{t} +\\
-&\quad \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0}\\
-&\quad \mathit{v0} * \mathit{t} ^{2} / 2
+&(\mathit{v} \mathit{d} \mathit{x} : \mathit{E} \to \mathbb{R} ),\; (\mathit{x0} \mathit{v0} \mathit{t} : \mathbb{R} ),\; (\mathit{hv0} : \mathit{v0} \neq 0)\\
+\vdash\;&\mathit{energy} \mathit{v} \mathit{d} \mathit{x} \mathit{x0} \mathit{v0} \mathit{t} = \mathit{Dval} \mathit{v} \mathit{d} \mathit{x} - \mathit{Mval} \mathit{v} \mathit{d} \mathit{x} * \mathit{t} + \mathit{Kcap} \mathit{v} \mathit{x} \mathit{x0} \mathit{v0} * \mathit{t} ^{2}\\
+&\quad / 2
 \end{aligned} \]}
 
 
 \noindent\emph{Supporting results in \lean{LeanMasterAnchorInstanceV1}.}~These instantiate the certificate. The cap on the anchor-free class is proved and then shown attained, so it is tight rather than merely valid; the anchored design's budget and value are computed in exact rationals; and the gap between them is checked positive. Every number in Theorem~\ref{thm:anchor} appears here as a separate checked statement rather than as a step inside one proof. They are reproduced as the prover has them; a further $1$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,8}\quad\lean{anchorFree\_attained}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{min} (\mathit{Ifree} (1/2)) (\mathit{Ifree}\\
-&\quad (1/2)) = 1 / 8
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{min} (\mathit{Ifree} (1/2)) (\mathit{Ifree} (1/2)) = 1 / 8 \]}
 
 \noindent\textbf{S\,9}\quad\lean{anchor\_is\_mandatory}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{Design} : \mathit{Type}*),\; (\mathit{value} :\\
-&\quad \mathit{Design} \to \mathbb{Q}\\
-&\quad ),\; (\mathit{anchorFree} : \mathit{Design}\\
-&\quad \to \mathit{Prop}),\; (\mathit{hcert} :\\
-&\quad \forall \mathit{D}, \mathit{anchorFree}\\
-&\quad \mathit{D} \to \mathit{value} \mathit{D}\\
-&\quad \leq 1/8),\; (\mathit{D1} :\\
-&\quad \mathit{Design}),\; (\mathit{hD1} : (261 : \mathbb{Q}\\
-&\quad )/1520 \leq \mathit{value}\\
-&\quad \mathit{D1}),\; (\mathit{Dopt} :\\
-&\quad \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D},\\
-&\quad \mathit{value} \mathit{D} \leq \mathit{value}\\
-&\quad \mathit{Dopt})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{Design} : \mathit{Type}*),\; (\mathit{value} : \mathit{Design} \to \mathbb{Q} ),\; (\mathit{anchorFree} :\\
+&\quad \mathit{Design} \to \mathit{Prop}),\; (\mathit{hcert} : \forall \mathit{D}, \mathit{anchorFree} \mathit{D} \to \mathit{value} \mathit{D} \leq\\
+&\quad 1/8),\; (\mathit{D1} : \mathit{Design}),\; (\mathit{hD1} : (261 : \mathbb{Q} )/1520 \leq \mathit{value} \mathit{D1}),\\
+&\quad \; (\mathit{Dopt} : \mathit{Design}),\; (\mathit{hopt} : \forall \mathit{D}, \mathit{value} \mathit{D} \leq \mathit{value} \mathit{Dopt})\\
 \vdash\;&\neg \mathit{anchorFree} \mathit{Dopt}
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{anchored\_K}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(9/20 : \mathbb{Q} ) + 9/20 + 1 = 19/10
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; (9/20 : \mathbb{Q} ) + 9/20 + 1 = 19/10 \]}
 
 \noindent\textbf{S\,11}\quad\lean{anchored\_budget}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(9/20 : \mathbb{Q} ) + 9/20 + (1/10) * 1 = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; (9/20 : \mathbb{Q} ) + 9/20 + (1/10) * 1 = 1 \]}
 
 \noindent\textbf{S\,12}\quad\lean{anchored\_value}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Ianch} (9/20) (19/10) = 261 / 1520
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{Ianch} (9/20) (19/10) = 261 / 1520 \]}
 
 \noindent\textbf{S\,13}\quad\lean{dual\_H\_value}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{Hval} 1 0 (1/2) = 1 / 8 \wedge \mathit{Hval} 0\\
-&\quad 1 (1/2) = 1 / 8
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{Hval} 1 0 (1/2) = 1 / 8 \wedge \mathit{Hval} 0 1 (1/2) = 1 / 8 \]}
 
 \noindent\textbf{S\,14}\quad\lean{gap\_positive}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 : \mathbb{Q} ) / 8 < 261 / 1520
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; (1 : \mathbb{Q} ) / 8 < 261 / 1520 \]}
 
 
 The cap is a dual certificate valid for every anchor-free design, and it is attained, so it
@@ -960,7 +840,17 @@ open.
 \subsection{Parameter Grid}
 
 The grid is $K\in\{1,2,4,8\}$, $m\in\{2,4\}$ and
-$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$, giving $32$ cells. The $\kappa$ values
+$\kappa\in\{\tfrac14,\tfrac23,1,4\}$ at $\Delta=1$ and $v=\nu=1$, giving $32$ cells. The
+two noise levels are stated because \eqref{eq:pricelaw} is written in the noise-weighted
+prices, so a grid that leaves them implicit does not determine the tabulated values. The $\kappa$ values
+\TODOPAR{Table~\ref{tab:cells} was regenerated for this draft by
+\texttt{EXP\_master\_cells.py} at $v=\nu=1$. The previous table matched
+$\Delta^{2}/\bigl(2K(\sqrt{4m}+\sqrt{4\kappa})^{2}\bigr)$ on all 32 cells to five digits,
+i.e.\ it was computed at $v=\nu=4$ without saying so---or, indistinguishably from the numbers
+alone, at $v=\nu=1$ with an effective separation $\Delta/2$. The generating script was not in
+the repository, so the ambiguity could not be resolved by reading and was removed by
+regenerating instead. \emph{Decide before submission} which convention the original sweep
+intended, in case a figure elsewhere still assumes the old one.}
 straddle the crossover $\kappa=m$ from both sides at both group sizes, which is the regime
 the law predicts to be qualitatively different.
 
@@ -998,11 +888,14 @@ noise-weighted ones, $s_{m}=\sqrt{vm}$ and $s_{\kappa}=\sqrt{\nu\kappa}$.
 \emph{Budget.} The budget is not swept in absolute units, which would make every instance
 a separate curve. It is set from the dimensionless product the law itself identifies,
 \begin{equation}
-\lambda \;=\; \Gamma^{*}B,
-\qquad
-\Gamma^{*}=\frac{\Delta^{2}}{4\,(s_{m}+s_{\kappa})^{2}},
+\lambda \;=\; \tfrac12 K\,\Gamma^{*}B \;=\; \frac{\Delta^{2}B}{4\,(s_{m}+s_{\kappa})^{2}},
 \label{eq:lambda}
 \end{equation}
+\NOTEPAR{$\lambda$ and $\Gamma^{*}$ are different objects and an earlier draft used one
+symbol for both. $\Gamma^{*}$ is the per-group value under a unit budget, which is what the
+Lean theorem bounds. $\lambda$ is the dimensionless error exponent, and the relation is
+$\lambda=\tfrac12K\Gamma^{*}B$. The finite-sample experiment uses $\lambda$; the design
+experiment uses $\Gamma^{*}$.}
 on the grid $\lambda\in\{0.05,0.1,0.2,0.4,0.7,1,1.5,2.25,3,4\}$, so that
 \eqref{eq:upper} predicts one curve, $\Phi(-\sqrt{\lambda})$, for every instance at once.
 A collapse onto a single curve is a strong prediction and an easy one to falsify. Drawing
@@ -1011,6 +904,18 @@ $\Delta$ buys the same information with many more observations per group, so the
 sample size can be measured at constant information.
 
 \emph{Estimator.} The test is a plug-in profiled likelihood ratio. It is not given $v$ or
+\TODOPAR{The simulated task is not the task the title names, and the numbers should be
+relabelled rather than reinterpreted. \texttt{EXP\_master\_finite.py} draws one binary latent
+$w\in\{0,1\}$ per replicate and shifts \emph{every} group's mean by $\Delta w$: the groups
+share a single world, so their information adds and the error is
+$\Phi(-\tfrac12\Delta\sqrt{\sum_{g}I_{g}})$. That is a common-world detection problem. The
+headline task is a threshold decision over $K$ groups, where the quantity being decided is
+not a single shared bit and the information coefficient is correspondingly different. The
+simulation is sound and its collapse onto the predicted curve is real evidence---for the
+common-world problem. \emph{Before submission, either rename what E2 measures, or rerun it
+with the threshold-set task and the coefficient that task implies.} Nothing in the closed form
+or its proof depends on which is chosen; what depends on it is the sentence in the abstract
+that says the law predicts a decision.}
 $\nu$ and estimates both from the replicate spread; it uses the integer counts the budget
 actually buys, $n_{x}=\lfloor Bx/m\rfloor$ and $n_{z}=\lfloor Bz/\kappa\rfloor$; and it
 weights each group by that group's own estimated information, so a group whose anchors are
@@ -1094,8 +999,10 @@ the file on disk; the compiled artifact is newer than its source; at least one
 within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-The contract is stated in full because each clause excludes a specific way of appearing
-verified without being so. The hash check across the compile excludes editing a file after
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
 checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
 a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
 outside the kernel is rejected by name mismatch rather than needing to be anticipated.
@@ -1149,7 +1056,7 @@ All $32$ cells are reported, with none excluded.
 \subsection{The Closed Form Against an Independent Optimiser}
 
 The closed form and the bisection optimiser agree in all $32$ cells. The largest relative
-gap anywhere in the sweep is $2.5\times10^{-16}$, which is floating-point agreement, and in
+gap anywhere in the sweep is $2.2\times10^{-16}$, which is floating-point agreement, and in
 no cell does the optimiser exceed the closed form.
 
 \begin{table}[htbp]
@@ -1162,7 +1069,7 @@ Quantity & Value \\
 \midrule
 Parameter cells                            & 32 \\
 Cells in which the two agree               & 32 \\
-Largest relative gap                       & $2.5\times10^{-16}$ \\
+Largest relative gap                       & $2.2\times10^{-16}$ \\
 Cells where the optimiser exceeds the form & 0 \\
 \bottomrule
 \end{tabular}
@@ -1359,7 +1266,7 @@ than on average. \NUM{}}
 Section~\ref{sec:opens} names the heterogeneous law as the first thing to settle, and observes
 that the per-group argument survives unchanged while the summation step does not. Writing
 $s_{g}^{2}=(\sqrt{v_{g}m_{g}}+\sqrt{\nu_{g}\kappa_{g}})^{2}$ for group $g$'s price of one unit
-of profiled information, the natural candidate replaces $K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the
+of profiled information, the natural candidate replaces $K(s_{m}+s_{\kappa})^{2}$ by the
 \emph{sum} $\sum_{g}s_{g}^{2}$ rather than by any average. Experiment~E4 puts that candidate
 in front of two tests it could fail separately, on instances whose groups differ by a median
 factor of $3.9$ and up to $24.5$ in price.
@@ -1444,7 +1351,7 @@ what happens when the additive-offset assumption fails.
 \label{sec:opens}
 
 The heterogeneous law is the obvious next step: replacing
-$K(\sqrt{m}+\sqrt{\kappa})^{2}$ by the corresponding weighted quantity and determining
+$K(s_{m}+s_{\kappa})^{2}$ by the corresponding weighted quantity and determining
 whether it remains exactly attainable. Section~\ref{sec:e4results} narrows the target---the
 quantity is the \emph{sum} $\sum_{g}s_{g}^{2}$ and not an average, it was not beaten by an
 independent optimiser on any of $250$ instances, and it predicts a realised error as well as
@@ -1469,7 +1376,7 @@ query types, and its price is not computed here.
 An additional \emph{type} of measurement can be a precondition rather than an optimisation.
 This paper exhibits a configuration in exact rationals where that is so, and computes the
 exact price of the measurement once it is admitted. The price law
-$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{m}+\sqrt{\kappa})^{2}\bigr)$ is an identity: matched
+$\Gamma^{*}=\Delta^{2}/\bigl(2K(\sqrt{vm}+\sqrt{\nu\kappa})^{2}\bigr)$ is an identity: matched
 on both sides and attained by an explicit design. For a practitioner the finding reduces to
 a check that costs nothing to perform. Ask whether the observation model sees the quantity
 of interest only in combination with something unknown; if it does, ask whether any pair of

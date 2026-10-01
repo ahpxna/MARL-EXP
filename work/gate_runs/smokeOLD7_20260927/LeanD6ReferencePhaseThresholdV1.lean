@@ -1,0 +1,101 @@
+import «LeanD6ReferencePhaseValueV1»
+
+/-! # The finite-k threshold of the reference phase law.
+
+`LeanD6ReferencePhaseValueV1` proves the value and that it collapses to zero
+once `k * r <= e`. This module proves the converse direction as well, so the
+threshold is an IFF rather than a one-sided sufficient condition, and restates
+it in the margin variable:
+
+    floor is alive   <->   e < k * r   <->   rho < 2 * a - e / k.
+
+`rho_crit = 2 * a - e / k` is therefore exact at finite `k`. At the corner
+(`a = 1`, `e = 0`) it is `rho_crit = 2`, recovering the published Top-C
+threshold; every `t > 0` strictly lowers it, which is the precise sense in
+which buying reference evidence shrinks the region of decision insufficiency.
+
+This module says nothing about the asymptotic budget law `tau = k * t`; that is
+measured in `research/master_reference_20260912`, not proved here.
+-/
+
+namespace CIGAMF.P13.D6ReferencePhaseThreshold
+open CIGAMF.P13.D6ReferencePhaseValue
+noncomputable section
+
+theorem max_zero_pos_iff (x : ℝ) : 0 < max 0 x ↔ 0 < x := by
+  constructor
+  · intro h
+    rcases lt_max_iff.mp h with h'|h'
+    · exact absurd h' (lt_irrefl 0)
+    · exact h'
+  · intro h
+    exact lt_max_iff.mpr (Or.inr h)
+
+/-- The floor is strictly positive exactly when `e < k * r`. The `only if`
+direction is `phaseValueFull_zero`; this supplies the `if` direction, which is
+what turns the sufficient condition into a genuine threshold. -/
+theorem phaseValueFull_pos_iff (k p c e r : ℝ) (hk : 1 < k) (hp : 0 < p) (hc : 0 < c) :
+    0 < phaseValueFull k p c e r ↔ e < k*r := by
+  have hk1 : (0:ℝ) < k-1 := by linarith
+  have hden : (0:ℝ) < 4*(c*(k-1)) := by positivity
+  have hsec : (0:ℝ) < p*(k-1)+max 0 (e-r) := by
+    have h1 : (0:ℝ) < p*(k-1) := mul_pos hp hk1
+    have h2 : (0:ℝ) ≤ max 0 (e-r) := le_max_left _ _
+    linarith
+  constructor
+  · intro h
+    by_contra hcon
+    push_neg at hcon
+    have hz : max 0 (k*r-e)=0 := max_eq_left (by linarith)
+    have hzero : phaseValueFull k p c e r=0 := by
+      unfold phaseValueFull
+      rw [hz]
+      simp
+    rw [hzero] at h
+    exact lt_irrefl 0 h
+  · intro h
+    have hm : 0 < max 0 (k*r-e) := (max_zero_pos_iff _).mpr (by linarith)
+    unfold phaseValueFull
+    exact div_pos (mul_pos hm hsec) hden
+
+/-- The same threshold in the margin variable: `rho_crit = 2 * a - e / k`. -/
+theorem threshold_margin (k a e rho : ℝ) (hk : 0 < k) :
+    e < k*(2*a-rho) ↔ rho < 2*a-e/k := by
+  constructor
+  · intro h
+    have hd : e/k < 2*a-rho := (div_lt_iff₀ hk).mpr (by linarith)
+    linarith
+  · intro h
+    have hd : e/k < 2*a-rho := by linarith
+    have hx := (div_lt_iff₀ hk).mp hd
+    linarith
+
+/-- Floor alive, stated entirely in the margin. -/
+theorem floor_alive_iff_margin (k p c a e rho : ℝ) (hk : 1 < k) (hp : 0 < p)
+    (hc : 0 < c) :
+    0 < phaseValueFull k p c e (2*a-rho) ↔ rho < 2*a-e/k := by
+  rw [phaseValueFull_pos_iff k p c e (2*a-rho) hk hp hc]
+  exact threshold_margin k a e rho (by linarith)
+
+/-- At the corner the threshold is exactly the published `2 * delta_square`. -/
+theorem corner_threshold (k rho : ℝ) (hk : 1 < k) :
+    rho < 2*(1:ℝ)-(0:ℝ)/k ↔ rho < 2 := by
+  rw [zero_div]
+  norm_num
+
+/-- Every positive correction strictly lowers the threshold below the corner
+value: buying reference evidence shrinks the insufficiency region. -/
+theorem threshold_strictly_below_corner (k a e : ℝ) (hk : 0 < k) (he : 0 < e)
+    (ha : a ≤ 1) : 2*a-e/k < 2 := by
+  have : 0 < e/k := div_pos he hk
+  linarith
+
+#print axioms max_zero_pos_iff
+#print axioms phaseValueFull_pos_iff
+#print axioms threshold_margin
+#print axioms floor_alive_iff_margin
+#print axioms corner_threshold
+#print axioms threshold_strictly_below_corner
+
+end
+end CIGAMF.P13.D6ReferencePhaseThreshold

@@ -1,0 +1,55 @@
+[11s] seed 901 done
+[21s] seed 902 done
+[31s] seed 903 done
+[40s] seed 904 done
+[50s] seed 905 done
+[60s] seed 906 done
+[72s] seed 907 done
+[82s] seed 908 done
+[93s] seed 909 done
+[101s] seed 910 done
+[111s] seed 911 done
+[120s] seed 912 done
+[130s] seed 913 done
+[139s] seed 914 done
+[147s] seed 915 done
+[156s] seed 916 done
+[164s] seed 917 done
+[175s] seed 918 done
+[184s] seed 919 done
+[193s] seed 920 done
+[202s] seed 921 done
+[210s] seed 922 done
+[220s] seed 923 done
+[229s] seed 924 done
+[239s] seed 925 done
+[249s] seed 926 done
+[262s] seed 927 done
+[273s] seed 928 done
+[281s] seed 929 done
+[291s] seed 930 done
+[300s] seed 931 done
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 175, in <module>
+    main(p.parse_args())
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 149, in main
+    ep = f'seed{seed}_load{load:g}'; q, rr = run(sc, seed, load, cks, a.rule, a.order, a.capacity, book)
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_decision_depth_probe_v2.py", line 109, in run
+    env, pol = make(sc, seed, load, cks['relay'], capacity)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_zero_loss_truncation.py", line 47, in make
+    env, topo, _, _ = sc.env(seed, load)
+                      ^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_train.py", line 46, in env
+    self.cache[(seed, load)] = scenario(self.out, seed, load)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_hetero_target_diag.py", line 50, in scenario
+    return make_grid_scenario(out / 'scenarios' / f'seed{seed}_load{load:g}', rows=ROWS, cols=COLS, traffic_seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/envs/external/cityflow_budgeted.py", line 883, in make_grid_scenario
+    p.write_text(json.dumps(obj), encoding="utf-8")
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1048, in write_text
+    return f.write(data)
+           ^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device

@@ -1,0 +1,55 @@
+DFL research/marl_budget/e3_scratch_seeds34_20260928/actor_s3 protocol sha256 4d1d49c0e1697b447545f32863a1bfc1b0bcdac42e1016374ebaeb57a426f5fd trainer sha256 c175425acb01daad8fc5bf0e7a55249b2a33d9b8056acd312b3c214750228706 Mon Sep 28 20:18:24 EDT 2026
+reproduction self-check (v6 --loss mse, lr 1e-3 sub-run, seed 0, vs v3): {'dev_chosen': True, 'select_metric': True, 'best_epoch': True, 'tau': True}
+selftest PASS (sign-flip: all-positive 1/256, all-zero 1)
+actor_s3 labels_dev mse_all  [primary]: gain -0.167 seed CI [-0.63,+0.26] edit 0.139 harm|edit 0.55 regret 15.60 bytes +16.5 (oracle 15.44)
+actor_s3 labels_dev mse_feas [primary]: gain -0.771 seed CI [-2.19,+0.81] edit 0.486 harm|edit 0.5428571428571428 regret 16.21 bytes +34.4 (oracle 15.44)
+actor_s3 labels_dev dfl      [primary]: gain +0.424 seed CI [-1.69,+2.57] edit 0.910 harm|edit 0.46564885496183206 regret 15.01 bytes +45.3 (oracle 15.44)
+actor_s3 labels_dev v3_hist  [descriptive]: gain -0.188 seed CI [-1.31,+1.12] edit 0.194 harm|edit 0.5714285714285714 regret 15.63 bytes +19.8 (oracle 15.44)
+  dfl_minus_prefix     mean of seed means +0.424  sign-flip p 0.3398  seed CI [-1.69,+2.57]  LOO [-0.42,+1.26]  -> fail
+  dfl_minus_mse_all    mean of seed means +0.590  sign-flip p 0.2969  seed CI [-1.50,+2.71]  LOO [-0.25,+1.38]  -> fail
+  dfl_minus_mse_feas   mean of seed means +1.194  sign-flip p 0.0664  seed CI [-0.26,+2.58]  LOO [+0.82,+1.75]  -> fail
+SCREEN: FAIL
+selftest PASS (sign-flip: all-positive 1/256, all-zero 1)
+actor_s3 labels_dev mse_all  [primary]: gain +0.198 seed CI [-0.13,+0.52] edit 0.133 harm|edit 0.4049586776859504 regret 14.36 bytes +17.1 (oracle 14.56)
+actor_s3 labels_dev mse_feas [primary]: gain +0.302 seed CI [-0.34,+1.03] edit 0.461 harm|edit 0.45476190476190476 regret 14.25 bytes +33.5 (oracle 14.56)
+actor_s3 labels_dev dfl      [primary]: gain -0.025 seed CI [-0.86,+0.80] edit 0.874 harm|edit 0.4203262233375157 regret 14.58 bytes +43.5 (oracle 14.56)
+actor_s3 labels_dev v3_hist  [descriptive]: gain +0.196 seed CI [-0.17,+0.63] edit 0.164 harm|edit 0.4266666666666667 regret 14.36 bytes +18.8 (oracle 14.56)
+  dfl_minus_prefix     mean of seed means -0.025  sign-flip p 0.5312  seed CI [-0.86,+0.80]  LOO [-0.33,+0.29]  -> fail
+  dfl_minus_mse_all    mean of seed means -0.224  sign-flip p 0.7305  seed CI [-0.83,+0.43]  LOO [-0.43,-0.03]  -> fail
+  dfl_minus_mse_feas   mean of seed means -0.327  sign-flip p 0.8086  seed CI [-0.95,+0.21]  LOO [-0.48,-0.07]  -> fail
+SCREEN: not gating (secondary); would be FAIL
+== research/marl_budget/e3_scratch_seeds34_20260928/actor_s3/selectors_v6 (selector diagnostic v3, tie-half)
+selftest PASS (all-tie 0.5, perfect 1, reversed 0)
+legal_bid_resp_dfl_s0  dev: gain +0.42 [-1.9166666666666667, 3.1666666666666665] | pair-acc (tie-half) 0.519 (strict v2 0.519, ties 0.000) | spearman +0.046
+legal_bid_resp_dfl_s1  dev: gain +0.15 [-2.8958333333333335, 3.2291666666666665] | pair-acc (tie-half) 0.515 (strict v2 0.515, ties 0.000) | spearman +0.035
+legal_bid_resp_dfl_s2  dev: gain +0.71 [-1.2708333333333333, 2.375] | pair-acc (tie-half) 0.524 (strict v2 0.524, ties 0.000) | spearman +0.056
+legal_bid_resp_mse_s0  dev: gain +0.00 [-0.625, 0.75] | pair-acc (tie-half) 0.516 (strict v2 0.484, ties 0.064) | spearman +0.040
+legal_bid_resp_mse_s1  dev: gain -0.06 [-0.5005208333333332, 0.33385416666665907] | pair-acc (tie-half) 0.506 (strict v2 0.504, ties 0.005) | spearman +0.010
+legal_bid_resp_mse_s2  dev: gain -0.44 [-1.5416666666666667, 0.5208333333333334] | pair-acc (tie-half) 0.495 (strict v2 0.495, ties 0.000) | spearman -0.014
+legal_bid_resp_msefeas_s0 dev: gain -0.75 [-2.5, 0.9583333333333334] | pair-acc (tie-half) 0.518 (strict v2 0.518, ties 0.000) | spearman +0.044
+legal_bid_resp_msefeas_s1 dev: gain -0.73 [-2.2505208333333333, 0.7708333333333334] | pair-acc (tie-half) 0.483 (strict v2 0.483, ties 0.000) | spearman -0.038
+legal_bid_resp_msefeas_s2 dev: gain -0.83 [-4.25, 2.5833333333333335] | pair-acc (tie-half) 0.507 (strict v2 0.507, ties 0.000) | spearman +0.013
+DFL done research/marl_budget/e3_scratch_seeds34_20260928/actor_s3 Mon Sep 28 20:38:30 EDT 2026
+DFL research/marl_budget/e3_run_seeds34_20260928/actor_s3 protocol sha256 4d1d49c0e1697b447545f32863a1bfc1b0bcdac42e1016374ebaeb57a426f5fd trainer sha256 c175425acb01daad8fc5bf0e7a55249b2a33d9b8056acd312b3c214750228706 Mon Sep 28 20:38:30 EDT 2026
+reproduction self-check (v6 --loss mse, lr 1e-3 sub-run, seed 0, vs v3): {'dev_chosen': True, 'select_metric': True, 'best_epoch': True, 'tau': True}
+selftest PASS (sign-flip: all-positive 1/256, all-zero 1)
+actor_s3 labels_dev mse_all  [primary]: gain -1.236 seed CI [-2.12,-0.51] edit 0.653 harm|edit 0.4574468085106383 regret 13.57 bytes +37.6 (oracle 12.33)
+actor_s3 labels_dev mse_feas [primary]: gain -1.875 seed CI [-2.83,-1.04] edit 0.611 harm|edit 0.6022727272727273 regret 14.21 bytes +40.6 (oracle 12.33)
+actor_s3 labels_dev dfl      [primary]: gain +0.111 seed CI [-0.65,+0.99] edit 0.868 harm|edit 0.32 regret 12.22 bytes +37.2 (oracle 12.33)
+actor_s3 labels_dev v3_hist  [descriptive]: gain -1.312 seed CI [-2.40,-0.43] edit 0.569 harm|edit 0.4878048780487805 regret 13.65 bytes +34.5 (oracle 12.33)
+  dfl_minus_prefix     mean of seed means +0.111  sign-flip p 0.4141  seed CI [-0.65,+0.99]  LOO [-0.24,+0.33]  -> fail
+  dfl_minus_mse_all    mean of seed means +1.347  sign-flip p 0.0586  seed CI [+0.19,+2.54]  LOO [+1.00,+1.70]  -> fail
+  dfl_minus_mse_feas   mean of seed means +1.986  sign-flip p 0.0117  seed CI [+0.85,+3.17]  LOO [+1.56,+2.40]  -> pass
+SCREEN: not gating (secondary); would be FAIL
+== research/marl_budget/e3_run_seeds34_20260928/actor_s3/selectors_v6 (selector diagnostic v3, tie-half)
+selftest PASS (all-tie 0.5, perfect 1, reversed 0)
+legal_bid_resp_dfl_s0  dev: gain +0.19 [-1.4791666666666667, 1.9375] | pair-acc (tie-half) 0.540 (strict v2 0.540, ties 0.000) | spearman +0.099
+legal_bid_resp_dfl_s1  dev: gain -0.19 [-2.0, 1.5833333333333333] | pair-acc (tie-half) 0.538 (strict v2 0.538, ties 0.000) | spearman +0.094
+legal_bid_resp_dfl_s2  dev: gain +0.33 [-1.1458333333333333, 1.875] | pair-acc (tie-half) 0.563 (strict v2 0.563, ties 0.000) | spearman +0.154
+legal_bid_resp_mse_s0  dev: gain -1.75 [-3.7708333333333335, 0.2916666666666667] | pair-acc (tie-half) 0.516 (strict v2 0.476, ties 0.080) | spearman +0.040
+legal_bid_resp_mse_s1  dev: gain -1.96 [-3.6041666666666665, -0.3541666666666667] | pair-acc (tie-half) 0.490 (strict v2 0.490, ties 0.000) | spearman -0.023
+legal_bid_resp_mse_s2  dev: gain +0.00 [-1.7088541666666663, 1.5833333333333333] | pair-acc (tie-half) 0.512 (strict v2 0.512, ties 0.000) | spearman +0.033
+legal_bid_resp_msefeas_s0 dev: gain -2.38 [-4.291666666666667, -0.6666666666666666] | pair-acc (tie-half) 0.505 (strict v2 0.505, ties 0.000) | spearman +0.013
+legal_bid_resp_msefeas_s1 dev: gain -2.60 [-4.770833333333333, -0.5416666666666666] | pair-acc (tie-half) 0.495 (strict v2 0.495, ties 0.000) | spearman -0.014
+legal_bid_resp_msefeas_s2 dev: gain -0.65 [-1.9166666666666667, 0.4583333333333333] | pair-acc (tie-half) 0.516 (strict v2 0.516, ties 0.000) | spearman +0.035
+DFL done research/marl_budget/e3_run_seeds34_20260928/actor_s3 Mon Sep 28 20:54:42 EDT 2026

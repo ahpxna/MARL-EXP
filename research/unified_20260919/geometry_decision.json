@@ -1,0 +1,234 @@
+{
+  "source_sha256": "8824257d309231853621f38b00d7253113ce81854f77b680ac7daf5889504568",
+  "partA": {
+    "delta_I": "0",
+    "rho": "1",
+    "C": [
+      "3",
+      "2",
+      "2"
+    ],
+    "L_X": {
+      "[0]": "2",
+      "[1]": "5/2",
+      "[2]": "5/2"
+    },
+    "L_K": {
+      "[0]": "2",
+      "[1]": "1/2",
+      "[2]": "1/2"
+    },
+    "D_K": {
+      "[0]": "0",
+      "[1]": "2",
+      "[2]": "2"
+    },
+    "exchange_lhs": "3",
+    "exchange_rhs": "3",
+    "equality": true,
+    "kappa_required": "2"
+  },
+  "partB": {
+    "rows": [
+      {
+        "a": "3",
+        "b": "1",
+        "c": "1",
+        "rho": "2",
+        "delta_I": "1",
+        "decision_clear": true,
+        "certificate_holds": true
+      },
+      {
+        "a": "3",
+        "b": "1",
+        "c": "3",
+        "rho": "2",
+        "delta_I": "3",
+        "decision_clear": true,
+        "certificate_holds": false
+      },
+      {
+        "a": "5/2",
+        "b": "2",
+        "c": "1/4",
+        "rho": "1/2",
+        "delta_I": "1/4",
+        "decision_clear": true,
+        "certificate_holds": true
+      },
+      {
+        "a": "3",
+        "b": "2",
+        "c": "2",
+        "rho": "1",
+        "delta_I": "2",
+        "decision_clear": true,
+        "certificate_holds": false
+      }
+    ]
+  },
+  "partC": {
+    "theta_star": "3/4",
+    "flip_value": "5/4",
+    "no_measurement_phase": "eps >= 1/2"
+  },
+  "checks": [
+    {
+      "name": "delta_I = 0 (F is additive, no interaction)",
+      "ok": true,
+      "detail": "delta_I=0"
+    },
+    {
+      "name": "component spans C = (3,2,2)",
+      "ok": true,
+      "detail": "C=['3', '2', '2']"
+    },
+    {
+      "name": "Top-C at k=1 selects {1}",
+      "ok": true,
+      "detail": "T=[0]"
+    },
+    {
+      "name": "margin rho = 1",
+      "ok": true,
+      "detail": "rho=1"
+    },
+    {
+      "name": "L_K({1}) = 2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "L_K({2}) = L_K({3}) = 1/2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "D_K(S) >= 0 for EVERY subset (oscOn_mono)",
+      "ok": true,
+      "detail": "8 subsets"
+    },
+    {
+      "name": "Top-C is NOT optimal on K despite delta_I = 0",
+      "ok": true,
+      "detail": "L_K(TopC)=2 > min=1/2 at [1]"
+    },
+    {
+      "name": "identity L_K(T)-L_K(S) = L_X(T)-L_X(S) + D_K(S)-D_K(T)  (all pairs)",
+      "ok": true,
+      "detail": "64 ordered pairs"
+    },
+    {
+      "name": "support exchange bound holds at the witness",
+      "ok": true,
+      "detail": "2*(L_K(T)-L_K(S))=3 <= 3"
+    },
+    {
+      "name": "and it holds with EQUALITY (geometry term is not removable)",
+      "ok": true,
+      "detail": "3 == 3"
+    },
+    {
+      "name": "plain (full-domain) exchange bound FAILS on K",
+      "ok": true,
+      "detail": "3 > -1"
+    },
+    {
+      "name": "threshold rho >= 2 delta_I + 2 kappa implies K-optimality",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "witness needs kappa = 2, so rho >= 4; actual rho = 1 < 4",
+      "ok": true,
+      "detail": "kappa=2, required rho>=4, actual rho=1"
+    },
+    {
+      "name": "L({1})=(b+c)/2 and L({2})=(a+c)/2 on the whole grid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "delta_I = c for this family",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "decision depends only on sign(a-b) (rho = a-b)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "a-b < 2c gives a clear decision with NO certificate",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "certificate never fires when the decision is wrong (it is sound)",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "L_theta({1}) = 2 - theta on [0,1]",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "L_theta({2}) = L_theta({3}) = 1/2 + theta on [0,1]",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "decision flips exactly at theta* = 3/4",
+      "ok": true,
+      "detail": "both = 5/4"
+    },
+    {
+      "name": "below 3/4 the better answer is {2}",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "above 3/4 the better answer is {1}",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "safe intervals: {1} iff theta >= 3/4-eps/2, {2} iff theta <= 3/4+eps/2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Delta_dec(theta,eps) = |theta - 3/4| + eps/2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "worlds (0,0) and (1,-3) give the same mean of Y",
+      "ok": true,
+      "detail": "both = -1"
+    },
+    {
+      "name": "F_theta(111) = -1 + 3 theta",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "F_theta(000) = 0, so Z = b + noise isolates the nuisance",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "yet the two confounded worlds need different answers when eps < 1/2",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "at eps >= 1/2 the answer {2} is safe for EVERY theta in [0,1]",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "all_passed": true
+}

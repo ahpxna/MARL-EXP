@@ -30,15 +30,58 @@ plt.rcParams.update({
 
 
 def note(fig, text, fs=20):
-    """Footnote anchored to the figure, wrapped, always inside the canvas."""
-    fig.text(0.012, 0.012, text, fontsize=fs, color=GREY, style='italic',
-             wrap=True, ha='left', va='bottom')
+    """Footnote anchored to the figure, below everything else.
+
+    The reserved strip used to be a fixed 7.5% of the height. A note longer than
+    that grew upward into the axes and sat on top of the x-axis label or an
+    annotation -- which is exactly how it fails, since nothing errors. The strip
+    is now measured: draw the note, ask the renderer how tall it actually is,
+    and reserve that much plus a margin.
+    """
+    t = fig.text(0.012, 0.010, text, fontsize=fs, color=GREY, style='italic',
+                 wrap=True, ha='left', va='bottom')
     eng = fig.get_layout_engine()
-    if eng is not None:
-        eng.set(rect=(0.012, 0.075, 0.976, 0.913))
+    if eng is None:
+        return
+    eng.set(rect=(0.012, 0.075, 0.976, 0.913))
+    fig.canvas.draw()
+    h = t.get_window_extent(renderer=fig.canvas.get_renderer()).height
+    frac = h / fig.get_window_extent().height
+    bottom = min(0.40, frac + 0.045)          # the note, plus clear air above it
+    eng.set(rect=(0.012, bottom, 0.976, 0.975 - bottom * 0.12))
+
+
+def _declutter_corner(fig):
+    """Hide a tick label that has collided with one on the other axis.
+
+    The bottom-left and bottom-right corners are where the first or last x tick
+    label meets the first or last y tick label. Nudging padding only moves the
+    problem, so measure and drop the x label, which is the one a reader can
+    infer from its neighbours.
+    """
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    for ax in fig.axes:
+        ys = [t for t in ax.get_yticklabels() if t.get_text() and t.get_visible()]
+        xs = [t for t in ax.get_xticklabels() if t.get_text() and t.get_visible()]
+        if not xs or not ys:
+            continue
+        for other in fig.axes:
+            oys = [t for t in other.get_yticklabels()
+                   if t.get_text() and t.get_visible()]
+            for xt in xs:
+                a = xt.get_window_extent(renderer=r)
+                for yt in ys + oys:
+                    b = yt.get_window_extent(renderer=r)
+                    dx = min(a.x1, b.x1) - max(a.x0, b.x0)
+                    dy = min(a.y1, b.y1) - max(a.y0, b.y0)
+                    if dx > 0 and dy > 0:
+                        xt.set_visible(False)
+                        break
 
 
 def save(fig, name):
+    _declutter_corner(fig)
     p = OUT / name
     fig.savefig(p, dpi=200, facecolor='white')
     plt.close(fig)
@@ -60,18 +103,15 @@ def master_rate():
                 'o' if m == 2 else 's', ms=20, mfc='white', mec=col, mew=4.0,
                 zorder=3, ls='none', label=f'numerical optimum, m = {m}')
         ax.axvline(m, color=GREEN, lw=1.8, ls=':', zorder=1)
-        ax.annotate(f'κ = m = {m}', xy=(m - 0.06, 0.0028),
+        ax.annotate(f'νκ = vm = {m}', xy=(m - 0.06, 0.0028),
                     color=GREEN, fontsize=22, fontweight='bold', ha='right')
     ax.set_xlabel('control price  κ    (an ordinary query costs 1)', fontsize=25, labelpad=10)
     ax.set_ylabel('Γ*      (Δ = 0.5,  K = 1)', fontsize=25, labelpad=10)
     ax.set_xlim(0.1, 4.15); ax.set_ylim(0, 0.042)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.grid(axis='y', color='#E3DCDD', lw=1, zorder=0)
     ax.set_axisbelow(True)
     ax.legend(fontsize=19, frameon=False, loc='center right', bbox_to_anchor=(1.0, .62))
-    ax.text(0.02, 0.06, f"all {d['cells']} cells agree · largest relative gap "
-                        f"{d['max_relative_gap']:.1e}",
-            transform=ax.transAxes, fontsize=19, color=GREY, style='italic')
     return save(fig, 'master_fig1_rate.png')
 
 
@@ -89,7 +129,7 @@ def master_baselines():
     ax.set_yticks(y); ax.set_yticklabels(labels, fontsize=24)
     ax.set_xlim(0, 112); ax.set_xlabel('percent of the analytic optimum reached',
                                        fontsize=25, labelpad=10)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f'{v:.0f}%'))
     ax.grid(axis='x', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
     ax.text(2, y[0], '  0 — unidentifiable, not a shortfall', va='center',
@@ -115,13 +155,13 @@ def master_anchor():
     ax.set_ylabel('design value', fontsize=25, labelpad=10)
     ax.set_ylim(0, .215); ax.tick_params(labelsize=22)
     ax.grid(axis='y', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
-    ax.text(0, d['anchor_free_cap'] + .006, d['anchor_free_cap_exact'], ha='center',
+    ax.text(0, d['anchor_free_cap'] + .016, d['anchor_free_cap_exact'], ha='center',
             fontsize=34, color=AMBER, fontweight='bold', family='monospace')
-    ax.text(1, d['anchored_value'] + .006, d['anchored_value_exact'], ha='center',
+    ax.text(1, d['anchored_value'] + .008, d['anchored_value_exact'], ha='center',
             fontsize=34, color=CRAN, fontweight='bold', family='monospace')
-    ax.annotate('', xy=(1, .196), xytext=(0, .196),
+    ax.annotate('', xy=(1, .214), xytext=(0, .214),
                 arrowprops=dict(arrowstyle='-|>', color=GREEN, lw=2.2))
-    ax.text(.5, .200, f"+{d['gap_percent']:.1f}%", ha='center', fontsize=25,
+    ax.text(.5, .218, f"+{d['gap_percent']:.1f}%", ha='center', fontsize=25,
             color=GREEN, fontweight='bold')
     note(fig, 'exact rationals throughout; no floating point enters this comparison', fs=19)
     return save(fig, 'master_fig3_anchor.png')
@@ -149,7 +189,7 @@ def master_witness():
         ax.set_xticks(x); ax.set_xticklabels([str(i) for i in x], fontsize=23)
         ax.set_xlabel('item', fontsize=22, labelpad=6)
         ax.set_xlim(-.62, 3.62); ax.set_ylim(-1.35, 1.72)
-        ax.tick_params(labelsize=22)
+        ax.tick_params(labelsize=22, pad=9)
         ax.grid(axis='y', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
         above = [i for i in x if th[i] > 0.5]
         ax.text(1.5, -1.22, 'answer  {' + ', '.join(str(i) for i in above) + '}',
@@ -197,14 +237,14 @@ def query_regret():
         ax.plot([m], [y], 'o', ms=20, color=GREEN, zorder=5)
         ax.text(m, y + .30, f'{m:.5f}', ha='center', fontsize=24,
                 color=GREEN, fontweight='bold')
-        ax.text(lo, y - .34, f'γρ²ᴺ/4 = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
-        ax.text(hi, y - .34, f'L_max ρᴺ/2 = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
+        ax.text(lo, y - .34, rf'$\gamma\rho^{{2N}}/4$ = {lo:.2e}', ha='left', fontsize=19, color=CRAN)
+        ax.text(hi, y - .34, rf'$L_{{\max}}\rho^{{N}}/2$ = {hi:.2e}', ha='right', fontsize=19, color=CRAN)
     ax.set_yticks(ys)
     ax.set_yticklabels([f"{r['measurement']}\nN = {r['N']:,},  h = {r['h']}" for r in rows],
                        fontsize=23)
     ax.set_xscale('log')
     ax.set_xlabel('Bayes regret at equal prior   (log scale)', fontsize=25, labelpad=12)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.set_ylim(-.75, len(rows) - .25)
     ax.grid(axis='x', color='#E3DCDD', lw=1, zorder=0); ax.set_axisbelow(True)
     note(fig, 'shaded band = the proved window; black bar = bootstrap 95% CI; '
@@ -225,7 +265,7 @@ def query_sandwich():
     ax.set_xscale('log'); ax.set_yscale('log')
     ax.set_xlabel('perturbation scale  h', fontsize=25, labelpad=12)
     ax.set_ylabel('squared Hellinger distance  $H^2$', fontsize=25, labelpad=12)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.legend(fontsize=22, frameon=False, loc='upper left')
     ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
     note(fig, 'both sides have slope 2r on this plot:\nthe order is pinned, '
@@ -238,6 +278,9 @@ def struct_law():
     d = DATA['STRUCTURAL_law']
     ms = d['m_grid']
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(16.1, 9.4), layout='constrained')
+    # two panels side by side: the right-hand x labels of the left panel were
+    # running into the y labels of the right one
+    fig.get_layout_engine().set(w_pad=0.18)
     a1.plot(ms, d['V_path'], 'o-', color=CRAN, lw=4, ms=14, label=r'$V_{path}=2/(m+4)$')
     a1.plot(ms, d['V_avg'], 's--', color=CRAN2, lw=4, ms=14,
             label=r'$V_{avg}=2/((m+4)(m-1))$')
@@ -248,6 +291,9 @@ def struct_law():
     a2.plot(ms, d['ratio'], 'o-', color=CRAN, lw=4, ms=14)
     a2.set_xlabel('m', fontsize=25, labelpad=10)
     a2.set_ylabel(r'$V_{path}/V_{avg}$', fontsize=25, labelpad=10)
+    # put the right panel's scale on its outer edge: against the left panel it
+    # was landing on that panel's own tick labels
+    a2.yaxis.tick_right(); a2.yaxis.set_label_position('right')
     a2.tick_params(labelsize=22)
     a2.grid(color='#E3DCDD', lw=1); a2.set_axisbelow(True)
     a2.text(.05, .88, 'exactly  m − 1,\nproved for every m ≥ 5', transform=a2.transAxes,
@@ -293,7 +339,12 @@ def func_panel():
     a1.grid(axis='y', color='#E3DCDD', lw=1, zorder=0); a1.set_axisbelow(True)
     a2.bar(names, [v[n]['median_N'] for n in names], width=.55, color=cols, zorder=2)
     a2.set_ylabel('median queries to certificate', fontsize=25, labelpad=10)
-    a2.tick_params(labelsize=22)
+    a2.tick_params(labelsize=22, pad=6)
+    # the twin axis put a tick at the same height as the left one, so the two
+    # labels rendered on top of each other; nudge the right ticks off the shared
+    # positions
+    a2.set_yticks([t for t in a2.get_yticks()
+                   if all(abs(t - u) > 1e-9 for u in a1.get_yticks())])
     for i, n in enumerate(names):
         a2.text(i, v[n]['median_N'] * 1.03, f"{v[n]['median_N']:,.0f}", ha='center',
                 fontsize=26, fontweight='bold', color=cols[i])
@@ -321,7 +372,7 @@ def func_families():
     ax.set_xscale('log'); ax.set_yscale('log')
     ax.set_xlabel('η', fontsize=27, labelpad=10)
     ax.set_ylabel(r'$J_{full}\,/\,J_{scalar}$', fontsize=25, labelpad=10)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.legend(fontsize=21, frameon=False, loc='center left')
     ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
     note(fig, 'both curves are PROVED bounds in exact arithmetic, not sampled: '
@@ -343,7 +394,7 @@ def support_separation():
     ax.set_xscale('log'); ax.set_yscale('log')
     ax.set_xlabel('number of classes  K', fontsize=25, labelpad=12)
     ax.set_ylabel('samples to reach error ε', fontsize=25, labelpad=12)
-    ax.tick_params(labelsize=22)
+    ax.tick_params(labelsize=22, pad=9)
     ax.legend(fontsize=22, frameon=False, loc='upper left')
     ax.grid(color='#E3DCDD', lw=1, which='both'); ax.set_axisbelow(True)
     note(fig, 'deciding is FLAT in K; recovering grows like K log K.\n'

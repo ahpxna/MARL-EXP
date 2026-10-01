@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Check every artifact's recorded producer hash against the script on disk.
+
+An artifact carries `source_sha256`, the hash of the script that wrote it.  If the script
+has changed since, the artifact describes a different computation than the one the repo
+now contains, and any number read out of it is unverifiable.  This walks the artifacts,
+resolves each to its producer, and reports STALE / CURRENT / NO-HASH.
+"""
+import hashlib, json, pathlib, re, sys
+
+ART = pathlib.Path("research/unified_20260919")
+SCR = pathlib.Path("scripts")
+
+def producer_for(art_name):
+    """Map an artifact to the script that writes it, by the destination path it names.
+
+    Two prefixes produce artifacts: `EXP_` runs an experiment, `ANALYSE_` reads an existing
+    artifact and derives a second one.  A derived artifact records the artifact it read in
+    `dependency_sha256`, so the chain stays checkable; missing `ANALYSE_` here reported such
+    an artifact as having no producer at all.
+    """
+    stem = art_name[:-len(".json")]
+    cands = sorted(SCR.glob("EXP_*.py")) + sorted(SCR.glob("ANALYSE_*.py"))
+    for s in cands:
+        txt = s.read_text()
+        if f"research/unified_20260919/{stem}" in txt:
+            return s
+    return None
+
+rows, stale, nohash, unknown = [], 0, 0, 0
+for a in sorted(ART.glob("*.json")):
+    if a.name.endswith("_smoke.json") or a.name.startswith("_"):
+        continue
+    try:
+        d = json.loads(a.read_text())
+    except Exception:
+        continue
+    rec = d.get("source_sha256")
+    prod = producer_for(a.name)
+    # An artifact whose `_corrected_v2` successor exists and is current is a legacy
+    # file, kept per the archive rule but no longer describing a live computation.
+    succ = ART / (a.name[:-len(".json")] + "_corrected_v2.json")
+    if rec is None and succ.exists():
+        rows.append({"artifact": a.name, "producer": prod.name if prod else None,
+                     "recorded": None, "current": None, "status": "SUPERSEDED"})
+        print(f"  {'SUPERSEDED':17s} {a.name:40s} -> {succ.name}")
+        continue
+    if rec is None:
+        status, cur = "NO-HASH", None
+        nohash += 1
+    elif prod is None:
+        status, cur = "UNKNOWN-PRODUCER", None
+        unknown += 1
+    else:
+        cur = hashlib.sha256(prod.read_bytes()).hexdigest()
+        status = "CURRENT" if cur == rec else "STALE"
+        if status == "STALE":
+            stale += 1
+    rows.append({"artifact": a.name, "producer": prod.name if prod else None,
+                 "recorded": rec, "current": cur, "status": status})
+    print(f"  {status:17s} {a.name:40s} {prod.name if prod else '-'}")
+
+sup = sum(1 for r in rows if r["status"] == "SUPERSEDED")
+print(f"\n  {len(rows)} artifacts: {sum(1 for r in rows if r['status']=='CURRENT')} current,"
+      f" {stale} stale, {nohash} without a hash, {sup} superseded,"
+      f" {unknown} with no resolvable producer")
+out = {"rows": rows, "stale": stale, "no_hash": nohash, "unknown": unknown,
+       "superseded": sup,
+       "all_live_current": stale == 0 and nohash == 0 and unknown == 0}
+pathlib.Path("research/unified_20260919/_provenance.json").write_text(json.dumps(out, indent=2))
+print("  artifact: research/unified_20260919/_provenance.json")
+sys.exit(0)

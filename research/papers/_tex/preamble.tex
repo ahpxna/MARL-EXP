@@ -14,6 +14,9 @@
 \usepackage{booktabs}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+% Lean names carry subscript digits (e.g. frozenGameC₀); the text fonts lack the glyph.
+\usepackage{newunicodechar}
+\newunicodechar{₀}{\textsubscript{0}}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -36,4 +39,22 @@
 \newcommand{\PROVED}{\textsc{proved}}
 \newcommand{\CERT}{\textsc{certificate}}
 \newcommand{\NUM}{\textsc{numerical}}
-\graphicspath{{../_figures/}}
+% figures resolve both in the repository layout and in a flat Overleaf bundle
+\graphicspath{{../_figures/}{figures/}{./}}
+
+% ---------------------------------------------------------------------------
+% Draft notes.  Blue is information carried forward for the final write-up;
+% red is a decision or a gap that still needs an author.  Both disappear from
+% the whole document with one line -- put \shownotesfalse here when the draft
+% becomes the submission, and nothing else has to be edited.
+% ---------------------------------------------------------------------------
+\newif\ifshownotes\shownotestrue
+\definecolor{notecol}{RGB}{0,70,190}
+\definecolor{todocol}{RGB}{190,20,20}
+\newcommand{\NOTE}[1]{\ifshownotes{\color{notecol}\,\textsf{\footnotesize[N: #1]}}\fi}
+\newcommand{\TODO}[1]{\ifshownotes{\color{todocol}\,\textsf{\footnotesize[TODO: #1]}}\fi}
+% a standalone paragraph-level note, for longer remarks between paragraphs
+\newcommand{\NOTEPAR}[1]{\ifshownotes\par\vspace{2pt}\noindent%
+  {\color{notecol}\textsf{\footnotesize\textbf{Note.}\;#1}}\par\vspace{2pt}\fi}
+\newcommand{\TODOPAR}[1]{\ifshownotes\par\vspace{2pt}\noindent%
+  {\color{todocol}\textsf{\footnotesize\textbf{To decide.}\;#1}}\par\vspace{2pt}\fi}

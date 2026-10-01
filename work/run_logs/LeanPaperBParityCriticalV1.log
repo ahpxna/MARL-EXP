@@ -1,0 +1,156 @@
+LeanPaperBParityCriticalV1.lean:152:8: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+LeanPaperBParityCriticalV1.lean:152:8: warning: Unused tactic linter: `linear_combination (h ^ j * iteratedDeriv j (gfun σ y) 0) * h2'` does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+LeanPaperBParityCriticalV1.lean:242:57: warning: Variable name `x` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _x
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+LeanPaperBParityCriticalV1.lean:352:48: error: Application type mismatch: The argument
+  h
+has type
+  Integrable (fun x => (ENNReal.ofReal (pdens j v h✝ σ x)).toReal) ℙ
+of sort `Prop` but is expected to have type
+  ℝ
+of sort `Type` in the application
+  pdens_nonneg j v h
+LeanPaperBParityCriticalV1.lean:346:45: error: unsolved goals
+j : ℕ
+σ v h✝ : ℝ
+hσ : 0 < σ
+hm : AEMeasurable (fun y => ENNReal.ofReal (pdens j v h✝ σ y)) ℙ
+h : Integrable (fun x => (ENNReal.ofReal (pdens j v h✝ σ x)).toReal) ℙ
+y : ℝ
+⊢ 0 ≤ pdens j v h✝ σ y
+LeanPaperBParityCriticalV1.lean:384:24: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  |?m.189 ^ 2 / pdens j v' h σ y|
+in the target expression
+  |chiInt j σ v' h y| ≤ h ^ (2 * j) * (KE j σ * envR j σ y)
+
+j : ℕ
+hj : 0 < j
+σ v' h : ℝ
+hσ : 0 < σ
+hh : 0 < h
+hh1 : h ≤ 1
+hv : v' = 1 ∨ v' = -1
+hb : Integrable (fun y => h ^ (2 * j) * (KE j σ * envR j σ y)) ℙ
+y : ℝ
+hp : 0 < pdens j v' h σ y
+hle : (Fd j σ y h / h ^ j) ^ 2 / pdens j v' h σ y ≤ KE j σ * envR j σ y
+hr : chiInt j σ v' h y / h ^ (2 * j) = (Fd j σ y h / h ^ j) ^ 2 / pdens j v' h σ y
+hhj : 0 < h ^ (2 * j)
+⊢ |chiInt j σ v' h y| ≤ h ^ (2 * j) * (KE j σ * envR j σ y)
+LeanPaperBParityCriticalV1.lean:413:75: error: No goals to be solved
+LeanPaperBParityCriticalV1.lean:432:4: error: linarith failed to find a contradiction
+r : ℝ
+hr : |r| ≤ 1 / 2
+hx : |(-r)| < 1
+E : ℝ := log (1 + r) - (r - r ^ 2 / 2)
+h : |E| ≤ |r| ^ (2 + 1) / (1 - |r|)
+e : ∑ i ∈ range 2, (-r) ^ (i + 1) / (↑i + 1) + log (1 - -r) = E
+hE : E = log (1 + r) - (r - r ^ 2 / 2)
+hr0 : 0 ≤ |r|
+hden : 1 / 2 ≤ 1 - |r|
+a✝ : 2 * |r| ^ 3 * (1 - |r|) < |r| ^ (2 + 1)
+⊢ False
+failed
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanPaperBParityCriticalV1.lean:556:57: error: unsolved goals
+j : ℕ
+hj : 0 < j
+σ v v' y : ℝ
+hσ : 0 < σ
+hvv : MaskPair v v'
+hv' : v' = 1 ∨ v' = -1
+hv : v = 1 ∨ v = -1
+q : ℝ → ℝ := fun h => pdens j v' h σ y
+hqdef : q = fun h => pdens j v' h σ y
+D : ℝ → ℝ := fun h => pdens j v h σ y - pdens j v' h σ y
+hDdef : D = fun h => pdens j v h σ y - pdens j v' h σ y
+C : ℝ → ℝ := fun h => D h ^ 2 / q h / h ^ (2 * j)
+hCdef : C = fun h => D h ^ 2 / q h / h ^ (2 * j)
+hC : Tendsto C (𝓝[>] 0) (𝓝 (aj j σ y ^ 2 / p0 σ y))
+hq : Tendsto q (𝓝[>] 0) (𝓝 (p0 σ y))
+hD : Tendsto D (𝓝[>] 0) (𝓝 0)
+hr : Tendsto (fun h => D h / q h) (𝓝[>] 0) (𝓝 0)
+Er : ℝ → ℝ := fun h => q h * ((1 + D h / q h) * log (1 + D h / q h) - D h / q h - (D h / q h) ^ 2 / 2) / h ^ (2 * j)
+hEr : Er = fun h => q h * ((1 + D h / q h) * log (1 + D h / q h) - D h / q h - (D h / q h) ^ 2 / 2) / h ^ (2 * j)
+hsmall : ∀ᶠ (h : ℝ) in 𝓝[>] 0, |D h / q h| ≤ 1 / 2
+hEr0 : Tendsto Er (𝓝[>] 0) (𝓝 0)
+hlim : Tendsto (fun x => C x / 2 + Er x) (𝓝[>] 0) (𝓝 (aj j σ y ^ 2 / p0 σ y / 2))
+h : ℝ
+hpos : h ∈ Set.Ioi 0
+hh : 0 < h
+hqp : 0 < q h
+hpp : 0 < pdens j v h σ y
+hhj : 0 < h ^ (2 * j)
+⊢ 1 + pdens j v h σ y * (pdens j v' h σ y)⁻¹ - pdens j v' h σ y * (pdens j v' h σ y)⁻¹ =
+    pdens j v h σ y * (pdens j v' h σ y)⁻¹
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+LeanPaperBParityCriticalV1.lean:501:50: error: unsolved goals
+j : ℕ
+hj : 0 < j
+σ v v' y : ℝ
+hσ : 0 < σ
+hvv : MaskPair v v'
+hv' : v' = 1 ∨ v' = -1
+hv : v = 1 ∨ v = -1
+q : ℝ → ℝ := fun h => pdens j v' h σ y
+hqdef : q = fun h => pdens j v' h σ y
+D : ℝ → ℝ := fun h => pdens j v h σ y - pdens j v' h σ y
+hDdef : D = fun h => pdens j v h σ y - pdens j v' h σ y
+C : ℝ → ℝ := fun h => D h ^ 2 / q h / h ^ (2 * j)
+hCdef : C = fun h => D h ^ 2 / q h / h ^ (2 * j)
+hC : Tendsto C (𝓝[>] 0) (𝓝 (aj j σ y ^ 2 / p0 σ y))
+hq : Tendsto q (𝓝[>] 0) (𝓝 (p0 σ y))
+hD : Tendsto D (𝓝[>] 0) (𝓝 0)
+hr : Tendsto (fun h => D h / q h) (𝓝[>] 0) (𝓝 0)
+Er : ℝ → ℝ := fun h => q h * ((1 + D h / q h) * log (1 + D h / q h) - D h / q h - (D h / q h) ^ 2 / 2) / h ^ (2 * j)
+hEr : Er = fun h => q h * ((1 + D h / q h) * log (1 + D h / q h) - D h / q h - (D h / q h) ^ 2 / 2) / h ^ (2 * j)
+hsmall : ∀ᶠ (h : ℝ) in 𝓝[>] 0, |D h / q h| ≤ 1 / 2
+hEr0 : Tendsto Er (𝓝[>] 0) (𝓝 0)
+hlim : Tendsto (fun x => C x / 2 + Er x) (𝓝[>] 0) (𝓝 (aj j σ y ^ 2 / p0 σ y / 2))
+h : ℝ
+hpos : h ∈ Set.Ioi 0
+hh : 0 < h
+hqp : 0 < q h
+hpp : 0 < pdens j v h σ y
+hhj : 0 < h ^ (2 * j)
+hratio : 1 + D h / q h = pdens j v h σ y / q h
+⊢ -(pdens j v h σ y * pdens j v' h σ y * (pdens j v' h σ y)⁻¹ * 2) +
+        pdens j v h σ y * pdens j v' h σ y * (pdens j v' h σ y)⁻¹ * log (pdens j v h σ y * (pdens j v' h σ y)⁻¹) * 2 +
+      pdens j v' h σ y ^ 2 * (pdens j v' h σ y)⁻¹ * 2 =
+    -(pdens j v h σ y * 2) + pdens j v h σ y * log (pdens j v h σ y * (pdens j v' h σ y)⁻¹) * 2 + pdens j v' h σ y * 2
+LeanPaperBParityCriticalV1.lean:610:79: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  b ≥ 0
+  a ≥ 0
+  a - b ≤ 1
+where
+ a := ↑↑⟨j - 1, ⋯⟩
+ b := ↑(j - 1)
+LeanPaperBParityCriticalV1.lean:619:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanPaperBParityCriticalV1.lean:621:24: warning: `if_pos` has been deprecated: Use `ite_eq_left` instead
+LeanPaperBParityCriticalV1.lean:628:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanPaperBParityCriticalV1.lean:630:24: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+LeanPaperBParityCriticalV1.lean:630:51: error: No goals to be solved
+
+real	1m29.868s
+user	0m11.085s
+sys	0m14.412s
+EXIT=1

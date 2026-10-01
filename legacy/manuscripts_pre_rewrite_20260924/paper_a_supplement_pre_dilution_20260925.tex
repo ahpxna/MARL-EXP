@@ -1,0 +1,413 @@
+\input{preamble}
+
+\begin{document}
+
+\title{Supplement to ``The Price of a Frozen Surrogate in Support-Aware Compression'':\\
+Proofs, Formal Declarations and Conditional Results}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+This supplement gives, for each theorem of the main paper, the proof architecture and the
+Lean~4 declarations it rests on. It also collects the material the main text leaves out, each
+with its exact status: the conditional rate of the implemented learner, the confidence-sequence
+machinery, two heteroscedastic families, the repair criterion, and the older constructions that
+the centred theorem supersedes. Sections S1--S8 follow the main text; theorems are named as
+there.
+\end{abstract}
+
+\section*{Conventions}
+
+All declarations live in \texttt{work/p13\_conjectures}. A module is accepted when it compiles
+with exit status $0$, contains no \texttt{sorry} and no \texttt{native\_decide}, and every audited
+axiom closure lies within \{\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}\}.
+Acceptance is checked by a frozen gate that copies every module and its local imports into a
+fresh directory and builds from an empty cache (S8). A theorem that takes a hypothesis is
+reported with that hypothesis named. It is not called a result about an algorithm until the
+hypothesis is discharged at that algorithm.
+
+\section{S1. The model, the decision and its alternatives}
+
+\paragraph{The loss is half a range} The coefficient vector $a_{T}$ is defined from $F$, the
+reference and $T$. The identity making it the residual is proved, as is the loss formula, and
+the corpus's \lean{selectedRadius} is identified with half the oscillation of that residual.
+
+\leanbox{\lean{residual\_eq\_inner}, \lean{loss\_eq\_half\_range},
+\lean{selectedRadius\_eq\_compressionLoss} in \lean{LeanPaperAModelBridgeV1}}
+
+\paragraph{The class and the marginals} The centred class is exactly where both
+uniform-product marginals recover their coordinates. On it, the residual after retaining $A$
+is $\lambda_{B}$, so the loss is half of arm $B$'s range. The unsafe condition carries its
+tolerance and is strict.
+
+\leanbox{\lean{centred\_iff\_marginals}, \lean{residA\_eq}, \lean{rangeB\_eq\_osc},
+\lean{lossRetainA\_eq}, \lean{unsafeA\_iff\_range\_gap}, \lean{unsafeA\_zero\_iff},
+\lean{unsafe\_subset\_closed} in \lean{LeanPaperACentredModelV1}}
+
+\paragraph{The alternative set, exactly} Retaining $A$ is $\varepsilon$-unsafe exactly when some
+pair $(p,q)$ of arm-$B$ cells satisfies two simultaneous strict linear inequalities. Forward,
+take the cells realising arm $B$'s extrema. Backward, any pair's gap is at most the range. The
+two inequalities are simultaneous, from $|x|<y\iff x<y\wedge -x<y$. Covering the set with the
+two as \emph{alternatives} contains the true world itself, and a certificate built on that
+cover collapses to zero.
+
+\leanbox{\lean{range\_gap\_iff\_exists\_pair}, \lean{pair\_region\_linear},
+\lean{unsafe\_iff\_union\_of\_polyhedra}, \lean{polyhedron\_nonvacuous} in
+\lean{LeanPaperARegionV1}}
+
+\paragraph{General regions, and the closure} For a general retained set and competitor, pinning
+the four extremum indices cuts out a polyhedron on which the doubled loss difference is one
+linear form. The alternative set is the union of those regions, in both directions. On a
+region that contains a strictly bad point, the infimum over the strict part equals the infimum
+over the closure. The proof moves along the segment towards that point, where the energy moves
+by at most $t$ times an explicit constant and the segment is strictly bad for every $t>0$. A
+region with an empty strict part is dropped, because closing it would turn a tie into an
+alternative. A coordinate with zero weight leaves the objective, so the inner problem is
+unconstrained in it.
+
+\leanbox{\lean{loss\_eq\_of\_extrema}, \lean{region\_form\_is\_linear}, \lean{alt\_iff\_exists\_region},
+\lean{exists\_extrema}, \lean{strict\_inf\_eq\_closed\_inf}, \lean{segment\_stays\_strict},
+\lean{energy\_segment\_bound}, \lean{strict\_empty\_has\_no\_alternatives} in
+\lean{LeanPaperAAlternativesV1}; \lean{exists\_strict\_near}, \lean{lower\_bound\_transfers},
+\lean{empty\_strict\_contributes\_nothing}, \lean{objective\_indep\_of\_zero\_weight},
+\lean{zero\_weight\_unbounded\_below\_direction} in \lean{LeanPaperAOracleRegionV1}}
+
+\paragraph{Certificates at two levels} A KKT point with non-negative multipliers minimises the
+quadratic over its region against every feasible competitor. The Hessian is \emph{not} assumed
+invertible, since a design that leaves a direction unmeasured has a singular one. A prior on
+alternatives that satisfies the dual inequality at every admissible query bounds every design,
+so ``optimal'' does not mean ``optimal within a searched family''. A certificate whose
+condition implies safety is never cheaper than the decision.
+
+\leanbox{\lean{kkt\_region\_minimum}, \lean{quad\_expand}, \lean{design\_upper\_bound\_of\_dual},
+\lean{design\_value\_eq\_of\_primal\_dual}, \lean{certification\_costs\_at\_least\_as\_much} in
+\lean{LeanPaperAOracleCertificateV1}}
+
+\paragraph{The divergence is the energy} For every centred candidate, the Gaussian divergence
+of each query's observation law is $\frac{(\theta_{e}-\lambda_{e})^{2}}{2\nu_{e}}$, so the
+energy of a design is the design-weighted divergence. The game over the strict alternatives is
+the game of the observation law.
+
+\leanbox{\lean{energy\_eq\_sum\_gaussKL}, \lean{gaussKL\_eq\_integral} in \lean{LeanPaperAStrictV1};
+\lean{gaussianKLIdentification\_holds} in \lean{LeanPaperAGaussianKLV1};
+\lean{actualKLValue\_eq} in \lean{LeanPaperAEndgameV1}}
+
+\section{S2. Separation (Theorem ``Separation'')}
+
+\paragraph{The frozen value} Shifting the four frozen cells by $(+\frac g4,-\frac g4,-\frac g4,
++\frac g4)$ closes the contrast, and this witness is centred. So
+$J_{\rm fr}(w)\le\frac{g^{2}}{32}a(w)$. The uniform-anchor design attains $\frac{g^{2}}{32}$ by
+Cauchy--Schwarz, and $g=\frac34$ gives $\frac{9}{512}$. The restriction to $\Theta_{0}$ raises
+the infimum, so the upper bound needs the witness to be in the class, which it is.
+
+\leanbox{\lean{thetaC\_centred}, \lean{frozen\_margin}, \lean{energy\_lamStar}, \lean{lamStar\_frozenC₀},
+\lean{frozenValueC₀\_le}, \lean{frozenGameC₀\_eq}, \lean{frozenValueC\_le\_restricted} in
+\lean{LeanPaperACentredV1}}
+
+\paragraph{The true value} Upper: some pair carries at most $\frac1r$ of any allocation, and the
+pair shift by $\frac12$ is a centred alternative of energy $\frac{\mathrm{pairWeight}}{8M}$. For
+every $\delta>0$ the shift by $\frac12+\delta$ is strictly alternative. Lower: at
+$w_{e}=\nu_{e}/(4+2rM)$ the energy is the squared distance over $2(4+2rM)$, and a reversal
+forces the four-cell contrast to move by $\frac34$.
+
+\leanbox{\lean{exists\_light\_pair\_le}, \lean{trueGameC₀\_le}, \lean{pairShiftC\_strict\_alt},
+\lean{wCert\_isAlloc}, \lean{energy\_wCert}, \lean{contrast\_movesC}, \lean{trueValueC₀\_wCert\_ge},
+\lean{trueGameC₀\_ge}, \lean{centred\_separation} in \lean{LeanPaperACentredV1};
+\lean{trueValueC₀\_le\_trueValueStrict}, \lean{trueValueStrict\_le\_shift} in
+\lean{LeanPaperAStrictV1}; \lean{strict\_design\_upper}, \lean{strict\_game\_bounds} in
+\lean{LeanPaperAEndgameV1}}
+
+\NOTEPAR{Superseded constructions. Two earlier separations are compiled and remain true; they
+are not cited for any main theorem. The heteroscedastic families of \lean{LeanPaperASeparationV1}
+separate only as $M$ grows. The $r$-pair games of \lean{LeanPaperARPairV1},
+\lean{LeanPaperARGamesV1} and \lean{LeanPaperAFrozenV1} bracket the ratio between
+$\frac{1}{128(4+2rM)}$ and $\frac{16}{Mr}$ on an uncentred world, against a restricted-coordinate
+surrogate and a frozen one. The centred theorem gives the sharper bracket on one class.}
+
+\leanbox{\lean{no\_constant\_factor\_on\_families} in \lean{LeanPaperASeparationV1};
+\lean{rpair\_ratio\_le}, \lean{rpair\_ratio\_ge} in \lean{LeanPaperARPairV1};
+\lean{rpair\_games\_theta} in \lean{LeanPaperARGamesV1}; \lean{frozen\_games\_theta} in
+\lean{LeanPaperAFrozenV1}}
+
+\section{S3. Starvation (Theorem ``Starvation'')}
+
+$J_{\rm fr}(w)\le\frac{9}{512}a(w)$, and $a(w)$ plus the middle mass is $1$. At the optimum
+$a(w)=1$. Within $\varepsilon$ of it, the middle mass is at most $\frac{512}{9}\varepsilon$.
+Some pair then carries at most $\frac1r$ of that, and the strict pair shift bounds the true
+value by $\frac{\mathrm{pairWeight}}{8M}$, giving $\frac{64\varepsilon}{9rM}$. The strict version
+of the zero statement uses the shift by $\frac12+\delta$ at every $\delta>0$.
+
+\leanbox{\lean{aMass\_add\_middle}, \lean{starvation\_at\_optimum₀}, \lean{near\_optimal\_starvation₀},
+\lean{frozen\_optimum\_trueValueC₀\_zero}, \lean{near\_optimal\_trueValueC₀\_le} in
+\lean{LeanPaperACentredV1}; \lean{starved\_trueValueStrict\_zero},
+\lean{frozen\_optimum\_trueValueStrict\_zero} in \lean{LeanPaperAStrictV1}}
+
+\NOTEPAR{The homogeneity route. Before the centred value was exact, starvation was derived from
+positive homogeneity of the surrogate in the anchor weights, giving the middle mass bound
+$\varepsilon/(\Gamma_{\rm fr}-\varepsilon)$ with no monotonicity modulus. It is compiled and
+superseded.}
+
+\leanbox{\lean{middle\_mass\_le\_of\_homogeneous}, \lean{middle\_mass\_le\_of\_near\_optimum} in
+\lean{LeanPaperAHomogV1}}
+
+\section{S4. The price of repair (Theorems ``The repair frontier'', ``The sacrifice law'',
+``The forcing law'')}
+
+\paragraph{The frontier} The energy is linear in the design, so each value is an infimum of
+linear functions and is concave. Mixing the uniform-anchor design with the certifying design
+keeps $(1-\beta)$ of the surrogate and gains $\beta$ of the true lower bound. The upper side is
+starvation with $\varepsilon=\beta\Gamma_{\rm fr}$. On the strict game the pointwise exchange
+$J_{\rm true}(w)\le\mathrm{sac}(w)/(8rM)$ comes from the strict pair shift at every margin
+$\frac12+d$, followed by $d\to0$.
+
+\leanbox{\lean{mixW\_isAlloc}, \lean{energy\_mixW}, \lean{value\_concave}, \lean{frontier\_upper},
+\lean{frontier\_lower}, \lean{frontier\_two\_sided}, \lean{frontier\_at\_zero} in
+\lean{LeanPaperAFrontierV1}; \lean{limit\_shift}, \lean{exchange\_strict}, \lean{strict\_frontier}
+in \lean{LeanPaperASacrificeV1}}
+
+\paragraph{The sacrifice law} Fix pair $j$ and $d>0$. The world that shifts pair $j$ by
+$\frac12+d$ is a strict centred alternative. Only the two cells of pair $j$ separate it from
+$\theta_{C}$, each with divergence $\frac{(1/2+d)^{2}}{2M}$. The change of measure for any
+randomised adaptive policy gives
+$\sum_{q}\mathbb{E}[N_{q}]\,\mathrm{KL}_{q}\ge(1-\delta)\log\frac1\delta-\log2=D$. The dummy
+query carries nothing, and the real terms are the energy of the expected counts. So
+$D\le N_{\rm pair}\frac{(1/2+d)^{2}}{2M}$ for every $d>0$, and $N_{\rm pair}\ge8MD$. Summing over
+the $r$ pairs gives $8rMD$ middle queries. The surrogate's value is at most $\Gamma_{\rm fr}$
+times the non-middle mass, so the middle mass of an allocation is at most its relative
+sacrifice. Applied to the average design $\bar w$, this gives $N\,\mathrm{sac}(\bar w)\ge8rMD$.
+
+\leanbox{\lean{demand}, \lean{sacrifice}, \lean{sacrifice\_eq\_relative},
+\lean{sacrifice\_le\_one}, \lean{middle\_le\_sacrifice}, \lean{expCnt}, \lean{demand\_le\_shift},
+\lean{pair\_demand}, \lean{middle\_demand}, \lean{sacrifice\_cost\_law} in
+\lean{LeanPaperASacrificeV1}; \lean{change\_of\_measure}, \lean{transcript\_kl\_le\_qsum} in
+\lean{LeanPaperALowerKLV1}}
+
+\paragraph{The upper constant, and satisfiability} The strict game is at least
+$\frac{9}{128(4+2rM)}$, so $1/\Gamma_{\rm true}\le\frac{128(4+2rM)}{9}$. Its ratio to the lower
+constant $8rM$ is $\frac{32}{9}+\frac{64}{9rM}$. The ideal learner is truncated at a horizon
+chosen by Markov's inequality, so that it has stopped with probability at least $1-\delta$. Its
+answer event then has probability at least $1-2\delta$ at the truth and at most $2\delta$ at
+every strict alternative. It therefore satisfies every hypothesis of the law at level
+$2\delta$, and its expected number of real queries is at most its expected stopping time.
+
+\leanbox{\lean{upper\_constant}, \lean{constant\_gap} in \lean{LeanPaperASacrificeV1};
+\lean{ideal\_sacrifice}, \lean{sacrifice\_hypotheses\_satisfiable} in
+\lean{LeanPaperASacrificeIdealV1}; \lean{markov\_horizon} in \lean{LeanPaperA7IdealFamilyV1}}
+
+\paragraph{The forcing law} The counts are bounded by the horizon, so $T$ and $\varphi(T)$ are
+bounded and measurable. Jensen for the concave $\varphi$ gives
+$\mathbb{E}\varphi(T)\le\varphi(\mathbb{E}T)$, and the middle demand closes it. For
+$\varphi(t)=ct^{a}$, concavity of $t^{a}$ on $[0,\infty)$ and monotonicity of $x\mapsto x^{1/a}$
+invert it.
+
+\leanbox{\lean{totReal}, \lean{midReal}, \lean{integral\_midReal}, \lean{integrable\_totReal},
+\lean{forcing\_law}, \lean{power\_forcing\_law} in \lean{LeanPaperASacrificeV1}}
+
+\NOTEPAR{Superseded: the cumulative-exploration shape. Before the forcing law, the same shape
+was assembled from four links, the per-round escape probability and the middle mass of an
+$\varepsilon$-optimal design among them, with the change-of-measure demand taken as an input.
+It is compiled, takes that input, and is no longer needed.}
+
+\leanbox{\lean{inv\_sq\_shift\_sum\_le}, \lean{expected\_bad\_rounds\_bounded},
+\lean{cumulative\_exploration\_bound} in \lean{LeanPaperA2ChainV1};
+\lean{surrogate\_cost\_quadratic}, \lean{surrogate\_omega\_log\_squared} in
+\lean{LeanPaperASurrogateV1}}
+
+\section{S5. Learners (Theorems ``The ideal learner'' and ``What following the surrogate
+costs'')}
+
+\paragraph{The ideal learner} Its oracle maximises the exact value $J$ over a refining net, and
+its stop uses the exact generalised likelihood ratio, so the stopping-certificate gap is zero
+by construction.
+\begin{itemize}
+\item \emph{Correctness.} Ville's inequality applies at the learner's own statistic, so the
+probability of stopping with a wrong answer is at most $(|\mathrm{Ans}|-1)\delta$.
+\item \emph{Upper bound.} On the rounds where the confidence event holds, the statistic
+accumulates at $\Gamma-\eta$ for every $\eta>0$, with no box on the worlds. The event fails at
+round $s$ with probability at most $s^{-4}$. Summing these gives, for every
+$\eta\in(0,\Gamma)$, some $A_{\eta}$ with
+$\mathbb{E}\tau_{\delta}\le\log(1/\delta)/(\Gamma-\eta)+A_{\eta}$ at every $\delta\in(0,1)$.
+\item \emph{Lower bound.} The stopped learner, which queries a fresh dummy after stopping, is
+coupled path by path with the unstopped run. Its real-cell count within any horizon is at most
+$\tau_{\delta}$, and the policy lower bound applies to it at level $2\delta$.
+\item \emph{Identification.} On the family, the learner's game is the Gaussian-divergence game
+over the strict alternatives.
+\end{itemize}
+
+\leanbox{\lean{ideal\_expect\_bound}, \lean{ideal\_upper\_rate}, \lean{ideal\_finite},
+\lean{ideal\_correct} in \lean{LeanPaperA7IdealUpperV1}; \lean{ideal\_direct} in
+\lean{LeanPaperA7IdealDirect2V1}; \lean{runS\_eq}, \lean{cnt\_le\_tau}, \lean{ansEv\_alt\_le},
+\lean{ansEv\_true\_ge} in \lean{LeanPaperA7IdealStoppedV1}; \lean{GamT\_fam},
+\lean{ideal\_family\_lower}, \lean{ideal\_family\_lower\_rate}, \lean{ideal\_family\_finish},
+\lean{ideal\_family\_correct} in \lean{LeanPaperA7IdealFamilyV1}; \lean{family\_policy\_lower},
+\lean{actualKLValue\_le\_game} in \lean{LeanPaperAFamilyLowerV1}}
+
+\paragraph{Following the surrogate, at the truth} Tracking a fixed design that is zero on the
+middle cells, the pair's count up to $\min(n,\tau_{\delta})$ is at most
+$4+2(\tau_{\delta}/s+s)/K$ along every path, for every $s>0$. The stopped run's counts equal the
+unstopped run's at $\min(n,\tau_{\delta})$. The stopped change of measure at level $2\delta$
+gives $\mathbb{E}N_{\rm pair}/(2M)\ge(1-2\delta)\log(1/(2\delta))-\log2$. Taking
+$s=\sqrt{\mathbb{E}\tau_{\delta}}+1$ gives the square.
+
+\leanbox{\lean{klq\_pair}, \lean{starved\_lower\_at}, \lean{starved\_cost\_log\_sq},
+\lean{surrogate\_optimum\_cost}, \lean{surrogate\_optimum\_exists}, \lean{uniform\_surrogate\_cost},
+\lean{surrogate\_vs\_ideal} in \lean{LeanPaperA6SurrogateCostV1}; \lean{fCount\_le\_amgm},
+\lean{fCount\_le\_sqrt} in \lean{LeanPaperA6FixedDesignV1}; \lean{cnt\_eq\_at\_min},
+\lean{ansEv\_alt\_leG}, \lean{ansEv\_true\_geG} in \lean{LeanPaperA7StoppedGenV1}}
+
+\paragraph{Following the surrogate, at the estimate} Consider an estimate whose extrema are the
+four anchors and which retains $A$. There the unrestricted surrogate's value is
+$\frac{g(\hat\mu)^{2}}{32}$, and every exact optimum is zero on the middles. Forcing gives
+every count order $\sqrt t$. So after a deterministic time $s_{0}$, the learner's confidence
+event places every estimate within $\frac1{16}$ of the truth, which makes the anchors the
+extrema. The event fails at round $s$ with probability at most $s^{-4}$. The expected number of
+misleading rounds is therefore at most $s_{0}+2$ at every horizon, and it enters the pair's count
+additively.
+
+\leanbox{\lean{est\_cost\_log\_sq}, \lean{surrogate\_learner\_cost}, \lean{exact\_oracle\_cost},
+\lean{surrogate\_learner\_vs\_ideal}, \lean{est\_lower\_at} in \lean{LeanPaperA6EstCostV1};
+\lean{frozenGameAt\_eq}, \lean{starvation\_at}, \lean{surD\_exact}, \lean{optimal\_oracle\_middle\_zero},
+\lean{close\_extreme} in \lean{LeanPaperA6SurrogateAtV1}; \lean{radius\_eventually},
+\lean{close\_of\_good}, \lean{badAll\_expect} in \lean{LeanPaperA6BadRoundsV1};
+\lean{oCount\_le\_amgm}, \lean{oCount\_ge} in \lean{LeanPaperA6OracleLearnerV1}}
+
+\paragraph{Two surrogates} The centred surrogate at the truth and the unrestricted surrogate at
+an estimate agree at $\theta_{C}$, where both are $\frac{9}{512}$. Now shift both arm-$A$ cells by
+$u$. The unrestricted value of the uniform-anchor design stays $\frac{9}{512}$, because the
+frozen margin ignores a common shift. The centred value must restore $x_{0}+x_{1}=0$. Write
+$d_{i}$ for the displacements. Then $d_{0}+d_{1}=-2u$ and $(d_{0}-d_{1})-d_{2}+d_{3}\ge\frac34$.
+Cauchy--Schwarz with weights $(\frac12,1,1)$ gives $\sum d_{i}^{2}\ge2u^{2}+\frac{9}{64}$, hence
+a value of at least $\frac{9}{512}+\frac{u^{2}}{4}$.
+
+\leanbox{\lean{frozenCentredAt}, \lean{muShift}, \lean{frozenGameAt\_thetaC},
+\lean{frozenAt\_unif\_shift}, \lean{energy\_unif}, \lean{centred\_unif\_shift\_ge},
+\lean{two\_surrogates\_differ} in \lean{LeanPaperA6TwoSurrogatesV1}}
+
+\section{S6. The implemented learner, and what its rate still takes}
+
+\paragraph{The algorithm} The shipped learner, \texttt{EXP\_paperA7\_learner.py}, sees only
+counts, observations and known variances. At each refresh it brackets each answer's value by
+cutting planes at the estimate. It keeps the answers whose upper bracket survives
+$\max_{S}l_{S}-2Lr_{t}$, tracks the selected answer's design with forced exploration, and stops
+when a certified lower bound on every region's infimum exceeds the threshold. The certificate is
+weak duality, valid whatever the optimiser does. A primal objective is an upper bound and is
+never used to stop. The cutting-plane tolerance tightens as $1/n^{2}$ down to a floor of
+$10^{-6}$, with an 80-iteration cap. The true world is not in the scope of \texttt{run}, and the
+self-check inspects the signature.
+
+\paragraph{The conditional chain} For this learner the stopping chain is a composition of proved
+links whose inputs are hypotheses about abstract processes.
+\begin{itemize}
+\item On a window where the confidence event holds, the statistic accumulates at
+$\Gamma^{*}$ minus the window's radius, selection slack, tracking discrepancy and
+initialisation loss.
+\item Not having stopped forces a confidence failure in the window. With the window
+$\lceil\sqrt t\rceil$ and failure mass $s^{-4}$, $\Pr(\tau>t)\le8t^{-3/2}$ and
+$\Pr(\tau=\infty)=0$.
+\item The expectation bound $\mathbb{E}\tau\le\log(1/\alpha)/\Gamma^{*}+19$ is proved
+\emph{under the hypothesis} that each truncated expectation is at most
+$t_{0}+\sum_{t\ge t_{0}}\Pr(\tau>t)$ (the input \texttt{hEsum}). It is not an unconditional
+statement about the learner. The joined chain pays the window head,
+$2\Gamma\sqrt t\le\varepsilon Gt+\Gamma^{2}/(\varepsilon G)$. So it lands at
+$1/((1-\varepsilon)\Gamma)$ and does not reach $1/\Gamma$.
+\end{itemize}
+Three inputs remain for the shipped learner: the $s^{-4}$ confidence bound at its own
+statistic; the accumulation hypotheses for its actual statistic, including the
+stopping-certificate gap; and the passage to the $\mathbb{N}_{\infty}$ hitting time. For the
+ideal learner all three are discharged (S5).
+
+\leanbox{\lean{good\_window\_rate}, \lean{stopping\_subset\_window\_failure},
+\lean{window\_union\_bound}, \lean{sqrt\_window\_tail}, \lean{tail\_forces\_finite\_stopping},
+\lean{sqrt\_tail\_sum\_le}, \lean{expected\_stopping\_bound\_at\_level}, \lean{a7\_rate\_limsup} in
+\lean{LeanPaperA7TailV1}; \lean{sqrt\_head\_split}, \lean{chain\_expected\_bound},
+\lean{a7\_chain\_rate}, \lean{chain\_rate\_is\_deficient} in \lean{LeanPaperA7ChainV1};
+\lean{increment\_deficit\_gives\_eta}, \lean{expected\_stopping\_bound\_general},
+\lean{rate\_limsup\_eta}, \lean{eta\_to\_zero} in \lean{LeanPaperA7EtaV1};
+\lean{sInf\_Qstat\_ge}, \lean{perturbationCost\_div\_le}; \lean{expectation\_le\_split} in
+\lean{LeanPaperClosuresV1}}
+
+\paragraph{The bracket width} As shipped, the oracle's bracket settled at $8.0\times10^{-3}$
+against $\Gamma_{\rm comp}\approx2.3\times10^{-2}$. Taking the running minimum of the relaxation
+values, damping the step and solving the regional dual to tolerance reduced it to
+$5.0\times10^{-7}$, flat in both the cutting-plane count and the dual budget. A bracket of width
+$\varepsilon$ gives $0\le\Gamma-J(w)\le\varepsilon$, and so a certified rate of
+$1/(\Gamma-c\varepsilon)$. It does not show that the learner is slower. \NUM{}
+
+\leanbox{\lean{rate\_floor\_of\_eps\_floor}, \lean{shipped\_floor\_material} in
+\lean{LeanPaperA7EtaV1}}
+
+\paragraph{An earlier twelve-run panel} On a centred instance at $M=16$, with $12$ runs at each
+$\alpha\in\{0.1,0.05,0.02,0.01\}$ under common random numbers, all $144$ runs returned the correct
+answer. The learner's mean was below uniform by $19$--$23\%$ at every level. No cell reached
+significance after a Holm correction. \NUM{} The four-cell panel of the main text, with $50$
+runs per cell, supersedes it as the measurement of this learner.
+
+\section{S7. The confidence sequence and the martingales}
+
+\paragraph{Ville} A non-negative supermartingale satisfies
+$\lambda\Pr(\exists j\le N: M_{j}\ge\lambda)\le\mathbb{E}M_{0}$. Mathlib has Doob's maximal
+inequality for submartingales, which is the wrong direction. We prove Ville's inequality from
+optional stopping.
+
+\leanbox{\lean{ville\_finite\_horizon}, \lean{confidence\_of\_supermartingale},
+\lean{stopping\_error\_le} in \lean{LeanPaperA7ConfidenceV1}}
+
+\paragraph{The closed form at a random past} The learner thresholds
+$M_{t}=\prod_{e}\sqrt{a/(a+N_{e})}\exp(S_{e}^{2}/2(a+N_{e}))$. The one-step identity holds at a
+fixed past, and under adaptive sampling $S_{e}$ given $N_{e}$ is not Gaussian. A freezing lemma
+built from \texttt{condDistrib} licenses the substitution. Integrability is derived by the
+product criterion. Crossing the threshold forces $M_{t}\ge1/\delta$, because the penalty
+cancels.
+
+\leanbox{\lean{condDistrib\_const\_of\_indepFun}, \lean{condExp\_freeze} in \lean{LeanPaperAFreezeV1};
+\lean{martingale\_step}, \lean{joint\_integrable} in \lean{LeanPaperAAdaptMartV1};
+\lean{Mval\_eq\_Mstat}, \lean{threshold\_crossing}, \lean{closed\_form\_error\_bound} in
+\lean{LeanPaperAStopJoinV1}}
+
+\paragraph{Adaptive queries and the grid prior} An adaptively queried Gaussian stream carries a
+martingale mixture. A fixed grid of tilts misses the exponent whenever the true gap is below
+half the mesh. A refining mesh loses only the squared miss, since
+$u\Delta-\frac12u^{2}=\frac12\Delta^{2}-\frac12(u-\Delta)^{2}$.
+
+\leanbox{\lean{obs\_indep}, \lean{mix\_supermartingale}, \lean{stream\_confidence},
+\lean{condExp\_adaptIncr}, \lean{adaptMix\_supermartingale}, \lean{adaptive\_confidence},
+\lean{fixed\_grid\_rate\_negative}, \lean{tiltRate\_eq}, \lean{mesh\_grid\_attains\_rate},
+\lean{grid\_penalty\_negligible} in \lean{LeanPaperA7StreamV1}}
+
+\section{S8. Heteroscedastic families, the repair criterion, and the build}
+
+\paragraph{Two families (numerical)} With one cheap cell of variance $M$ and all others unit,
+two instances show the surrogate mispricing in opposite directions.
+\begin{itemize}
+\item Family~1, $A=(0,1,\frac12)$, $B=(0,\frac34,\frac12)$: $J_{\rm full}/J_{\rm fr}\le16/M$.
+\item Family~2, $A=(0,1,\frac34)$, $B=(0,\frac12,\frac14)$: $J_{\rm full}/J_{\rm fr}\ge(M+3)/24$.
+\end{itemize}
+At $M=1024$ the computed ratios are $0.0156$ and $64.58$, with every one of the $81$ regions
+carrying a floating-point KKT certificate. \NUM{} The families are stated for a range oracle
+with per-cell observations. Only the overpricing direction is realised in the model, by the
+centred theorem.
+
+\paragraph{The repair criterion} A design whose surrogate value sits below the barrier to the
+nearest switch has $J_{\rm true}=J_{\rm proxy}$. Wherever the criterion fires, the design
+inherits the separation. Measured against $\Gamma_{\rm true}$, however, that ceiling is vacuous on
+the sweep. At $M=256$ the rational design $\frac{1}{1000}(1,1,1,1,1,1,497,497)$ fires the
+criterion at $4.15\%$ of the bracketed true optimum. \CERT{} The value of the best certified
+design is not determined.
+
+\leanbox{\lean{barrier\_implies\_equality}, \lean{optima\_equal\_of\_certificate},
+\lean{certifiable\_fraction\_le\_sixtyfour\_over\_M}, \lean{design\_certificate\_insufficient} in
+\lean{LeanPaperARepairV1}}
+
+\paragraph{Build record} The last full gate that passed, \texttt{full6\_20260925}, built $214$
+modules and audited $1666$ theorems, with no \texttt{sorry}, no \texttt{native\_decide}, the
+standard axioms, and frozen sources identical to the working copy afterwards. It includes every
+module this supplement cites, among them \lean{LeanPaperASacrificeV1},
+\lean{LeanPaperASacrificeIdealV1} and \lean{LeanPaperA6TwoSurrogatesV1}. Before it, the first
+two were covered by the smoke gate \texttt{smokeNEWDIR\_20260924} and the third by
+\texttt{smokeFAM\_20260925}.
+
+\end{document}

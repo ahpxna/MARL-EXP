@@ -1,0 +1,150 @@
+{
+  "sigma": 1.0,
+  "r": 3,
+  "smoke": true,
+  "moments": [
+    {
+      "eta": 0.0,
+      "sup_norm": 1.0,
+      "E_chi_g": 2.7755575615628914e-17,
+      "E_chi_g2": 0.0,
+      "E_chi_g3": 0.22222222222222224,
+      "pred_g2": 0.0,
+      "pred_g3": 0.2222222222222222
+    },
+    {
+      "eta": 0.25,
+      "sup_norm": 1.0,
+      "E_chi_g": -2.7755575615628914e-17,
+      "E_chi_g2": 0.04733727810650888,
+      "E_chi_g3": 0.1747837960855712,
+      "pred_g2": 0.047337278106508875,
+      "pred_g3": 0.17478379608557124
+    },
+    {
+      "eta": 1.0,
+      "sup_norm": 1.0,
+      "E_chi_g": 0.0,
+      "E_chi_g2": 0.125,
+      "E_chi_g3": 0.09375,
+      "pred_g2": 0.125,
+      "pred_g3": 0.09375
+    }
+  ],
+  "parity": {
+    "A_odd_defect": 2.119320344218245e-12,
+    "B_even_defect": 1.9593465738765303e-10,
+    "p0_even_defect": 4.718447854656915e-16,
+    "cross": 4.0586201066624115e-14,
+    "normalised_cross": 1.4875417947435066e-15
+  },
+  "rows": [
+    {
+      "eta": 0.0,
+      "h": 0.4,
+      "H2": 3.7863931963144637e-06
+    },
+    {
+      "eta": 0.0,
+      "h": 0.2,
+      "H2": 6.248800143993094e-08
+    },
+    {
+      "eta": 0.25,
+      "h": 0.4,
+      "H2": 6.057612446208616e-06
+    },
+    {
+      "eta": 0.25,
+      "h": 0.2,
+      "H2": 2.8552258091174565e-07
+    },
+    {
+      "eta": 1.0,
+      "h": 0.4,
+      "H2": 2.698536008571839e-05
+    },
+    {
+      "eta": 1.0,
+      "h": 0.2,
+      "H2": 1.7405017260774258e-06
+    }
+  ],
+  "fit": {
+    "c6": 0.001024250780671108,
+    "c4": 0.0008913004461527536,
+    "oos_median_rel": 0.14298690920057042,
+    "oos_worst_rel": 0.45824917215203315
+  },
+  "crossover": [
+    {
+      "h": 0.4,
+      "eta_star": 0.42879635127418797,
+      "eta_star_over_h": 1.07199087818547
+    },
+    {
+      "h": 0.2,
+      "eta_star": 0.21439817563709399,
+      "eta_star_over_h": 1.07199087818547
+    }
+  ],
+  "order_by_eta": [
+    {
+      "eta": 0.0,
+      "order": 5.92110122564321
+    },
+    {
+      "eta": 0.25,
+      "order": 4.407072527814058
+    },
+    {
+      "eta": 1.0,
+      "order": 3.9546017884775675
+    }
+  ],
+  "scope": "one probe g_eta; a lower bound on the supremum, not a class-level crossover law",
+  "source_sha256": "5374e30f91d3dfb2f8cee644c61b8f5f05c83a9db0c660ab9d0231efb01953cc",
+  "checks": [
+    {
+      "name": "`g_eta` is a legal probe at every eta: sup-norm exactly one",
+      "ok": true,
+      "detail": "worst |||g||-1| = 0.00e+00"
+    },
+    {
+      "name": "the moment algebra is exact: E[chi g]=0, E[chi g^2]=2eta/(3+eta)^2, E[chi g^3]=6/(3+eta)^3 -- so eta opens a SQUARE channel while the cube channel stays open",
+      "ok": true,
+      "detail": "worst deviation 2.78e-17"
+    },
+    {
+      "name": "A is odd, B is even and p_0 is even, so the cross term int A B / p_0 vanishes -- the eta h^5 term does not interfere with the two channels",
+      "ok": true,
+      "detail": "normalised cross term 1.49e-15; A-odd defect 2.1e-12, B-even defect 2.0e-10"
+    },
+    {
+      "name": "both coefficients of c6 h^6 + c4 eta^2 h^4 are positive, so the two channels are present and additive rather than one masking the other",
+      "ok": true,
+      "detail": "c6 = 1.0243e-03, c4 = 8.9130e-04"
+    },
+    {
+      "name": "the two-channel form fitted on the COARSE half predicts the FINE half -- not a fit re-checked at its own points",
+      "ok": true,
+      "detail": "median relative error 0.1430, worst 0.4582"
+    },
+    {
+      "name": "at eta = 0 the measured order in h is six -- the linear probe reaches the worlds only through the CUBE channel",
+      "ok": true,
+      "detail": "order at eta=0 is 5.921"
+    },
+    {
+      "name": "at the largest eta the measured order drops toward four -- the SQUARE channel has taken over, which is the collapse the crossover predicts",
+      "ok": true,
+      "detail": "order at eta=1.0 is 3.955 against 5.921 at eta=0"
+    },
+    {
+      "name": "the measured order decreases monotonically in eta, so the transition is a crossover and not a switch",
+      "ok": true,
+      "detail": "eta=0.0: 5.92; eta=0.25: 4.41; eta=1.0: 3.95"
+    }
+  ],
+  "all_passed": true
+}

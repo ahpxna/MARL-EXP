@@ -10,6 +10,8 @@ from pathlib import Path
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import pathlib
+ROOT = pathlib.Path('/Users/phanan/cig-amf-main')
 
 CRAN, AMBER, GREEN, INK, GREY = '#63131E', '#8A5A00', '#1C6444', '#161213', '#6E6469'
 BLUE = '#1F4E79'
@@ -24,8 +26,72 @@ plt.rcParams.update({
 })
 
 
-def fin(fig, name):
+
+def label_points(ax, xs, ys, labels, dx=4, dy=4, fontsize=5.8, color=None):
+    """Annotate points, then push apart any labels that actually collide.
+
+    Staggering on equal coordinates is not enough: points a little apart in data
+    still put their labels on top of each other, which is how three policy names
+    rendered as one smear. Place them, measure with the renderer, and move the
+    lower one down until nothing intersects.
+    """
+    anns = []
+    for i, (x, y, t) in enumerate(zip(xs, ys, labels)):
+        anns.append(ax.annotate(t, (x, y), fontsize=fontsize, color=color or INK,
+                                xytext=(dx, dy), textcoords='offset points'))
+    fig = ax.figure
+    for _ in range(24):
+        fig.canvas.draw()
+        r = fig.canvas.get_renderer()
+        boxes = [a.get_window_extent(renderer=r) for a in anns]
+        moved = False
+        for i in range(len(anns)):
+            for j in range(i + 1, len(anns)):
+                a, b = boxes[i], boxes[j]
+                if (min(a.x1, b.x1) - max(a.x0, b.x0) > 0
+                        and min(a.y1, b.y1) - max(a.y0, b.y0) > 0):
+                    lo = i if a.y0 <= b.y0 else j
+                    ox, oy = anns[lo].get_position()
+                    anns[lo].set_position((ox, oy - 6))
+                    moved = True
+        if not moved:
+            break
+    return anns
+
+
+def _declutter_corner(fig):
+    """Hide a tick label that has collided with one on the other axis.
+
+    The bottom-left and bottom-right corners are where the first or last x tick
+    label meets the first or last y tick label. Nudging padding only moves the
+    problem, so measure and drop the x label, which is the one a reader can
+    infer from its neighbours.
+    """
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
     for ax in fig.axes:
+        ys = [t for t in ax.get_yticklabels() if t.get_text() and t.get_visible()]
+        xs = [t for t in ax.get_xticklabels() if t.get_text() and t.get_visible()]
+        if not xs or not ys:
+            continue
+        for other in fig.axes:
+            oys = [t for t in other.get_yticklabels()
+                   if t.get_text() and t.get_visible()]
+            for xt in xs:
+                a = xt.get_window_extent(renderer=r)
+                for yt in ys + oys:
+                    b = yt.get_window_extent(renderer=r)
+                    dx = min(a.x1, b.x1) - max(a.x0, b.x0)
+                    dy = min(a.y1, b.y1) - max(a.y0, b.y0)
+                    if dx > 0 and dy > 0:
+                        xt.set_visible(False)
+                        break
+
+
+def fin(fig, name):
+    _declutter_corner(fig)
+    for ax in fig.axes:
+        ax.tick_params(pad=3.0)
         ax.grid(True, alpha=0.8); ax.set_axisbelow(True)
         for sp in ('top', 'right'):
             ax.spines[sp].set_visible(False)
@@ -76,7 +142,7 @@ def master_unitprice():
                 label=f'$m={m}$')
         ax.plot(ks, [m + k for k in ks], color=col, ls=':', lw=0.8)
     ax.set_xlabel(r'calibration price  $\kappa$')
-    ax.set_ylabel(r'price of one unit,  $(\sqrt{m}+\sqrt{\kappa})^{2}$')
+    ax.set_ylabel(r'price of one unit,  $(s_{m}+s_{\kappa})^{2}$')
     ax.legend(frameon=False, loc='upper left', ncol=2)
     ax.text(0.97, 0.05, 'dotted: additive $m+\\kappa$', transform=ax.transAxes,
             ha='right', fontsize=6.2, color=GREY)
@@ -256,6 +322,7 @@ def struct_enum():
     ax2.plot(ms, [r['optimal_fraction'] for r in rows], color=CRAN, ls='--', lw=1.3,
              label='fraction at the bound')
     ax2.set_yscale('log'); ax2.set_ylabel('fraction attaining defect 2'); ax2.grid(False)
+    ax2.tick_params(axis='x', labelbottom=False)
     ax2.spines['top'].set_visible(False)
     ax.set_yscale('log'); ax.set_xlabel(r'population size  $m$')
     ax.set_ylabel('orderings')
@@ -385,9 +452,7 @@ def func_paneldetail():
     names = [names[i] for i in order]; fr = [fr[i] for i in order]; med = [med[i] for i in order]
     fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
     ax.scatter(med, fr, s=26, c=CRAN, zorder=5)
-    for n, x, y in zip(names, med, fr):
-        ax.annotate(n.replace('_', r'\_') if False else n, (x, y), fontsize=5.8,
-                    xytext=(3, 3), textcoords='offset points', color=INK)
+    label_points(ax, [float(x) for x in med], [float(y) for y in fr], list(names))
     ax.set_xlabel('median queries when certified'); ax.set_ylabel('fraction certified')
     ax.set_xscale('log')
     ax.text(0.02, 0.05, 'upper-left is better', transform=ax.transAxes,
@@ -573,7 +638,7 @@ def adaptive_search():
     ax.set_xlabel('worst deficit reached by the online rule')
     ax.set_ylabel('violating targets')
     ax.set_title(f"{d['targets_violating_quota']:,} of {d['targets_checked']:,} targets "
-                 f"({100*d['violation_fraction']:.1f}\\%)", fontsize=6.8)
+                 f"({100*d['violation_fraction']:.1f}%)", fontsize=6.8)
     fin(fig, 'adaptive_fig3_search.png')
 
 
@@ -590,6 +655,7 @@ def adaptive_onset():
              label='worst deficit')
     ax2.set_ylim(1.0, None)
     ax2.set_ylabel('worst deficit (bound is 1)'); ax2.grid(False)
+    ax2.tick_params(axis='x', labelbottom=False)
     ax2.spines['top'].set_visible(False)
     ax.set_xlabel('number of arms  $K$'); ax.set_ylabel('fraction of targets violating')
     ax.set_xticks(Ks)
@@ -718,19 +784,32 @@ def adaptive_rules():
                         'adaptive_rules.json').read_text())
     rules = [r for r in d['rules'] if r != 'randomized']
     fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    xs, ys, labs = [], [], []
     for r in rules:
         s = d['per_rule'][r]
-        x, y = 100 * s['fraction'], 100 * s['fraction_surplus']
-        ax.plot([x], [y], 'o', ms=5, mfc='white', mec=CRAN, mew=1.4, zorder=5)
-        ax.annotate(r.replace('_', ' '), (x, y), fontsize=5.8, color=INK,
-                    xytext=(4, 4), textcoords='offset points')
-    ax.set_xlim(-6, 106); ax.set_ylim(-6, 106)
+        xs.append(100 * s['fraction']); ys.append(100 * s['fraction_surplus'])
+        labs.append('quota (B&Y)' if r == 'quota_bny'
+                    else r.replace('_', ' '))
+    # the quota method is the point of the figure, so it is drawn apart from the
+    # family that trades one axis for the other
+    at_origin = [i for i, (x, y) in enumerate(zip(xs, ys)) if x == 0 and y == 0]
+    other = [i for i in range(len(xs)) if i not in at_origin]
+    ax.plot([xs[i] for i in other], [ys[i] for i in other], 'o', ms=5,
+            mfc='white', mec=CRAN, mew=1.4, zorder=5, ls='none')
+    if at_origin:
+        ax.plot([xs[i] for i in at_origin], [ys[i] for i in at_origin], 'o', ms=7,
+                mfc=GREEN, mec=GREEN, zorder=6, ls='none')
+    label_points(ax, xs, ys, labs)
+    # the labels sit to the right of their points, so the box needs room
+    ax.set_xlim(-8, 152); ax.set_ylim(-9, 112)
     ax.plot([0, 100], [0, 0], color=GREY, lw=0.7, ls=':')
     ax.plot([0, 0], [0, 100], color=GREY, lw=0.7, ls=':')
-    ax.set_xlabel(r'targets violating the deficit bound  (\%)')
-    ax.set_ylabel(r'targets violating the surplus bound  (\%)')
-    ax.text(0.5, 0.5, 'the origin is empty', transform=ax.transAxes,
-            ha='center', fontsize=6.4, color=GREY)
+    ax.set_xlabel(r'targets violating the deficit bound  (%)')
+    ax.set_ylabel(r'targets violating the surplus bound  (%)')
+    ax.text(0.52, 0.55,
+            'the divisor family trades one axis\nfor the other; the quota method\n'
+            'sits at the origin',
+            transform=ax.transAxes, ha='center', fontsize=6.2, color=GREY)
     fin(fig, 'adaptive_fig6_rules.png')
 
 
@@ -744,7 +823,7 @@ def master_misspec():
     lab = {'gaussian': 'model correct', 'heavy_tail_t10': 'noise $t_{10}$',
            'heavy_tail_t5': 'noise $t_{5}$', 'heavy_tail_t3': 'noise $t_{3}$',
            'nuisance_t3': 'offset $t_{3}$', 'hetero': 'variances $9\\times$ apart',
-           'contaminated_1pct': 'anchors 1\\% bad', 'contaminated_5pct': 'anchors 5\\% bad',
+           'contaminated_1pct': 'anchors 1% bad', 'contaminated_5pct': 'anchors 5% bad',
            'delta_0.75': r'$\Delta\times0.75$', 'delta_1.25': r'$\Delta\times1.25$',
            'delta_0.5': r'$\Delta\times0.5$', 'delta_2.0': r'$\Delta\times2$'}
     fig, ax = plt.subplots(figsize=(W, H * 1.15), layout='constrained')
@@ -876,12 +955,12 @@ def d6_directions():
     fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
     ax.barh(range(len(order)), vals, color=cols, height=0.62)
     for i, (o, v) in enumerate(zip(order, vals)):
-        ax.annotate(f'{v:.1f}\\%  ({fams[o][1]})', (v, i), fontsize=5.8,
+        ax.annotate(f'{v:.1f}%  ({fams[o][1]})', (v, i), fontsize=5.8,
                     color=INK, va='center', xytext=(3, 0), textcoords='offset points')
     ax.set_yticks(range(len(order)))
     ax.set_yticklabels([lab[o] for o in order], fontsize=6.2)
     ax.set_xlim(0, max(vals) * 1.35)
-    ax.set_xlabel(r'references at which $A$ loses Top-$C$  (\%)')
+    ax.set_xlabel(r'references at which $A$ loses Top-$C$  (%)')
     fin(fig, 'd6_fig7_directions.png')
 
 
@@ -964,6 +1043,49 @@ def functional_duality():
 # the paper's single-column aspect becomes twelve inches tall and eats forty per
 # cent of the column, which is what forces the body text down to sixteen point.
 # Re-rendering the same figure wider costs nothing and returns the column.
+def adaptive_frontier():
+    """Where the worst deficit of largest-deficit tracking actually sits.
+
+    Three things belong on one axis. The published census stopped at
+    denominator 64 and reported 7/4; every one of its forty worst targets sat
+    against that limit, so the number was a property of the search box. Lifting
+    the limit moves it. And the literature already bounds the same quantity at
+    K-1, which the measurements fall far below once K is more than a few.
+    """
+    import json
+    d = json.load(open(ROOT / 'research/paper_exp_20260916/adaptive_frontier.json'))
+    per = d['per_K']
+    Ks = sorted(int(k) for k in per)
+    worst = [per[str(k)]['worst_float'] for k in Ks]
+    old_K = [3, 4, 5, 6, 7, 8]
+    old_w = [1.3651, 1.5500, 1.6500, 1.6964, 1.7460, 1.7500]
+
+    fig, ax = plt.subplots(figsize=(W, H), layout='constrained')
+    ax.plot(Ks, [k - 1 for k in Ks], color=GREY, ls='--', lw=1.0,
+            label=r'proved upper bound $K-1$')
+    ax.axhline(2.0, color=INK, lw=0.8, ls=':')
+    ax.plot(old_K, old_w, 'o-', color=AMBER, ms=3.0, lw=1.0,
+            label=r'exhaustive, $d\leq64$')
+    ax.plot(Ks, worst, 'o-', color=CRAN, ms=3.0, lw=1.2,
+            label=r'restricted shape, $d\leq%d$' % d['dmax'])
+    ax.axhline(1.0, color=GREEN, lw=0.8)
+    ax.set_xlabel('number of arms  $K$')
+    ax.set_ylabel('worst deficit attained')
+    ax.set_yscale('log')
+    ax.set_yticks([1, 2, 5, 10, 20])
+    ax.set_yticklabels(['1', '2', '5', '10', '20'])
+    ax.set_ylim(0.9, 22)
+    ax.legend(frameon=False, loc='upper left', fontsize=6.0)
+    # the note goes below the axes, clear of the x-axis label: inside, it crossed
+    # both the unit line and the plateau it is describing
+    fig.text(0.5, -0.055,
+             'the bound an analysis wants is 1 (green line); every measured target exceeds it. '
+             'the published $7/4$ was pinned\nto a search limit -- lifting it reaches a plateau '
+             'at about 2, far below the proved $K-1$ once $K>3$.',
+             ha='center', va='top', fontsize=5.8, color=GREY)
+    fin(fig, 'adaptive_fig7_frontier.png')
+
+
 def poster_variants(names=None):
     """Re-render chosen figures at a poster aspect into _figures/poster/."""
     import importlib

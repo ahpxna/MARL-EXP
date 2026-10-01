@@ -23,7 +23,7 @@ non-negative solution in $24$ of $24$ cells is evidence rather than a derivation
 supplies an argument for each. We define the general alternative as an arbitrary shift
 vector, show the $(d,x)$ formula is exactly the general information evaluated on the slice,
 and prove that every alternative in the class costs at least the slice value, with equality
-precisely on the slice---so the reduction loses nothing and gains nothing. The same
+attained on the slice---so the reduction loses nothing and gains nothing. The same
 computation shows the general information vanishes only at the zero shift, so the scalar
 query is blind in no direction. We then prove that the budget constraint together with the
 split \emph{forces} the two weights, which depend on the split and the price alone and not on
@@ -213,6 +213,10 @@ sampling model. The paper's subject is what can be concluded \emph{from} them, a
 who disputes them disputes the premises rather than the argument.
 
 \subsection{Simplifying Assumptions}
+\NOTEPAR{$I_{B}$ and $I_{\mathrm{pair}}$ are taken as given from the corpus and are not
+re-derived from the sampling model. A reviewer cannot check a premise they cannot see, so the
+final version should either derive them or state precisely which external artifact supplies
+them and how it was checked.}
 
 \begin{enumerate}
 \item[1)] \textbf{Magnitude-constrained class.} The alternative set is cut out by
@@ -273,7 +277,8 @@ expression written two ways.
 
 \begin{theorem}[Every alternative costs at least the slice value]
 \label{thm:reduction}
-If $|v_{i}|\ge\mu$ for $i\in S$, $|v_{i}|\ge x$ for $i\notin S$, and $|S|=d$, then
+If $\mu\ge0$, $x\ge0$, $|v_{i}|\ge\mu$ for $i\in S$, $|v_{i}|\ge x$ for $i\notin S$, and
+$|S|=d$, then
 \begin{equation}
 I_{B}(d,x)\;\leq\;I(v).
 \label{eq:reduction}
@@ -289,21 +294,53 @@ $S$ and its complement and dividing by the positive normaliser $2q$ gives
 
 \leanbox{\lean{IB\_le\_general} in \lean{LeanD6GeneralFamilyV1}}
 
+The two sign hypotheses are what make the statement true rather than tidy. With $\mu<0$ the
+constraint $|v_{i}|\ge\mu$ holds for every $v$, so $v=0$ would be admissible and give
+$I(v)=0<I_{B}(d,x)$. They appear in \lean{IB\_le\_general} for that reason.
+\NOTEPAR{An earlier draft printed Theorem~\ref{thm:reduction} without $\mu\ge0$ and
+$x\ge0$. That is not a cosmetic omission---the statement is false without them---and the Lean
+version had them all along, so this is a case of the prose being weaker than the artifact
+rather than stronger.}
+
 The proof is coordinate-wise and the sum is finite, so no optimiser and no rearrangement
 argument is needed. This is worth noting because a reduction of this kind is often attempted
 by an exchange argument, which requires care about which coordinate is moved and in what
 order; here the monotonicity of the square does all the work, and it does so because
 assumption 1 cuts the class out by \emph{lower} bounds while the objective \emph{increases}
-in each magnitude. A minimiser therefore sits where every constraint is active, and that set
-is exactly the slice.
+in each magnitude. A minimiser therefore sits where every constraint is active. That set is the magnitude
+boundary
+\begin{equation}
+\mathcal{B}=\{v:\ |v_{i}|=\mu\ (i\in S),\ |v_{i}|=x\ (i\notin S)\},
+\label{eq:boundary}
+\end{equation}
+\TODOPAR{What is and is not machine-checked here. \lean{slice\_is\_tight} is
+character-for-character identical to \lean{IB\_eq\_of\_slice}: same hypotheses
+($v_{i}=\mu$ on $S$, $v_{i}=x$ off it---\emph{signed}, not magnitudes), same conclusion. So
+the Lean development contains the sufficient direction on the signed slice and nothing else.
+The extension to all of $\mathcal{B}$ and the converse are both true by the same
+coordinate-wise argument and are done in prose here. \emph{If the word ``precisely'' is wanted
+back in Corollary~\ref{cor:tight}, the converse has to be formalised}; nothing below needs it,
+because the quantifier upgrade consumes attainment only.}
+and the slice is one of its $2^{q}$ sign orthants: $I$ depends on $v$ only through
+$|v_{i}|$, so every sign pattern on $\mathcal{B}$ attains the same value.
 
-\begin{corollary}[The slice is exactly tight]
+\begin{corollary}[The slice attains the bound]
 \label{cor:tight}
-Equality holds in \eqref{eq:reduction} precisely when $|v_{i}|=\mu$ on $S$ and $|v_{i}|=x$
-off it, that is, precisely on the slice.
+Every $v\in\mathcal{B}$ attains equality in \eqref{eq:reduction}, and the slice is a subset
+of $\mathcal{B}$. The bound is therefore attained within the class, which is what
+Corollary~\ref{cor:upgrade} consumes.
 \end{corollary}
 
 \leanbox{\lean{slice\_is\_tight} in \lean{LeanD6GeneralFamilyV1}}
+
+The machine-checked statement is the sufficient direction on the signed slice: given
+$v_{i}=\mu$ on $S$ and $v_{i}=x$ off it, $I(v)=I_{B}(d,x)$. The extension to all of
+$\mathcal{B}$ is immediate because $I$ sees only $|v_{i}|$, but it is arithmetic done here
+and not in Lean. The converse---that equality forces $v\in\mathcal{B}$---is true by the same
+coordinate-wise argument and is likewise not formalised, and no result below uses it: what
+the quantifier upgrade needs is attainment, not uniqueness. An earlier version of this
+corollary claimed equality holds \emph{precisely} on the slice, which is false as stated,
+since flipping the sign of one coordinate leaves $I$ unchanged and leaves the slice.
 
 \begin{corollary}[Quantifier upgrade]
 \label{cor:upgrade}
@@ -419,53 +456,26 @@ on $[0,1]$ attains its maximum at an endpoint unless it is constant.
 \noindent\emph{Supporting results in \lean{LeanD6DesignDerivationV1}.}~These are the design derivation. The budget identity and the uniqueness statement are separate because the first alone is consistent with the weights having been fitted; it is the uniqueness that leaves nothing to fit. The non-negativity characterisation makes the admissible range of the split a derived statement, and the affine and endpoint results then remove the need to search over the split at all. They are reproduced as the prover has them; a further $3$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,1}\quad\lean{budget\_exact}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} :\\
-&\quad \mathit{c} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{wB} \mathit{eta} + \mathit{c} * \mathit{wPair}\\
-&\quad \mathit{eta} \mathit{c} = 1
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0) \;\vdash\; \mathit{wB} \mathit{eta} + \mathit{c} * \mathit{wPair} \mathit{eta} \mathit{c} = 1 \]}
 
 \noindent\textbf{S\,2}\quad\lean{flat\_when\_equal\_price}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{IB} \mathit{Ipair} \mathit{c} : \mathbb{Q}\\
-&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
-&\quad (\mathit{heq} : \mathit{Ipair} / \mathit{c} -\\
-&\quad \mathit{IB} =\\
-&\quad 0),\; (\mathit{eta} \mathit{eta'} : \mathbb{Q} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
-&\quad \mathit{c} = \mathit{info} \mathit{IB} \mathit{Ipair}\\
-&\quad \mathit{eta'} \mathit{c}
+&(\mathit{IB} \mathit{Ipair} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{heq} : \mathit{Ipair} / \mathit{c} - \mathit{IB} = 0),\\
+&\quad \; (\mathit{eta} \mathit{eta'} : \mathbb{Q} )\\
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} = \mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta'} \mathit{c}
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{info\_linear}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} : \mathbb{Q}\\
-&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta}\\
-&\quad \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} /\\
-&\quad \mathit{c} -\\
-&\quad \mathit{IB})
+&(\mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0)\\
+\vdash\;&\mathit{info} \mathit{IB} \mathit{Ipair} \mathit{eta} \mathit{c} = \mathit{IB} + \mathit{eta} * (\mathit{Ipair} / \mathit{c} - \mathit{IB})
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{weights\_unique}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{eta} \mathit{c} \mathit{a} \mathit{b} : \mathbb{Q}\\
-&\quad ),\; (\mathit{hc} : \mathit{c} \neq 0),\;\\
-&\quad (\mathit{hbudget} : \mathit{a} + \mathit{c} *\\
-&\quad \mathit{b} =\\
-&\quad 1),\; (\mathit{hshare} : \mathit{c} * \mathit{b} =\\
-&\quad \mathit{eta})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{a} = \mathit{wB} \mathit{eta} \wedge \mathit{b}\\
-&\quad = \mathit{wPair} \mathit{eta} \mathit{c}
+&(\mathit{eta} \mathit{c} \mathit{a} \mathit{b} : \mathbb{Q} ),\; (\mathit{hc} : \mathit{c} \neq 0),\; (\mathit{hbudget} : \mathit{a} + \mathit{c} * \mathit{b} = 1),\\
+&\quad \; (\mathit{hshare} : \mathit{c} * \mathit{b} = \mathit{eta})\\
+\vdash\;&\mathit{a} = \mathit{wB} \mathit{eta} \wedge \mathit{b} = \mathit{wPair} \mathit{eta} \mathit{c}
 \end{aligned} \]}
 
 
@@ -562,121 +572,45 @@ because $|T|=|S|$.
 
 \noindent\textbf{S\,5}\quad\lean{pair\_doubled\_loss\_le\_card\_mul\_two\_delta\_sub\_margin}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} \mathit{mu} : \mathbb{R}\\
-&\quad ),\; (\mathit{hWeight} : \forall \mathit{c}, 0\\
-&\quad \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} :\\
-&\quad \textstyle\sum \mathit{c},\\
-&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
-&\quad =\\
-&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
-&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1) \to \mathit{U}),\\
-&\quad |\mathit{mixedDifference} \mathit{F}\\
-&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
-&\quad (\mathit{selected} \mathit{competitor} :\\
-&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
-&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
-&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
-&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
-&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
-&\quad \mathit{competitor}.\mathit{card} =\\
-&\quad \mathit{k}),\; (\mathit{hMargin} : \forall \mathit{i}\\
-&\quad \in \mathit{selected}, \forall \mathit{j}\\
-&\quad \notin \mathit{selected}, \mathit{mu} +\\
-&\quad \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F}\\
-&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
-&\quad \mathit{q} \mathit{F}\\
-&\quad \mathit{i}))
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F}\\
-&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
-&\quad \mathit{selected} -\\
-&\quad \mathit{productCompressionLoss} \mathit{F}\\
-&\quad (\mathit{productResponse} \mathit{q} \mathit{F})\\
-&\quad \mathit{competitor}) \leq ((\mathit{selected} \\\
-&\quad \mathit{competitor}).\mathit{card} :\\
-&\quad \mathbb{R}\\
-&\quad ) * (2 * \mathit{delta} - \mathit{mu})
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R} ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R} ),\; (\mathit{delta} \mathit{mu} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} = 1),\\
+&\quad \; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} :\\
+&\quad \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}), |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\\
+&\quad \; (\mathit{selected} \mathit{competitor} : \mathit{Finset} (\mathit{Fin} (\mathit{n} + 1))),\; (\mathit{k} : \mathbb{N} ),\\
+&\quad \; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}))\\
+&\quad \mathit{selected} \mathit{k}),\; (\mathit{hCompetitorCard} : \mathit{competitor}.\mathit{card} = \mathit{k}),\\
+&\quad \; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{selected}, \forall \mathit{j} \notin \mathit{selected}, \mathit{mu} + \mathit{osc} (\\
+&\quad \mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{i}))\\
+\vdash\;&2 * (\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{selected}\\
+&\quad - \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{competitor})\\
+&\quad \leq ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R} ) * (2 * \mathit{delta} - \mathit{mu})
 \end{aligned} \]}
 
 \noindent\textbf{S\,6}\quad\lean{pair\_loss\_le\_sdiff\_card\_sub\_score\_surplus}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} : \mathbb{R} ),\;\\
-&\quad (\mathit{hWeight} : \forall \mathit{c}, 0\\
-&\quad \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} :\\
-&\quad \textstyle\sum \mathit{c},\\
-&\quad \mathit{jointWeight} \mathit{q} \mathit{c}\\
-&\quad =\\
-&\quad 1),\; (\mathit{hDeltaNonneg} : 0 \leq \mathit{delta}),\;\\
-&\quad (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin}\\
-&\quad (\mathit{n} + 1) \to \mathit{U}),\\
-&\quad |\mathit{mixedDifference} \mathit{F}\\
-&\quad \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\;\\
-&\quad (\mathit{selected} \mathit{competitor} :\\
-&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} +\\
-&\quad 1))),\; (\mathit{k} : \mathbb{N} ),\;\\
-&\quad (\mathit{hTop} : \mathit{IsTopKByScore}\\
-&\quad (\mathbf{fun} \mathit{j} \mapsto \mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F} \mathit{j})) \mathit{selected}\\
-&\quad \mathit{k}),\; (\mathit{hCompetitorCard} :\\
-&\quad \mathit{competitor}.\mathit{card} =\\
-&\quad \mathit{k})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
-&\quad (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F}) \mathit{selected} -\\
-&\quad \mathit{productCompressionLoss} \mathit{F}\\
-&\quad (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F}) \mathit{competitor} \leq ((\mathit{selected} \\\
-&\quad \mathit{competitor}).\mathit{card} :\\
-&\quad \mathbb{R}\\
-&\quad ) * \mathit{delta} - ((\mathit{selected} \\\
-&\quad \mathit{competitor}).\mathit{sum}\\
-&\quad (\mathbf{fun} \mathit{j}\\
-&\quad \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F} \mathit{j})) - (\mathit{competitor} \\\
-&\quad \mathit{selected}).\mathit{sum} (\mathbf{fun}\\
-&\quad \mathit{j} \mapsto \mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
-&\quad \mathit{j}))) / 2
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U} \to \mathbb{R} ),\; (\mathit{F} : (\mathit{Fin} (\mathit{n} + 1) \to \mathit{U})\\
+&\quad \to \mathbb{R} ),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{hWeight} : \forall \mathit{c}, 0 \leq \mathit{jointWeight} \mathit{q} \mathit{c}),\\
+&\quad \; (\mathit{hNorm} : \textstyle\sum \mathit{c}, \mathit{jointWeight} \mathit{q} \mathit{c} = 1),\; (\mathit{hDeltaNonneg} : 0 \leq\\
+&\quad \mathit{delta}),\; (\mathit{hdelta} : \forall (\mathit{i} : \mathit{Fin} (\mathit{n} + 1)) (\mathit{x} \mathit{c} : \mathit{Fin} (\mathit{n} + 1) \to \mathit{U}),\\
+&\quad |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{selected} \mathit{competitor} :\\
+&\quad \mathit{Finset} (\mathit{Fin} (\mathit{n} + 1))),\; (\mathit{k} : \mathbb{N} ),\; (\mathit{hTop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{j}\\
+&\quad \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) \mathit{selected} \mathit{k}),\; (\mathit{hCompetitorCard}\\
+&\quad : \mathit{competitor}.\mathit{card} = \mathit{k})\\
+\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{selected} -\\
+&\quad \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{competitor} \leq\\
+&\quad ((\mathit{selected} \ \mathit{competitor}).\mathit{card} : \mathbb{R} ) * \mathit{delta} - ((\mathit{selected}\\
+&\quad \ \mathit{competitor}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j})) - (\\
+&\quad \mathit{competitor} \ \mathit{selected}).\mathit{sum} (\mathbf{fun} \mathit{j} \mapsto \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}))\\
+&\quad ) / 2
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{score\_surplus\_ge\_card\_mul\_margin}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{DecidableEq}\\
-&\quad \mathit{I}],\; (\mathit{A} \mathit{B} : \mathit{Finset}\\
-&\quad \mathit{I}),\; (\mathit{score} : \mathit{I}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{mu} : \mathbb{R} ),\;\\
-&\quad (\mathit{hCard} : \mathit{A}.\mathit{card}\\
-&\quad =\\
-&\quad \mathit{B}.\mathit{card}),\; (\mathit{hMargin}\\
-&\quad : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j}\\
-&\quad \in \mathit{B}, \mathit{mu} + \mathit{score}\\
-&\quad \mathit{j} \leq \mathit{score}\\
-&\quad \mathit{i})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{A}.\mathit{card} : \mathbb{R} ) * \mathit{mu}\\
-&\quad \leq \mathit{A}.\mathit{sum} \mathit{score} -\\
-&\quad \mathit{B}.\mathit{sum} \mathit{score}
+&\{ \mathit{I} : \mathit{Type}*\},\; [\mathit{DecidableEq} \mathit{I}],\; (\mathit{A} \mathit{B} : \mathit{Finset} \mathit{I}),\\
+&\quad \; (\mathit{score} : \mathit{I} \to \mathbb{R} ),\; (\mathit{mu} : \mathbb{R} ),\; (\mathit{hCard} : \mathit{A}.\mathit{card} = \mathit{B}.\mathit{card}),\\
+&\quad \; (\mathit{hMargin} : \forall \mathit{i} \in \mathit{A}, \forall \mathit{j} \in \mathit{B}, \mathit{mu} + \mathit{score} \mathit{j} \leq \mathit{score} \mathit{i})\\
+\vdash\;&(\mathit{A}.\mathit{card} : \mathbb{R} ) * \mathit{mu} \leq \mathit{A}.\mathit{sum} \mathit{score} - \mathit{B}.\mathit{sum} \mathit{score}
 \end{aligned} \]}
 
 
@@ -736,107 +670,42 @@ $|A|(2-\rho)>0$.
 
 \noindent\textbf{S\,8}\quad\lean{every\_subthreshold\_margin\_fails}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
-&\quad (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
-&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
-&\quad \notin \mathit{A}),\; (\mathit{hne} :\\
-&\quad \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho}\\
-&\quad : \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
-&\quad (\mathit{hr2} : \mathit{rho} <\\
-&\quad 2),\; (\mathit{hbal} :\\
-&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
-&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
-&\quad \mathit{j}).\mathit{card})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
-&\quad \mathit{A} \mathit{j} \mathit{rho})\\
-&\quad \mathit{i})) \mathit{A} \mathit{A}.\mathit{card}\\
-&\quad \wedge \mathit{productCompressionLoss} (\mathit{steered}\\
-&\quad \mathit{A} \mathit{j}\\
-&\quad \mathit{rho}) (\mathit{productResponse}\\
-&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
-&\quad \mathit{rho})) \mathit{Aᶜ} <\\
-&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
-&\quad \mathit{j}\\
-&\quad \mathit{rho}) (\mathit{productResponse}\\
-&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
-&\quad \mathit{rho})) \mathit{A}
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I} \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\\
+&\quad \; (\mathit{hne} : \mathit{A}.\mathit{Nonempty}),\; (\mathit{rho} : \mathbb{R} ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\\
+&\quad \; (\mathit{hr2} : \mathit{rho} < 2),\; (\mathit{hbal} : \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\\
+&\quad \; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A} \mathit{j}).\mathit{card})\\
+\vdash\;&\mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
+&\quad \mathit{A} \mathit{j} \mathit{rho}) \mathit{i})) \mathit{A} \mathit{A}.\mathit{card} \wedge \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\\
+&\quad \mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{Aᶜ} <\\
+&\quad \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{A}
 \end{aligned} \]}
 
 \noindent\textbf{S\,9}\quad\lean{margin\_two\_sufficient}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{U} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{U}],\; [\mathit{Nonempty} \mathit{U}],\; \{\\
-&\quad \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I}\\
-&\quad \mathit{n} \to \mathit{U} \to \mathbb{R}\\
-&\quad ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U})\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{delta} \mathit{rho} : \mathbb{R}\\
-&\quad ),\; (\mathit{hWeight} : \forall \mathit{c},0\\
-&\quad \leq \mathit{jointWeight} \mathit{q}\\
-&\quad \mathit{c}),\; (\mathit{hNorm} :\\
-&\quad \textstyle\sum \mathit{c},\mathit{jointWeight}\\
-&\quad \mathit{q}\\
-&\quad \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\;\\
-&\quad (\mathit{hdelta} : \forall \mathit{i}\\
-&\quad \mathit{x}\\
-&\quad \mathit{c},|\mathit{mixedDifference}\\
-&\quad \mathit{F} \mathit{i} \mathit{x} \mathit{c}|\\
-&\quad \leq \mathit{delta}),\; (\mathit{T} :\\
-&\quad \mathit{Finset} (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{k} : \mathbb{N} ),\;\\
-&\quad (\mathit{htop} : \mathit{IsTopKByScore}\\
-&\quad (\mathbf{fun} \mathit{i} => \mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
-&\quad \mathit{i})) \mathit{T}\\
-&\quad \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i}\\
-&\quad \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\mathit{rho}+\mathit{osc}\\
-&\quad (\mathit{productResponse} \mathit{q} \mathit{F}\\
-&\quad \mathit{j}) \leq \mathit{osc} (\mathit{productResponse}\\
-&\quad \mathit{q} \mathit{F}\\
-&\quad \mathit{i})),\; (\mathit{hrho} :\\
-&\quad 2*\mathit{delta} \leq \mathit{rho}),\;\\
-&\quad (\mathit{S} : \mathit{Finset} (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{hS} :\\
-&\quad \mathit{S}.\mathit{card}=\mathit{k})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{productCompressionLoss} \mathit{F}\\
-&\quad (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F}) \mathit{T} \leq \mathit{productCompressionLoss}\\
-&\quad \mathit{F} (\mathit{productResponse} \mathit{q}\\
-&\quad \mathit{F}) \mathit{S}
+&\{ \mathit{U} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{U}],\; [\mathit{Nonempty} \mathit{U}],\; \{ \mathit{n} : \mathbb{N} \},\; (\mathit{q} : \mathit{I} \mathit{n} \to\\
+&\quad \mathit{U} \to \mathbb{R} ),\; (\mathit{F} : (\mathit{I} \mathit{n} \to \mathit{U}) \to \mathbb{R} ),\; (\mathit{delta} \mathit{rho} : \mathbb{R} ),\\
+&\quad \; (\mathit{hWeight} : \forall \mathit{c},0 \leq \mathit{jointWeight} \mathit{q} \mathit{c}),\; (\mathit{hNorm} : \textstyle\sum \mathit{c},\\
+&\quad \mathit{jointWeight} \mathit{q} \mathit{c}=1),\; (\mathit{hd} : 0 \leq \mathit{delta}),\; (\mathit{hdelta} : \forall \mathit{i} \mathit{x} \mathit{c},\\
+&\quad |\mathit{mixedDifference} \mathit{F} \mathit{i} \mathit{x} \mathit{c}| \leq \mathit{delta}),\; (\mathit{T} : \mathit{Finset} (\mathit{I} \mathit{n})),\\
+&\quad \; (\mathit{k} : \mathbb{N} ),\; (\mathit{htop} : \mathit{IsTopKByScore} (\mathbf{fun} \mathit{i} => \mathit{osc} (\\
+&\quad \mathit{productResponse} \mathit{q} \mathit{F} \mathit{i})) \mathit{T} \mathit{k}),\; (\mathit{hmargin} : \forall \mathit{i} \in \mathit{T},\forall \mathit{j} \notin \mathit{T},\\
+&\quad \mathit{rho}+\mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{j}) \leq \mathit{osc} (\mathit{productResponse} \mathit{q} \mathit{F} \mathit{i})\\
+&\quad ),\; (\mathit{hrho} : 2*\mathit{delta} \leq \mathit{rho}),\; (\mathit{S} : \mathit{Finset} (\mathit{I} \mathit{n})),\\
+&\quad \; (\mathit{hS} : \mathit{S}.\mathit{card}=\mathit{k})\\
+\vdash\;&\mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{T} \leq\\
+&\quad \mathit{productCompressionLoss} \mathit{F} (\mathit{productResponse} \mathit{q} \mathit{F}) \mathit{S}
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{steered\_exchange\_equality}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset}\\
-&\quad (\mathit{I}\\
-&\quad \mathit{n})),\; (\mathit{j} : \mathit{I}\\
-&\quad \mathit{n}),\; (\mathit{hj} : \mathit{j}\\
-&\quad \notin \mathit{A}),\; (\mathit{rho} :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{hr} : 1 \leq \mathit{rho}),\;\\
-&\quad (\mathit{hbal} :\\
-&\quad \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\;\\
-&\quad (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A}\\
-&\quad \mathit{j}).\mathit{card})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A}\\
-&\quad \mathit{j} \mathit{rho}) (\mathit{productResponse}\\
-&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j}\\
-&\quad \mathit{rho})) \mathit{A}-\\
-&\quad \mathit{productCompressionLoss}\\
-&\quad (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})\\
-&\quad (\mathit{productResponse} \mathit{corner} (\mathit{steered}\\
-&\quad \mathit{A} \mathit{j} \mathit{rho}))\\
-&\quad \mathit{Aᶜ})= (\mathit{A}.\mathit{card}:\mathbb{R}\\
-&\quad )*(2-\mathit{rho})
+&\{ \mathit{n} : \mathbb{N} \},\; (\mathit{A} : \mathit{Finset} (\mathit{I} \mathit{n})),\; (\mathit{j} : \mathit{I} \mathit{n}),\; (\mathit{hj} : \mathit{j} \notin \mathit{A}),\; (\mathit{rho} : \mathbb{R} ),\\
+&\quad \; (\mathit{hr} : 1 \leq \mathit{rho}),\; (\mathit{hbal} : \mathit{Aᶜ}.\mathit{card}=\mathit{A}.\mathit{card}),\\
+&\quad \; (\mathit{hB} : 2 \leq (\mathit{others} \mathit{A} \mathit{j}).\mathit{card})\\
+\vdash\;&2*(\mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho}) (\mathit{productResponse}\\
+&\quad \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{A}- \mathit{productCompressionLoss} (\mathit{steered} \mathit{A} \mathit{j}\\
+&\quad \mathit{rho}) (\mathit{productResponse} \mathit{corner} (\mathit{steered} \mathit{A} \mathit{j} \mathit{rho})) \mathit{Aᶜ})=\\
+&\quad (\mathit{A}.\mathit{card}:\mathbb{R} )*(2-\mathit{rho})
 \end{aligned} \]}
 
 
@@ -904,63 +773,27 @@ then the strict separation holds throughout the cell.
 
 \noindent\textbf{S\,11}\quad\lean{crossing\_bracket}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
-&\quad \mathit{t1} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
-&\quad (\mathit{hc} : \mathit{ContinuousOn}\\
-&\quad \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0}\\
-&\quad \mathit{t1})),\; (\mathit{h0} : \mathit{f}\\
-&\quad \mathit{t0} \leq 0),\; (\mathit{h1} : 0\\
-&\quad \leq \mathit{f}\\
-&\quad \mathit{t1})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
-&\quad \mathit{t0} \mathit{t1}, \mathit{f} \mathit{t}\\
-&\quad = 0
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} : \mathbb{R} ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\; (\mathit{hc} :\\
+&\quad \mathit{ContinuousOn} \mathit{f} (\mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1})),\; (\mathit{h0} : \mathit{f} \mathit{t0} \leq 0),\; (\mathit{h1} : 0 \leq \mathit{f} \mathit{t1})\\
+\vdash\;&\exists \mathit{t} \in \mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1}, \mathit{f} \mathit{t} = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,12}\quad\lean{no\_crossing\_of\_modulus}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0}\\
-&\quad \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R}\\
-&\quad ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\;\\
-&\quad (\mathit{hLip} : 0 \leq \mathit{Lip}),\;\\
-&\quad (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc}\\
-&\quad \mathit{t0} \mathit{t1}, |\mathit{f}\\
-&\quad \mathit{s} - \mathit{f} \mathit{t0}|\\
-&\quad \leq \mathit{Lip} * (\mathit{s} -\\
-&\quad \mathit{t0})),\; (\mathit{hm} : \mathit{m}\\
-&\quad \leq \mathit{f}\\
-&\quad \mathit{t0}),\; (\mathit{hpos} : 0 <\\
-&\quad \mathit{m}),\; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} -\\
-&\quad \mathit{t0}) <\\
-&\quad \mathit{m})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{t} \in \mathit{Set}.\mathit{Icc}\\
-&\quad \mathit{t0} \mathit{t1}, 0 < \mathit{f} \mathit{t}
+&(\mathit{f} : \mathbb{R} \to \mathbb{R} ),\; (\mathit{t0} \mathit{t1} \mathit{Lip} \mathit{m} : \mathbb{R} ),\; (\mathit{ht} : \mathit{t0} \leq \mathit{t1}),\\
+&\quad \; (\mathit{hLip} : 0 \leq \mathit{Lip}),\; (\mathit{hlip} : \forall \mathit{s} \in \mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1}, |\mathit{f} \mathit{s} - \mathit{f} \mathit{t0}| \leq\\
+&\quad \mathit{Lip} * (\mathit{s} - \mathit{t0})),\; (\mathit{hm} : \mathit{m} \leq \mathit{f} \mathit{t0}),\; (\mathit{hpos} : 0 < \mathit{m}),\\
+&\quad \; (\mathit{hgap} : \mathit{Lip} * (\mathit{t1} - \mathit{t0}) < \mathit{m})\\
+\vdash\;&\forall \mathit{t} \in \mathit{Set}.\mathit{Icc} \mathit{t0} \mathit{t1}, 0 < \mathit{f} \mathit{t}
 \end{aligned} \]}
 
 \noindent\textbf{S\,13}\quad\lean{quadratic\_inf\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{ha} : 0 < \mathit{a}),\;\\
-&\quad (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 *\\
-&\quad \mathit{a})),\; (\mathit{hv2} : -\mathit{b} /\\
-&\quad (2 * \mathit{a}) \leq \mathit{hi})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x}\\
-&\quad \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 *\\
-&\quad \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (2 *\\
-&\quad \mathit{a})) + \mathit{c} \leq \mathit{a} *\\
-&\quad \mathit{x} ^{2} +\\
-&\quad \mathit{b} * \mathit{x} +\\
-&\quad \mathit{c}) \wedge \mathit{lo} \leq -\mathit{b} / (2 *\\
-&\quad \mathit{a}) \wedge -\mathit{b} / (2 * \mathit{a})\\
-&\quad \leq \mathit{hi}
+&(\mathit{a} \mathit{b} \mathit{c} \mathit{lo} \mathit{hi} : \mathbb{R} ),\; (\mathit{ha} : 0 < \mathit{a}),\; (\mathit{hv1} : \mathit{lo} \leq -\mathit{b} / (2 * \mathit{a})),\\
+&\quad \; (\mathit{hv2} : -\mathit{b} / (2 * \mathit{a}) \leq \mathit{hi})\\
+\vdash\;&(\forall \mathit{x}, \mathit{lo} \leq \mathit{x} \to \mathit{x} \leq \mathit{hi} \to \mathit{a} * (-\mathit{b} / (2 * \mathit{a})) ^{2} + \mathit{b} * (-\mathit{b} / (\\
+&\quad 2 * \mathit{a})) + \mathit{c} \leq \mathit{a} * \mathit{x} ^{2} + \mathit{b} * \mathit{x} + \mathit{c}) \wedge \mathit{lo} \leq -\mathit{b} / (2 * \mathit{a}) \wedge\\
+&\quad -\mathit{b} / (2 * \mathit{a}) \leq \mathit{hi}
 \end{aligned} \]}
 
 
@@ -1111,8 +944,10 @@ the file on disk; the compiled artifact is newer than its source; at least one
 within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-The contract is stated in full because each clause excludes a specific way of appearing
-verified without being so. The hash check across the compile excludes editing a file after
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
 checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
 a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
 outside the kernel is rejected by name mismatch rather than needing to be anticipated.
@@ -1140,8 +975,8 @@ Separation, Thm~\ref{thm:modulus}               & \lean{LeanD6AlternativeReducti
 \subsection{Scope of the Formalisation}
 
 The D6 strand contains $444$ Lean source files with $4{,}087$ theorem and lemma statements,
-of which $30$ modules carry an acceptance receipt covering $181$ audited declarations. Across
-the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $30$ modules carry an acceptance receipt covering $187$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 The ratio of strand size to displayed equations invites the question of what the rest is doing,
@@ -1270,7 +1105,7 @@ oscillation: once a cell flips it stays flipped, at every configuration. \NUM{}
 
 \emph{It is not the symmetric path.} Asymmetric references drawn with an independent $t_{i}$
 per coordinate flip the Top-$C$ set at a \emph{higher} rate than the symmetric path,
-$49.6\%$ against $41.2\%$, and the four structured directions at a lower one, $18.0\%$. The
+$49.6\%$ against $42.5\%$, and the four structured directions at a lower one, $19.1\%$. The
 symmetric path is therefore neither the most nor the least favourable direction; it sits
 inside the range the other directions span, which is what licenses reading it as
 representative rather than as special.
@@ -1332,6 +1167,15 @@ into a derivation. Theorem~\ref{thm:affine} says the optimum is at an endpoint, 
 as a degenerate answer but is what removes the need to search.
 
 \subsection{Shortcomings and Limitations}
+\TODOPAR{Two structural things to settle for the final version. (i) Notation:
+$\mu$ denotes both the displacement of the $d$ coordinates in the alternative family
+(Sections~I and IV-A) and the margin in the exchange bound (Theorem~\ref{thm:exchange}),
+and Theorems~\ref{thm:sufficient}--\ref{thm:subthreshold} then switch to $\rho$ for the same margin while
+Section~VII-F switches back. Pick one. (ii) The title carries three propositions and the
+margin threshold has nothing to do with the slice or the design; the margin half is a
+self-contained result on Top-$C$ selection under approximate modularity and would stand as a
+short paper on its own, positioned against Feige--Feldman--Talgam-Cohen on the three axes
+Section~II-C already identifies.}
 
 \emph{The reduction is for the scalar query only.} The pair query has a blind direction, so
 the coordinate-wise argument of Theorem~\ref{thm:reduction} cannot start: there are non-zero
@@ -1376,7 +1220,7 @@ without settling it.
 \section{Conclusion}
 
 The two-parameter alternative family is not a restriction: every alternative in its class
-costs at least the slice value, and the bound is attained exactly on the slice. The design
+costs at least the slice value, and the bound is attained on the slice. The design
 that reproduces the corpus's coefficients is not fitted: it is forced by the budget constraint
 and the split, depends only on the split and the price, and makes the delivered information
 affine, so the optimal design is pure except on an explicitly computable threshold. And the

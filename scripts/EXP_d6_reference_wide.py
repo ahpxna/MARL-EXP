@@ -265,7 +265,11 @@ def main():
                 monotone_all = False
 
     def rate(rs):
-        pos = [r for r in rs if (r.get('t_float', 1) or 1) > 0 or r['family'] == 'random']
+        # t_float == 0.0 is falsy, so "(r.get('t_float', 1) or 1) > 0" silently kept
+        # the corner rows -- which never flip -- in the denominator and diluted every
+        # rate. Test for the key's presence, not its truthiness.
+        pos = [r for r in rs
+               if r['family'] == 'random' or r.get('t_float', 1.0) > 0.0]
         return (sum(1 for r in pos if not r['topC_is_A']) / len(pos)) if pos else None
 
     out = dict(script='EXP_d6_reference_wide.py',

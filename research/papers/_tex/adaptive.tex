@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\title{House Monotonicity and Quota Cannot Both Hold:\\
-Closing the Probabilistic Inputs of an\\
-Adaptive Stopping Analysis}
+\title{Largest-Deficit Tracking Does Not Achieve\\
+Unit Quota Error: A Witness, a Census, and the\\
+Probabilistic Inputs of an Adaptive Stopping Analysis}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -21,10 +21,11 @@ in three different ways. The per-arm concentration inequality appeared as a hypo
 enclosing lemma, so a reader could see it but nothing established that anything satisfies it.
 The step from a tail bound to a bound on the \emph{expected} stopping time was cited in a
 comment as standard, which is weaker, since a comment does not appear in the statement. And
-the tracking bound was taken for granted in prose describing what the sampling rule does,
-which is the worst position of the three: an assumption nobody wrote down is one nobody
-checked. This paper closes all three, and the third has a negative answer that is itself the
-result. We prove the layer-cake identity for an $\mathbb{N}$-valued stopping time, so a
+the tracking bound was carried in prose at a strength the literature does not supply:
+Garivier and Kaufmann prove that the largest-deficit rule keeps every arm within $K-1$ of its
+entitlement, while an analysis that wants a per-arm error of one unit needs a constant that
+does not grow with the number of arms. This paper closes all three, and the third has a
+negative answer that is itself the result. We prove the layer-cake identity for an $\mathbb{N}$-valued stopping time, so a
 geometric tail bounds the expected stopping time rather than merely the tail sum. We discharge
 the concentration input from a sub-Gaussian hypothesis at an explicit threshold. We prove by
 construction that for every target and every horizon there \emph{exists} an integer allocation
@@ -35,9 +36,15 @@ horizon eleven. An exhaustive search over $1{,}228{,}079$ rational targets finds
 $375{,}239$ that violate the bound, the worst reaching $\tfrac74$ and the earliest at $t=3$.
 Seven online rules are then compared, four of them classical apportionment divisor methods,
 and the comparison corrects a claim this paper previously made: Jefferson's rule violates the
-deficit bound on none of the targets, so the failure is not common to every rule. What no
-rule escapes is both bounds at once---the deficit and the surplus---so the failure can be
-moved between the two directions but not removed.
+deficit bound on none of the targets, so the failure is not common to every rule. An eighth
+rule settles the stronger question: Balinski and Young's quota method, which is
+house-monotone and within quota by construction, violates neither bound on any of the
+$32{,}018$ targets, so the obstruction is not integrality but this rule. Two further
+measurements locate the constant. Lifting the denominator limit that the census had been
+pinned against raises the worst deficit at eight arms from $\tfrac74$ to $\tfrac{307}{160}$,
+and the worst over twenty arms is $\tfrac{321}{160}$---a plateau at about two, far below the
+$K-1$ the literature proves, so a bound linear in the arm count is the wrong shape for what
+this rule does.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -68,8 +75,10 @@ $w$, an analysis would like to assume $|D_{i}(t)|\le1$ at every horizon.
 This paper proves such an allocation always \emph{exists} and that the natural online rule does
 not \emph{achieve} it. The two together say the bound is true as an existence statement and
 false as a property of the rule an algorithm would use, which is exactly the distinction an
-analysis must respect. The obstruction is the apportionment paradox in algorithmic form: house
-monotonicity---counts only increase as the horizon grows---and quota cannot both hold.
+analysis must respect. The obstruction is integrality, but not in the form the apportionment paradox names: house
+monotonicity and quota \emph{are} compatible, and a rule holding both is exhibited in
+Section~\ref{sec:bny}. What fails is the particular rule---serve whichever arm is furthest
+behind---that an adaptive analysis reaches for.
 
 The paper makes five contributions. First, it proves the layer-cake identity, so a geometric
 tail bounds the expected stopping time. Second, it discharges the concentration input from a
@@ -77,7 +86,8 @@ sub-Gaussian hypothesis at an explicit threshold. Third, it proves the per-horiz
 by construction rather than by an existence argument. Fourth, it refutes the online bound with
 an exact witness whose eleven steps are each a genuine largest-deficit choice. Fifth, it
 states the transfer an analysis actually consumes with the constant left free, so that
-whatever bound a specific rule can prove may be substituted.
+whatever bound a specific rule can prove may be substituted---and exhibits a rule, Balinski
+and Young's quota method, for which the constant is one.
 
 The scope is bounded. The refutation concerns \emph{this} rule and does not prove that no
 online monotone rule achieves any constant bound; the search establishing how common the
@@ -98,17 +108,44 @@ in that framework is the direct source of the question
 Sections~\ref{sec:exists}--\ref{sec:fails} answer, and the concentration inputs are the ones
 Section~\ref{sec:subgauss} discharges.
 
-Nothing here improves their bounds. What is contributed is that two of the analysis's inputs
-become theorems in this development, and that the tracking assumption is shown to be
-unavailable in the form an analysis would most like to use.
+Their Appendix~B is the precise point of contact, and it is closer than a framework
+reference. Lemma~15 there analyses exactly the rule studied below---serve the arm maximising
+$P_{i}(k{+}1)-N_{i}(k)$---and proves $\max_{i}|N_{i}(n)-P_{i}(n)|\le K-1$. So a deficit bound
+\NOTEPAR{This was read from the primary source for this draft (arXiv:1602.04589v2,
+Appendix~B). Lemma~15 is the deterministic core behind their Lemmas 7 and 8, and its rule is
+literally the one studied here. An earlier draft's abstract said the tracking bound was ``an
+assumption nobody wrote down''; it was written down, proved, and the constant is $K-1$. The
+contribution is that the constant $1$ is unavailable, not that no constant was known.}
+for largest-deficit tracking exists in the literature, and its constant grows with the number
+of arms.
+
+Nothing here improves that bound, and nothing here contradicts it: every violation the census
+below reports is comfortably inside $K-1$. What is contributed is that two of the analysis's
+inputs become theorems in this development, and that the tracking bound is shown to be
+unavailable at the constant an analysis would most like to use---one, independent of $K$---so
+the true constant for this rule lies in $[\tfrac{321}{160},K-1]$, with the lower end
+established by exhibition in Section~\ref{sec:frontier} rather than assumed.
 
 \subsection{Apportionment}
+\NOTEPAR{An earlier draft asserted here that no apportionment method satisfies both
+house monotonicity and quota, citing \cite{balinski1982}---the book containing the theorem
+that characterises the family which does. The compatible direction is what matters for this
+paper, and Section~\ref{sec:bny} now exhibits a rule holding both. \emph{The 1975 and 1979
+papers were cited from secondary sources and metadata; verify both against the originals
+before submission}, since this is a positive claim about prior work and it is the kind a
+social-choice reviewer checks first.}
 
-Balinski and Young prove the impossibility at the heart of the negative result: no
-apportionment method satisfies both house monotonicity and quota, so divisor methods are
-house-monotone and violate quota while quota methods violate house monotonicity
-\cite{balinski1982}. That result is stated in the language of seats and states, for
-apportionment methods in general.
+The apportionment literature settles what is and is not compatible here, and it is worth
+stating precisely because the compatible direction is the one that matters for this paper.
+House monotonicity and quota are \emph{not} in conflict: Balinski and Young construct a
+method satisfying both \cite{balinski1975}, and later characterise the whole family of
+house-monotone methods that stay within quota \cite{balinski1979}. The impossibility in that
+literature is a different pairing---no method is both population-monotone and within
+quota---and divisor methods sit on the other side of it, being population-monotone and
+violating quota \cite{balinski1982}. Nothing below contradicts any of this. The bound at
+issue here is not quota in the apportionment sense but the stronger per-arm requirement
+$|N_{i}(t)-t w_{i}|\le 1$, and the negative result concerns one online rule, not a class of
+methods.
 
 Theorem~\ref{thm:quotafails} is not a restatement of it, and the difference is what makes it
 usable. The general impossibility says \emph{some} violation exists for any house-monotone
@@ -233,6 +270,32 @@ $\mathbb{E}[\tau]\le C/(1-\rho)$.
 \end{corollary}
 
 \leanbox{\lean{expected\_stopping\_le} in \lean{LeanAdaptiveExpectedStoppingV1}}
+\NOTEPAR{What the layer-cake theorem does not say, and what now does.
+\lean{expected\_stopping\_le} takes $\tau:\Omega\to\mathbb{N}$, so finiteness of the stopping
+time was a consequence of the \emph{type} rather than of an argument: a run that never stops
+has no representative in $\mathbb{N}$ and is silently outside the statement. That gap is now
+closed in \lean{LeanAdaptiveStoppingFiniteV1}, which carries
+$\tau:\Omega\to\mathbb{N}\cup\{\infty\}$---so a run that never stops \emph{is} in the state
+space---and derives almost-sure finiteness from the same geometric tail the expectation bound
+already assumes. Nothing new is assumed. What remains an input, and belongs to the
+algorithm's own analysis rather than to this development, is the geometric tail itself.}
+
+\begin{theorem}[Finiteness from the tail, for a time that may be infinite]
+\label{thm:aefinite}
+Let $\tau:\Omega\to\mathbb{N}\cup\{\infty\}$ and suppose
+$\mu\{\tau>n\}\le C\rho^{n}$ for every $n$, with $C<\infty$ and $\rho<1$. Then
+$\mu\{\tau=\infty\}=0$, so $\tau$ is finite almost everywhere.
+\end{theorem}
+
+\leanbox{\lean{never\_measure\_zero}, \lean{ae\_finite\_of\_geometric\_tail} in
+\lean{LeanAdaptiveStoppingFiniteV1}}
+
+The proof is the one line the typed version was standing in for: the event that the scheme
+never stops is contained in the event that it has not stopped by time $n$, for every $n$, so
+its measure is below $C\rho^{n}$ for every $n$, and a geometric sequence with ratio below one
+tends to zero. Taken with \lean{expected\_stopping\_le}, the pair now says what an analysis
+needs: \emph{given} a geometric tail, the stopping time is almost surely finite and its
+expectation is bounded.
 
 The hypothesis $\rho<1$ is explicit because an earlier version omitted it; the statement is
 then false, and the omission is invisible in prose because ``geometric tail'' carries the
@@ -261,23 +324,12 @@ $u=\sqrt{2c\log(1/\beta)}$ makes the exponent $-\log(1/\beta)$.
 
 \noindent\textbf{S\,1}\quad\lean{subgaussian\_threshold}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mu : \mathit{Measure} \Omega \},\;\\
-&\quad [\mathit{IsProbabilityMeasure} \mu ],\;\\
-&\quad \{ \mathit{X} : \Omega \to \mathbb{R} \},\; \{\\
-&\quad \mathit{c} : \mathbb{R}_{\geq0} \},\; (\mathit{hc} :\\
-&\quad (0:\mathbb{R} ) < (\mathit{c} : \mathbb{R}\\
-&\quad )),\; (\mathit{h} : \mathit{HasSubgaussianMGF}\\
-&\quad \mathit{X} \mathit{c} \mu ),\; (\mathit{beta}\\
-&\quad : \mathbb{R}\\
-&\quad ),\; (\mathit{hb0} : 0 < \mathit{beta}),\;\\
-&\quad (\mathit{hb1} : \mathit{beta} \leq 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mu .\mathit{real} \{ \omega |\\
-&\quad \mathit{Real}.\mathit{sqrt} (2 * (\mathit{c} : \mathbb{R} ) *\\
-&\quad \mathit{Real}.\mathit{log} (1 /\\
-&\quad \mathit{beta})) \leq \mathit{X} \omega \}\\
-&\quad \leq \mathit{beta}
+&\{ \mu : \mathit{Measure} \Omega \},\; [\mathit{IsProbabilityMeasure} \mu ],\; \{ \mathit{X} : \Omega \to\\
+&\quad \mathbb{R} \},\; \{ \mathit{c} : \mathbb{R}_{\geq0} \},\; (\mathit{hc} : (0:\mathbb{R} ) < (\mathit{c} : \mathbb{R} )),\; (\mathit{h} :\\
+&\quad \mathit{HasSubgaussianMGF} \mathit{X} \mathit{c} \mu ),\; (\mathit{beta} : \mathbb{R} ),\; (\mathit{hb0} : 0 < \mathit{beta}),\\
+&\quad \; (\mathit{hb1} : \mathit{beta} \leq 1)\\
+\vdash\;&\mu .\mathit{real} \{ \omega | \mathit{Real}.\mathit{sqrt} (2 * (\mathit{c} : \mathbb{R} ) * \mathit{Real}.\mathit{log} (1 / \mathit{beta})) \leq\\
+&\quad \mathit{X} \omega \} \leq \mathit{beta}
 \end{aligned} \]}
 
 
@@ -380,36 +432,22 @@ Continuing to horizon fourteen the deficit reaches $\frac{31}{23}$.
 \noindent\emph{Supporting results in \lean{LeanAdaptiveOnlineQuotaFailsV1}.}~These are the witness, and their limits are the subject of Section~\ref{sec:gap}. The target is checked to lie on the simplex and the counts to spend exactly eleven pulls; the deficit statement is exact rational arithmetic. Note that \lean{greedy\_steps} concludes \lean{True}: its eleven comparisons are kernel-checked inside the proof but do not escape it, so nothing here ties the counts to the greedy rule. They are reproduced as the prover has them; a further $0$ audited declarations in this module are positivity checks and measurability side conditions and are not displayed.
 
 \noindent\textbf{S\,7}\quad\lean{counts\_sum}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{i}, \mathit{N} \mathit{i}\\
-&\quad = 11
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = 11 \]}
 
 \noindent\textbf{S\,8}\quad\lean{deficit\_exceeds\_one}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) *\\
-&\quad \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q}\\
-&\quad )
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) * \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q} ) \]}
 
 \noindent\textbf{S\,9}\quad\lean{greedy\_steps}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{True}
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \mathit{True} \]}
 
 \noindent\textbf{S\,10}\quad\lean{online\_quota\_fails}
 {\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1)\\
-&\quad \wedge (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
-&\quad 11) \wedge (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) *\\
-&\quad \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q} )
+\vdash\;&(\textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1) \wedge (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = 11) \wedge (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) * \mathit{w} 0 - (\mathit{N} 0\\
+&\quad : \mathbb{Q} )
 \end{aligned} \]}
 
 \noindent\textbf{S\,11}\quad\lean{weights\_sum\_one}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{i}, \mathit{w} \mathit{i}\\
-&\quad = 1
-\end{aligned} \]}
+{\footnotesize\[ \vdash\; \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1 \]}
 
 
 \input{adaptive_trace}
@@ -449,7 +487,9 @@ actually reaches. The eleven step comparisons sit in the proof body of a lemma w
 is \lean{True}, written as hardcoded rationals; each is kernel-checked as an arithmetic fact,
 but nothing about them is exported and no statement connects those literals to $w$ and $N$.
 The rule-to-counts link---the part that makes this a statement about the \emph{rule} rather
-than about some allocation---is carried by a comment in the module, not by a proof.
+than about some allocation---was carried by a comment in the module rather than by a proof
+when this section was first written. Section~\ref{sec:trace} now supplies the proof, and the
+paragraph below records how the link was established before it existed.
 
 \emph{How the link is established instead.} We recomputed the trajectory independently in
 exact rational arithmetic, simulating largest-deficit-first on $w$ from $t=0$ and comparing
@@ -461,6 +501,41 @@ reproducible, and not machine-checked.
 Theorem~\ref{thm:quotafails} should therefore be read as one \PROVED{} half and one \NUM{}
 half. Closing the gap means formalising the greedy rule as a Lean function and proving
 $\mathrm{greedyCount}(w,11)=N$, which is not done.
+
+\subsection{The Rule Reaches the Counts, as a Theorem}
+\label{sec:trace}
+
+The witness is only a witness if the count vector $N$ is what the rule produces. The rule is
+therefore defined here as a function, and the trajectory is computed by the kernel. Because
+every weight of the witness has denominator $23$, the deficit $t\,w_{i}-N_{i}$ equals
+$(t\,p_{i}-N_{i}\cdot23)/23$; a rule that only ever compares deficits with one another can be
+run on the numerators alone, so the whole trajectory is integer arithmetic.
+
+\begin{theorem}[The rule reaches the witness counts]
+\label{thm:trace}
+Running largest-deficit-first on $w=\tfrac{1}{23}(17,1,1,3,1)$ for eleven steps from the
+empty allocation produces $N=(7,1,1,1,1)$, and on that trajectory the scaled deficit of arm
+$0$ is $26$ against the scaled bound $23$: $D_{0}(11)=\tfrac{26}{23}>1$.
+\end{theorem}
+
+\leanbox{\lean{greedy\_reaches\_witness}, \lean{greedy\_deficit\_exceeds\_one},
+\lean{greedy\_step\_is\_maximal} in \lean{LeanAdaptiveGreedyTraceV1}}
+
+Maximality of each step is no longer eleven hand-written comparisons either. It is one lemma
+about the selection function, from which \lean{greedy\_step\_is\_maximal} follows at
+\emph{every} horizon rather than at the eleven this witness happens to need.
+
+\NOTEPAR{Two implementation notes worth keeping. The counts are carried as a five-tuple
+rather than as $\mathsf{Fin}\,5\to\mathbb{Z}$ with \lean{Function.update}: the latter is the
+natural phrasing and the kernel does not reduce it in reasonable time, because each step
+forces five decidable equality tests underneath eleven layers of recursion---a first attempt
+ran for minutes without finishing. The tuple reduces by pattern matching and the file checks
+in fifteen seconds. And the proofs use \lean{decide}, never \lean{native\_decide}, which
+would add \lean{Lean.ofReduceBool} to the axiom set and fail the acceptance contract of
+Section~\ref{sec:verification}. Reported axioms are $\{\textsf{propext}\}$ for the two
+computational statements and
+$\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$ for the maximality
+lemma.}
 
 \subsection{What the Analysis Actually Consumes}
 \label{sec:consumes}
@@ -482,91 +557,39 @@ $\mathrm{greedyCount}(w,11)=N$, which is not done.
 
 \noindent\textbf{S\,2}\quad\lean{deficit\_sum\_zero}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{t} : \mathbb{N} ),\;\\
-&\quad (\mathit{hw} : \textstyle\sum \mathit{i},\\
-&\quad \mathit{w} \mathit{i} =\\
-&\quad 1),\; (\mathit{hN} : \textstyle\sum \mathit{i},\\
-&\quad \mathit{N} \mathit{i} =\\
-&\quad \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{i}, \mathit{deficit} \mathit{w}\\
-&\quad \mathit{N} \mathit{t} \mathit{i} = 0
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\\
+&\quad \; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t})\\
+\vdash\;&\textstyle\sum \mathit{i}, \mathit{deficit} \mathit{w} \mathit{N} \mathit{t} \mathit{i} = 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{exists\_deficient}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{N} : \iota \to \mathbb{N} ),\;\\
-&\quad (\mathit{t} : \mathbb{N}\\
-&\quad ),\; (\mathit{hw} : \textstyle\sum \mathit{i},\\
-&\quad \mathit{w} \mathit{i} =\\
-&\quad 1),\; (\mathit{hN} : \textstyle\sum \mathit{i},\\
-&\quad \mathit{N} \mathit{i} =\\
-&\quad \mathit{t})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{i}, 0 \leq \mathit{deficit} \mathit{w}\\
-&\quad \mathit{N} \mathit{t} \mathit{i}
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\\
+&\quad \; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t})\\
+\vdash\;&\exists \mathit{i}, 0 \leq \mathit{deficit} \mathit{w} \mathit{N} \mathit{t} \mathit{i}
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{pull\_count\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{s} \mathit{t} :\\
-&\quad \mathbb{N}\\
-&\quad ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{i}\\
-&\quad : \iota ),\; (\mathit{Ns} \mathit{Nt} :\\
-&\quad \mathbb{R}\\
-&\quad ),\; (\mathit{hNs} : |\mathit{Ns} - (\mathit{s} : \mathbb{R}\\
-&\quad ) * \mathit{w} \mathit{i}| \leq \mathit{c}),\;\\
-&\quad (\mathit{hNt} : |\mathit{Nt} - (\mathit{t} : \mathbb{R}\\
-&\quad ) * \mathit{w} \mathit{i}| \leq \mathit{c})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{t} : \mathbb{R} ) - (\mathit{s} : \mathbb{R}\\
-&\quad )) * \mathit{w} \mathit{i} - 2 * \mathit{c}\\
-&\quad \leq \mathit{Nt} - \mathit{Ns}
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{s} \mathit{t} : \mathbb{N} ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{i} : \iota ),\; (\mathit{Ns} \mathit{Nt} : \mathbb{R} ),\\
+&\quad \; (\mathit{hNs} : |\mathit{Ns} - (\mathit{s} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq \mathit{c}),\; (\mathit{hNt} : |\mathit{Nt} - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}|\\
+&\quad \leq \mathit{c})\\
+\vdash\;&((\mathit{t} : \mathbb{R} ) - (\mathit{s} : \mathbb{R} )) * \mathit{w} \mathit{i} - 2 * \mathit{c} \leq \mathit{Nt} - \mathit{Ns}
 \end{aligned} \]}
 
 \noindent\textbf{S\,5}\quad\lean{tracking\_bound}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{t} : \mathbb{N} ),\;\\
-&\quad (\mathit{hlo} : \forall \mathit{i}, ((\lfloor (\mathit{t} :\\
-&\quad \mathbb{R} ) * \mathit{w} \mathit{i}\rfloor :\\
-&\quad \mathbb{Z} ) :\\
-&\quad \mathbb{R} ) \leq (\mathit{N} \mathit{i} : \mathbb{R}\\
-&\quad )),\; (\mathit{hhi} : \forall \mathit{i},\\
-&\quad (\mathit{N} \mathit{i} : \mathbb{R} )\\
-&\quad \leq ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w}\\
-&\quad \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R}\\
-&\quad ) +\\
-&\quad 1),\; (\mathit{i} : \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&|(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} :\\
-&\quad \mathbb{R}\\
-&\quad ) * \mathit{w} \mathit{i}| \leq 1
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hlo} : \forall \mathit{i}, ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w}\\
+&\quad \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) \leq (\mathit{N} \mathit{i} : \mathbb{R} )),\; (\mathit{hhi} : \forall \mathit{i}, (\mathit{N} \mathit{i} : \mathbb{R} ) \leq\\
+&\quad ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) + 1),\; (\mathit{i} : \iota )\\
+\vdash\;&|(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq 1
 \end{aligned} \]}
 
 \noindent\textbf{S\,6}\quad\lean{tracking\_exists}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{t} : \mathbb{N} ),\;\\
-&\quad (\mathit{hw} : \textstyle\sum \mathit{i},\\
-&\quad \mathit{w} \mathit{i} =\\
-&\quad 1),\; (\mathit{hw0} : \forall \mathit{i}, 0\\
-&\quad \leq \mathit{w}\\
-&\quad \mathit{i})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{N} : \iota \to \mathbb{N}\\
-&\quad , (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} =\\
-&\quad \mathit{t}) \wedge \forall \mathit{i},\\
-&\quad |(\mathit{N} \mathit{i} : \mathbb{R}\\
-&\quad ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}|\\
-&\quad \leq 1
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\\
+&\quad \; (\mathit{hw0} : \forall \mathit{i}, 0 \leq \mathit{w} \mathit{i})\\
+\vdash\;&\exists \mathit{N} : \iota \to \mathbb{N} , (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t}) \wedge \forall \mathit{i}, |(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq 1
 \end{aligned} \]}
 
 
@@ -696,8 +719,10 @@ the file on disk; the compiled artifact is newer than its source; at least one
 within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-The contract is stated in full because each clause excludes a specific way of appearing
-verified without being so. The hash check across the compile excludes editing a file after
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
 checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
 a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
 outside the kernel is rejected by name mismatch rather than needing to be anticipated.
@@ -725,8 +750,8 @@ Transfer, Thm~\ref{thm:freq}          & \lean{LeanAdaptiveTrackingV1}          &
 \subsection{Scope of the Formalisation}
 
 The Adaptive strand contains $13$ Lean source files with $50$ theorem and lemma statements,
-of which $6$ modules carry an acceptance receipt covering $27$ audited declarations. Across the
-programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $6$ modules carry an acceptance receipt covering $26$ audited declarations. Across the
+programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 Three formulations were withdrawn under the prover, and the third is this paper's main result.
@@ -825,10 +850,11 @@ of service is one whole sample while the entitlements being balanced are fractio
 than one. It is tempting to conclude that any rule serving whole samples and never revoking
 them faces the same arithmetic. That conclusion is too strong, and
 Section~\ref{sec:e2results} refutes it: Jefferson's rule never violates this bound at all.
-What the apportionment impossibility gives \cite{balinski1982}, and what the experiment
-confirms, is the weaker and still sufficient statement---no rule respects the deficit and the
-surplus bounds together, so the failure can be moved between the two directions but not
-removed. It also explains
+Nor is the weaker statement---that no rule respects the deficit and the surplus bound
+together---available, and Section~\ref{sec:bny} refutes that one too, with a rule that
+respects both on every target checked. What survives is narrower and is what this paper is
+about: the specific rule an adaptive analysis reaches for does not achieve the bound of one.
+The mechanism also explains
 the pattern in the search: the worst targets all have several very small components alongside
 one dominant one, exactly the configuration in which a small arm's occasional service is most
 expensive relative to its entitlement.
@@ -847,31 +873,34 @@ the deficit bound on $95.6\%$ of targets and the surplus bound on none. Largest-
 the rule the theorem is about, violates the deficit bound on $26.4\%$ and the surplus bound on
 none. \NUM{}
 
-The replacement is the statement apportionment theory actually supports, and the sweep
-confirms it without exception: \emph{no rule respects both bounds}. Figure~\ref{fig:rules}
-places each rule by its two violation rates, and the origin---the corner a rule would occupy
-if it respected both---is empty. Jefferson buys its perfect deficit record with a $69.4\%$
-surplus-violation rate and a worst surplus of $4.25$; Adams buys the mirror of that; Webster,
-sitting between them, violates both at lower rates, $21.7\%$ and $12.0\%$. The randomised
-rule violates both on every target and reaches a deficit of $31.2$, which is what a rule with
-no memory of its own history looks like.
+Within those seven the failure is traded rather than escaped. Figure~\ref{fig:rules} places
+each rule by its two violation rates, and none of the seven reaches the origin. Jefferson buys
+its perfect deficit record with a $69.4\%$ surplus-violation rate and a worst surplus of
+$4.25$; Adams buys the mirror of that; Webster, sitting between them, violates both at lower
+rates, $21.7\%$ and $12.0\%$. The randomised rule violates both on every target and reaches a
+deficit of $31.2$, which is what a rule with no memory of its own history looks like.
 
-This sharpens rather than weakens the paper's position. Theorem~\ref{thm:quotafails} refutes
-the per-horizon bound for the rule an analysis would naturally assume, and E2 shows that the
-refutation cannot be evaded by changing rules---only \emph{relocated}, from one bound to the
-other. An analysis that needs both directions, which any two-sided concentration argument
-does, has no rule to appeal to. An analysis needing only the surplus direction may safely use
-Jefferson's rule, and that is a usable finding the theorem alone does not give.
+The seven are a divisor-method family plus two greedy rules, and stopping there is what made
+an earlier version of this section assert that \emph{no} rule respects both bounds. The eighth
+rule of Section~\ref{sec:bny} occupies the origin.
+
+This sharpens rather than weakens the paper's position, but in a different direction than the
+previous version claimed. Theorem~\ref{thm:quotafails} refutes the per-horizon bound for the
+rule an analysis would naturally assume, and E2 shows that within the divisor-method family
+the refutation is relocated rather than removed---from one bound to the other. It does not
+show that no rule escapes, and Section~\ref{sec:bny} exhibits one that does. An analysis
+needing only the surplus direction may use Jefferson's rule; an analysis needing both may use
+the quota method; what neither may do is assume the bound for largest-deficit tracking.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\columnwidth]{adaptive_fig6_rules.png}
-\caption{Seven online rules by how often each violates the two quota bounds over $32{,}018$
+\caption{Eight online rules by how often each violates the two quota bounds over $32{,}018$
 rational targets, in exact arithmetic. The randomised rule is omitted: it violates both on
-every target. The origin is where a rule respecting both bounds would sit, and it is empty---
-which is the claim this paper can support. What it cannot support, and previously asserted,
-is that every rule fails in the deficit direction: Jefferson's rule sits exactly on the
-vertical axis, having never violated it. The axes are traded, not escaped. \NUM{}}
+every target. Within the divisor-method family the failure is traded between the axes rather
+than escaped---Jefferson sits on the vertical axis, Adams on the horizontal---which is what an
+earlier version of this paper mistook for a statement about every rule. Balinski and Young's
+quota method sits at the origin, violating neither bound on any target. \NUM{}}
 \label{fig:rules}
 \end{figure}
 
@@ -892,7 +921,7 @@ not unreachable in principle, so a rule failing to meet it fails for reasons of 
 rather than of arithmetic.
 
 Three replacements are available to an implementer, in increasing order of cost. Keep
-largest-deficit-first with a larger constant, which must exceed $\tfrac32$ on the searched
+largest-deficit-first with a larger constant, which must be at least $\tfrac74$ on the searched
 family and is not bounded by anything proved here. Use a divisor method, which is
 house-monotone with a characterised violation \cite{balinski1982}, at the cost of no longer
 serving the largest deficit. Or recompute the allocation from scratch at each horizon using
@@ -900,18 +929,139 @@ Theorem~\ref{thm:exists}, which achieves deficit at most one but is not house-mo
 arm's count can fall as the horizon grows, which is meaningless once the samples are drawn.
 The three exhaust what the obstruction permits.
 
+\subsection{How Far the Deficit Goes, and What the Search Limit Was Hiding}
+\label{sec:frontier}
+\NOTEPAR{Three searches now bear on this, and they should not be conflated in the final
+version. (i) Exhaustive, $K\le8$, $d\le64$, horizon $240$: $1{,}228{,}079$ targets, worst
+$\tfrac74$---this is the one the earlier draft reported. (ii) Exhaustive, $d\le96$:
+$17{,}513{,}610$ targets, worst $\tfrac{59}{32}$, violation rate $33.8\%$. (iii) Restricted
+shape, $K\le20$, $d\le160$, horizon $400$: worst $\tfrac{321}{160}$. Each time the box grew
+the answer grew, and in (i) and (ii) the worst target sat at both limits of its own box.}
+
+The census of Section~\ref{sec:results} answers how \emph{often} the rule exceeds a deficit of
+one. It does not answer how far, and the number it reports for that---$\tfrac74$---is a
+property of the search rather than of the rule. Every one of the forty worst targets it found
+carries the largest arm count the sweep allowed and a denominator within four of the largest
+it allowed. A quantity pinned against both limits of its own box has not converged, and this
+paper previously reported it as though it had.
+
+Widening the box is not possible by exhaustive enumeration: partitions of $d$ into $K$ parts
+grow fast enough that $K\le10$ with $d\le128$ is already six hundred million targets. But the
+extremal targets are not generic. Every one of them is a few arms of weight $1/d$, one or two
+middling arms, and one arm carrying most of the weight---a partition with a handful of
+\emph{distinct values}, not a handful of parts. Enumerating exactly those reaches
+$K\le20$ and $d\le160$ at a cost the exhaustive search cannot.
+
+The restriction is checked rather than assumed, and checked twice. On the range the original
+census covered it reproduces that census's worst deficit at every arm count, 6 of 6, and the
+sweep refuses to report otherwise. The second check is the stronger one. Re-running the
+exhaustive census with the denominator raised to $96$ covers 17{,}513{,}610 targets---fourteen
+times the original---and finds a worst deficit of $\tfrac{59}{32}$; the restricted shape over
+the same box finds $\tfrac{59}{32}$ as well, from 221{,}718 targets, which is
+$1.27\%$ of the work. Agreement at that scale is
+what licenses using the shape beyond the range exhaustive enumeration can reach. What it
+yields there is a lower bound---every target it finds is a real target, so a deficit it
+exhibits is really attained---and the lower side is the one that matters here.
+
+The widened census is also worth reporting for its own sake, and for the same reason the
+original one was misleading: its worst target again sits at both search limits, $K=8$ and
+$d=96$. Raising the limit raised the answer from $\tfrac74$ to $\tfrac{59}{32}$, and the
+violation rate from $30.6\%$ to $33.8\%$. \NUM{}
+
+The deficit goes considerably further than $\tfrac74$, and then it stops. At eight arms,
+lifting the denominator limit from $64$ to $160$ raises the worst from $\tfrac74$ to
+$307/160$. It climbs steeply to about $1.97$ by ten arms and then flattens: from eleven arms
+to twenty every value lies between $1.96$ and $2.01$, reaching exactly $2$ at
+$K=15$ and peaking at $321/160$ at $K=16$. The fluctuation inside that band
+is arithmetic---which denominators below the limit admit an extremal target---not growth.
+On 4 of the 18 arm counts the worst target sits at the denominator limit, so every
+value here is a lower bound and the flattening could in principle be the limit's doing rather
+than the rule's.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{adaptive_fig7_frontier.png}
+\caption{The worst deficit largest-deficit tracking attains, against the number of arms. The
+published census (amber) stopped at denominator $64$ and reported $\tfrac74$; lifting the
+limit (cranberry) shows that figure was set by the limit. The measured values climb to a
+plateau at about $2$ and stay there through twenty arms, while the proved bound $K-1$ (grey)
+keeps growing. Both curves are lower bounds.}
+\label{fig:frontier}
+\end{figure}
+
+Two things follow, and the second is a correction to this paper. Against the bound the
+literature supplies---Garivier and Kaufmann's Lemma~15 gives $K-1$ for this rule---the
+measurements are far below and diverging from it: at $K=16$ that bound permits
+$15$ and the worst found is $321/160$. A bound linear in the arm count is therefore
+the wrong shape for what this rule actually does over the range measured, and a constant near
+two is the shape the data suggest. That is a conjecture and not a theorem: the search is a
+lower bound, the denominator limit binds at four arm counts, and nothing here rules out slow
+growth that twenty arms cannot see. What the measurements do settle is the smaller question
+this paper got wrong---the Discussion said a larger constant for this rule need only exceed
+$\tfrac32$, and $\tfrac{321}{160}$ is exhibited.
+
+\subsection{A Rule That Holds Both Bounds}
+\label{sec:bny}
+\TODOPAR{This is the result most worth developing. The quota method holds both bounds on
+all $32{,}018$ targets, and \texttt{EXP\_adaptive\_quotacheck.py} shows why: it satisfies
+quota in the apportionment sense, which is strictly stronger and implies both bounds. So the
+sweep confirms a consequence rather than a coincidence. \emph{What is missing is a proof for
+this setting}---that the quota method's eligibility rule keeps $|N_{i}(t)-tw_{i}|<1$ at every
+horizon---which should follow from the upper-quota restriction plus $\sum_{i}\lceil
+hw_{i}\rceil\ge h$ and would turn the strongest empirical claim in the paper into a theorem.
+It would also give the downstream analysis a rule it can actually appeal to.}
+
+The comparison in Section~\ref{sec:e2results} covered seven rules and found none holding the
+deficit and the surplus bound together. That was the wrong family to stop at, and the
+apportionment literature says why: house monotonicity and quota are compatible, and Balinski
+and Young exhibit a method holding both \cite{balinski1975} and later characterise all of
+them \cite{balinski1979}. Their quota method is Jefferson's rule restricted at each step to
+the arms that can take the next sample without passing their upper quota at the new horizon.
+It is house-monotone because samples are only ever added, and it stays within quota by
+construction. That the eligible set is never empty is the counting fact
+$\sum_{i}\lceil h w_{i}\rceil\ge h$.
+
+Run as an eighth rule on the same targets, it holds both bounds where the others fail. On
+this paper's own five-arm witness---the target at which largest-deficit-first reaches
+$\tfrac{26}{23}$ at horizon eleven---it reaches a deficit of $\tfrac{21}{23}$ and a surplus of
+$\tfrac{22}{23}$, both below one. Across the sweep it violates the deficit bound on
+0 targets and either bound on 0, against 26.4\% for
+largest-deficit-first. \NUM{}
+
+That is not a sweep it happened to survive. Quota in the apportionment sense---$\lfloor t w_{i}\rfloor\le N_{i}(t)\le\lceil t w_{i}\rceil$ at
+every horizon---is strictly stronger than the bound this paper is about, because it forces
+$|N_{i}(t)-t w_{i}|<1$ and therefore both directions at once. A separate check confirms the
+two properties directly on 3{,}000 skewed targets to horizon 300, at every horizon of every
+trajectory rather than at the end: 0 violations of house monotonicity, 0 of
+quota, and a worst absolute deviation of $\tfrac{99}{100}$, which is below one as quota requires.
+The sweep result is a consequence of a property the rule has by construction, not a
+coincidence of the targets chosen. \NUM{}
+
+This changes what the negative result is about. It is not that online allocation cannot track
+a target to within one sample per arm: a rule published in 1975 does, on every target checked
+here. It is that the rule adaptive sampling reaches for---serve whichever arm is furthest
+behind---cannot, and the alternative that can was characterised before the question was asked
+in this setting. For an analysis that needs a per-arm bound of one, the substitution is
+available and costs an eligibility test per step.
+
 \subsection{Shortcomings and Limitations}
 
 \emph{One rule, not all rules.} Theorem~\ref{thm:quotafails} refutes the bound $1$ for
-\emph{this} rule. It does not prove that no online monotone rule achieves any constant bound,
-and the constant for a divisor method is not computed here.
+\emph{this} rule. It does not prove that no online monotone rule achieves any constant bound.
+A constant \emph{is} now available for one alternative---the quota method holds one, by
+Section~\ref{sec:bny}---but none is computed for the divisor methods.
 
-\emph{The rule-to-counts link is not machine-checked.} As Section~\ref{sec:gap} states, the
-arithmetic of the violation is proved and the identification of $N$ as the greedy trajectory
-rests on an exact recomputation reported here.
+\emph{The rule-to-counts link is now machine-checked.} An earlier version of this paper
+listed this as its one open gap: \lean{greedy\_steps} concluded \textsf{True}, so its eleven
+comparisons were checked inside the proof and nothing about them escaped into a statement,
+and the identification of $N$ as the greedy trajectory rested on a recomputation reported in
+prose. Section~\ref{sec:trace} closes it with a theorem.
+\NOTEPAR{This was the one place where this paper's prose was broader than its artifact, and
+it is worth recording that it is shut rather than quietly deleting the admission.}
 
-\emph{The search covers a finite family.} Rational targets on three to five arms with
-denominators to $30$, run to horizon $40$. Nothing here bounds the worst deficit over all
+\emph{The search covers a finite family.} Exhaustively, rational targets on three to eight
+arms with denominators to $64$ at horizon $240$; on the restricted shape of
+Section~\ref{sec:frontier}, three to twenty arms with denominators to $160$ at horizon $400$. Nothing here bounds the worst deficit over all
 targets, arm counts and horizons, and such a bound---an impossibility with a matching
 constant---is the natural companion this paper does not supply.
 
@@ -925,7 +1075,8 @@ belongs to the algorithm's own analysis.
 \subsection{Open Problems}
 
 Computing the smallest constant achievable online, for a specific rule, would turn
-Theorem~\ref{thm:freq} from a template into a bound. Whether $\tfrac32$ is the worst case over
+Theorem~\ref{thm:freq} from a template into a bound. Whether $\tfrac{321}{160}$---or the two
+it appears to approach---is the worst case over
 all targets rather than over the searched family is second. Third, the sub-Gaussian hypothesis
 with an estimated variance---the setting an implementation actually faces---requires a
 different concentration input.
@@ -943,7 +1094,7 @@ substitute what its rule can prove.
 
 The correction is modest in size. An analysis assuming $|D_{i}(t)|\le1$ obtained an
 empirical-allocation error of $1/t$; the correct statement carries whatever constant the rule
-can prove, which on the searched family exceeds $\tfrac32$. The resulting bound is a constant
+can prove, which on the searched family reaches $\tfrac{321}{160}$. The resulting bound is a constant
 factor worse in the term the tracking controls, not asymptotically different. Finding that the
 correction is small is a conclusion, not a premise, and it was available only after the
 refutation.
@@ -954,7 +1105,7 @@ The two probabilistic inputs of the stopping analysis are now theorems: the laye
 is proved, so a geometric tail bounds the expected stopping time, and the per-arm concentration
 inequality is discharged from a sub-Gaussian hypothesis. The tracking question is settled and
 the answer is negative: an allocation with deficit at most one exists at every horizon, but the
-natural online monotone rule cannot achieve it, and the failure occurs on nearly a quarter of
+natural online monotone rule cannot achieve it, and the failure occurs on $30.6\%$ of
 the targets searched, as early as the third sample, and most severely on exactly the skewed
 targets that best-arm identification produces. The broader lesson concerns which parts of an
 analysis deserve scrutiny. Of the three inputs closed here, two were true and merely uncited,
@@ -973,6 +1124,12 @@ fixed confidence,'' in \emph{Proc. 29th Annu. Conf. Learning Theory (COLT)}, 201
 \bibitem{kaufmann2016} E. Kaufmann, O. Capp\'e, and A. Garivier, ``On the complexity of
 best-arm identification in multi-armed bandit models,'' \emph{J. Mach. Learn. Res.},
 vol.~17, pp.~1--42, 2016.
+
+\bibitem{balinski1975} M. L. Balinski and H. P. Young, ``The quota method of
+apportionment,'' \emph{Amer. Math. Monthly}, vol.~82, no.~7, pp.~701--730, 1975.
+
+\bibitem{balinski1979} M. L. Balinski and H. P. Young, ``Quotatone apportionment methods,''
+\emph{Math. Oper. Res.}, vol.~4, no.~1, pp.~31--38, 1979.
 
 \bibitem{balinski1982} M. L. Balinski and H. P. Young, \emph{Fair Representation: Meeting the
 Ideal of One Man, One Vote}. New Haven, CT: Yale Univ. Press, 1982.

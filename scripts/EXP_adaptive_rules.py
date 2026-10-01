@@ -66,6 +66,11 @@ def compositions(total, parts):
     return list(gen(total, parts, 1))
 
 
+def _ceil(q):
+    """Ceiling of an exact rational, without going through float."""
+    return -((-q.numerator) // q.denominator)
+
+
 def pick(rule, w, N, t, rng):
     K = len(w)
     if rule == 'largest_deficit':
@@ -89,6 +94,18 @@ def pick(rule, w, N, t, rng):
     if rule == 'smallest_share':
         D = [N[i] / w[i] for i in range(K)]
         return D.index(min(D))
+    if rule == 'quota_bny':
+        # Balinski and Young's quota method (1975): Jefferson's rule restricted
+        # to the arms that can take the next sample without passing their upper
+        # quota at the new horizon. It is house-monotone by construction, since
+        # samples are only ever added, and it stays within quota -- which is why
+        # it belongs in this comparison. The apportionment literature settles
+        # that those two properties are compatible, so the interesting question
+        # is whether a rule holding both also holds the stronger per-arm bound.
+        h = t + 1
+        elig = [i for i in range(K) if N[i] + 1 <= _ceil(h * w[i])]
+        # non-empty: sum_i ceil(h w_i) >= h = sum_i N_i + 1, so some arm has room
+        return max((w[i] / (N[i] + 1), i) for i in elig)[1]
     if rule == 'randomized':
         u = F(int(rng.integers(0, 10 ** 9)), 10 ** 9)
         acc = F(0)
@@ -130,7 +147,7 @@ def run(rule, w, T, rng=None):
 
 
 RULES = ('largest_deficit', 'largest_relative', 'jefferson', 'webster',
-         'adams', 'smallest_share', 'randomized')
+         'adams', 'smallest_share', 'randomized', 'quota_bny')
 
 
 def main():

@@ -1,0 +1,195 @@
+\appendices
+\section{Complete statement inventory}
+\label{app:inventory}
+
+The Adaptive strand contributes $26$ axiom-audited theorems and lemmas across its accepted modules. Those that any step of this paper uses are displayed in Section~\ref{sec:setting}, beside the step that consumes them. This appendix reproduces the \emph{complete} chain---every audited statement of the strand, grouped by module, including the ones already shown---so that the development can be read end to end without reassembling it from the body.
+
+Each entry is a symbol-level transliteration of the Lean statement: Unicode maps to the corresponding \LaTeX{} symbol and identifiers are set upright, but no structure is rewritten and no hypothesis is dropped. Binders are listed as the prover has them and the turnstile $\vdash$ separates them from the conclusion. Every entry carries an acceptance receipt and an axiom audit confining it to $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; none contains \texttt{sorry}.
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveConfidenceJoinV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,1}\quad\lean{cost\_on\_event}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mathit{E} : \mathit{Prop}\},\; (\mathit{b0} \mathit{Bstar} : \mathbb{R} ),\; (\mathit{hb0} : 0 < \mathit{b0}),\; (\mathit{hB} : \mathit{b0} \leq \mathit{Bstar}),\\
+&\quad \; (\mathit{k} : \mathbb{N} ),\; (\mathit{hk} : \mathit{Bstar} \leq \mathit{budget} \mathit{b0} \mathit{k}),\; (\mathit{hmin} : \forall \mathit{j}, \mathit{j} < \mathit{k} \to\\
+&\quad \mathit{budget} \mathit{b0} \mathit{j} < \mathit{Bstar}),\; (\mathit{hE} : \mathit{E})\\
+\vdash\;&\textstyle\sum \mathit{i} \in \mathit{Finset}.\mathit{range} (\mathit{k} + 1), \mathit{budget} \mathit{b0} \mathit{i} < 4 * \mathit{Bstar}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveExpectedStoppingV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,2}\quad\lean{expected\_stopping\_le}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{tau} : \Omega \to \mathbb{N} ),\; (\mathit{hmeas} : \mathit{Measurable} \mathit{tau}),\\
+&\quad \; (\mathit{C} \mathit{rho} : \mathbb{R}_{\geq0}^{\infty} ),\; (\mathit{hrho} : \mathit{rho} < 1),\; (\mathit{htail} : \forall \mathit{n} : \mathbb{N} , \mu \{ \omega | \mathit{n} < \mathit{tau} \omega\\
+&\quad \} \leq \mathit{C} * \mathit{rho} ^{\mathit{n}})\\
+\vdash\;&\int^{-} \omega , (\mathit{tau} \omega : \mathbb{R}_{\geq0}^{\infty} ) ∂\mu \leq \mathit{C} * (1 - \mathit{rho})^{-1}
+\end{aligned} \]}
+
+\noindent\textbf{A\,3}\quad\lean{lintegral\_nat\_eq\_tsum\_meas\_gt}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mu : \mathit{Measure} \Omega ),\; (\mathit{tau} : \Omega \to \mathbb{N} ),\; (\mathit{hmeas} : \mathit{Measurable} \mathit{tau})\\
+\vdash\;&\int^{-} \omega , (\mathit{tau} \omega : \mathbb{R}_{\geq0}^{\infty} ) ∂\mu = \textstyle\sum ' \mathit{n} : \mathbb{N} , \mu \{ \omega | \mathit{n} < \mathit{tau} \omega \}
+\end{aligned} \]}
+
+\noindent\textbf{A\,4}\quad\lean{subgaussian\_threshold}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \mu : \mathit{Measure} \Omega \},\; [\mathit{IsProbabilityMeasure} \mu ],\; \{ \mathit{X} : \Omega \to\\
+&\quad \mathbb{R} \},\; \{ \mathit{c} : \mathbb{R}_{\geq0} \},\; (\mathit{hc} : (0:\mathbb{R} ) < (\mathit{c} : \mathbb{R} )),\; (\mathit{h} :\\
+&\quad \mathit{HasSubgaussianMGF} \mathit{X} \mathit{c} \mu ),\; (\mathit{beta} : \mathbb{R} ),\; (\mathit{hb0} : 0 < \mathit{beta}),\\
+&\quad \; (\mathit{hb1} : \mathit{beta} \leq 1)\\
+\vdash\;&\mu .\mathit{real} \{ \omega | \mathit{Real}.\mathit{sqrt} (2 * (\mathit{c} : \mathbb{R} ) * \mathit{Real}.\mathit{log} (1 / \mathit{beta})) \leq\\
+&\quad \mathit{X} \omega \} \leq \mathit{beta}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveLoopJoinV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,5}\quad\lean{doubling\_factor}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{b0} \mathit{Bstar} : \mathbb{R} ),\; (\mathit{hb0} : 0 < \mathit{b0}),\; (\mathit{hB} : \mathit{b0} \leq \mathit{Bstar}),\; (\mathit{k} : \mathbb{N} ),\\
+&\quad \; (\mathit{hk} : \mathit{Bstar} \leq \mathit{budget} \mathit{b0} \mathit{k}),\; (\mathit{hmin} : \forall \mathit{j}, \mathit{j} < \mathit{k} \to \mathit{budget} \mathit{b0} \mathit{j} <\\
+&\quad \mathit{Bstar})\\
+\vdash\;&\textstyle\sum \mathit{i} \in \mathit{Finset}.\mathit{range} (\mathit{k} + 1), \mathit{budget} \mathit{b0} \mathit{i} < 4 * \mathit{Bstar}
+\end{aligned} \]}
+
+\noindent\textbf{A\,6}\quad\lean{late\_revalidation\_can\_overshoot}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{b0} : \mathbb{R} ),\; (\mathit{hb0} : 0 < \mathit{b0}),\; (\mathit{m} : \mathbb{N} )\\
+\vdash\;&\mathit{budget} \mathit{b0} \mathit{m} = 2 ^{\mathit{m}} * \mathit{budget} \mathit{b0} 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,7}\quad\lean{total\_le\_two\_last}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{b0} : \mathbb{R} ),\; (\mathit{hb} : 0 \leq \mathit{b0}),\; (\mathit{K} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{k} \in \mathit{Finset}.\mathit{range} (\mathit{K} + 1), \mathit{budget} \mathit{b0} \mathit{k} \leq 2 * \mathit{budget} \mathit{b0} \mathit{K}
+\end{aligned} \]}
+
+\noindent\textbf{A\,8}\quad\lean{two\_pow\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{k} \in \mathit{Finset}.\mathit{range} (\mathit{K} + 1), (2:\mathbb{R} ) ^{\mathit{k}} = 2 ^{} (\mathit{K} + 1) - 1
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveOnlineQuotaFailsV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,9}\quad\lean{counts\_sum}
+{\footnotesize\[ \vdash\; \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = 11 \]}
+
+\noindent\textbf{A\,10}\quad\lean{deficit\_exceeds\_one}
+{\footnotesize\[ \vdash\; (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) * \mathit{w} 0 - (\mathit{N} 0 : \mathbb{Q} ) \]}
+
+\noindent\textbf{A\,11}\quad\lean{greedy\_steps}
+{\footnotesize\[ \vdash\; \mathit{True} \]}
+
+\noindent\textbf{A\,12}\quad\lean{online\_quota\_fails}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&(\textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1) \wedge (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = 11) \wedge (1 : \mathbb{Q} ) < (11 : \mathbb{Q} ) * \mathit{w} 0 - (\mathit{N} 0\\
+&\quad : \mathbb{Q} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,13}\quad\lean{weights\_sum\_one}
+{\footnotesize\[ \vdash\; \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1 \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveStoppingTailV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,14}\quad\lean{expectation\_of\_tail}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} \mathit{rho} : \mathbb{R} ),\; (\mathit{tail} : \mathbb{N} \to \mathbb{R} ),\; (\mathit{hC} : 0 \leq \mathit{C}),\; (\mathit{h0} : 0 \leq \mathit{rho}),\\
+&\quad \; (\mathit{h1} : \mathit{rho} < 1),\; (\mathit{hnn} : \forall \mathit{n}, 0 \leq \mathit{tail} \mathit{n}),\; (\mathit{hle} : \forall \mathit{n}, \mathit{tail} \mathit{n} \leq \mathit{C}\\
+&\quad * \mathit{rho} ^{\mathit{n}}),\; (\mathit{hsum} : \mathit{Summable} \mathit{tail})\\
+\vdash\;&\textstyle\sum ' \mathit{n} : \mathbb{N} , \mathit{tail} \mathit{n} \leq \mathit{C} / (1 - \mathit{rho})
+\end{aligned} \]}
+
+\noindent\textbf{A\,15}\quad\lean{geometric\_tail\_sum}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{C} \mathit{rho} : \mathbb{R} ),\; (\mathit{hC} : 0 \leq \mathit{C}),\; (\mathit{h0} : 0 \leq \mathit{rho}),\; (\mathit{h1} : \mathit{rho} < 1)\\
+\vdash\;&\textstyle\sum ' \mathit{n} : \mathbb{N} , \mathit{C} * \mathit{rho} ^{\mathit{n}} = \mathit{C} / (1 - \mathit{rho})
+\end{aligned} \]}
+
+\noindent\textbf{A\,16}\quad\lean{grid\_overhead}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{eps} \mathit{b0} \mathit{Bstar} \mathit{target} \mathit{prev} : \mathbb{R} ),\; (\mathit{heps} : 0 < \mathit{eps}),\\
+&\quad \; (\mathit{hb0} : 0 < \mathit{b0}),\; (\mathit{hB} : 0 < \mathit{Bstar}),\; (\mathit{hprev} : \mathit{prev} < \mathit{Bstar}),\\
+&\quad \; (\mathit{hstep} : \mathit{target} \leq (1 + \mathit{eps}) * \mathit{prev} + \mathit{b0})\\
+\vdash\;&\mathit{target} < (1 + \mathit{eps}) * \mathit{Bstar} + \mathit{b0}
+\end{aligned} \]}
+
+\noindent\textbf{A\,17}\quad\lean{peeling\_budget}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{K} : \mathbb{N} ),\; (\mathit{hK} : 0 < \mathit{K}),\; (\mathit{delta} : \mathbb{R} ),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{n} \in \mathit{Finset}.\mathit{range} \mathit{N}, (\mathit{K} : \mathbb{R} ) * (\mathit{delta} / ((\mathit{K} : \mathbb{R} ) * ((\mathit{n} + 1)\\
+&\quad * (\mathit{n} + 2)))) = \mathit{delta} * (1 - 1 / ((\mathit{N} : \mathbb{R} ) + 1))
+\end{aligned} \]}
+
+\noindent\textbf{A\,18}\quad\lean{telescope\_limit}
+{\footnotesize\[ \begin{aligned}[t]
+\vdash\;&\mathit{Filter}.\mathit{Tendsto} (\mathbf{fun} \mathit{N} : \mathbb{N} => \textstyle\sum \mathit{n} \in \mathit{Finset}.\mathit{range} \mathit{N}, (1 : \mathbb{R} )\\
+&\quad / ((\mathit{n} + 1) * (\mathit{n} + 2))) \mathit{Filter}.\mathit{atTop} (\mathit{nhds} 1)
+\end{aligned} \]}
+
+\noindent\textbf{A\,19}\quad\lean{telescope\_partial}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{N} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{n} \in \mathit{Finset}.\mathit{range} \mathit{N}, (1 : \mathbb{R} ) / ((\mathit{n} + 1) * (\mathit{n} + 2)) =\\
+&\quad 1 - 1 / (\mathit{N} + 1)
+\end{aligned} \]}
+
+\noindent\textbf{A\,20}\quad\lean{union\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&\{ \Omega : \mathit{Type}*\},\; [\mathit{MeasurableSpace} \Omega ],\; (\mu : \mathit{Measure} \Omega ),\\
+&\quad \; (\mathit{B} : \mathbb{N} \to \mathit{Set} \Omega ),\; (\mathit{d} : \mathbb{N} \to \mathbb{R}_{\geq0}^{\infty} ),\; (\mathit{delta} : \mathbb{R}_{\geq0}^{\infty} ),\\
+&\quad \; (\mathit{hB} : \forall \mathit{n}, \mu (\mathit{B} \mathit{n}) \leq \mathit{d} \mathit{n}),\; (\mathit{hd} : \textstyle\sum ' \mathit{n}, \mathit{d} \mathit{n} \leq \mathit{delta})\\
+\vdash\;&\mu (⋃ \mathit{n}, \mathit{B} \mathit{n}) \leq \mathit{delta}
+\end{aligned} \]}
+
+\vspace{4pt}\noindent\rule{\columnwidth}{0.4pt}\par\vspace{2pt}
+\noindent\textbf{Module \lean{LeanAdaptiveTrackingV1}}\par\vspace{3pt}
+
+\noindent\textbf{A\,21}\quad\lean{deficit\_sum\_zero}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\\
+&\quad \; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t})\\
+\vdash\;&\textstyle\sum \mathit{i}, \mathit{deficit} \mathit{w} \mathit{N} \mathit{t} \mathit{i} = 0
+\end{aligned} \]}
+
+\noindent\textbf{A\,22}\quad\lean{exists\_deficient}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\\
+&\quad \; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\; (\mathit{hN} : \textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t})\\
+\vdash\;&\exists \mathit{i}, 0 \leq \mathit{deficit} \mathit{w} \mathit{N} \mathit{t} \mathit{i}
+\end{aligned} \]}
+
+\noindent\textbf{A\,23}\quad\lean{frequency\_converges}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{ht} : 0 < \mathit{t}),\\
+&\quad \; (\mathit{hc} : \forall \mathit{i}, |(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq \mathit{c}),\; (\mathit{i} : \iota )\\
+\vdash\;&|(\mathit{N} \mathit{i} : \mathbb{R} ) / (\mathit{t} : \mathbb{R} ) - \mathit{w} \mathit{i}| \leq \mathit{c} / (\mathit{t} : \mathbb{R} )
+\end{aligned} \]}
+
+\noindent\textbf{A\,24}\quad\lean{pull\_count\_lower}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{s} \mathit{t} : \mathbb{N} ),\; (\mathit{c} : \mathbb{R} ),\; (\mathit{i} : \iota ),\; (\mathit{Ns} \mathit{Nt} : \mathbb{R} ),\\
+&\quad \; (\mathit{hNs} : |\mathit{Ns} - (\mathit{s} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq \mathit{c}),\; (\mathit{hNt} : |\mathit{Nt} - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}|\\
+&\quad \leq \mathit{c})\\
+\vdash\;&((\mathit{t} : \mathbb{R} ) - (\mathit{s} : \mathbb{R} )) * \mathit{w} \mathit{i} - 2 * \mathit{c} \leq \mathit{Nt} - \mathit{Ns}
+\end{aligned} \]}
+
+\noindent\textbf{A\,25}\quad\lean{tracking\_bound}
+{\footnotesize\[ \begin{aligned}[t]
+&(\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{N} : \iota \to \mathbb{N} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hlo} : \forall \mathit{i}, ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w}\\
+&\quad \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) \leq (\mathit{N} \mathit{i} : \mathbb{R} )),\; (\mathit{hhi} : \forall \mathit{i}, (\mathit{N} \mathit{i} : \mathbb{R} ) \leq\\
+&\quad ((\lfloor (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}\rfloor : \mathbb{Z} ) : \mathbb{R} ) + 1),\; (\mathit{i} : \iota )\\
+\vdash\;&|(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq 1
+\end{aligned} \]}
+
+\noindent\textbf{A\,26}\quad\lean{tracking\_exists}
+{\footnotesize\[ \begin{aligned}[t]
+&[\mathit{Nonempty} \iota ],\; (\mathit{w} : \iota \to \mathbb{R} ),\; (\mathit{t} : \mathbb{N} ),\; (\mathit{hw} : \textstyle\sum \mathit{i}, \mathit{w} \mathit{i} = 1),\\
+&\quad \; (\mathit{hw0} : \forall \mathit{i}, 0 \leq \mathit{w} \mathit{i})\\
+\vdash\;&\exists \mathit{N} : \iota \to \mathbb{N} , (\textstyle\sum \mathit{i}, \mathit{N} \mathit{i} = \mathit{t}) \wedge \forall \mathit{i}, |(\mathit{N} \mathit{i} : \mathbb{R} ) - (\mathit{t} : \mathbb{R} ) * \mathit{w} \mathit{i}| \leq 1
+\end{aligned} \]}

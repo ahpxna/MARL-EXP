@@ -2,9 +2,9 @@
 
 \begin{document}
 
-\title{Deciding Without Identifying:\\
-An Equivariant Decoder That Is Minimax\\
-Over All Decision Rules}
+\title{Exact Minimax Decision Risk Under\\
+One-Sided Revelation: A Separation Between\\
+Deciding and Recovering}
 
 \author{\IEEEauthorblockN{Vu Phan An Nguyen}
 \IEEEauthorblockA{\textit{Rider University} \\
@@ -84,7 +84,8 @@ throughout. And the observation process is given: nothing here designs the sampl
 
 \subsection{Decision Region Determination}
 
-The closest prior work asks precisely the question this paper's title names. Javdani, Chen,
+The closest prior work asks the question this paper's results are about, and asks it first.
+Javdani, Chen,
 Karbasi, Krause, Bagnell and Srinivasa formulate near-optimal Bayesian active learning for
 decision making, where the goal is to choose well rather than to learn the hypothesis, and
 their Hyperedge Cutting algorithm handles overlapping decision regions with an approximation
@@ -141,6 +142,11 @@ one-sidedness and the resulting equivariance, which has no analogue in the cost-
 characterisation.
 
 \subsection{The Gap}
+\NOTEPAR{The title was narrowed for this draft. ``Deciding Without Identifying'' is
+Javdani et al.'s framing, and this paper's own Related Work concedes that the generic idea is
+theirs; leading with it invites a comparison this paper does not win. What is defensible is
+the exact law in a specific one-sided model: $R_{\mathrm{dec}}=\tfrac12(1-P)^{N}$,
+independent of $K$, against a recovery cost that grows with $K$.}
 
 The literature therefore leaves a specific opening. Decision-region determination designs
 policies and gives approximation ratios but not an exact optimality statement for a terminal
@@ -251,163 +257,65 @@ the sum over draws; the exchange is between two finite sums and is exact.
 
 \noindent\textbf{S\,1}\quad\lean{avoid\_prob}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} :\\
-&\quad \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N}\\
-&\quad \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
-&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{k},\\
-&\quad \mathit{h} \mathit{k} \in \mathit{A}\\
-&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
-&\quad 0) = (\textstyle\sum \mathit{x} \in \mathit{A},\\
-&\quad \mathit{p}\\
-&\quad \mathit{x}) ^{\mathit{N}}
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{A} : \mathit{Finset} \Omega ),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h} \mathit{k})) * (\mathbf{if} \forall \mathit{k}, \mathit{h} \mathit{k} \in \mathit{A} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)\\
+&\quad = (\textstyle\sum \mathit{x} \in \mathit{A}, \mathit{p} \mathit{x}) ^{\mathit{N}}
 \end{aligned} \]}
 
 \noindent\textbf{S\,2}\quad\lean{expected\_prod\_unseen}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
-&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
-&\quad \to \Omega ),\;\\
-&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
-&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
-&\quad => \mathit{u} \mathit{x}.1\\
-&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
-&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
-&\quad \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
-&\quad \mathit{p} \mathit{x} =\\
-&\quad 1),\; (\mathit{N} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega ,\\
-&\quad (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h}\\
-&\quad \mathit{k}))\\
-&\quad * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
-&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
-&\quad ))) = (\textstyle\prod \mathit{i},\\
-&\quad (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i})\\
-&\quad : \mathbb{R}\\
-&\quad )) * (1 - \textstyle\sum \mathit{i}, \mathit{pc}\\
-&\quad \mathit{i}) ^{\mathit{N}}
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\\
+&\quad \mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1 \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc} \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} = 1),\; (\mathit{N} : \mathbb{N} )\\
+\vdash\;&(\textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h} \mathit{k})) * (\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R} )\\
+&\quad )) = (\textstyle\prod \mathit{i}, (\mathit{Fintype}.\mathit{card} (\kappa \mathit{i}) : \mathbb{R} )) * (1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i}) ^{\mathit{N}}
 \end{aligned} \]}
 
 \noindent\textbf{S\,3}\quad\lean{fixed\_tip\_unsafe\_fraction}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L'} : \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} :\\
-&\quad \mathbb{N} ) : \mathbb{R}\\
-&\quad ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose}\\
-&\quad (\mathit{L'} + 1) : \mathbb{N} ) : \mathbb{R}\\
-&\quad ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} :\\
-&\quad \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) +\\
-&\quad 1)
+&(\mathit{a} \mathit{L'} : \mathbb{N} )\\
+\vdash\;&(((\mathit{a} + \mathit{L'}).\mathit{choose} \mathit{L'} : \mathbb{N} ) : \mathbb{R} ) / (((\mathit{a} + \mathit{L'} + 1).\mathit{choose} (\mathit{L'} +\\
+&\quad 1) : \mathbb{N} ) : \mathbb{R} ) = ((\mathit{L'} : \mathbb{R} ) + 1) / ((\mathit{a} : \mathbb{R} ) + (\mathit{L'} : \mathbb{R} ) + 1)
 \end{aligned} \]}
 
 \noindent\textbf{S\,4}\quad\lean{good\_event\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
-&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
-&\quad \to \Omega ),\;\\
-&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
-&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
-&\quad => \mathit{u} \mathit{x}.1\\
-&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
-&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
-&\quad \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
-&\quad \mathit{p} \mathit{x} =\\
-&\quad 1),\; (\mathit{hpnn} : \forall \mathit{x}, 0\\
-&\quad \leq \mathit{p}\\
-&\quad \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\;\\
-&\quad (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i})\\
-&\quad ^{\mathit{N}} \leq \textstyle\sum \mathit{h} :\\
-&\quad \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k},\\
-&\quad \mathit{p} (\mathit{h}\\
-&\quad \mathit{k})) * (\mathbf{if} \forall \mathit{i},\\
-&\quad 1 \leq (\mathit{unseenSet} \mathit{u}\\
-&\quad \mathit{h} \mathit{i}).\mathit{card}\\
-&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
-&\quad 0)
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\\
+&\quad \mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1 \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc} \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} = 1),\\
+&\quad \; (\mathit{hpnn} : \forall \mathit{x}, 0 \leq \mathit{p} \mathit{x}),\; (\mathit{N} : \mathbb{N} ),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})\\
+\vdash\;&(1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i}) ^{\mathit{N}} \leq \textstyle\sum \mathit{h} : \mathit{Fin} \mathit{N} \to \Omega , (\textstyle\prod \mathit{k}, \mathit{p} (\mathit{h} \mathit{k})) * (\mathbf{if} \forall \mathit{i}, 1 \leq (\\
+&\quad \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)
 \end{aligned} \]}
 
 \noindent\textbf{S\,5}\quad\lean{minimax\_eq\_of\_constant}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{World}],\; [\mathit{Nonempty}\\
-&\quad \mathit{World}],\; (\mathit{R} :\\
-&\quad \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h}\\
-&\quad : \forall \mathit{w}, \mathit{R} \mathit{w}\\
-&\quad =\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad \mathit{R} = \mathit{r}
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{World}],\; [\mathit{Nonempty} \mathit{World}],\\
+&\quad \; (\mathit{R} : \mathit{World} \to \mathbb{R} ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{h} : \forall \mathit{w}, \mathit{R} \mathit{w} = \mathit{r})\\
+\vdash\;&(\mathit{univ} : \mathit{Finset} \mathit{World}).\mathit{sup'} \mathit{univ\_nonempty} \mathit{R} = \mathit{r}
 \end{aligned} \]}
 
 \noindent\textbf{S\,6}\quad\lean{prod\_unseen\_as\_sum}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
-&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u}\\
-&\quad \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R}\\
-&\quad )) = \textstyle\sum \tau : (\mathit{i} : \iota )\\
-&\quad \to \kappa \mathit{i}, (\mathbf{if} \forall \mathit{i}, \tau \mathit{i}\\
-&\quad \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}\\
-&\quad \mathbf{then} (1:\mathbb{R} ) \mathbf{else}\\
-&\quad 0)
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )\\
+\vdash\;&(\textstyle\prod \mathit{i}, ((\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} : \mathbb{R} )) = \textstyle\sum \tau : (\mathit{i} : \iota ) \to \kappa \mathit{i},\\
+&\quad (\mathbf{if} \forall \mathit{i}, \tau \mathit{i} \in \mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i} \mathbf{then} (1:\mathbb{R} ) \mathbf{else} 0)
 \end{aligned} \]}
 
 \noindent\textbf{S\,7}\quad\lean{prod\_unseen\_card}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\;\\
-&\quad (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u}\\
-&\quad \mathit{h}\\
-&\quad \mathit{i}).\mathit{card} =\\
-&\quad (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet}\\
-&\quad \mathit{u}\\
-&\quad \mathit{h})).\mathit{card}
+&(\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{h} : \mathit{Fin} \mathit{N} \to \Omega )\\
+\vdash\;&\textstyle\prod \mathit{i}, (\mathit{unseenSet} \mathit{u} \mathit{h} \mathit{i}).\mathit{card} = (\mathit{Fintype}.\mathit{piFinset} (\mathit{unseenSet} \mathit{u} \mathit{h}))\\
+&\quad .\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,8}\quad\lean{transversal\_mass}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} :\\
-&\quad (\mathit{i} : \iota ) \to \kappa \mathit{i}\\
-&\quad \to \Omega ),\;\\
-&\quad (\mathit{hinj} : \mathit{Function}.\mathit{Injective}\\
-&\quad (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i}\\
-&\quad => \mathit{u} \mathit{x}.1\\
-&\quad \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R}\\
-&\quad ),\; (\mathit{hp} : \forall \mathit{i}\\
-&\quad \mathit{j}, \mathit{p} (\mathit{u} \mathit{i}\\
-&\quad \mathit{j}) = \mathit{pc}\\
-&\quad \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x},\\
-&\quad \mathit{p} \mathit{x} =\\
-&\quad 1),\; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \\\
-&\quad (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} =>\\
-&\quad \mathit{u} \mathit{i} (\tau \mathit{i}))),\\
-&\quad \mathit{p} \mathit{x} = 1 - \textstyle\sum \mathit{i},\\
-&\quad \mathit{pc} \mathit{i}
+&(\mathit{p} : \Omega \to \mathbb{R} ),\; (\mathit{u} : (\mathit{i} : \iota ) \to \kappa \mathit{i} \to \Omega ),\; (\mathit{hinj} : \mathit{Function}.\\
+&\quad \mathit{Injective} (\mathbf{fun} \mathit{x} : \Sigma \mathit{i}, \kappa \mathit{i} => \mathit{u} \mathit{x}.1 \mathit{x}.2)),\; (\mathit{pc} : \iota \to \mathbb{R} ),\\
+&\quad \; (\mathit{hp} : \forall \mathit{i} \mathit{j}, \mathit{p} (\mathit{u} \mathit{i} \mathit{j}) = \mathit{pc} \mathit{i}),\; (\mathit{htot} : \textstyle\sum \mathit{x}, \mathit{p} \mathit{x} = 1),\\
+&\quad \; (\tau : (\mathit{i} : \iota ) \to \kappa \mathit{i})\\
+\vdash\;&\textstyle\sum \mathit{x} \in \mathit{univ} \ (\mathit{univ}.\mathit{image} (\mathbf{fun} \mathit{i} => \mathit{u} \mathit{i} (\tau \mathit{i}))), \mathit{p} \mathit{x} = 1 - \textstyle\sum \mathit{i}, \mathit{pc} \mathit{i}
 \end{aligned} \]}
 
 
@@ -455,82 +363,35 @@ ratio. Both numerator and denominator are functions of $|R|$.
 
 \noindent\textbf{S\,9}\quad\lean{bayes\_is\_minimax}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype}\\
-&\quad \mathit{World}],\; [\mathit{Nonempty}\\
-&\quad \mathit{World}],\; (\mathit{pri} \mathit{R} :\\
-&\quad \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{r} : \mathbb{R} ),\;\\
-&\quad (\mathit{hpi} : \forall \mathit{w}, 0\\
-&\quad \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
-&\quad \mathit{pri} \mathit{w} =\\
-&\quad 1),\; (\mathit{hconst} : \forall \mathit{w},\\
-&\quad \mathit{R} \mathit{w} =\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} * \mathit{R}\\
-&\quad \mathit{w}) = \mathit{r} \wedge (\mathit{univ}\\
-&\quad : \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'} \mathit{univ\_{}nonempty}\\
-&\quad \mathit{R} = \mathit{r}
+&\{ \mathit{World} : \mathit{Type}*\},\; [\mathit{Fintype} \mathit{World}],\; [\mathit{Nonempty} \mathit{World}],\\
+&\quad \; (\mathit{pri} \mathit{R} : \mathit{World} \to \mathbb{R} ),\; (\mathit{r} : \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri} \mathit{w}),\\
+&\quad \; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} = 1),\; (\mathit{hconst} : \forall \mathit{w}, \mathit{R} \mathit{w} = \mathit{r})\\
+\vdash\;&(\textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} * \mathit{R} \mathit{w}) = \mathit{r} \wedge (\mathit{univ} : \mathit{Finset} \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_nonempty} \mathit{R} = \mathit{r}
 \end{aligned} \]}
 
 \noindent\textbf{S\,10}\quad\lean{decoder\_risk\_eq\_L\_over\_aL}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W} \mathit{R} : \mathit{Finset}\\
-&\quad \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N}\\
-&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
-&\quad \subseteq \mathit{W}),\; (\mathit{hT} :\\
-&\quad \mathit{Fintype}.\mathit{card} \mathit{T}\\
-&\quad = \mathit{a} +\\
-&\quad \mathit{b}),\; (\mathit{hle} :\\
-&\quad \mathit{R}.\mathit{card} \leq \mathit{b})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(((\mathit{W} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad )) / ((\mathit{univ} \\\
-&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad ) = ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N}\\
-&\quad ) : \mathbb{R}\\
-&\quad ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} -\\
-&\quad \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
+&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{a} \mathit{b} : \mathbb{N} ),\; (\mathit{hW} : \mathit{W}.\mathit{card} = \mathit{b}),\\
+&\quad \; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W}),\; (\mathit{hT} : \mathit{Fintype}.\mathit{card} \mathit{T} = \mathit{a} + \mathit{b}),\\
+&\quad \; (\mathit{hle} : \mathit{R}.\mathit{card} \leq \mathit{b})\\
+\vdash\;&(((\mathit{W} \ \mathit{R}).\mathit{card} : \mathbb{R} )) / ((\mathit{univ} \ \mathit{R}).\mathit{card} : \mathbb{R} ) =\\
+&\quad ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R} ) / ((\mathit{a} : \mathbb{R} ) + ((\mathit{b} - \mathit{R}.\mathit{card} : \mathbb{N} ) : \mathbb{R}\\
 &\quad ))
 \end{aligned} \]}
 
 \noindent\textbf{S\,11}\quad\lean{decoder\_risk\_world\_free}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W₁} \mathit{W₂} \mathit{R} : \mathit{Finset}\\
-&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\;\\
-&\quad (\mathit{hW₁} : \mathit{W₁}.\mathit{card}\\
-&\quad =\\
-&\quad \mathit{b}),\; (\mathit{hW₂} :\\
-&\quad \mathit{W₂}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{h₁} : \mathit{R}\\
-&\quad \subseteq \mathit{W₁}),\; (\mathit{h₂} :\\
-&\quad \mathit{R} \subseteq \mathit{W₂}),\;\\
-&\quad (\mathit{U} : \mathit{Finset}\\
-&\quad \mathit{T})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&((\mathit{W₁} \ \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \\\
-&\quad \mathit{R}).\mathit{card} : \mathbb{R}\\
-&\quad ) / \mathit{U}.\mathit{card}
+&(\mathit{W₁} \mathit{W₂} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\; (\mathit{hW₁} : \mathit{W₁}.\mathit{card} = \mathit{b}),\\
+&\quad \; (\mathit{hW₂} : \mathit{W₂}.\mathit{card} = \mathit{b}),\; (\mathit{h₁} : \mathit{R} \subseteq \mathit{W₁}),\; (\mathit{h₂} : \mathit{R} \subseteq \mathit{W₂}),\\
+&\quad \; (\mathit{U} : \mathit{Finset} \mathit{T})\\
+\vdash\;&((\mathit{W₁} \ \mathit{R}).\mathit{card} : \mathbb{R} ) / \mathit{U}.\mathit{card} = ((\mathit{W₂} \ \mathit{R}).\mathit{card} : \mathbb{R} ) / \mathit{U}.\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,12}\quad\lean{hidden\_count\_world\_free}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{W} \mathit{R} : \mathit{Finset}\\
-&\quad \mathit{T}),\; (\mathit{b} : \mathbb{N}\\
-&\quad ),\; (\mathit{hW} : \mathit{W}.\mathit{card} =\\
-&\quad \mathit{b}),\; (\mathit{hRW} : \mathit{R}\\
-&\quad \subseteq \mathit{W})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{W} \ \mathit{R}).\mathit{card} = \mathit{b} -\\
-&\quad \mathit{R}.\mathit{card}
+&(\mathit{W} \mathit{R} : \mathit{Finset} \mathit{T}),\; (\mathit{b} : \mathbb{N} ),\; (\mathit{hW} : \mathit{W}.\mathit{card} = \mathit{b}),\; (\mathit{hRW} : \mathit{R} \subseteq \mathit{W})\\
+\vdash\;&(\mathit{W} \ \mathit{R}).\mathit{card} = \mathit{b} - \mathit{R}.\mathit{card}
 \end{aligned} \]}
 
 
@@ -565,6 +426,18 @@ sums, then collect the rule's action at each observation.
 \end{proof}
 
 \leanbox{\lean{bayesRisk\_eq\_sum\_postLoss} in \lean{LeanSupportMinimaxLowerV1}}
+\TODOPAR{Two gaps, and the second is larger. (i) \lean{equivariant\_is\_minimax} takes
+\lean{hconst} (the decoder has constant risk $r$) and \lean{hopt} (the Bayes value equals
+$r$) as hypotheses and concludes minimaxity. Both are exactly the facts that make the
+argument work, and neither is proved here for this paper's decoder on this paper's
+transcript; \lean{constant\_risk\_of\_symmetry} supplies the first \emph{abstractly}, from a
+transitive risk-invariant group action, but that action is not instantiated for the model.
+(ii) The quantifier is over deterministic rules $d:\mathit{Obs}\to\mathit{Act}$. A minimax
+claim against \emph{all} decision rules has to admit randomised ones, and in a finite
+symmetric problem the usual route is that randomisation cannot beat the Bayes value---which
+is itself a step this development does not contain. \emph{Either instantiate the group action
+and extend the quantifier, or state the theorem as minimax over deterministic rules}, which
+is what is proved.}
 
 After \eqref{eq:bayes} the rule appears only inside $g$, once per observation, so the Bayes
 risk of an arbitrary rule is a sum of independent terms each depending on the rule through a
@@ -632,123 +505,51 @@ invariance equates their risks.
 
 \noindent\textbf{S\,13}\quad\lean{bayesRisk\_eq\_sum\_postLoss}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
-&\quad \mathit{d} = \textstyle\sum \mathit{x},\\
-&\quad \mathit{postLoss} \mathit{pri} \mathit{P} \mathit{L}\\
-&\quad \mathit{x} (\mathit{d} \mathit{x})
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R} ),\\
+&\quad \; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})\\
+\vdash\;&\mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L} \mathit{d} = \textstyle\sum \mathit{x}, \mathit{postLoss} \mathit{pri} \mathit{P} \mathit{L} \mathit{x} (\mathit{d} \mathit{x})
 \end{aligned} \]}
 
 \noindent\textbf{S\,14}\quad\lean{bayes\_optimal\_attained}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\exists \mathit{d} : \mathit{Obs} \to \mathit{Act},\\
-&\quad \mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L}\\
-&\quad \mathit{d} = \mathit{bayesOptValue} \mathit{pri}\\
-&\quad \mathit{P} \mathit{L}
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R} ),\\
+&\quad \; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R} )\\
+\vdash\;&\exists \mathit{d} : \mathit{Obs} \to \mathit{Act}, \mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L} \mathit{d} = \mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L}
 \end{aligned} \]}
 
 \noindent\textbf{S\,15}\quad\lean{bayes\_optimal\_lower}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{pri} : \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
-&\quad \mathit{L} \leq \mathit{bayesRisk} \mathit{pri}\\
-&\quad \mathit{P} \mathit{L} \mathit{d}
+&(\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to \mathbb{R} ),\\
+&\quad \; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})\\
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L} \leq \mathit{bayesRisk} \mathit{pri} \mathit{P} \mathit{L} \mathit{d}
 \end{aligned} \]}
 
 \noindent\textbf{S\,16}\quad\lean{constant\_risk\_of\_symmetry}
 {\footnotesize\[ \begin{aligned}[t]
-&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G}\\
-&\quad \to \mathit{World} \to \mathit{World}),\; (\mathit{R} :\\
-&\quad \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{hinv} : \forall \mathit{g}\\
-&\quad \mathit{w}, \mathit{R} (\mathit{act} \mathit{g}\\
-&\quad \mathit{w}) = \mathit{R}\\
-&\quad \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w}\\
-&\quad \mathit{w'} : \mathit{World}, \exists \mathit{g},\\
-&\quad \mathit{act} \mathit{g} \mathit{w} =\\
-&\quad \mathit{w'})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\forall \mathit{w} \mathit{w'} : \mathit{World},\\
-&\quad \mathit{R} \mathit{w} = \mathit{R} \mathit{w'}
+&\{ \mathit{G} : \mathit{Type}*\},\; (\mathit{act} : \mathit{G} \to \mathit{World} \to \mathit{World}),\; (\mathit{R} : \mathit{World} \to \mathbb{R} )\\
+&\quad ,\; (\mathit{hinv} : \forall \mathit{g} \mathit{w}, \mathit{R} (\mathit{act} \mathit{g} \mathit{w}) = \mathit{R} \mathit{w}),\; (\mathit{htrans} : \forall \mathit{w} \mathit{w'} : \mathit{World}, \exists \mathit{g},\\
+&\quad \mathit{act} \mathit{g} \mathit{w} = \mathit{w'})\\
+\vdash\;&\forall \mathit{w} \mathit{w'} : \mathit{World}, \mathit{R} \mathit{w} = \mathit{R} \mathit{w'}
 \end{aligned} \]}
 
 \noindent\textbf{S\,17}\quad\lean{equivariant\_is\_minimax}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
-&\quad \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
-&\quad \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
-&\quad \mathit{pri} \mathit{w} =\\
-&\quad 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\;\\
-&\quad (\mathit{r} : \mathbb{R}\\
-&\quad ),\; (\mathit{hconst} : \forall \mathit{w},\\
-&\quad \mathit{risk} \mathit{P} \mathit{L}\\
-&\quad \mathit{d₀} \mathit{w} =\\
-&\quad \mathit{r}),\; (\mathit{hopt} :\\
-&\quad \mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
-&\quad \mathit{L} =\\
-&\quad \mathit{r})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} |\\
-&\quad \exists \mathit{d}\\
-&\quad : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} :\\
-&\quad \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
-&\quad \mathit{P} \mathit{L}\\
-&\quad \mathit{d}) = \mathit{v}\} \mathit{r}
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to\\
+&\quad \mathbb{R} ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri} \mathit{w}),\\
+&\quad \; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} = 1),\; (\mathit{d₀} : \mathit{Obs} \to \mathit{Act}),\; (\mathit{r} : \mathbb{R} ),\\
+&\quad \; (\mathit{hconst} : \forall \mathit{w}, \mathit{risk} \mathit{P} \mathit{L} \mathit{d₀} \mathit{w} = \mathit{r}),\; (\mathit{hopt} : \mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L}\\
+&\quad = \mathit{r})\\
+\vdash\;&\mathit{IsLeast} \{ \mathit{v} : \mathbb{R} | \exists \mathit{d} : \mathit{Obs} \to \mathit{Act}, (\mathit{univ} : \mathit{Finset} \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_nonempty} (\mathit{risk} \mathit{P} \mathit{L} \mathit{d}) = \mathit{v}\} \mathit{r}
 \end{aligned} \]}
 
 \noindent\textbf{S\,18}\quad\lean{minimax\_ge\_bayes\_optimal}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} :\\
-&\quad \mathit{World} \to \mathbb{R}\\
-&\quad ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{L} : \mathit{World} \to \mathit{Act}\\
-&\quad \to \mathbb{R}\\
-&\quad ),\; (\mathit{hpi} : \forall \mathit{w}, 0\\
-&\quad \leq \mathit{pri}\\
-&\quad \mathit{w}),\; (\mathit{hsum} : \textstyle\sum \mathit{w},\\
-&\quad \mathit{pri} \mathit{w} =\\
-&\quad 1),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P}\\
-&\quad \mathit{L} \leq (\mathit{univ} : \mathit{Finset}\\
-&\quad \mathit{World}).\mathit{sup'}\\
-&\quad \mathit{univ\_{}nonempty} (\mathit{risk}\\
-&\quad \mathit{P} \mathit{L}\\
-&\quad \mathit{d})
+&[\mathit{Nonempty} \mathit{World}],\; (\mathit{pri} : \mathit{World} \to \mathbb{R} ),\; (\mathit{P} : \mathit{World} \to \mathit{Obs} \to\\
+&\quad \mathbb{R} ),\; (\mathit{L} : \mathit{World} \to \mathit{Act} \to \mathbb{R} ),\; (\mathit{hpi} : \forall \mathit{w}, 0 \leq \mathit{pri} \mathit{w}),\\
+&\quad \; (\mathit{hsum} : \textstyle\sum \mathit{w}, \mathit{pri} \mathit{w} = 1),\; (\mathit{d} : \mathit{Obs} \to \mathit{Act})\\
+\vdash\;&\mathit{bayesOptValue} \mathit{pri} \mathit{P} \mathit{L} \leq (\mathit{univ} : \mathit{Finset} \mathit{World}).\mathit{sup'}\\
+&\quad \mathit{univ\_nonempty} (\mathit{risk} \mathit{P} \mathit{L} \mathit{d})
 \end{aligned} \]}
 
 
@@ -942,79 +743,32 @@ argument.
 
 \noindent\textbf{S\,19}\quad\lean{binary\_decide\_value}
 {\footnotesize\[ \begin{aligned}[t]
-&[\mathit{Nonempty} \iota ],\; (\mathit{L} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{hL} : \forall \mathit{i},\\
-&\quad \mathit{L} \mathit{i} \leq 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_{}nonempty}\\
-&\quad (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R}\\
-&\quad ) / (1 + \mathit{L}\\
-&\quad \mathit{i}))) = \mathbf{if} (\forall \mathit{i},\\
-&\quad \mathit{L} \mathit{i} =\\
-&\quad 1) \mathbf{then} (1 : \mathbb{R} ) / 2 \mathbf{else} 0
+&[\mathit{Nonempty} \iota ],\; (\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)\\
+\vdash\;&(\mathit{univ}.\mathit{inf'} \mathit{univ\_nonempty} (\mathbf{fun} \mathit{i} => (\mathit{L} \mathit{i} : \mathbb{R} ) / (1 + \mathit{L} \mathit{i})))\\
+&\quad = \mathbf{if} (\forall \mathit{i}, \mathit{L} \mathit{i} = 1) \mathbf{then} (1 : \mathbb{R} ) / 2 \mathbf{else} 0
 \end{aligned} \]}
 
 \noindent\textbf{S\,20}\quad\lean{cfac\_le\_one}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{i} : \iota )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\mathit{cfac} \mathit{a} \mathit{L} \mathit{i}\\
-&\quad \leq 1
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{i} : \iota ) \;\vdash\; \mathit{cfac} \mathit{a} \mathit{L} \mathit{i} \leq 1 \]}
 
 \noindent\textbf{S\,21}\quad\lean{growing\_K\_recover}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i},\\
-&\quad \mathit{L} \mathit{i} \leq 1)
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L}\\
-&\quad \mathit{i}).\mathit{choose} (\mathit{L}\\
-&\quad \mathit{i}) : \mathbb{N}\\
-&\quad ) : \mathbb{R}\\
-&\quad )) = (1 / 2 : \mathbb{R} ) ^{}\\
-&\quad (\mathit{univ}.\mathit{filter} (\mathbf{fun}\\
-&\quad \mathit{i} => \mathit{L} \mathit{i} =\\
-&\quad 1)).\mathit{card}
+&(\mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{hL} : \forall \mathit{i}, \mathit{L} \mathit{i} \leq 1)\\
+\vdash\;&\textstyle\prod \mathit{i}, (1 / ((((1:\mathbb{N} ) + \mathit{L} \mathit{i}).\mathit{choose} (\mathit{L} \mathit{i}) : \mathbb{N} ) : \mathbb{R} )) =\\
+&\quad (1 / 2 : \mathbb{R} ) ^{} (\mathit{univ}.\mathit{filter} (\mathbf{fun} \mathit{i} => \mathit{L} \mathit{i} = 1)).\mathit{card}
 \end{aligned} \]}
 
 \noindent\textbf{S\,22}\quad\lean{recover\_lower\_pointwise}
 {\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \iota \to \mathbb{N}\\
-&\quad ),\; (\mathit{ha} : \forall \mathit{i}, 1\\
-&\quad \leq \mathit{a}\\
-&\quad \mathit{i}),\; (\mathit{i₀} : \iota ),\;\\
-&\quad (\mathit{h} : 1 \leq \mathit{L}\\
-&\quad \mathit{i₀})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&(1:\mathbb{R} ) / 2 \leq 1 - \textstyle\prod \mathit{i},\\
-&\quad \mathit{cfac} \mathit{a} \mathit{L} \mathit{i}
+&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} ),\; (\mathit{ha} : \forall \mathit{i}, 1 \leq \mathit{a} \mathit{i}),\; (\mathit{i₀} : \iota ),\; (\mathit{h} : 1 \leq \mathit{L} \mathit{i₀})\\
+\vdash\;&(1:\mathbb{R} ) / 2 \leq 1 - \textstyle\prod \mathit{i}, \mathit{cfac} \mathit{a} \mathit{L} \mathit{i}
 \end{aligned} \]}
 
 \noindent\textbf{S\,23}\quad\lean{recover\_upper\_pointwise}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \iota \to \mathbb{N} )
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&1 - \textstyle\prod \mathit{i}, \mathit{cfac}\\
-&\quad \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i},\\
-&\quad (\mathit{L} \mathit{i} : \mathbb{R}\\
-&\quad )
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{a} \mathit{L} : \iota \to \mathbb{N} ) \;\vdash\; 1 - \textstyle\prod \mathit{i}, \mathit{cfac} \mathit{a} \mathit{L} \mathit{i} \leq \textstyle\sum \mathit{i}, (\mathit{L} \mathit{i} : \mathbb{R} ) \]}
 
 \noindent\textbf{S\,24}\quad\lean{two\_le\_choose}
-{\footnotesize\[ \begin{aligned}[t]
-&(\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\;\\
-&\quad (\mathit{hL} : 1 \leq \mathit{L})
-\end{aligned} \]}
-{\footnotesize\[ \begin{aligned}[t]
-\vdash\;&2 \leq (\mathit{a} + \mathit{L}).\mathit{choose}\\
-&\quad \mathit{L}
-\end{aligned} \]}
+{\footnotesize\[ (\mathit{a} \mathit{L} : \mathbb{N} ),\; (\mathit{ha} : 1 \leq \mathit{a}),\; (\mathit{hL} : 1 \leq \mathit{L}) \;\vdash\; 2 \leq (\mathit{a} + \mathit{L}).\mathit{choose} \mathit{L} \]}
 
 
 The recovery side is computed as an identity rather than a bound, and this matters because an
@@ -1047,10 +801,14 @@ compares.
 
 \subsection{Setup}
 
-The grid is $K\in\{1,2,3,4,6,8,12,16,24,32,48,64,96,128,192,256,384,512,768,1024\}$,
-$P\in\{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\}$
-and $\varepsilon$ from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the model
-$a_{i}=b_{i}=1$, $p_{i}=P/K$.
+The grid is
+\begin{align*}
+K &\in \{1,2,3,4,6,8,12,16,24,32,48,\\
+  &\qquad 64,96,128,192,256,384,512,768,1024\},\\
+P &\in \{\tfrac1{20},\tfrac1{10},\tfrac15,\tfrac14,\tfrac13,\tfrac12,\tfrac23,\tfrac34,\tfrac9{10}\},
+\end{align*}
+and $\varepsilon$ runs from $\tfrac1{10}$ down to $10^{-6}$, giving $1{,}080$ cells on the
+model $a_{i}=b_{i}=1$, $p_{i}=P/K$.
 
 The recovery sum alternates in sign with binomial weights, so it loses roughly $K$ bits to
 cancellation and cannot be evaluated in double precision anywhere near the top of this grid:
@@ -1134,8 +892,10 @@ the file on disk; the compiled artifact is newer than its source; at least one
 within $\{\textsf{propext},\textsf{Classical.choice},\textsf{Quot.sound}\}$; and no
 \texttt{sorry} appears anywhere in the file.
 
-The contract is stated in full because each clause excludes a specific way of appearing
-verified without being so. The hash check across the compile excludes editing a file after
+This contract is shared with the other papers of the programme and is reproduced verbatim in
+each, so that no paper's evidence claim has to be read against a different standard; the
+wording is common and the counts in this section are not. The contract is stated in full
+because each clause excludes a specific way of appearing verified without being so. The hash check across the compile excludes editing a file after
 checking it; the artifact-newer check excludes a stale \texttt{.olean}; and the axiom audit is
 a \emph{whitelist} rather than a blacklist, so an axiom introduced by a decision procedure
 outside the kernel is rejected by name mismatch rather than needing to be anticipated.
@@ -1164,8 +924,8 @@ Separation, Thm~\ref{thm:separation}  & \lean{LeanSupportDecideRecoverV1}      &
 \subsection{Scope of the Formalisation}
 
 The Support strand contains $50$ Lean source files with $870$ theorem and lemma statements,
-of which $22$ modules carry an acceptance receipt covering $189$ audited declarations. Across
-the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $875$ audited
+of which $21$ modules carry an acceptance receipt covering $183$ audited declarations. Across
+the programme: $762$ files, $7{,}199$ statements, $111$ accepted modules, $857$ audited
 declarations.
 
 Two formulations were withdrawn under the prover. The original minimax statement took constant
@@ -1302,6 +1062,16 @@ choice among actions rather than a report of the parameter, the identification c
 entirely avoidable, and Theorem~\ref{thm:minimax} says the avoidance is not a heuristic.
 
 \subsection{Shortcomings and Limitations}
+\TODOPAR{Three things a reviewer will press, in order of severity. (i) The decoder is
+not \emph{uniquely} optimal---any rule naming an unexplored tip attains the bound---so the
+result constrains rather than selects, and the prose should say so where the optimality is
+claimed. (ii) $R_{\mathrm{dec}}$'s independence of $K$ is an identity in the symmetric model
+($a_{i}=b_{i}=1$, $p_{i}=P/K$, $P$ held fixed), not a discovered fact; Section~V-E says
+``structural, not measured'' and that caveat belongs in the abstract. (iii) The decide side is
+a closed form and the recovery side is an inclusion--exclusion identity inverted by bisection,
+so the ``separation'' compares objects of different kinds. The coupon-collector fit
+($c\in[0.916,0.966]$, $R^{2}\ge0.99996$) is strong evidence that an asymptotic closed form
+exists; \emph{deriving it would close the comparison} and is probably a week's work.}
 
 \emph{One prior, not a minimax theorem.} The prior is arbitrary but fixed: this is minimaxity
 through one Bayes prior, and no saddle point is claimed. What is obtained is a value
