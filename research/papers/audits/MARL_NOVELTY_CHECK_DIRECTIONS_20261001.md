@@ -57,3 +57,52 @@ niche has low expected yield.  The one coherent positioning left for paper_marl_
 Moeller–Krishnamachari's own open list (endogenous closed-loop state, communication charged in bytes, heterogeneous
 radii = capacities, long-range shortcuts = relay, low-dimensional summaries = byte packets), with an exact channel
 frontier and a pre-registered reserved-panel result (L-201) — an empirical/systems contribution, not new theory.
+
+## Round 4 (09:5x–10:1x; the user's choices: re-dig MARL v1, open problems of the newest papers, LLM evaluation, A/B testing)
+| Candidate | Closest prior work | Verdict |
+|---|---|---|
+| MARL v1's commitment bound (price of one order ≤ 2η·Σ_b(|P_b∖T_b| − R)₊, η = distance of marginal values from a score) as the "selection term" of v2 | approximate modularity / submodularity ratio: Das, Kempe (JMLR 2018); Chierichetti et al. (FOCS 2015) | Incremental as theory; USEFUL as the paper's decomposition: value of an order = one-step selection term (small under relay) + dynamic freshness term (rotation) — matches L-202 (congestion order loses at cap4/low) |
+| Open problems of the Sep-2026 papers | AH-VIB (arXiv 2609.34860) future work: learn "what information should appear early in a message AND which agent can communicate at which slot"; Moeller–Krishnamachari: heterogeneous radii, shortcuts, summaries, budgets, endogenous state; Chauhan–Bera: non-PPO learners, longer budgets | The "which agent at which slot under prefix truncation" problem IS paper_marl_v2's setting → strongest positioning sentence available. The joint (slot × within-message prefix) problem has a classical networking analogue (receiver-driven layered multicast, McCanne et al. 1996) → incremental |
+| LLM evaluation: decide which model is better without estimating accuracy | Select-LLM / active model selection (arXiv 2510.09418); "LLM selection with limited annotations" (2605.24981); ATLAS adaptive testing (2511.04689); "Stop guessing when to stop testing" (2607.08522, Jul 2026); "Knowing when to stop: Bayesian optimal stopping for LLM evaluations" (2608.14425, Aug 2026); tinyBenchmarks | Collided (crowded, very recent) |
+| A/B testing: stop when the decision is safe | "Ranking experiments under sequential sampling" (2608.19897, Aug 2026); "When is statistical evidence strong enough? Using hypothesis tests to value data collection" (2609.09544, Sep 2026); decision-theoretic A/B testing (Azevedo et al. 2017, arXiv 1710.03410); best-arm identification | Collided |
+
+Conclusion after four rounds (15 candidates): none passes as a standalone contribution.  Every neighbourhood got
+directly relevant papers in Jul–Sep 2026.  The defensible unit remains paper_marl_v2, positioned as answering the open
+setting named by AH-VIB, Moeller–Krishnamachari and Chauhan–Bera, with the reserved-panel result (L-201/L-202) and the
+audit (L-203).
+
+## Round 5 (12:0x; third external audit: "protocol-conditioned net decision effect = repair − corruption")
+| Claimed element | Closest prior work (verified 01/10 12:0x) | Verdict |
+|---|---|---|
+| "Communication can hurt a learned decentralised policy" (stale / partial / delayed messages) | VIL2C (arXiv 2511.19146, AAAI 2026: value of information of delayed messages); CoDe (arXiv 2501.05207, AAAI 2025: asynchronous messages, age-decayed attention); CAIC (UAI 2026, PMLR 337:3705–3718: queueing channel, delay-robust intent messages); Don't Fire Together (Sensors 2026, doi 10.3390/s26154778: frozen learned policy, staleness "synchrony tax", test-time scheduling); CGDC (arXiv 2604.03785) | **not new** (audit agrees) |
+| Repair / corruption split of a new system against a reference ("decisions correct before and wrong after") | negative flip rate, positive-congruent training (Yan et al., CVPR 2021, arXiv 2011.09161); compatibility of updates (Bansal et al., AAAI 2019: new errors penalised); benefit vs detriment of added information predicted without training (Tok-RAG, Xu et al., ICLR 2025, arXiv 2406.00944) | **known template**; audit did not cite it |
+| Predicting cross-seed realised gain of runtime communication from a decision-level net measure computed on a development rollout | none found in the papers above | narrow, empirical; and the measure needs the TRAINED relay student run closed loop, so it is not "before deployment" |
+Algebra the audit missed: with its definitions net_S = acc_S − acc_E exactly (teacher-on-local baseline, not Z).
+
+## Round 6 (20:5x–21:0x): the receiver floor (LeanMarlReceiverFloorV1/V2) against AoI lower bounds
+Read: Farazi, Klein, Brown, "Fundamental bounds on the age of information in general multi-hop interference networks"
+(par.nsf.gov/servlets/purl/10112751, pp. 1–4).  Model: every node is a source and a monitor; each transmission carries ONE
+status (one sample, own or relayed); every one-hop neighbour of a transmitter receives it; at most ν nodes transmit per slot
+(feasible activation sets).  Lemma 1: updating all statuses needs at least ⌈(Nγ_c + |L|)/ν⌉ slots for every schedule;
+Theorem 1: instantaneous peak age ≥ that T*; Theorem 2: an average-age bound.
+| Our statement | Covered there? |
+|---|---|
+| Constant K, everyone decodes the same K senders: ≤ K·n senders fresh within n steps | Same counting idea (a measurement leaves its source only when the source is decoded; ≤ ν transmitters per slot) — INCREMENTAL |
+| Packets carry the sender's whole table (unbounded piggyback) | Not there (one status per packet); but piggyback does not change the counting for the public set |
+| Prefix decoding: the (K+1)-th sender is decoded only by the public receivers; the floor is K·n, not (K+1)·n (private-pool lemma ≤ 1, sharp) | Not there (all neighbours decode every transmission) |
+| Heterogeneous / time-varying budgets: Σ_s K*(s) (richest receiver) | Not there |
+| Use as a pre-deployment predicate for when a learned receiver is forced out of its training support | Not there |
+Verdict: supporting lemma, as in the 08:30 verdict on the freshness theory; the new pieces are the prefix / heterogeneous
+decoding and the predicate use, not the counting.  Cite Farazi–Klein–Brown (both the global-interference JCN 2019 paper and
+this general-interference version) next to Kadota et al. 2018.  Gossip / radio-network gossiping with combined messages
+(e.g. arXiv 1302.0264, DMTCS gossiping papers) is about rounds to complete dissemination, not per-receiver freshness under a
+shared prefix channel; abstracts only, not read in full.
+
+## Round 7 (21:2x–21:4x): the "operating envelope" framing (F(κ) ∩ R_θ, repair locus)
+| Element | Nearest prior work found | Verdict |
+|---|---|---|
+| F(κ), the channel-achievable exposure set | Feasible average-age region of multiple sources (Yates–Kaul, arXiv 1608.08622); throughput–AoI capacity region (arXiv 2508.12185); Farazi–Klein–Brown lower bounds | NOT new as an object; our outer bound (prefix floor) is the new piece |
+| R_θ, a learned receiver's compatibility region | Communication demand specified by robust control invariant sets for model-based MPC co-design (Chalmers, "Optimal scheduling and control for constrained multi-agent networked control systems", abstract only) | Model-based analogue exists; a LEARNED receiver's region against a compiled-silence bar not found |
+| "Can the network fix the learned controller, or must the receiver change?" with a scheduler-independent impossibility side | Not found (searches: operating envelope / co-design / deployability; SchedNet ICLR 2019 learns scheduling jointly, no impossibility side) | Candidate contribution (targeted search, not a priority claim) |
+| Schedule-only causal effect on a frozen learned policy | Don't Fire Together (Sensors 2026; frozen learned policy + communication scheduling + staleness; full text not re-read, MDPI 403) | Do NOT claim first |
+| Prefix → "nested reception" generalisation | — | Mathematically trivial for truly nested decode sets; prefix is NOT nested (receivers are senders; self-exclusion). V2's two-inclusion step is the right class; formalised for the prefix rule in LeanMarlPrefixInstanceV1 (compiling) |

@@ -1,0 +1,114 @@
+LeanMarlImitationGapV1.lean:72:104: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+LeanMarlImitationGapV1.lean:74:93: error: unsolved goals
+case «0».«0»
+⊢ ∑ x with ![0, 1, 1] x = 0 ∧ ![0, 1, 0] x = 0, ![1 / 2, 3 / 10, 1 / 5] x ≤
+    ∑ x with ![0, 1, 1] x = 0 ∧ ![0, 1, 0] x = 0, ![1 / 2, 3 / 10, 1 / 5] x
+
+case «0».«1»
+⊢ ∑ x with ![0, 1, 1] x = 0 ∧ ![0, 1, 0] x = 1, ![1 / 2, 3 / 10, 1 / 5] x ≤
+    ∑ x with ![0, 1, 1] x = 0 ∧ ![0, 1, 0] x = 0, ![1 / 2, 3 / 10, 1 / 5] x
+
+case «1».«0»
+⊢ ∑ x with ![0, 1, 1] x = 1 ∧ ![0, 1, 0] x = 0, ![1 / 2, 3 / 10, 1 / 5] x ≤ 3 / 10
+
+case «1».«1»
+⊢ ∑ x with ![0, 1, 1] x = 1 ∧ ![0, 1, 0] x = 1, ![1 / 2, 3 / 10, 1 / 5] x ≤ 3 / 10
+LeanMarlImitationGapV1.lean:78:86: error: unsolved goals
+case left
+⊢ ∑ x with 0 = ![0, 1, 0] x, ![1 / 2, 3 / 10, 1 / 5] x = 7 / 10
+
+case right
+⊢ ∑ x with ![0, 1] (![0, 1, 1] x) = ![0, 1, 0] x, ![1 / 2, 3 / 10, 1 / 5] x = 4 / 5
+LeanMarlImitationGapV1.lean:79:35: warning: This simp argument is unused:
+  coarse
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [agreement, fine, polC, polF, aT, p, Finset.sum_filter, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:79:68: warning: This simp argument is unused:
+  Finset.sum_filter
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [agreement, coarse, fine, polC, polF, aT, p, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:79:87: warning: This simp argument is unused:
+  Fin.sum_univ_three
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [agreement, coarse, fine, polC, polF, aT, p, Finset.sum_filter]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:82:114: error: Tactic `decide` failed for proposition
+  ∑ w with ![0, 1] (![0, 1, 1] w) ∉ ![{0}, {0, 1}, {0}] w, ![2⁻¹, 3 / 10, 5⁻¹] w = 5⁻¹
+because its `Decidable` instance
+  instDecidableEqRat (∑ w with ![0, 1] (![0, 1, 1] w) ∉ ![{0}, {0, 1}, {0}] w, ![2⁻¹, 3 / 10, 5⁻¹] w) 5⁻¹
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `decidable_of_decidable_of_iff`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqRat`, `instDecidableNot`, `Bool.decEq`, `decidableMem`, `Int.decEq`, `Int.instDecidableEq`, `List.instDecidableMemOfLawfulBEq`, `Multiset.decidableMem`, `Nat.decEq`, `instDecidableEqRat.decEq`, and `Multiset.decidableMem._aux_1`, reduction got stuck at the `Decidable` instance
+  match
+    (((fun w => ![2⁻¹, 3 / 10, 5⁻¹] w) ((fun i => i) ⟨2, ⋯⟩)).add
+        (List.foldr (fun x1 x2 => x1 + x2) 0
+          (List.map (fun w => ![2⁻¹, 3 / 10, 5⁻¹] w)
+            (List.filter (fun b => decide ((fun w => ![0, 1] (![0, 1, 1] w) ∉ ![{0}, {0, 1}, {0}] w) b)) [])))).num,
+    (Rat.inv 5).num with
+  | Int.ofNat a, Int.ofNat b =>
+    match decEq a b with
+    | isTrue h => isTrue ⋯
+    | isFalse h => isFalse ⋯
+  | Int.ofNat a, Int.negSucc a_1 => isFalse ⋯
+  | Int.negSucc a, Int.ofNat a_1 => isFalse ⋯
+  | Int.negSucc a, Int.negSucc b =>
+    match decEq a b with
+    | isTrue h => isTrue ⋯
+    | isFalse h => isFalse ⋯
+LeanMarlImitationGapV1.lean:82:36: warning: This simp argument is unused:
+  coarse
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, fine, polC, polF, safe, p, Finset.sum_filter, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:82:71: warning: This simp argument is unused:
+  Finset.sum_filter
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, coarse, fine, polC, polF, safe, p, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:82:90: warning: This simp argument is unused:
+  Fin.sum_univ_three
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, coarse, fine, polC, polF, safe, p, Finset.sum_filter]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:85:20: warning: This simp argument is unused:
+  fine
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, polB, safe, p, Finset.sum_filter, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:85:41: warning: This simp argument is unused:
+  Finset.sum_filter
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, fine, polB, safe, p, Fin.sum_univ_three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:85:60: warning: This simp argument is unused:
+  Fin.sum_univ_three
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [unsafeMass, fine, polB, safe, p, Finset.sum_filter]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+LeanMarlImitationGapV1.lean:85:80: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+'CIGAMF.P13.MarlImitationGap.imitation_gap' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+lake env lean LeanMarlImitationGapV1.lean  8.12s user 58.96s system 15% cpu 7:18.89 total

@@ -1,0 +1,526 @@
+% WORKING DRAFT v2 of the MARL paper (30/09/2026, from 16:0x EDT).  Replaces the selector framing of paper_marl.tex,
+% which is kept unchanged as the historical draft (with its A1/G1 corrections of 30/09).
+% Part I (analysis + minimal fix) rests on evidence in hand.  Part II (a theory of prefix-broadcast communication) is IN
+% PROGRESS: its mechanism checks are measured, its E3-specific statements are NOT yet in Lean (rule: nothing enters as a
+% theorem before compiled, gated Lean).  Every number is copied from a named ledger row of
+% research/papers/audits/MARL_SELF_AUDIT_LEDGER_20260928.md (tags L-xxx in the notes) and its artifacts.
+% All E3 results are DEVELOPMENT or DEVELOPMENT-CONFIRM (pre-registered, unused panels); the reserved test 1301-1316 is closed.
+% Build: tectonic -X compile paper_marl_v2.tex --keep-logs
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx,booktabs,url,xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{conjecture}{Conjecture}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{prediction}{Prediction}
+
+\newcommand{\lean}[1]{\textsf{\footnotesize #1}}
+\newcommand{\PROVED}{\textsc{proved}}
+\newcommand{\NUM}{\textsc{numerical}}
+\newcommand{\DEV}{\textsc{dev}}
+\newcommand{\PRE}{\textsc{pre-reg}}
+\newif\ifshownotes\shownotestrue
+\definecolor{notecol}{RGB}{0,70,190}
+\definecolor{todocol}{RGB}{190,20,20}
+\newcommand{\NOTE}[1]{\ifshownotes{\color{notecol}\,\textsf{\footnotesize[N: #1]}}\fi}
+\newcommand{\TODO}[1]{\ifshownotes{\color{todocol}\,\textsf{\footnotesize[TODO: #1]}}\fi}
+\newcommand{\TODOPAR}[1]{\ifshownotes\par\vspace{2pt}\noindent%
+  {\color{todocol}\textsf{\footnotesize\textbf{To decide.}\;#1}}\par\vspace{2pt}\fi}
+
+\begin{document}
+\sloppy
+\title{Silence Is a Strong Baseline: Relay, Rotation and the Distilled Zero-Byte Bar\\
+for Prefix-Broadcast Multi-Agent Communication}
+\author{\TODO{authors and affiliation}}
+\date{Working draft v2, 30 September 2026}
+\maketitle
+
+\TODOPAR{(1) Venue and page limit are unconfirmed (the v1 draft named CCSC Eastern); they decide how much of
+Sections~\ref{sec:fail}--\ref{sec:theory} moves to an appendix. (2) Framing: Part I (analysis plus minimal fix) is
+supported now; Part II (Section~\ref{sec:theory}) is in progress and must stay labelled as such until its E3-specific
+statements are compiled in Lean. (3) Whether to run the reserved test (traffic seeds 1301--1316) on relay with a rotating
+head. (4) More training seeds: the gains depend on the teacher's quality (Section~\ref{sec:limits}).}
+
+\begin{abstract}
+When several agents share one broadcast stream and each receiver can decode only a prefix of it, of a size that varies
+between receivers and over time, does communication help a learned team? On a $3\times3$ CityFlow traffic-signal grid
+with such a channel we find that the answer depends on the comparator. Learned actors that use the delivered messages
+are worse than an actor trained without any messages. A student distilled from a full-information teacher that sends
+\emph{zero} bytes is better than both. Controls show that the student's gain is the teacher's information, not
+distillation or extra compute: a student of a silent teacher gains nothing on three seeds, and the gain grows with the
+teacher's information. Measured against this distilled silence, five pre-registered communication designs inside the
+packet channel fail, and one has a seed-dependent result. We trace the failures to three mechanisms of prefix decoding:
+sparse, varying sender sets in a slot-indexed input; stale cached copies; and a congestion-ranked stream head that never
+injects low-ranked senders when capacity is low. The minimal repair keeps the channel and its byte accounting. Every
+25-byte packet carries a 3-byte decision summary of its sender and aged relays of every other agent in an explicit
+185-bit layout, and the head of the stream rotates. On an unused, pre-registered panel this beats the distilled
+zero-byte student on both training seeds under every capacity condition tested ($-2.2$ to $-4.0\%$ total waiting). Each
+missing piece breaks it: no relay, no rotation, reinforcement learning instead of distillation, or no messages at all.
+A companion analysis (in progress) ties each failure to a theorem shape from compression and experimental design:
+frozen-surrogate starvation, one ranking for every budget, quota tracking, decision lifetime and obstruction floors. It
+checks the predicted mechanisms directly.
+\end{abstract}
+
+\part*{Part I --- Analysis and a minimal fix}
+
+\section{Introduction}\label{sec:intro}
+Budgeted multi-agent communication is usually evaluated against agents trained without messages. We study a channel
+where that comparator is too weak. One broadcast stream is committed per step; after it is committed, each receiver
+learns how many packets it can decode, and it decodes the first $K_i$ of the stream. Capacities differ between receivers
+and change every step. The same structure appears in layered multicast~\cite{rlm}, where heterogeneous receivers
+subscribe to a prefix of layers. It is new, as far as we can tell, as a multi-agent reinforcement-learning channel.
+
+We report three findings and one repair:
+\begin{enumerate}
+\item \textbf{Messages harm, and silence is strong.} Actors trained on the channel's own deliveries are worse than a
+co-trained actor that ignores communication. The heuristic reference used in earlier drafts (max pressure) is itself
+harmed by its neighbour messages, and a message-free max-queue rule is the honest heuristic (Section~\ref{sec:fail}).
+\item \textbf{The bar is a distilled zero-byte student.} DAgger distillation of a full-information teacher into a policy
+that receives no messages beats the co-trained silent actor on five of five seeds. The gain is information, not
+distillation or compute (Section~\ref{sec:student}). Against this bar every design inside the packet channel that we
+pre-registered fails or is seed-dependent.
+\item \textbf{The failure has mechanisms.} We identify three (Section~\ref{sec:mech}): sparse and varying sender sets in a
+slot-indexed input, stale cached copies, and head starvation when capacity is low.
+\item \textbf{A minimal repair works.} Relay tables in the unchanged packets, plus a rotating stream head, beat the bar
+on an unused pre-registered panel, on both seeds and under every capacity condition (Section~\ref{sec:fix}).
+\end{enumerate}
+
+\paragraph{Contributions, scoped.}
+(i) The prefix-broadcast channel with heterogeneous receiver capacities as a MARL testbed, with explicit byte accounting
+and an oracle-access audit. (ii) The distilled zero-byte student as a required comparator for deployment-communication
+claims, with controls for distillation, compute and dose. (iii) A diagnosis of why learned communication fails on this
+channel, with each alternative hypothesis tested by a rule written before its result. (iv) Relay with a rotating head as
+a minimal, pre-registered repair. What is \emph{not} claimed: relay itself is prior art (Section~\ref{sec:related}), and
+so is distillation of a privileged teacher.
+
+\section{Related work}\label{sec:related}
+\paragraph{Learned communication under budgets.} Scheduling who talks (SchedNet~\cite{schednet}), sparse or compressed
+messages (NDQ~\cite{ndq}, IMAC~\cite{imac}, information-bottleneck and vector-quantised messages~\cite{ibvq}),
+event-triggered sending~\cite{etcnet} and request-based perception (Where2comm~\cite{where2comm}) are established.
+Chauhan and Bera~\cite{chauhan2026} find that learned protocols at 2-bit budgets are often indistinguishable from
+silence and that engineered senders beat learned ones. Our results agree in spirit. We add the distilled-silence
+comparator, a channel with prefix decoding, and a positive design.
+\paragraph{Multi-hop and delayed information.} Delayed multi-hop information structures, in which agent $i$ holds
+$x_j(t-k)$ from $k$-hop neighbours, are learned by imitation of a centralised expert in graph neural controllers (Gama et
+al.~\cite{gama2022}; Tolstaya et al.~\cite{tolstaya2019}). NeurComm~\cite{neurcomm} propagates delayed global information
+through recurrent messages in traffic-signal control. Message chains (TEM~\cite{tem}), two-hop relays (AC2C~\cite{ac2c})
+and small-diameter topologies with memory (ExpoComm~\cite{expocomm}) spread information further. Our relay tables are an
+instance of this idea. What differs is the channel: none of these models a prefix-decoded stream with heterogeneous
+capacities, and none compares with a distilled silent student.
+\paragraph{Privileged teachers and distillation.} Distilling centralised or privileged teachers into decentralised
+students is established: CTDS~\cite{ctds}, PTDE~\cite{ptde}, communication-enhanced tutoring~\cite{tutoring},
+KD-MARL~\cite{kdmarl}, and MAGPO~\cite{magpo}. We use it as a comparator and as the training route, not as a
+contribution.
+\paragraph{One order for every budget; freshness.} One ordering that serves every cardinality is studied in incremental
+maximisation~\cite{bernstein2022,bienkowski2026}. Embedding priorities so that any prefix decodes the important part is
+Priority Encoding Transmission~\cite{pet}. Keeping every source fresh on a shared channel is age-of-information
+scheduling~\cite{kadota2018}. One sequence that serves every house size within quota is house-monotone apportionment
+(Balinski and Young~\cite{balinski1982}).
+\paragraph{Traffic.} CityFlow~\cite{cityflow}; CoLight~\cite{colight}; UniComm~\cite{unicomm} (sharing predictions of
+approaching vehicles); max pressure~\cite{varaiya2013}; MAPPO~\cite{mappo}; DAgger~\cite{dagger}.
+
+\section{Setting}\label{sec:setting}
+\paragraph{Channel (PROTOCOL\_HETERO\_v0).} The $m=9$ intersections are senders and receivers. At each of 26 decision
+steps (10\,s apart) the scheduler commits an order $\pi$ of the senders. Receiver capacities $K_i$ are then revealed,
+and receiver $i$ decodes $S_i$, the first $K_i$ senders of $\pi$ other than itself. We use three capacity conditions: iid
+$K_i\sim U\{1,\dots,7\}$ per receiver and step; \emph{cap4}, the stream capped at 4 packets; and \emph{low},
+$K_i\sim U\{1,2,3\}$. A frontier study uses a constant $K$. Packets are 25\,B, and a profile is charged for its stream
+prefix plus its description, exactly as in the protocol. The average step costs 188.7\,B under iid, 100\,B under cap4
+and about 94\,B under low. A receiver keeps its last direct copy of every sender.
+\paragraph{Information.} The scheduler may use the payloads paid in earlier steps, their measurement times, a mirror of
+every receiver's cache, the public topology and the actor code. Fresh states, counterfactual views and oracle rollouts
+are used only as training labels or labelled diagnostics. Every evaluation runs a per-step access audit, and every
+oracle call inside a deployable path raises.
+\paragraph{Task.} CityFlow $3\times3$ grid, headways 8 and 16\,s. The metric is total queue (waiting) per episode.
+Development panel: traffic seeds 901--964 $\times$ both headways (128 episodes). Pre-registered panels use unused seed
+blocks between 2001 and 2664, each used once. Comparisons are paired by episode, reported as the ratio of summed waiting
+minus one, with 95\% bootstrap intervals over traffic seeds (both headways resampled together, 4000 draws).
+
+\section{Actors, training and comparators}\label{sec:methods}
+\paragraph{Actors.} A flat actor concatenates eight sender blocks (fresh flag, heard flag, age, phase, elapsed,
+vehicles and waiting per approach, static topology) with the receiver's own state into an MLP. A \emph{set} actor applies
+one shared encoder to each present sender block and mean-pools over present senders, so absent senders contribute
+nothing. Both are trained by MAPPO with a centralised critic~\cite{mappo}.
+\paragraph{Teacher and students.} The \emph{teacher} is a set actor trained with full, fresh delivery (every receiver
+decodes all 8 senders every step). A \emph{student} is trained by DAgger~\cite{dagger}: it acts on its own deployment
+input, the teacher labels its states from the counterfactual full view (a training-only oracle), and the teacher mixture
+$\beta$ decays from 1 to 0 over the first half of 500 iterations.
+\paragraph{Comparators.}
+\begin{itemize}
+\item \emph{maxq}: serve the approach with the largest queue; 0 bytes.
+\item \emph{set\_none}: a set actor co-trained with no messages.
+\item \emph{The zero-byte student}: the teacher distilled into a policy with no message input.
+\item \emph{FO}: the teacher deployed with a fresh-only receiver, which drops stale cached blocks.
+\item \emph{BYTEBUDGET}, a reference in a different channel model: receiver byte capacity $25K_i$, with 3\,B packets, so
+that every receiver decodes all 8 senders at 27\,B per step.
+\end{itemize}
+\paragraph{Relay packets.} Sender $k$'s 25\,B packet carries positional slots:
+\begin{itemize}
+\item its own 17-bit summary: phase 4, elapsed 1, vehicles $2\times4$, waiting $1\times4$ bits;
+\item for each other agent $j$, the same 17 bits of the freshest summary of $j$ that $k$ holds, plus a 4-bit age in
+decision steps, saturated at 14, with 15 meaning absent.
+\end{itemize}
+That is $17+8\times21=185$ bits $\le 200$. Summary levels come from a codebook fitted on training traffic. A receiver
+merges the packets it decodes with its own cache, keeping the freshest copy per agent.
+\NOTE{L-162, L-165 (the byte-layout audit), L-174 (the saturated-age re-measure).}
+\paragraph{Stream order.}
+\begin{itemize}
+\item \emph{Prefix}: the scheduler's cached-queue ranking (the default).
+\item \emph{Agefirst}: senders whose last paid packet is oldest go first.
+\end{itemize}
+Both use scheduler information only. The cap rule is applied under every order.\NOTE{L-168: a tooling bug that ignored
+cap4 under agefirst was found and fixed before any affected run.}
+
+\section{Failures: messages harm, and why}\label{sec:fail}
+\paragraph{Learned actors that use their messages are worse than silence.} On the development panel, a flat actor
+trained with the same recipe but no messages has $8.0\%$ $[7.4,8.6]$ less waiting than the committed-prefix system of
+five flat prefix-trained actors, and less than each of them ($5.6$ to $10.5\%$). A second training seed gives $7.9\%$.
+Doubling the prefix actor's training to 4000 iterations leaves it $6.3\%$ $[5.3,7.4]$ worse than the silent actor at
+equal iterations.\NOTE{L-105, L-109, L-113.}
+\paragraph{The heuristic reference was harmed by its own messages.} Max pressure as implemented has about 14\% MORE
+waiting than the same rule without its downstream (message-fed) terms. This max-queue rule uses no messages, and every
+pressure variant tried is worse still. Against max-queue, warm-started actors cloned from max pressure are worse
+($+1.2$ to $+5.5\%$), and flat prefix actors are only $1.7$--$6.3\%$ better.\NOTE{L-114--L-116.}
+\paragraph{Selecting messages does not fix it.} An earlier line of work scheduled messages for frozen prefix-trained
+actors. No legal selector beat the committed prefix in closed loop (Appendix~\ref{app:history}). The oracle headroom
+behind that effort is, to first order, best-of-N over action perturbations of an imperfect actor: forcing one agent's
+action with no message change reaches the same oracle.\NOTE{L-78, L-81.}
+
+\section{Mechanisms of the failure}\label{sec:mech}
+We wrote each hypothesis and its reading rule before its result.
+\paragraph{Sparse, varying sender sets in a slot-indexed input.}
+\begin{itemize}
+\item A flat actor trained with full delivery keeps 79--85\% of its full-information gain when 5--7 of 8 senders are
+present.
+\item It falls below the silent actor under the protocol's capacity process, where about half the senders are absent:
+$+4.2$ and $+1.3\%$ on two seeds.
+\item Mean pooling over present senders (the set actor) degrades gracefully; attention pooling equals mean pooling.
+\item Three alternatives are refuted by their rules: irrelevant input dimensions (H1), stale content alone (H5), and
+weight sharing without pooling (H3); doubling the width (H7) does not close the gap.
+\item Under 25\% packet loss the set receiver keeps its advantage, and the flat one breaks.
+\end{itemize}
+\NOTE{L-132, L-133, L-135, L-142, L-157.}
+\paragraph{Stale cached copies.}
+\begin{itemize}
+\item The full-information set teacher, deployed under the prefix with its stale cached blocks, is no better than
+set\_none: $-0.1\%$ $[-1.0,+0.9]$.
+\item Dropping stale blocks at the receiver (FO) recovers 59\% of the full-information gain: $-3.3\%$ on the development
+panel, $-3.0\%$ and $-5.2\%$ for two seeds on a pre-registered panel.
+\end{itemize}
+\NOTE{L-124, L-125, L-127, L-138.}
+\paragraph{Head starvation at low capacity.}
+\begin{itemize}
+\item The default order ranks senders by cached congestion. When few packets are decoded, the same senders stay at the
+head.
+\item In a traffic-free replica of the channel, validated against measured ages, a sticky ranking at cap4 leaves 40--46\%
+of (receiver, agent) pairs never covered.
+\item With relay packets in CityFlow the pairs are still covered, but copies are old: the mean relayed age is 5.4 decision
+steps, and 45\% of copies are at least 4 steps old, under cap4 and low.
+\item A rotating head gives ages of 0.8--1.4 steps, with 0--5\% of copies at least 4 steps old.
+\end{itemize}
+\NOTE{L-168 (simulator), L-177 (probe ages).}
+
+\section{The bar: a distilled zero-byte student}\label{sec:student}
+\paragraph{Gain.} Development panel, five training seeds: the zero-byte student has $3.5\%$ $[2.2,4.9]$ less waiting than
+set\_none, and less on every seed.\NOTE{L-160; two-level bootstrap over training and traffic seeds.}
+\paragraph{Controls.}
+\begin{itemize}
+\item \emph{Distillation alone:} the same DAgger recipe with a silent teacher gives $+0.2$, $-0.2$ and $+0.2\%$ against
+set\_none on three seeds.
+\item \emph{Extra compute:} 500 more PPO iterations for set\_none give $+2.0\%$.
+\item \emph{Dose:} the gain grows with the teacher's information. Against set\_none, a silent teacher gives $\approx0$, a
+prefix-message teacher $-2.3/-0.9\%$, and a full-information teacher $-3.2/-6.3\%$ (two seeds).
+\end{itemize}
+The gain is therefore communication used at training time and compiled into a local policy.\NOTE{L-147, L-149, L-152,
+L-153, L-158.}
+\paragraph{Designs inside the packet channel measured against the bar} (pre-registered, unused panels, both seeds
+required):
+\begin{center}\small
+\begin{tabular}{@{}lccl@{}}
+\toprule
+design & seed 0 & seed 1 & verdict\\
+\midrule
+FO vs set\_none & $-3.0\%$ & $-5.2\%$ & passes against the weak bar\\
+FO vs the zero-byte student & $+1.3\%$ & $+2.1\%$ & the student is better\\
+fresh-only student vs the zero-byte student & $-0.8\%$ (fail) & $-4.0\%$ & seed-dependent\\
+set\_fresh vs the zero-byte student & $-2.0\%$ & $+7.2\%$ (fail) & seed-dependent\\
+\bottomrule
+\end{tabular}
+\end{center}
+Extra seeds confirm the reading: set\_fresh is typically about $-2\%$ against set\_none and does not beat the student.
+\NOTE{L-127, L-129, L-138, L-140, L-141, L-144--L-146, L-150.}
+
+\section{The fix: relay tables and a rotating head}\label{sec:fix}
+\paragraph{Relay removes sparse presence inside the packet channel.} On the development panel, the relay student under
+the default order beats the zero-byte student by $3.3\%$ $[2.5,4.2]$ and $4.0\%$ $[3.1,5.0]$ (iid), with the channel and
+its accounting unchanged. That equals the byte-budget reference, a tie. With no messages it is $4.8\%$ worse than the
+student, so it uses them.\NOTE{L-163; unchanged under saturated ages, L-174.}
+\paragraph{Rotation removes starvation.} Under the default order, relay loses its advantage at low capacity. Seed 0 is
+$+0.9\%$ (cap4) and $+0.4\%$ (low) against the student on the development panel. A rotating head restores it:
+\begin{itemize}
+\item cap4: $-2.3$ / $-4.1\%$ (seed 0 / seed 1);
+\item low: $-2.8$ / $-3.0\%$;
+\item the iid cost of rotation is small and not significant on these panels: $+0.3$ / $+0.9\%$.
+\end{itemize}
+\NOTE{L-169, L-174.}
+\paragraph{Pre-registered confirmation.} We registered the protocol before any run, on panel 2601--2664 (checked unused).
+The primary endpoint is relay with a rotating head against the same-seed zero-byte student, and all six cells (two seeds
+$\times$ three capacity conditions) had to have an upper 95\% bound below zero.
+\begin{center}\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& iid (189\,B/step) & cap4 (100\,B/step) & low ($\approx94$\,B/step)\\
+\midrule
+seed 0 & $-2.19\%$ $[-3.10,-1.25]$ & $-2.96\%$ $[-3.87,-2.04]$ & $-2.19\%$ $[-2.95,-1.43]$\\
+seed 1 & $-4.00\%$ $[-4.71,-3.30]$ & $-3.41\%$ $[-4.09,-2.75]$ & $-2.43\%$ $[-3.20,-1.67]$\\
+\midrule
+\multicolumn{4}{@{}l}{\emph{secondary, same panel}}\\
+relay, default order, seed 0 & $-2.71\%$ & $+0.68\%$ $[-0.12,+1.50]$ & $+0.96\%$ $[+0.10,+1.88]$\\
+relay, default order, seed 1 & $-4.29\%$ & $-1.76\%$ & $-1.74\%$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The primary endpoint is supported in all six cells. The same panel reproduces the starvation effect of the default order
+for seed 0 at low capacity.
+
+On the same panel, the relay system also beats:
+\begin{itemize}
+\item set\_none by 5.7--10.1\%;
+\item max-queue by 22.5--26.2\%.
+\end{itemize}
+The byte-budget reference, in its own channel, gives $-4.0$ / $-4.5\%$.\NOTE{L-173 (protocol,
+PROTOCOL\_E3\_RELAY\_ROTATION\_20260930, sha256 c7467697\dots), L-175, report e3\_relayrot\_panel\_report\_20260930.}
+\paragraph{Every missing piece breaks it} (development panel, same-seed zero-byte student as the reference):
+\begin{itemize}
+\item \emph{No relay} (FO): the student is better (Section~\ref{sec:student}).
+\item \emph{No rotation}: loses at low capacity (the rows above).
+\item \emph{RL instead of distillation}: MAPPO from scratch on relay inputs is $+2.0$ / $+4.5\%$ worse than the student.
+\item \emph{No messages}: $+4.8\%$.
+\item \emph{A different rotation rule}: a head chosen for the freshest table (a ``bass'' rule) equals age-first rotation,
+so we do not claim it.
+\end{itemize}
+\NOTE{L-166, L-169.}
+\paragraph{More seeds (development).} We distilled students trained under rotation (relay6Cage) for seeds 2 and 3. With
+a rotating head, against their zero-byte students (iid / cap4 / low):
+\begin{itemize}
+\item seed 2: $-3.9$ / $-4.6$ / $-4.1\%$;
+\item seed 3, whose teacher is weaker: $-1.0$ / $-1.0$ / $+0.0\%$.
+\end{itemize}
+Training under rotation does not beat rotating only at evaluation (seed 0 / seed 1: $-2.9$ / $-2.7$ / $-1.0$ and $-3.3$ /
+$-3.1$ / $-1.9\%$). \TODO{seeds 4--9 relaunched after the disk incident; L-177.}
+\paragraph{Reference: a byte-limited channel.} In the alternative channel model where receiver capacity is counted in
+bytes, 3\,B decision summaries from the raw full-information teacher beat the zero-byte student on 5/5 seeds, by $3.6\%$
+$[2.7,4.5]$. The effect holds:
+\begin{itemize}
+\item on three pre-registered panels;
+\item under unseen demand (headways 6, 12 and 24\,s);
+\item with a codebook refitted on other traffic;
+\item and up to 25\% packet loss.
+\end{itemize}
+With eight seeds the mean is $2.5\%$ $[1.4,3.6]$, with the size tracking the teacher's quality. Training directly on
+compressed payloads is fragile: one of three seeds fails.\NOTE{L-131, L-144, L-151, L-156, L-157, L-159, L-160, L-170;
+the 10-seed synthesis reported by a parallel session is not yet in the ledger.}
+
+\section{Limitations}\label{sec:limits}
+\begin{itemize}
+\item \emph{Seeds and teacher quality.} The pre-registered relay result rests on two training seeds. Two development
+seeds more give one strong pass and one weak result. Across ten teachers the size of every gain tracks the teacher's own
+full-information gain; at one seed the teacher is worse than silence.
+\item \emph{Rotation at evaluation.} The pre-registered students were trained under the default order. Rotation costs
+0.3--1.0\% at iid, and training under rotation did not remove that cost.
+\item \emph{Development-confirm only.} The reserved test (traffic seeds 1301--1316) is closed. Pre-registered panels
+are unused before their single use, but the designs were selected on the development panel.
+\item \emph{One grid, one simulator,} two headways in training, a fixed 26-step horizon, and one codebook family.
+\item \emph{Prior art.} Relay, distillation and compression are known. Our claims concern this channel and this
+comparator.
+\item \emph{Diagnostics use an oracle.} The counterfactual views in Section~\ref{sec:theory} are labelled diagnostics;
+no deployable path calls them.
+\end{itemize}
+
+\part*{Part II --- Toward a theory of prefix-broadcast communication (in progress)}
+
+\section{Five mechanisms and their direct checks}\label{sec:theory}
+\TODOPAR{Every statement in this section is a \emph{shape} taken from a proved result in another model (the source is
+named) and a prediction measured in E3. None is a theorem about E3 yet. The E3-specific Lean modules listed at the end
+must be compiled and gated before any of it is stated as a theorem.}
+
+\paragraph{M1. Frozen-surrogate starvation and linear repair} (source: the frozen-surrogate separation of Paper A, proved
+in its own model). There, every optimum of a frozen surrogate gives zero mass to the decision-relevant cells, and a
+$\beta$-mixture with a certificate design buys information linearly in $\beta$, with no threshold. \emph{E3 reading:} the
+cached-queue ranking is a frozen surrogate of ``who matters'', and rotation is the repair.
+\begin{itemize}
+\item \emph{Information level, traffic-free:} coverage of starved pairs has no threshold in $\beta$. At low capacity the
+never-covered share falls from 0.41 to 0.27 at $\beta=0.02$ and to 0 at $\beta=0.25$. The mean age, however, first rises
+(present but stale copies) before falling.
+\item \emph{Closed loop:} the repair grows with $\beta$ and so does the iid sacrifice. Seed 0 shows no threshold at cap4
+($-0.96\%$ $[-1.53,-0.43]$ already at $\beta=0.05$). Seed 1 is flat until $\beta\ge0.5$.
+\item \emph{Reading:} coverage without bounded age pays little. The operative quantity is the age bound (M3).
+\end{itemize}
+\NOTE{L-176, L-177.}
+
+\paragraph{M2. One schedule for every budget: signed versus monotone regimes} (source: the exact menu law under signed
+cancellation, STRUCTURAL). With non-negative item values one order degrades gracefully across budgets. With signed values
+(extra items can hurt) no single order serves every budget. \emph{Prediction:} the waiting-versus-$K$ frontier is
+monotone for receivers that drop or age stale inputs and non-monotone for a stale-kept receiver.
+\begin{itemize}
+\item \emph{Monotone:} relay with the default order, and FO, on both seeds.
+\item \emph{Signed:} the stale-kept set actor is non-monotone on seed 0 (waiting rises from $K=2$ to $K=3$), flat on seed
+1, and never beats the zero-byte student.
+\item \emph{Exception:} relay with rotation is monotone on seed 1 and has one significant violation on seed 0 ($K=5\to6$),
+which is unexplained.
+\item Relay with rotation beats the student from $K=2$ (seed 0) and $K=1$ (seed 1); relay with the default order needs
+$K\ge3$--4.
+\end{itemize}
+\NOTE{L-177.}
+
+\paragraph{M3. Quota tracking and bounded age} (source: ADAPTIVE; and Paper C's band, whose closest analogue it names as
+house-monotone apportionment). A rotating head is an apportionment of head positions over time. For uniform targets the
+largest-deficit rule is round-robin and stays within 1 of quota.
+\begin{itemize}
+\item \emph{ADAPTIVE's warning, reproduced on the E3 scheduler:} with non-uniform targets, the online largest-deficit rule
+exceeds unit quota on 209 of 2000 random targets (worst $3/2$; ADAPTIVE's witness $26/23$ reproduced exactly), while
+the Balinski--Young quota method never does.
+\item \emph{A new pathology:} rotation with deterministic tie-breaks \emph{phase-locks} with raw one-sender packets at
+constant $K=2$, leaving 25\% of pairs never covered. Relay removes it.
+\item \emph{Measured in CityFlow:} rotation bounds the relayed age (0--5\% of copies are 4 or more steps old, against
+45\% under the default order at low capacity).
+\end{itemize}
+\NOTE{L-176; ADAPTIVE's trace caption claims a unique maximum at every step, but ties occur at $t=0,4,7$; all 18
+tie-break paths still give $26/23$.}
+
+\paragraph{M4. Decision lifetime} (source: the functional certificate lifetime, LIFE2/LIFE3; D6's sharp $2\delta$ margin;
+the argmax-stability lemma of the MARL certificate module). If the score gap exceeds $2(\delta+h\nu)$, an $h$-step-old
+input yields the same decision. \emph{Direct check} (probe, 12 runs, parity 128/128 with the evaluator):
+\begin{itemize}
+\item Agreement of the relay-view action with the fresh-complete-information action rises with the fresh margin, from
+$\approx0.6$ in the lowest to $\approx1.0$ in the highest quintile.
+\item It falls with the relayed age: for example 0.94, 0.87, 0.83, 0.81, 0.80 and 0.78 at ages 1--6 under low capacity.
+\item A lifetime certificate fitted on half the traffic seeds is sound on the other half ($\ge0.9997$) but covers only
+0--23\% of decisions: valid, and conservative.
+\end{itemize}
+\NOTE{L-177.}
+
+\paragraph{M5. Obstruction floors: when silence is enough} (source: UNIFIED's obstruction criterion and randomised error
+floor $1/|H|$; Paper B's safe-order law; SUPPORT's whole-fibre condition). A zero-byte rule is safe exactly when no
+obstruction hides inside a local-observation class. Messages are worth bytes only there.
+\begin{itemize}
+\item \emph{Direct check:} the zero-byte student disagrees with the teacher on 14--17\% of receiver-steps. There, relay
+with rotation agrees with the teacher on 53--70\%, and elsewhere on 92--94\%. Relay's teacher-agreement advantage is
+therefore concentrated where local information does not settle the decision.
+\item Under the default order at low capacity the advantage vanishes or reverses. This links age (M3, M4) to agreement to
+waiting.
+\item \emph{Decide, not identify:} 3\,B compression flips the teacher's decision on 1.3--2.3\% of steps, almost all in the
+smallest-margin quintile.
+\end{itemize}
+\NOTE{L-177.}
+
+\paragraph{What must be proved for Part II to become a theorem-level contribution} \TODO{Lean, paused by the authors on
+30/09}:
+\begin{itemize}
+\item[(T-a)] Under prefix decoding with $K_i\ge1$, relay merging and an age-first head with a stated tie rule, every
+relayed age is bounded (a finite bound in $m$), and a phase-lock counterexample exists for raw packets.
+\item[(T-b)] The lifetime composite: a margin above $2(\delta+H\nu)$, with $H$ the bound of (T-a), implies the relay action
+equals the fresh-complete action. This instantiates LIFE2/LIFE3 and the MARL argmax lemma.
+\item[(T-c)] Monotonicity of the value of a decoded prefix for fresh-only or aged-relay receivers, under a stated
+non-negativity condition, against a signed counterexample for stale-kept receivers.
+\end{itemize}
+Each needs a satisfiability witness.
+
+\section{Reproducibility}
+Every number is produced by a script from saved artifacts whose manifests record source hashes and self-checks. The
+self-checks are:
+\begin{itemize}
+\item a parity check of each new evaluator against the previous one;
+\item the scheduler-side age mirror, checked against the merged views at every step;
+\item probe parity with the evaluator rows;
+\item the simulator's reproduction of ADAPTIVE's witness.
+\end{itemize}
+Main scripts:
+\begin{itemize}
+\item \texttt{MARL\_e3\_actor\_distill\_v4/v6.py} (students);
+\item \texttt{MARL\_e3\_delivery\_eval\_relay\_satrot.py} and \texttt{\_v4.py} (evaluation);
+\item \texttt{models/marl\_relay\_v2.py} (the 185-bit layout);
+\item \texttt{models/marl\_delivery\_music.py} and \texttt{\_v2.py} (orders);
+\item \texttt{MARL\_e3\_theory\_sim.py} and \texttt{MARL\_e3\_theory\_probe.py} (Part II);
+\item the reports \texttt{MARL\_e3\_relayrot\_report.py}, \texttt{MARL\_e3\_theory\_cl\_report.py} and
+\texttt{MARL\_e3\_theory\_probe\_report.py}.
+\end{itemize}
+Protocols: \texttt{research/marl\_budget/PROTOCOL\_E3\_*.md}.
+
+\appendix
+\section{History: scheduling messages for frozen actors}\label{app:history}
+The first design scheduled which packets each receiver decodes, for actors trained with the committed prefix. It used a
+paid one-byte receiver bid and a learned critic over candidate profiles; the v1 draft kept its theory (revision
+geometry) and its results. On a fixed max-pressure actor the bid improved held-phase selection on fresh traffic, with a
+small closed-loop benefit. On learned actors:
+\begin{itemize}
+\item no legal selector variant beat the committed prefix in closed loop;
+\item nor did guarded, decision-focused or densely labelled variants;
+\item nor did a SchedNet-style learned schedule.
+\end{itemize}
+Two later findings explain why this line could not succeed on this testbed. The frozen actors were themselves beaten by
+a silent actor (Section~\ref{sec:fail}). And the oracle headroom that motivated selection was best-of-N action
+perturbation, not communication value.\NOTE{paper\_marl.tex (v1, kept), L-69, L-78--L-81.}
+
+\begin{thebibliography}{99}
+\bibitem{rlm} S.~McCanne, V.~Jacobson, M.~Vetterli, ``Receiver-driven layered multicast,'' SIGCOMM 1996.
+\bibitem{pet} A.~Albanese, J.~Bl\"omer, J.~Edmonds, M.~Luby, M.~Sudan, ``Priority encoding transmission,'' FOCS 1994.
+\bibitem{kadota2018} I.~Kadota, A.~Sinha, E.~Uysal-Biyikoglu, R.~Singh, E.~Modiano, ``Scheduling policies for minimizing
+age of information in broadcast wireless networks,'' IEEE/ACM Trans.\ Networking, 2018, arXiv:1801.01803.
+\bibitem{balinski1982} M.~L.~Balinski, H.~P.~Young, \emph{Fair Representation}, Yale University Press, 1982.
+\bibitem{schednet} D.~Kim et al., ``Learning to schedule communication in multi-agent reinforcement learning,'' ICLR 2019.
+\bibitem{ndq} T.~Wang, J.~Wang, C.~Zheng, C.~Zhang, ``Learning nearly decomposable value functions via communication
+minimization,'' ICLR 2020.
+\bibitem{imac} R.~Wang, X.~He, R.~Yu, W.~Qiu, B.~An, Z.~Rabinovich, ``Learning efficient multi-agent communication: an
+information bottleneck approach,'' ICML 2020, arXiv:1911.06992.
+\bibitem{ibvq} ``Bandwidth-efficient multi-agent communication through information bottleneck and vector quantization,''
+arXiv:2602.02035, 2026.
+\bibitem{etcnet} ``Event-triggered multi-agent reinforcement learning with communication under limited-bandwidth
+constraint,'' arXiv:2010.04978.
+\bibitem{where2comm} Y.~Hu et al., ``Where2comm: communication-efficient collaborative perception via spatial confidence
+maps,'' NeurIPS 2022.
+\bibitem{chauhan2026} M.~Chauhan, A.~Bera, ``Emergence, not bandwidth: physical coupling and the limits of learned
+multi-agent communication,'' arXiv:2609.34373, 2026.
+\bibitem{gama2022} F.~Gama, Q.~Li, E.~Tolstaya, A.~Prorok, A.~Ribeiro, ``Synthesizing decentralized controllers with graph
+neural networks and imitation learning,'' IEEE Trans.\ Signal Processing, 2022, arXiv:2012.14906.
+\bibitem{tolstaya2019} E.~Tolstaya, F.~Gama, J.~Paulos, G.~Pappas, V.~Kumar, A.~Ribeiro, ``Learning decentralized
+controllers for robot swarms with graph neural networks,'' CoRL 2019.
+\bibitem{neurcomm} T.~Chu, S.~Chinchali, S.~Katti, ``Multi-agent reinforcement learning for networked system control,''
+ICLR 2020, arXiv:2004.01339.
+\bibitem{tem} ``Scalable communication for multi-agent reinforcement learning via transformer-based email mechanism,''
+IJCAI 2023, arXiv:2301.01919.
+\bibitem{ac2c} X.~Wang, X.~Li, J.~Shao, J.~Zhang, ``AC2C: adaptively controlled two-hop communication for multi-agent
+reinforcement learning,'' AAMAS 2023, arXiv:2302.12515.
+\bibitem{expocomm} X.~Li et al., ``Exponential topology-enabled scalable communication in multi-agent reinforcement
+learning,'' ICLR 2025, arXiv:2502.19717.
+\bibitem{ctds} ``CTDS: centralized teacher with decentralized student for multi-agent reinforcement learning,''
+arXiv:2203.08412.
+\bibitem{ptde} ``PTDE: personalized training with distilled execution for multi-agent reinforcement learning,'' IJCAI
+2024, arXiv:2210.08872.
+\bibitem{tutoring} ``Communication-enhanced tutoring for efficient decentralized multi-agent reinforcement learning,''
+arXiv:2508.13661.
+\bibitem{kdmarl} ``KD-MARL: resource-aware knowledge distillation in multi-agent reinforcement learning,''
+arXiv:2604.06691.
+\bibitem{magpo} ``Multi-agent guided policy optimization,'' ICLR 2026, arXiv:2507.18059.
+\bibitem{bernstein2022} A.~Bernstein, Y.~Disser, M.~Gro{\ss}, S.~Himburg, ``General bounds for incremental
+maximization,'' Mathematical Programming, 2022.
+\bibitem{bienkowski2026} Bienkowski et al., ``Incremental submodular maximization: better than greedy,''
+arXiv:2606.28558, 2026.
+\bibitem{cityflow} H.~Zhang et al., ``CityFlow: a multi-agent reinforcement learning environment for large scale city
+traffic scenario,'' WWW 2019.
+\bibitem{colight} H.~Wei et al., ``CoLight: learning network-level cooperation for traffic signal control,'' CIKM 2019.
+\bibitem{unicomm} ``Multi-agent reinforcement learning for traffic signal control through universal communication
+method,'' IJCAI 2022, arXiv:2204.12190.
+\bibitem{varaiya2013} P.~Varaiya, ``Max pressure control of a network of signalized intersections,'' Transportation
+Research Part C, 2013.
+\bibitem{mappo} C.~Yu et al., ``The surprising effectiveness of PPO in cooperative multi-agent games,'' NeurIPS 2022.
+\bibitem{dagger} S.~Ross, G.~Gordon, J.~A.~Bagnell, ``A reduction of imitation learning and structured prediction to
+no-regret online learning,'' AISTATS 2011.
+\end{thebibliography}
+\TODO{verify every bibliography entry against its primary source (authors and venue) before submission; entries without
+authors were checked only by title and arXiv id.}
+\end{document}

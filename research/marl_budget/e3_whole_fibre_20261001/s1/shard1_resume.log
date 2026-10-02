@@ -1,0 +1,22 @@
+
+[watchdog] attempt 0 Thu Oct  1 10:57:17 2026: external_envs/runtime/bin/python -u scripts/MARL_e3_whole_fibre_probe.py --seed 1 --relay research/marl_budget/e3_delivery_actors_20260929/relay6Cage_st_s1/ckpt_best.pt --teacher research/marl_budget/e3_delivery_actors_20260929/set_full_s1/ckpt_best.pt --parity research/marl_budget/e3_satrot_eval_20260930/relay6Cage_st_s1_agefirst_low/rows.json --shard 1 --nshards 2 --out research/marl_budget/e3_whole_fibre_20261001/s1
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_whole_fibre_probe.py", line 197, in <module>
+    main(p.parse_args())
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_whole_fibre_probe.py", line 173, in main
+    S.episode(seed, load, {}, cap_t=0, cap_i=0, stop_at_capture=True)
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_whole_fibre_probe.py", line 68, in episode
+    env, pol = make(self.sc, seed, load, self.cks['relay'], 'low')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_zero_loss_truncation.py", line 47, in make
+    env, topo, _, _ = sc.env(seed, load)
+                      ^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_actor_train.py", line 46, in env
+    self.cache[(seed, load)] = scenario(self.out, seed, load)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_hetero_target_diag.py", line 50, in scenario
+    return make_grid_scenario(out / 'scenarios' / f'seed{seed}_load{load:g}', rows=ROWS, cols=COLS, traffic_seed=seed,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/envs/external/cityflow_budgeted.py", line 861, in make_grid_scenario
+    raise FileExistsError(f"refusing to overwrite scenario dir {out_dir}")
+FileExistsError: refusing to overwrite scenario dir research/marl_budget/e3_whole_fibre_20261001/s1/scenarios/seed915_load16
