@@ -46,6 +46,7 @@ component can hurt the team" (all taken in the literature).
 | C-2 Q3 | vehicle-carried neighbour information is stale at BOTH ends of demand (110 s at 450 veh/h, 14 s at 7 200, 172 s at 14 400): a U shape; 24–40 % of light-seconds at the extremes are older than anything seen at the training demand; the closed form L/u + 1/q is right only on average (per-link r 0.70–0.75) |
 | C-4 Q2b | the harm survives every eco design (+41 … +128 points under actuated); SPaT-aware GLOSA is the WORST because the actuated light's own prediction is wrong; under fixed-time lights GLOSA works (+2.9 % time loss, −33 % stops); no light-side fix halves the harm (best: delay-based sensing, 128 → 72) |
 | C-5 Q4 | re-timing ONE light of a green wave (its own timing law unchanged, so every per-light certificate is 0) harms the car trained on the old corridor (Δ +8.7 [6.5, 10.6]; up to +30.5 at the opposite offset) while the exact table is unharmed; the corridor (joint-log) certificate ranks the harm perfectly (Spearman 1.00); a range monitor is blind, a density monitor sees it (1.00) |
+| C-6 Q5 | at the one undersaturated demand, an honest commitment window has a real price: strict commitment +60 % light delay for half the car regret; a 20 s window keeps the light within 4 % but most of the car gain is gone; one revision +31 %.  The two higher demands saturate (the reference light is not the best there), so their formal passes are not evidence |
 | C-3 C0 | a light upgrade that extends phases breaks the legacy learned car (Δ +19.8 [7.1, 40.3]; exact Bayes tables 135 vs 4.5); one that switches earlier inside the trained range does not (Δ +0.23, CI contains 0); an input-support monitor sees the first (29 % out of support) and its fallback recovers more than half; the SPaT residual makes the car nearly immune (ΔM 2.8; exact M* 0.01); a certificate from the light's own logs ranks the harm (Spearman 0.78 for students, 1.00 for exact tables) but the support-exit term alone does best (0.91): the hazard (semantics) term and the receiver-side factor add nothing here; mixture is not minimax (the broadest specialist wins); quantile relabelling HELPS here, unlike E3 |
 Lean (compiled, 0 errors, standard axioms; not yet in the frozen gate): LeanCityConditionalShiftV1 (an upgrade with the same view
 distribution but a new meaning is invisible to every input monitor; the message rule is optimal under both lights — a formal
@@ -57,5 +58,5 @@ missing piece is an upgrade that is a LEARNED controller, genuinely better on it
 
 ## C. Running / queued at 19:5x
 * MARL: 4×4 train-match at K = 1 (round 2), then test C (3×3 mixture of K1 + iid), test D (4×4 mixture), NYC 16×3.
-* City: Q5 (honest commitment windows) running since 19:41; Q4 finished (C-5).  Q6 (rule A in
+* City: Q4 (C-5) and Q5 (C-6) finished.  Q6 (rule A in
   V2I) needs a student-quality fix before it is queued; Q7 / Q8 not coded.

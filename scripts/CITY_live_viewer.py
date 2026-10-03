@@ -61,18 +61,23 @@ class Sim(threading.Thread):
         if self.a.signals != 'fixed' or self.a.vehicles != 'default':
             from scripts.CITY_env import make_controllers  # RL controllers live with the environment
             self.ctrl = make_controllers(ls, self.a.net, self.a.signals, self.a.vehicles, self.a.seed)
+        self.agent_ctrl = [c for c in self.ctrl if hasattr(c, 'is_agent')]   # learned cars: drawn as agents
         self.arrived = self.teleports = 0; self.ids.clear(); self.next_id = 0
 
     def snapshot(self):
         for v in ls.simulation.getDepartedIDList():
             ls.vehicle.subscribe(v, [tc.VAR_POSITION, tc.VAR_ANGLE, tc.VAR_SPEED, tc.VAR_TYPE])
         sub = ls.vehicle.getAllSubscriptionResults(); veh = []; halting = 0; sp = 0.0
-        for v, r in sub.items():
+        live = set(ls.vehicle.getIDList())   # libsumo keeps the previous run's subscription results across close/start:
+        for v, r in sub.items():             # without this filter the first frame after Restart re-showed the old jam
+            if v not in live:
+                continue
             if v not in self.ids:
                 self.ids[v] = self.next_id; self.next_id += 1
             (x, y), s = r[tc.VAR_POSITION], r[tc.VAR_SPEED]
             halting += s < 0.1; sp += s
-            veh.append([self.ids[v], round(x, 1), round(y, 1), round(r[tc.VAR_ANGLE], 1), round(s, 1), 1 if r[tc.VAR_TYPE].startswith('cav') else 0])
+            ag = r[tc.VAR_TYPE].startswith('cav') or any(c.is_agent(v) for c in self.agent_ctrl)
+            veh.append([self.ids[v], round(x, 1), round(y, 1), round(r[tc.VAR_ANGLE], 1), round(s, 1), 1 if ag else 0])
         states = {}
         sig = []
         for tid, idxs in self.head_links:
@@ -81,7 +86,7 @@ class Sim(threading.Thread):
         self.arrived += ls.simulation.getArrivedNumber(); self.teleports += ls.simulation.getStartingTeleportNumber()
         info = dict(t=ls.simulation.getTime(), running=len(veh), arrived=self.arrived, halting=halting,
                     mean_speed=round(sp / max(1, len(veh)), 2), teleports=self.teleports, speed=self.speed, paused=self.paused,
-                    signals=self.a.signals, vehicles=self.a.vehicles)
+                    signals=self.a.signals, vehicles=self.a.vehicles, label=self.a.label)
         return json.dumps(dict(v=veh, s=''.join(sig), i=info), separators=(',', ':'))
 
     def run(self):
@@ -94,7 +99,7 @@ class Sim(threading.Thread):
                 t0 = time.time()
                 ls.simulationStep()
                 for c in self.ctrl:
-                    c.step()
+                    c.step(ls.simulation.getTime())            # CITY_env controllers take the simulation time (was c.step())
                 self.publish(self.snapshot())
                 time.sleep(max(0.0, 1.0 / max(self.speed, 1e-3) - (time.time() - t0)))
             ls.close()
@@ -158,5 +163,5 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--net', required=True); ap.add_argument('--routes', required=True)
     ap.add_argument('--port', type=int, default=8770); ap.add_argument('--end', type=float, default=3600); ap.add_argument('--seed', type=int, default=0)
-    ap.add_argument('--signals', default='fixed'); ap.add_argument('--vehicles', default='default')
+    ap.add_argument('--signals', default='fixed'); ap.add_argument('--vehicles', default='default'); ap.add_argument('--label', default='')
     serve(ap.parse_args())

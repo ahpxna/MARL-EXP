@@ -381,9 +381,9 @@ def run_seed(a, out, sizes):
                                             stops=float(r['stops'].mean()), timeouts=float(r['timeouts'].mean()))
     for L in lights:                                          # exact references: own tables everywhere, ACT tables on every light
         for kind in ('Z', 'M'):
-            for src in sorted({L, 'ACT'}):
-                r = rollout(table_policy(tabs[src][kind], kind, src), panels[L]); REG[f'{kind}*_{src}|{L}|plain'] = r['regret']
-                cells[f'{kind}*_{src}|{L}|plain'] = dict(regret=float(r['regret'].mean()), viol=float(r['viol'].mean()))
+            for ref in sorted({L, 'ACT'}):                     # was `src`, which overwrote the source sha (fixed 03/10, wake 1)
+                r = rollout(table_policy(tabs[ref][kind], kind, ref), panels[L]); REG[f'{kind}*_{ref}|{L}|plain'] = r['regret']
+                cells[f'{kind}*_{ref}|{L}|plain'] = dict(regret=float(r['regret'].mean()), viol=float(r['viol'].mean()))
     zact, tm = nets['Z_ACT'][0], tmax['ACT']
     tr_gt = rollout(net_policy(zact, False), calib['ACT'], record=True)['gt']
     for L in lights:

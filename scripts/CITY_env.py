@@ -109,17 +109,20 @@ class CarRL:
             if v in self.agents:
                 self._end(v); self.agents.discard(v)
         ids, O, meta = [], [], []
-        for v in self.agents:
-            nt = ls.vehicle.getNextTLS(v)
-            if not nt:
-                self._end(v); continue
-            tid, _li, dist, st = nt[0]
-            if dist > ZONE:
-                self._end(v); continue
-            prev = self.state.get(v)
-            if prev is not None and prev[3] != tid:           # passed the previous stop line: that approach is over
-                self._end(v); prev = None
-            sp = ls.vehicle.getSpeed(v); lead = ls.vehicle.getLeader(v, 100.0)
+        for v in list(self.agents):
+            try:                                              # a teleporting vehicle is temporarily off the network
+                nt = ls.vehicle.getNextTLS(v)
+                if not nt:
+                    self._end(v); continue
+                tid, _li, dist, st = nt[0]
+                if dist > ZONE:
+                    self._end(v); continue
+                prev = self.state.get(v)
+                if prev is not None and prev[3] != tid:       # passed the previous stop line: that approach is over
+                    self._end(v); prev = None
+                sp = ls.vehicle.getSpeed(v); lead = ls.vehicle.getLeader(v, 100.0)
+            except Exception:
+                continue
             gap = (lead[1] / 100.0) if lead else 1.0
             o = np.array([dist / ZONE, sp / 14.0, st in 'Gg', st in 'yY', ls.trafficlight.getSpentDuration(tid) / 60.0, gap], np.float32)
             ids.append(v); O.append(o); meta.append((tid, sp))
@@ -130,8 +133,10 @@ class CarRL:
             prev = self.state.get(v)
             if self.record and prev is not None:
                 po, pa, pc, _ = prev; self.trans.append((po, pa, -pc, o, 0.0))
-            vmax = ls.vehicle.getAllowedSpeed(v); nv = float(min(max(sp + ACC[a], 0.0), vmax))
-            ls.vehicle.setSpeed(v, nv)
+            try:
+                vmax = ls.vehicle.getAllowedSpeed(v); nv = float(min(max(sp + ACC[a], 0.0), vmax)); ls.vehicle.setSpeed(v, nv)
+            except Exception:
+                continue
             cost = 1.0 + 0.05 * ACC[a] ** 2 + IDLE * (nv < 0.1)
             self.state[v] = (o, int(a), cost, tid); self.oos_log.append((o[2], o[4] * 60.0))
 
@@ -187,12 +192,13 @@ def read_tripinfo(path, agents=None):
 def make_controllers(_ls, net_file, signals, vehicles, seed):
     """Hook for scripts/CITY_live_viewer.py: 'rl:<ckpt>' / 'rlcompat:<ckpt>:<maxg>' lights, 'cav:<ckpt>:<rho>' cars."""
     import torch
+    torch.set_grad_enabled(False)                                 # inference only in the viewer
     out = []
     if signals.startswith('rl'):
         parts = signals.split(':'); net = torch.load(parts[1], weights_only=False)['net']; net.eval()
         maxg = float(parts[2]) if parts[0] == 'rlcompat' else None
-        out.append(LightRL(NetInfo(net_file), lambda O: net(torch.as_tensor(O)).argmax(1).numpy(), max_g=maxg))
+        out.append(LightRL(NetInfo(net_file), lambda O, n=net: n(torch.as_tensor(O)).argmax(1).numpy(), max_g=maxg))   # bind n now (was late-bound)
     if vehicles.startswith('cav'):
         parts = vehicles.split(':'); net = torch.load(parts[1], weights_only=False)['net']; net.eval()
-        out.append(CarRL(lambda O: net(torch.as_tensor(O)).argmax(1).numpy(), float(parts[2]), seed))
+        out.append(CarRL(lambda O, n=net: n(torch.as_tensor(O)).argmax(1).numpy(), float(parts[2]), seed))
     return out

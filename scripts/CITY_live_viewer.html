@@ -140,7 +140,10 @@
     const now = performance.now(); if (cur) interval = Math.min(1000, Math.max(16, now - tCur));
     prev = cur; cur = fr; tCur = now;
     const i = fr.i;
-    document.getElementById('mode').textContent = `signals: ${i.signals} · vehicles: ${i.vehicles}`;
+    if (!prev || prev.i.t !== i.t) {           // a repeated (held) frame must not wipe a warning
+      const m = document.getElementById('mode'); m.style.color = ''; m.style.fontWeight = '';
+      m.textContent = (i.label ? i.label + ' — ' : '') + `signals: ${i.signals} · vehicles: ${i.vehicles}`;
+    }
     document.getElementById('t').textContent = fmt(i.t);
     document.getElementById('running').textContent = i.running;
     document.getElementById('arrived').textContent = i.arrived;
@@ -150,7 +153,18 @@
     document.getElementById('pause').textContent = i.paused ? 'Play' : 'Pause';
   }
 
-  const control = q => fetch('/control?' + q).catch(() => {});
+  // A dead server used to fail silently (frozen last frame, Restart doing nothing); say so in red instead.
+  function warn(msg) { const m = document.getElementById('mode'); m.textContent = msg; m.style.color = 'var(--stop)'; m.style.fontWeight = '600'; }
+  const control = q => fetch('/control?' + q).then(r => { if (!r.ok) throw 0; })
+    .catch(() => warn('Server của viewer này KHÔNG chạy — đang hiện khung hình cuối; Restart không có tác dụng.'));
+  // The simulation stops at --end and holds its last frame; tell the viewer instead of looking like a permanent jam.
+  let lastT = -1, lastChange = performance.now();
+  setInterval(() => {
+    if (!cur) return;
+    if (cur.i.t !== lastT) { lastT = cur.i.t; lastChange = performance.now(); return; }
+    if (!cur.i.paused && performance.now() - lastChange > 6000)
+      warn(`Mô phỏng dừng ở ${fmt(cur.i.t)} (hết giờ hoặc mất kết nối) — đây là khung hình cuối; bấm Restart để chạy lại.`);
+  }, 2000);
   document.getElementById('pause').onclick = () => control('pause=' + (cur && cur.i.paused ? '0' : '1'));
   document.getElementById('restart').onclick = () => control('restart=1');
   document.getElementById('rate').onchange = e => control('speed=' + e.target.value);
@@ -171,7 +185,7 @@
     net = g; fit(); control('speed=' + document.getElementById('rate').value);
     const es = new EventSource('/events');
     es.onmessage = e => { const fr = JSON.parse(e.data); if (fr.v) onFrame(fr); };
-    es.onerror = () => { document.getElementById('mode').textContent = 'stream lost – retrying…'; };
+    es.onerror = () => warn('Mất kết nối tới server viewer (server đã tắt?) — đang hiện khung hình cuối.');
   });
   render();
 })();
