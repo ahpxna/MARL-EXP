@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E3 Compatibility Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root { --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e3e3e0; --pos:#2f7d4f; --neg:#b3412e; --acc:#3b5ba5; --warn:#a36b00; }
+@media (prefers-color-scheme: dark) { :root { --bg:#141416; --card:#1e1e22; --ink:#ececee; --muted:#9a9aa2; --line:#2e2e34; --pos:#5fbf86; --neg:#e07a64; --acc:#86a2e8; --warn:#e0a93b; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+header { padding:20px 24px 8px; }
+h1 { font-size:20px; margin:0 0 4px; }
+h2 { font-size:16px; margin:0 0 8px; }
+.sub { color:var(--muted); font-size:13px; }
+main { display:grid; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); gap:16px; padding:16px 24px 32px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; min-width:0; }
+.wide { grid-column:1 / -1; }
+table { border-collapse:collapse; width:100%; font-size:13px; }
+th, td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { color:var(--muted); font-weight:600; }
+.pos { color:var(--pos); } .neg { color:var(--neg); } .warn { color:var(--warn); }
+.tag { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; border:1px solid var(--line); color:var(--muted); }
+.scroll { overflow-x:auto; }
+canvas { max-height:320px; }
+@media (max-width: 520px) { main { grid-template-columns:1fr; padding:12px 16px; } header { padding:16px 16px 4px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>E3 — channel–receiver compatibility</h1>
+  <div class="sub" id="status"></div>
+</header>
+<main>
+  <section class="card">
+    <h2>4×4, seed 0 — gain vs Z theo K (dev panel 901–904)</h2>
+    <div class="sub">Exploratory, một seed. Panel đích const-K (3301–3364) chưa chạy.</div>
+    <canvas id="g4dev"></canvas>
+  </section>
+  <section class="card">
+    <h2>4×4 — tọa độ net theo channel (chỉ cần channel)</h2>
+    <div class="sub">Dự đoán dấu: net/15 &gt; −0.08. Tương đối: stale = tuổi &gt; 9 (vùng train iid). Tuyệt đối: tuổi &gt; 2.</div>
+    <div class="scroll"><table id="g4comp"></table></div>
+  </section>
+  <section class="card">
+    <h2>3×3 — net (fresh − stale − never) vs gain</h2>
+    <div class="sub">Order × capacity: ρ +0.983 (post hoc). Hold-r: ρ +0.850 dev, 6/6 dấu prospective (out of sample).</div>
+    <canvas id="g3net"></canvas>
+  </section>
+  <section class="card">
+    <h2>3×3 — B₃ (cộng dồn tuổi) vs gain</h2>
+    <div class="sub">So sánh: B₃ chỉ ρ −0.778 trên các cell order × capacity.</div>
+    <canvas id="g3b3"></canvas>
+  </section>
+  <section class="card">
+    <h2>Probe tuổi — acceptability theo nhãn tuổi (state K=1)</h2>
+    <div class="sub">Train iid đạt đỉnh ở tuổi 1–2; train K=1 đỉnh dịch sang 3–4 (H-C).</div>
+    <canvas id="age"></canvas>
+  </section>
+  <section class="card">
+    <h2>Train-match — gain vs Z trên panel đích (interim)</h2>
+    <div class="sub">Rule TM1–TM4 chỉ áp khi đủ 5 seed. Seed 4 đang train lại bằng v9.</div>
+    <div class="scroll"><table id="tm"></table></div>
+  </section>
+  <section class="card">
+    <h2>4×4 — replication target, seed 0 (interim)</h2>
+    <div class="sub">Panel 2901–2964; cần ≥ 8 seed mới có verdict.</div>
+    <div class="scroll"><table id="rep"></table></div>
+  </section>
+  <section class="card wide">
+    <h2>4×4 — trạng thái các actor</h2>
+    <div class="sub">Chuỗi đã dừng 01:0x theo yêu cầu. "resumable" = có state_last.pt (resume tại chỗ được).</div>
+    <div class="scroll"><table id="actors"></table></div>
+  </section>
+</main>
+<script>
+const D = __DATA__;
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = { pos: css('--pos'), neg: css('--neg'), acc: css('--acc'), warn: css('--warn'), muted: css('--muted'), line: css('--line'), ink: css('--ink') };
+Chart.defaults.color = C.muted; Chart.defaults.borderColor = C.line;
+const sgn = v => v > 0 ? 'pos' : (v < 0 ? 'neg' : '');
+const fmt = v => (v > 0 ? '+' : '') + Number(v).toFixed(2);
+document.getElementById('status').textContent =
+  `Cập nhật ${D.status.time} · load ${D.status.load} · ` + Object.entries(D.status.jobs).map(([k, v]) => `${k}: ${v}`).join(' · ');
+
+const Ks = ['1','2','3','4','5','6','0'], lab = Ks.map(k => k === '0' ? 'iid' : 'K=' + k);
+new Chart(document.getElementById('g4dev'), { type: 'bar',
+  data: { labels: lab, datasets: [{ label: 'gain vs Z (%)', data: Ks.map(k => D.g4.dev[k].gain), backgroundColor: Ks.map(k => D.g4.dev[k].gain > 0 ? C.pos : C.neg) }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { title: { display: true, text: '% ít waiting hơn Z' } } } } });
+
+const th = cols => '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+let t = th(['K', 'F', 'never', 'B₃', 'net tương đối', 'dấu', 'net tuyệt đối', 'dấu', 'gain s0 dev']);
+for (const k of Ks) { const c = D.g4.comp[k], g = D.g4.dev[k].gain;
+  const pr = c.net_rel / 15 > -0.08, pa = c.net_abs / 15 > -0.08;
+  t += `<tr><td>${k === '0' ? 'iid' : k}</td><td>${c.F}</td><td>${c.never}</td><td>${c.B3}</td><td class="${sgn(c.net_rel)}">${fmt(c.net_rel)}</td><td class="${(pr === (g > 0)) ? 'pos' : 'neg'}">${pr ? '+' : '−'}</td><td class="${sgn(c.net_abs)}">${fmt(c.net_abs)}</td><td class="${(pa === (g > 0)) ? 'pos' : 'neg'}">${pa ? '+' : '−'}</td><td class="${sgn(g)}">${fmt(g)}%</td></tr>`; }
+document.getElementById('g4comp').innerHTML = t;
+
+const kinds = { 'order x capacity': C.acc, 'hold-r development': C.warn, 'hold-r prospective': C.pos };
+const scatter = (id, x) => new Chart(document.getElementById(id), { type: 'scatter',
+  data: { datasets: Object.entries(kinds).map(([k, col]) => ({ label: k, backgroundColor: col, pointRadius: 5,
+    data: D.g3.filter(c => c.kind === k).map(c => ({ x: c[x], y: c.gain, cell: c.cell })) })) },
+  options: { plugins: { tooltip: { callbacks: { label: ctx => `${ctx.raw.cell}: ${x} ${ctx.raw.x}, gain ${ctx.raw.y}%` } } },
+    scales: { x: { title: { display: true, text: x === 'net' ? 'net = fresh − stale(>2) − never' : 'B₃' } }, y: { title: { display: true, text: 'gain vs Z (%)' } } } } });
+scatter('g3net', 'net'); scatter('g3b3', 'B3');
+
+new Chart(document.getElementById('age'), { type: 'line',
+  data: { labels: [...Array(11).keys()], datasets: [
+    { label: 'train iid (relay6Cage)', data: D.age.iid_trained, borderColor: C.acc, backgroundColor: C.acc, tension: .2 },
+    { label: 'train K=1 (relayCK1)', data: D.age.k1_trained, borderColor: C.warn, backgroundColor: C.warn, tension: .2 } ] },
+  options: { scales: { x: { title: { display: true, text: 'nhãn tuổi gán cho copy relay (bước)' } }, y: { title: { display: true, text: 'acceptability' } } } } });
+
+let tm = th(['seed', 'train K=1 @K=1', 'train iid @K=1', 'train K=1 @iid', 'train iid @iid']);
+for (const [s, v] of Object.entries(D.tm)) tm += `<tr><td>${s}</td>` + ['relayCK1_st|K1', 'relay6Cage_st|K1', 'relayCK1_st|K0', 'relay6Cage_st|K0'].map(k => `<td class="${sgn(v[k])}">${fmt(v[k])}%</td>`).join('') + '</tr>';
+document.getElementById('tm').innerHTML = tm;
+
+let rp = th(['capacity', 'gain vs Z']);
+for (const [k, v] of Object.entries(D.g4.rep)) rp += `<tr><td>${k}</td><td class="${sgn(v)}">${fmt(v)}%</td></tr>`;
+document.getElementById('rep').innerHTML = rp;
+
+let ac = th(['actor', 'xong', 'resumable', 'best select', 'dòng log cuối']);
+for (const a of D.g4.actors) ac += `<tr><td>${a.name}</td><td>${a.done ? '✓' : ''}</td><td>${a.resumable ? '✓' : ''}</td><td>${a.best ?? ''}</td><td class="sub">${a.last.replace(/</g, '&lt;')}</td></tr>`;
+document.getElementById('actors').innerHTML = ac;
+</script>
+</body>
+</html>

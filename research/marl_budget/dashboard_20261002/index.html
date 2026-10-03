@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E3 Compatibility Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root { --bg:#f7f7f5; --card:#ffffff; --ink:#1d1d1f; --muted:#6b6b70; --line:#e3e3e0; --pos:#2f7d4f; --neg:#b3412e; --acc:#3b5ba5; --warn:#a36b00; }
+@media (prefers-color-scheme: dark) { :root { --bg:#141416; --card:#1e1e22; --ink:#ececee; --muted:#9a9aa2; --line:#2e2e34; --pos:#5fbf86; --neg:#e07a64; --acc:#86a2e8; --warn:#e0a93b; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+header { padding:20px 24px 8px; }
+h1 { font-size:20px; margin:0 0 4px; }
+h2 { font-size:16px; margin:0 0 8px; }
+.sub { color:var(--muted); font-size:13px; }
+main { display:grid; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); gap:16px; padding:16px 24px 32px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; min-width:0; }
+.wide { grid-column:1 / -1; }
+table { border-collapse:collapse; width:100%; font-size:13px; }
+th, td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+th { color:var(--muted); font-weight:600; }
+.pos { color:var(--pos); } .neg { color:var(--neg); } .warn { color:var(--warn); }
+.tag { display:inline-block; padding:1px 6px; border-radius:4px; font-size:11px; border:1px solid var(--line); color:var(--muted); }
+.scroll { overflow-x:auto; }
+canvas { max-height:320px; }
+@media (max-width: 520px) { main { grid-template-columns:1fr; padding:12px 16px; } header { padding:16px 16px 4px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>E3 — channel–receiver compatibility</h1>
+  <div class="sub" id="status"></div>
+</header>
+<main>
+  <section class="card">
+    <h2>4×4, seed 0 — gain vs Z theo K (dev panel 901–904)</h2>
+    <div class="sub">Exploratory, một seed. Panel đích const-K (3301–3364) chưa chạy.</div>
+    <canvas id="g4dev"></canvas>
+  </section>
+  <section class="card">
+    <h2>4×4 — tọa độ net theo channel (chỉ cần channel)</h2>
+    <div class="sub">Dự đoán dấu: net/15 &gt; −0.08. Tương đối: stale = tuổi &gt; 9 (vùng train iid). Tuyệt đối: tuổi &gt; 2.</div>
+    <div class="scroll"><table id="g4comp"></table></div>
+  </section>
+  <section class="card">
+    <h2>3×3 — net (fresh − stale − never) vs gain</h2>
+    <div class="sub">Order × capacity: ρ +0.983 (post hoc). Hold-r: ρ +0.850 dev, 6/6 dấu prospective (out of sample).</div>
+    <canvas id="g3net"></canvas>
+  </section>
+  <section class="card">
+    <h2>3×3 — B₃ (cộng dồn tuổi) vs gain</h2>
+    <div class="sub">So sánh: B₃ chỉ ρ −0.778 trên các cell order × capacity.</div>
+    <canvas id="g3b3"></canvas>
+  </section>
+  <section class="card">
+    <h2>Probe tuổi — acceptability theo nhãn tuổi (state K=1)</h2>
+    <div class="sub">Train iid đạt đỉnh ở tuổi 1–2; train K=1 đỉnh dịch sang 3–4 (H-C).</div>
+    <canvas id="age"></canvas>
+  </section>
+  <section class="card">
+    <h2>Train-match — gain vs Z trên panel đích (interim)</h2>
+    <div class="sub">Rule TM1–TM4 chỉ áp khi đủ 5 seed. Seed 4 đang train lại bằng v9.</div>
+    <div class="scroll"><table id="tm"></table></div>
+  </section>
+  <section class="card">
+    <h2>4×4 — replication target, seed 0 (interim)</h2>
+    <div class="sub">Panel 2901–2964; cần ≥ 8 seed mới có verdict.</div>
+    <div class="scroll"><table id="rep"></table></div>
+  </section>
+  <section class="card wide">
+    <h2>4×4 — trạng thái các actor</h2>
+    <div class="sub">Chuỗi đã dừng 01:0x theo yêu cầu. "resumable" = có state_last.pt (resume tại chỗ được).</div>
+    <div class="scroll"><table id="actors"></table></div>
+  </section>
+</main>
+<script>
+const D = {"g4": {"dev": {"1": {"gain": -4.94815727338056, "netZ": 0.009915865384615308}, "2": {"gain": 1.375628785545635, "netZ": 0.01953125}, "3": {"gain": 4.270608767067041, "netZ": 0.025240384615384692}, "4": {"gain": 4.783903090031827, "netZ": 0.024939903846153855}, "5": {"gain": 5.0816137973514035, "netZ": 0.034555288461538436}, "6": {"gain": 5.492249255723236, "netZ": 0.041466346153846145}, "0": {"gain": 3.716250898265061, "netZ": 0.039362980769230727}}, "comp": {"1": {"F": 1, "never": 6.57, "B3": 17.35, "net_rel": -6.17, "net_abs": -11.12}, "2": {"F": 2, "never": 2.07, "B3": 16.41, "net_rel": -0.39, "net_abs": -7.23}, "3": {"F": 3, "never": 2.49, "B3": 1.88, "net_rel": 0.51, "net_abs": -3.35}, "4": {"F": 4, "never": 0.89, "B3": 2.65, "net_rel": 3.02, "net_abs": 0.54}, "5": {"F": 5, "never": 0.62, "B3": 0.0, "net_rel": 4.38, "net_abs": 3.83}, "6": {"F": 6, "never": 0.48, "B3": 0.0, "net_rel": 5.52, "net_abs": 5.02}, "0": {"F": 7.58, "never": 0.45, "B3": 0.54, "net_rel": 7.12, "net_abs": 6.55}}, "rep": {"iid": 6.93, "cap4": 5.92, "low": 2.68}, "actors": [{"name": "distill_none_s0", "done": true, "resumable": false, "best": 1244.75, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/distill_none_s0 best select 1244."}, {"name": "distill_none_s1", "done": false, "resumable": false, "best": null, "last": "[watchdog] partial output moved to /Users/phanan/cig-amf-main/legacy/distill_none_s1_stall"}, {"name": "distill_none_s3", "done": false, "resumable": false, "best": null, "last": "[12017s] it 327: beta 0.00 loss 0.278 agree 0.898"}, {"name": "distill_none_s4", "done": true, "resumable": false, "best": 1218.9375, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/distill_none_s4 best select 1218."}, {"name": "relayCage_st_s0", "done": true, "resumable": false, "best": 1169.75, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/relayCage_st_s0 best select 1169."}, {"name": "relayCage_st_s1", "done": true, "resumable": false, "best": 1172.8125, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/relayCage_st_s1 best select 1172."}, {"name": "relayCage_st_s3", "done": true, "resumable": false, "best": 1166.9375, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/relayCage_st_s3 best select 1166."}, {"name": "relayCage_st_s4", "done": false, "resumable": false, "best": null, "last": "[watchdog] partial output moved to /Users/phanan/cig-amf-main/legacy/relayCage_st_s4_stall"}, {"name": "relay_st_s0", "done": false, "resumable": false, "best": null, "last": "RuntimeError: [enforce fail at inline_container.cc:743] . open file failed with strerror: "}, {"name": "set_full_s0", "done": true, "resumable": true, "best": 1173.5, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/set_full_s0 best select 1173.5 MP"}, {"name": "set_full_s1", "done": true, "resumable": true, "best": 1175.9375, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/set_full_s1 best select 1175.9375"}, {"name": "set_full_s2", "done": false, "resumable": false, "best": null, "last": "[watchdog] partial output moved to /Users/phanan/cig-amf-main/legacy/set_full_s2_stalled_3"}, {"name": "set_full_s3", "done": true, "resumable": true, "best": 1148.5, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/set_full_s3 best select 1148.5 MP"}, {"name": "set_full_s4", "done": true, "resumable": true, "best": 1155.9375, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/set_full_s4 best select 1155.9375"}, {"name": "set_full_s5", "done": false, "resumable": true, "best": null, "last": "[16936s] it 1744: train \u03a3wait 1459 ent 0.862 vl 1.256"}, {"name": "set_full_s7", "done": false, "resumable": true, "best": null, "last": "[1970s] it 371: train \u03a3wait 2602 ent 1.735 vl 8.253"}, {"name": "set_full_s9", "done": false, "resumable": true, "best": null, "last": "[1657s] it 323: train \u03a3wait 3485 ent 1.818 vl 12.619"}, {"name": "set_none_s0", "done": true, "resumable": true, "best": 1432.5, "last": "COMPLETE research/marl_budget/e3_grid4x4_20260930/actors/set_none_s0 best select 1432.5 MP"}]}, "g3": [{"cell": "prefix/iid", "net": 2.99, "B3": 6.07, "gain": 2.0, "kind": "order x capacity"}, {"cell": "prefix/cap4", "net": -1.09, "B3": 29.71, "gain": -0.15, "kind": "order x capacity"}, {"cell": "prefix/low", "net": -2.23, "B3": 26.54, "gain": -0.38, "kind": "order x capacity"}, {"cell": "agefirst/cap4", "net": 2.6, "B3": 0.0, "gain": 2.04, "kind": "order x capacity"}, {"cell": "agefirst/low", "net": 0.46, "B3": 0.47, "gain": 1.26, "kind": "order x capacity"}, {"cell": "agefirst/iid", "net": 3.86, "B3": 0.0, "gain": 2.29, "kind": "order x capacity"}, {"cell": "agefirst/const1", "net": -4.12, "B3": 8.48, "gain": -1.65, "kind": "order x capacity"}, {"cell": "agefirst/const2", "net": -0.23, "B3": 1.64, "gain": 1.01, "kind": "order x capacity"}, {"cell": "agefirst/const3", "net": 2.22, "B3": 0.0, "gain": 1.72, "kind": "order x capacity"}, {"cell": "hold K2 r1 (dev)", "net": -0.23, "B3": 1.64, "gain": 1.32, "kind": "hold-r development"}, {"cell": "hold K2 r1 (prospective)", "net": -0.23, "B3": 1.64, "gain": 0.92, "kind": "hold-r prospective"}, {"cell": "hold K2 r2 (dev)", "net": -1.51, "B3": 2.21, "gain": -0.07, "kind": "hold-r development"}, {"cell": "hold K2 r3 (dev)", "net": -2.13, "B3": 5.31, "gain": 0.79, "kind": "hold-r development"}, {"cell": "hold K2 r3 (prospective)", "net": -2.13, "B3": 5.31, "gain": -0.23, "kind": "hold-r prospective"}, {"cell": "hold K2 r4 (dev)", "net": -2.44, "B3": 8.1, "gain": -0.42, "kind": "hold-r development"}, {"cell": "hold K2 r4 (prospective)", "net": -2.44, "B3": 8.1, "gain": -0.36, "kind": "hold-r prospective"}, {"cell": "hold K2 r6 (dev)", "net": -2.74, "B3": 11.95, "gain": -0.24, "kind": "hold-r development"}, {"cell": "hold K2 r6 (prospective)", "net": -2.74, "B3": 11.95, "gain": -0.8, "kind": "hold-r prospective"}, {"cell": "hold K3 r1 (dev)", "net": 2.22, "B3": 0.0, "gain": 1.39, "kind": "hold-r development"}, {"cell": "hold K3 r1 (prospective)", "net": 2.22, "B3": 0.0, "gain": 1.5, "kind": "hold-r prospective"}, {"cell": "hold K3 r4 (dev)", "net": -0.08, "B3": 3.2, "gain": 0.78, "kind": "hold-r development"}, {"cell": "hold K3 r6 (dev)", "net": -0.54, "B3": 5.95, "gain": 0.53, "kind": "hold-r development"}, {"cell": "hold K3 r6 (prospective)", "net": -0.54, "B3": 5.95, "gain": 0.33, "kind": "hold-r prospective"}], "tm": {"0": {"relayCK1_st|K1": 2.61, "relayCK1_st|K0": -0.01, "relay6Cage_st|K1": -4.96, "relay6Cage_st|K0": 2.68}, "1": {"relayCK1_st|K1": 2.99, "relayCK1_st|K0": 1.18, "relay6Cage_st|K1": -1.75, "relay6Cage_st|K0": 3.16}, "2": {"relayCK1_st|K1": 4.01, "relayCK1_st|K0": 3.32, "relay6Cage_st|K1": -1.78, "relay6Cage_st|K0": 4.74}, "3": {"relayCK1_st|K1": 0.82, "relayCK1_st|K0": -2.97, "relay6Cage_st|K1": -1.94, "relay6Cage_st|K0": 1.97}}, "age": {"iid_trained": [0.783, 0.838, 0.84, 0.815, 0.783, 0.756, 0.738, 0.726, 0.719, 0.714, 0.709], "k1_trained": [0.704, 0.754, 0.878, 0.89, 0.891, 0.877, 0.856, 0.745, 0.796, 0.774, 0.767], "seeds": ["0", "1", "2", "3"]}, "status": {"jobs": {"train-match seed 4 (v9)": "2 process(es)", "arch control (shared-concat / attention)": "2 process(es)", "4x4 chain": "0 process(es)"}, "load": 19.6, "time": "2026-10-02 01:20:26"}};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const C = { pos: css('--pos'), neg: css('--neg'), acc: css('--acc'), warn: css('--warn'), muted: css('--muted'), line: css('--line'), ink: css('--ink') };
+Chart.defaults.color = C.muted; Chart.defaults.borderColor = C.line;
+const sgn = v => v > 0 ? 'pos' : (v < 0 ? 'neg' : '');
+const fmt = v => (v > 0 ? '+' : '') + Number(v).toFixed(2);
+document.getElementById('status').textContent =
+  `Cập nhật ${D.status.time} · load ${D.status.load} · ` + Object.entries(D.status.jobs).map(([k, v]) => `${k}: ${v}`).join(' · ');
+
+const Ks = ['1','2','3','4','5','6','0'], lab = Ks.map(k => k === '0' ? 'iid' : 'K=' + k);
+new Chart(document.getElementById('g4dev'), { type: 'bar',
+  data: { labels: lab, datasets: [{ label: 'gain vs Z (%)', data: Ks.map(k => D.g4.dev[k].gain), backgroundColor: Ks.map(k => D.g4.dev[k].gain > 0 ? C.pos : C.neg) }] },
+  options: { plugins: { legend: { display: false } }, scales: { y: { title: { display: true, text: '% ít waiting hơn Z' } } } } });
+
+const th = cols => '<tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr>';
+let t = th(['K', 'F', 'never', 'B₃', 'net tương đối', 'dấu', 'net tuyệt đối', 'dấu', 'gain s0 dev']);
+for (const k of Ks) { const c = D.g4.comp[k], g = D.g4.dev[k].gain;
+  const pr = c.net_rel / 15 > -0.08, pa = c.net_abs / 15 > -0.08;
+  t += `<tr><td>${k === '0' ? 'iid' : k}</td><td>${c.F}</td><td>${c.never}</td><td>${c.B3}</td><td class="${sgn(c.net_rel)}">${fmt(c.net_rel)}</td><td class="${(pr === (g > 0)) ? 'pos' : 'neg'}">${pr ? '+' : '−'}</td><td class="${sgn(c.net_abs)}">${fmt(c.net_abs)}</td><td class="${(pa === (g > 0)) ? 'pos' : 'neg'}">${pa ? '+' : '−'}</td><td class="${sgn(g)}">${fmt(g)}%</td></tr>`; }
+document.getElementById('g4comp').innerHTML = t;
+
+const kinds = { 'order x capacity': C.acc, 'hold-r development': C.warn, 'hold-r prospective': C.pos };
+const scatter = (id, x) => new Chart(document.getElementById(id), { type: 'scatter',
+  data: { datasets: Object.entries(kinds).map(([k, col]) => ({ label: k, backgroundColor: col, pointRadius: 5,
+    data: D.g3.filter(c => c.kind === k).map(c => ({ x: c[x], y: c.gain, cell: c.cell })) })) },
+  options: { plugins: { tooltip: { callbacks: { label: ctx => `${ctx.raw.cell}: ${x} ${ctx.raw.x}, gain ${ctx.raw.y}%` } } },
+    scales: { x: { title: { display: true, text: x === 'net' ? 'net = fresh − stale(>2) − never' : 'B₃' } }, y: { title: { display: true, text: 'gain vs Z (%)' } } } } });
+scatter('g3net', 'net'); scatter('g3b3', 'B3');
+
+new Chart(document.getElementById('age'), { type: 'line',
+  data: { labels: [...Array(11).keys()], datasets: [
+    { label: 'train iid (relay6Cage)', data: D.age.iid_trained, borderColor: C.acc, backgroundColor: C.acc, tension: .2 },
+    { label: 'train K=1 (relayCK1)', data: D.age.k1_trained, borderColor: C.warn, backgroundColor: C.warn, tension: .2 } ] },
+  options: { scales: { x: { title: { display: true, text: 'nhãn tuổi gán cho copy relay (bước)' } }, y: { title: { display: true, text: 'acceptability' } } } } });
+
+let tm = th(['seed', 'train K=1 @K=1', 'train iid @K=1', 'train K=1 @iid', 'train iid @iid']);
+for (const [s, v] of Object.entries(D.tm)) tm += `<tr><td>${s}</td>` + ['relayCK1_st|K1', 'relay6Cage_st|K1', 'relayCK1_st|K0', 'relay6Cage_st|K0'].map(k => `<td class="${sgn(v[k])}">${fmt(v[k])}%</td>`).join('') + '</tr>';
+document.getElementById('tm').innerHTML = tm;
+
+let rp = th(['capacity', 'gain vs Z']);
+for (const [k, v] of Object.entries(D.g4.rep)) rp += `<tr><td>${k}</td><td class="${sgn(v)}">${fmt(v)}%</td></tr>`;
+document.getElementById('rep').innerHTML = rp;
+
+let ac = th(['actor', 'xong', 'resumable', 'best select', 'dòng log cuối']);
+for (const a of D.g4.actors) ac += `<tr><td>${a.name}</td><td>${a.done ? '✓' : ''}</td><td>${a.resumable ? '✓' : ''}</td><td>${a.best ?? ''}</td><td class="sub">${a.last.replace(/</g, '&lt;')}</td></tr>`;
+document.getElementById('actors').innerHTML = ac;
+</script>
+</body>
+</html>

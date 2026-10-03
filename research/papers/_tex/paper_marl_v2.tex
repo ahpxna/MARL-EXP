@@ -60,7 +60,9 @@ low-ranked senders when capacity is low. Relay tables carried inside the same 25
 the congestion order their copies are old, and a relay student trained at iid capacity loses to compiled silence at low
 capacity. Under an age-first stream
 order, with the same packets and byte accounting, relay beats the bar in all six cells of a pre-specified panel (two
-teacher/student pairs, three capacity conditions; $-2.2$ to $-4.0\%$ total waiting). For the channel we show that age-first
+teacher/student pairs, three capacity conditions; $-2.2$ to $-4.0\%$ total waiting) and, on a reserved panel used once, on
+average over ten teacher/student pairs in every capacity condition ($-2.3$, $-2.0$ and $-1.3\%$), while the same students
+under the congestion order lose the advantage at low capacity. For the channel we show that age-first
 ordering transmits every sender at least once in every $m$ steps and attains the minimum mean injection age for a given
 stream length. When the stream head is a receiver that decoded everything transmitted in the previous step, every other
 receiver holds, for every agent, a copy at least as recent as that agent's last transmission before the current step.
@@ -130,7 +132,9 @@ here the payloads are engineered summaries, and staleness arises from which pack
 \paragraph{Communication under budgets.} SchedNet~\cite{schednet} learns who broadcasts, and IMAC~\cite{imac} learns
 messages and schedules jointly. NDQ~\cite{ndq}, information-bottleneck and vector-quantised messages~\cite{ibvq},
 event-triggered sending~\cite{etcnet} and Where2comm~\cite{where2comm} reduce bytes. CACOM~\cite{cacom} personalises
-messages per receiver after a coarse broadcast. Here every receiver decodes a prefix of one common ordered broadcast.
+messages per receiver after a coarse broadcast. AH-VIB~\cite{ahvib} makes one message robust to truncation of its
+dimensions to a prefix, and names learning which agent communicates at which slot as open. Here every receiver decodes a
+prefix of one common ordered broadcast, and the order of senders in that stream is the object of study.
 \paragraph{Multi-hop, global and delayed information.} Graph controllers imitate centralised experts from delayed $k$-hop
 information~\cite{gama2022,tolstaya2019}; NeurComm propagates delayed global information in traffic control~\cite{neurcomm}.
 Message chains (TEM~\cite{tem}), two-hop relays (AC2C~\cite{ac2c}), full-team recurrent chains (FCMNet~\cite{fcmnet}) and
@@ -138,7 +142,11 @@ low-diameter topologies with memory (ExpoComm~\cite{expocomm}) spread informatio
 protocols under which every agent reconstructs the state uniformly. Delay-aware methods include DACOM~\cite{dacom},
 CoDe~\cite{code}, VIL2C~\cite{vil2c}, which values delayed messages by their effect on the recipient's decision, and
 CGDC~\cite{cgdc}, which separates communication gain from delay cost.
-\paragraph{Freshness and scheduling.} Keeping every source fresh on a shared channel is age-of-information scheduling; in
+\paragraph{Freshness and scheduling.} All-to-all dissemination in which every node is both a source and a monitor and
+broadcasts carry other nodes' states (piggybacking) goes back to vehicular safety messaging~\cite{kaul2011}, which also
+defines the relay age; lower bounds on age, and schedules that attain them, are known when each transmission carries a
+single status~\cite{farazi2019}. Here several senders are decoded per step, by prefix and with heterogeneous capacity, and
+each packet carries its sender's whole table. Keeping every source fresh on a shared channel is age-of-information scheduling; in
 symmetric broadcast networks the greedy highest-age-first policy is optimal~\cite{kadota2018}, and round-robin is
 $O(1)$-competitive under packet management~\cite{jien2023}. Freshest-copy merging of timestamped relays is gossip, whose
 age scaling with network size is analysed in~\cite{yates2021,selen2013}. Periodic per-source deadlines are pinwheel
@@ -146,6 +154,13 @@ scheduling, where every instance of density at most $5/6$ is schedulable~\cite{k
 with different needs is broadcast disks~\cite{broadcastdisks}. One order serving every cardinality is incremental
 maximisation~\cite{bernstein2022,bienkowski2026}, and one sequence serving every house size within quota is house-monotone
 apportionment~\cite{balinski1982}.
+\paragraph{Information architecture and information structures.} Moeller and Krishnamachari~\cite{moeller2026} study the
+trade-off between the scope and the age of a team's information in exogenous linear-quadratic environments, where the
+delay is a given function of the scope and communication is not charged; what governs performance there is the
+predictability of the optimal decision rather than of the state. Liu, You and Zhang~\cite{liu2026ltc} formalise learning to
+communicate through information structures, with a cost on additional sharing, and Matni~\cite{matni2017} co-designs
+communication delays with a distributed controller. Here the delay is produced by a byte-charged broadcast schedule, the
+traffic state is endogenous, and the policies are learned.
 \paragraph{Privileged teachers and communication-free students.} Centralised or privileged teachers are distilled into
 decentralised students in CTDS~\cite{ctds}, PTDE~\cite{ptde}, HINT~\cite{hint}, communication-enhanced tutoring~\cite{tutoring},
 KD-MARL~\cite{kdmarl} and MAGPO~\cite{magpo}, and into communication-free students in CoDiMAD~\cite{codimad}. These works
@@ -467,6 +482,27 @@ seed 1 & $-4.29\%$ & $-1.76\%$ & $-1.74\%$\\
 The primary rule is met in all six cells. On the same panel relay under age-first ordering also beats set\_none by
 5.7--10.1\% and max-queue by 22.5--26.2\%; the byte-budget reference gives $-4.0$ / $-4.5\%$. The test used one zero-byte
 student per teacher and two teacher/student pairs.\NOTE{L-173 (protocol hash c7467697\dots), L-175.}
+\paragraph{Reserved ten-seed test}\label{sec:res-ten} (panel 2701--2764, used once; protocol written before any run on it).
+Ten teacher/student pairs, relay students trained under age-first ordering, against each pair's zero-byte student. The
+statistic per condition is the mean over the ten pairs of the paired waiting ratio minus one; its interval resamples the
+pairs and then the traffic seeds within each pair (4000 draws); the rule required all three upper bounds below zero.
+\begin{center}\small
+\begin{tabular}{@{}lccc@{}}
+\toprule
+& iid & cap4 & low\\
+\midrule
+age-first, vs same-seed zero-byte student & $-2.29\%$ $[-3.25,-1.39]$ & $-2.04\%$ $[-3.03,-1.10]$ & $-1.26\%$ $[-2.08,-0.50]$\\
+\multicolumn{4}{@{}l}{\emph{secondary}}\\
+age-first, vs replicate zero-byte student & $-2.11\%$ $[-3.01,-1.25]$ & $-1.86\%$ $[-2.78,-0.93]$ & $-1.08\%$ $[-1.88,-0.31]$\\
+congestion order, vs same-seed student & $-2.00\%$ $[-2.87,-1.17]$ & $+0.15\%$ $[-0.84,+1.10]$ & $+0.38\%$ $[-0.57,+1.36]$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The rule is met. Per pair the effect ranges from $-4.6\%$ to $-0.2\%$ (mean over conditions); three of the ten pairs are
+not individually below zero in most cells. Under the congestion order the advantage disappears at cap4 and low, as the
+freshness analysis predicts (Section~\ref{sec:fresh}). Across pairs the effect correlates with the byte-budget headroom of
+the same teacher (Spearman $0.87$, nine pairs).\NOTE{PROTOCOL\_E3\_TEN\_SEEDS\_20260930 (hash 4bb1ab17\dots); report
+scripts/MARL\_e3\_ten\_seed\_panel\_report.py; L-201, L-202, L-203 (comparator, leakage and provenance checks).}
 \paragraph{Ablations} (development, against the same-seed zero-byte student):
 \begin{itemize}
 \item MAPPO from scratch on relay inputs instead of distillation is $+2.0$ / $+4.5\%$ worse;
@@ -481,17 +517,18 @@ order at iid for seed 1 ($+0.7$ to $+1.0\%$).
 \item \emph{Replication.} Relay students with the corrected 185-bit layout, trained independently under the congestion order
 at iid, reproduce the pattern: under the congestion order they fail at low capacity (seed 1: $+0.97\%$ $[+0.04,+1.84]$), and
 under age-first ordering every cell has an upper bound below zero against both $Z$ and $Z'$.
-\item \emph{Training at low capacity.} A relay student trained at low capacity under the congestion order beats both bars at
+\item \emph{Training at low capacity} (two seeds). A relay student trained at low capacity under the congestion order beats both bars at
 cap4 and low without age-first ordering ($-3.4$ / $-2.9\%$ and $-4.0$ / $-4.2\%$, every upper bound against $Z'$ below
 $-1.7$). It is weaker at iid and worse under age-first ordering (low: $-0.27\%$ $[-1.18,+0.72]$ and $-0.51\%$): copies
 fresher than those it was trained on hurt it. The failure of iid-trained students under the congestion order is therefore
 partly a shift in the age distribution between training and deployment. Age-first ordering removes it at deployment,
 and training at the target capacity is an alternative.
 \item \emph{A decision-sensitivity codebook.} A relay student whose summaries allocate bits by the teacher's decision
-sensitivity (8 levels) beats both bars in all twelve cells, under both orders and both seeds. With 12 levels the robustness
-to the order holds for one seed of two: seed 1 fails under the congestion order at cap4 and low ($+0.05\%$, $-0.11\%$),
-while age-first ordering wins in all six cells. Why the codebook sometimes removes the order effect is not
-isolated.\NOTE{L-184, L-187; B8 seeds 2--9 overnight.}
+sensitivity (8 levels) beats both bars in all twelve cells, under both orders, for seeds 0 and 1. It does not remove the
+order effect in general: on seeds 3--5 it loses to the zero-byte student under the congestion order at cap4 or low (seed 3,
+low: $+1.57\%$ $[+0.82,+2.41]$; seed 4: $+0.91\%$, $+2.34\%$; seed 5: $+1.23\%$, $+1.07\%$, all lower bounds above zero), so
+the robustness holds on two of five seeds. With 12 levels it holds for one seed of two: seed 1 fails under the congestion
+order at cap4 and low ($+0.05\%$, $-0.11\%$), while age-first ordering wins in all six cells.\NOTE{L-184, L-187, L-203.}
 \end{itemize}
 \NOTE{L-184.}
 \begin{figure}[t]
@@ -652,8 +689,8 @@ second zero-byte student in all four low-capacity development cells.
 \item Relay under age-first ordering meets the six-cell rule on the pre-specified panel for two pairs, and wins against the
 second zero-byte student in six of six development cells; an independently trained pair of relay students reproduces the
 pattern.
-\item Age-first ordering is one repair, not the only one: training at the target capacity, or a decision-sensitivity
-codebook, also repairs relay under the congestion order on the development panel.
+\item Age-first ordering is one repair, not the only one: training at the target capacity also repairs relay under the
+congestion order on the development panel (two seeds). A decision-sensitivity codebook does so on two of five seeds only.
 \item Claims~\ref{cl:inj}--\ref{cl:mono} are proved on paper and agree with the replica. Claim~\ref{cl:life}'s argmax step is
 machine-checked.
 \item Relay moves decisions toward the teacher's on the steps where compiled silence departs from it, beyond a
@@ -670,11 +707,12 @@ seeds 6--9 held, L-185).
 \item A second road network (with $m\le9$ the 185-bit table still fits 25\,B; larger teams need truncated tables).
 \item A transport-delay sweep, since the ages here are selection-induced only.
 \item The frozen Lean gate of the twelve channel modules (all compiled with clean axioms on 30/09).
-\item Overnight runs (30/09--01/10): replicate zero-byte students and relay, decision-codebook and low-capacity students
-for seeds 2--9; the pre-specified ten-seed test (protocol hash 4bb1ab17\dots, panel 2701--2764); and a $4\times4$ grid
-(teachers, compiled silence and relay students with eight relay slots per packet, keeping the 185-bit layout).
+\item Runs not completed (disk): decision-codebook students for seeds 2 and 6--9, low-capacity students for seeds 2--9,
+and the $4\times4$ grid beyond seed 0 (teachers, compiled silence and relay students with eight relay slots per packet,
+keeping the 185-bit layout). The pre-specified ten-seed test and the replicate zero-byte students are done
+(Section~\ref{sec:res-ten}).
 \item Whether the three mechanisms interact (a factorial test).
-\item Why the decision-sensitivity codebook makes relay robust to the order, and whether training at the deployment
+\item Why the decision-sensitivity codebook makes relay robust to the order on some seeds and not on others, and whether training at the deployment
 capacity or age-first ordering is preferable when the capacity regime is unknown (a pre-specified comparison).
 \item Whether fresh, decision-relevant coverage is the limiting resource (a causal test; the current evidence is
 consistent with it).
@@ -803,5 +841,16 @@ Research Part C 36, 2013.
 Datasets and Benchmarks.
 \bibitem{dagger} S.~Ross, G.~Gordon, J.~A.~Bagnell, ``A reduction of imitation learning and structured prediction to
 no-regret online learning,'' AISTATS 2011.
+\bibitem{kaul2011} S.~Kaul, R.~Yates, M.~Gruteser, ``On piggybacking in vehicular networks,'' IEEE GLOBECOM 2011.
+\bibitem{farazi2019} S.~Farazi, A.~G.~Klein, D.~R.~Brown~III, ``Fundamental bounds on the age of information in multi-hop
+global status update networks,'' Journal of Communications and Networks 21(3):268--279, 2019.
+\bibitem{ahvib} L.~K.~Vindbjerg, Q.~Zhang, Y.~Brodskiy, L.~Esterle, ``Attention-based hierarchical variational information
+bottleneck for robust multi-agent communication under variable bandwidth,'' arXiv:2609.34860, 2026.
+\bibitem{moeller2026} S.~Moeller, B.~Krishnamachari, ``A theory of information architecture for networked decisions:
+freshness, locality, and coordination,'' arXiv:2609.06351, 2026.
+\bibitem{liu2026ltc} X.~Liu, H.~You, K.~Zhang, ``Principled learning-to-communicate with quasi-classical information
+structures,'' arXiv:2603.03664, 2026.
+\bibitem{matni2017} N.~Matni, ``Communication delay co-design in $\mathcal{H}_2$-distributed control using atomic norm
+minimization,'' IEEE Transactions on Control of Network Systems 4(2), 2017.
 \end{thebibliography}
 \end{document}

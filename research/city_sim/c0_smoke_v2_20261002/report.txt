@@ -1,0 +1,29 @@
+C0 regret table (mean over seeds [0, 1]; rows = student, columns = deployment light)
+student | FT | ACT | EXT | CUT
+Z_FT | 260.02 | 249.85 | 308.72 | 257.13
+Z_ACT | 287.39 | 279.97 | 262.46 | 275.17
+Z_EXT | 203.07 | 204.82 | 201.22 | 208.48
+Z_CUT | 105.37 | 105.09 | 160.69 | 102.64
+Z_MIX | 331.39 | 331.61 | 326.46 | 324.94
+M_FT | 220.88 | 190.76 | 236.41 | 173.76
+M_ACT | 357.88 | 357.74 | 352.36 | 358.61
+M_EXT | 255.07 | 242.58 | 209.76 | 263.14
+M_CUT | 361.18 | 361.74 | 359.58 | 360.16
+M_MIX | 348.20 | 347.44 | 340.64 | 348.89
+rule car | 17.58 | 13.32 | 17.15 | 12.83
+Z_ACT variants: ACT: plain 279.97 clip 279.97 fallback 279.97 relabel 279.97; EXT: plain 262.46 clip 264.75 fallback 199.13 relabel 322.62; CUT: plain 275.17 clip 275.17 fallback 275.17 relabel 271.65
+C0b light-log certificate (seeds [0]): FT: K 0.051 (S_exit 0.000, D_haz 0.051, W1 0.6) Delta +39.15 DeltaM +131.84; EXT: K 0.264 (S_exit 0.204, D_haz 0.060, W1 9.3) Delta +169.04 DeltaM +65.92; CUT: K 0.020 (S_exit 0.000, D_haz 0.020, W1 2.0) Delta +368.06 DeltaM +24.01; A1: K 0.014 (S_exit 0.000, D_haz 0.014, W1 1.5) Delta +66.30 DeltaM +219.13; A2: K 0.023 (S_exit 0.000, D_haz 0.023, W1 2.4) Delta +227.59 DeltaM +39.09; A3: K 0.085 (S_exit 0.050, D_haz 0.035, W1 3.0) Delta +66.51 DeltaM +208.39; A4: K 0.052 (S_exit 0.021, D_haz 0.031, W1 2.4) Delta +185.05 DeltaM +229.99; A5: K 0.216 (S_exit 0.149, D_haz 0.067, W1 7.7) Delta +192.71 DeltaM +13.00; A6: K 0.026 (S_exit 0.000, D_haz 0.026, W1 2.9) Delta +182.75 DeltaM +34.41
+C0b Spearman with Delta: {"K": -0.117, "S_exit": -0.018, "W1": 0.233, "D_haz": -0.183}; with DeltaM: {"K": -0.05, "S_exit": 0.0, "W1": -0.35, "D_haz": -0.183}
+C0-1 Delta(EXT) > 0: NOT SUPPORTED {"mean": 61.2328124999993, "ci": [-57.76201562499991, 189.69162499999848]}
+C0-3 DeltaM(EXT) <= Delta(EXT)/4: NOT SUPPORTED {"deltaM": 142.5949999999995, "delta": 61.2328124999993}
+C0-5 relabel worse on EXT: SUPPORTED {"relabel": 322.6203124999995, "plain": 262.45687499999957}
+C0-1 Delta(CUT) > 0: NOT SUPPORTED {"mean": 172.53406249999952, "ci": [-28.77378124999993, 372.62934374999907]}
+C0-3 DeltaM(CUT) <= Delta(CUT)/4: SUPPORTED {"deltaM": -1.5471874999994129, "delta": 172.53406249999952}
+C0-5 relabel worse on CUT: NOT SUPPORTED {"relabel": 271.64874999999955, "plain": 275.1706249999996}
+C0-2 oos mass EXT >= 0.10, CUT = 0: SUPPORTED {"EXT": 0.23440823699421964, "CUT": 0.0}
+C0-2 fallback recovers >= half of Delta(EXT): SUPPORTED {"fallback": 199.13499999999982, "plain": 262.45687499999957, "delta": 61.2328124999993}
+C0-3 FT: compiled silence = message: NOT SUPPORTED {"diff": 39.13406249999946, "bound": 0.8789062500000004}
+C0-4 mixture minimax: NOT SUPPORTED {"worst": {"Z_MIX": 331.61468749999995, "Z_ACT": 279.97187499999956, "Z_EXT": 208.4803125000003, "Z_CUT": 160.69124999999994}}
+C0b-1 Spearman(K, Delta) >= 0.7: NOT SUPPORTED {"value": -0.11666666666666665}
+C0b-2 Spearman(K) > Spearman(S_exit), Spearman(W1): NOT SUPPORTED {"K": -0.11666666666666665, "S_exit": -0.018257418583505537, "W1": 0.2333333333333333}
+C0b-3 inside lights: Spearman(D_haz, Delta) >= 0.6 (weak): NOT SUPPORTED {"value": -0.39999999999999997, "lights": ["FT", "CUT", "A1", "A2", "A6"]}

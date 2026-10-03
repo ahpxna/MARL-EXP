@@ -8,6 +8,8 @@ not change for --stall seconds it kills THAT child (SIGTERM, then SIGKILL), move
 --out directory (if any) to legacy/<name>_stalled_<k>_<timestamp> (never deleted), and retries up to
 --retries times.  Exit code: the command's own, or 124 after the last stalled attempt.
 Usage: run_with_watchdog.py --log L [--out DIR] [--stall S] [--retries N] -- cmd args...
+01/10/2026 18:3x: the stall clock is time.monotonic() (does not advance while the machine sleeps or hibernates; the
+wall-clock version killed every frozen child on waking from a 1 h 50 min low-battery hibernation, ledger L-216).
 """
 from __future__ import annotations
 import argparse, os, shutil, signal, subprocess, sys, time
@@ -26,20 +28,20 @@ def main():
         with open(log, 'ab') as fh:
             fh.write(f'\n[watchdog] attempt {attempt} {time.ctime()}: {" ".join(cmd)}\n'.encode()); fh.flush()
             proc = subprocess.Popen(cmd, stdout=fh, stderr=subprocess.STDOUT)
-            last = (log.stat().st_size, log.stat().st_mtime); t_last = time.time()
+            last = (log.stat().st_size, log.stat().st_mtime); t_last = time.monotonic()
             while proc.poll() is None:
                 time.sleep(10)
                 cur = (log.stat().st_size, log.stat().st_mtime)
                 if cur != last:
-                    last, t_last = cur, time.time()
-                elif time.time() - t_last > a.stall:
+                    last, t_last = cur, time.monotonic()
+                elif time.monotonic() - t_last > a.stall:
                     proc.send_signal(signal.SIGTERM)
                     try:
                         proc.wait(30)
                     except subprocess.TimeoutExpired:
                         proc.kill(); proc.wait()
                     break
-        if proc.returncode is not None and proc.returncode >= 0 and time.time() - t_last <= a.stall:
+        if proc.returncode is not None and proc.returncode >= 0 and time.monotonic() - t_last <= a.stall:
             return proc.returncode
         with open(log, 'ab') as fh:
             fh.write(f'[watchdog] STALL after {a.stall:.0f}s without log output; child killed {time.ctime()}\n'.encode())

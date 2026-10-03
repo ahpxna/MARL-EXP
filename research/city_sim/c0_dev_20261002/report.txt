@@ -1,0 +1,25 @@
+C0 regret table (mean over seeds; rows = student, columns = deployment light)
+student | FT | ACT | EXT | CUT
+Z_FT | 17.78 | 25.97 | 169.25 | 24.74
+Z_ACT | 17.78 | 16.16 | 35.50 | 18.30
+Z_EXT | 11.84 | 13.28 | 27.39 | 19.94
+Z_CUT | 24.00 | 22.05 | 45.13 | 22.13
+Z_MIX | 21.86 | 20.85 | 31.31 | 20.16
+M_FT | 15.32 | 12.86 | 74.22 | 14.46
+M_ACT | 16.05 | 15.33 | 24.77 | 15.09
+M_EXT | 11.86 | 12.30 | 16.20 | 15.16
+M_CUT | 19.73 | 16.77 | 24.57 | 13.96
+M_MIX | 14.42 | 14.37 | 20.03 | 12.92
+rule car | 13.15 | 12.41 | 16.67 | 12.17
+Z_ACT variants: ACT: plain 16.16 clip 16.16 fallback 16.16 relabel 16.16; EXT: plain 35.50 clip 35.96 fallback 29.85 relabel 25.80; CUT: plain 18.30 clip 18.30 fallback 18.30 relabel 19.88
+W1(tau) EXT 11.41 CUT 3.01
+C0-1 Delta(EXT): SUPPORTED {"mean": 8.106583333333333, "ci": [5.559079166666668, 10.78718125]}
+C0-3 DeltaM(EXT) <= Delta/4: NOT SUPPORTED {"deltaM": 8.574666666666667, "delta": 8.106583333333333}
+C0-5 relabel worse on EXT: NOT SUPPORTED {"relabel": 25.800833333333337, "plain": 35.49775}
+C0-1 Delta(CUT): NOT SUPPORTED {"mean": -3.830083333333332, "ci": [-5.529045833333332, -2.1284583333333327]}
+C0-3 DeltaM(CUT) <= Delta/4: NOT SUPPORTED {"deltaM": 1.1338333333333326, "delta": -3.830083333333332}
+C0-5 relabel worse on CUT: SUPPORTED {"relabel": 19.87516666666667, "plain": 18.299083333333336}
+C0-2 oos mass: SUPPORTED {"EXT": 0.2568632780646915, "CUT": 0.0}
+C0-2 fallback recovers half of Delta(EXT): SUPPORTED {"fallback": 29.850416666666668, "plain": 35.49775, "delta": 8.106583333333333}
+C0-3 FT compiled silence = message: NOT SUPPORTED {"diff": 2.4619166666666654, "bound": 0.6574125000000003}
+C0-4 mixture minimax: NOT SUPPORTED {"worst": {"Z_MIX": 31.30558333333333, "Z_ACT": 35.49775, "Z_EXT": 27.391166666666674, "Z_CUT": 45.12808333333334}}

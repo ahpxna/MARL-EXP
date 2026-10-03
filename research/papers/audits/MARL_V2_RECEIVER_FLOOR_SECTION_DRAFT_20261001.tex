@@ -1,0 +1,66 @@
+% DRAFT section for paper_marl_v2 (01/10/2026 19:4x EDT).  NOT in the manuscript: per the corpus rule nothing enters as a
+% theorem before gated Lean.  Lean: work/p13_conjectures/LeanMarlReceiverFloorV1.lean (receiver_floor, private_pool,
+% pub_card_le, forced_stale, timed_floor, timed_forced_stale, witness_attains).  Ledger L-223.
+% 21:5x: + LeanMarlReceiverFloorV2 (abstract step, Σ K*) and LeanMarlPrefixInstanceV1 (prefix rule is an instance;
+% L-230, L-233); smoke gate smokeMARLFLOOR_20261001 pending.  Framing to be rewritten per PROTOCOL_E3_FRAMING_DECISION.
+
+\section{No scheduler keeps a receiver fresh at constant capacity}\label{sec:floor}
+
+\paragraph{Setting.} At constant capacity $K$ every receiver decodes the first $K$ packets of the committed order other
+than its own. The senders in positions $0,\dots,K-1$ form the public set $P_s$, decoded by every other receiver; the
+sender $h_s$ in position $K$ is decoded only by the members of $P_s$. With relay, a decoded packet carries its sender's
+fresh state and everything its sender knew at the end of the previous step; we allow unbounded memory, so the bounds
+below hold a fortiori for the relay merge of Section~\ref{sec:relay}, which forgets copies it does not re-receive.
+
+\begin{claim}[Receiver floor]\label{cl:floor}
+For every scheduler, every receiver $i$, every step $t$ and every $n\le t$, at most $Kn$ other senders have, at receiver
+$i$ and time $t$, a copy measured during the last $n$ steps. Equivalently, at least $m-1-Kn$ other senders have age at
+least $n$. \LEANC{LeanMarlReceiverFloorV1.timed\_floor, timed\_forced\_stale}
+With unequal, time-varying budgets $K_r(s)$ the same holds with $Kn$ replaced by $\sum_{s}K^*(s)$, $K^*(s)=\max_r K_r(s)$:
+the prefix decode rule (receiver $r$ decodes the first $K_r(s)$ entries of the committed order other than its own) is an
+instance of the abstract step of the proof, for every order. \LEANC{LeanMarlReceiverFloorV2.receiver\_floor;
+LeanMarlPrefixInstanceV1.prefixStep, prefix\_receiver\_floor, prefix\_witness}
+\end{claim}
+
+\begin{proof}
+Fix the window of the last $n$ steps and call a sender \emph{public} once a public packet of the window has carried a
+window measurement of it; let $\mathrm{Pub}$ be that set and $Q_r=N_r\setminus\mathrm{Pub}$ the part of receiver $r$'s
+window knowledge $N_r$ that no public packet has carried (its private pool).
+
+\emph{(i) Private pools hold at most one sender, and only public receivers hold one.} A receiver outside $P_s$ decodes
+only public packets, so its private pool can only shrink. A receiver $r\in P_s$ sends a public packet at $s$, which
+releases everything it knew; its only non-public input is $h_s$'s packet. So its new private pool is contained in
+$(\{h_s\}\cup N_{h_s})\setminus\mathrm{Pub}$, which is $\subseteq\{h_s\}$ if $h_s$'s pool is empty and
+$\subseteq Q_{h_s}$ otherwise --- in the second case $h_s$ has been public, by induction. \LEANC{private\_pool}
+
+\emph{(ii) Each step adds at most $K$ public senders.} Each of the at most $K$ public packets adds its sender and its
+private pool; by (i) a non-empty pool belongs to a sender that is already public, so each packet adds at most one new
+sender. Hence $|\mathrm{Pub}|\le Kn$. \LEANC{pub\_card\_le}
+
+\emph{(iii)} $N_i\subseteq\mathrm{Pub}\cup Q_i$. If $Q_i=\emptyset$, $|N_i\setminus\{i\}|\le Kn$. Otherwise $i$ is public by
+(i) and $|N_i\setminus\{i\}|\le(|\mathrm{Pub}|-1)+1$. \LEANC{receiver\_floor}
+The bound is attained (three agents, $K=1$). \LEANC{witness\_attains}
+\end{proof}
+
+The $(K{+}1)$-th packet that public receivers decode adds nothing to the floor: the channel behaves, for freshness, like
+one that delivers exactly $K$ packets per step. Summing Claim~\ref{cl:floor} over $n=d+1$ for $d\ge\tau$ gives the
+\emph{burden floor}
+\[
+\textstyle\sum_{j\ne i}(a_j-\tau)_+\;\ge\;\sum_{d\ge\tau}\bigl(m-1-K(d+1)\bigr)_+ ,
+\]
+and the \emph{forced-shift predicate}: if $K(\tau+1)<m-1$, every receiver at every step carries at least
+$m-1-K(\tau+1)$ copies older than $\tau$, under every scheduler.
+
+\paragraph{Prediction before training.} Let $\tau_{\mathrm{train}}$ be the largest copy age the receiver meets in training
+(here the 99th percentile of the maximum copy age under the i.i.d.\ capacity process, which is itself a function of the
+channel alone: Section~\ref{sec:composition}). Where $K(\tau_{\mathrm{train}}+1)<m-1$ no scheduler can keep the receiver
+inside its training range; where it fails, a scheduler can. On the $3\times3$ grid ($m-1=8$, $\tau_{\mathrm{train}}=3$) the
+predicate holds for $K=1$ only; on the $4\times4$ grid ($m-1=15$, $\tau_{\mathrm{train}}=9$) also for $K=1$ only, although
+the absolute ages at $K=2$ there exceed those of the $3\times3$ grid at $K=1$. \TODO{insert the 4×4 const-K target result
+(PROTOCOL\_E3\_G4\_CONSTK\_20261001, Addenda 1–3) before stating the match.}
+
+\paragraph{Prior work.} Lower bounds on the age of information under broadcast scheduling are known for one packet per
+slot (Kadota et al.\ 2018), and piggybacked relay ages under round-robin (Kaul, Yates and Gruteser 2011). The prefix
+decoding with relay and memory, the private-pool argument that makes the hidden packet worthless for the floor, and the
+use of the floor as a pre-deployment predicate for when a learned receiver is forced out of its training support are,
+as far as we found, new.
