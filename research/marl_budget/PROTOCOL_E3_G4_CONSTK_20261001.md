@@ -24,3 +24,6 @@ two-level bootstrap as PROTOCOL_E3_AGECLIP_PROSPECTIVE_20261001.
 Interpretation: G1 + G3 → the phenomenon and its decision-level signature replicate on a second network; G2 → dose-response
 in staleness burden; G4 → the age-interface part replicates.  Failure of G1 → the K = 1 reversal is 3×3-specific.
 Launcher `scripts/RUN_marl_g4_constk.sh`, report `scripts/MARL_e3_g4_constk_report.py`, both written before the runs.
+
+Execution addendum (02/10/2026 01:5x, `date` 01:59:34): the const-K work runs per seed under PROTOCOL_E3_G4_RELAUNCH_20261002.md
+(scripts/RUN_marl_g4_constk_seed.sh = this protocol's launcher loop body, verbatim); rules and predictions unchanged.

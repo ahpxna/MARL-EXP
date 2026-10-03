@@ -52,3 +52,21 @@ changes the teacher's argmax (DIAGNOSTIC ORACLE).  D = Σ_j 1[j witness] (a_j �
 order × capacity cells of PROTOCOL_E3_ORDER_DOSE, |Spearman(D, gain)| ≥ |Spearman(B_3, gain)|, and the congestion cells
 have a smaller D / B_3 than the age-first cells.  Its own probe script and smoke run come first; the cell gains are already
 known, so W1 is exploratory and only a prospective cell can confirm it.
+
+## Addendum 1 — Part D: the BENEFIT side (written 01/10/2026 22:3x EDT, after Part C's report, before any Part D run)
+Hypothesis (user 22:3x "test giả thuyết này"): the congestion order is milder than its stale burden because its FRESH
+packets carry the most decision-relevant information (it transmits the most congested senders), so the envelope needs a
+benefit coordinate.  Probe scripts/MARL_e3_fresh_value_probe.py: Part C's closed loop and parity (same nine cells, seeds 0–9,
+development episodes), and for every FRESH entry j of receiver i (delivered directly this step) whose sender the receiver
+already held at t − 1: j is a FRESH WITNESS if, in the full fresh counterfactual view, replacing j's entry by the receiver's
+previous copy of j (its payload, age label 0) changes the teacher's argmax — the decision value of THIS delivery.  Fresh
+entries of senders never held before are counted separately.  DIAGNOSTIC ORACLE, recorded only.
+Per receiver-step: W_F = number of fresh witnesses; W_S = number of relayed witnesses with age ≥ 3 (from Part C's records).
+- BF1 (mechanism): per fresh packet, the witness rate under the congestion order is ≥ 1.2 × the age-first rate at the same
+  capacity, for each of iid, cap4 and low.
+- BF2 (two-sided coordinate): Spearman(W_F − W_S, gain) over the nine cells ≥ +0.85 (B_3 alone: −0.778), AND both congestion
+  cap4 / low cells have a larger W_F − W_S than age-first const1.
+Reading fixed now: BF1 and BF2 → the congestion anomaly is a benefit effect and the envelope is two-sided; BF2 without BF1 →
+the benefit is a COUNT effect (more fresh packets), not better-targeted packets; neither → the information side (teacher
+decision relevance) does not explain the anomaly, and the explanation must be on the student side (how the receiver
+responds to these views), to be tested separately.  Exploratory: the cell gains are known.

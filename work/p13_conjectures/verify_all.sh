@@ -117,6 +117,19 @@ LeanPaperCEvenRankSumV1 LeanPaperCRelabelBandJoinV1 LeanPaperCEndpointLawV1 Lean
 MODS="$MODS LeanMarlEstimatedRevisionV1 LeanMarlGenericRecourseV1 LeanMarlMenuRevisionV1 LeanMarlNestingDegreeGeneralV1 LeanMarlProxyBlindnessV1 LeanMarlRepairCalibrationV1 LeanMarlRevisionFrontierV1 LeanMarlSubsetFrontierV1 LeanMarlXorGameV1 LeanPaperCBudgetExchangeOddV1 LeanPaperCBudgetExchangeOddV2 LeanPaperBParityCriticalV1 LeanPaperBParityCriticalGameV1 LeanPaperBCrossoverRateV1 LeanMarlRevisionAuditBridgeV1"
 # Smoke-gated 27/09 (smokeMARL4, smokeMARL17, smokeMARL1_E1b) and cited by paper_marl / paper_b; added 28/09 for the full gate.
 MODS="$MODS LeanMarlBlockFrontierV1 LeanMarlStarvationV1 LeanMarlCalibrationGapV1 LeanMarlPairCalibrationV1 LeanMarlTabulationV1 LeanMarlProfileSearchV1 LeanMarlE1bRealizationV1 LeanUnifiedQueryOrderV1 LeanMarlE1bUniformV1 LeanMarlSafeEditV1"
+# Smoke-gated 01/10 22:17 (smokeMARLFLOOR_20261001: 4 modules, 20 audited theorems, SMOKE PASS); receiver floor, prefix
+# instance and the imitation gap of the E3 compatibility track (ledger L-224 … L-235).
+MODS="$MODS LeanMarlReceiverFloorV1 LeanMarlReceiverFloorV2 LeanMarlPrefixInstanceV1 LeanMarlImitationGapV1"
+# Smoke-gated 02/10 00:04 (smokeMARLNET_20261001: SMOKE PASS, 12 audited theorems with its dependency); ledger L-241, L-242.
+MODS="$MODS LeanMarlNetFloorV1"
+# Smoke-gated 02/10 11:51 (smokeMARLW1_20261002: SMOKE PASS, 4 audited theorems); ledger L-260.
+MODS="$MODS LeanMarlMismatchW1V1"
+# Smoke-gated 02/10 12:11 (smokeMARLEMU_20261002: SMOKE PASS, 14 audited theorems with dependencies) and 12:24 (smokeMARLVERIFIED_20261002: SMOKE PASS, 33 audited theorems with dependencies); ledger L-262.
+MODS="$MODS LeanMarlEmulationV1 LeanMarlProvisioningV1 LeanMarlSupportV1 LeanMarlHoldFloorV1 LeanMarlMixtureV1"
+# Smoke-gated 02/10 12:27 (smokeMARLAGEROLE_20261002: SMOKE PASS, 4 audited theorems); ledger L-264.
+MODS="$MODS LeanMarlAgeRoleV1"
+# Smoke-gated 02/10 13:38 (smokeMARLPROJ_20261002: SMOKE PASS); ledger L-276, L-280.
+MODS="$MODS LeanMarlProjectionV1 LeanMarlProvisioningInstancesV1"
 
 WHITELIST='propext|Classical.choice|Quot.sound'
 

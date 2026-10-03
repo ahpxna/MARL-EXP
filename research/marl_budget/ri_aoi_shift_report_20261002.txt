@@ -1,0 +1,11 @@
+gain vs silent (1 - MSE/MSE_silent), mean over seeds; deployment window a = 0..8 (δ ~ U{a..a+3})
+fast: +0.985 +0.977 +0.955 +0.907 +0.821 +0.680 +0.477 +0.215 -0.095
+slow: +0.900 +0.938 +0.952 +0.948 +0.929 +0.896 +0.843 +0.764 +0.651
+mix : +0.979 +0.974 +0.964 +0.949 +0.927 +0.899 +0.866 +0.825 +0.775
+slow + emulation a=0..3: +0.929 +0.929 +0.929 +0.929 | slow + label remap a=0..3: +0.395 +0.645 +0.820 +0.915
+UR1 upgrade regression: slow a=0 +0.900 vs a=4 +0.929; seeds with a=0 < a=4: 5/5 -> SUPPORTED
+UR2 crossing: a=0 fast +0.985 vs slow +0.900; a=4 slow +0.929 vs fast +0.821 -> SUPPORTED
+UR3 mixture covers: min over a of mix - max(fast, slow) = -0.007 (need >= -0.02) -> SUPPORTED
+UR4 emulation: max |emulation - slow(a=4)| = 0.0002 (need <= 0.01) -> SUPPORTED
+reported: slow-trained slope of gain per unit W1 — upgrade side (a = 4 -> 0) -0.0068, downgrade side (a=4 -> 8) -0.0687
+reported: mixture premium (mix - specialist): a=0 -0.007, a=4 -0.002; label remap - plain (slow, a=0..3): -0.504 -0.293 -0.132 -0.032

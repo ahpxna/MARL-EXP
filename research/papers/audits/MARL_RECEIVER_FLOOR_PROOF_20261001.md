@@ -118,3 +118,30 @@ age clip +0.79 %, tail gate +0.78 %, matched training pending).
 In all of them, unequal receiver budgets are the reason the constraint exists; the theorem says what freshness the shared
 order can deliver to each receiver, and the experiments show what happens to a learned controller when the deployment
 budget pattern leaves the training pattern.
+
+## The net count and the provisioning rule (01/10/2026 23:4x; PROTOCOL_E3_NET_COUNT_20261001, ledger L-239, L-240)
+
+**Corollary (net floor).**  At constant capacity `K`, for every scheduler, relay content and memory, every receiver `i` and
+every step `t ≥ τ + 1`:  fresh_i + (m − 1) ≤ K (τ + 2) + stale_{i,τ}, where fresh = senders measured at the last step and
+stale_τ = senders whose freshest copy at `i` is older than `τ` steps or absent.  Equivalently
+**net_i := fresh_i − stale_{i,τ} ≤ K (τ + 2) − (m − 1).**
+*Proof.*  `timed_floor` with `n = 1` gives fresh ≤ K; `timed_forced_stale` with `n = τ + 1` gives
+stale_τ ≥ m − 1 − K (τ + 1); add.  Attained with equality by V1's witness.  Lean: `LeanMarlNetFloorV1.net_floor`,
+`fresh_le`, `net_floor_witness` (compiling, 23:42).
+With unequal or time-varying budgets the same argument with `LeanMarlReceiverFloorV2` / `LeanMarlPrefixInstanceV1` replaces
+`K (τ + 1)` by the richest-receiver budget summed over the last `τ + 1` steps.
+
+**Measured.**  Age-first attains the bound within 0.1–0.8 copies per receiver-step on 3×3 (stale + never 5.12 / 2.23 / 0.78
+against 5 / 2 / 0 at K = 1 / 2 / 3).  A count-targeting order (count-deadline) reduces the stale count by exactly 0 at K = 1
+and K = 2 and by 0.51 (≤ the room 0.78) at K = 3 — the bound is the binding constraint where the theorem says it is.
+
+**Empirical link (not a theorem).**  Across 9 order × capacity cells the per-receiver mean net (τ = 2, the iid training
+range) ranks the gain of relay over compiled silence with Spearman +0.983; out of sample, on 9 hold-r development cells
++0.850 and the frozen sign rule `net/(m − 1) > −0.08` classifies all 6 prospective hold cells.  The COUNT of stale copies
+predicts better than their summed age (B_3): the receiver's harm per copy saturates with age (age-response probe).
+
+**Provisioning rule (A).**  Combining the two: a scheduler can keep a receiver whose training range is τ_train on the
+positive side only if  K > K_min = (1 + θ)(m − 1) / (τ_train + 2),  θ = −0.08.  3×3: iid-trained K_min = 1.84 (K = 1 forced
+negative, observed); K = 1-trained K_min = 0.74.  4×4 (15 senders per view): iid-trained K_min = 1.25 with the training-
+relative τ_train = 9, 3.45 with the absolute τ = 2 — the pending 4×4 const-K cells decide (Addendum 4).  The rule is
+necessary, not sufficient (the scheduler must attain the bound; the receiver's lower band edge, "too fresh", is separate).

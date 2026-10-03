@@ -36,3 +36,7 @@ capacities), low (rule prefix, low capacities); relay under age-first ordering; 
 ## Not changed after this file
 Arms, recipes, predictor, panel, conditions, endpoint, R1–R3, completeness.  Report `scripts/MARL_e3_g4_replication_report.py`
 is written before any target run.
+
+Execution addendum (02/10/2026 01:5x, `date` 01:59:34): the relaunch after the 01:0x stop is governed by
+PROTOCOL_E3_G4_RELAUNCH_20261002.md — execution only (resumable bit-identical trainers, one scheduler, per-seed downstream
+timing); nothing above changes.

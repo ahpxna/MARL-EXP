@@ -106,3 +106,14 @@ shared prefix channel; abstracts only, not read in full.
 | "Can the network fix the learned controller, or must the receiver change?" with a scheduler-independent impossibility side | Not found (searches: operating envelope / co-design / deployability; SchedNet ICLR 2019 learns scheduling jointly, no impossibility side) | Candidate contribution (targeted search, not a priority claim) |
 | Schedule-only causal effect on a frozen learned policy | Don't Fire Together (Sensors 2026; frozen learned policy + communication scheduling + staleness; full text not re-read, MDPI 403) | Do NOT claim first |
 | Prefix → "nested reception" generalisation | — | Mathematically trivial for truly nested decode sets; prefix is NOT nested (receivers are senders; self-exclusion). V2's two-inclusion step is the right class; formalised for the prefix rule in LeanMarlPrefixInstanceV1 (compiling) |
+
+## Round 8 (00:5x, 02/10): the count coordinate and the band against new neighbours
+Cho & Garcia-Molina (SIGMOD 2000, freshness vs age); binary freshness (Bastopcu–Ulukus, arXiv 2004.09475, 2012.14323);
+Ahmed, Ghosh, Wang, Shroff, "Beyond Freshness and Semantics: A Coupon-Collector Framework for Effective Status Updates"
+(arXiv 2603.26998: each sample expires, after which it is useless for control; doubly-thresholded optimal schedule);
+CALF (arXiv 2603.12543, network-aware training of distributed RL); CTHE / MARO (arXiv 2210.06274, low-communication
+mismatch); Shisher–Ji–Hou–Sun co-design (arXiv 2308.10094); Smith-predictor delay mismatch (both directions degrade);
+DEFLECT (arXiv 2605.19294, zero-shot delay generalisation for VLAs — extrapolation succeeds there, unlike our receivers).
+Verdict: ingredients known; the combination and three claims (training-relative band with return evidence; channel-only
+theorem-bounded count with a provisioning rule; scheduler-impossibility regime split) not found.  Details and the
+experiments they suggest: MARL_RESULTS_VS_LITERATURE_20261002.md.

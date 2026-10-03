@@ -1,0 +1,25 @@
+C0 regret table (mean over seeds [0, 1]; rows = student, columns = deployment light)
+student | FT | ACT | EXT | CUT
+Z_FT | 273.47 | 240.70 | 337.38 | 243.01
+Z_ACT | 266.05 | 241.67 | 233.25 | 233.29
+Z_EXT | 212.16 | 192.74 | 202.76 | 141.76
+Z_CUT | 115.42 | 80.30 | 145.43 | 64.47
+Z_MIX | 319.20 | 323.24 | 317.88 | 325.08
+M_FT | 185.25 | 164.23 | 238.28 | 175.05
+M_ACT | 356.98 | 360.12 | 354.49 | 361.94
+M_EXT | 247.56 | 274.23 | 222.02 | 235.16
+M_CUT | 360.08 | 363.82 | 361.83 | 364.30
+M_MIX | 292.11 | 256.91 | 295.42 | 225.09
+rule car | 17.18 | 14.23 | 13.10 | 12.05
+exact Bayes tables: Z*_FT: FT 0.00; Z*_ACT: FT 6.60, ACT 2.58, EXT 179.17, CUT 4.33; Z*_EXT: EXT 3.14; Z*_CUT: CUT 4.05; M*_FT: FT 0.00; M*_ACT: FT 0.00, ACT 0.00, EXT 0.00, CUT 0.11; M*_EXT: EXT 0.00; M*_CUT: CUT 0.07
+Z_ACT variants: ACT: plain 241.67 clip 241.67 fallback 241.67 relabel 241.67; EXT: plain 233.25 clip 227.36 fallback 150.02 relabel 273.80; CUT: plain 233.29 clip 233.29 fallback 233.29 relabel 231.04
+C0-1 Delta(EXT) > 0: NOT SUPPORTED {"mean": 30.49843749999918, "ci": [-118.07298437500006, 170.0329218749984]}
+C0-3 DeltaM(EXT) <= Delta(EXT)/4: NOT SUPPORTED {"deltaM": 132.46812499999947, "delta": 30.49843749999918}
+C0-5 relabel worse on EXT: SUPPORTED {"relabel": 273.79656249999954, "plain": 233.25437499999953}
+C0-1 Delta(CUT) > 0: NOT SUPPORTED {"mean": 168.81468749999954, "ci": [-43.50548437499995, 375.9312812499991]}
+C0-3 DeltaM(CUT) <= Delta(CUT)/4: SUPPORTED {"deltaM": -2.360937499999406, "delta": 168.81468749999954}
+C0-5 relabel worse on CUT: NOT SUPPORTED {"relabel": 231.04343749999953, "plain": 233.28624999999957}
+C0-2 oos mass EXT >= 0.10, CUT = 0: SUPPORTED {"EXT": 0.2588450704225352, "CUT": 0.0}
+C0-2 fallback recovers >= half of Delta(EXT): SUPPORTED {"fallback": 150.02124999999975, "plain": 233.25437499999953, "delta": 30.49843749999918}
+C0-3 FT: compiled silence = message: NOT SUPPORTED {"diff": 88.22187499999947, "bound": 0.8590312500000004}
+C0-4 mixture minimax: NOT SUPPORTED {"worst": {"Z_MIX": 325.0750000000008, "Z_ACT": 241.66874999999953, "Z_EXT": 202.7559375000003, "Z_CUT": 145.43281249999995}}

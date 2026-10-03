@@ -1,0 +1,51 @@
+wait C0 panels (23416 23418 23420 ) Fri Oct  2 19:14:26 EDT 2026
+      11
+C0 seeds start Fri Oct  2 19:18:56 EDT 2026
+C0 seeds done Fri Oct  2 19:43:36 EDT 2026
+Z_EXT | 7.32 | 7.47 | 9.46 | 9.76
+Z_CUT | 7.27 | 7.87 | 29.89 | 8.45
+Z_MIX | 7.75 | 8.62 | 14.45 | 10.03
+M_FT | 6.93 | 10.81 | 36.33 | 19.14
+M_ACT | 10.79 | 10.76 | 14.89 | 11.04
+M_EXT | 11.12 | 11.28 | 12.11 | 13.29
+M_CUT | 6.88 | 7.49 | 12.60 | 8.22
+M_MIX | 8.91 | 8.98 | 11.28 | 9.59
+rule car | 12.70 | 12.59 | 17.03 | 12.77
+exact Bayes tables: Z*_FT: FT 0.00; Z*_ACT: FT 3.60, ACT 3.27, EXT 135.30, CUT 4.82; Z*_EXT: EXT 4.48; Z*_CUT: CUT 4.12; M*_FT: FT 0.00; M*_ACT: FT 0.00, ACT 0.00, EXT 0.01, CUT 0.21; M*_EXT: EXT 0.00; M*_CUT: CUT 0.07
+Z_ACT variants: ACT: plain 7.13 clip 7.13 fallback 7.13 relabel 7.13; EXT: plain 29.27 clip 15.77 fallback 15.83 relabel 11.44; CUT: plain 8.69 clip 8.69 fallback 8.69 relabel 8.73
+C0b light-log certificate (seeds [0, 1, 2]): FT: K 0.051 (S_exit 0.000, D_haz 0.051, W1 0.6) Delta -4.24 DeltaM +2.14 DeltaZ* +3.60; EXT: K 0.262 (S_exit 0.203, D_haz 0.060, W1 9.3) Delta +10.60 DeltaM +1.22 DeltaZ* +130.82; CUT: K 0.020 (S_exit 0.000, D_haz 0.020, W1 2.0) Delta +0.45 DeltaM +2.97 DeltaZ* +0.69; A1: K 0.014 (S_exit 0.000, D_haz 0.014, W1 1.6) Delta +0.15 DeltaM +4.45 DeltaZ* +0.23; A2: K 0.023 (S_exit 0.000, D_haz 0.023, W1 2.4) Delta +0.05 DeltaM +2.68 DeltaZ* +0.72; A3: K 0.085 (S_exit 0.050, D_haz 0.035, W1 3.0) Delta +1.97 DeltaM +0.90 DeltaZ* +26.19; A4: K 0.051 (S_exit 0.021, D_haz 0.031, W1 2.4) Delta +1.25 DeltaM -0.47 DeltaZ* +9.91; A5: K 0.216 (S_exit 0.149, D_haz 0.067, W1 7.7) Delta +7.92 DeltaM +3.59 DeltaZ* +95.35; A6: K 0.026 (S_exit 0.000, D_haz 0.026, W1 2.9) Delta +0.61 DeltaM +0.40 DeltaZ* +1.51
+C0b Spearman with Delta: {"K": 0.783, "S_exit": 0.913, "W1": 0.867, "D_haz": 0.583}; with DeltaM: {"K": -0.4, "S_exit": -0.201, "W1": -0.233, "D_haz": -0.233}; with DeltaZ*: {"K": 1.0, "S_exit": 0.913, "W1": 0.75, "D_haz": 0.933}
+C0c phi per seed {"0": 2.348, "1": 2.157, "2": 3.001, "3": 1.737, "4": 2.032}; Spearman(phi*K) 0.713 vs K 0.735
+C0-1 Delta(EXT) > 0: SUPPORTED {"mean": 19.814043333333334, "ci": [7.120159333333331, 40.25225941666667]}
+C0-3 DeltaM(EXT) <= Delta(EXT)/4: SUPPORTED {"deltaM": 2.786269999999996, "delta": 19.814043333333334}
+C0-5 relabel worse on EXT: NOT SUPPORTED {"relabel": 11.438216666666674, "plain": 29.272110000000005}
+C0-1 Delta(CUT) > 0: NOT SUPPORTED {"mean": 0.23380333333333417, "ci": [-0.2866899999999995, 0.7532358333333352]}
+C0-3 DeltaM(CUT) <= Delta(CUT)/4: NOT SUPPORTED {"deltaM": 2.8261399999999983, "delta": 0.23380333333333417}
+C0-5 relabel worse on CUT: SUPPORTED {"relabel": 8.72891, "plain": 8.68743}
+C0-2 oos mass EXT >= 0.10, CUT = 0: SUPPORTED {"EXT": 0.28564663154927045, "CUT": 0.0}
+C0-2 fallback recovers >= half of Delta(EXT): SUPPORTED {"fallback": 15.829636666666676, "plain": 29.272110000000005, "delta": 19.814043333333334}
+C0-3 FT: compiled silence = message: NOT SUPPORTED {"diff": 3.2835366666666683, "bound": 0.6347950000000002}
+C0-4 mixture minimax: NOT SUPPORTED {"worst": {"Z_MIX": 14.453463333333334, "Z_ACT": 29.272110000000005, "Z_EXT": 9.764653333333335, "Z_CUT": 29.89153000000001}}
+C0b-1 Spearman(K, Delta) >= 0.7: SUPPORTED {"value": 0.7833333333333333}
+C0b-2 Spearman(K) > Spearman(S_exit), Spearman(W1): NOT SUPPORTED {"K": 0.7833333333333333, "S_exit": 0.9128709291752769, "W1": 0.8666666666666667}
+C0b-3 inside lights: Spearman(D_haz, Delta) >= 0.6 (weak): NOT SUPPORTED {"value": -0.3, "lights": ["FT", "CUT", "A1", "A2", "A6"]}
+C0c-1 Spearman(phi*K, Delta) >= 0.6: SUPPORTED {"value": 0.7129032258064517}
+C0c-2 product beats K alone: NOT SUPPORTED {"product": 0.7129032258064517, "K": 0.7348936725412604}
+C0c-3 seed order of phi matches Delta in >= half of the lights (reported): SUPPORTED {"value": "5/9"}
+Q4 panels start Fri Oct  2 19:44:03 EDT 2026
+Q4 seeds done Fri Oct  2 19:58:04 EDT 2026
+Q4 corridor (seeds [0, 1, 2]): Delta by corridor (Z_OLD minus specialist), corridor TV, monitors
+corridor | TV | Delta Z | Delta M | Z_OLD | spec Z | range mon | density mon | rule
+20 | 0.173 | +1.45 | -0.05 | 4.71 | 3.27 | 0.000 | 0.151 | 3.35
+25 | 0.336 | +4.04 | +6.75 | 9.92 | 5.88 | 0.000 | 0.288 | 3.90
+30 | 0.504 | +11.51 | +11.48 | 15.41 | 3.90 | 0.000 | 0.382 | 5.54
+35 | 0.670 | +20.96 | +16.73 | 22.22 | 1.26 | 0.000 | 0.449 | 8.04
+45 | 1.000 | +30.54 | +16.88 | 37.24 | 6.70 | 0.000 | 0.464 | 17.55
+RANDOM | 0.500 | +8.69 | +8.11 | 19.66 | 10.97 | 0.000 | 0.323 | 12.57
+OLD | 0 | — | — | 3.20 | — | 0.000 | 0.060 | 8.12
+Q4-1 Delta(RANDOM) > 0 (Z*_FT exact on every corridor: panel self-check): SUPPORTED {"mean": 8.688988888888888, "ci": [6.478068333333345, 10.579622638888882]}
+Q4-2 Spearman(corridor TV, Delta) >= 0.8: SUPPORTED {"value": 1.0, "tv": {"20": 0.172535, "25": 0.33614999999999995, "30": 0.503575, "35": 0.66972, "45": 1.0000000000000002, "RANDOM": 0.49965}, "delta": {"20": 1.4467888888888887, "25": 4.038272222222219, "30": 11.506433333333327, "35": 20.95588333333333, "45": 30.53844444444444, "RANDOM": 8.688988888888888}}
+Q4-3 range monitor fires 0 % (reported): SUPPORTED {"range": {"OLD": 0.0, "20": 0.0, "25": 0.0, "30": 0.0, "35": 0.0, "45": 0.0, "RANDOM": 0.0}}
+Q4-3b Spearman(density monitor, Delta) (reported): SUPPORTED {"value": 1.0, "density": {"OLD": 0.06043840194651005, "20": 0.1511916012570673, "25": 0.28813284839004566, "30": 0.38198882511811255, "35": 0.44891893142878825, "45": 0.46426046352304184, "RANDOM": 0.3229824794763276}}
+Q4-4 derived: staggered harm 2f(1-f)·Delta(RANDOM): SUPPORTED {"f": [0, 0.25, 0.5, 0.75, 1], "harm": [0.0, 3.258370833333333, 4.344494444444444, 3.258370833333333, 0.0]}
+queue end Fri Oct  2 19:58:11 EDT 2026

@@ -49,9 +49,12 @@ learned receiver tolerates against compiled silence; scheduler repair is possibl
 | Schedule-only traversal of F at fixed K, bytes, fresh count | hold-r prospective (L-228): +0.92 → −0.80 %, HD1 / HD3 / HD4 ✅, HD2 sign only | ✅ (do not claim first: Don't Fire Together) |
 | R_θ moves with training (same channel) | train-match TM1–TM4; dev SELECT indicator −2.7 / −2.7 / −4.3 % vs Z at K = 1 (optimistic) | ⏳ target pending (~01:30–02:00) |
 | R_θ is a band, not a half-space (H-B) | P-UP1 / P-UP2 registered on TM3 | ⏳ |
+| The learned error-vs-age function follows the TRAINING age distribution (H-C) | age-response shift (L-237): peak 1–2 → 3–4 in 4/4 seeds, HC1 / HC2 3/4; K = 1-trained student worse at the young label a = 1 | ✅ exploratory (n = 4); decision-level support for the band |
 | R_θ across architectures | arch control AC1–AC3; attention learns iid policies on par | ⏳ (~04:00) |
 | Third "semantic" class (meaning shift under state-dependent order) | staleness-meaning probe (L-231): SM1 ✅ null, SM2 ❌, SM3 ❌ | ❌ dropped: two classes only |
-| Low-dimensional coordinates of R_θ | post hoc: R = B_3 / F separates the age-first 3×3 cells; congestion cells milder than R; witness burden D (Part C) | ⏳ Part C (~23:00); prospective CM1 on 4×4 |
+| Low-dimensional coordinate of R_θ | net = fresh − (stale > τ_train + never), CHANNEL-ONLY: ρ +0.983 over 9 order × capacity cells (L-239, = teacher-witness N); out of sample on hold cells ρ +0.850 and 6/6 prospective signs (L-240); count beats burden; bounded by the net floor (LeanMarlNetFloorV1, compiling) and attained by age-first | ✅ 3×3 (exploratory + out-of-sample); prospective 4×4 (Addendum 4) ⏳ |
+| Provisioning rule K_min = (1 + θ)(m − 1)/(τ_train + 2) (A) | 3×3 signs 3/3 + K = 1-trained; 4×4 relative vs absolute pending | ✅ known cells; ⏳ 4×4 |
+| Count-targeting scheduler (B) | zero room at K ≤ 2 (the floor), ≤ 0.5 copies elsewhere ⇒ predicted ≈ 0.07 % | ✅ closed as "age-first is near-optimal for the coordinate" |
 | Second network | 4×4 replication + const-K | ⏳ ≈ 30 h |
 Dropped since 16:0x: SafeEdit gate (L-229); "stale information is intrinsically harmful"; decision-level acceptability as a
 return surrogate (H6); rich7 as support (missed its prediction).

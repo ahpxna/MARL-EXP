@@ -25,3 +25,13 @@ Interpretation fixed now: TM1 and TM2 → the K = 1 loss is mostly a training–
 TM1 → matching helps but the K = 1 channel itself limits the value; neither → a deeper channel problem.  Caveat recorded:
 negative flips are a same-state decision effect on the relay's own states (s ~ d^R), not a whole-trajectory effect.
 Launcher `scripts/RUN_marl_e3_train_match.sh`, report `scripts/MARL_e3_train_match_report.py`.
+
+## Deviation 1 (02/10/2026 00:5x EDT, before any seed-4 target row exists)
+relayCK1_st_s4 failed 8 times (two lane runs × four watchdog attempts; CityFlow hangs at iterations 350, 277, 147, 137, 55,
+49, 46, 39; ledger L-243).  Seed 4 is retrained with scripts/MARL_e3_actor_distill_v9.py — v8 (= v7 with the default
+--arch set) plus exact resume; self-check (L-234): uninterrupted v9 equals v8 bit for bit, and a killed-and-resumed v9 equals
+the uninterrupted run bit for bit — launched through run_with_watchdog WITHOUT --out so a hang resumes in place, with the
+same arguments as the v7 lane.  Evaluations, panel and rules unchanged.  Started only after the architecture-control lanes
+finish (user 00:5x: when the CPU is freer).  An unplanned interim look at seeds 0–3 was taken at 23:1x (L-238).
+Deviation 1, timing update (02/10 01:0x): the user asked (01:0x) to stop the 4×4 chain and start seed 4 now; started at
+once instead of after the architecture-control lanes.  Nothing else changed.

@@ -1,0 +1,25 @@
+C0 regret table (mean over seeds [0]; rows = student, columns = deployment light)
+student | FT | ACT | EXT | CUT
+Z_FT | 16.32 | 15.58 | 24.54 | 17.00
+Z_ACT | 13.37 | 13.22 | 23.57 | 15.96
+Z_EXT | 8.86 | 8.70 | 14.36 | 12.83
+Z_CUT | 8.19 | 9.52 | 18.48 | 11.17
+Z_MIX | 14.04 | 14.60 | 22.80 | 14.13
+M_FT | 16.01 | 16.66 | 21.41 | 17.39
+M_ACT | 17.38 | 17.49 | 27.33 | 16.92
+M_EXT | 16.79 | 17.08 | 19.31 | 20.72
+M_CUT | 18.09 | 17.89 | 30.15 | 18.06
+M_MIX | 138.37 | 140.91 | 82.86 | 151.12
+rule car | 13.31 | 11.45 | 18.08 | 12.09
+exact Bayes tables: Z*_FT: FT 0.00; Z*_ACT: FT 3.29, ACT 2.60, EXT 130.18, CUT 4.94; Z*_EXT: EXT 5.01; Z*_CUT: CUT 4.18; M*_FT: FT 0.00; M*_ACT: FT 0.00, ACT 0.00, EXT 0.02, CUT 0.28; M*_EXT: EXT 0.00; M*_CUT: CUT 0.07
+Z_ACT variants: ACT: plain 13.22 clip 13.22 fallback 13.22 relabel 13.22; EXT: plain 23.57 clip 23.76 fallback 17.50 relabel 19.76; CUT: plain 15.96 clip 15.96 fallback 15.96 relabel 15.46
+C0-1 Delta(EXT) > 0: SUPPORTED {"mean": 9.204916666666668, "ci": [7.363483333333338, 11.142631249999999]}
+C0-3 DeltaM(EXT) <= Delta(EXT)/4: NOT SUPPORTED {"deltaM": 8.018999999999991, "delta": 9.204916666666668}
+C0-5 relabel worse on EXT: NOT SUPPORTED {"relabel": 19.756083333333343, "plain": 23.56958333333334}
+C0-1 Delta(CUT) > 0: SUPPORTED {"mean": 4.793333333333331, "ci": [3.419485416666663, 6.27337708333333]}
+C0-3 DeltaM(CUT) <= Delta(CUT)/4: SUPPORTED {"deltaM": -1.1420833333333338, "delta": 4.793333333333331}
+C0-5 relabel worse on CUT: NOT SUPPORTED {"relabel": 15.463750000000003, "plain": 15.961916666666673}
+C0-2 oos mass EXT >= 0.10, CUT = 0: SUPPORTED {"EXT": 0.25871550623588335, "CUT": 0.0}
+C0-2 fallback recovers >= half of Delta(EXT): SUPPORTED {"fallback": 17.50033333333333, "plain": 23.56958333333334, "delta": 9.204916666666668}
+C0-3 FT: compiled silence = message: SUPPORTED {"diff": 0.3044999999999938, "bound": 0.6656875000000002}
+C0-4 mixture minimax: NOT SUPPORTED {"worst": {"Z_MIX": 22.802250000000004, "Z_ACT": 23.56958333333334, "Z_EXT": 14.364666666666677, "Z_CUT": 18.478833333333338}}
