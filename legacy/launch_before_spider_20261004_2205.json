@@ -1,0 +1,293 @@
+{
+ "version": "0.0.1",
+ "configurations": [
+  {
+   "name": "cityflow-viewer",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8765",
+    "--directory",
+    "research/marl_budget/e3_watch_latest"
+   ],
+   "port": 8765
+  },
+  {
+   "name": "e3-dashboard",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8766",
+    "--directory",
+    "research/marl_budget/dashboard_20261002"
+   ],
+   "port": 8766
+  },
+  {
+   "name": "cityflow-viewer-4x4",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8767",
+    "--directory",
+    "research/marl_budget/e3_watch_g4_20261002"
+   ],
+   "port": 8767
+  },
+  {
+   "name": "city-sumo-live",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p06_s0.rou.xml",
+    "--port",
+    "8770"
+   ],
+   "port": 8770
+  },
+  {
+   "name": "midtown-q7-old",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown_actuated.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8771",
+    "--signals",
+    "fixed",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "CŨ: đèn actuated + fleet L-ACT (fleet được train với đèn actuated)"
+   ],
+   "port": 8771
+  },
+  {
+   "name": "midtown-q7-upgrade",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8772",
+    "--signals",
+    "rl:research/city_sim/q7_cross_version_20261002/RL-H.pt",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "NÂNG CẤP: đèn RL-H + cùng fleet L-ACT (hazard Q7)"
+   ],
+   "port": 8772
+  },
+  {
+   "name": "midtown-q7-compat",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8773",
+    "--signals",
+    "rlcompat:research/city_sim/q7_cross_version_20261002/RL-H.pt:50",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "COMPATIBLE: RL-H ép chuyển pha ở 50 s + fleet L-ACT"
+   ],
+   "port": 8773
+  },
+  {
+   "name": "cityflow-viewer-nyc",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8774",
+    "--directory",
+    "research/marl_budget/e3_watch_nyc_20261003/viewer"
+   ],
+   "port": 8774
+  },
+  {
+   "name": "grid-always",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8780",
+    "--vehicles",
+    "eval:L-ACT:0",
+    "--label",
+    "always-SUMO (khong fleet, moc so sanh) - traffic SELECT 100, den FT"
+   ],
+   "port": 8780
+  },
+  {
+   "name": "grid-pilotB",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8781",
+    "--vehicles",
+    "eval:P:research/city_sim/spat_pilot_20261004/fleets/Bon_s113_fleet.pt",
+    "--label",
+    "Pilot B Bon_s113 (PPO tu dau, reward B): TL agent +241 s/xe, xang +114 % so always-SUMO -> FAIL"
+   ],
+   "port": 8781
+  },
+  {
+   "name": "grid-v9",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8782",
+    "--vehicles",
+    "eval:R:research/city_sim/spat_pilot_20261004/fleets_v9/R9_s113_fleet.pt",
+    "--label",
+    "v9 R9_s113 (residual tren IC-GLOSA): xang -9.4 %, TL xe nguoi +2.8 -> FAIL (a)"
+   ],
+   "port": 8782
+  },
+  {
+   "name": "grid-glosa-sstar",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8783",
+    "--vehicles",
+    "eval:GLOSAL0:0.3",
+    "--label",
+    "GLOSA tren nen sigma* KHONG lane release: deadlock doi lan (seed 100: 2 teleport)"
+   ],
+   "port": 8783
+  },
+  {
+   "name": "grid-r8-rule",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8784",
+    "--vehicles",
+    "eval:GLOSAL:0.3",
+    "--label",
+    "R8 luat GLOSA-L tren nen sigma*: PASS (a)(b) tren traffic moi 430-449"
+   ],
+   "port": 8784
+  },
+  {
+   "name": "grid-r9-learned",
+   "runtimeExecutable": "/usr/bin/env",
+   "runtimeArgs": [
+    "PYTHONHASHSEED=0",
+    "OMP_NUM_THREADS=1",
+    "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+    "-u",
+    "scripts/CITY_live_viewer_fleets.py",
+    "--net",
+    "research/city_sim/net/grid4.net.xml",
+    "--routes",
+    "research/city_sim/demand/grid4/rou_s100.xml",
+    "--seed",
+    "100",
+    "--signals",
+    "fixed",
+    "--port",
+    "8785",
+    "--vehicles",
+    "eval:ESLD:research/city_sim/spat_pilot_20261004/lane_d/theta_s2.json",
+    "--label",
+    "R9 fleet hoc (4 tham so, d_lc 15.5 m): M1 MET tren traffic moi 450-469"
+   ],
+   "port": 8785
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M3 training dashboard</title>
+<style>:root{--bg:#0f1115;--fg:#e6e6e6;--mut:#8a8f98;--card:#171a21}body{background:var(--bg);color:var(--fg);font:14px system-ui;margin:16px}
+h1{font-size:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px}.card{background:var(--card);border-radius:8px;padding:10px}
+canvas{width:100%;height:240px}.mut{color:var(--mut)}table{border-collapse:collapse;width:100%}td,th{padding:3px 6px;border-bottom:1px solid #262a33;text-align:right}td:first-child,th:first-child{text-align:left}</style></head>
+<body><h1>M3 — E light fine-tuning (DEV, light seeds k0/k1) <span class="mut" id="ts"></span></h1>
+<p class="mut">Training curves (60 episodes, 3 blocks; provider refits at ep 20, 40). Not endpoints: DEV evaluation decides. Solid = k0, dashed = k1.</p>
+<div class="grid"><div class="card"><b>Physical base reward per decision (higher = better)</b><canvas id="c1"></canvas></div>
+<div class="card"><b>Forecast-deviation penalty (λ·w excluded; mean per decision)</b><canvas id="c2"></canvas></div>
+<div class="card"><b>Switches per episode</b><canvas id="c3"></canvas></div>
+<div class="card"><b>DEV evaluation progress</b><div id="dev"></div><table id="tab"></table></div></div>
+<script>
+const ARMS=['E0p_lam0','E0q_lam0','uniform_lam1','uniform_lam4','eta_lam1','eta_lam4','active_lam1','active_lam4','receiver_lam1','receiver_lam4'];
+const COL={E0p:'#9aa0a6',E0q:'#5f6368',uniform:'#f28b82',eta:'#fbbc04',active:'#81c995',receiver:'#8ab4f8'};
+async function load(){const out={};for(const a of ARMS)for(const k of [0,1]){try{const r=await fetch(`../train/E_${a}_k${k}.log.json?`+Date.now());out[`${a}_k${k}`]=await r.json()}catch(e){}}return out}
+function draw(id,data,key){const c=document.getElementById(id),x=c.getContext('2d');const W=c.width=c.clientWidth*2,H=c.height=c.clientHeight*2;x.clearRect(0,0,W,H);
+ let vals=[];for(const n in data){for(const r of data[n]){if(r[key]!=null && !(key==='r_phys_mean'&&n.startsWith('E0q')))vals.push(r[key])}}if(!vals.length)return;
+ const lo=Math.min(...vals),hi=Math.max(...vals),pad=40;const sx=e=>pad+(W-2*pad)*e/59,sy=v=>H-pad-(H-2*pad)*(v-lo)/((hi-lo)||1);
+ x.strokeStyle='#333';x.beginPath();x.moveTo(pad,pad);x.lineTo(pad,H-pad);x.lineTo(W-pad,H-pad);x.stroke();x.fillStyle='#8a8f98';x.font='20px system-ui';x.fillText(hi.toFixed(3),2,pad);x.fillText(lo.toFixed(3),2,H-pad);
+ for(const n in data){if(key==='r_phys_mean'&&n.startsWith('E0q'))continue;const fam=n.split('_')[0];x.strokeStyle=COL[fam]||'#fff';x.lineWidth=3;x.setLineDash(n.endsWith('k1')?[10,8]:[]);x.beginPath();
+  data[n].forEach((r,i)=>{const v=r[key];if(v==null)return;i?x.lineTo(sx(r.ep),sy(v)):x.moveTo(sx(r.ep),sy(v))});x.stroke()}
+ x.setLineDash([]);let ly=pad;for(const f in COL){x.fillStyle=COL[f];x.fillText(f,W-pad-110,ly);ly+=24}}
+async function dev(){try{const t=await (await fetch('../dev/?'+Date.now())).text();const n=(t.match(/href="[^"]+\.json"/g)||[]).filter(s=>!s.includes('_m3.json')).length;document.getElementById('dev').textContent=`${n} / 127 evaluation files written`}catch(e){document.getElementById('dev').textContent='not started'}}
+async function tick(){const d=await load();draw('c1',d,'r_phys_mean');draw('c2',d,'pen_mean');draw('c3',d,'switches');
+ let h='<tr><th>run</th><th>ep</th><th>r first8</th><th>r last8</th><th>switch last8</th></tr>';for(const n in d){const L=d[n];if(!L.length)continue;const m=(a,k)=>a.reduce((s,r)=>s+(r[k]||0),0)/a.length;
+ h+=`<tr><td>${n}</td><td>${L[L.length-1].ep}</td><td>${m(L.slice(0,8),'r_phys_mean').toFixed(3)}</td><td>${m(L.slice(-8),'r_phys_mean').toFixed(3)}</td><td>${m(L.slice(-8),'switches').toFixed(0)}</td></tr>`}
+ document.getElementById('tab').innerHTML=h;await dev();document.getElementById('ts').textContent='updated '+new Date().toLocaleTimeString()}
+tick();setInterval(tick,20000);</script></body></html>

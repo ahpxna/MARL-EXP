@@ -1,0 +1,12 @@
+== B4F fleet-side support gate (520 gated runs)
+SELF-CHECK G-0 (ACT: 0 firings, bit-identical to plain): 40/40 runs; G-0b gate firings under RL-H 324828; missing 0 [] -> PASS
+FB-1 RL-H x L-ACT, gate fallback: agent-TL change vs plain -15.68 [-25.90, -7.95] s/veh (plain agent regression vs ACT +25.08); city TL 30.61 (plain 41.60, ACT with the plain fleet 26.20); cells below ACT 4/16 (plain 4/16); human TL change -6.31; gated share 0.046; teleports/run 1.4 -> SUPPORTED
+FB-2 city TL below ACT in 4/16 cells (>= 12 needed) -> NOT SUPPORTED
+FB-3 human TL change -6.305 s/veh (<= +0.5 needed) -> SUPPORTED
+   agent regression with the fallback gate (rows RL-H_t, cols L-ACT_t'): +10.41 +14.58 +12.50  -2.32 |  +9.87 +14.59 +11.12  -3.00 | +12.66 +21.46 +14.00  -2.40 | +11.40 +15.79 +11.45  -1.78
+FB-4 RL-H x L-ACT, gate clip: agent-TL change vs plain +0.83 [-2.63, +4.11] s/veh (plain agent regression vs ACT +25.08); city TL 41.96 (plain 41.60, ACT with the plain fleet 26.20); cells below ACT 4/16 (plain 4/16); human TL change -0.12; gated share 0.098; teleports/run 4.1
+FB-4 RL-C50 x L-ACT, gate fallback: agent-TL change vs plain +0.40 [-0.71, +1.58] s/veh (plain agent regression vs ACT +11.62); city TL 32.30 (plain 32.01, ACT with the plain fleet 26.20); cells below ACT 4/16 (plain 4/16); human TL change +0.18; gated share 0.004; teleports/run 1.7
+FB-4 RL-C50 x L-ACT, gate clip: agent-TL change vs plain +0.72 [-0.42, +2.07] s/veh (plain agent regression vs ACT +11.62); city TL 32.65 (plain 32.01, ACT with the plain fleet 26.20); cells below ACT 4/16 (plain 4/16); human TL change +0.58; gated share 0.004; teleports/run 2.2
+FB-4 RL-J x L-ACT, gate fallback: agent-TL change vs plain -2.29 [-5.66, +0.69] s/veh (plain agent regression vs ACT +7.31); city TL 28.59 (plain 29.90, ACT with the plain fleet 26.20); cells below ACT 4/16 (plain 6/16); human TL change -0.33; gated share 0.024; teleports/run 1.5
+FB-4 RL-J x L-ACT, gate clip: agent-TL change vs plain +0.78 [-1.23, +3.71] s/veh (plain agent regression vs ACT +7.31); city TL 30.73 (plain 29.90, ACT with the plain fleet 26.20); cells below ACT 6/16 (plain 6/16); human TL change +0.89; gated share 0.034; teleports/run 1.9
+FB-5 offline brake propensity on synthetic GREEN observations (tau <= 50 / tau > 50) vs mean regression r under RL-H: L-ACT_0 0.365/0.995 r +20.84, L-ACT_1 0.657/0.199 r +7.88, L-ACT_2 0.300/0.901 r +6.81, L-ACT_3 0.117/0.057 r -0.05; Spearman(OOS brake, r) +0.80, Spearman(OOS - in-support brake, r) +0.40 (n = 4)

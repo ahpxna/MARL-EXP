@@ -1,0 +1,2606 @@
+1
+
+Time-to-Green predictions for fully-actuated signal
+control systems with supervised learning
+
+arXiv:2208.11344v1 [cs.LG] 24 Aug 2022
+
+Alexander Genser, Michail A. Makridis, Kaidi Yang, Lukas Ambühl, Monica Menendez and Anastasios Kouvelas
+
+Abstract—Recently, efforts have been made to standardize
+signal phase and timing (SPaT) messages. These messages contain
+signal phase timings of all signalized intersection approaches.
+This information can thus be used for efficient motion planning,
+resulting in more homogeneous traffic flows and uniform speed
+profiles. Despite efforts to provide robust predictions for semiactuated signal control systems, predicting signal phase timings
+for fully-actuated controls remains challenging. This paper proposes a time series prediction framework using aggregated traffic
+signal and loop detector data. We utilize state-of-the-art machine
+learning models to predict future signal phases’ duration. The
+performance of a Linear Regression (LR), a Random Forest (RF),
+and a Long-Short-Term-Memory (LSTM) neural network are
+assessed against a naive baseline model. Results based on an
+empirical data set from a fully-actuated signal control system
+in Zurich, Switzerland, show that machine learning models
+outperform conventional prediction methods. Furthermore, treebased decision models such as the RF perform best with an
+accuracy that meets requirements for practical applications.
+Index Terms—Signal Phase and Timing (SPaT), Time series
+forecasting, Supervised learning, Actuated traffic signal control.
+
+I. INTRODUCTION
+Digitization has substantially transformed the transportation
+sector over the past decade. The availability of several new
+data sources (e.g., sensor and in-vehicle technologies) enables
+data-driven methods to be integrated into established traffic
+management systems. In addition, new developments such
+as vehicle-to-infrastructure (V2I) communications open the
+possibility for new methodologies that utilize infrastructure
+data for motion planning, speed advisory systems, or route
+choice [1]. Recent developments in traffic signal control at
+urban intersections (e.g., fully-actuated signal control [2], selfsteering algorithms [3]) affect signal phasing and result in
+different green, red, and cycle times. Therefore, it would
+benefit speed advisory systems if the duration of a future
+signal phase is known. Ideally, fewer vehicles have to stop
+when crossing an intersection and uncertainty for other transportation modes is reduced. Signal phasing and timing (SPaT)
+messages provide the necessary information. Unfortunately,
+determining the future phase duration of fully-actuated signal
+control systems is not trivial reverse engineering as predictions
+depend on Loop Detector (LD) detections that occur after
+the forecast is applied. Also, such systems typically involve
+complex optimization, which constitutes a barrier to applying
+SPaT messages in practice. Therefore, a sophisticated modeling approach using traffic signals and LD data for accurate
+predictions is still a subject of research.
+In this paper, we propose a methodology to forecast the
+duration of the following red phase (i.e., when a traffic
+
+stream is not allowed to cross the intersection and a stop is
+required). By providing an accurate prediction for the next
+red-phase (in this work denoted as the Time-to-Green (T2G))
+with Machine Learning (ML) models, we can enhance SPaT
+messages. We utilize empirical traffic signal and LD data
+based on previous work [4], and compute domain-specific
+features for time series forecasting. We first introduce a simple
+reference model: “no-change”, a dummy model that utilizes
+the duration of the last occurring red phase to justify the use
+of ML. Then, a selection of complex models found to be strong
+candidates for various ML problems are compared against the
+dummy case. Finally, we implement a Linear Regression (LR),
+a Random Forest (RF) regressor, and a Long-Short-TermMemory (LSTM) neural network. The proposed framework
+allows for (a) the processing of empirical traffic signal and LD
+data, (b) extensive feature engineering, and (c) the assessment
+of supervised machine learning models’ phase predictions. A
+numerical experiment in Zurich, Switzerland, is conducted to
+prove the concept. A data set from a fully-actuated signal
+control system, consisting of historical LD and traffic signal
+data, is utilized. The area under investigation also includes
+a priority for public transportation (i.e., signal priorities frequently change the control behavior of the intersection), which
+further demonstrates the complexity of the problem.
+An accurate prediction of the T2G can not only help the
+improvement of speed-advisory systems but consequently also
+have an impact on the homogeneity of traffic flow in multimodal urban transportation networks. We address the opening
+challenges for T2G predictions by providing the following
+contributions:
+1) The framework design allows for predicting the next
+signal phase of multi-modal fully-actuated signal control
+systems. The work is based on an empirical data set
+allowing for real-time applications.
+2) The prediction of the next red phase, modeled as a
+supervised learning problem, captures the complex and
+non-linear relation between a traffic signal and LD
+detection data.
+3) The framework requires no prior knowledge about the
+implemented traffic signal control system. Hence, the
+method also provides accurate predictions where the
+signal control algorithm is proprietary.
+4) A physics-informed feature engineering incorporates the
+concepts of traffic flow theory. The approach enhances
+the quality of a given prediction model and can be used
+for multi-model systems with transit priority.
+The remainder of this paper is organized as follows:
+
+2
+
+Section II provides an overview of recent research on the
+prediction of signal phasing and timing. Besides, due to the
+limited contributions in this area utilizing ML techniques, we
+provide an overview of publications applying such techniques
+to similar transportation problems. In Section III the time
+series problem is defined. Section IV describes the utilized
+data sources and the feature engineering based on LD and
+traffic signal data. Furthermore, the framework definition and
+the theory of the selected models is introduced. Finally,
+we introduce the performance metrics used to evaluate the
+T2G predictions. Section V shows the applicability of all
+models based on a case study with a detailed presentation of
+prediction results and a final performance evaluation. Finally, a
+discussion, conclusion, and proposal of future work are given
+in Section VI and Section VII.
+II. RELATED WORKS
+Recently, efforts were made to standardize SPaT messages [5]. Such messages contain the current phase with a
+prediction for the corresponding phase duration for all signalized intersection approaches. Hence, SPaT information allows
+a more efficient and environmentally friendly motion planning
+of human-driven and/or autonomously operated individual or
+public transport vehicles. Especially in urban areas, this would
+lead to more homogeneous traffic flow, a smoother speed
+profile (i.e., the absence of speeding and heavy breaking
+between traffic lights) or an improvement in ride comfort [6].
+In this section, we first present methods for obtaining SPAT
+estimations/predictions (Section II-A) and continue with related works that specifically focus on transportation problems
+with ML applications (Section II-B).
+A. Prediction methods for SPaT information
+Most of the existing methods to obtain SPaT information
+for semi-actuated traffic signal control systems are based on
+aggregated trajectory data. In such methods, signal timings
+are unknown and can either be fixed or change slowly in time.
+They use estimation approaches based on floating car data [7]–
+[10] or travel time measurements collected with wireless traffic
+sensors [11]. For example, [7] and [8] employed a queue
+discharging model to estimate the start of green signals based
+on aggregated low-frequency bus data and probe data. Yu
+et al. [10] formulated the SPaT estimation problem into a
+general approximate greatest common divisor problem, aiming
+to obtain the cycle lengths, green times, and the phase schemes
+based on historical sparse taxi trajectories. Protschky et al. [12]
+used a Bayesian learning approach to reconstruct the cycle
+length from historical trajectory data for traffic signals where
+the cycle length is fixed within a certain period. These methods
+typically rely on the underlying assumption that the cycle
+length is fixed, although some of them (e.g., [8], [12]) are
+able to identify the occasional changes in the traffic signal
+timing plan. Moreover, these works are based on aggregating
+historical vehicle trajectories, assuming that the historical
+signal timings are unknown. They do not provide insights on
+how the spatially-sparse LD data and the temporally-sparse
+public transport data can be utilized to perform real-time
+
+SPaT prediction within each signal cycle. Therefore, their
+applicability to real-life problems is limited.
+Some other studies propose probabilistic methods [13]–[15]
+and ML techniques [4], [16], [17] that can be used to predict
+the SPaT information for actuated and adaptive traffic signals.
+Compared to the estimation problems above, here traffic signal
+data (i.e., signal timings) are available based on a historical
+data set. Protschky et al. [16] employed a Kalman Filter (KF)
+to estimate the probability of phase switches at each time
+step using historical traffic signal data. This work was further
+enhanced to consider implementation factors such as latency
+and data losses [13]. Based on historical signal data, [14]
+estimated the conditional distribution of each signal phase
+given the real-time signal phase measurements and predicted
+the phase duration as the conditional expectation and the
+confidence interval. These methods treat the SPaT information as a time series and are expected to yield satisfactory
+prediction accuracy if the variance of the signal phase duration
+is small. However, in cases where the signal phase duration
+changes drastically (i.e., with high variance), these works
+may not yield the best results, as they cannot incorporate
+relevant vehicle detection information. [15] took an initial
+step to establish the relationship between real-time vehicle
+information and traffic signal timings. Based on historical
+floating car and bus trajectory data, it first calculated the joint
+distribution of the driving speed and the distance to the stop
+line, given a particular signal state (green or red). Afterward,
+it predicted the phase duration using a maximum a posteriori
+(MAP) estimation. This work only linked the signal state to
+the information of an individual vehicle at a single time step.
+However, in reality, many detectors can contribute to the signal
+timings in a complex signalized intersection with multiple
+approaches and movements. Hence, learning the relationship
+between the signal states and the information sent by multiple
+detectors is crucial as shown in [17]. Finally, previous work
+from the authors in [4] shows a preliminary ML approach with
+traffic signal and LD data. Nevertheless, the non-aggregated
+raw data is utilized for predicting the T2G without extensive
+feature engineering. Also, the set of ML models is tested on
+a small data set, leading to an overoptimistic result for the
+LSTM neural networks.
+B. Machine learning based methods for similar problems in
+transportation
+Despite the lack of literature on ML-based SPaT prediction
+for actuated and adaptive signals, ML-based methods have
+been widely applied to many transportation research topics.
+Here, we present a short literature review on ML applications on similar prediction problems. Interested readers can
+refer to [18], [19] for comprehensive surveys. Two important
+attributes characterize the SPaT prediction problem: First,
+it is a prediction problem aiming to obtain a future traffic
+signal state using historical data. Due to the uncertainty of
+the future arrivals (thus the actuation of the detectors), there
+is uncertainty in the future signal state. Second, it aims to
+establish the relationship between the traffic signal state and
+detector information. Therefore, in this subsection, we mainly
+
+3
+
+look at two research problems, the short-term traffic prediction
+that shares the first attribute and the prediction of driver
+behaviors (e.g., acceleration rates, lane change decisions) that
+shares the second.
+Within the same family of problems, we can find the
+short-term prediction of traffic variables, including traffic
+states (e.g., flow, speed, occupancy), demand (e.g., origindestination matrix), and accident rates. Such problems are
+typically formulated as a time-series prediction problem where
+future variables are predicted from historical ones. Conventional parametric methods, such as Auto-Regressive Integrated
+Moving Average (ARIMA) and KF, can achieve good performance when the traffic variations are regular. To handle
+more general traffic scenarios, many ML models have been
+adopted, such as k-Nearest Neighbor (k-NN) [20], multivariate
+regression [21]–[23], Support Vector Regression (SVR) [24]–
+[26], RF [27], artificial neural networks (ANN) [28]–[31], and
+deep learning methods [32]–[35]. It is non-trivial to compare
+the performance of the proposed methods as these methods
+are developed and evaluated based on different data sets
+with specific features. Nevertheless, results indicate that the
+deep neural networks can outperform other ML methods with
+sufficient training data [34], [36].
+Another traffic problem that shares some similarities with
+the SPaT prediction problem is the prediction of driver behaviors. This problem links the behaviors of the drivers (e.g.,
+acceleration rates, lane change decisions) with the current
+traffic scenarios (e.g., position and speed of the considered
+vehicle and the vehicles around it). In addition to the traditional analytical car following and lane changing models [37]–
+[39], many works attempt to employ data driven models to
+capture driver behaviors based on methods such as Hidden
+Markov Models [40], support vector machines (SVM) [41],
+[42], Bayesian Filter [42], etc. Deep learning methods have
+also attracted much attention within the context of this research
+problem. For example, [43] employed a deep Convolutional
+Neural Network (CNN) to perform lane change prediction
+based on camera data; [44] predicted the actions of drivers
+using deep Recurrent Neural Network (RNN) based on invehicle sensors; [45] modeled car-following behaviors by deep
+RNN with the Gated Recurrent Unit (GRU) using the position
+and speed information over multiple time steps. However,
+these methods typically rely on high-resolution and demanding
+data sets (e.g., GPS data or in-vehicle sensors).
+This paper focuses on machine learning methods that use
+traffic signals and data from loop detectors, the most common
+traffic data source in cities worldwide. Our work proposes
+the first framework to provide a robust prediction of the
+next signal phase in a multi-modal and fully-actuated control
+system with public transportation priority. Furthermore, our
+work captures complex non-linear relationships between a
+traffic signal and detector data by applying physics-informed
+feature engineering.
+III. PROBLEM DEFINITION
+Assume an intersection controlled by fully-actuated signal
+control with installed traffic lights and LDs. There are A traffic
+
+lights and B LDs, and historical states are available from all
+devices (i.e, a traffic light operated in a red or green phase;
+an LD occupied/not occupied). We denote every traffic light
+with the index i ∈ S, where S = {1, 2, 3, . . . , A} and every
+LD with the index j ∈ D, where D = {1, 2, 3, . . . , B}. As
+fully-actuated signal controls allow for non-constant red and
+green times, it is essential to distinguish traffic lights by the
+index i. Hereafter, we define a signal cycle as ci,n . n denotes
+the index of a specific cycle c of a traffic light i. Every ci,n
+starts with a red phase for i and ends when the following
+red phase starts. Because we consider a fully-actuated control,
+our definition implies that different signals i from the same
+intersection might have different cycles at the same time.
+The signal states of all traffic lights and LDs during the
+corresponding cycle ci,n are then utilized to compute a feature
+set Xn . Aiming for the prediction of the T2G, denoted as
+Ŷi (ci,n ), the problem is formulated as Ŷi (ci,n ) = f (Xn ). The
+function f (Xn ) denotes the relationship between the set of
+input features Xn and the target Ŷi (ci,n ). Note that the T2G
+prediction corresponds to the red time of the next cycle ci,n+1 .
+IV. METHODOLOGY
+A. T2G framework
+In the following, we introduce a T2G prediction framework
+that allows a generic application to any intersection, providing
+traffic signal and LD data. The architecture is depicted in
+Figure 1. The blocks (1) and (3) denote a supervised ML
+problem’s processing and implementation steps.
+The raw data (i.e., LD and signal data from the traffic operator) functions as an input to the data pre-processing (Block
+(1)). The input signals are transformed into a structured format
+within this step, and undefined signal states are eliminated.
+Consequently, the quantities in the processed data set can be
+defined as follows: Let si (k, ci,n ) and dj (k, ci,n ) be the signal
+state of a traffic signal i ∈ S and an LD j ∈ D at discrete
+time step k, respectively. Consequently, si (k, ci,n ) is defined
+as follows:
+
+0,
+if: i is red
+si (k, ci,n ) =
+(1)
+1,
+else: i is green.
+Note that in (1) only the red and green signal phases are considered. Other common signal indications such as the start and
+end of a green phase (yellow and red-yellow, respectively [46])
+are considered as si (k, ci,n ) = 0. Analogously, we define the
+state dj (k, ci,n ):
+
+0,
+if: j is not occupied
+dj (k, ci,n ) =
+(2)
+1,
+else: j is occupied
+The final processed time series for all i and j are conB
+catenated in the set R = {{si (k, ci,n )}A
+i=1 , {dj (k, ci,n )}j=1 }n
+which represents the non-aggregated data set (Figure 1). R
+serves as an input to Block (2), where the data set is aggregated
+and feature engineering is performed.
+B. Feature engineering
+We perform data aggregation and feature engineering based
+on R. We aggregate the data by signal cycles. This approach
+
+4
+
+(1)
+Signal &
+LD data
+
+(2)
+Data preprocessing
+
+R
+
+(3)
+Data
+aggregation
+and feature
+engineering
+
+Xn
+
+Model
+engineering
+and hyperparameter
+tuning
+
+(4)
+Xn,test
+
+Model
+testing
+
+PM
+
+Accuracy
+met?
+
+True
+
+Ŷi (ci,n )
+
+False
+
+Figure 1: T2G framework. The input data includes by LD and signal data from the traffic operator.
+
+is selected as (a) the prediction target T2G is an aggregated
+quantity by definition (a float value representing the duration
+of the next red phase) and (b) aggregated quantities are
+more easily accessible for traffic operators or other authorities
+compared to data streams with a resolution of, e.g., 1 sec. Note
+that this approach differs from previous works in [4], [47],
+where the non-aggregated data set R is utilized without any
+further feature engineering. We first utilize the traffic signal
+data si (k, ci,n ) to compute the red ri (ci,n ) and green time
+gi (ci,n ) of a signal i operating in cycle ci,n . Consequently,
+the duration of the individual signal phases can be defined as
+follows:
+
+indicate when vehicles pass a given LD, which corresponds
+to dj (k, ci,n ) changing its state from 1 to 0. We denote these
+traffic flows during a red or green phase as qi,R (ci,n ) and
+qi,G (ci,n ). The quantities represent the summation of signal
+changes in the corresponding traffic signal phase defined with
+Iverson brackets (the function takes the value 1 if the statement
+is true and 0 otherwise) as follows:
+
+qi,R (ci,n ) =
+
+KR
+X
+
+Jdj (kR − 1, ci,n ) − dj (kR , ci,n ) = 1K, (5)
+
+kR =2
+
+and
+ri (ci,n ) =
+
+K 
+X
+
+
+
+1 − si (k, ci,n ) ,
+
+(3)
+
+k=1
+
+gi (ci,n ) =
+
+qi,G (ci,n ) =
+
+KG
+X
+
+Jdj (kG − 1, ci,n ) − dj (kG , ci,n ) = 1K, (6)
+
+kG =2
+K
+X
+
+si (k, ci,n ),
+
+(4)
+
+k=1
+
+Note that K defines the discrete time step of the last sample
+of cycle ci,n . Figure 2 depicts an example of the introduced
+quantities. The black pulse signals denote the raw traffic signal
+data si (k, ci,n ). The computation of the red and green time
+for signal i = 1 by utilizing (3) and (4) give r1 (c1,1 ) and
+g1 (c1,1 ). The summation r1 (c1,1 ) + g1 (c1,1 ) results in the
+duration of cycle c1,1 . The derivation is performed for all
+traffic signals in S and serves as an input to forecast Yi (ci,n ).
+Note that in Figure 2 no prediction is shown for si (k, ci,n )
+as the last signal phase shows a red phase. Since we only
+predict the T2G, predictions of following green phases are
+not considered. Nevertheless, the framework would allow for
+such an application.
+Per definition, every ci,n starts with a red phase. To also
+utilize the temporal component of the set R, we compute the
+day, hour, minute, and second of a cycle’s starting point as
+separate features denoted as D, H, M , and S, respectively.
+To enhance the prediction of the next red phase, data from
+LDs are of great importance as the detections transmitted to
+the signal control system are, in fact, key for determining
+future red- and green phases. Consequently, we utilize all
+signals dj (k, ci,n ) ∀j, k, i, n of detectors j and compute a set
+of features to infer the current traffic state at the signalized
+intersection. Figure 3 depicts an example of the utilized signals
+and visually supports the feature engineering in the following.
+First, we compute the traffic flow when traffic signal i is
+red or green, respectively. To determine the traffic flow based
+on LD data, we assume that one signal peak corresponds to
+one detected vehicle. This is a reasonable assumption based
+on the time intervals used. Hence, the arrows in Figure 3
+
+where KR = ri (ci,n ) and KG = gi (ci,n ), i.e., the duration of
+the red and green phase, respectively.
+
+Figure 2: Feature computation of red and green time based on
+si (k, ci,n ).
+
+Figure 3: Feature computation based on traffic signal and
+detector data si (k, ci,n ) and dj (k, ci,n ).
+
+5
+
+Next, we compute the occupancy of a detector j during
+a cycle ci,n . For that, we again utilize the corresponding
+signal dj (k, ci,n ) and compute the summation of time steps
+the detector was occupied (indicated in Figure 3 by the blue
+areas). The summation is then normalized by the cycle length
+of ci,n which is computed by the summation of cycles’ red
+and green time:
+PK
+oj (ci,n ) =
+
+k=1 dj (k, ci,n )
+
+ri (ci,n ) + gi (ci,n )
+
+(7)
+
+The occupancy is defined within the interval [0, 1]; if a
+detector is not occupied within a signal cycle, the occupancy
+is 0; if a detector is fully occupied throughout a cycle,
+oj (ci,n ) = 1.
+Further, we want to gain information about the last detection
+of an LD in a signal cycle. This feature allows for inferring
+information about the current traffic demand at a signal.
+Especially for public transportation vehicles, this feature can
+be utilized as a proxy to provide information about the
+next arrival. For example, suppose a detector that only gives
+detection information about a bus or tram has been activated
+in the last cycle. In that case, the likelihood that no detections
+occur in the next cycle might increase, and consequently, a
+longer red phase might be expected. The orange areas highlight
+the last detection of a detector in Figure 3. We compute the
+time duration from the last detection to the end of a cycle lj
+as follows:
+
+
+lj (ci,n ) = ri (ci,n ) + gi (ci,n ) − v(dj (k, ci,n )),
+
+(8)
+
+where the function v(·) computes the time stamp of the last
+detection in cycle ci,n of detector j based on the signal
+dj (k, ci,n ).
+As last feature inputs, we compute a queue and congestion
+indicator denoted as QIi (ci,n ) and CIi (ci,n ), when traffic light
+i is red or green, respectively. The quantities’ definition is
+based on a threshold of the time duration of a single detector
+activation; i.e., if dj (k, ci,n ) shows an activation lasting longer
+than a threshold parameter p in seconds during a cycle ci,n ,
+dependent on the operated signal phase, QIi (ci,n ) or CIi (ci,n )
+is set to 1. Formally, this can be denoted as:
+QIi (ci,n ) = Ju(dj (k, ci,n )) > p ∧ si (k, ci,n ) = 0K,
+
+(9)
+
+CIi (ci,n ) = Ju(dj (k, ci,n )) > p ∧ si (k, ci,n ) = 1K,
+
+(10)
+
+and
+
+where function u determines the longest detection during
+a cycle and computes the corresponding time duration in
+seconds. The returned set of values from u is then thresholded
+with p and conditional on the state of si (k, ci,n ); if the long
+occupation represents a queue during red light or congestion
+during a green light. We utilize the queue and congestion
+indicators to determine if a single vehicle or multiple vehicles
+(with small headway) occupy a detector longer than p. The
+latter does represent a traffic state where queues/congestion
+is likely. However, theoretically, the occupation larger than
+
+p caused by a single vehicle can also be caused by a random phenomenon (e.g., a taxi loading/unloading passengers).
+Therefore, this does not necessarily represent the same traffic
+state as the occupation by multiple vehicles. Nevertheless, this
+behavior can lead to queues/congestion, so we treat these two
+cases identically.
+Finally, we can derive the target variable Yi (ci,n ). We
+predict the next T2G based on an input sample from the current
+cycle. As the T2G target value in the data constitutes the red
+time of the next cycle ri (ci,n+1 ), the target feature is simply
+denoted as:
+Yi (ci,n ) = ri (ci,n+1 )
+(11)
+The data set combined in Xn contains the red times ri (ci,n ),
+green times gi (ci,n ), traffic flow during a red and green phase
+qi,R (ci,n ), qi,G (ci,n ), the LD occupancy oj (ci,n ), time since
+last detections during a cycle lj (ci,n ), and the queue and
+congestion indicators QIi (ci,n ), CIi (ci,n ) for all traffic lights
+i. Finally, the T2G values Yi (ci,n ), serving as targets for the
+regression problem, are added to Xn and utilized to implement
+the supervised learning problem with a set of machine learning
+models for tackling Ŷ (ci,n ) = f (Xn ).
+C. Naive baseline and linear model
+The naive model is introduced as a first baseline model,
+where the prediction of the next T2G is simply set to the last
+observed red time. Formally, this can be denoted as follows:
+Ŷi (ci,n ) = ri (ci,n ).
+
+(12)
+
+Such a simple forecasting approach is utilized in various
+research domains and also transportation [48], [49] for performance comparison of more robust forecasting models.
+As stated by [50], naive models should not be treated as
+forecasting models but rather as a benchmark to disqualify
+proposed prediction models that perform worse on a problem
+than a naive model.
+Secondly, we introduce the LR, which can be defined as
+follows:
+Ŷi (ci,n ) = βi,0 + βi,1 x1 (ci,n ) + βi,2 x2 (ci,n ) + ...
++βi,p xp (ci,n ) + Ei (ci,n ), ∀o = 1, .., T,
+
+(13)
+
+where Ŷi (ci,n ) is the T2G (response variable) for signal i
+and cycle ci,n , βi,0 represents the intercept term and βi,1
+to βi,p are the regression coefficients for the p predictors
+x1 (ci,n ) to xp (ci,n ) (i.e., the members of the LD and signal
+feature set Xn described above), respectively. The error term
+is denoted by Ei (ci,n ) and follows a Gaussian distribution
+(i.e., Ei (ci,n ) ∼ N (0, σEi (ci,n ) ); T denotes the prediction
+horizon. The solution for Ŷi (ci,n ) is found by applying the
+Ordinary Least Square (OLS) method. The fitted model can
+be used to determine a prediction of the T2G for a given
+traffic signal by obtaining the conditional expected value of the
+response. To obtain the LR model, the implementation from
+scikit-learn [51] is utilized. Research that similarly introduces
+LR models within this context can be found in e.g., [52].
+
+6
+
+Algorithm 1 RF pseudo code
+1: procedure DO R ANDOM F OREST
+2:
+B ← Bootstrap samples from the
+3:
+4:
+5:
+6:
+
+training data set randomly
+T ← Grow and fit a decision tree ∀s ∈ B,
+where s is a bootstrap sample from B
+O ← Exclude out-of-bag data
+C ← Calculate the average prediction ∀t ∈ T ,
+where t is a decision tree for one bootstrap sample
+P ← Calculate average prediction error using O
+
+the feature variables above:
+
+
+ik = sig Wix xk + Wim mk−1 + Wic ck−1 + bi ,
+(14)
+
+
+fk = sig Wf x xk + Wf m mk−1 + Wf c ck−1 + bf , (15)
+
+
+ck = fk ck−1 + ik g Wcx xk + Wcm mk−1 + bc , (16)
+
+
+ok = sig Wox xk + Wom mk−1 + Woc ck + bo ,
+(17)
+m k = ok
+
+D. Supervised learning model candidates
+We introduce the RF, a supervised learning technique based
+on ensemble learning utilizing decision trees based on the
+work from [53]. RFs are applied in various research domains for classification and regression tasks. In this work,
+we utilize the RF implementation from scikit-learn [51] to
+predict the T2G by solving a supervised regression problem.
+The implemented procedure is described with the pseudo-code
+in Algorithm 1. First, samples are randomly selected with
+replacements from the training data set to create a bootstrap
+sample, which is a member of B; i.e., one sample can be
+selected more than once. Next, for all bootstrap samples, a
+decision tree is fit. This procedure results in a collection of
+decision trees that are denoted as an RF. Before the average
+prediction error from all decision trees is calculated, the Outof-Bag (OOB) data set is collected. None of the data samples
+belonging to the OOB are selected during the computation of
+the randomized process in Step 2. Finally, the prediction error
+on the OOB data is calculated for all trees and averaged.
+For a detailed mathematical background on RF and corresponding theorems and proofs, the interested reader is referred
+to [53].
+The last ML model incorporated into the T2G framework is
+an LSTM network, a particular type of RNN. To address the
+drawbacks of standard memory-less RNNs (vanishing gradient
+or exploding), extensions regarding the network architecture
+with a memory block were proposed by [54]. Along with
+other neural network designs, an LSTM is constructed with an
+input, hidden, and output layer. In addition, the hidden layer is
+designed with a memory block containing memory cells. The
+state of these cells is influenced by memorizing the temporal
+state and gating units that control the information flow in one
+memory cell. In addition, input and output gates are implemented to control the input and output activation, respectively.
+When the information state of a memory cell is outdated, a
+forget gate allows an automatic reset to forget information that
+loses importance while evolving over time [55]. The model
+formulation is denoted with an input x = (xi,1 , xi,2 , ..., xi,K )
+and the output y = (yi,1 , yi,2 , ...yi,K ). yk is the predicted
+response, and K is the prediction horizon. To compute the
+model response for the next time step, the following equations
+are introduced. For simplicity, note that the index for signal i
+and cycle ci,n are omitted; also the variables introduced here
+are internal model variables and should not be mistaken with
+
+h(ck ),
+
+(18)
+
+yk = Wym mk + by ,
+
+(19)
+
+where ik , fk , ck , ok and mk are the states of the input
+gate, forget gate, cell state, output gate and memory gate,
+respectively. The variables W and b denote the weight matrices
+and bias vectors, respectively, and are utilized to connect
+input, hidden, and output layers. Note that sig(·) defines the
+logistic function (i.e., sigmoid function); g(·) and h(·) denoted
+activation functions, respectively, where commonly tanh is
+utilized [55]. The work in [54] introduces similar mathematical
+descriptions of LSTM networks. The implementation in our
+framework is performed with TensorFlow [56] and Keras [57].
+E. Hyperparameter tuning
+Hyperparameter tuning (block (3) in Figure 1) is an essential
+step in a machine learning pipeline to improve the model accuracy. Therefore, we utilize two libraries to finalize the RF and
+LSTM models in this work. To train the hyperparameters of the
+RF models, we utilize the open-source library Hyperopt [58].
+The framework allows defining a hyperparameter search space.
+Then one of the implemented optimization algorithms is
+utilized to sample values from the pre-specified distributions
+and evaluate the model for several trail runs. Every trail model
+is then evaluated with the specified loss function during kfold cross-validation. In this work, we choose to optimize
+the following hyperparameters of the RF models: the number
+of estimators, max depth, min samples split, and min weight
+fraction leaf. As an optimization algorithm, the adaptive Treestructured Parzen Estimator (TPE) is utilized [58].
+For the hyperparameter tuning of the LSTM neural network
+models, we utilize KerasTuner [59], built in the deep learning
+API Keras. KerasTuner is an optimization framework for the
+tuning of hyperparameters with state-of-the-art algorithms.
+The framework allows to define ranges for non-conditional and
+conditional hyperparameters, from which values are sampled
+during a trial run. To find the best model performance for
+all LSTM neural networks, we optimize the following hyperparameters: number of units for the LSTM input and output
+layer, number of hidden LSTM layers with the corresponding
+number of units, dropout rate, and number of units for dense
+layer. Note that we fix the activation function of the dense
+layer and utilize the ReLU function [60]. As an optimization
+algorithm, the Hyperband Tuner proposed by [61] is applied.
+Note that in both tuning procedures the MAE and Mean
+Squared Error (MSE) are utilized as a loss function, and the
+models with the best results are selected.
+
+7
+
+F. Performance metrics
+We evaluate the models on the test data set Xn,test with
+performance metrics in block (4). First, the Mean Absolute
+Error (MAE) and the Root Mean Square Error (RMSE) are
+utilized. The performance metrics are introduced by (20) and
+(21):
+
+1
+
+2
+
+K
+
+MAE =
+
+test
+1 X
+Ŷi (ci,n+k ) − Yi (ci,n+k ) ,
+Ktest
+
+12
+2 3
+
+(20)
+
+k=1
+
+8
+
+7
+
+v
+u
+test
+u 1 KX
+2
+RMSE = t
+Ŷi (ci,n+k ) − Yi (ci,n+k ) .
+Ktest
+
+3
+
+(21)
+1
+
+k=1
+
+Ŷi (ci,n+k ) again represents the predicted T2G for a future
+cycle ci,n+k of signal i. Yi (ci,n+k ) is the T2G from the test
+data set. k is here utilized to sum the errors over all samples
+from the test data set, i.e., Ktest . Besides the evaluation concerning the MAE and RMSE, we introduce two additional and
+strict error metrics. As we want to evaluate if the prediction
+meets the requirements of practical applications (e.g., speedadvisory systems), we introduce the Exact Hit (EH) and the
+Near-Misses (NM) ratio as follows:
+KP
+test r
+
+EH =
+
+Ktest
+KP
+test r
+
+NM =
+
+Ktest
+
+6
+11
+4
+
+N
+
+Motorized Personal Transportation / Bike
+
+5
+0
+
+10
+
+20m
+
+Public Transportation
+Pedestrians
+
+· 100, (22)
+
+z
+Ŷi (ci,n+k ) − Yi (ci,n+k ) ≤ 2 !
+
+k=1
+
+9
+
+10
+
+Figure 4: Test intersection in the city center of Zurich, Switzerland.
+
+z
+Ŷi (ci,n+k ) − Yi (ci,n+k ) = 0 !
+
+k=1
+
+4
+5
+
+· 100. (23)
+
+An EH is defined when the prediction model forecasts the
+T2G with an error of 0 seconds and an NM when the error is
+lower or equal to two seconds. The threshold value is chosen
+based on studies such as e.g., [62], [63], that find the response
+time for action of Connected Automated Vehicles (CAV) is
+ranging from one to two seconds (and higher under certain
+circumstances). Consequently, predictions that are classified
+as EH or NM can serve as an input to, e.g., motion planning
+algorithms without forcing a vehicle to stop at an intersection.
+Note that the T2G values of the test data set are given as
+integer values; therefore, we also round the prediction values
+to integers.
+V. NUMERICAL EXPERIMENTS
+The numerical experiment is based on a historical data set
+from an intersection in the city center of Zurich, Switzerland.
+The intersection depicted in Figure 4 is regulated by a fullyactuated signal control system with 12 traffic signals (indicated
+with circled numbers). Signals 1, 2, 4, 5, and 6 control
+vehicular traffic streams. Traffic signal 3 is implemented for
+cyclists who can travel straight ahead and is co-regulated with
+signal 2. Signals 7 – 10 regulate pedestrian flows. From north
+to south and vice versa, tram lines are potentially prioritized by
+the signal control. Tram tracks are indicated with dashed lines
+and overlap with car lanes southbound of the intersection. The
+
+corresponding signals 11 and 12 are specifically implemented
+for trams. These signals only operate in a green phase when
+a public transportation vehicle arrives at the intersection. The
+case study does not focus on predicting the T2G for these
+signals, i.e., only results for signal 1 – 10 are presented. A
+discussion with numerical insights for signals 11 and 12 is
+then presented in Section VI.
+Figure 4 also depicts the five associated LDs (indicated
+as rectangles with the corresponding numbering at the intersection approaches). Note that no separate detector data is
+implemented for traffic signals 1 and 3. Hence, no information
+on arriving vehicles/cyclists is available.
+The data set contains event-based data from every device
+installed at the test site (i.e., LD and signal data). With a
+resolution of 1 second, a telegram is generated every time a
+device changes its state. A telegram contains the timestamp,
+device id, and the new state. In other words, we know when
+an LD is activated/not activated, or a signal operates in a red
+or green phase. Besides, LD or signal failures can be detected.
+A raw data set of 2 months of consecutive telegram data
+from January and February 2019 is available. Note that the
+time axis of the data set is unevenly spaced as telegrams are
+only reported when an event occurs. In the following analysis,
+we take data from all weekdays from 7:00 to 22:00 hours into
+account as public transportation operates on a regular schedule
+within this time frame.
+A. Data aggregation and descriptive analysis
+First, we process the telegram data set for 2 months to
+eliminate telegrams containing devices or values not defined
+
+8
+
+for the case study intersection. Also, the raw data set contains
+clock telegrams (the device state is reported every full minute,
+regardless of a state change) that are not relevant for this study.
+Finally, the data is processed to a tabular format, required for
+machine learning purposes; i.e., we compute the data set R
+containing all si (k, ci,n ) and dj (k, ci,n ).
+Afterward, we proceed to aggregate the data set to cycles.
+As cycles diverge for every traffic signal i, we create a separate
+data set for every traffic signal. Every feature in such a data set
+is grouped by the corresponding cycles of ci,n . This approach
+allows determining the features of all remaining traffic signals
+and LDs during the cycles of i. Consequently, we determine 10
+data sets with the proposed feature set: red time, green time,
+traffic flow during red and green, occupancy, last detection of
+an LD, and the queue and congestion indicator. These features
+are concatenated to the vector Xn and serve as an input to
+the model training/testing procedure. Last, we determine the
+T2G Yi (ci,n ) which serve as the target value for the regression
+problem.
+In Figure 5, feature distributions for the red and green times
+of all traffic signals are presented.
+The violin plots present the red and green time feature distributions for all considered traffic signals. The data distributions
+highlight that the signal control system is fully-actuated.
+For example, the red time of signal 4 (shown separately in
+Figure 5) operates with an average red time of 38.46 seconds.
+Nevertheless, the minimum and maximum values in the data
+set show red times of 29 sec and 104 sec, respectively.
+Note that signal 4’s red time distribution shows a long tail
+due to red times higher than 70 seconds. Nevertheless, these
+samples are not outliers, as the maximum allowed red time
+for this signal control strategy is fixed to 180 sec. Hence, the
+prediction models must be capable of learning and predicting
+this behavior. The threshold values +SD/2 (41.63 sec) and SD/2 (35.30 sec) highlight the range around the mean value of
+38.46 sec. 28207 from 53031 available samples occur within
+the specified range. Consequently, 24824 samples of signal
+4’s red time are outside +SD/2 or -SD/2 and not close to the
+mean value. This underlines the full actuation of the system
+and that not just a few samples show a high variance. Similar
+characteristics can be shown for the green and cycle time
+distribution of signal 4. The range around the mean green
+time of 12.01 sec are computed with 12.75 and 11.44 sec.
+From 53031 samples, 24306 samples are within, and 28725
+samples are outside the range between +SD/2 and -SD/2. For
+the cycle time with a mean value of 50.56 sec, 33323 samples
+are close to the mean and 19708 samples are outside the
+range. The descriptive analysis underlines that (a) the system is
+fully-actuated and (b) a substantial amount of data is different
+from the mean. Note that signal 4 is presented here as it
+regulates a traffic stream conflicting with public transportation
+(controlled by signal 12). Hence, for both traffic lights, the
+signalization is influenced by the arrival of trams. Additionally,
+LD 3, upstream from signal 4, might be utilized for green time
+extensions when high traffic demand is present.
+A complete compilation of the computed descriptive statistics of the data sets for all traffic signals is given in Table I.
+The red and green times of signals 1 – 10 all show maximum
+
+values greater or equal than 80 sec. Contrary, the maximum
+values of green times are below 56 seconds, except for signal
+9 (87 sec.). The high green time of signal 9 occurs because
+this pedestrian traffic signal can remain green together with
+signals 11/12.
+B. T2G prediction results
+This section applies our set of models to the training and
+testing procedure. We assess the model qualities by utilizing
+the processed data set and split it into 70% train and 30% test
+data, respectively. First, the naive baseline model is applied to
+the train data sets of traffic lights i = [1, 10]. As discussed, the
+naive baseline model is a benchmark to assess the ML models
+applied in the following. As the model utilizes the last red
+time of a signal cycle, no training or hyperparameter training
+procedure is performed.
+For traffic lights 1 – 10, the results of the naive baseline
+show MAE and RMSE errors from 1.54/2.78 sec (i = 9) to
+8.42/13.48 sec (i = 10). Also, the EH ratio is below 37.16%
+for all traffic lights except signals 5 and 9 (ratio of 46.42% and
+54.68%, respectively). The NM ratios are below 60%, except
+for traffic signals 5 and 9, where 67.41% and 74.26% are
+computed, respectively. See Table II for all results. The highest
+NM ratio is computed for traffic light 9 which also shows the
+highest EH ratio of 54.68%. The difference in performance
+can be explained by the variation of the T2G values: If the
+signal control assigns the identical green phase multiple times
+throughout a certain time frame (such a system behavior can
+correspond to a standard program; i.e., no high traffic demand
+detected or arriving public transportation), the naive model
+predicts an exact hit with an error of 0.00 sec. Contrary, the
+absence of a standard control program or high variations in the
+T2G lead to an obvious worse performance of the naive model.
+A subset of the prediction results (50 cycles) assessed with
+the corresponding test data subset are depicted in Figure 6.
+Results show (a) low variability of the T2G for traffic light 4
+and (b) high variability in the T2G for traffic signal 6. Note
+that the prediction values of the T2G derived by utilizing the
+naive model constitute a shift by one cycle. The presented
+time frames of prediction results are utilized throughout this
+section to ensure comparability.
+In particular, Figure 6 (a) shows time frames where the T2G
+stays constant throughout multiple cycles. In these cases, the
+naive model performs with high accuracy, whereas in Figure 6
+(b), high variations with fluctuations of the T2G between 37
+sec and 68 sec are present. In these cases, the time lag of one
+cycle produces high error rates.
+We now present the results of the LR models for all
+traffic lights, respectively, which serve as a supervised learning
+baseline in this study. Before all models are trained, the
+Recursive Feature Elimination (RFE) method is applied to the
+traffic signal data sets. The method assigns a weight to an input
+feature which functions as a proxy for feature importance.
+The features with minor importance are then eliminated from
+the data set. In our case, the feature space is reduced from
+70 features to 35 features. For example, two traffic signals
+that regulate non-conflicting pedestrian flows within the same
+
+9
+
+Figure 5: Distributions of red and green times for all signals 1–10. Additionally, the distributions for red, green, and cycle
+time of signal 4 are shown with corresponding standard deviation thresholds +SD/2 and -SD/2.
+Table I: Descriptive statistics of input features for traffic signals i = [1, 10] represented as mean values. The dash indicates
+that no detector is available and features are not computed. The values within parentheses indicate the (min, max) of the
+corresponding feature.
+i
+
+# ci,n
+[-]
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+64807
+67242
+67916
+53031
+50937
+63712
+67909
+67902
+67913
+67902
+
+  
+
+r̄i
+36.64
+42.38
+39.22
+38.46
+38.00
+43.40
+32.28
+28.79
+28.48
+24.21
+
+ḡi
+
+[s]
+(29, 102)
+(33, 102)
+(30, 100)
+(29, 104)
+(31, 105)
+(33, 94)
+(18, 80)
+(18, 99)
+(18, 79)
+(16, 101)
+
+13.57
+7.62
+10.79
+12.01
+12.89
+6.70
+17.74
+21.23
+21.53
+25.80
+
+[s]
+
+q̄i,R
+
+[veh]
+
+q̄i,G
+
+[veh]
+
+ōj
+
+[-]
+
+(8, 19)
+(7, 28)
+(9, 31)
+(8, 17)
+(8, 19)
+(6, 27)
+(12, 56)
+(5, 32)
+(12, 87)
+(8, 38)
+
+0.73
+0.68
+1.70
+1.71
+0.18
+-
+
+(0, 8)
+(0, 7)
+(0, 9)
+(0, 8)
+(0, 2)
+-
+
+0.17
+0.22
+0.61
+0.62
+0.02
+-
+
+(0, 6)
+(0, 6)
+(0, 6)
+(0, 7)
+(0, 1)
+-
+
+0.06
+0.06
+0.07
+0.07
+0.04
+-
+
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+-
+
+107.53
+107.39
+63.38
+63.57
+196.87
+-
+
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(a)
+  
+
+ V J    7  *  W H V W  G D W D
+ V J    1 D L Y H  P R G H O
+
+  
+  
+ 7  *  > V @
+
+(0, 2115)
+(0, 2115)
+(0, 4014)
+(0, 4010)
+(0, 4815)
+-
+
+[s]
+
+C̄Ii
+0.07
+0.06
+0.02
+0.06
+0.06
+-
+
+Q̄Ii
+
+[-]
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+-
+
+0.03
+0.06
+0.12
+0.11
+0.07
+-
+
+[-]
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+(0, 1)
+-
+
+Table II: Model performance on the test data set with MAE,
+RMSE, EH, and NM for the naive baseline model.
+
+ V J    7  *  W H V W  G D W D
+ V J    1 D L Y H  P R G H O
+
+  
+
+l̄det,j
+
+i
+
+MAE [s]
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+5.22
+4.59
+4.59
+5.48
+4.30
+4.87
+4.21
+7.32
+1.54
+8.42
+
+Naive Baseline
+RMSE [s]
+EH [%]
+9.20
+7.89
+7.93
+9.29
+8.37
+8.24
+7.20
+11.75
+2.78
+13.48
+
+35.49
+36.53
+37.16
+33.37
+46.42
+33.73
+36.06
+33.33
+54.68
+36.81
+
+NM [%]
+58.43
+55.93
+56.07
+56.30
+67.41
+54.92
+55.59
+48.51
+74.26
+49.35
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(b)
+
+Figure 6: Prediction results of the naive baseline model.
+Results assessed on the T2G test data set for (a) traffic signal
+4 and (b) traffic signal 6.
+
+signal stage show a high correlation, and RFE will eliminate
+one of the features.
+All LR models are derived by the application of the OLS
+method and the prediction performance of the T2G samples of
+the test data set are assessed with the introduced performance
+metrics. The performance results are compiled in Table III and
+prediction results for the same test data subset are presented
+in Figure 7.
+The LR models reduce the MAE and RMSE errors in all test
+
+10
+
+Table III: Model performance on the test data set with MAE, RMSE, EH, and NM for the LR model. Also, the improvemenst
+over the naive baseline are presented with the given performance metrics.
+LR model
+
+Improvement over naive baseline
+
+Signal
+
+MAE [s]
+
+RMSE [s]
+
+EH [%]
+
+NM [%]
+
+∆MAE [%]
+
+∆RMSE [%]
+
+∆EH [%]
+
+∆NM [%]
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+3.20
+2.56
+2.50
+3.21
+2.75
+2.63
+2.59
+4.60
+1.24
+4.94
+
+5.42
+4.68
+4.70
+5.42
+4.95
+4.77
+4.60
+7.06
+1.86
+7.68
+
+8.20
+32.24
+35.91
+8.69
+9.87
+33.87
+24.96
+3.76
+35.16
+4.31
+
+68.56
+72.42
+72.86
+68.24
+76.17
+70.55
+70.93
+40.02
+86.16
+36.81
+
+-38.70
+-44.23
+-45.53
+-41.42
+-36.05
+-46.00
+-38.48
+-37.16
+-19.48
+-41.33
+
+-41.09
+-40.68
+-40.73
+-41.66
+-40.86
+-42.11
+-36.11
+-39.91
+-33.09
+-43.03
+
+-27.29
+-4.29
+-1.25
+-24.68
+-36.55
+0.14
+-11.10
+-29.57
+-19.52
+-32.50
+
+10.13
+16.49
+16.79
+11.94
+8.76
+15.63
+15.34
+-8.49
+11.90
+-12.54
+
+Figure 7 (a) shows the test data with lower variation in
+the T2G test samples again. The LR model for traffic signal
+4 can represent the general trend of the time series but can
+not predict high peaks of the T2G. In addition, the results
+underline the EH and NM ratios shown in Table III. For the
+time frames where the T2G remains constant, the LR model
+overestimates the T2G consistently. Figure 7 (b) shows that
+the LR model for traffic signal 6 fails to reproduce the T2G
+pattern and also to predict high variations in the T2G (cycle 20
+to 30). Nevertheless, the MAE and RMSE decrease for both
+cases (Table III).
+As third candidates, RF models are implemented for predicting the T2G. Again, we utilize the data set after the application
+of the RFE to guarantee a fair performance assessment.
+RF models require the tuning of a set of hyperparameters.
+In this work, we selected the following set of parameters
+and corresponding distributions for parameter sampling: the
+number of estimators, denoted as a uniformed distribution
+U(50, 200); max depth denoted as U(3, 12); min samples split,
+denoted as U(2, 6); and min weight fraction leaf as U(0, 0.5).
+The defined distributions specify the parameter search space
+for the TPE algorithm. Ten trail runs are executed, and the
+best model performance is obtained with the mean absolute
+
+  
+
+ V J    7  *  W H V W  G D W D
+ V J    / 5  P R G H O
+
+  
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(a)
+  
+
+ V J    7  *  W H V W  G D W D
+ V J    / 5  P R G H O
+
+  
+  
+ 7  *  > V @
+
+cases. For traffic lights, 1 – 10, the MAE decreases between
+1.24 and 3.20 sec. Only for traffic light 9 the improvement is
+lower with 19.48%. Nevertheless, the MAE error of the naive
+model for this test case (1.24 sec) is already low compared
+to the other test cases. However, the error metrics still show
+high deviations from the test data set. The high variation of the
+T2G due to non-linear dependencies on the arrival of public
+transportation can not be captured by the LR models. Also,
+the results of the EH- and NM-ratio stresses the importance
+of this assessment: The EH-ratios decrease significantly for all
+traffic signals, except traffic signal 6. However, for that signal
+no substantial improvements can be observed (an increase in
+EH-ratio of 0.14%). For the NM-ratios, the ratios improve
+between 8.76% and 16.79%. However, for traffic signal 8 and
+10, the performance in NMs decreases by 8.49% and 12.54%,
+respectively. Note that only evaluating the LR models by the
+MAE would lead to an acceptable performance improvement
+compared to the naive model. Nevertheless, the EH- and NM
+ratios draw a different picture and stress the importance of
+these metrics.
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(b)
+
+Figure 7: Prediction results of the LR model. Results assessed
+on the T2G test data set for (a) traffic signal 4 and (b) traffic
+signal 6.
+error criterion. Note that the tuning procedure is applied to
+every model separately to maximize performance. A further
+increase of, e.g., the number of estimators or max depth of
+trees improves the performance only slightly, whereas the
+computational time to fit the model increases substantially.
+Table IV shows the performance of the prediction models
+on the test data set for every traffic signal at the intersection.
+The MAE, RMSE, EH ratio, and NM ratio are again compared
+to the Naive model results from Table II. An assessment of
+the decision-tree-based method shows that all MAE values
+decrease by 41.75% up to 61.16% for traffic lights 1 – 10.
+Note that this constitutes a reduction of MAE between 14.96%
+and 34.18% compared to the LR models.
+The two samples of RF predictions for 50 cycles of the test
+data set are shown in Figure 8. The RF model in Figure 8
+shows a good fit when the signal control system is operating
+in its standard phase, and the time series trend can be replicated for traffic light 4 (overall MAE=2.27 sec; EH=59.71%;
+NM=79.47%). Note that the LR model overestimates the T2G
+
+11
+
+Table IV: Model performance on the test data set with MAE, RMSE, EH, and NM for the RF model. Also, the improvements
+over the naive baseline are presented with the given performance metrics.
+RF model
+
+  
+
+Improvement over naive baseline
+
+Signal
+
+MAE [s]
+
+RMSE [s]
+
+EH [%]
+
+NM [%]
+
+∆MAE [%]
+
+∆RMSE [%]
+
+∆EH [%]
+
+∆NM [%]
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+2.23
+2.18
+2.08
+2.27
+1.81
+2.22
+2.10
+3.16
+0.90
+3.27
+
+5.57
+4.72
+4.71
+5.50
+5.13
+4.79
+4.42
+7.18
+2.02
+7.81
+
+62.77
+54.68
+58.56
+59.71
+69.71
+52.69
+51.21
+54.39
+68.16
+59.57
+
+80.81
+76.35
+77.17
+79.47
+84.65
+76.40
+75.69
+73.99
+86.25
+74.82
+
+-57.38
+-52.57
+-54.64
+-58.59
+-57.91
+-54.41
+-50.02
+-56.83
+-41.75
+-61.16
+
+-39.46
+-40.14
+-40.62
+-40.81
+-38.71
+-41.87
+-38.55
+-38.87
+-27.23
+-42.06
+
+27.28
+18.15
+21.40
+26.34
+23.29
+18.96
+15.15
+21.06
+13.48
+22.76
+
+22.38
+20.42
+21.10
+23.17
+17.24
+21.48
+20.10
+25.48
+11.99
+25.47
+
+ V J    7  *  W H V W  G D W D
+ V J    5 )  P R G H O
+
+  
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(a)
+  
+
+ V J    7  *  W H V W  G D W D
+ V J    5 )  P R G H O
+
+  
+
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(b)
+
+Figure 8: Prediction results of the RF model. Results assessed
+on the T2G test data set for (a) traffic signal 4 and (b) traffic
+signal 6.
+within such time frames. Also, high variations up to a T2G
+of 50 sec can be predicted accurately. Nevertheless, higher
+peaks in the T2G samples (Figure 8 (a) and (b)) can not be
+captured by any of the two models. Potential reasons for this
+failure are detections of public transportation that occur after
+the prediction time stamp of the next T2G. More details are
+discussed in Section VI.
+Last, LSTM neural network models are implemented to
+predict the T2G. Again the data set after the application
+of the RFE is utilized. The application of the KerasTuner
+finds the architectures of the LSTM models by sampling the
+following parameters: the number of units for an LSTM layer,
+specified as U(8, 256); the number of hidden layers specified as U(1, 2); the dropout rate for regularization purposes
+specified as U(0, 0.5); the number of units for a dense layer
+connected after the LSTM layers, specified as U(1, 50). The
+activation function is fixed to ReLU. For the training of the
+models, 100 epochs are computed with early stopping criteria
+by monitoring the validation loss with a patience p = 5 is
+
+specified to prevent overfitting to the training data set. The
+batch size is set to 64, the validation split to 20% of the
+training data set, and the MAE is utilized as a loss function.
+The considered time lag for the LSTM models is chosen with
+7 time steps, determined with a sensitivity analysis.
+In Table V the compilation of performance metrics for
+the LSTM models are shown. Overall, a reduction in MAE
+and RMSE compared to the Naive model can be achieved
+by deploying LSTM neural networks. Also, the EH and NM
+ratios are increased significantly and outperform the Naive
+models: The EH-ratio for the naive model ranges from 33.33%
+to 54.68%, whereas the LSTM models achieve performance
+metrics between 43.05% and 68.80%. The LSTM models for
+traffic lights 1 – 10 perform with an MAE error below 5.00 sec,
+and the EH-/NM-ratios are above 43% and 61%, respectively.
+The LSTM neural networks can not outperform the decision
+tree ensembles concerning all considered performance metrics
+compared with the RF results. For example, the MAE and
+RMSE errors when applying the LSTM models for traffic
+lights 1 – 10 are between 12.60% sec and 52.91% higher.
+In addition, the EH and NM ratio decrease by -2% up to 19%. Only for the T2G predictions of traffic lights 7 and 9,
+the EH ratio is improved by 1.47% and 0.64%, respectively.
+This behavior can be explained by the low variability of the
+T2G target values for these traffic lights.
+Figure 9 shows that the predicted T2G series for traffic
+lights 4 and 6 are converging towards the mean value of
+the corresponding T2G. Hence, an LSTM model that predicts
+the average T2G performs well on test data sets with low
+variability of the target variable. The predictions in Figure 9
+show in both cases that the LSTM models perform well in
+predicting the T2G when no high variability of the T2G is
+present. Nevertheless, none of the higher variations are not
+captured with these models, although the RF model predicted
+and approximated these samples with high accuracy.
+Finally, we compare the results of all models in Figure 10.
+The subplots show the MAE, RMSE, EH, and NM metrics for
+signals 1 – 10. The RF models show the lowest error values
+with an MAE of 2.22 sec (standard deviation: 0.66 sec), an
+EH-ratio of 59.14% (standard deviation: 6.27%), and an NMratio of 78.56% (standard deviation: 4.17%). Note that the
+aggregated RMSE metrics of the LR and RF models show no
+significant difference with 5.11 and 5.18 sec, respectively.
+
+12
+
+Table V: Model performance on the test data set with MAE, RMSE, EH, and NM for the LSTM model. Also, the improvements
+over the naive baseline are presented with the given performance metrics.
+LSTM model
+
+  
+
+Improvement over naive baseline
+
+Signal
+
+MAE [s]
+
+RMSE [s]
+
+EH [%]
+
+NM [%]
+
+∆MAE [%]
+
+∆RMSE [%]
+
+∆EH [%]
+
+∆NM [%]
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+3.15
+2.51
+2.59
+3.27
+2.48
+2.78
+2.44
+4.39
+1.01
+5.00
+
+6.54
+5.39
+5.47
+6.57
+6.30
+5.56
+4.96
+8.24
+2.19
+9.45
+
+43.69
+50.65
+53.19
+43.05
+64.81
+46.29
+52.68
+44.51
+68.80
+47.59
+
+72.94
+71.10
+71.45
+70.66
+81.65
+70.08
+70.41
+61.60
+83.86
+61.41
+
+-39.66
+-45.32
+-43.57
+-40.33
+-42.33
+-42.92
+-42.04
+-40.03
+-34.42
+-40.62
+
+-28.91
+-31.69
+-31.02
+-29.28
+-24.73
+-32.52
+-31.11
+-29.87
+-21.22
+-29.90
+
+8.20
+14.12
+16.03
+9.68
+18.39
+12.56
+16.62
+11.18
+14.12
+10.78
+
+14.51
+15.17
+15.38
+14.36
+14.24
+15.16
+14.82
+13.09
+9.60
+12.06
+
+ V J    7  *  W H V W  G D W D
+ V J    / 6 7 0  P R G H O
+
+  
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(a)
+  
+
+ V J    7  *  W H V W  G D W D
+ V J    / 6 7 0  P R G H O
+
+  
+
+ 7  *  > V @
+
+  
+  
+  
+  
+  
+  
+
+ 
+
+  
+
+  
+
+ & \ F O H V  >  @
+
+  
+
+  
+
+  
+
+(b)
+
+Figure 9: Prediction results of the LSTM model. Results
+assessed on the T2G test data set for (a) traffic signal 4 and
+(b) traffic signal 6.
+
+(a)). Figure 11 also highlights the feature importance on the
+intersection. The traffic stream in blue shows the signal for
+which the T2G prediction is computed. In red, the relevant
+devices (LDs or traffic signals) of conflicting traffic streams
+are shown, and green highlights the devices of the compatible
+traffic streams.
+For the both signals, the most important feature appears to
+be the occupancy of LD 1, i.e., o1 detecting arriving trams
+from the north of the intersection area. This is expected
+as the T2G is highly dependent on the priority of public
+transportation. Additionally, for both models, the occupancy
+o5 for arriving vehicles and trams from the south is listed in
+the 10 most relevant features. For the T2G prediction of traffic
+signal 4, the second most important feature is the green phase’s
+duration of signal 1, g1 (non-conflicting traffic stream); for the
+T2G of traffic signal 6, it is the red phase duration, r2 . Finally,
+note that in both cases, the feature representing the hour of
+the day H is important and highlights that both models find
+T2G patterns that depend on the time of the day.
+Interesting all computed features introduced in Section IV
+appear at least once in one or the other feature importance
+subsets of the two presented models. On the other hand, the
+congestion and queue indicator QIi (ci,n ) and CIi (ci,n ) do not
+appear, and an analysis shows that the RFE procedure already
+eliminated these features.
+
+C. Feature importance of Random Forest models
+One advantage of the best candidate in this study is that
+RFs allow for a straightforward computation of the feature
+importance. One decision tree in a random forest splits input
+values based on the condition of impurity. When solving a
+regression problem, impurity is defined as the variance. When
+training the model, the weighted impurity should be minimized. Each feature’s contribution allows for the calculation of
+the feature importance to solve the initial problem definition
+Ŷi (ci,n ) = f (X); i.e., the approximation of a function that
+maps the input feature vector to the T2G target values.
+We compute the feature importance for the 10 most relevant
+features for the models of traffic signals 4 and 6, respectively. Note that other importance vectors can be computed
+analogously. Figure 11 shows the 10 most important features
+for the prediction of the T2G of traffic signals 4 and 6. In
+the case of signal 4 o1 is the most important, and r10 is
+the least important feature of the presented subset (Figure 11
+
+VI. DISCUSSION
+A. Metrics for model evaluation
+A model for T2G predictions has to meet strong accuracy
+requirements. For example, motion planning algorithms of
+automated vehicles can utilize such forecasts. Hence, a low
+accuracy prediction of the following green can cause safety
+issues that are not acceptable in practice. Consequently, a
+judgment based on standard metrics such as the MAE or
+RMSE can lead to a good performance on average, but individual predictions might still not meet the initial requirements.
+Therefore, in this study, we introduced the EH and NM to
+evaluate models based on the forecast being identical to the
+target, or an error smaller or equal to two sec, respectively.
+For example, the performance concerning the MAE for the
+LR models (Table III) shows errors that are close to the ones
+for the RF models (Table IV). Nevertheless, the EH and NM
+ratio in Table IV significantly improved compared to the naive
+
+   
+   
+   
+   
+     1 D L Y H  / 5  5 )  / 6 7 0
+
+    
+    
+    
+    
+    
+    
+     1 D L Y H  / 5  5 )  / 6 7 0
+
+ 1 0  >  @
+
+    
+ ( +  >  @
+
+ 6 L J Q D O V       
+   
+   
+   
+   
+   
+   
+     1 D L Y H  / 5  5 )  / 6 7 0
+
+ 5 0 6 (  > V @
+
+ 0 $ (  > V @
+
+13
+
+    
+    
+    
+    
+    
+    
+    
+    
+     1 D L Y H  / 5  5 )  / 6 7 0
+
+Figure 10: Performance of all signals 1–10 with respect to MAE, RMSE, EH and NM ratio.
+
+1
+
+1
+
+2
+
+2
+
+12
+2 3
+
+12
+2 3
+8
+
+7
+
+8
+
+7
+
+3
+
+3
+
+4
+5
+
+1
+9
+
+10
+
+4
+5
+
+1
+9
+
+10
+6
+11
+
+6
+11
+4
+
+4
+
+5
+
+(a)
+
+5
+
+(b)
+
+Figure 11: Feature importance for RF model of (a) for traffic signal 4 and (b) traffic signal 6.
+
+baseline. On the contrary, the performance ratios of the LR
+models even decrease compared to the naive model. This
+highlights the importance of EH and NM for this problem.
+Although the hyperparameter tuning was carried out by
+assessing different loss functions, the MAE function showed
+the best performance concerning all presented performance
+metrics. For example, utilizing the mean squared error as a
+loss function did not improve the results. A more extensive
+data set might help improve generalization and performance.
+However, for the RF models, the loss function allows for the
+most accurate results. In addition, RF models are easier to
+fit and allow for interpretation of the model parameters (the
+feature importance analysis described in Section V-C).
+B. Vehicle detection after T2G prediction
+As shown in Section V-C the LD data representing trams’
+detection is of great importance for the RF models. However,
+results also show that models sometimes fail to predict a T2G
+peak (Figure 8 (b)). One potential explanation for this behavior
+is detections of vehicles that occur after the prediction of the
+T2G. In other words, we predict the duration of the next red
+phase, and afterward, the corresponding phase starts. If a tram
+arrives at an intersection approach within this phase, the signal
+control system might react according to predefined conditions.
+As a result, the red phase can be shortened or extended
+(dependent on the traffic relation), and the T2G duration
+also changes. However, this information is only available in
+
+the next cycle. Therefore, the presented prediction models
+potentially miss high peaks of the T2G.
+A more extensive data set or additional feature engineering
+could help eliminate this limitation. Additionally, works such
+as [14] capture this system behavior as the predictions are
+updated consistently during the red phase. Nevertheless, this
+leads to fluctuations in the T2G that are problematic for control
+systems (e.g., motion planning of automated vehicles). Ibrahim
+et al. [14] also requires data aggregation per cycle length;
+meaning knowledge of the cycle length must be present a
+priori which is only possible for semi-actuated signal control
+systems.
+C. Prediction of T2G for dedicated public transportation
+signals
+As presented in Figure 4, traffic signals 11 and 12 are
+dedicated to public transportation vehicles. These traffic lights
+only operate in a green phase when a tram is detected and
+needs to pass the intersection. Hence, the average red and
+green times differ significantly from those of signals 1–10:
+For signals 11 and 12, the average red/green time are 203.12
+sec/13 sec, and 214.50 sec/17.65 sec, respectively. Also, the
+minimum and maximum values range from 5 to 500 sec, 12 to
+500 sec for the red times, and 6 to 353 sec, 4 to 320 sec for the
+green times. Note that the maximum allowed duration of 180
+sec does not apply to these signals. Besides, the green times
+are significantly shorter, indicating that these traffic lights are
+
+14
+
+   
+
+ V J     7  *  W H V W  G D W D
+ V J     5 )  P R G H O
+
+ 7  *  > V @
+
+   
+   
+   
+   
+ 
+
+ 
+
+  
+
+  
+
+  
+
+   
+   
+ & \ F O H V  >  @
+
+   
+
+   
+
+   
+
+Figure 12: Prediction results of the RF model for traffic signal
+11 only utilized by public transportation.
+Table VI: Model performance on the test data set with MAE,
+RMSE, EH, and NM for the RF model on signal 11 and 12.
+RF model
+Signal
+
+MAE [s]
+
+RMSE [s]
+
+EH [%]
+
+NM [%]
+
+11
+12
+
+61.56
+54.08
+
+92.40
+78.61
+
+3.21
+3.87
+
+8.12
+8.33
+
+only utilized when public transportation vehicles are detected.
+Consequently, a significantly higher variance of the quantities
+is given, which needs to be captured by the applied prediction
+model. Also, the described limitation from Section VI-B that
+vehicle detections after the T2G prediction, i.e., occurring
+within the red phase we predicted the duration for, has a
+substantial influence on model performance. As signals 11 and
+12 only operate in a green phase when a vehicle is detected,
+it is evident that many detections occur during a red phase.
+In Figure 12 we shortly present the prediction results of the
+RF model for 200 cycles of traffic signal 11.
+The test data in black shows high fluctuations between 5
+and 500 seconds that correspond to the min and max values
+found in the descriptive analysis. The RF model captures the
+time series pattern with most prediction samples. Nevertheless,
+the prediction errors are high compared to the values shown
+for signals 1–10. Table VI compiles the MAE, RMSE, EH,
+and NM ratio for the RF models.
+As expected, the performance metrics show a significantly
+higher magnitude with an MAE of 85.88 and 64.02 sec,
+respectively. This is because the RF models can not capture
+the high T2G peaks that frequently occur for signals 11 and
+12. Additionally, the EH and NM ratios underline the modest
+performance with values below 2% for all metrics in Table VI.
+A model design for designated traffic lights that satisfies
+accuracy requirements, additional information such as GPS
+signals that provide the location of trams, or additional LDs
+that allow inferring location or speed is needed.
+D. Utilization of T2G predictions for speed-advisory systems
+T2G predictions can serve as an input to motion planning
+algorithms leading to a smoother speed profile and more
+homogeneous traffic flow as vehicles do not need to stop
+at an intersection. Our proposed methodology considers the
+complex relationship between traffic signals and LD detections
+
+to determine the T2G. Nevertheless, when motion planning algorithms consider the predictions of the T2G for determining,
+e.g., the speed profile to cross an intersection, the timestamp of
+an LD detection will also change. Consequently, the proposed
+models in this work that learned this temporal relationship
+via a historical data set (offline learning) can not dynamically
+adapt to the new system behavior. As a solution, the authors
+suggest researching the directions of (a) online learning, which
+allows for learning new data patterns as they are available,
+or (b) meta-learning allowing ML models to learn from T2G
+prediction outputs and adapt to the new system behavior.
+VII. CONCLUSION
+This paper proposes a framework for Time-to-Green (T2G)
+predictions at an urban intersection to enhance the quality of
+Signal Phase and Timing (SPaT) messages. The problem was
+constructed as a time series forecast to predict the next signal
+phase of a fully-actuated signal control system. The framework
+implementation is generic and can be applied to any intersection that provides Loop Detectors (LD) and signals data.
+An extensive feature engineering methodology is proposed to
+enhance the model quality by utilizing concepts from traffic
+flow theory. To assess the performance of supervised learning
+algorithms, a Linear Regression (LR), a Random Forest (RF),
+and a Long-Short-Term-Memory (LSTM) neural network are
+implemented and assessed with a set of performance metrics.
+In the presented numerical experiment, the methodology
+was tested on an intersection in Zurich operated by a fullyactuated signal control and public transport priority. A consecutive data set of two months (traffic signal and LD data)
+is processed, and prediction models are assessed on the
+accuracy when predicting the T2G. Results show that RF
+models are promising tools for predicting the next red phase
+and outperform naive baseline, LR, and LSTM models with
+Mean Absolute Errors (MAE) between 0.90 and 3.27 sec.
+Nevertheless, the RF models show limitations in predicting the
+T2G of traffic lights designated for public transportation due
+to the high variance of the target values and vehicle detections
+after prediction. Future work will extend the present research
+with the possibility of updating T2G predictions throughout
+the next signal phase that can serve as an input to various
+control systems. We will also look at the parameter tuning
+of the models concerning computational time. This paves the
+way for real-time applications. Another promising direction
+is to develop an algorithm that can be quickly adapted to
+new environments (e.g., other intersections or scenarios with
+different transit operations) within a few shots via metalearning (e.g., [64]).
+ACKNOWLEDGMENT
+The authors would like to thank Felix Denzler from the city
+of Zurich for collaborating in a research project and to provide
+the data. K. Yang acknowledges the support by the Ministry of
+Education, Singapore, under its Academic Research Fund Tier
+1. M. Menendez acknowledges the support by the NYUAD
+Center for Interacting Urban Networks (CITIES) funded by
+Tamkeen under the NYUAD Research Institute Award CG001.
+
+15
+
+L. Ambühl acknowledges the support by ETH Research Grant
+ETH-27 16-1 under the name of SPEED.
+R EFERENCES
+[1] L. Claussmann, M. Revilloud, D. Gruyer, and S. Glaser, “A review of
+motion planning for highway autonomous driving,” IEEE Transactions
+on Intelligent Transportation Systems, vol. 21, no. 5, pp. 1826–1848,
+2020.
+[2] X. Zheng and W. Recker, “An adaptive control algorithm for trafficactuated signals,” Transportation Research Part C: Emerging Technologies, vol. 30, pp. 93–115, 2013.
+[3] S. Lämmer and D. Helbing, “Self-control of traffic lights and vehicle
+flows in urban road networks,” Journal of Statistical Mechanics: Theory
+and Experiment, vol. 2008, no. 04, p. P04019, apr 2008.
+[4] A. Genser, L. Ambühl, K. Yang, M. Menendez, and A. Kouvelas,
+“Time-to-green predictions: A framework to enhance spat messages
+using machine learning,” in 2020 IEEE 23rd International Conference
+on Intelligent Transportation Systems (ITSC), 2020, pp. 1–6.
+[5] CAR 2 CAR Communication Consortium, “Automotive requirements
+for spat and map - car 2 car.” [Online]. Available: https://www.
+car-2-car.org/fileadmin/documents/Basic System Profile/Release 1.5.1/
+C2CCC RS 2077 SPATMAP AutomotiveRequirements.pdf
+[6] A. Genser, R. Spielhofer, P. Nitsche, and A. Kouvelas, “Ride comfort
+assessment for automated vehicles utilizing a road surface model and
+monte carlo simulations,” Computer-Aided Civil and Infrastructure
+Engineering, 2021.
+[7] S. A. Fayazi, A. Vahidi, G. Mahler, and A. Winckler, “Traffic signal
+phase and timing estimation from low-frequency transit bus data,” IEEE
+Transactions on Intelligent Transportation Systems, vol. 16, no. 1, pp.
+19–28, 2015.
+[8] S. A. Fayazi and A. Vahidi, “Crowdsourcing phase and timing of pretimed traffic signals in the presence of queues: Algorithms and back-end
+system architecture,” IEEE Transactions on Intelligent Transportation
+Systems, vol. 17, no. 3, pp. 870–881, 2016.
+[9] C. Wang and S. Jiang, “Traffic signal phases’ estimation by floating car
+data,” in 2012 12th International Conference on ITS Telecommunications, 2012, pp. 568–573.
+[10] Juan Yu and Pei-zhong Lu, “Learning traffic signal phase and timing
+information from low-sampling rate taxi gps trajectories,” Knowl.-Based
+Syst., vol. 110, pp. 275–292, 2016.
+[11] X. J. Ban, R. Herring, P. Hao, and A. M. Bayen, “Delay pattern
+estimation for signalized intersections using sampled travel times,”
+Transportation Research Record, vol. 2130, no. 1, pp. 109–119, 2009.
+[12] V. Protschky, C. Ruhhammer, and S. Feit, “Learning traffic light
+parameters with floating car data,” in 2015 IEEE 18th International
+Conference on Intelligent Transportation Systems, 2015, pp. 2438–2443.
+[13] V. Protschky, S. Feit, and C. Linnhoff-Popien, “Extensive traffic light
+prediction under real-world conditions,” in 2014 IEEE 80th Vehicular
+Technology Conference (VTC2014-Fall), 2014, pp. 1–5.
+[14] S. Ibrahim, D. Kalathil, R. O. Sanchez, and P. Varaiya, “Estimating
+phase duration for spat messages,” IEEE Transactions on Intelligent
+Transportation Systems, vol. 20, no. 7, pp. 2668–2676, 2019.
+[15] Y. Zhu, X. Liu, M. Li, and Q. Zhang, “Pova: Traffic light sensing with
+probe vehicles,” IEEE Transactions on Parallel and Distributed Systems,
+vol. 24, no. 7, pp. 1390–1400, 2013.
+[16] V. Protschky, K. Wiesner, and S. Feit, “Adaptive traffic light prediction
+via kalman filtering,” in 2014 IEEE Intelligent Vehicles Symposium
+Proceedings, 2014, pp. 151–157.
+[17] Z. Islam, M. Abdel-Aty, and N. Mahmoud, “Using cnn-lstm to predict
+signal phasing and timing aided by high-resolution detector data,”
+Transportation Research Part C: Emerging Technologies, vol. 141, p.
+103742, 2022.
+[18] Y. Wang, D. Zhang, Y. Liu, B. Dai, and L. H. Lee, “Enhancing
+transportation systems via deep learning: A survey,” Transportation
+Research Part C: Emerging Technologies, vol. 99, pp. 144 – 163, 2019.
+[19] J. Zhang, F.-Y. Wang, K. Wang, W.-H. Lin, X. Xu, and C. Chen, “Datadriven intelligent transportation systems: A survey,” IEEE Transactions
+on Intelligent Transportation Systems, vol. 12, no. 4, pp. 1624–1639,
+2011.
+[20] C. H., L. Y., Y. B, and B. S., “Dynamic near-term traffic flow prediction:
+system-oriented approach based on past experiences,” IET Intelligent
+Transport Systems, vol. 6, no. 3, pp. 292–305, 2012.
+[21] H. Sun, H. X. Liu, H. Xiao, R. R. He, and B. Ran, “Use of local linear regression model for short-term traffic forecasting,” Transportation
+Research Record, vol. 1836, no. 1, pp. 143–150, 2003.
+
+[22] S. Clark, “Traffic prediction using multivariate nonparametric regression,” Journal of Transportation Engineering, vol. 129, no. 2, pp. 161–
+168, 2003.
+[23] A. Genser, N. Hautle, M. Makridis, and A. Kouvelas, “An experimental
+urban case study with various data sources and a model for traffic
+estimation,” Sensors, vol. 22, no. 1, p. 144, Dec 2021.
+[24] W.-C. Hong, “Traffic flow forecasting by seasonal svr with chaotic
+simulated annealing algorithm,” Neurocomputing, vol. 74, no. 12–13,
+2011.
+[25] M. Castro-Neto, Y.-S. Jeong, M.-K. Jeong, and L. D. Han, “Online-svr
+for short-term traffic flow prediction under typical and atypical traffic
+conditions,” Expert Systems with Applications, vol. 36, no. 3, Part 2, pp.
+6164–6173, 2009.
+[26] Y.-S. Jeong, Y.-J. Byon, M. M. Castro-Neto, and S. M. Easa, “Supervised
+weighting-online learning algorithm for short-term traffic flow prediction,” IEEE Transactions on Intelligent Transportation Systems, vol. 14,
+no. 4, pp. 1700–1707, 2013.
+[27] Y. Zhang and A. Haghani, “A gradient boosting method to improve
+travel time prediction,” Transportation Research Part C: Emerging
+Technologies, vol. 58, pp. 308–324, 2015, big Data in Transportation
+and Traffic Engineering.
+[28] E. I. Vlahogianni, M. G. Karlaftis, and J. C. Golias, “Optimized and
+meta-optimized neural networks for short-term traffic flow prediction:
+A genetic approach,” Transportation Research Part C: Emerging Technologies, vol. 13, no. 3, pp. 211–234, 2005.
+[29] K. Y. Chan, T. S. Dillon, J. Singh, and E. Chang, “Neural-network-based
+models for short-term traffic flow forecasting using a hybrid exponential
+smoothing and levenberg–marquardt algorithm,” IEEE Transactions on
+Intelligent Transportation Systems, vol. 13, no. 2, pp. 644–654, 2012.
+[30] K. Kumar, M. Parida, and V. Katiyar, “Short term traffic flow prediction
+for a non urban highway using artificial neural network,” Procedia
+- Social and Behavioral Sciences, vol. 104, pp. 755–764, 2013, 2nd
+Conference of Transportation Research Group of India (2nd CTRG).
+[31] J. Tang, F. Liu, Y. Zou, W. Zhang, and Y. Wang, “An improved
+fuzzy neural network for traffic speed prediction considering periodic
+characteristic,” IEEE Transactions on Intelligent Transportation Systems,
+vol. 18, no. 9, pp. 2340–2350, 2017.
+[32] Y. Lv, Y. Duan, W. Kang, Z. Li, and F.-Y. Wang, “Traffic flow
+prediction with big data: A deep learning approach,” IEEE Transactions
+on Intelligent Transportation Systems, vol. 16, no. 2, pp. 865–873, 2015.
+[33] W. Huang, G. Song, H. Hong, and K. Xie, “Deep architecture for traffic
+flow prediction: Deep belief networks with multitask learning,” IEEE
+Transactions on Intelligent Transportation Systems, vol. 15, no. 5, pp.
+2191–2201, 2014.
+[34] R. Yu, Y. Li, C. Shahabi, U. Demiryurek, and Y. Liu, Deep Learning:
+A Generic Approach for Extreme Condition Traffic Forecasting, 2017,
+pp. 777–785.
+[35] F. Qian, G. Hu, and J. Xie, “A recurrent neural network approach to
+traffic matrix tracking using partial measurements,” in 2008 3rd IEEE
+Conference on Industrial Electronics and Applications, 2008, pp. 1640–
+1643.
+[36] A. Koesdwiady, R. Soua, and F. Karray, “Improving traffic flow prediction with weather information in connected cars: A deep learning
+approach,” IEEE Transactions on Vehicular Technology, vol. 65, no. 12,
+pp. 9508–9517, 2016.
+[37] S. Panwai and H. Dia, “Comparative evaluation of microscopic carfollowing behavior,” IEEE Transactions on Intelligent Transportation
+Systems, vol. 6, no. 3, pp. 314–325, 2005.
+[38] B. Ciuffo, V. Punzo, and M. Montanino, “Thirty years of gipps’
+car-following model: Applications, developments, and new features,”
+Transportation Research Record, vol. 2315, no. 1, pp. 89–99, 2012.
+[39] A. Kesting, M. Treiber, M. Schönhof, and D. Helbing, “Adaptive cruise
+control design for active congestion avoidance,” Transportation Research
+Part C: Emerging Technologies, vol. 16, no. 6, pp. 668–683, 2008.
+[40] D. Tran, W. Sheng, L. Liu, and M. Liu, “A hidden markov model
+based driver intention prediction system,” in 2015 IEEE International
+Conference on Cyber Technology in Automation, Control, and Intelligent
+Systems (CYBER), 2015, pp. 115–120.
+[41] P. J. Kim IH, Bong JH and P. S., “Prediction of driver’s intention of
+lane change by augmenting sensor information using machine learning
+techniques,” Sensors, vol. 17(6):1350, 2017.
+[42] P. Kumar, M. Perrollaz, S. Lefèvre, and C. Laugier, “Learning-based
+approach for online lane change intention prediction,” in 2013 IEEE
+Intelligent Vehicles Symposium (IV), 2013, pp. 797–802.
+[43] A. Gurghian, T. Koduri, S. V. Bailur, K. J. Carey, and V. N. Murali,
+“Deeplanes: End-to-end lane position estimation using deep neural
+
+16
+
+networks,” in 2016 IEEE Conference on Computer Vision and Pattern
+Recognition Workshops (CVPRW), 2016, pp. 38–45.
+[44] O. Olabiyi, E. Martinson, V. Chintalapudi, and R. Guo, “Driver action
+prediction using deep (bidirectional) recurrent neural network,” 2017.
+[45] X. Wang, R. Jiang, L. Li, Y. Lin, X. Zheng, and F.-Y. Wang, “Capturing car-following behaviors by deep learning,” IEEE Transactions on
+Intelligent Transportation Systems, vol. 19, no. 3, pp. 910–920, 2018.
+[46] T. Riedel and M. Menendez, “Switzerland,” in Global practices on
+road traffic signal control: Fixed-time control at isolated intersections,
+K. Tang, M., Boltze, H. Nakamura, and Z. Tian, Eds. Elsevier, 2019,
+ch. 7, pp. 99–116.
+[47] A. Genser, L. Ambühl, K. Yang, M. Menendez, and A. Kouvelas,
+“Enhancement of spat-messages with machine learning based time-togreen predictions,” in 9th Symposium of the European Association for
+Research in Transportation (hEART 2020). European Association for
+Research in Transportation, 2020.
+[48] M.-C. Tan, S. C. Wong, J.-M. Xu, Z.-R. Guan, and P. Zhang, “An aggregation approach to short-term traffic flow prediction,” IEEE Transactions
+on Intelligent Transportation Systems, vol. 10, no. 1, pp. 60–69, 2009.
+[49] B. L. Smith, B. M. Williams, and R. Keith Oswald, “Comparison
+of parametric and nonparametric models for traffic flow forecasting,”
+Transportation Research Part C: Emerging Technologies, vol. 10, no. 4,
+pp. 303–321, 2002.
+[50] R. L. McLaughlin, “Forecasting models: Sophisticated or naive?” Journal of Forecasting (pre-1986), vol. 2, no. 3, p. 274, 1983.
+[51] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion,
+O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cournapeau, M. Brucher, M. Perrot, and E. Duchesnay, “Scikit-learn: Machine learning in Python,” Journal of Machine
+Learning Research, vol. 12, pp. 2825–2830, 2011.
+[52] D. Branston and H. van Zuylen, “The estimation of saturation flow,
+effective green time and passenger car equivalents at traffic signals by
+multiple linear regression,” Transportation Research, vol. 12, no. 1, pp.
+47 – 53, 1978.
+[53] L. Breiman, “Random forests,” Machine learning, vol. 45, no. 1, pp.
+5–32, 2001.
+[54] S. Hochreiter and J. Schmidhuber, “Long short-term memory,” Neural
+computation, vol. 9, no. 8, pp. 1735–1780, 1997.
+[55] X. Ma, Z. Tao, Y. Wang, H. Yu, and Y. Wang, “Long short-term memory
+neural network for traffic speed prediction using remote microwave
+sensor data,” Transportation Research Part C: Emerging Technologies,
+vol. 54, pp. 187 – 197, 2015.
+[56] M. Abadi, P. Barham, J. Chen, Z. Chen, A. Davis, J. Dean, M. Devin,
+S. Ghemawat, G. Irving, M. Isard, M. Kudlur, J. Levenberg, R. Monga,
+S. Moore, D. G. Murray, B. Steiner, P. Tucker, V. Vasudevan, P. Warden,
+M. Wicke, Y. Yu, and X. Zheng, “Tensorflow: A system for large-scale
+machine learning,” in 12th USENIX Symposium on Operating Systems
+Design and Implementation (OSDI 16).
+Savannah, GA: USENIX
+Association, Nov. 2016, pp. 265–283.
+[57] F. Chollet et al., “Keras,” https://keras.io, 2015.
+[58] J. Bergstra, D. Yamins, and D. D. Cox, “Making a science of model
+search: Hyperparameter optimization in hundreds of dimensions for vision architectures,” in Proceedings of the 30th International Conference
+on International Conference on Machine Learning - Volume 28, ser.
+ICML’13, 2013, p. I–115–I–123.
+[59] T. O’Malley, E. Bursztein, J. Long, F. Chollet, H. Jin, L. Invernizzi et al.,
+“Kerastuner,” https://github.com/keras-team/keras-tuner, 2019.
+[60] Y. LeCun, Y. Bengio, and G. Hinton, “Deep learning,” Nature, vol. 521,
+pp. 436–444, 2015.
+[61] L. Li, K. Jamieson, G. DeSalvo, A. Rostamizadeh, and A. Talwalkar,
+“Hyperband: A novel bandit-based approach to hyperparameter optimization,” Journal of Machine Learning Research, vol. 18, no. 185, pp.
+1–52, 2018.
+[62] J. S. Brunner, M. A. Makridis, and A. Kouvelas, “Comparing the
+observable response times of acc and cacc systems,” IEEE Transactions
+on Intelligent Transportation Systems, pp. 1–10, 2022.
+[63] M. Makridis, K. Mattas, B. Ciuffo, F. Re, A. Kriston, F. Minarini, and
+G. Rognelund, “Empirical study on the properties of adaptive cruise
+control systems and their impact on traffic flow and string stability,”
+Transportation Research Record, vol. 2674, no. 4, pp. 471–484, 2020.
+[64] D. Gammelli, K. Yang, J. Harrison, F. Rodrigues, F. C. Pereira, and
+M. Pavone, “Graph meta-reinforcement learning for transferable autonomous mobility-on-demand,” in SIGKDD Conference on Knowledge
+Discovery and Data Mining, 2022.
+
+

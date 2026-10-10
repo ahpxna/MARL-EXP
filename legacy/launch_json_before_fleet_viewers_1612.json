@@ -1,0 +1,137 @@
+{
+ "version": "0.0.1",
+ "configurations": [
+  {
+   "name": "cityflow-viewer",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8765",
+    "--directory",
+    "research/marl_budget/e3_watch_latest"
+   ],
+   "port": 8765
+  },
+  {
+   "name": "e3-dashboard",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8766",
+    "--directory",
+    "research/marl_budget/dashboard_20261002"
+   ],
+   "port": 8766
+  },
+  {
+   "name": "cityflow-viewer-4x4",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8767",
+    "--directory",
+    "research/marl_budget/e3_watch_g4_20261002"
+   ],
+   "port": 8767
+  },
+  {
+   "name": "city-sumo-live",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p06_s0.rou.xml",
+    "--port",
+    "8770"
+   ],
+   "port": 8770
+  },
+  {
+   "name": "midtown-q7-old",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown_actuated.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8771",
+    "--signals",
+    "fixed",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "C\u0168: \u0111\u00e8n actuated + fleet L-ACT (fleet \u0111\u01b0\u1ee3c train v\u1edbi \u0111\u00e8n actuated)"
+   ],
+   "port": 8771
+  },
+  {
+   "name": "midtown-q7-upgrade",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8772",
+    "--signals",
+    "rl:research/city_sim/q7_cross_version_20261002/RL-H.pt",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "N\u00c2NG C\u1ea4P: \u0111\u00e8n RL-H + c\u00f9ng fleet L-ACT (hazard Q7)"
+   ],
+   "port": 8772
+  },
+  {
+   "name": "midtown-q7-compat",
+   "runtimeExecutable": "/Users/phanan/cig-amf-main/external_envs/city_runtime/bin/python",
+   "runtimeArgs": [
+    "-u",
+    "scripts/CITY_live_viewer.py",
+    "--net",
+    "research/city_sim/net/midtown.net.xml",
+    "--routes",
+    "research/city_sim/demand/midtown_p075_s0.rou.xml",
+    "--port",
+    "8773",
+    "--signals",
+    "rlcompat:research/city_sim/q7_cross_version_20261002/RL-H.pt:50",
+    "--vehicles",
+    "cav:research/city_sim/q7_cross_version_20261002/L-ACT.pt:0.5",
+    "--seed",
+    "0",
+    "--label",
+    "COMPATIBLE: RL-H \u00e9p chuy\u1ec3n pha \u1edf 50 s + fleet L-ACT"
+   ],
+   "port": 8773
+  },
+  {
+   "name": "cityflow-viewer-nyc",
+   "runtimeExecutable": "python3",
+   "runtimeArgs": [
+    "-m",
+    "http.server",
+    "8774",
+    "--directory",
+    "research/marl_budget/e3_watch_nyc_20261003/viewer"
+   ],
+   "port": 8774
+  }
+ ]
+}

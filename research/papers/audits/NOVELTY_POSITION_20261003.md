@@ -125,3 +125,22 @@ our account and a citeable confirmation; (iv) channel-side prospective predictio
 repairs work (joint-level: matched / mixture training, FB_S fallback) and which do not (input relabel and per-entry / per-slot
 garbling, L-295); (vi) decision-level flips on identical states (L-292).  The paper must cite RDC Figs 8–9 as the first
 observation of the phenomenon in MARL.
+
+## Addendum 4 (14:0x EDT 03/10) — CORRECTION to Addendum 3 (RDC), verified on the PDF pages by me (p. 8, p. 17 Table 2, p. 18 Table 4)
+* "Base+DR" is Base + a **delay-reconciled critic** (the critic sees the delay-free state; p. 8), NOT delay randomisation — Addendum 3's
+  phrase "trained with delay randomisation over a range that excludes 0–2" was wrong.
+* Both Base and Base+DR are trained under random ('unfixed') observation delays: MPE delay_value 6, delay_scope 3; SMAC 3 / 3 (Table 2,
+  p. 17).  Reading these as delay ranges 3–9 (MPE) and 0–6 (SMAC) is an inference (subagent A; consistent with the paper's in- / half-out-
+  of-distribution test ranges).
+* Table 4 (p. 18, FT-QMIX, TAG reward): Base 110.2 ± 17.7 at delay 0, 135.2 ± 22.5 at 3, 142.3 ± 22.3 at 6; Base+DR 135.1 at 0, 156.9 at
+  3; Oracle (trained delay-free) 213.4 at 0 falling to 66.1 at 12.  SPREAD / REFERENCE differences at 0 vs 3 are ≤ 2.8.  On SMAC (training
+  range includes 0–2, as read) no comparable drop (subagent A, Table 6).
+* So RDC's own tables contain the upgrade-direction hazard (a policy trained on a staler channel loses on a fresher one, MPE TAG), and the
+  pattern — drop where the deployment delay leaves the TRAINING range (MPE 0–2), none where it stays inside (SMAC) — is consistent with our
+  support account.  This is an independent, citable confirmation, and it strengthens the need to claim measurement / mechanism / repairs,
+  not the phenomenon.  Remaining ours: as in Addendum 3 (i)–(vi).
+
+## Addendum 5 (17:4x EDT 03/10) — numeric correction to Addendum 4 (external review; re-read on Table 4, p. 18)
+TAG reward, FT-QMIX: Base 110.2 (delay 0), 135.2 (3), **125.4 (6)**, 112.6 (9), 101.5 (12); Base+DR 135.1, 156.9, **142.3**, 120.9, 111.7.
+Addendum 4 gave 142.3 to Base — wrong.  Base peaks at delay 3, inside the inferred training range 3–9, and drops at 0; the qualitative
+reading (drop when the deployment delay leaves the training range on MPE) is unchanged.

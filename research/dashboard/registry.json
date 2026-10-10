@@ -3,6 +3,423 @@
  "banner": "Mọi kết quả là MÔ PHỎNG (CityFlow / SUMO) với các thành phần do mình tự train. Chưa có: log controller thật, trace J2735 thật, vehicle stack phát triển độc lập, dữ liệu cross-version của thành phố thật. NYC 16×3 = lưới cách điệu với khoảng cách block Manhattan + tập tuyến taxi thật (arrival vẽ lại).",
  "experiments": [
   {
+   "id": "w8net3",
+   "track": "City",
+   "network": "SUMO rand3",
+   "title": "W8-4 NET3: mạng thứ ba (rand3, 20 đèn 2 pha, bất quy tắc) — chính sách mới, TSI hiệu chỉnh từ đầu",
+   "ledger": "C-134",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE8_20261005.md",
+   "report": "research/city_sim/w8_20261005/net3/report_net3.txt",
+   "chart": "contrasts",
+   "progress": [
+    {
+     "kind": "iters",
+     "label": "rand3: train fleet (episode / 400)",
+     "glob": "research/city_sim/w8_20261005/net3/fleets/N3_s*.out",
+     "regex": "ep (\\d+) ",
+     "total": 399
+    },
+    {
+     "kind": "iters",
+     "label": "rand3: train đèn (episode / 120)",
+     "glob": "research/city_sim/w8_20261005/net3/lights/train_t*.out",
+     "regex": "ep (\\d+) ",
+     "total": 119
+    }
+   ]
+  },
+  {
+   "id": "w8lcd2",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W8-3 LCD2: đèn học có lịch dự đoán được (reward chuẩn hoá theo thời gian)",
+   "ledger": "C-134",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE8_20261005.md",
+   "report": "research/city_sim/w8_20261005/lcd2/report_lcd2.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "w8fresh2",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W8-2 FRESH2: bộ chính sách mới thứ 2 + kiểm định non-inferiority so với retrain + fleet share 25%",
+   "ledger": "C-134",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE8_20261005.md",
+   "report": "research/city_sim/w8_20261005/fresh2/report_fresh2.txt",
+   "chart": "contrasts",
+   "progress": [
+    {
+     "kind": "iters",
+     "label": "fresh2: train fleet (episode / 400)",
+     "glob": "research/city_sim/w8_20261005/fresh2/fleets/L11_s*.out",
+     "regex": "ep (\\d+) ",
+     "total": 399
+    }
+   ]
+  },
+  {
+   "id": "w8spdiag",
+   "track": "City",
+   "network": "SUMO spider",
+   "title": "W8-1 SPDIAG: vì sao spider fail (đèn phản ứng, sai số forecast, giá trị thông tin chính xác, nút 2 vs 3 pha)",
+   "ledger": "C-134",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE8_20261005.md",
+   "report": "research/city_sim/w8_20261005/spdiag/report_spdiag.txt"
+  },
+  {
+   "id": "w7fpr",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W7-1 FPR: TSI với chính sách MỚI (đèn t9–t13 × fleet s613–s913 × traffic 780–799) — đang chạy",
+   "ledger": "C-131",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE7_20261005.md",
+   "report": "research/city_sim/w7_20261005/fpr/report_fpr.txt",
+   "chart": "contrasts",
+   "progress": [
+    {
+     "kind": "iters",
+     "label": "train đèn mới (episode / 120)",
+     "glob": "research/city_sim/w7_20261005/fpr/lights/train_t*.out",
+     "regex": "ep (\\d+) ",
+     "total": 119
+    },
+    {
+     "kind": "iters",
+     "label": "train fleet mới (episode / 400)",
+     "glob": "research/city_sim/w7_20261005/fpr/fleets/L11_s*.out",
+     "regex": "ep (\\d+) ",
+     "total": 399
+    }
+   ]
+  },
+  {
+   "id": "w7dca2",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W7-2 DCA2: DC-Ada port trung thành — TSI-2 tốt hơn về agent TL (−2.72 s/veh), xăng như nhau; DCA2 trượt giới hạn",
+   "ledger": "C-131",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE7_20261005.md",
+   "report": "research/city_sim/w7_20261005/dca2/report_dca2.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "w6sp3",
+   "track": "City",
+   "network": "SUMO spider",
+   "title": "W6-6 SPIDER lượt 3 (chỉ ô xác định; α 0.0125) — FAIL",
+   "ledger": "C-129",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE6_20261005.md",
+   "report": "research/city_sim/w6_20261005/sp3/report_sp3.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "w6m2l",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W6-5 M2-L: đèn học → đèn học (SIM-halt, thay thế chứ không nâng cấp) — không mất lợi ích",
+   "ledger": "C-129",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE6_20261005.md",
+   "report": "research/city_sim/w6_20261005/m2l/report_m2l.txt",
+   "chart": "contrasts",
+   "verdict_map": {
+    "W6-5 LOSS": "info"
+   }
+  },
+  {
+   "id": "w6lcd",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W6-4 LCD: đèn học có lịch dự đoán được — trượt DEV gate (reward chưa chuẩn hoá: lỗi thiết kế)",
+   "ledger": "C-129",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE6_20261005.md",
+   "report": "research/city_sim/w6_20261005/lcd/report_lcd.txt"
+  },
+  {
+   "id": "w6h45",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W6-2/3 H4, H5 vs F1-B (panel 760–779): F1-B, H5 đạt; H4 trượt",
+   "ledger": "C-129",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE6_20261005.md",
+   "report": "research/city_sim/w6_20261005/h45/report_h45.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "w6dca",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "W6-1: TSI-2 lặp lại trên panel thứ 3 (ĐẠT) + DC-Ada-style (identity, trượt agent TL)",
+   "ledger": "C-129",
+   "protocol": "research/city_sim/PROTOCOL_CITY_WAVE6_20261005.md",
+   "report": "research/city_sim/w6_20261005/dca/report_dca.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "sptsi2",
+   "track": "City",
+   "network": "SUMO spider",
+   "title": "SPIDER TSI attempt 2 (second network; α 0.025) — FAIL",
+   "ledger": "C-124",
+   "protocol": "research/city_sim/PROTOCOL_CITY_SPIDER_TSI_20261005.md",
+   "report": "research/city_sim/sptsi_20261005/report_sptsi2.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "sptsi",
+   "track": "City",
+   "network": "SUMO spider",
+   "title": "SPIDER TSI attempt 1 (second network) — FAIL",
+   "ledger": "C-123",
+   "protocol": "research/city_sim/PROTOCOL_CITY_SPIDER_TSI_20261005.md",
+   "report": "research/city_sim/sptsi_20261005/report_sptsi.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "perf",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "PERF: adapter reduces publication sensitivity",
+   "ledger": "C-122",
+   "protocol": "research/city_sim/PROTOCOL_CITY_PERF_20261005.md",
+   "report": "research/city_sim/perf_20261005/report_perf.txt"
+  },
+  {
+   "id": "gen",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "GEN: receiver classes, penetration, c2 ablation, H-PATH",
+   "ledger": "C-121",
+   "protocol": "research/city_sim/PROTOCOL_CITY_GEN_20261005.md",
+   "report": "research/city_sim/gen_20261005/report_gen.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "shift",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "SHIFT: TSI-2 under +25 % demand",
+   "ledger": "C-120",
+   "protocol": "research/city_sim/PROTOCOL_CITY_SHIFT_20261005.md",
+   "report": "research/city_sim/shift_20261005/report_shift.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "tsi2",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "TSI-2 CONFIRMATION (grid4; per-light adapter; α 0.025) — PASS, M3 MET",
+   "ledger": "C-118",
+   "protocol": "research/city_sim/PROTOCOL_CITY_TSI2_20261005.md",
+   "report": "research/city_sim/tsi2_20261005/report_tsi2_confirm.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "tsiconf",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "TSI CONFIRMATION (t4–t8 × s213–s513 × 700–719)",
+   "ledger": "C-108…",
+   "protocol": "research/city_sim/PROTOCOL_CITY_TSI_20261005.md",
+   "report": "research/city_sim/tsi_20261005/report_tsi_confirm.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "kt1",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "TSI KT-1 parity (t4, t8)",
+   "ledger": "C-113",
+   "protocol": "research/city_sim/PROTOCOL_CITY_TSI_20261005.md",
+   "report": "research/city_sim/tsi_20261005/check/kt1_report.txt"
+  },
+  {
+   "id": "tsiv",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "TSI variants (direct-only hybrid, no-left)",
+   "ledger": "—",
+   "protocol": "research/city_sim/PROTOCOL_CITY_TSI_VARIANTS_20261005.md",
+   "report": "research/city_sim/tsiv_20261005/report_tsiv.txt"
+  },
+  {
+   "id": "n8",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N8 committed-duration controller (CDC)",
+   "ledger": "—",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N8_CDC_20261005.md",
+   "report": "research/city_sim/n8_20261005/report_n8.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "hyb",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "HYB / HYBQ (N2 + exact yellow; ± adapter)",
+   "ledger": "C-106",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N4_SERVICE_GATE_20261005.md",
+   "report": "research/city_sim/n4_20261005/report_hyb.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "gq",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "GQ gate + adapter",
+   "ledger": "C-105",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N4_SERVICE_GATE_20261005.md",
+   "report": "research/city_sim/n4_20261005/report_gq.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "n4",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N4 service gate",
+   "ledger": "C-104",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N4_SERVICE_GATE_20261005.md",
+   "report": "research/city_sim/n4_20261005/report_n4.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "n3",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N3 publication feedback",
+   "ledger": "C-109",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N3_FEEDBACK_20261005.md",
+   "report": "research/city_sim/n3_20261005/report_n3.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "x3",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "X3 exact info on fixed schedule (open loop)",
+   "ledger": "C-107",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N2M_MECHANISM_20261005.md",
+   "report": "research/city_sim/n2m_20261005/report_x3.txt",
+   "chart": "contrasts",
+   "frontier": [
+    "RPex - RPsig",
+    "RPn2 - RPsig",
+    "RPc2 - RPsig"
+   ]
+  },
+  {
+   "id": "n2m",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N2M hidden demand / feedback",
+   "ledger": "C-100",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N2M_MECHANISM_20261005.md",
+   "report": "research/city_sim/n2m_20261005/report_n2m.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "n2",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N2 state forecast",
+   "ledger": "C-99",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N2_STATE_FORECAST_20261005.md",
+   "report": "research/city_sim/n2_20261005/report_n2.txt",
+   "chart": "contrasts"
+  },
+  {
+   "id": "n5n6",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N5 / N6 out-of-sample commitment selection",
+   "ledger": "C-98",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N5N6_OOS_20261005.md",
+   "report": "research/city_sim/m3h3_20261004/report_n5n6.txt"
+  },
+  {
+   "id": "n1",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "N1 tail-support abstention",
+   "ledger": "C-97",
+   "protocol": "research/city_sim/PROTOCOL_CITY_N1_TAIL_SUPPORT_20261005.md",
+   "report": "research/city_sim/n1_20261005/report_n1.txt",
+   "chart": "contrasts",
+   "frontier": [
+    "grid4 all vs R",
+    "grid4 tail vs R",
+    "grid4 strict vs R"
+   ]
+  },
+  {
+   "id": "h3",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "H3 continuation opportunity",
+   "ledger": "C-96",
+   "protocol": "research/city_sim/PROTOCOL_CITY_M3_H3_OPPORTUNITY_20261004.md",
+   "report": "research/city_sim/m3h3_20261004/report_m3h3.txt"
+  },
+  {
+   "id": "m3pd",
+   "track": "City",
+   "network": "SUMO grid4",
+   "title": "M3′-D RPC 2×2 (H1 / H2)",
+   "ledger": "C-95",
+   "protocol": "research/city_sim/PROTOCOL_CITY_M3P_DIAG_20261004.md",
+   "report": "research/city_sim/m3pd_20261004/report_m3pd.txt",
+   "chart": "contrasts",
+   "frontier": [
+    "F1 M1 registered",
+    "F0 M1 no forced hold",
+    "F1 M0 kept message",
+    "F0 M0 both"
+   ]
+  },
+  {
+   "id": "fbm",
+   "track": "MARL",
+   "network": "3×3 + 4×4",
+   "title": "Baseline chuẩn: gate support Mahalanobis/χ² (SIL-C) vs monitor support chung FB_S",
+   "protocol": "research/marl_budget/PROTOCOL_E3_FALLBACK_MAHAL_20261003.md",
+   "report": "research/marl_budget/e3_fallback_mahal_20261003/report.txt",
+   "progress": [
+    {
+     "glob": "research/marl_budget/e3_fallback_mahal_20261003/3x3/*/manifest.json",
+     "kind": "manifests",
+     "label": "3×3 xong",
+     "total": 40
+    },
+    {
+     "glob": "research/marl_budget/e3_fallback_mahal_20261003/4x4/*/manifest.json",
+     "kind": "manifests",
+     "label": "4×4 xong",
+     "total": 80
+    }
+   ]
+  },
+  {
+   "id": "jt",
+   "track": "MARL",
+   "network": "3×3 + 4×4",
+   "title": "Joint throttle (nhận đúng số gói như lúc train) + masked-message reference π^(−0) — sau L-295",
+   "protocol": "research/marl_budget/PROTOCOL_E3_JOINT_THROTTLE_20261003.md",
+   "report": "research/marl_budget/e3_joint_throttle_20261003/report.txt",
+   "progress": [
+    {
+     "glob": "research/marl_budget/e3_joint_throttle_20261003/3x3/*/manifest.json",
+     "kind": "manifests",
+     "label": "3×3 xong",
+     "total": 35
+    },
+    {
+     "glob": "research/marl_budget/e3_joint_throttle_20261003/4x4/*/manifest.json",
+     "kind": "manifests",
+     "label": "4×4 xong",
+     "total": 70
+    }
+   ]
+  },
+  {
    "id": "nyc",
    "title": "NYC 16×3 — mạng thứ ba (relay vs Z, rule A, train-match, upgrade hazard, fallback)",
    "track": "MARL",

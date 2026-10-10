@@ -1,0 +1,1348 @@
+{
+  "summary": "Lean capped finders for the 8 collision-search angles that never ran (patents, citation chase, non-English, grey, venues, MARL compatibility, method/theory)",
+  "agentCount": 8,
+  "logs": [],
+  "result": [
+    {
+      "key": "patents",
+      "result": {
+        "candidates": [
+          {
+            "title": "Method for generating a traffic control signal (EP3594920A1)",
+            "url": "https://patents.google.com/patent/EP3594920A1/en",
+            "venue": "EPO patent application, Siemens Mobility GmbH",
+            "year": "2018 (priority 2018-07-09)",
+            "severity": "component",
+            "opened": true,
+            "overlap": "This is the closest patent to C4's architecture that we found. It inserts virtual detector signals in front of an existing adaptive or actuated signal controller. Those signals come from upstream detections 400-600 m out and a NARX neural-network prediction of platoon arrivals, and they replace or add to the real detector inputs. The stated aim is to give vehicles more stable GLOSA and time-to-green/red advice, with 20-35 s of foresight. That is the same building block as C4: a transform on the detector input that sits in front of a controller left unchanged, used to make signal timing work with speed advisory.",
+            "does_not": "The controller it fronts is conventional, not a frozen learned DQN, so it does not touch the learned signal. The input is not compensated for advised or gliding vehicles that disappear from halting counts; the problem it solves is foresight, not the self-defeating forecast. It has no speed-binned count adapter and no per-signal calibration of an adapter with both policies frozen. It does not model that published forecasts change the controller's input.",
+            "contributions": [
+              "C4",
+              "C5"
+            ]
+          },
+          {
+            "title": "Method and arrangement for predicting switching times of a signal group of a signal system for controlling traffic flow (WO2021110370A1)",
+            "url": "https://patents.google.com/patent/WO2021110370A1/en",
+            "venue": "WIPO patent application, Siemens Mobility GmbH",
+            "year": "2019 (priority 2019-12-04)",
+            "severity": "component",
+            "opened": true,
+            "overlap": "It uses two neural networks to predict switching times of traffic-actuated or adaptive signal groups from detector values. The first network fills in missing or delayed status data; the second, a recurrent network, predicts switching times. It outputs a probability distribution for the remaining time in the current signal state, more than 120 s ahead, and in the vehicle the forecast drives optimal-speed advice. That matches C3's uncertainty-aware ML forecast for a non-fixed signal used for GLOSA.",
+            "does_not": "The signal it forecasts is actuated or adaptive, not an RL or DQN policy. It does not split the forecast into exact time-to-green in determined yellow plus a quantile forecast. Training is open-loop on historical forecast-versus-actual switching times, not on logs recorded while forecasts were published. It explicitly does not model vehicles acting on the forecast changing detector inputs (no C2 feedback), and it has no signal-side adapter.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Traffic signal timing estimation using an artificial neural network model (US20170169705A1)",
+            "url": "https://patents.google.com/patent/US20170169705",
+            "venue": "USPTO patent application, Nissan North America / Nissan Motor Co",
+            "year": "2015 (priority 2015-12-15)",
+            "severity": "component",
+            "opened": true,
+            "overlap": "An ANN or SVR is trained on signal-controller logs to predict the remaining green or red time of vehicle-actuated signals, and the signal state when the vehicle arrives. Its inputs include loop-detector vehicle counts, elapsed phase time, previous phase durations and internal controller state. An autonomous vehicle uses the prediction to adjust speed and avoid stopping. That is a learned SPaT forecaster for a demand-responsive signal, conditioned on the same kind of count state the paper's DQN sees.",
+            "does_not": "It has no quantile or confidence output and does not target a learned or RL signal controller. It does not handle feedback: the patent does not consider that vehicles acting on the estimate change detector counts and therefore the timing. It does not train on forecast-published logs, has no exact determined-yellow component and no signal-side adapter.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Traffic signal state prediction correction and real-time probe data validation (WO2020086615A1 / US10878693B2)",
+            "url": "https://patents.google.com/patent/WO2020086615A1/en",
+            "venue": "WIPO / USPTO patent, Traffic Technology Services Inc",
+            "year": "2018 (priority 2018-10-23)",
+            "severity": "component",
+            "opened": true,
+            "overlap": "It emulates the field controller with its timing parameters to make deterministic baseline signal-change predictions, then corrects them using real-time controller data (for example clock drift above about 3 s). Before broadcasting to vehicles, it checks the predictions against GPS probe data from vehicles crossing the stop line. This is a building block for the exact part of C3: running the controller's own logic to get deterministic time-to-change before publishing.",
+            "does_not": "The prediction uses controller emulation, not ML, and the patent says nothing about RL or learned signal policies. It gives no confidence, probability or quantiles. It does not discuss vehicles acting on the published prediction changing detector actuations or timing, so it does not cover the self-defeating mechanism, and it has no detector or count adapter.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Prediction of traffic signal state changes (US9396657B1) and Hybrid distributed prediction of traffic signal state changes (US10008113B2 / WO2017003793A1)",
+            "url": "https://patents.google.com/patent/US10008113B2/en",
+            "venue": "USPTO / WIPO patents, Traffic Technology Services Inc",
+            "year": "2015-2016",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Not opened; this is based on search snippets only. Per the snippets, these TTS patents predict state changes for non-fixed (actuated or adaptive) signals and broadcast them to vehicles for fuel efficiency. They may estimate the probability that a phase is called or extended and attach a confidence measure, said to matter especially for adaptive signals. That would be a building block for C3's uncertainty-aware SPaT.",
+            "does_not": "The snippets do not mention learned or RL controllers, closed-loop training on forecast-published logs, the feedback of advised vehicles on detector inputs, or a signal-side adapter. Open the documents before citing them for probability or confidence.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Method and device for predicting the time remaining of a signal phase (US 12,148,293)",
+            "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/12148293",
+            "venue": "USPTO granted patent (assignee not seen)",
+            "year": "2024 (approx., from patent number)",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Not opened; per the search snippet, a combination neural network outputs a prediction of the remaining time of a signal phase for signal groups. That is an ML-based time-to-change forecaster, a building block for C3.",
+            "does_not": "From the snippet, nothing shows a learned or RL controller, a quantile or exact hybrid, closed-loop training, publish-feedback, or a signal-side adapter. Assignee and details not verified.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Traffic light prediction (EP3671687A1)",
+            "url": "https://patents.google.com/patent/EP3671687A1/en",
+            "venue": "EPO patent application (assignee not seen)",
+            "year": "2018-2019 (approx.)",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Not opened; per the search snippet, the predicted traffic-light state includes a recommended speed for reaching the light on green and/or a probability of reaching it on green. That links an uncertain SPaT forecast directly to speed advice, a building block for C3's quantile forecast feeding GLOSA.",
+            "does_not": "From the snippet, nothing shows a learned or RL controller, closed-loop or publish-feedback training, or compensation of the signal's detector inputs. Assignee and details not verified.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Multi-agent reinforcement learning for integrated and networked adaptive traffic signal control (US9818297B2)",
+            "url": "https://patents.google.com/patent/US9818297B2/en",
+            "venue": "USPTO granted patent",
+            "year": "2017 (approx.)",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A patented learned (MARL) adaptive signal controller: the kind of controller the city upgrades to in C1.",
+            "does_not": "Based on the search result only, it has no SPaT forecasting for vehicles, no eco-driving fleet, no publish-feedback mechanism and no input adapter.",
+            "contributions": [
+              "C1"
+            ]
+          },
+          {
+            "title": "Smart and scalable urban signal networks: methods and systems for adaptive traffic signal control (US20140368358A1, SURTRAC)",
+            "url": "https://patents.google.com/patent/US20140368358A1/en",
+            "venue": "USPTO patent application (Carnegie Mellon / Surtrac)",
+            "year": "2014",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A schedule-driven adaptive controller that sits in front of the field signal controller and allocates green time in real time. It is the commercial lineage (Rapid Flow) of adaptive signals whose timing is not known in advance.",
+            "does_not": "Based on the search result only, it is not a learned DQN controller. It has no quantile SPaT for an eco-driving fleet, no publish-feedback analysis and no speed-binned count adapter.",
+            "contributions": [
+              "C1"
+            ]
+          },
+          {
+            "title": "Speed Advisory System Using Real-Time Actuated Traffic Light Phase Length Prediction",
+            "url": "https://arxiv.org/pdf/2107.10372",
+            "venue": "arXiv (non-patent)",
+            "year": "2021",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Uses advanced-detector data to predict the current green length of semi- or fully-actuated signals and gives connected vehicles PASS/WAIT advice. The snippet reports about 95% prediction accuracy and up to 30% fuel saving. It is a GLOSA-plus-prediction pipeline for demand-responsive signals.",
+            "does_not": "Based on the search snippet only, it does not cover a learned signal, a quantile or exact hybrid, closed-loop or publish-feedback effects on detectors, or a signal-side adapter.",
+            "contributions": [
+              "C3"
+            ]
+          }
+        ],
+        "queries_run": [
+          "WebSearch (patents.google.com): patent predicting time to green adaptive traffic signal reinforcement learning controller SPaT prediction vehicle",
+          "WebSearch (patents.google.com): patent traffic signal controller detector data adjusted for connected vehicles following speed advisory GLOSA vehicles not detected as queue",
+          "WebSearch (patents.google.com): 专利 强化学习 信号控制 绿灯剩余时间 预测 车速引导 网联车",
+          "WebSearch (patents.google.com): patent traffic signal phase change prediction confidence probability distribution time-to-green adaptive actuated signal Traffic Technology Services OR Audi",
+          "WebSearch (patents.google.com): patent speed advisory vehicles slowing approach affects actuated signal detector call extension prediction feedback eco-approach signal timing",
+          "WebSearch (patents.google.com): 专利 强化学习信号控制 信号相位配时 预测 网联自动驾驶车辆 轨迹优化 生态驾驶",
+          "WebSearch (patents.google.com): patent artificial intelligence traffic signal controller broadcasts predicted signal timing to connected vehicles which adjust speed; vehicles' adjusted arrivals fed back to controller (NoTraffic OR Rapid Flow OR Surtrac OR Yunex)",
+          "WebSearch (patents.google.com): patent remaining green time prediction interval quantile neural network adaptive traffic light vehicle speed planning Toyota OR Ford OR Hyundai OR Bosch OR GM",
+          "WebSearch (open web): patent traffic signal control model input correction vehicles following green light speed recommendation counted as queue demand compensate detection eco-driving connected vehicles",
+          "WebSearch (patents.google.com): patent predicting signal phase and timing of AI-based adaptive traffic signal controller by simulating its learned policy, broadcast SPaT to connected vehicles (NoTraffic OR Hyundai OR Huawei OR Baidu OR Alibaba)",
+          "WebFetch: patents.google.com/patent/EP3594920A1/en",
+          "WebFetch: patents.google.com/patent/WO2021110370A1/en",
+          "WebFetch: patents.google.com/patent/CN111383481B/en (Southeast Univ GLOSA/MPC speed optimisation; no RL, no signal-side adaptation -> not reported)",
+          "WebFetch: patents.google.com/patent/WO2020086615A1/en",
+          "WebFetch: patents.google.com/patent/US20170169705"
+        ]
+      }
+    },
+    {
+      "key": "cite-chase-adapters",
+      "result": {
+        "candidates": [
+          {
+            "title": "Final Thesis (University of Southampton, eprint 502165): GLOSA paired with responsive traffic control systems [exact title not retrieved, page returned 403]",
+            "url": "https://eprints.soton.ac.uk/502165",
+            "venue": "University of Southampton PhD thesis (ePrints Soton)",
+            "year": "unknown (likely 2024-2025)",
+            "severity": "partial",
+            "opened": false,
+            "overlap": "C1/C2. The search snippet states that GLOSA becomes a detriment when paired with responsive traffic control systems, which are widespread, and that this greatly reduces where GLOSA helps. That is the same problem as the paper's staged-upgrade loss: a speed-advisory fleet loses its benefit once signals respond to traffic. The setting is adjacent: responsive (non-learned) controllers and rule-based GLOSA rather than a frozen DQN signal and a PPO fleet.",
+            "contributions": [
+              "C1",
+              "C2"
+            ],
+            "does_not": "It was not verified to use learned policies on either side, a halting-count mechanism, publish versus shadow forecasts, or a two-sided interface fix. The page returned 403, so the title, mechanism and any proposed remedy are unconfirmed."
+          },
+          {
+            "title": "TRC-30 paper 296: integrating actuated signal control with queue-based GLOSA (Q-GLOSA) using loop-detector and probe queue estimation",
+            "url": "https://trc-30.epfl.ch/wp-content/uploads/2024/09/TRC-30_paper_296.pdf",
+            "venue": "TRC-30 (Transportation Research Conference, EPFL)",
+            "year": "2024",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C2/C3 building block. It combines an actuated (traffic-responsive) signal policy with a queue-aware GLOSA whose trajectories use real-time queue estimates from loop detectors and probes. That is the queue/detector coupling between an advisory fleet and a responsive signal.",
+            "contributions": [
+              "C2",
+              "C3"
+            ],
+            "does_not": "The signal is not learned or frozen, the GLOSA fleet is not learned, there is no forecast trained on forecast-published closed-loop logs, no count adapter in front of the signal, and no self-defeating-forecast analysis."
+          },
+          {
+            "title": "Enabling GLOSA through Domain Knowledge Aware SPaT Prediction and Queue Length Aware Trajectory Optimization",
+            "url": "https://rosap.ntl.bts.gov/view/dot/79024",
+            "venue": "USDOT / Morgan State National Transportation Center (SMARTER) report",
+            "year": "2024-2025",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C3 building block. It predicts SPaT for actuated signals with a hybrid of deep learning and controller domain logic, so that predictions follow the controller's logic, and pairs this with queue-length-aware GLOSA trajectory optimization. This resembles the hybrid exact plus learned forecast feeding a queue-aware eco-approach.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "The target is actuated controllers, not a learned DQN signal. The forecast is not described as trained closed-loop on forecast-published logs, and there is no publish-versus-shadow feedback, no signal-side adapter, and no frozen learned fleet."
+          },
+          {
+            "title": "Reinforcement Learning Approaches for Traffic Signal Control Under Missing Data",
+            "url": "https://mlanthology.org/ijcai/2023/mei2023ijcai-reinforcement",
+            "venue": "IJCAI 2023",
+            "year": "2023",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C4 building block. It puts an input-side transformation (state imputation) in front of an RL signal policy when detectors do not observe parts of the traffic state, so the signal policy can act on a corrected observation.",
+            "contributions": [
+              "C4"
+            ],
+            "does_not": "It handles missing sensors, not systematic undercounting caused by gliding eco-driving vehicles that stay above the halting threshold. The imputation is learned, not a physical 2-parameter speed-binned adapter, and it does not pair the signal with a learned fleet or study forecast feedback."
+          },
+          {
+            "title": "Cooperative signal and vehicle control in mixed traffic environment using model-guided reinforcement learning (SVCC)",
+            "url": "https://trid.trb.org/View/2676482",
+            "venue": "Journal article indexed in TRID",
+            "year": "2025-2026",
+            "severity": "component",
+            "opened": false,
+            "overlap": "It pairs learned signal agents with learned CAV eco-driving agents (the assignment's pairing criterion). A queuing model gives advisory speeds to the eco-driving agents through a shaping reward.",
+            "contributions": [
+              "C5"
+            ],
+            "does_not": "The two policies are trained together (the CoTV-style joint-training category), so it has no staged upgrade, no frozen policies, no SPaT forecast of a learned signal, no count adapter, and no self-defeating-forecast mechanism."
+          },
+          {
+            "title": "Sim2Signal: Sim-to-Real Benchmarks for Traffic Signal Control",
+            "url": "https://arxiv.org/pdf/2609.01676",
+            "venue": "arXiv 2609.01676",
+            "year": "2026",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A deployment-gap benchmark: one shared pretrained signal checkpoint per network and controller pair is carried through pretrain, train and deploy stages on LibSignal (SUMO/CityFlow). It is close in spirit to adapting around a fixed learned signal.",
+            "contributions": [],
+            "does_not": "No learned vehicle fleet, no input-count adapter, and no SPaT forecasting."
+          },
+          {
+            "title": "A Graph-Based Control Interface for Traffic Signals on Heterogeneous Road Networks",
+            "url": "https://arxiv.org/pdf/2607.21831",
+            "venue": "arXiv 2607.21831",
+            "year": "2026",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A PPO signal-control interface that runs one trained policy across unseen geometries and city graphs, and reports that a shift in signal coverage exposes the policy's sensitivity. This is an input-side shift for a fixed learned signal.",
+            "contributions": [],
+            "does_not": "No adapter in front of a frozen policy, no vehicle-side learned fleet, and no forecast."
+          },
+          {
+            "title": "Evaluating the Robustness of Reinforcement Learning based Adaptive Traffic Signal Control",
+            "url": "https://arxiv.org/pdf/2603.15283",
+            "venue": "arXiv 2603.15283",
+            "year": "2026",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A robustness evaluation of frozen RL signal controllers under perturbed conditions. It is related to how a learned signal degrades when its inputs change, for example because of eco-driving vehicles.",
+            "contributions": [],
+            "does_not": "Content not inspected. Its title shows no fleet, no forecast and no adapter."
+          }
+        ],
+        "queries_run": [
+          "WebFetch S2 citations arXiv:2604.03905 (DC-Ada): 1 citing work, 'Impact of Architectural Heterogeneity and Reward Design on Coordination in IPPO-Based Multi-Agent Systems for Sequential SAR Tasks' (Appl. Sci. 2026, doi 10.3390/app16157448), not relevant to traffic",
+          "WebFetch S2 citations arXiv:2609.26010 (MATES): 0 citing works",
+          "WebFetch S2 citations arXiv:2501.02548 (Huang): 0 citing works",
+          "WebFetch S2 citations arXiv:2509.03118 (Gu): 1 citing work, a 2023 VR/6G scheduling review (doi 10.65521/ijeecs.v12i1.2629); a 2023 paper cannot cite a 2025 preprint, so Semantic Scholar has likely mis-linked it; irrelevant",
+          "WebFetch eprints.soton.ac.uk/502165: HTTP 403, not opened",
+          "WebSearch: frozen pretrained traffic signal control policy observation adapter without retraining sim-to-real",
+          "WebSearch: reinforcement learning traffic signal and eco-driving connected vehicles mixed autonomy learned signal learned vehicles interaction 2026 arXiv",
+          "WebSearch: SPaT prediction for reinforcement learning adaptive traffic signal GLOSA eco-approach learned controller forecast",
+          "WebSearch: arXiv 2607.00545 traffic signal",
+          "WebSearch: time-to-green prediction for deep reinforcement learning traffic signal controller GLOSA connected vehicles uncertainty quantile",
+          "WebSearch: traffic signal reinforcement learning policy state mismatch detector input transformation deployment pretrained agent adapter 2026",
+          "WebSearch: ML-based Prediction Framework for varying Traffic Signal Control Strategies GLOSA reinforcement learning (Malena ITSC 2025, already known)",
+          "WebSearch: A Graph-Based Control Interface for Traffic Signals on Heterogeneous Road Networks",
+          "WebSearch: GLOSA eco-approach vehicles interaction with adaptive or actuated signal control detection queue feedback self-defeating speed advisory reinforcement learning signal",
+          "WebSearch: pretrained reinforcement learning traffic signal agent deployed with connected automated vehicles speed guidance without retraining distribution shift observation correction"
+        ]
+      }
+    },
+    {
+      "key": "cite-chase-spat",
+      "result": {
+        "candidates": [
+          {
+            "title": "Traffic Signal Phase and Timing Prediction: A Machine Learning and Controller Logic Hybrid Approach (PhD dissertation, S. Eteifa, Virginia Tech)",
+            "url": "https://vtechworks.lib.vt.edu/items/332914c0-6466-494e-abb1-8f3cb74641ae",
+            "venue": "Virginia Tech dissertation (VTechWorks)",
+            "year": "2024",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Splits SPaT prediction into a deterministic controller-logic part and an ML (LSTM) part, with confidence levels for GLOSA. This is the same hybrid 'exact + learned' building block as C3's exact time-to-green in determined yellow plus a quantile forecast.",
+            "does_not": "Its target is actuated or coordinated-actuated controllers on the Gallows Road corridor (6 intersections), not a learned or RL signal. The predictor is trained open-loop on field logs, not on forecast-published closed-loop logs. No feedback from advised vehicles to the signal is shown, and no frozen-policy two-sided interface.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Developing an Integrated Machine Learning and Digital Twin Model for Predicting Traffic Signal Phasing and Timing Information",
+            "url": "https://doi.org/10.1109/SM69703.2026.11614153",
+            "venue": "2026 conference (DOI 10.1109/SM69703.2026.11614153; Semantic Scholar's venue label 'ACM Symposium on Solid Modeling' looks wrong)",
+            "year": "2026",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Cites Eteifa (Sensors 2025). Per the Semantic Scholar abstract it proposes a 'hybrid approach that separates the stochastic element of traffic SPaT prediction', i.e. a deterministic/controller part plus an ML part, using a digital twin. Same hybrid-forecast building block as C3.",
+            "does_not": "Only the citation-API abstract summary was seen. Nothing indicates the target signal is learned/RL, that the forecast is trained closed-loop on published-forecast logs, or that advised vehicles alter the signal's input. Needs opening to confirm whether the digital twin simulates the feedback loop.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Enabling GLOSA through Domain Knowledge Aware SPAT Prediction and Queue Length Aware Trajectory Optimization (Shafik, Eteifa, Rakha; USDOT SMARTER UTC report)",
+            "url": "https://rosap.ntl.bts.gov/view/dot/79024",
+            "venue": "USDOT UTC final report (Morgan State SMARTER / VTTI)",
+            "year": "2024",
+            "severity": "component",
+            "opened": true,
+            "overlap": "Transformer-ensemble SPaT prediction with confidence levels ('within one second of the true value 90.2% of the time') for actuated signals. The predictions feed queue-length-aware GLOSA trajectory optimization, evaluated in simulation up to 100% penetration. Building blocks: uncertainty-aware SPaT forecast (C3) and queue-aware eco-approach.",
+            "does_not": "Per the abstract there is no closed-loop training with advised vehicles present, no discussion of GLOSA vehicles changing detector actuations or signal timing (no self-defeating-forecast mechanism), no RL or learned signal controller, and no signal-side adapter.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Identification and Adjustment of Implausible Outputs of Machine Learning Models for Enhancing the Reliability of Switching Time Predictions for Traffic-Actuated Signals",
+            "url": "https://doi.org/10.1177/03611981251362780",
+            "venue": "Transportation Research Record",
+            "year": "2025",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Cites Stevanovic 2013. It checks ML switching-time predictions for plausibility and adjusts implausible ones, which is close to C3's use of a deterministic exact part (determined yellow) to override or bound a learned forecast.",
+            "does_not": "Only the abstract summary from the citation API was seen. It targets traffic-actuated controllers, not learned signals, has no closed-loop or published-forecast training, and has no feedback through the signal's input. It is unconfirmed whether the plausibility rules come from controller logic.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "Multi-Agent Adaptive Traffic Signal Control Based on Q-Learning and Speed Transition Matrices (Majstorovic et al.)",
+            "url": "https://doi.org/10.3390/s25237327",
+            "venue": "Sensors",
+            "year": "2025",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Cites Maadi 2022. A learned (Q-learning) signal whose state uses speed information (speed transition matrices) rather than plain halting counts. This relates to C4's idea that speed-binned counts give a learned signal the information that halting-count states lose.",
+            "does_not": "Speed information is built into the RL state at training time. There is no adapter in front of a frozen, already-trained signal, no eco-driving or GLOSA fleet, and no forecast feedback.",
+            "contributions": [
+              "C4"
+            ]
+          },
+          {
+            "title": "TRC-30 paper 296 (Q-GLOSA with actuated signal control; title not verified)",
+            "url": "https://trc-30.epfl.ch/wp-content/uploads/2024/09/TRC-30_paper_296.pdf",
+            "venue": "TRC-30 conference (EPFL), 2024",
+            "year": "2024",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Turned up twice in searches for GLOSA interacting with actuated detectors. The search snippet describes queue-based GLOSA integrated with an actuated signal policy that detects queues in real time, and mentions advised vehicles altering arrival distributions. If the paper itself shows advised vehicles changing actuated green times, it would be a partial overlap for C2 (adjacent setting: actuated, not learned).",
+            "does_not": "Not opened. The title and the 'advised vehicles alter arrivals/conflict' claim come only from a search-engine summary and may be synthesis. Open this first if more budget is available.",
+            "contributions": [
+              "C2"
+            ]
+          },
+          {
+            "title": "Dual-Layer Machine Learning Approach for Predicting Switching Times of Vehicle-Actuated Signal Phases",
+            "url": "https://doi.org/10.1177/03611981261467309",
+            "venue": "Transportation Research Record",
+            "year": "2026",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Cites Stevanovic 2013. XGBoost-based dual-layer switching-time prediction for vehicle-actuated signals, for cooperative or GLOSA use. Same line as Genser and Eteifa (already known).",
+            "does_not": "Targets actuated, not learned, signals and is open-loop. It has no feedback from advised vehicles and no signal-side adapter.",
+            "contributions": [
+              "C3"
+            ]
+          },
+          {
+            "title": "A methodology for prediction accuracy assessment of intelligent traffic signal control algorithms with SPaT messages",
+            "url": "https://doi.org/10.1109/ITSC45102.2020.9294370",
+            "venue": "IEEE ITSC",
+            "year": "2020",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Cites Stevanovic 2013. Proposes indicators for how accurately SPaT messages predict 'intelligent' (adaptive) traffic signal control. Related to evaluating SPaT forecasts of non-fixed controllers (C3 evaluation side).",
+            "does_not": "Only the abstract summary was seen. It is a metric/assessment paper: no learned or RL signal, no forecast model, no closed-loop or published-forecast feedback, and no fleet.",
+            "contributions": [
+              "C3"
+            ]
+          }
+        ],
+        "queries_run": [
+          "WebFetch Semantic Scholar citations of arXiv:2208.11344 (Genser): 12 citing works; only HONEST-CAV (already known) touches SPaT prediction with MARL signals",
+          "WebFetch Semantic Scholar citations of DOI:10.3390/s25061664 (Eteifa): 9 citing works; flagged the 2026 ML + digital-twin SPaT prediction paper",
+          "WebFetch Semantic Scholar citations of DOI:10.3390/s22197501 (Maadi): 36 citing works; flagged Majstorovic 2025 (speed-transition-matrix Q-learning signal); rest are generic RL/adaptive TSC",
+          "WebFetch Semantic Scholar citations of DOI:10.3141/2390-06 (Stevanovic): 47 citing works; flagged actuated-signal SPaT prediction papers (TRR 2024/2025/2026, ITSC 2020) and the AF-GLOSA RL paper",
+          "WebSearch: \"Integrated Machine Learning and Digital Twin Model for Predicting Traffic Signal Phasing and Timing\"",
+          "WebSearch: \"Adaptive Frequency Green Light Optimal Speed Advisory\" hybrid actor-critic actuated signal uncertainty",
+          "WebSearch: \"Dual-Layer Machine Learning Approach for Predicting Switching Times of Vehicle-Actuated Signal Phases\"",
+          "WebSearch: \"Traffic Signal Phase and Timing Prediction: A Machine Learning and Controller Logic Hybrid Approach\"",
+          "WebSearch: predicting phase timing of reinforcement learning controlled traffic signal for GLOSA eco-driving SPaT prediction deep RL signal",
+          "WebSearch: GLOSA speed advisory interaction actuated traffic signal detector green extension vehicles slow down changes signal timing feedback",
+          "WebSearch: GLOSA equipped vehicles influence actuated signal switching time prediction accuracy feedback penetration rate",
+          "WebSearch: eco-approach connected vehicles reinforcement learning traffic signal halting count state interaction speed advisory degrades signal controller",
+          "WebSearch: time-to-green prediction for reinforcement learning traffic light controller GLOSA learned signal SPaT forecast uncertainty",
+          "WebSearch: \"speed advisory\" adaptive traffic signal control interaction detector vehicles gliding arrival distribution changes adaptive signal timing GLOSA conflict",
+          "WebFetch rosap.ntl.bts.gov/view/dot/79024 (Shafik/Eteifa/Rakha GLOSA + domain-knowledge SPaT report)",
+          "Budget used: 10/10 WebSearch, 5/5 WebFetch. Result: no forward citation of the four seeds predicts SPaT of a learned/RL signal, except the already-known HONEST-CAV. None shows speed-advised vehicles changing a learned signal's behaviour; the one unverified lead for actuated signals is TRC-30 paper 296."
+        ]
+      }
+    },
+    {
+      "key": "non-english",
+      "result": {
+        "candidates": [
+          {
+            "title": "Methoden zur Schaltzeitprognose an verkehrsabhängigen Lichtsignalanlagen (Methods for switching-time prediction at traffic-actuated signal installations), DFG project 461855625, Universität Kassel, Institut für Verkehrswesen",
+            "url": "https://www.uni-kassel.de/fb14bau/institute/institut-fuer-verkehrswesen-ifv/verkehrstechnik-und-transportlogistik/forschung/methoden-zur-schaltzeitprognose-an-verkehrsabhaengigen-lichtsignalanlagen.html",
+            "venue": "DFG research project page (Univ. Kassel)",
+            "year": "2022-2024",
+            "severity": "component",
+            "opened": true,
+            "overlap": "C3 building block. It predicts SPaT switching times for traffic-actuated (detector-driven) signals so GLOSA can be offered there. Its research questions cover combining signal-program/controller knowledge with prediction of control-relevant parameters, which is the same structural idea as the paper's exact-plus-learned hybrid. A search snippet (source not pinned between this page and the TRID record below) said SVM, neural networks and RL were evaluated and the framework uses decision-tree ensembles plus model knowledge.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "The page names no learned or RL signal controller, no quantile or conditional forecast trained on forecast-published closed-loop logs, no analysis of published forecasts feeding back into detector calls or green extension (C2), no count adapter and no frozen-policy setting."
+          },
+          {
+            "title": "Ein Verfahren zur Prognose verkehrsabhaengiger Schaltzeiten von Lichtsignalanlagen (A method for predicting traffic-dependent switching times of traffic signals)",
+            "url": "https://trid.trb.org/View/1482711",
+            "venue": "TRID record (German-language publication)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C3 building block: a switching-time forecast for traffic-dependent signals to feed GLOSA. This may be where the 'decision-tree ensemble plus model knowledge' hybrid in the search snippet comes from; that attribution is unverified.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "From the snippet only: no learned signal controller, no closed-loop or self-defeating forecast analysis, no adapter. Not opened."
+          },
+          {
+            "title": "Dissertation by Robert Bodenheimer, FAU Erlangen-Nürnberg, on GLOSA and signal-state prognosis for adaptive traffic lights (exact title not retrieved; fetch hit a redirect to open.fau.de/handle/openfau/8121)",
+            "url": "https://opus4.kobv.de/opus4-fau/files/8121/DissertationRobertBodenheimer.pdf",
+            "venue": "Doctoral dissertation, FAU Erlangen-Nürnberg (OPUS)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C3 building block. Per the search snippet, the forecast system runs independently of the signal's control strategy and gives each forecast a quality level through continuous self-assessment, which resembles a confidence-aware forecast. It lets a real GLOSA system run without changing the traffic lights.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "From the snippet: built for conventional adaptive/actuated controllers, not an RL signal. No evidence of modelling feedback from guided vehicles onto the controller's detector or halting inputs (C2), no frozen-policy adapter (C4/C5), no closed-loop forecast training. Not opened, so it should be checked before citing."
+          },
+          {
+            "title": "EP4046150 - Verfahren und Anordnung zur Prognose von Schaltzeitpunkten einer Signalgruppe einer Signalanlage zur Steuerung eines Verkehrsflusses (Method and arrangement for predicting switching time points of a signal group of a signal system for controlling traffic flow) [English title from the snippet; German wording reconstructed, not seen verbatim]",
+            "url": "https://patents.google.com/patent/EP4046150C0/de",
+            "venue": "European patent (German-language)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "C3 building block: a patented switching-time forecast for a signal group, which is the input to GLOSA.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "Not opened. From the title it does not cover learned/RL signals, feedback through queue inputs, or a two-sided interface."
+          },
+          {
+            "title": "Traffic Signal Phase and Timing Prediction: A Machine Learning and Controller Logic Hybrid Approach",
+            "url": "https://vtechworks.lib.vt.edu/items/332914c0-6466-494e-abb1-8f3cb74641ae",
+            "venue": "Virginia Tech (VTechWorks)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Closest component found for C3's 'hybrid' design. It combines deterministic controller logic with ML to predict SPaT, which mirrors the exact-time-to-green-in-determined-states plus learned-forecast split. It is English-language and sits outside this non-English assignment, but it is not in the known list.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "Not opened. It appears to target conventional actuated controllers, not a learned DQN signal. No sign of closed-loop training on forecast-published logs, quantile/state-conditioned output, the self-defeating-forecast mechanism, or a signal-side adapter."
+          },
+          {
+            "title": "Connected Eco-Driving Technologies for Adaptive Traffic Signal Control",
+            "url": "https://rosap.ntl.bts.gov/view/dot/40886",
+            "venue": "US DOT report (ROSA P)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Fleet-side building block. Per the snippet it builds methods to generate meaningful SPaT from real adaptive control systems and shows eco-driving still saves fuel with imperfect timing information. This matches the paper's premise that eco-driving loses some benefit when signal timing becomes uncertain or adaptive.",
+            "contributions": [
+              "C1",
+              "C3"
+            ],
+            "does_not": "Not opened. Adaptive, not learned, signals; no RL fleet; no feedback of eco-vehicles on the controller's halting counts; no count adapter; no frozen-both-policies setting."
+          },
+          {
+            "title": "面向信号交叉口随机环境生态驾驶的CAV深度强化学习控制 (Deep Reinforcement Learning Control of CAVs for Eco-driving in Random Environments at Signalized Intersections), Qin Yanyan, Huang Yu, Yan Shiyi, Wang Hao",
+            "url": "https://zgglxb.chd.edu.cn/CN/10.19721/j.cnki.1001-7372.2025.07.020",
+            "venue": "中国公路学报 (China Journal of Highway and Transport) 38(7):262-274",
+            "year": "2025",
+            "severity": "component",
+            "opened": true,
+            "overlap": "Fleet-side component: a DRL eco-driving CAV policy at signalized intersections under a 'random environment', which may include random signal timing. It corresponds to the learned GLOSA fleet in C1.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "Only metadata was retrievable (the abstract did not render). Nothing shows a learned signal controller, a staged upgrade, effects on signal inputs, a forecast of an RL signal, or an adapter."
+          },
+          {
+            "title": "信号交叉口网联电动汽车自适应学习生态驾驶策略 (Adaptive-learning eco-driving strategy for connected electric vehicles at signalized intersections)",
+            "url": "https://xbgxb.jlu.edu.cn/rc-pub/front/front-article/download/33127104/lowqualitypdf/信号交叉口网联电动汽车自适应学习生态驾驶策略.pdf",
+            "venue": "吉林大学学报(工学版) (Journal of Jilin University, Engineering & Technology Edition); Southeast University authors per snippet",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Fleet-side component: a DDPG eco-driving policy for connected EVs at single and multiple signalized intersections, trading energy against throughput. It is a learned eco-driving fleet like the paper's PPO fleet.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "Not opened. The signal side appears conventional, with no learned signal, upgrade/staging, feedback or forecast analysis, or adapter."
+          },
+          {
+            "title": "Hierarchical soft actor-critic for joint optimization of signal timing and vehicle trajectories (South China University of Technology journal; exact title not retrieved, fetch returned 403)",
+            "url": "https://zrb.bjb.scut.edu.cn/CN/10.12141/j.issn.1000-565X.240549",
+            "venue": "华南理工大学学报(自然科学版) (Journal of South China University of Technology, Natural Science Edition) 53(12)",
+            "year": "2025",
+            "severity": "component",
+            "opened": false,
+            "overlap": "A Chinese joint-learning work in the same family as CoTV and Busch: a hierarchical SAC with one layer for signal timing and one for vehicle trajectories, which is both learned populations together.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "It is trained jointly, the opposite of C5's both-frozen staged upgrade. No forecast publication versus shadow, no self-defeating-forecast mechanism, no count adapter. Title and abstract not verified."
+          },
+          {
+            "title": "Queue Estimation and Consideration in Vehicle Trajectory Optimization at Actuated Signalized Intersections",
+            "url": "https://opact.sdu.edu.tr/vufind/SummonRecord/FETCH-ieee_primary_107334973",
+            "venue": "IEEE (library catalog record)",
+            "year": "",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Possible C2/C7 component. It couples queue estimation with eco-trajectory planning at actuated signals, the setting where guided vehicles' queue state matters to both sides. It may be from the Eteifa/Rakha group (already known), which would make it a known adjacent work.",
+            "contributions": [
+              "C2",
+              "C7"
+            ],
+            "does_not": "Not opened. It appears to estimate queues for the vehicle planner, not how guided vehicles change the signal's own queue/halting input and so the forecast target. No learned signal, no adapter."
+          },
+          {
+            "title": "KI4LSA - Künstliche Intelligenz für Lichtsignalanlagen, Whitepaper Transferfähigkeit (AI for traffic signals: transferability white paper)",
+            "url": "https://www.Iosb-ina.fraunhofer.de/content/dam/iosb/iosb-ina/documents/WhitePaper_KI4LSA.pdf",
+            "venue": "mFUND (BMDV) project white paper; Fraunhofer IOSB-INA, Stührenberg, CAT-Traffic; Lemgo real-world lab",
+            "year": "2023",
+            "severity": "background",
+            "opened": true,
+            "overlap": "Background for the C1 premise that cities really are upgrading to learned signals. An RL agent trained in SUMO (LemgoRL, open source) on camera-derived inputs ran a real signal in Lemgo (2020 to Aug 2022). It was put on an edge computer in the cabinet and sent phase requests through OCIT, with a transfer study across 5 municipalities. The text notes that more V2X data would favour AI control.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "No switching-time prognosis or GLOSA, no connected eco-driving fleet, no feedback of published forecasts, no adapter. The white paper's text was checked directly."
+          },
+          {
+            "title": "Robustness of Reinforcement Learning-Based Traffic Signal Control under Incidents: A Comparative Study",
+            "url": "https://arxiv.org/pdf/2506.13836",
+            "venue": "arXiv",
+            "year": "2025",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Background for C4: trained RL signal controllers degrade under distribution shift (incidents, sensor failures). The paper's adapter in front of a frozen signal answers the same kind of input shift.",
+            "contributions": [
+              "C4"
+            ],
+            "does_not": "Not opened. No eco-driving or GLOSA fleet as the cause of the shift, no input adapter, no forecast."
+          },
+          {
+            "title": "Adaptive Frequency Green Light Optimal Speed Advisory based on Hybrid Actor-Critic Reinforcement Learning",
+            "url": "https://arxiv.org/pdf/2306.04660",
+            "venue": "arXiv",
+            "year": "2023",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Background: an RL-based GLOSA fleet policy, like the paper's learned eco-driving side.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "Not opened. Presumably fixed or known signal timing, no learned signal, no forecast feedback, no adapter."
+          }
+        ],
+        "queries_run": [
+          "WebSearch: 强化学习 信号控制 生态驾驶 网联车 协同 车速引导 论文",
+          "WebSearch: Schaltzeitprognose KI-gesteuerte Lichtsignalanlage Reinforcement Learning GLOSA",
+          "WebSearch: KI4LSA GLOSA Schaltzeitprognose",
+          "WebSearch: 自适应信号 信号灯 剩余时间 预测 车速引导 感应控制 不确定性",
+          "WebSearch: GLOSA Rückwirkung verkehrsabhängige Steuerung Detektor Belegung Prognose",
+          "WebSearch: 车速引导 感应控制 信号交叉口 检测器 绿灯延长 相互影响 网联车 渗透率",
+          "WebSearch: 强化学习信号控制 状态 排队车辆数 停车 速度阈值 网联车 生态驾驶 影响 鲁棒性 迁移 不重新训练",
+          "WebSearch: 专利 强化学习 信号灯 配时 预测 发布 车辆 车速引导 信号相位 预测 深度强化学习 控制 路口",
+          "WebSearch: Rückwirkung Fahrempfehlung GLOSA verkehrsabhängige Lichtsignalanlage Prognose beeinflusst Steuerung Ampelphasenassistent",
+          "WebSearch: 强化学习 信号控制 智能体 信号配时 预测 网联车辆 SPaT 发布 预测 不确定 生态驾驶 联合 冻结",
+          "WebFetch: Fraunhofer IOSB-INA KI4LSA white paper PDF (text extracted locally with pdftotext)",
+          "WebFetch: Uni Kassel DFG project page Methoden zur Schaltzeitprognose",
+          "WebFetch: zgglxb.chd.edu.cn 10.19721/j.cnki.1001-7372.2025.07.020 (metadata only)",
+          "WebFetch: Bodenheimer dissertation PDF (301 redirect to open.fau.de, not followed; budget exhausted)",
+          "WebFetch: zrb.bjb.scut.edu.cn 10.12141/j.issn.1000-565X.240549 (HTTP 403)",
+          "Summary: the Chinese and German searches found no full or partial match for C1, C2, C4, C5, C6 or C7. Hits were components: switching-time prognosis for actuated signals (Kassel DFG, TRID, Bodenheimer, EP4046150), learned eco-driving fleets (Qin 2025, Jilin), and joint signal-plus-trajectory learning (SCUT 2025). The German GLOSA feedback (Rückwirkung) query returned no work on guided vehicles changing the controller's detector or halting input. KI4LSA is a real deployed RL signal with no GLOSA or forecast component. Maadi 2022 (PMC9572689) and Busch/TU Dresden (fis.tu-dresden.de) came up but are already known."
+        ]
+      }
+    },
+    {
+      "key": "grey-theses",
+      "result": {
+        "candidates": [
+          {
+            "title": "Using Reinforcement Learning to Combine Green Light Optimised Speed Advisory and Responsive Traffic Control Systems with Non-Autonomous Vehicles: Effects of Imperfect Training and Incomplete Information (PhD thesis, William Paine, University of Southampton)",
+            "url": "https://eprints.soton.ac.uk/502165",
+            "venue": "University of Southampton doctoral thesis (ePrints Soton 502165)",
+            "year": "2025",
+            "severity": "partial",
+            "opened": false,
+            "overlap": "This is the closest grey-literature hit. The abstract snippets I saw say that GLOSA becomes a detriment when paired with responsive traffic control systems (RTCs), that RTCs cannot give accurate long-term signal plans without mitigation, and that RL frameworks are built to combine GLOSA with RTCs for connected non-autonomous vehicles. 'Imperfect training and incomplete information' sits close to our no-retraining, frozen-policy setting. It shares the problem (C1: the speed-advice benefit collapses once signals become responsive) and probably the remedy direction (C5: repair the GLOSA-signal interface). The full text returned HTTP 403 for both the PDF and the landing page, so I could not check four things: whether the RTC is a learned (RL) controller or a conventional one (MOVA/SCOOT/actuated); whether either policy is frozen; whether the mechanism is the detector/queue feedback of C2; and whether it uses a signal-side adapter (C4) or a quantile forecast (C3).",
+            "contributions": [
+              "C1",
+              "C2",
+              "C3",
+              "C5"
+            ],
+            "does_not": "From the snippets alone, nothing shows both learned policies held frozen, a two-sided interface (fleet-side forecast plus signal-side count adapter), a self-defeating-forecast analysis through halting counts, or a pre-registered non-inferiority/crossed-bootstrap design. The full text must be read before the paper is submitted. This is the top-priority collision to check."
+          },
+          {
+            "title": "MAVEN - Managing Automated Vehicles Enhances Network (H2020 project 690727): infrastructure-assisted platoon negotiation, GLOSA and negotiation-driven adaptive traffic control",
+            "url": "https://cordis.europa.eu/project/id/690727/reporting",
+            "venue": "EU Horizon 2020 project reporting (CORDIS)",
+            "year": "2016-2019",
+            "severity": "component",
+            "opened": false,
+            "overlap": "In this EU project, GLOSA is coupled bi-directionally with an adaptive signal controller. Vehicles send trip details to the signal, which uses them to improve its queue-length estimate, and the signal plan is updated through negotiation. That is a signal-side input correction built from vehicle information, a building block related to C4 (repairing what the signal 'sees' about the advised vehicles) and to the two-sided framing of C5.",
+            "contributions": [
+              "C4",
+              "C5"
+            ],
+            "does_not": "The controller is conventional/optimisation-based, not a frozen learned controller. The fleet policy is not a learned PPO policy, and the design is co-designed and negotiated rather than retrofitted with both policies frozen. There is no forecast quantile model, no self-defeating-forecast analysis, and no non-inferiority statistics."
+          },
+          {
+            "title": "Enabling GLOSA through Domain Knowledge Aware SPaT Prediction and Queue Length Aware Trajectory Optimization (USDOT UTC final report; factsheet also on ROSAP)",
+            "url": "https://rosap.ntl.bts.gov/view/dot/79024",
+            "venue": "USDOT / ROSAP university transportation center report",
+            "year": "2024 (approx.)",
+            "severity": "component",
+            "opened": false,
+            "overlap": "This agency report pairs SPaT prediction for actuated signals, made 'domain-knowledge aware' (controller logic combined with a learned predictor), with queue-length-aware GLOSA trajectory optimisation. That is one building block of C3 (a hybrid of exact controller logic and a learned forecast) and touches the queue interaction behind C2.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "The controller is a conventional actuated signal, not a learned (DQN) one. The predictor is not trained closed-loop on forecast-published logs. There is no publish-versus-shadow or self-defeating-forecast analysis, no signal-side adapter, and no frozen-policy staged-upgrade setting. Possibly related to the already-known Eteifa work; I did not open it to confirm the authors."
+          },
+          {
+            "title": "Optimal Trajectory Planning Algorithm for Connected and Autonomous Vehicles towards Uncertainty of Actuated Traffic Signals (Morgan State UMEC project report)",
+            "url": "https://morgan.edu/national-transportation-center/umec-(2016-2023)/optimal-trajectory-planning-algorithm-for-connected-and-autonomous-vehicles-towards-uncertainty-of-actuated-traffic-signals",
+            "venue": "Urban Mobility & Equity Center (USDOT UTC) report",
+            "year": "2016-2023 programme",
+            "severity": "component",
+            "opened": false,
+            "overlap": "This robust GLOSA for actuated signals consumes a probability distribution over the switching times derived from SPaT, using A* inside dynamic programming. It reports 37% fuel savings with deterministic SPaT and 30% with stochastic SPaT. That is a distributional/probabilistic time-to-green input to the fleet, a component of C3's quantile forecast.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "The signal is conventional actuated, not learned. The forecast is not trained closed-loop and does not include the vehicles' own effect on the signal. There is no signal-side adapter, no frozen learned fleet, and no staged-upgrade setting."
+          },
+          {
+            "title": "Deep Reinforcement Learning for the Joint Control of Traffic Light Signaling and Vehicle Speed Advice",
+            "url": "https://arxiv.org/abs/2309.09881",
+            "venue": "arXiv preprint",
+            "year": "2023",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Both the traffic light and the vehicle speed advice are learned with deep RL, and the joint control lowers trip delay in 8 of 11 benchmarks compared with controlling the lights alone. This is the joint-training baseline class that the paper contrasts with (no retraining, both policies frozen).",
+            "contributions": [
+              "C5"
+            ],
+            "does_not": "The policies are trained jointly, which is exactly what the paper avoids. There is no staged upgrade, no frozen policies, no published forecast and no self-defeating analysis, no count adapter, and no non-inferiority design."
+          },
+          {
+            "title": "Cloudy with a Chance of Green: Measuring the Predictability of 18,009 Traffic Lights in Hamburg",
+            "url": "https://arxiv.org/abs/2403.18830",
+            "venue": "arXiv preprint (traffic-light assistance / time-to-green services)",
+            "year": "2024",
+            "severity": "background",
+            "opened": false,
+            "overlap": "This is a large-scale field study of how predictable adaptive and actuated lights are for time-to-green services. It notes that vehicle detectors and public-transport priority can change operation within seconds. It gives background evidence that adaptive signals undermine SPaT forecasts.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "It measures predictability only. There are no learned signals, no closed-loop effect of the published forecast on the signal, and no interface repair."
+          },
+          {
+            "title": "KI4LSA - Artificial intelligence for light signal systems (Fraunhofer IOSB-INA project)",
+            "url": "https://www.iosb-ina.fraunhofer.de/en/divisions/Machine-Learning/Research-topics-and-projects/Project-KI4LSA-Artificial-intelligence-for-light-signal-systems.html",
+            "venue": "German federal research project (Fraunhofer IOSB-INA, Lemgo)",
+            "year": "2020-2023",
+            "severity": "background",
+            "opened": false,
+            "overlap": "This was a real-world deployment of a deep-RL signal controller, which is the 'city upgrades to a learned signal' half of the staged-upgrade setting (C1). The search snippets do not say whether the project studied the deployed RL signal's interaction with GLOSA or SPaT services.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "Nothing I saw addresses a learned eco-driving fleet, published SPaT forecasts of the learned signal, or a count adapter. I did not check whether the project produced GLOSA/time-to-green deliverables."
+          }
+        ],
+        "queries_run": [
+          "thesis GLOSA eco-driving vehicles interaction with adaptive traffic signal control queue detection",
+          "KI4LSA reinforcement learning traffic signal control GLOSA forecast signal prediction adaptive",
+          "FHWA report eco-approach and departure actuated signal control SPaT prediction uncertainty connected vehicles",
+          "GLOSA vehicles change detector actuation feedback actuated signal timing prediction becomes invalid self-fulfilling OR feedback speed advice",
+          "MAVEN project deliverable GLOSA adaptive traffic light control automated vehicles platoon negotiation signal timing",
+          "dissertation 2023 eco-driving connected vehicles reinforcement learning traffic signal control interaction mixed learned policies",
+          "predictability of reinforcement learning traffic signal controller for GLOSA switching time prediction thesis",
+          "Talking Traffic iVRI time-to-green prediction reliability adaptive control interaction speed advice report",
+          "\"Using Reinforcement Learning to Combine Green Light Optimised Speed Advisory and Responsive Traffic Control Systems\"",
+          "Paine GLOSA responsive traffic control MOVA detriment reinforcement learning Southampton SUMO",
+          "eco-approach vehicles not detected stopped queue adaptive signal controller underestimates demand GLOSA penetration rate loop detector thesis TransAID OR Hi-Drive OR C-Roads (NOTE: 11th search, one over the 10-search budget)",
+          "WebFetch eprints.soton.ac.uk/502165/1/Final_Thesis.pdf (HTTP 403)",
+          "WebFetch eprints.soton.ac.uk/502165 (HTTP 403)",
+          "WebFetch vtechworks.lib.vt.edu/items/332914c0-6466-494e-abb1-8f3cb74641ae (Eteifa 2024 dissertation; already known, not reported)",
+          "WebFetch rosap.ntl.bts.gov/view/dot/40886 (NYSERDA 2019 Connected Eco-Driving for Adaptive Signal Control; already known as NYSERDA 19-08, not reported)"
+        ]
+      }
+    },
+    {
+      "key": "venues-2025-2026",
+      "result": {
+        "candidates": [
+          {
+            "title": "(Univ. of Southampton doctoral thesis) Frameworks combining GLOSA with Reinforcement-Learning Traffic Control (RLTC) for Connected Non-Autonomous Vehicles",
+            "url": "https://eprints.soton.ac.uk/502165",
+            "venue": "University of Southampton ePrints, PhD thesis (Final_Thesis.pdf at https://eprints.soton.ac.uk/502165/1/Final_Thesis.pdf)",
+            "year": "c. 2025 (search snippet; record page returned HTTP 403, year not verified)",
+            "severity": "partial",
+            "opened": false,
+            "overlap": "This is the closest hit in this venue sweep. According to the search-result summary, the thesis argues that GLOSA hurts when paired with responsive traffic control, because a responsive controller cannot give accurate long-term signal plans. It then builds RL frameworks that combine GLOSA with an RL traffic controller for connected non-autonomous (human-driven) vehicles. That is the same core problem as C1 (a speed-advisory fleet loses its benefit when the signals become adaptive or learned). It also touches C3 (supplying timing information from an RL controller to GLOSA vehicles). Reported result: positive at 55% of saturation, negative at 70%, because the RL controller could not regularly reach states where vehicles approach without queue obstruction.",
+            "contributions": [
+              "C1",
+              "C3"
+            ],
+            "does_not": "Both the record page and the PDF returned 403, so the following could not be verified. Whether the RL controller and the GLOSA logic are designed or trained jointly. Whether either policy is kept frozen. Whether the vehicle side is a learned (PPO) policy rather than advisory to human drivers. Whether the thesis identifies the halting-count or queue-input feedback mechanism (C2), a count adapter in front of a frozen signal (C4), or a crossed-seed non-inferiority design (C6). The framing ('frameworks designed to combine GLOSA and RTCs') suggests co-design rather than the paper's frozen-both repair."
+          },
+          {
+            "title": "Enabling GLOSA through Domain Knowledge Aware SPaT Prediction and Queue Length Aware Trajectory Optimization",
+            "url": "https://rosap.ntl.bts.gov/view/dot/79024",
+            "venue": "USDOT SMARTER University Transportation Center (Morgan State University) final report, ROSA P (factsheet: https://rosap.ntl.bts.gov/view/dot/86575)",
+            "year": "2024-2025 (SMARTER Center 2023-2029 project; exact year not verified)",
+            "severity": "component",
+            "opened": false,
+            "overlap": "A hybrid SPaT predictor that combines deep learning with traffic-controller domain logic, so that predictions stay consistent with controller rules. It is paired with queue-length-aware GLOSA trajectory optimisation. This is a building block of C3 (a hybrid exact-plus-learned SPaT forecast) and is close to the paper's exact time-to-green during determined yellow plus a quantile forecast.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "It predicts conventional actuated or adaptive controllers, not a learned DQN signal. Based on the snippets, it does not train the forecast closed-loop on forecast-published logs, does not model the published forecast changing the controller's input (C2), and has no frozen learned fleet or signal-side adapter."
+          },
+          {
+            "title": "Traffic Signal Phase and Timing Prediction: A Machine Learning and Controller Logic Hybrid Approach",
+            "url": "https://vtechworks.lib.vt.edu/items/332914c0-6466-494e-abb1-8f3cb74641ae",
+            "venue": "Virginia Tech VTechWorks (dissertation or report)",
+            "year": "c. 2024-2025 (not verified)",
+            "severity": "component",
+            "opened": false,
+            "overlap": "A hybrid of ML and controller logic for SPaT prediction, which is the same building block as the paper's exact-plus-learned hybrid forecast (C3). This may be the Eteifa group's work: the related 2025 PMC paper 'Deep Learning Ensemble Approach for Predicting Expected and Confidence Levels of SPaT at Actuated Traffic Signals' (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11944547/) appears to be Eteifa, who is already on the known list. In that case this item only confirms the known prior work.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "It targets actuated controllers, not a learned signal. Based on what the search showed, there is no closed-loop or forecast-published training, no feedback analysis, and no frozen learned fleet."
+          },
+          {
+            "title": "RobustLight: Improving Robustness via Diffusion Reinforcement Learning for Traffic Signal Control",
+            "url": "https://proceedings.mlr.press/v267/li25cs.html",
+            "venue": "ICML 2025 (PMLR v267)",
+            "year": "2025",
+            "severity": "component",
+            "opened": false,
+            "overlap": "An input-side module (diffusion-based denoising or imputation of the observed traffic state) placed in front of an RL traffic-signal controller to restore performance when its observations are corrupted. My recollection, not verified on the page, is that it plugs into pre-trained TSC agents. It is a generic building block for C4: repairing the observation channel of a learned signal without retraining the signal policy.",
+            "contributions": [
+              "C4"
+            ],
+            "does_not": "It targets noise, missing data or attacks, not a systematic physical shift caused by eco-driving vehicles gliding above the halting threshold. It has no 2-parameter speed-binned count model, no learned vehicle fleet, no SPaT forecast and no two-sided repair (C5). The page was not opened, so its plug-in-to-frozen-agent property is unverified."
+          },
+          {
+            "title": "Evaluating the Robustness of Reinforcement Learning based Adaptive Traffic Signal Control",
+            "url": "https://arxiv.org/abs/2603.15283",
+            "venue": "arXiv (Kwesiga, Guin, Abdelghany, Hunter; Georgia Tech)",
+            "year": "2026",
+            "severity": "background",
+            "opened": true,
+            "overlap": "Tests trained (frozen) RL signal controllers with an eight-phase ring-barrier configuration under unseen demand patterns, against actuated control. This is related to deploying a learned signal under distribution shift.",
+            "contributions": [],
+            "does_not": "No connected, eco-driving or learned vehicles. No observation shift caused by a vehicle population. No adapters and no SPaT forecasts (confirmed on the abstract page)."
+          },
+          {
+            "title": "TRC-30 paper 296: queue-estimation-aware GLOSA at actuated signals",
+            "url": "https://trc-30.epfl.ch/wp-content/uploads/2024/09/TRC-30_paper_296.pdf",
+            "venue": "TRC-30 (EPFL Transportation Research Conference)",
+            "year": "2024",
+            "severity": "background",
+            "opened": false,
+            "overlap": "GLOSA near actuated signals with real-time queue estimation from loop detectors and probes. It reports large savings for individual vehicles (up to 35.7%) but only about 1% at the intersection level once queuing is considered, so the benefit is eroded by the signal and queue interaction. This is related to C1 and C2.",
+            "contributions": [],
+            "does_not": "No learned signal, no learned fleet, and no mechanism in which advised vehicles leave the controller's halting or queue input. Slightly outside the 2025-2026 window."
+          },
+          {
+            "title": "Connected Eco-Driving Technologies for Adaptive Traffic Signal Control",
+            "url": "https://rosap.ntl.bts.gov/view/dot/40886",
+            "venue": "USDOT ROSA P report",
+            "year": "pre-2025 (not verified)",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Eco-driving under adaptive (non-fixed) signal control, where SPaT is uncertain. This is related to C1's observation that a fleet calibrated to fixed-time SPaT degrades once signals adapt. A companion report covers eco-driving under uncertain traffic and signal conditions: https://rosap.ntl.bts.gov/view/dot/54551/dot_54551_DS1.pdf.",
+            "contributions": [],
+            "does_not": "Neither the signal nor the vehicles are learned policies, there is no staged-upgrade or frozen-policy framing, and there is no adapter. The likely date falls outside the 2025-2026 window."
+          }
+        ],
+        "queries_run": [
+          "WebSearch: learned traffic signal control eco-driving connected vehicles distribution shift frozen policy 2025",
+          "WebSearch: reinforcement learning signal controller GLOSA vehicles separately trained interaction mismatch arXiv 2025 2026",
+          "WebSearch: \"signal phase and timing\" prediction reinforcement learning traffic signal controller GLOSA forecast 2025",
+          "WebSearch: RL traffic signal control robustness CAV penetration connected vehicle observation shift adapter frozen controller 2026 IEEE ITSC",
+          "WebSearch: eco-driving agent trained fixed-time signals tested under adaptive RL signal control performance degradation SPaT uncertainty 2025 2026",
+          "WebSearch: speed advisory vehicles affect queue detection actuated adaptive signal feedback loop GLOSA self-defeating prediction",
+          "WebSearch: performative prediction traffic signal timing forecast feedback connected vehicles 2025 2026 arXiv",
+          "WebSearch: ad hoc teamwork zero-shot coordination traffic signal agent automated vehicle agents independently trained policies arXiv 2025",
+          "WebSearch: deep reinforcement learning traffic signal and eco-driving vehicles mutual adaptation non-stationarity co-evolution separately trained agents 2026 transportation research part C",
+          "WebSearch: GLOSA with reinforcement learning traffic control signal timing forecast published to vehicles queue obstruction thesis Southampton",
+          "WebFetch: https://eprints.soton.ac.uk/502165 (HTTP 403)",
+          "WebFetch: https://athene-forschung.unibw.de/doc/141042/141042.pdf (Rostami-Shahrbabaki et al., IFAC 2020, RL trajectory advisory; out of window, not reported)",
+          "WebFetch: https://arxiv.org/abs/2603.15283 (opened)",
+          "WebFetch: https://eprints.soton.ac.uk/502165/1/Final_Thesis.pdf (HTTP 403)",
+          "WebFetch: https://arxiv.org/abs/2605.29693 (Momentum-Based Reward for low-emission TSC; signal only, not relevant)"
+        ]
+      }
+    },
+    {
+      "key": "marl-compat",
+      "result": {
+        "candidates": [
+          {
+            "title": "STAMP: Scalable Task And Model-agnostic Collaborative Perception",
+            "url": "https://arxiv.org/abs/2501.18616",
+            "venue": "ICLR 2025",
+            "year": "2025",
+            "severity": "component",
+            "opened": true,
+            "overlap": "A two-sided interface between independently trained, heterogeneous agents (connected vehicles). Lightweight adapter-reverter pairs on both sides map each agent's BEV features into a shared protocol domain and back, so existing agents can collaborate without joint retraining and without sharing model details. It is the closest general analogue of C4/C5's 'repair the interface on both sides around existing learned models', and it targets traffic.",
+            "contributions": [
+              "C5",
+              "C4"
+            ],
+            "does_not": "Perception only, with no control loop, no learned signal controller, no forecast and no feedback or performative effect. Adapters are trained per agent toward a common protocol. The abstract does not explicitly say the agents' models stay frozen. There is no staged upgrade of one population, no self-defeating forecast, no non-inferiority design."
+          },
+          {
+            "title": "One is Plenty: A Polymorphic Feature Interpreter for Immutable Heterogeneous Collaborative Perception (PolyInter)",
+            "url": "https://arxiv.org/abs/2411.16799",
+            "venue": "CVPR 2025",
+            "year": "2024",
+            "severity": "component",
+            "opened": true,
+            "overlap": "Explicitly targets 'immutable' heterogeneous agents (fixed perception networks that cannot be modified). One shared interpreter, with small per-agent learnable prompts, bridges the semantic gap, so a new agent type joins by training about 1.4% of parameters. It is an adapter between frozen, independently trained vehicle agents (traffic). Per the search result it is compared against PnPDA and MPDA, described as the only earlier interpreters for immutable heterogeneous collaboration.",
+            "contributions": [
+              "C4",
+              "C5"
+            ],
+            "does_not": "One-sided: only the ego agent interprets the others' features. Perception, not control. No closed loop through queues or signals, no forecast, no upgrade-induced loss of benefit."
+          },
+          {
+            "title": "BOLT: Online Lightweight Adaptation for Preparation-Free Heterogeneous Cooperative Perception",
+            "url": "https://arxiv.org/abs/2605.00405",
+            "venue": "arXiv",
+            "year": "2026",
+            "severity": "component",
+            "opened": true,
+            "overlap": "Independently trained single-agent detectors with no pre-deployment coordination. The ego model stays frozen, and a 0.9M-parameter online adapter (ego-as-teacher distillation) aligns neighbours' features at runtime. Same 'no joint training, no retraining of deployed models, lightweight calibrated adapter' framing as C4, in V2V traffic (DAIR-V2X, OPV2V).",
+            "contributions": [
+              "C4"
+            ],
+            "does_not": "One-sided, perception only, no learned controller or control loop, no forecast or performative effect, no two-population upgrade staging."
+          },
+          {
+            "title": "TaCA: Upgrading Your Visual Foundation Model with Task-agnostic Compatible Adapter",
+            "url": "https://arxiv.org/abs/2306.12642",
+            "venue": "arXiv",
+            "year": "2023",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Upgrade-compatibility setting: when the upstream foundation model is upgraded, a parameter-efficient compatible adapter lets the frozen downstream modules keep working without retraining. This is the general ML analogue of C1's 'one component upgraded, the other frozen, restore compatibility with an adapter'.",
+            "contributions": [
+              "C1",
+              "C4"
+            ],
+            "does_not": "Static feed-forward pipeline, not two interacting learned agent populations. No closed-loop dynamics, no performative feedback, no RL policies, no traffic. Seen via search snippet only."
+          },
+          {
+            "title": "X-Adapter: Adding Universal Compatibility of Plugins for Upgraded Diffusion Model",
+            "url": "https://arxiv.org/html/2312.02238v3",
+            "venue": "CVPR 2024 (arXiv)",
+            "year": "2023",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Same upgrade-compatibility pattern: plugins trained for the old base model are kept frozen and reused on an upgraded base model through a learned adapter, so the downstream components need no retraining.",
+            "contributions": [
+              "C1",
+              "C4"
+            ],
+            "does_not": "Generative-model plugins. No interacting agents, closed loop, forecast or traffic. Seen via search snippet only."
+          },
+          {
+            "title": "MUSCLE: A Model Update Strategy for Compatible LLM Evolution",
+            "url": "https://arxiv.org/html/2407.09435v2",
+            "venue": "arXiv (Apple ML Research)",
+            "year": "2024",
+            "severity": "component",
+            "opened": false,
+            "overlap": "After a base-model update, downstream task adapters regress (negative flips). A compatibility adapter reduces the regression, by up to about 40% from Llama 1 to Llama 2. This is the 'upgrade one side, frozen other side loses benefit, repair with a compatibility module' story in LLMs (cf. Bansal 2019, already known).",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "No multi-agent interaction, no closed-loop or performative feedback, the compatibility adapter is trained on the updated side, no traffic. Seen via search snippet only."
+          },
+          {
+            "title": "Learning Translations: Emergent Communication Pretraining for Cooperative Language Acquisition (ECTL / CLAP)",
+            "url": "https://www.ijcai.org/proceedings/2024/5",
+            "venue": "IJCAI 2024",
+            "year": "2024",
+            "severity": "component",
+            "opened": false,
+            "overlap": "A 'joiner' agent must interoperate with an existing, independently trained agent community whose emergent protocol it does not share. It learns a translator between its own protocol and the community's from a dataset of the community's interaction logs, without retraining the community. Closest MARL analogue of a translator between two independently trained populations learned from logs (cf. C3's quantile forecast trained on logs).",
+            "contributions": [
+              "C5",
+              "C3"
+            ],
+            "does_not": "One-sided (only the joiner adapts). Referential and communication games, not control through a physical queue. No upgrade staging, no performative or self-defeating effect, no traffic. Seen via search snippet only."
+          },
+          {
+            "title": "Multiplayer Performative Prediction: Learning in Decision-Dependent Games",
+            "url": "https://arxiv.org/abs/2201.03398",
+            "venue": "AISTATS 2022 / JMLR 2023",
+            "year": "2022",
+            "severity": "component",
+            "opened": false,
+            "overlap": "Formalizes performative feedback between several learned decision makers: the data distribution each learner sees depends on the decisions of all of them. This is the general mechanism behind C2, where the fleet's published forecast shifts the signal's input and hence the forecast target. It gives a formal model of such cross-learner feedback (relevant to C7).",
+            "contributions": [
+              "C2",
+              "C7"
+            ],
+            "does_not": "Learners repeatedly retrain toward performatively stable or Nash equilibria, the opposite of the frozen-policy setting. No interface or adapter fix, no queue model, no traffic. Seen via search snippet only."
+          },
+          {
+            "title": "Performative Time-Series Forecasting (PeTS / Feature Performative-Shifting)",
+            "url": "https://arxiv.org/html/2310.06077v1",
+            "venue": "arXiv",
+            "year": "2023",
+            "severity": "component",
+            "opened": false,
+            "overlap": "A forecaster whose published predictions induce distribution shift in the target (self-negating or self-fulfilling forecasts). FPS uses the delayed response to anticipate the performative shift. A building block for C3 (training the forecast on forecast-influenced data) and for C2's self-defeating forecast.",
+            "contributions": [
+              "C3",
+              "C2"
+            ],
+            "does_not": "Single forecaster with a generic population response, not a second frozen learned controller. No signal or queue mechanism, no adapter on the other side, no traffic SPaT. Seen via search snippet only."
+          },
+          {
+            "title": "When Is a Learned Command Adapter Worth It? Closed-Loop Identification and Counterfactual Auditing of Frozen Locomotion Policies",
+            "url": "https://arxiv.org/abs/2607.21867",
+            "venue": "arXiv",
+            "year": "2026",
+            "severity": "component",
+            "opened": true,
+            "overlap": "A learned adapter in front of a FROZEN learned (command-conditioned) policy, identified in closed loop, plus a pre-specified audit (GO/NO-GO) of whether the adapter recovers meaningful gain. Shares C4's 'adapter in front of a frozen learned controller' and the audit flavour of C6.",
+            "contributions": [
+              "C4",
+              "C6"
+            ],
+            "does_not": "Single agent (Go2 robot locomotion). No second learned population, no forecast, no performative feedback, no traffic. Mostly negative verdicts."
+          },
+          {
+            "title": "Independent Learning in Performative Markov Potential Games",
+            "url": "https://arxiv.org/abs/2504.20593",
+            "venue": "arXiv",
+            "year": "2025",
+            "severity": "background",
+            "opened": true,
+            "overlap": "Multi-agent performative RL: deployed policies change rewards and transitions for all agents, with performatively stable equilibria defined.",
+            "contributions": [
+              "C2"
+            ],
+            "does_not": "Assumes repeated retraining and independent policy gradient. No frozen populations, no interface or adapter, no traffic."
+          },
+          {
+            "title": "MEAL: A Benchmark for Continual Multi-Agent Reinforcement Learning",
+            "url": "https://arxiv.org/pdf/2506.14990",
+            "venue": "arXiv",
+            "year": "2025",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Partners are replaced by frozen new partners. It measures how an ego agent loses or retains performance when the partner population changes, an analogue of the C1 compatibility-loss phenomenon.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "The ego agent is retrained continually (EWC and similar). No adapter or interface, no performative forecast, no traffic."
+          },
+          {
+            "title": "Learning to Coordinate with Anyone (Macop, Multi-agent Compatible Policy Learning)",
+            "url": "https://arxiv.org/pdf/2309.12633",
+            "venue": "arXiv / DAI 2023",
+            "year": "2023",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Trains agents to remain compatible with diverse, evolving teammate groups: compatibility of a learned population with partners' policy changes.",
+            "contributions": [
+              "C1"
+            ],
+            "does_not": "Solves compatibility by training the controllable agents, not with an interface between two frozen populations. No performative or forecast mechanism, no traffic."
+          }
+        ],
+        "queries_run": [
+          "backward-compatible policy update multi-agent reinforcement learning frozen partner population compatibility after upgrade",
+          "translator adapter between independently trained frozen agents emergent communication zero-shot coordination without retraining",
+          "performative prediction two learners interacting feedback loop each other's predictions multi-player decision-dependent",
+          "\"backward compatibility\" policy update other agents learned model cooperative AI update regression partners adapted to old policy",
+          "learned interface between two frozen pretrained policies mutual adaptation both sides message encoder decoder heterogeneous agents interoperability",
+          "heterogeneous collaborative perception frozen encoders protocol adapter new agent joins without retraining STAMP PnPDA PolyInter",
+          "performative reinforcement learning multi-agent deployed policy changes other agents' responses frozen follower population",
+          "frozen ego policy partner upgraded incompatible conventions lightweight adapter restores coordination without retraining either agent",
+          "published forecast changes behavior that downstream learned controller observes performative forecasting closed-loop \"self-defeating\" machine learning two systems",
+          "upstream model update breaks frozen downstream model compatibility adapter interacting ML systems hidden feedback loop two models",
+          "WebFetch arxiv.org/abs/2607.21867",
+          "WebFetch arxiv.org/abs/2605.00405",
+          "WebFetch arxiv.org/abs/2504.20593",
+          "WebFetch arxiv.org/abs/2411.16799",
+          "WebFetch arxiv.org/abs/2501.18616"
+        ]
+      }
+    },
+    {
+      "key": "method-theory",
+      "result": {
+        "candidates": [
+          {
+            "title": "A Meta-Game Evaluation Framework for Deep Multiagent Reinforcement Learning (Li & Wellman)",
+            "url": "https://arxiv.org/abs/2405.00243",
+            "venue": "IJCAI 2024",
+            "year": "2024",
+            "severity": "component",
+            "opened": true,
+            "overlap": "Gives uncertainty for comparisons between learned agent populations by repeatedly resampling combinations of training seeds across several algorithms (self-play and cross-play cells), then bootstrapping statistics of the resulting empirical game. This is a close building block for C6, which uses a crossed bootstrap over the seeds of two independently trained populations.",
+            "contributions": [
+              "C6"
+            ],
+            "does_not": "Has no traffic or eco-driving content, no pre-registration and no non-inferiority margin. Its populations are agents in one game, not a frozen signal policy paired with a frozen vehicle fleet policy."
+          },
+          {
+            "title": "Bootstrapping data arrays of arbitrary order (Owen & Eckles)",
+            "url": "https://ar5iv.arxiv.org/html/1106.2125",
+            "venue": "Annals of Applied Statistics (arXiv 1106.2125)",
+            "year": "2012",
+            "severity": "component",
+            "opened": false,
+            "overlap": "The standard statistical method (pigeonhole or product bootstrap) for data indexed by two or more crossed random factors. In C6, signal-seed by fleet-seed cells are exactly such a two-way crossed array, so this paper is the reference for the method's validity and conservativeness.",
+            "contributions": [
+              "C6"
+            ],
+            "does_not": "Is not about RL, traffic or non-inferiority testing. It is a general statistical tool, so it should be cited, but it does not threaten novelty."
+          },
+          {
+            "title": "When the Reward Suite Is Leaky: A Preregistered Causal Contrast of Natural Verifier False Positives in RLVR",
+            "url": "https://arxiv.org/pdf/2607.11022",
+            "venue": "arXiv",
+            "year": "2026",
+            "severity": "component",
+            "opened": false,
+            "overlap": "From the search snippet: an RL evaluation that uses a one-sided non-inferiority contrast, rejecting inferiority when the one-sided 95% upper confidence bound on the gap falls below a margin fixed before any pilot data. This is the same pre-registered non-inferiority device as C6, used in RL.",
+            "contributions": [
+              "C6"
+            ],
+            "does_not": "It is about LLM RL with verifiable rewards, not traffic. Its bootstrap is not crossed over two learned populations. I saw only the snippet, not the full text."
+          },
+          {
+            "title": "Optimization of Vehicle Trajectories Considering Uncertainty in Actuated Traffic Signal Timings",
+            "url": "https://arxiv.org/pdf/2208.13709",
+            "venue": "arXiv",
+            "year": "2022",
+            "severity": "component",
+            "opened": false,
+            "overlap": "From the snippets: an infrastructure-to-vehicle setting where the actuated signal sends a probability distribution of the next switching time, and vehicles optimize trajectories against that distribution and update as it changes. This is a building block for C3, the distributional or quantile forecast consumed by an eco-approach fleet. It may belong to the already-known Genser or Eteifa lines; I did not check the authors.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "Forecasts a rule-based actuated controller, not a learned DQN signal. The forecast is not trained closed-loop on logs where it was published, and the paper does not model how the advised vehicles change the controller's input (C2)."
+          },
+          {
+            "title": "Arrangement and method for providing adaptation to queue length for traffic light assist-applications (US 11055995)",
+            "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11055995",
+            "venue": "USPTO patent",
+            "year": "unknown",
+            "severity": "component",
+            "opened": true,
+            "overlap": "The title, seen in search results, claims queue-length adaptation of traffic-light-assist (GLOSA-type) advice. That would be a fleet-side building block next to C3 and C2: advice that depends on the queue in front of the signal.",
+            "contributions": [
+              "C3"
+            ],
+            "does_not": "The fetched PDF was a scanned image and its claims could not be read, so the queue adaptation is confirmed by the title only. Nothing seen suggests it models the advice feeding back into the signal's detector or queue input, or a learned signal."
+          },
+          {
+            "title": "Information Design for Regulating Traffic Flows under Uncertain Network State (Wu & Amin)",
+            "url": "https://arxiv.org/pdf/1908.07105",
+            "venue": "arXiv / MIT DSpace",
+            "year": "2019",
+            "severity": "background",
+            "opened": false,
+            "overlap": "A Bayesian-persuasion analytical model: an authority designs a noisy signal sent to a fraction of travelers to steer the equilibrium flow, and the optimum is characterized in closed form against the fraction that receives the signal. It is the closest formal precedent for treating a published forecast as an information-design choice (publish vs shadow, penetration) for C7.",
+            "contributions": [
+              "C7"
+            ],
+            "does_not": "Covers route choice only. It has no signal timing, queues at an intersection, halting-count feedback into a signal controller, or learned policies."
+          },
+          {
+            "title": "JASSS 7(1) 1: traffic forecast and route-choice agent simulation (forecast-reacting drivers do not reach equilibrium)",
+            "url": "https://www.jasss.org/7/1/1.html",
+            "venue": "Journal of Artificial Societies and Social Simulation",
+            "year": "2004",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Per the search snippet, it shows that a traffic system where a large share of drivers react to the forecast will not reach equilibrium. This is a classic self-defeating-forecast result in traffic, in the same family as the already-known Bottom 2000.",
+            "contributions": [
+              "C2",
+              "C7"
+            ],
+            "does_not": "Covers route choice, not signal SPaT. It has no queue or detector channel into a signal controller and no learned signal or fleet."
+          },
+          {
+            "title": "How Many Random Seeds? Statistical Power Analysis in Deep Reinforcement Learning Experiments (Colas, Sigaud, Oudeyer)",
+            "url": "https://ar5iv.labs.arxiv.org/html/1806.08295",
+            "venue": "arXiv 1806.08295",
+            "year": "2018",
+            "severity": "background",
+            "opened": false,
+            "overlap": "Standard reference for seed-level t-tests and bootstrap confidence-interval tests and for choosing the number of seeds in deep RL comparisons. It supports how C6 sizes its seed panels.",
+            "contributions": [
+              "C6"
+            ],
+            "does_not": "Covers a single learned population per arm. It has no crossed two-population bootstrap, no non-inferiority margin, no pre-registration and no traffic."
+          }
+        ],
+        "queries_run": [
+          "WebSearch: self-defeating forecast published signal timing prediction queue feedback connected vehicles speed advisory",
+          "WebSearch: Bayesian persuasion information design traffic signal timing broadcast drivers",
+          "WebSearch: performative prediction traffic signal phase timing forecast adaptive signal control learned",
+          "WebSearch: GLOSA vehicles influence actuated signal detector \"feedback\" prediction accuracy degrade switching time forecast",
+          "WebSearch: non-inferiority margin pre-registered evaluation reinforcement learning traffic signal control seeds bootstrap",
+          "WebSearch: crossed random effects bootstrap two factors training seeds multi-agent reinforcement learning evaluation",
+          "WebSearch: eco-approach GLOSA vehicles change actuated or adaptive signal timing interaction \"time-to-green\" prediction closed loop penetration rate",
+          "WebSearch: strategic prediction publication signal phase forecast drivers react endogenous prediction game theory traffic light",
+          "WebSearch: self-defeating prediction queueing system published waiting time forecast customers react analytical model",
+          "WebSearch: GLOSA adaptive traffic lights influence on traffic light controller prediction vehicles react to advisory changes detector demand",
+          "WebSearch: information design signal phase and timing disclosure connected vehicles strategic SPaT persuasion intersection",
+          "WebFetch: ris.uni-paderborn.de/record/61492 (Malena ITSC 2025 - already known; confirmed no closed-loop GLOSA feedback modelled)",
+          "WebFetch: arxiv.org/abs/2405.00243 (Li & Wellman meta-game evaluation)",
+          "WebFetch: arxiv.org/abs/2411.03271 (red-light-violation warning; not relevant)",
+          "WebFetch: gepris.dfg.de/gepris/projekt/461855625 (failed - no content)",
+          "WebFetch: USPTO 11055995 PDF (scanned image, claims unreadable)"
+        ]
+      }
+    }
+  ],
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Find"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "find:patents",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a681334688137e08d",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503180,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334715001,
+      "tokens": 80067,
+      "toolCalls": 17,
+      "durationMs": 211816,
+      "resultPreview": "{\"candidates\":[{\"title\":\"Method for generating a traffic control signal (EP3594920A1)\",\"url\":\"https://patents.google.com/patent/EP3594920A1/en\",\"venue\":\"EPO patent application, Siemens Mobility GmbH\",\"year\":\"2018 (priority 2018-07-09)\",\"severity\":\"component\",\"opened\":true,\"overlap\":\"This is the closest patent to C4's architecture that we found. It inserts virtual detector signals in front of an ex…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "find:cite-chase-adapters",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a6251cd2e411c545b",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503181,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334616925,
+      "tokens": 74132,
+      "toolCalls": 17,
+      "durationMs": 112409,
+      "resultPreview": "{\"candidates\":[{\"title\":\"Final Thesis (University of Southampton, eprint 502165): GLOSA paired with responsive traffic control systems [exact title not retrieved, page returned 403]\",\"url\":\"https://eprints.soton.ac.uk/502165\",\"venue\":\"University of Southampton PhD thesis (ePrints Soton)\",\"year\":\"unknown (likely 2024-2025)\",\"severity\":\"partial\",\"opened\":false,\"overlap\":\"C1/C2. The search snippet st…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "find:cite-chase-spat",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a38af9f30af6e9c55",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503182,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334698753,
+      "tokens": 88323,
+      "toolCalls": 17,
+      "durationMs": 194238,
+      "resultPreview": "{\"candidates\":[{\"title\":\"Traffic Signal Phase and Timing Prediction: A Machine Learning and Controller Logic Hybrid Approach (PhD dissertation, S. Eteifa, Virginia Tech)\",\"url\":\"https://vtechworks.lib.vt.edu/items/332914c0-6466-494e-abb1-8f3cb74641ae\",\"venue\":\"Virginia Tech dissertation (VTechWorks)\",\"year\":\"2024\",\"severity\":\"component\",\"opened\":false,\"overlap\":\"Splits SPaT prediction into a deter…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "find:non-english",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a594aab862e39727c",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503182,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334675912,
+      "tokens": 86985,
+      "toolCalls": 19,
+      "durationMs": 171397,
+      "resultPreview": "{\"candidates\":[{\"title\":\"Methoden zur Schaltzeitprognose an verkehrsabhängigen Lichtsignalanlagen (Methods for switching-time prediction at traffic-actuated signal installations), DFG project 461855625, Universität Kassel, Institut für Verkehrswesen\",\"url\":\"https://www.uni-kassel.de/fb14bau/institute/institut-fuer-verkehrswesen-ifv/verkehrstechnik-und-transportlogistik/forschung/methoden-zur-schal…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "find:grey-theses",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a71a6b58898c6e03c",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503183,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334636961,
+      "tokens": 76324,
+      "toolCalls": 17,
+      "durationMs": 132445,
+      "resultPreview": "{\"candidates\":[{\"title\":\"Using Reinforcement Learning to Combine Green Light Optimised Speed Advisory and Responsive Traffic Control Systems with Non-Autonomous Vehicles: Effects of Imperfect Training and Incomplete Information (PhD thesis, William Paine, University of Southampton)\",\"url\":\"https://eprints.soton.ac.uk/502165\",\"venue\":\"University of Southampton doctoral thesis (ePrints Soton 502165)…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "find:venues-2025-2026",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "ac29babade2095cae",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503184,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334634649,
+      "tokens": 76137,
+      "toolCalls": 18,
+      "durationMs": 130133,
+      "resultPreview": "{\"candidates\":[{\"title\":\"(Univ. of Southampton doctoral thesis) Frameworks combining GLOSA with Reinforcement-Learning Traffic Control (RLTC) for Connected Non-Autonomous Vehicles\",\"url\":\"https://eprints.soton.ac.uk/502165\",\"venue\":\"University of Southampton ePrints, PhD thesis (Final_Thesis.pdf at https://eprints.soton.ac.uk/502165/1/Final_Thesis.pdf)\",\"year\":\"c. 2025 (search snippet; record page…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "find:marl-compat",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a98451baa50538aca",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503184,
+      "queuedAt": 1791334503163,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334709801,
+      "tokens": 79590,
+      "toolCalls": 17,
+      "durationMs": 205284,
+      "resultPreview": "{\"candidates\":[{\"title\":\"STAMP: Scalable Task And Model-agnostic Collaborative Perception\",\"url\":\"https://arxiv.org/abs/2501.18616\",\"venue\":\"ICLR 2025\",\"year\":\"2025\",\"severity\":\"component\",\"opened\":true,\"overlap\":\"A two-sided interface between independently trained, heterogeneous agents (connected vehicles). Lightweight adapter-reverter pairs on both sides map each agent's BEV features into a shar…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "find:method-theory",
+      "phaseIndex": 1,
+      "phaseTitle": "Find",
+      "agentId": "a1ba3ed54f22dcb7b",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791334503185,
+      "queuedAt": 1791334503164,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "PAPER (Oct 2026, SUMO): \"Staged Upgrades of Two Learned Populations: A Two-Sided Interface That Recovers a Learned Fleet's Benefit When Its Signals Are Upgraded\". A city upgrades fixed-time signals to a LEARNED signal controller (DQN; state = per-lane halting counts). A carmaker's LEARNED eco-driving/GLOSA fleet (PPO, trained under fixed-time SPaT) loses its fuel benefit. Neither policy is retrain…",
+      "promptFramed": true,
+      "lastProgressAt": 1791334641089,
+      "tokens": 78087,
+      "toolCalls": 18,
+      "durationMs": 136572,
+      "resultPreview": "{\"candidates\":[{\"title\":\"A Meta-Game Evaluation Framework for Deep Multiagent Reinforcement Learning (Li & Wellman)\",\"url\":\"https://arxiv.org/abs/2405.00243\",\"venue\":\"IJCAI 2024\",\"year\":\"2024\",\"severity\":\"component\",\"opened\":true,\"overlap\":\"Gives uncertainty for comparisons between learned agent populations by repeatedly resampling combinations of training seeds across several algorithms (self-pla…"
+    }
+  ],
+  "totalTokens": 639645,
+  "totalToolCalls": 140
+}

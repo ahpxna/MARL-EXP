@@ -135,8 +135,8 @@ function renderLists() {
   document.getElementById('table').innerHTML = '<tr><th>track</th><th>thí nghiệm</th><th>ledger</th><th>tốt</th><th>xấu</th><th>khác</th><th>report</th></tr>' + rows.join('');
 }
 const ciPlugin = { id:'ci', afterDatasetsDraw(chart) {
-  const { ctx, scales:{ y } } = chart; ctx.save(); ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1;
-  chart.data.datasets.forEach((ds, di) => { if (!ds.ci) return; const meta = chart.getDatasetMeta(di); if (meta.hidden) return;
+  const { ctx } = chart; ctx.save(); ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1;
+  chart.data.datasets.forEach((ds, di) => { if (!ds.ci) return; const meta = chart.getDatasetMeta(di); if (meta.hidden) return; const y = chart.scales[ds.yAxisID || 'y'];
     meta.data.forEach((el, i) => { const c = ds.ci[i]; if (!c) return; const x = el.x, a = y.getPixelForValue(c[0]), b = y.getPixelForValue(c[1]);
       ctx.beginPath(); ctx.moveTo(x, a); ctx.lineTo(x, b); ctx.moveTo(x - 3, a); ctx.lineTo(x + 3, a); ctx.moveTo(x - 3, b); ctx.lineTo(x + 3, b); ctx.stroke(); }); });
   ctx.restore(); } };
@@ -159,15 +159,44 @@ function gainBars(c, key) {
       ci:Ks.map(k => c.series[a][k] ? [c.series[a][k][1], c.series[a][k][2]] : null), backgroundColor:P[i % P.length] + 'cc' })) },
     options:baseOpts('gain vs Z (%)') });
 }
+function contrastChart(c) {
+  const rows = c.rows || []; if (!rows.length) throw new Error('không có dòng contrast');
+  const g = (r, m) => r.m[m] ? r.m[m].v : null, ci = (r, m) => (r.m[m] && r.m[m].lo != null) ? [r.m[m].lo, r.m[m].hi] : null;
+  const o = baseOpts('agent fuel (%)'); o.scales.y2 = { position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:css('--muted') }, title:{ display:true, text:'time loss (s/xe)', color:css('--muted') } };
+  o.scales.x.ticks.autoSkip = false; o.scales.x.ticks.maxRotation = 60; o.scales.x.ticks.minRotation = 30;
+  return new Chart(card(c.title, 'mỗi cột = một phép so trong report; CI 95 % (crossed bootstrap); fuel trái (%), time loss phải (s/xe)'), { type:'bar', plugins:[ciPlugin],
+    data:{ labels:rows.map(r => r.name), datasets:[
+      { label:'agent fuel %', data:rows.map(r => g(r, 'fuel')), ci:rows.map(r => ci(r, 'fuel')), backgroundColor:css('--acc') + 'cc', yAxisID:'y' },
+      { label:'agent TL', data:rows.map(r => g(r, 'agentTL')), ci:rows.map(r => ci(r, 'agentTL')), backgroundColor:css('--bad') + 'aa', yAxisID:'y2' },
+      { label:'human TL', data:rows.map(r => g(r, 'humanTL')), ci:rows.map(r => ci(r, 'humanTL')), backgroundColor:css('--good') + '88', yAxisID:'y2' },
+      { label:'city TL', data:rows.map(r => g(r, 'cityTL')), ci:rows.map(r => ci(r, 'cityTL')), backgroundColor:css('--warn') + '88', yAxisID:'y2' } ] }, options:o });
+}
+const gatePlugin = { id:'gate', beforeDatasetsDraw(chart) {
+  const { ctx, chartArea:a, scales:{ x, y } } = chart; const x5 = x.getPixelForValue(0.5), y0 = y.getPixelForValue(0);
+  ctx.save(); ctx.fillStyle = css('--good') + '22'; const l = a.left, r = Math.min(Math.max(x5, a.left), a.right), t = Math.min(Math.max(y0, a.top), a.bottom);
+  ctx.fillRect(l, t, r - l, a.bottom - t); ctx.strokeStyle = css('--muted'); ctx.setLineDash([4, 4]); ctx.beginPath();
+  if (x5 > a.left && x5 < a.right) { ctx.moveTo(x5, a.top); ctx.lineTo(x5, a.bottom); } if (y0 > a.top && y0 < a.bottom) { ctx.moveTo(a.left, y0); ctx.lineTo(a.right, y0); }
+  ctx.stroke(); ctx.restore(); } };
+function frontierChart(c) {
+  const pts = c.points || []; if (!pts.length) throw new Error('chưa có điểm'); const P = pal(), exps = [...new Set(pts.map(p => p.exp))];
+  const o = baseOpts('agent fuel vs R (%)', 'agent time loss vs R (s/xe)');
+  o.plugins.tooltip = { callbacks:{ label:t => { const p = t.raw.p; const f = p.fuel, a = p.agentTL;
+    return `${p.exp}: ${p.name} — fuel ${f.v}${f.lo != null ? ` [${f.lo}, ${f.hi}]` : ''} % · agent TL ${a.v}${a.lo != null ? ` [${a.lo}, ${a.hi}]` : ''}${a.up != null ? ` (up ${a.up})` : ''}`; } } };
+  return new Chart(card(c.title, 'vùng xanh = gate M3 theo ước lượng điểm (fuel < 0, agent TL < +0.5); gate thật dùng cận trên một phía (xem tooltip)' + ((c.excluded || []).length ? ` · ngoài khung (|agent TL| > 15 hoặc |fuel| > 30): ${c.excluded.join('; ')}` : '')), { type:'scatter', plugins:[gatePlugin],
+    data:{ datasets:exps.map((e, i) => ({ label:e, data:pts.filter(p => p.exp === e).map(p => ({ x:p.agentTL.v, y:p.fuel.v, p })), backgroundColor:P[i % P.length], pointRadius:5 })) }, options:o });
+}
 function renderCharts() {
   CHARTS.forEach(ch => ch.destroy()); CHARTS = []; const box = document.getElementById('charts'); box.innerHTML = '';
   const show = new Set(DATA.experiments.filter(visible).map(e => e.chart || e.id));
-  const order = ['q7', 'fallback', 'testD', 'g4tm', 'testC', 'q3', 'q2', 'q4'];
+  const cs = DATA.experiments.filter(visible).map(e => 'c_' + e.id).filter(k => DATA.charts[k]);
+  const order = ['_frontier', ...cs, 'q7', 'fallback', 'testD', 'g4tm', 'testC', 'q3', 'q2', 'q4'];
   for (const k of order) {
     const c = DATA.charts[k]; if (!c) continue;
     const exp = DATA.experiments.find(e => e.id === k || (k === 'fallback' && e.id === 'fallback')); if (exp && !visible(exp)) continue;
     try {
       if (c.error) throw new Error(c.error);
+      if (c.kind === 'contrasts') { CHARTS.push(contrastChart(c)); continue; }
+      if (c.kind === 'frontier') { if (FILTER === 'MARL') continue; CHARTS.push(frontierChart(c)); continue; }
       if (c.kind === 'gainbars') CHARTS.push(gainBars(c, k));
       else if (c.kind === 'grouped') { const P = pal();
         CHARTS.push(new Chart(card(c.title, 'time loss trung bình toàn mạng; mỗi nhóm = một loại đèn'), { type:'bar',

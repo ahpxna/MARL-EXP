@@ -1,0 +1,590 @@
+{
+ "boxes": {
+  "1": [
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 4.1,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "I.  Introduction"
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 0.23,
+    "top": 5.12,
+    "width": 15.05,
+    "height": 6.12,
+    "ref": "research/papers/_tex/figs_two_pop/p2_problem.png"
+   },
+   {
+    "kind": "caption",
+    "left": 1.3,
+    "top": 11.4,
+    "width": 12.9,
+    "height": 1.54,
+    "shape": null,
+    "lines": [
+     "Fig. 1.  The compatibility problem. A frozen learned fleet saves fuel against its own base driver under fixed-time signals; after the upgrade to a learned signal its benefit is exactly zero with no timing, and the old timing served as SPaT harms it."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 13.1,
+    "width": 12.9,
+    "height": 2.18,
+    "shape": null,
+    "lines": [
+     "Learned traffic signals and learned connected-vehicle fleets are owned by different parties and upgraded on different schedules. A fleet trained against fixed-time signals uses the broadcast signal phase and timing (SPaT) as a plan; a learned adaptive signal decides every few seconds, so the plan disappears."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 15.44,
+    "width": 12.9,
+    "height": 2.18,
+    "shape": null,
+    "lines": [
+     "THE LOSS IS REAL. In SUMO on a 16-signal grid, a PPO eco-driving fleet that saves 6.5% fuel against its base driver loses that benefit when the signals are upgraded. A forecast of the learned signal costs the fleet's own vehicles time, and light-side commitments cost more than they recover."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 17.78,
+    "width": 12.9,
+    "height": 1.31,
+    "shape": null,
+    "lines": [
+     "THE QUESTION. Can the fleet's benefit be recovered WITHOUT retraining either population, by changing only what the fleet is told and what the signal sees?"
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 19.25,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "What the literature leaves open"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 20.27,
+    "width": 12.9,
+    "height": 2.62,
+    "shape": null,
+    "lines": [
+     "SPaT prediction for adaptive signals (statistical residual-time and supervised time-to-green models) changes only the forecast; eco-driving under uncertain timing changes the vehicle; joint signal\u2013vehicle control and FoRL (2026), which trains a signal to forecast its own actions, retrain one side. None keeps both learned populations frozen."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 1.3,
+    "top": 23.06,
+    "width": 12.9,
+    "height": 2.18,
+    "shape": null,
+    "lines": [
+     "Self-defeating forecasts are not new in transportation: anticipatory route guidance can invalidate its own forecast, and consistent guidance is a fixed point. The new instance is at the signal\u2013eco-driving interface, where the fleet's reaction passes through a learned signal's observation."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 1.3,
+    "top": 25.4,
+    "width": 12.9,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "II.  Methodology"
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 0.23,
+    "top": 26.42,
+    "width": 15.05,
+    "height": 7.73,
+    "ref": "research/papers/_tex/figs_two_pop/p1_schematic.png"
+   },
+   {
+    "kind": "caption",
+    "left": 1.3,
+    "top": 34.31,
+    "width": 12.9,
+    "height": 1.54,
+    "shape": null,
+    "lines": [
+     "Fig. 2.  The two frozen populations and the two interfaces TSI changes (blue). The orange path is the closed loop: published timing changes the approach, a halting-count signal does not see slow cars as demand, holds its greens, and the forecast's target shifts."
+    ],
+    "text": null
+   }
+  ],
+  "2": [
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 4.1,
+    "width": 15.2,
+    "height": 1.76,
+    "shape": null,
+    "lines": [
+     "STAGED, REGISTERED DESIGN. M1 a fleet worth protecting; M2 the upgrade removes its benefit, measured as a difference in differences; M3 repair through the interfaces only; M4 transfer. Every experiment had a written protocol before its code ran, a smoke run, and self-checks that can fail."
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 17.78,
+    "top": 6.02,
+    "width": 10.45,
+    "height": 0.52,
+    "ref": "tsi_did"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 6.7,
+    "width": 15.2,
+    "height": 1.32,
+    "shape": null,
+    "lines": [
+     "FLEET SIDE. A hybrid provider answers exactly where the timing is determined (a yellow whose next green serves the link) and otherwise with a state-conditioned quantile forecaster, fitted with a query-weighted pinball loss:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 18.1,
+    "top": 8.18,
+    "width": 9.81,
+    "height": 1.06,
+    "ref": "tsi_pinball"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 9.4,
+    "width": 15.2,
+    "height": 0.88,
+    "shape": null,
+    "lines": [
+     "LIGHT SIDE. In front of the frozen signal's halting-count input, a speed-binned count adds slowly approaching vehicles; A = B = 0 is the deployed signal:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 17.83,
+    "top": 10.44,
+    "width": 10.34,
+    "height": 0.93,
+    "ref": "tsi_adapter"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 11.53,
+    "width": 15.2,
+    "height": 1.32,
+    "shape": null,
+    "lines": [
+     "INFERENCE. Crossed bootstrap over signal, fleet and traffic seeds (2 000 draws). A repair passes only if every limit holds, with teleports and unfinished trips not above the reference:"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 18.97,
+    "top": 13.01,
+    "width": 8.06,
+    "height": 0.5,
+    "ref": "tsi_limits"
+   },
+   {
+    "kind": "header",
+    "left": 15.4,
+    "top": 13.67,
+    "width": 15.2,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "II.  Methodology, continued"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 14.69,
+    "width": 15.2,
+    "height": 1.32,
+    "shape": null,
+    "lines": [
+     "WHY ONE SIDE IS NOT ENOUGH, PROVED. A threshold signal fed by an arrival stream at rate \u03bb, of which a fleet share \u03c1 glides and is weighted A, is served after T; a forecast learned without the fleet predicts T\u2080 and errs by"
+    ],
+    "text": null
+   },
+   {
+    "kind": "eq",
+    "left": 20.07,
+    "top": 16.17,
+    "width": 5.87,
+    "height": 0.73,
+    "ref": "tsi_queue_bias"
+   },
+   {
+    "kind": "eq",
+    "left": 17.84,
+    "top": 17.06,
+    "width": 10.33,
+    "height": 0.5,
+    "ref": "tsi_queue_iff"
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 17.72,
+    "width": 15.2,
+    "height": 2.2,
+    "shape": null,
+    "lines": [
+     "The light-side half is needed exactly when the signal's input weights gliding vehicles below halted ones, and the error grows with the fleet share; with n vehicles a halting count misses with probability at least p\u207f, while A \u2265 1 never misses. Machine-checked in Lean 4: four modules, 32 audited declarations, standard axioms only, no sorry."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 20.08,
+    "width": 15.2,
+    "height": 1.32,
+    "shape": null,
+    "lines": [
+     "THE THEOREM PREDICTS THE SIGN OF EVERY MEASURED GREEN CHANGE: lengthening for the halting-count learned signal (15.0 \u2192 17.1 s), none for MaxPressure, which counts every vehicle (18.1 \u2192 18.0 s), and a return to baseline under TSI."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 15.4,
+    "top": 21.56,
+    "width": 15.2,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "III.  Results"
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 15.28,
+    "top": 22.58,
+    "width": 15.44,
+    "height": 7.9,
+    "ref": "research/papers/_tex/figs_two_pop/p5_evidence.png"
+   },
+   {
+    "kind": "caption",
+    "left": 15.4,
+    "top": 30.64,
+    "width": 15.2,
+    "height": 0.77,
+    "shape": null,
+    "lines": [
+     "Fig. 3.  TSI against the no-SPaT fallback in every registered test (95% intervals; verdicts at each test's level)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 31.57,
+    "width": 15.2,
+    "height": 2.2,
+    "shape": null,
+    "lines": [
+     "CONFIRMED AND REPLICATED. Registered second attempt: \u22123.85% agent fuel [3.26, 4.43] with every time loss within +0.5 s/veh (one-sided \u03b1 = 0.025). It held on fresh traffic (\u22123.70%) and with two independently trained sets of signals and fleets recalibrated from scratch (\u22122.61%, \u22122.97%). Each half alone failed every time."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 33.93,
+    "width": 15.2,
+    "height": 0.88,
+    "shape": null,
+    "lines": [
+     "ONE SETTING FOR EVERY SIGNAL. (A, B) = (1, 0.5), fixed on other signals, met every limit on unseen policies (\u22122.88%), removing the per-site grid search."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 15.4,
+    "top": 34.97,
+    "width": 15.2,
+    "height": 0.88,
+    "shape": null,
+    "lines": [
+     "ROBUSTNESS. Within the limits with 80% detection, 1 m/s speed noise and 20% SPaT loss; a 1-s latency removes most of the saving."
+    ],
+    "text": null
+   }
+  ],
+  "3": [
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 4.1,
+    "width": 15.6,
+    "height": 2.23,
+    "shape": null,
+    "lines": [
+     "COMPARATORS. Against retraining the fleet, TSI's time losses are lower and fuel non-inferiority at 0.5 pp is not shown. A corrected DC-Ada port tuned at TSI's budget, on fresh traffic, saves similar fuel (\u22123.45%) but adds 2.87 s/veh to the fleet's time loss and fails the limits; TSI's time losses are lower (\u22123.15 s/veh), fuel is not ordered."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 6.49,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "IV.  Discussion"
+    ],
+    "text": null
+   },
+   {
+    "kind": "fig",
+    "left": 31.28,
+    "top": 7.51,
+    "width": 15.05,
+    "height": 6.32,
+    "ref": "research/papers/_tex/figs_two_pop/p4_mechanism.png"
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 13.99,
+    "width": 15.6,
+    "height": 1.18,
+    "shape": null,
+    "lines": [
+     "Fig. 4.  Mechanism. Under the service the learned signal holds its greens longer (A); the residual time cost grows with that lengthening (B); on a replayed schedule exact timing saves fuel and time (C)."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 15.32,
+    "width": 15.6,
+    "height": 1.34,
+    "shape": null,
+    "lines": [
+     "A PUBLISHED SIGNAL CONFIRMS THE MECHANISM. Registered in advance: with MaxPressure, which counts vehicles at every speed, the fleet-side service alone meets every limit (\u22122.68% fuel), the case the theorem says needs no light-side change."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 16.82,
+    "width": 15.6,
+    "height": 2.23,
+    "shape": null,
+    "lines": [
+     "WHEN IT TRANSFERS. Served-answer diagnostics (exact on all three networks): on one-lane spider, publication shifts the forecast by +7.8 s and commanded agents hold five times as many humans; spider rebuilt with two lanes passes; a refitted forecaster removes the shift but not the failure. rand3 passes a second attempt with a wider adapter range."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 19.21,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "Limitations \u2014 what is not established"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 20.23,
+    "width": 15.6,
+    "height": 1.34,
+    "shape": null,
+    "lines": [
+     "Simulation only. The fuel saving under learned signals holds for HBEFA4 but not PHEMlight5 (the fleet's own fixed-time benefit survives both); the frozen design does not transfer to IDM drivers."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 21.72,
+    "width": 15.6,
+    "height": 0.89,
+    "shape": null,
+    "lines": [
+     "Fails on one-lane roads with enough following traffic; three synthetic networks are not a sample of real cities; the theorem predicts signs, not magnitudes."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 22.78,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "V.  Conclusions"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 23.8,
+    "width": 15.6,
+    "height": 1.78,
+    "shape": null,
+    "lines": [
+     "Two learned populations that each work alone can stop working together when one is upgraded, invisibly to either population's inputs. Neither interface alone repairs it; both together recover most of the benefit, without retraining either population."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 25.74,
+    "width": 15.6,
+    "height": 1.34,
+    "shape": null,
+    "lines": [
+     "For a practitioner: before upgrading signals a learned fleet relies on, ask whether the signal's input sees the fleet's slower approach and whether the road lets followers pass."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 27.23,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "How the numbers were produced"
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 28.25,
+    "width": 15.6,
+    "height": 1.78,
+    "shape": null,
+    "lines": [
+     "REGISTERED, THEN RUN. Every experiment was registered before its code ran, smoke-tested end to end, and reported as it came out, failures included. Runs are deterministic; reports refuse incomplete panels; parity, identity and exactness self-checks gate every result."
+    ],
+    "text": null
+   },
+   {
+    "kind": "prose",
+    "left": 31.0,
+    "top": 30.2,
+    "width": 15.6,
+    "height": 1.34,
+    "shape": null,
+    "lines": [
+     "CORRECTED IN THE OPEN. Two of our own claims were withdrawn after an independent audit of code and raw rows (a DC-Ada port with mismatched tuning horizons; a non-comparable forecast-error sample) and replaced by corrected runs."
+    ],
+    "text": null
+   },
+   {
+    "kind": "header",
+    "left": 31.0,
+    "top": 31.69,
+    "width": 15.6,
+    "height": 0.92,
+    "shape": null,
+    "lines": [
+     "References"
+    ],
+    "text": null
+   },
+   {
+    "kind": "caption",
+    "left": 31.0,
+    "top": 32.71,
+    "width": 15.6,
+    "height": 3.14,
+    "shape": null,
+    "lines": [
+     "[1] K. Katsaros et al., \u201cPerformance study of a GLOSA application,\u201d IWCMC, 2011. [2] R. Bodenheimer et al., \u201cEnabling GLOSA for adaptive traffic lights,\u201d IEEE VNC, 2014. [3] P. Varaiya, \u201cMax pressure control of a network of signalized intersections,\u201d Transp. Res. C, 2013. [4] J. A. Bottom, Consistent Anticipatory Route Guidance, PhD thesis, MIT, 2000. [5] J. Perdomo et al., \u201cPerformative prediction,\u201d ICML, 2020. [6] J. Gerner, K. Bogenberger, S. Schmidtner, \u201cForecasting-conditioned reinforcement learning,\u201d XAI@IJCAI, 2026. [7] S. Alqithami, \u201cDC-Ada,\u201d IEEE Access, 2026. [8] P. A. Lopez et al., \u201cMicroscopic traffic simulation using SUMO,\u201d IEEE ITSC, 2018. [9] L. de Moura, S. Ullrich, \u201cThe Lean 4 theorem prover,\u201d CADE, 2021."
+    ],
+    "text": null
+   }
+  ]
+ },
+ "report": {
+  "1": {
+   "text_scale": 0.968,
+   "figure_scale": 1.0,
+   "natural_in": 32.2,
+   "available_in": 31.75,
+   "fill": 1.014,
+   "blocks": 12,
+   "stack_in": 31.75,
+   "verdict": "good"
+  },
+  "2": {
+   "text_scale": 0.975,
+   "figure_scale": 1.0,
+   "natural_in": 32.13,
+   "available_in": 31.75,
+   "fill": 1.012,
+   "blocks": 20,
+   "stack_in": 31.75,
+   "verdict": "good"
+  },
+  "3": {
+   "text_scale": 0.987,
+   "figure_scale": 1.0,
+   "natural_in": 31.99,
+   "available_in": 31.75,
+   "fill": 1.008,
+   "blocks": 17,
+   "stack_in": 31.75,
+   "verdict": "good"
+  }
+ }
+}

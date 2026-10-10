@@ -69,7 +69,8 @@ def main(a):
         fb5 = all(G[(arm, K, 'FB_S')] >= min(G[(arm, K, 'RELAY')], 0) - 0.5 for arm in c['arms'] for K in (1, 2, 3, 0))
         cells = [(arm, K) for arm in c['arms'] for K in (1, 2, 3, 0)]
         fr_ = np.array([FR[(arm, K, 'FB_S')] for arm, K in cells]); lg_ = np.array([-G[(arm, K, 'RELAY')] for arm, K in cells])
-        rk = lambda v: np.argsort(np.argsort(v)); sp6 = float(np.corrcoef(rk(fr_), rk(lg_))[0, 1]) if len(cells) > 2 else float('nan')
+        from scipy.stats import spearmanr     # AVERAGE ranks for ties (audit 03/10 14:1x; was argsort-of-argsort: FB6 3x3 +0.46 -> +0.50, 4x4 +0.83 -> +0.88, verdicts unchanged)
+        sp6 = float(spearmanr(fr_, lg_).statistic) if len(cells) > 2 else float('nan')
         fb6 = sp6 >= 0.6                                  # Addendum 2 (23:0x): coverage ranks the relay's loss
         sv = lambda v: 'not tested' if v is None else ('SUPPORTED' if v else 'NOT SUPPORTED')
         L += [f'hazard cells {haz}; benefit cells (own channel) {ben}; upgrade hazard cells {upg}',

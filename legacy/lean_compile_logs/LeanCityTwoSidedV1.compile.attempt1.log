@@ -1,0 +1,32 @@
+LeanCityTwoSidedV1.lean:41:24: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  @Membership.mem ?m.6 (Finset ?m.6) SetLike.instMembership { val := ?m.8, nodup := ?m.9 } ?m.7
+in the target expression
+  @Membership.mem Car (Finset Car) SetLike.instMembership { val := ↑Car.enumList, nodup := Car.enumList_nodup } x✝
+
+x✝ : Car
+⊢ x✝ ∈ { val := ↑Car.enumList, nodup := Car.enumList_nodup }
+
+Note: The target expression is not type-correct under the `implicit` transparency level, which may have triggered the failure. This is usually caused by unfolding of semireducible definitions in prior tactic steps. Use `set_option linter.tacticCheckInstances true` to investigate the source of the issue.
+Full error:
+  Application type mismatch: The argument
+    Car.enumList_nodup
+  has type
+    Car.enumList.Nodup
+  but is expected to have type
+    (↑Car.enumList).Nodup
+  in the application
+    { val := ↑Car.enumList, nodup := Car.enumList_nodup }
+'CIGAMF.P13.CityTwoSidedV1.service_alone_harms' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.forecast_self_defeating' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.adapter_alone_no_gain' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.two_sided_zero' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.two_sided_gain' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.two_sided_min' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.no_fleet_side_fix' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.CityTwoSidedV1.no_light_side_fix' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.allspeed_sensor_service_suffices' depends on axioms: [propext]
+'CIGAMF.P13.CityTwoSidedV1.hyps_satisfiable' does not depend on any axioms
+'CIGAMF.P13.CityTwoSidedV1.chain_fwer' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CIGAMF.P13.CityTwoSidedV1.two_attempts_fwer' depends on axioms: [propext, Classical.choice, Quot.sound]
+lake env lean LeanCityTwoSidedV1.lean  6.31s user 42.75s system 22% cpu 3:42.70 total
+exit 1

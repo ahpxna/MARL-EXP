@@ -1,0 +1,23 @@
+W8-NET3 start Mon Oct  5 16:07:38 EDT 2026
+grid4 FT city TL (seed 0, smoke horizon) 47.25; rand3 by period {"1.6": 75.88, "2.0": 73.22, "2.5": 69.51, "3.0": 66.97}; chosen period 3.0; within +-30 %: False
+
+period 3.0
+rand3 panels ready Mon Oct  5 16:07:57 EDT 2026
+training done Mon Oct  5 16:08:00 EDT 2026
+fit 21 files 8 lights 20
+KN3-3 t21: 20 lights x 1 files
+KN2-1 compared 7884 provider rows (60 censored offline): feature mismatches 0 []; KN2-2 prediction mismatches 0 -> PASS
+t21: choice 1,0 (qualified 0) -> fuel:-2.88 timeloss:-0.47 timeloss_agent:-1.25 timeloss_human:+0.39
+panel done Mon Oct  5 16:08:31 EDT 2026
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/CITY_w8_report.py", line 78, in <module>
+    dict(fresh2=fresh2, lcd2=lcd2, net3=net3)[sys.argv[1]]()
+  File "/Users/phanan/cig-amf-main/scripts/CITY_w8_report.py", line 66, in net3
+    la = V.paired(Rd, lambda l, f: f'LA_t{l}', lambda l, f: 'FTA', LT, ('x',), DV); out.append(V.line('learned light - FT (SUMO cars, DEV)', la))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/CITY_w6_report_v2.py", line 24, in paired
+    require_panel(Rt, [key(l, f) for key in (a, b) for l in L for f in F], S)
+  File "/Users/phanan/cig-amf-main/scripts/CITY_w6_validation.py", line 24, in require_panel
+    if m not in data[key][s] or not math.isfinite(data[key][s][m]): raise ValueError(f'NONFINITE/MISSING {key} {s} {m}')
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: NONFINITE/MISSING LA_t21 600 fuel_agent

@@ -58,6 +58,7 @@ def run_episode(scen, seed, load, method, ck, out):
     cfg.update(saveReplay=True, roadnetLogFile=f'replay_{method}_roadnet.json', replayLogFile=f'replay_{method}.txt')
     rc = d / f'config_replay_{method}.json'; rc.write_text(json.dumps(cfg)); s['files']['config.json']['path'] = str(rc)
     env, topo, down, onward = new_env(s, seed, load); m = env.n_agents
+    import scripts.MARL_e3_continuation_labels as _CL; from models.marl_comm_actor_set import SetActorNet as _SA; from models.marl_comm_actor import ActorNet as _AN; _CL.ActorNet = _SA if (ck is not None and (ck['config'].get('set_actor') or ck['config'].get('arch') == 'set')) else _AN   # set-actor checkpoints (03/10 NYC viewer)
     pol = Policy(ck, topo, env.action_interval) if ck is not None else None; q = []
     for t in range(N_DEC):
         with no_oracle_access(env):
