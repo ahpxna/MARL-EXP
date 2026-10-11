@@ -25,7 +25,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 > The first time, the whole city **gridlocked**. It looked like the AI had failed.
 > It hadn't. We traced every stuck car back to where its jam began. The jams didn't start at the AI signals — they started at the 56 complex junctions the AI can't run: tunnel ramps, bridge approaches, a seven-phase intersection on 57th Street. Those were left on fixed timing, and fixed timing can't cope — fixed timing everywhere gridlocks too.
 > So we deployed it the way a city would: **the AI runs the 511 simple intersections, the city's own actuated controllers keep the 56 complex ones.**
-> Result, against actuated signals everywhere, over 100 test runs: **21% less delay, 37% less time stopped, 11% less fuel. The AI won 98 of 100 runs on delay, and all 100 on fuel.**"
+> Result, against actuated signals everywhere, over 100 test runs: **21% less delay, 38% less time stopped, 11% less fuel. The AI won 98 of 100 runs on delay, and all 100 on fuel.**"
 
 *(press **Zoom in**: queues on the left, traffic rolling on the right)*
 
@@ -50,7 +50,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 | Claim | Number | Evidence |
 |---|---|---|
 | Real map scale | 567 signals, 206 km, river to river (about 19th–74th St) | `research/city_sim/net/midtown_full.net.xml`; OSM via Overpass 11/10 |
-| AI lights + AI cars vs actuated | **−21% delay** (162 → 127 s), **−37% stopped** (71 → 44 s), **−11% fuel** (328 → 291 g) | 100 runs = 5 test days × 5 signal models × 4 fleets; paired: delay −34.5 s [−36.2, −32.5], better in 98/100; fuel better in 100/100 |
+| AI lights + AI cars vs actuated | **−21% delay** (162 → 127 s), **−38% stopped** (71 → 44 s), **−11% fuel** (328 → 291 g) | 100 runs = 5 test days × 5 signal models × 4 fleets; paired: delay −34.5 s [−36.2, −32.5], better in 98/100; fuel better in 100/100 |
 | AI lights alone vs actuated | −20% delay, −25% stopped, −8% fuel; 24/25 runs better | 25 runs |
 | Best pair | signal model **t63 + fleet s1413**: **−25% delay**, −12% fuel, **0 stuck cars in 5 days** | `eval_full/MTF_BGar_t63_s1413.json` |
 | Worst pair still wins | t61 + s1713: 139 s vs 162 s actuated | same panel |
@@ -66,7 +66,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 ## Demo click path (2 minutes)
 1. Open the page. The **Midtown Manhattan** tab is already on "Actuated signals → AI signals + AI cars". Let it play at 4×. Point at the "cars stopped now" counters, left vs right.
 2. Press **Zoom in**: the same 650 m corner of both maps, so queues and gliding cars are visible.
-3. Scroll to the cards (−21% / −37% / −11%) and the dot chart (every dot is one run; the AI rows sit left of actuated).
+3. Scroll to the cards (−21% / −38% / −11%) and the dot chart (every dot is one run; the AI rows sit left of actuated).
 4. Switch the dropdown to "Actuated → AI signals (human drivers)" to show the signals alone (−20%).
 5. Tab **Two AIs meet**: left = without TSI-G (the AI cars wait), right = with TSI-G. Then the chart of five signal designs.
 6. Optional: **How they learned** (corner window, 20×).
@@ -100,3 +100,17 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 - Models in SageMaker.
 - The translation layer as a Lambda between two vendors' systems.
 - A CloudWatch alarm when a partner's behaviour leaves the training range.
+
+---
+
+## Screen-recording plan (clock = the simulation clock under the map; at 4×, 1 sim-minute = 15 s of video)
+Browser wide enough for the two maps side by side; speed 4×; jump with the scrub bar.
+
+| Shot | Tab / comparison | Record (sim clock) | Watch for |
+|---|---|---|---|
+| A. Gridlock | Midtown, "Fixed-time → AI signals + AI cars" | 26:20 → 27:20 (15 s) | left: ~600 cars stopped, 11 km/h; right: ~55, 34 km/h. Fixed timing, not the AI |
+| B. Main result | Midtown, "Actuated → AI signals + AI cars" | 25:00 → 28:50 (58 s); **Zoom in** at 25:30, out at 27:10 | stopped now 97 vs 61 (25:30), 86 vs 53 (26:30); stopped so far 91 vs 60 car-min at 26:00, 261 vs 176 at 28:00. **Stop before 29:00** (right side spikes to ~83) |
+| C. Proof | same, scroll down | still, 8 s | cards −21% / −38% / −11%; dot chart, AI rows left of actuated |
+| D. Signals alone (optional) | Midtown, "Actuated → AI signals (human drivers)" | 25:00 → 26:00 (15 s) | 97 vs 66 stopped at 25:30 |
+| E. Two AIs meet | "Two AIs meet", MPLight comparison, Zoom in | 25:00 → 28:00 (45 s) | AI cars stopped so far: 2.3 vs 0.5 at 26:00, 5.7 vs 1.2 at 28:00; then the five-design chart (8 s) |
+| F. Toy grid (optional) | Test grid | 26:00 → 27:00 (15 s) | 24–34 vs 2 stopped; then "How they learned" 10 s |
