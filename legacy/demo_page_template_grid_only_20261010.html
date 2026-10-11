@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gridlock to Green Wave</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one stage, two live maps side by side (stacked on phones), controls under them, three result figures at the foot.
+   Single dark look on purpose: night asphalt reads best on a projector. */
+:root {
+  --bg: #0f1214; --panel: #161a1d; --road: #262b30; --road-edge: #353b41; --fg: #e9ede9; --muted: #98a2a7;
+  --ai: #3fd3c9; --human: #d8d2c4; --stop: #ff5b4f; --go: #5fdb6c; --amber: #ffb547; --line: #2b3136;
+  --display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
+  --mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); }
+body { font-family: var(--display); padding-block: 20px 28px; padding-inline: max(16px, 3vw); }
+.wrap { max-width: 1280px; margin-inline: auto; display: grid; gap: 18px; }
+header { display: grid; gap: 6px; }
+h1 { font-weight: 800; font-size: clamp(28px, 4.2vw, 52px); letter-spacing: 0.01em; margin: 0; text-wrap: balance; line-height: 1.02; }
+h1 .g { color: var(--go); }
+.sub { color: var(--muted); font-size: clamp(14px, 1.5vw, 18px); max-width: 70ch; margin: 0; }
+.stage { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .stage { grid-template-columns: 1fr; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; min-width: 0; }
+.ptop { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.tag { font-weight: 800; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; }
+.tag.today { background: #3a1f1d; color: #ffb3ab; }
+.tag.ai { background: #12312f; color: var(--ai); }
+.ptitle { font-weight: 600; font-size: 17px; margin: 0; }
+canvas { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 6px; background: #0b0d0f; max-width: 100%; }
+.live { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.kv { display: grid; gap: 2px; }
+.kv .k { color: var(--muted); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.kv .v { font-family: var(--mono); font-size: clamp(18px, 2.2vw, 26px); font-weight: 600; font-variant-numeric: tabular-nums; }
+.kv .v.bad { color: var(--stop); } .kv .v.good { color: var(--go); }
+.caption { color: var(--muted); font-size: 14px; margin: 0; min-height: 3em; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+button, select { font-family: var(--display); font-size: 15px; font-weight: 600; color: var(--fg); background: #20262b; border: 1px solid #39424a; border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
+button.on { background: #12312f; border-color: var(--ai); color: var(--ai); }
+#scrub { flex: 1 1 200px; accent-color: var(--ai); min-width: 0; }
+.clock { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); min-width: 9ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 13px; }
+.dot { display: inline-block; width: 12px; height: 6px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+.results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 760px) { .results { grid-template-columns: 1fr; } }
+.res { border-top: 3px solid var(--go); padding-top: 10px; display: grid; gap: 4px; }
+.res .big { font-family: var(--mono); font-weight: 600; font-size: clamp(38px, 5.5vw, 64px); line-height: 1; color: var(--go); font-variant-numeric: tabular-nums; }
+.res .what { font-weight: 600; font-size: 17px; }
+.res .from { color: var(--muted); font-family: var(--mono); font-size: 13px; }
+.foot { color: var(--muted); font-size: 12px; max-width: 110ch; margin: 0; }
+.trainwin { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(260px, 40vw); background: var(--panel);
+  border: 1px solid #39424a; border-radius: 10px; padding: 8px; display: grid; gap: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); z-index: 5; }
+.trainwin .tw-top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
+.trainwin .tw-tag { font-weight: 800; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+.trainwin .tw-x { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.trainwin .tw-ep { font-weight: 600; font-size: 13px; min-height: 2.4em; }
+#cT { aspect-ratio: 1 / 1; }
+#curve { width: 100%; height: 46px; display: block; }
+@media (max-width: 760px) { .trainwin { position: static; width: 100%; box-shadow: none; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Gridlock to <span class="g">Green Wave</span></h1>
+    <p class="sub">The same 16-intersection city, the same cars, the same five minutes of rush hour. Left: today's fixed-time lights. Right: AI traffic lights and AI cars that share signal timing.</p>
+  </header>
+
+  <section class="stage" aria-label="Two simulations side by side">
+    <div class="panel">
+      <div class="ptop"><span class="tag today">Today</span><p class="ptitle">Fixed-time lights, human drivers</p></div>
+      <canvas id="cL" aria-label="Map with fixed-time lights"></canvas>
+      <div class="live">
+        <div class="kv"><span class="k">Cars stopped now</span><span class="v bad" id="hL">0</span></div>
+        <div class="kv"><span class="k">Average speed</span><span class="v" id="sL">0</span></div>
+        <div class="kv"><span class="k">Delay per car (full run)</span><span class="v bad" id="dL">0</span></div>
+      </div>
+      <p class="caption">Lights run on a fixed cycle no matter who is waiting, so queues pile up at every corner.</p>
+    </div>
+
+    <div class="panel">
+      <div class="ptop"><span class="tag ai">AI + AI</span>
+        <select id="pick" aria-label="Choose the right-hand scenario">
+          <option value="best">Lights and cars working together</option>
+          <option value="broken">Two AIs that never met</option>
+          <option value="fixed">Two AIs plus our sensing layer (TSI-G)</option>
+        </select>
+      </div>
+      <canvas id="cR" aria-label="Map with AI lights and AI cars"></canvas>
+      <div class="live">
+        <div class="kv"><span class="k">Cars stopped now</span><span class="v" id="hR">0</span></div>
+        <div class="kv"><span class="k">Average speed</span><span class="v" id="sR">0</span></div>
+        <div class="kv"><span class="k">Delay per car (full run)</span><span class="v" id="dR">0</span></div>
+      </div>
+      <p class="caption" id="capR"></p>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button id="play" class="on" aria-label="Play or pause">Pause</button>
+    <button data-speed="1">1×</button><button data-speed="2" class="on">2×</button><button data-speed="4">4×</button>
+    <input id="scrub" type="range" min="0" max="299" step="0.01" value="0" aria-label="Simulation time">
+    <span class="clock" id="clock">25:00</span>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--ai)"></i>AI eco-driving car</span>
+      <span><i class="dot" style="background:var(--human)"></i>Human-driven car</span>
+      <span><i class="dot" style="background:var(--stop)"></i>Stopped</span>
+    </div>
+  </div>
+
+  <section class="results" aria-label="Results over the full experiment">
+    <div class="res"><span class="big">−71%</span><span class="what">delay per car</span><span class="from">55.8 → 16.2 seconds</span></div>
+    <div class="res"><span class="big">−93%</span><span class="what">time stopped at red lights</span><span class="from">39.1 → 2.7 seconds per car</span></div>
+    <div class="res"><span class="big">−26%</span><span class="what">fuel per trip, whole city</span><span class="from">93.8 → 69.8 grams</span></div>
+  </section>
+  <p class="foot">SUMO traffic simulation of a 16-signal grid, peak demand. Results: 20 unseen traffic days × 5 independently trained AI lights × 4 AI fleets, fuel model HBEFA4; the maps replay minutes 25–30 of one day. In the right panel half the cars are the AI fleet. Lights: AI keep-or-switch controllers; cars: an AI eco-driving fleet that receives a calibrated forecast of each light.</p>
+</div>
+
+<aside class="trainwin" aria-label="Training replay">
+  <div class="tw-top"><span class="tw-tag">Training replay</span><span class="tw-x">20×</span></div>
+  <canvas id="cT" aria-label="The agents while they were learning"></canvas>
+  <div class="tw-ep" id="twEp"></div>
+  <canvas id="curve" aria-label="Learning curve"></canvas>
+</aside>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const NET = D.net, SC = D.scenes;
+  const META = {
+    today: { delay: 56.4, caption: '' },
+    best: { delay: 16.7, caption: 'The light sees where the queue is; the cars know when green is coming. Cars roll up as the light turns green and keep moving.' },
+    broken: { delay: 35.6, caption: 'An off-the-shelf AI light (RESCO MPLight) counts only stopped cars. AI cars that glide toward a red are invisible to it, so it makes them wait the longest.' },
+    fixed: { delay: 29.4, caption: 'Same two AIs, plus TSI-G: the light senses each AI car as the human driver it replaces. No retraining, and the gliding cars are served again.' }
+  };
+  const css = getComputedStyle(document.documentElement);
+  const C = k => css.getPropertyValue(k).trim();
+  const COL = { road: C('--road'), edge: C('--road-edge'), ai: C('--ai'), human: C('--human'), stop: C('--stop'), go: C('--go'), amber: C('--amber') };
+  const [bx0, by0, bx1, by1] = NET.bbox, pad = 30;
+  function prep(scene) {                        // id -> entry per frame, for interpolation
+    return scene.frames.map(f => { const m = new Map(); for (const v of f.v) m.set(v[0], v); return { f, m }; });
+  }
+  const P = {}; for (const k in SC) P[k] = prep(SC[k]);
+  function setup(canvas) {
+    const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, w = Math.max(200, r.width);
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(w * dpr);
+    const ctx = canvas.getContext('2d'); const s = (w - 2 * pad) / Math.max(bx1 - bx0, by1 - by0);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, w, X: x => pad + (x - bx0) * s, Y: y => w - pad - (y - by0) * s, s };
+  }
+  let L, R;
+  function resize() { L = setup(document.getElementById('cL')); R = setup(document.getElementById('cR')); }
+  function drawNet(V) {
+    const { ctx, w, X, Y, s } = V; ctx.fillStyle = '#0b0d0f'; ctx.fillRect(0, 0, w, w);
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = COL.edge; ctx.lineWidth = Math.max(2, 3.6 * s);
+    for (const ln of NET.lanes) { ctx.beginPath(); ln.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1]))); ctx.stroke(); }
+    ctx.strokeStyle = COL.road; ctx.lineWidth = Math.max(1.5, 3.0 * s);
+    for (const ln of NET.lanes) { ctx.beginPath(); ln.forEach((p, i) => i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1]))); ctx.stroke(); }
+    ctx.fillStyle = COL.road; for (const j of NET.junctions) { const r = 14 * s; ctx.fillRect(X(j[0]) - r, Y(j[1]) - r, 2 * r, 2 * r); }
+  }
+  function drawSignals(V, frame, tlsIds) {
+    const { ctx, X, Y, s } = V;
+    tlsIds.forEach((tid, i) => {
+      const st = frame.s[i]; const links = NET.tls[tid]; if (!links) return;
+      for (const [idx, x1, y1, x0, y0] of links) {
+        const c = st[idx]; const col = (c === 'G' || c === 'g') ? COL.go : (c === 'y' || c === 'Y') ? COL.amber : COL.stop;
+        const dx = x1 - x0, dy = y1 - y0, n = Math.hypot(dx, dy) || 1, ux = dx / n, uy = dy / n;
+        ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, 2.2 * s);
+        ctx.beginPath(); ctx.moveTo(X(x1 - uy * 1.5), Y(y1 + ux * 1.5)); ctx.lineTo(X(x1 + uy * 1.5), Y(y1 - ux * 1.5)); ctx.stroke();
+      }
+    });
+  }
+  function drawCars(V, scene, key, t) {
+    const { ctx, X, Y, s } = V, i = Math.max(0, Math.min(Math.floor(t), scene.length - 1)), a = Math.max(0, t - i);
+    const cur = scene[i], nxt = scene[Math.min(i + 1, scene.length - 1)];
+    const len = Math.max(4, 5 * s), wid = Math.max(2.2, 2.2 * s), forceHuman = key === 'today';
+    for (const v of cur.f.v) {
+      const n = nxt.m.get(v[0]); let x = v[1] / 10, y = v[2] / 10;
+      if (n && a > 0) { x += (n[1] / 10 - x) * a; y += (n[2] / 10 - y) * a; }
+      const stopped = v[4] < 1, ai = !forceHuman && v[5] === 1;
+      ctx.fillStyle = stopped ? COL.stop : ai ? COL.ai : COL.human;
+      ctx.save(); ctx.translate(X(x), Y(y)); ctx.rotate(v[3] * Math.PI / 180);
+      ctx.fillRect(-wid / 2, -len / 2, wid, len); ctx.restore();
+    }
+    return cur.f;
+  }
+  const el = id => document.getElementById(id);
+  let t = 0, speed = 2, playing = true, last = performance.now(), right = 'best';
+  function render() {
+    const fl = drawFrame(L, 'today'), fr = drawFrame(R, right);
+    el('hL').textContent = fl.h; el('sL').textContent = Math.round(fl.ms * 3.6) + ' km/h';
+    el('hR').textContent = fr.h; el('sR').textContent = Math.round(fr.ms * 3.6) + ' km/h';
+    el('hR').className = 'v ' + (fr.h <= fl.h / 2 ? 'good' : 'bad');
+    const sec = 1500 + Math.floor(t), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0'); el('clock').textContent = `${mm}:${ss}`;
+    el('scrub').value = t;
+  }
+  function drawFrame(V, key) { drawNet(V); const f = drawCars(V, P[key], key, t); drawSignals(V, f, SC[key].tls); return f; }
+  function setRight(k) {
+    right = k; el('capR').textContent = META[k].caption; el('dR').textContent = META[k].delay.toFixed(1) + ' s';
+    el('dR').className = 'v ' + (META[k].delay < 25 ? 'good' : 'bad'); render();
+  }
+  let loop = function (now) {
+    const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;
+    if (playing) { t += dt * speed; if (t >= 299) t = 0; render(); }
+    requestAnimationFrame(loop);
+  };
+  el('dL').textContent = META.today.delay.toFixed(1) + ' s';
+  el('pick').addEventListener('change', e => setRight(e.target.value));
+  el('play').addEventListener('click', () => { playing = !playing; el('play').textContent = playing ? 'Pause' : 'Play'; el('play').classList.toggle('on', playing); });
+  document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
+    speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(x => x.classList.toggle('on', x === b)); }));
+  el('scrub').addEventListener('input', e => { t = +e.target.value; render(); });
+  window.addEventListener('resize', () => { resize(); render(); });
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { speed = 1; }
+  // ---------------- training replay (corner window, 20x) ----------------
+  const TR = D.train || null; let tw = null;
+  if (TR) {
+    const seq = [];
+    for (const e of TR.light.episodes) seq.push({ kind: 'light', ep: e.ep, n: TR.light.n, frames: prep({ frames: e.frames }), tls: TR.light.tls });
+    for (const e of TR.fleet.episodes) seq.push({ kind: 'fleet', ep: e.ep, n: TR.fleet.n, frames: prep({ frames: e.frames }), tls: TR.fleet.tls });
+    tw = { seq, i: 0, t: 0 };
+  } else { document.querySelector('.trainwin').hidden = true; }
+  let T;
+  function resizeT() { if (tw) T = setup(el('cT')); }
+  function drawCurve(item) {
+    const c = el('curve'), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1; c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
+    const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
+    const ys = TR[item.kind].curve, n = ys.length, lo = Math.min(...ys), hi = Math.max(...ys), X = i => 4 + (r.width - 8) * i / (n - 1), Y = v => r.height - 6 - (r.height - 14) * (v - lo) / ((hi - lo) || 1);
+    g.strokeStyle = '#3a434a'; g.lineWidth = 1; g.beginPath(); g.moveTo(4, r.height - 6); g.lineTo(r.width - 4, r.height - 6); g.stroke();
+    g.strokeStyle = item.kind === 'light' ? COL.go : COL.ai; g.lineWidth = 1.5; g.beginPath(); ys.forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke();
+    g.fillStyle = COL.amber; g.beginPath(); g.arc(X(item.ep), Y(ys[item.ep]), 3.5, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = '#98a2a7'; g.font = '10px ' + css.getPropertyValue('--mono'); g.fillText(TR[item.kind].label, 6, 10);
+  }
+  function renderT(dt) {
+    if (!tw) return; const item = tw.seq[tw.i]; tw.t += dt * 20;
+    if (tw.t >= item.frames.length - 1) { tw.t = 0; tw.i = (tw.i + 1) % tw.seq.length; drawCurve(tw.seq[tw.i]); }
+    const it = tw.seq[tw.i]; drawNet(T); const f = drawCars(T, it.frames, it.kind === 'light' ? 'today' : 'train', tw.t); drawSignals(T, f, it.tls);
+    el('twEp').textContent = (it.kind === 'light' ? 'AI lights learning' : 'AI cars learning') + ` · episode ${it.ep + 1} of ${it.n}` + (it.ep === 0 ? ' (random start)' : it.ep + 1 === it.n ? ' (final)' : '');
+  }
+  const _loop = loop;
+  loop = function (now) { const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); renderT(playing ? dt : 0); _loop(now); };
+  window.addEventListener('resize', () => { resizeT(); if (tw) drawCurve(tw.seq[tw.i]); });
+  resize(); resizeT(); setRight('best'); if (tw) drawCurve(tw.seq[0]); requestAnimationFrame(loop);
+})();
+</script>
