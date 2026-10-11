@@ -37,7 +37,7 @@ h1 .g { color: var(--go); }
 .tag.ai { background: #12312f; color: var(--ai); }
 .ptitle { font-weight: 600; font-size: 16px; margin: 0; }
 canvas.map { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 6px; background: #0b0d0f; max-width: 100%; }
-.live { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.live { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .kv { display: grid; gap: 2px; align-content: start; }
 .kv .k { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .kv .v { font-family: var(--mono); font-size: clamp(17px, 2vw, 25px); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -96,7 +96,8 @@ select:disabled { opacity: 0.6; cursor: default; }
       <div class="live">
         <div class="kv"><span class="k hk">Cars stopped now</span><span class="v" id="hL">0</span></div>
         <div class="kv"><span class="k">Average speed</span><span class="v" id="sL">0</span></div>
-        <div class="kv"><span class="k" id="dLk">Delay per car, this run</span><span class="v" id="dL">0</span></div>
+        <div class="kv"><span class="k" id="wLk">Time stopped so far</span><span class="v" id="wL">0</span></div>
+        <div class="kv"><span class="k" id="dLk">Delay per trip, whole run</span><span class="v" id="dL">0</span></div>
       </div>
       <p class="caption" id="capL"></p>
     </div>
@@ -106,7 +107,8 @@ select:disabled { opacity: 0.6; cursor: default; }
       <div class="live">
         <div class="kv"><span class="k hk">Cars stopped now</span><span class="v" id="hR">0</span></div>
         <div class="kv"><span class="k">Average speed</span><span class="v" id="sR">0</span></div>
-        <div class="kv"><span class="k" id="dRk">Delay per car, this run</span><span class="v" id="dR">0</span></div>
+        <div class="kv"><span class="k" id="wRk">Time stopped so far</span><span class="v" id="wR">0</span></div>
+        <div class="kv"><span class="k" id="dRk">Delay per trip, whole run</span><span class="v" id="dR">0</span></div>
       </div>
       <p class="caption" id="capR"></p>
     </div>
@@ -143,9 +145,16 @@ select:disabled { opacity: 0.6; cursor: default; }
   const C = k => css.getPropertyValue(k).trim();
   const COL = { road: C('--road'), edge: C('--road-edge'), ai: C('--ai'), human: C('--human'), stop: C('--stop'), go: C('--go'), amber: C('--amber'), muted: C('--muted'), grid: C('--grid'), fg: C('--fg') };
   const pad = 20, el = id => document.getElementById(id);
-  function prep(scene) {                        // id -> entry per frame, for interpolation
-    return scene.frames.map(f => { const m = new Map(); for (const v of f.v) m.set(v[0], v); return { f, m }; });
+  function prep(scene) {                        // id -> entry per frame, for interpolation; ch / ca = car-seconds stopped before this frame (all cars / AI cars)
+    const dt = scene.dt || 1; let ch = 0, ca = 0;
+    return scene.frames.map(f => { const m = new Map(); let a = 0; for (const v of f.v) { m.set(v[0], v); if (v[4] < 1 && v[5] === 1) a++; }
+      const e = { f, m, a, ch, ca }; ch += f.h * dt; ca += a * dt; return e; });
   }
+  function stoppedSoFar(key, ai) {              // live: car-seconds stopped since the clip started, interpolated inside the frame
+    const sc = SCENES[key], pr = P(key), dt = sc.dt || 1, x = Math.max(0, t / dt), i = Math.min(Math.floor(x), pr.length - 1), e = pr[i], a = Math.min(1, x - i);
+    return ai ? e.ca + e.a * dt * a : e.ch + e.f.h * dt * a;
+  }
+  const carMin = s => { const m = s / 60; return (m < 100 ? m.toFixed(1) : Math.round(m).toLocaleString('en-US')) + ' car-min'; };
   const PREP = {}; const P = k => (PREP[k] = PREP[k] || prep(SCENES[k]));
   // one canvas showing one box of one net; the static road layer is drawn once into an offscreen canvas
   function setup(canvas, net, box) {
@@ -201,13 +210,16 @@ select:disabled { opacity: 0.6; cursor: default; }
     el('hL').textContent = hl; el('sL').textContent = Math.round(rl.f.ms * 3.6) + ' km/h';
     el('hR').textContent = hr; el('sR').textContent = Math.round(rr.f.ms * 3.6) + ' km/h';
     el('hR').className = 'v ' + (hr < hl ? 'good' : hr > hl ? 'bad' : ''); el('hL').className = 'v ' + (hl > hr ? 'bad' : '');
+    const cl = stoppedSoFar(c.left, ai), cr = stoppedSoFar(c.right, ai); el('wL').textContent = carMin(cl); el('wR').textContent = carMin(cr);
+    el('wR').className = 'v ' + (cr < cl ? 'good' : cr > cl ? 'bad' : ''); el('wL').className = 'v ' + (cl > cr ? 'bad' : '');
     const sec = SCENES[c.left].t0 + Math.floor(t), mm = Math.floor(sec / 60), ss = String(sec % 60).padStart(2, '0'); el('clock').textContent = `${mm}:${ss}`;
     el('scrub').value = t;
   }
   function panel(S, key) {
     const sc = SCENES[key];
     el('tag' + S).textContent = sc.tag; el('tag' + S).className = 'tag ' + sc.tagClass; el('title' + S).textContent = sc.title; el('cap' + S).textContent = sc.caption;
-    el('d' + S + 'k').textContent = V_().metricAI ? 'AI-car delay, this run' : 'Delay per car, this run';
+    el('d' + S + 'k').textContent = V_().metricAI ? 'AI-car delay per trip, whole run' : 'Delay per trip, whole run';
+    el('w' + S + 'k').textContent = V_().metricAI ? 'AI cars: time stopped so far' : 'Time stopped so far (all cars)';
     el('d' + S).textContent = sc.delay.toFixed(1) + ' s';
   }
   function resize() { const b = zoomed ? V_().zoom : NETS[V_().net].bbox; L = setup(el('cL'), NETS[V_().net], b); R = setup(el('cR'), NETS[V_().net], b); }
