@@ -1,0 +1,33 @@
+== P2 nesting panel 5401-5464 x 8/16 (4x4): complete seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+-- gain vs Z, %
+CK1 | K1/PLAIN | +5.70 [+4.03, +7.11] (10/10 > 0)
+CK1 | U1/PLAIN | -3.48 [-6.44, -0.54] (3/10 > 0)
+CK1 | U2/PLAIN | -2.43 [-4.53, -0.21] (3/10 > 0)
+CK1 | U2/EXACT | +5.70 [+4.03, +7.11] (10/10 > 0)
+CK1 | U1/EXACT | -7.65 [-12.30, -2.78] (2/10 > 0)
+Cage | K1/PLAIN | -2.52 [-4.20, -1.00] (1/10 > 0)
+Cage | U1/PLAIN | +6.23 [+5.29, +7.21] (10/10 > 0)
+Cage | U2/PLAIN | +5.94 [+4.96, +6.96] (10/10 > 0)
+MIX | K1/PLAIN | +5.11 [+3.77, +6.36] (10/10 > 0)
+MIX | U1/PLAIN | +5.86 [+4.65, +7.12] (10/10 > 0)
+MIX | U2/PLAIN | +5.77 [+4.77, +6.85] (10/10 > 0)
+-- paired differences (same receiver checkpoint, same episodes)
+CK1 U1/PLAIN - K1/PLAIN (the deployed hazard): -9.18 [-12.23, -6.15] (0/10 > 0)
+CK1 U2/PLAIN - K1/PLAIN (nested upgrade): -8.13 [-10.54, -5.67] (0/10 > 0)
+CK1 U1/EXACT - U1/PLAIN: -4.17 [-8.34, -0.14] (4/10 > 0)
+CK1 U1/EXACT - K1/PLAIN: -13.35 [-18.16, -8.60] (1/10 > 0)
+CK1 U2/EXACT - K1/PLAIN: -0.00 [-0.01, +0.00] (1/10 > 0)
+Cage U2/PLAIN - U1/PLAIN: -0.29 [-0.64, +0.05] (1/10 > 0)
+MIX U2/PLAIN - U1/PLAIN: -0.09 [-0.49, +0.39] (3/10 > 0)
+-- N1 detail (Amendment 1): U2/EXACT episodes differing from K1/PLAIN: 50 of 1280 (mismatched steps 91; first steps [15, 23]; queue differs in 8)
+-- emulator on U1: missing-entry share per seed [0.216, 0.216, 0.216, 0.216, 0.216, 0.216, 0.216, 0.216, 0.216, 0.216] (older substitutes / missing: 967980 / 969670)
+-- CK1 costs: K1/PLAIN: 10400 B delivered/episode, 0.378 s, buffer 0; U1/PLAIN: 77962 B delivered/episode, 0.520 s, buffer 0; U2/PLAIN: 77962 B delivered/episode, 0.525 s, buffer 0; U2/EXACT: 77962 B delivered/episode, 0.476 s, buffer 4979; U1/EXACT: 77962 B delivered/episode, 0.473 s, buffer 5037
+-- Cage costs: K1/PLAIN: 10400 B delivered/episode, 0.431 s, buffer 0; U1/PLAIN: 77962 B delivered/episode, 0.592 s, buffer 0; U2/PLAIN: 77962 B delivered/episode, 0.596 s, buffer 0
+-- MIX costs: K1/PLAIN: 10400 B delivered/episode, 0.429 s, buffer 0; U1/PLAIN: 77962 B delivered/episode, 0.593 s, buffer 0; U2/PLAIN: 77962 B delivered/episode, 0.594 s, buffer 0
+-- exploratory (Amendment 2): CK1 U2/PLAIN - U1/PLAIN +1.05 [-0.21, +2.52] (6/10 > 0) (an estimate, not a bound or a causal split); U2/EXACT - K1/PLAIN mean -0.0032 [-0.0104, +0.0002]
+-- verdicts (PROTOCOL_E3_P2_NESTING_20261003 §3)
+N1 U2/EXACT == K1/PLAIN on every episode (locked step by step) -> NOT SUPPORTED
+N2 U1 missing-entry share >= 10 % on every seed -> SUPPORTED
+N3 U1/EXACT partial: > U1/PLAIN (lower > 0) and < K1/PLAIN (upper < 0) -> NOT SUPPORTED
+N4 nested upgrade still hurts: U2/PLAIN < K1/PLAIN (upper < 0) -> SUPPORTED
+N5 nesting costs the adaptive-trained receiver: Cage U2 < U1 (upper < 0) -> NOT SUPPORTED

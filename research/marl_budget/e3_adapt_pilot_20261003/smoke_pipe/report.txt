@@ -1,0 +1,25 @@
+== adaptation pilot (screening; seeds [0]): 84 / 84 required evaluations present
+-- seed 0: DEV gain vs Z, NEW channel (iid) / OLD channel (K1) drop from the parent (parent: new -2.62, old +8.59)
+arm | B=8 | B=16
+FTNEW | -2.62 / drop +3.88 | +1.82 / drop +33.02
+FTMIX | -2.01 / drop +5.81 | +0.34 / drop -1.86
+PCT | -1.63 / drop +0.46 | +0.08 / drop +4.33
+PAIRED | -3.69 / drop +10.33 | -7.83 / drop +2.05
+A0 | -8.62 / drop +4.79 | -3.84 / drop +9.12
+A1 | -0.61 / drop +27.01 | -3.72 / drop +8.09
+A2 | -2.32 / drop +15.35 | +1.37 / drop +0.57
+BCWI | -3.57 / drop +0.42 | -2.62 / drop +0.00 (alpha ['0.5', '0'])
+cost FTNEW s0: simulated episodes 16, teacher queries (decision steps) 416, 17 s
+cost FTMIX s0: simulated episodes 16, teacher queries (decision steps) 416, 15 s
+cost PCT s0: simulated episodes 16, teacher queries (decision steps) 416, 17 s
+cost PAIRED s0: simulated episodes 16, teacher queries (decision steps) 208, 14 s, h-rate mean 0.107
+cost A0 s0: simulated episodes 16, teacher queries (decision steps) 208, 12 s, h-rate mean 0.113
+cost A1 s0: simulated episodes 16, teacher queries (decision steps) 208, 13 s, h-rate mean 0.116
+cost A2 s0: simulated episodes 16, teacher queries (decision steps) 208, 13 s, h-rate mean 0.109
+-- contrasts at B = 8 (new-channel gain difference per seed, DEV): PAIRED-FTMIX [primary] [-1.67]; PAIRED-A0 [weighting + preservation] [4.94]; PAIRED-A2 [weighting (h), given preservation] [-1.37]; PAIRED-A1 [preservation, given weighting] [-3.08]; A0-FTMIX [pairing alone] [-6.61]; PAIRED-PCT [vs PCT-style] [-2.05]; PAIRED-BCWI [vs BCWI] [-0.11]; FTNEW-FTMIX [old replay] [-0.61]
+-- contrasts at B = 16 (new-channel gain difference per seed, DEV): PAIRED-FTMIX [primary] [-8.17]; PAIRED-A0 [weighting + preservation] [-3.99]; PAIRED-A2 [weighting (h), given preservation] [-9.19]; PAIRED-A1 [preservation, given weighting] [-4.1]; A0-FTMIX [pairing alone] [-4.18]; PAIRED-PCT [vs PCT-style] [-7.9]; PAIRED-BCWI [vs BCWI] [-5.21]; FTNEW-FTMIX [old replay] [1.48]
+-- primary (B = 16, DEV): PAIRED - FTMIX per seed {0: -8.17}; PAIRED old drop {0: 2.05}
+   registered GO = (1) > +1.0 every seed False & (2) old drop <= 0.5 False & (3) PAIRED > A0 False -> False
+   Amendment 1 GO additionally needs (4) PAIRED > A2 on every seed False & (5) PAIRED > PCT and > BCWI on every seed False -> NO-GO (report where PAIRED loses)
+   caveat: the loss normalises CE over old and new samples together, so gamma > 0 also raises the new channel's share of the weight; PAIRED - A2 confounds regression targeting with that shift (control arm: uniform new-channel up-weighting, confirmation stage)
+   best arm at B = 16 per seed (new channel): {0: 'FTNEW'}

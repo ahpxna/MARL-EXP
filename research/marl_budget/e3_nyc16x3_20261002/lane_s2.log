@@ -1,1 +1,15 @@
-train set_full_s2 Sat Oct  3 06:39:58 EDT 2026
+done set_full_s2
+train relayCage_st_s2 (iid, v9 resumable) Sat Oct  3 22:42:49 EDT 2026
+train relayCK1_st_s2 (const1, v9 resumable) Sat Oct  3 22:42:49 EDT 2026
+train distill_none_s2 Sat Oct  3 22:42:49 EDT 2026
+done set_full_s2
+train relayCage_st_s2 (iid, v9 resumable) Sat Oct  3 23:09:27 EDT 2026
+train relayCK1_st_s2 (const1, v9 resumable) Sat Oct  3 23:09:27 EDT 2026
+train distill_none_s2 Sat Oct  3 23:09:27 EDT 2026
+scripts/RUN_marl_nyc.sh: line 28: 94832 Terminated: 15          "$PY" scripts/run_with_watchdog.py --log "$A/$z.log" --out "$A/$z" --stall 2400 --retries 3 -- "$PY" -u $W scripts/MARL_e3_actor_distill.py --teacher "$A/$t/ckpt_best.pt" --student-delivery none --seed $s --iters $SI --threads 2 --out "$A/$z"
+scripts/RUN_marl_nyc.sh: line 29: 94830 Terminated: 15          "$PY" scripts/run_with_watchdog.py --log "$A/$a.log" --stall 2400 --retries 20 -- "$PY" -u $WR scripts/MARL_e3_actor_distill_v9.py --teacher "$A/$t/ckpt_best.pt" --student-delivery prefix --relay age --seed $s --iters $SI --quant 4 --order agefirst --capacity $cap --park-if-no-state --out "$A/$a"
+scripts/RUN_marl_nyc.sh: line 29: 94825 Terminated: 15          "$PY" scripts/run_with_watchdog.py --log "$A/$a.log" --stall 2400 --retries 20 -- "$PY" -u $WR scripts/MARL_e3_actor_distill_v9.py --teacher "$A/$t/ckpt_best.pt" --student-delivery prefix --relay age --seed $s --iters $SI --quant 4 --order agefirst --capacity $cap --park-if-no-state --out "$A/$a"
+FAIL distill_none_s2
+FAIL relayCK1_st_s2
+FAIL relayCage_st_s2
+missing distill_none_s2: stop
