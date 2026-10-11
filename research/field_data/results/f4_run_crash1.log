@@ -1,0 +1,34 @@
+KF4-2' leader RMS >= 0.5 m: train 62 / 539, test 28 / 332 -> dropped
+Krauss start done {'start': [-0.1335313926245225, -0.25131442828090605, -1.0498221244986778, -0.2231435513142097], 'fun': 0.3056572165958942, 'th': {'accel': 1.9428330872834725, 'decel': 3.0780318981724504, 'tau': 0.3202209193019394, 'minGap': 4.384635875607506}, 'nfev': 150}
+Krauss start done {'start': [0.1257302210933933, -0.1321048632913019, 0.6404226504432821, 0.10490011715303971], 'fun': 0.31027974635874295, 'th': {'accel': 2.820973777027713, 'decel': 2.454995012468367, 'tau': 0.30278399419339774, 'minGap': 3.94791104976499}, 'nfev': 150}
+Krauss start done {'start': [-0.535669373161111, 0.36159505490948474, 1.3040000451301372, 0.9470809631292422], 'fun': 0.30746309821551304, 'th': {'accel': 0.9525890072600075, 'decel': 5.506435113989954, 'tau': 0.6734404017889659, 'minGap': 3.9931812083553035}, 'nfev': 150}
+Krauss start done {'start': [-0.7037352358069926, -1.2654214710460525, -0.6232744625373522, 0.0413259793472436], 'fun': 0.2989907984740053, 'th': {'accel': 0.9313413921647005, 'decel': 2.680498125210427, 'tau': 0.34521780287595333, 'minGap': 2.5408844990607506}, 'nfev': 150}
+Krauss start done {'start': [-2.3250307746388343, -0.21879166393254573, -1.2459109472530652, -0.7322673547034516], 'fun': 0.29809307411457825, 'th': {'accel': 0.9459948949373757, 'decel': 4.2000147083147255, 'tau': 0.5107227344383658, 'minGap': 3.6277280036035116}, 'nfev': 150}
+Krauss start done {'start': [-0.5442589828573099, -0.31630015636915454, 0.4116305363741328, 1.0425133694426776], 'fun': 0.2974309468644798, 'th': {'accel': 1.0474440052654592, 'decel': 2.9414247144371877, 'tau': 0.3900714281981164, 'minGap': 4.006817364299523}, 'nfev': 150}
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/FIELD_f4_calib.py", line 154, in <module>
+    best, hist = calib(m); res[m] = dict(best_train_nrmse=best[0], th=best[1], starts=hist, default_train_nrmse=nrmse(TR, e))
+                 ^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/FIELD_f4_calib.py", line 95, in calib
+    r = minimize(f, z0, method='Nelder-Mead', options=dict(maxfev=nev, xatol=1e-3, fatol=1e-5))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/external_envs/runtime/lib/python3.12/site-packages/scipy/optimize/_minimize.py", line 772, in minimize
+    res = _minimize_neldermead(fun, x0, args, callback, bounds=bounds,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/external_envs/runtime/lib/python3.12/site-packages/scipy/optimize/_optimize.py", line 883, in _minimize_neldermead
+    fxe = func(xe)
+          ^^^^^^^^
+  File "/Users/phanan/cig-amf-main/external_envs/runtime/lib/python3.12/site-packages/scipy/optimize/_optimize.py", line 560, in function_wrapper
+    fx = function(np.copy(x), *(wrapper_args + args))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/FIELD_f4_calib.py", line 94, in <lambda>
+    f = lambda z: nrmse(TR, run_pairs(TR, model, to_th(model, z))[0])  # noqa: E731
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/FIELD_f4_calib.py", line 56, in run_pairs
+    ls.simulationStep()
+  File "/Users/phanan/cig-amf-main/external_envs/city_runtime/lib/python3.12/site-packages/libsumo/__init__.py", line 231, in simulationStep
+    _libsumo_step(time)
+  File "/Users/phanan/cig-amf-main/external_envs/city_runtime/lib/python3.12/site-packages/libsumo/libsumo.py", line 3714, in step
+    return _libsumo.simulation_step(time)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+libsumo.libsumo.FatalTraCIError: Departure speed for vehicle 'F77' is too high for the vehicle type 'fol'.
