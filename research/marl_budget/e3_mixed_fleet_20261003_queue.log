@@ -1,0 +1,50 @@
+mixed fleet queue start Sat Oct  3 20:43:10 EDT 2026; lanes 3
+job REF 0 done rc=0 Sat Oct  3 20:45:30 EDT 2026
+job MIX 0 D done rc=0 Sat Oct  3 20:48:30 EDT 2026
+job MIX 0 C done rc=0 Sat Oct  3 20:48:30 EDT 2026
+job MIX 1 D done rc=0 Sat Oct  3 20:50:30 EDT 2026
+job REF 1 done rc=0 Sat Oct  3 20:50:40 EDT 2026
+job MIX 1 C done rc=0 Sat Oct  3 20:52:41 EDT 2026
+job MIX 2 D done rc=0 Sat Oct  3 20:54:41 EDT 2026
+job REF 2 done rc=0 Sat Oct  3 20:54:41 EDT 2026
+job MIX 2 C done rc=0 Sat Oct  3 20:54:51 EDT 2026
+job REF 3 done rc=0 Sat Oct  3 20:56:51 EDT 2026
+job MIX 3 D done rc=0 Sat Oct  3 20:58:51 EDT 2026
+job MIX 3 C done rc=0 Sat Oct  3 20:58:52 EDT 2026
+job MIX 4 D done rc=0 Sat Oct  3 21:00:51 EDT 2026
+job REF 4 done rc=0 Sat Oct  3 21:00:52 EDT 2026
+job MIX 4 C done rc=0 Sat Oct  3 21:02:31 EDT 2026
+jobs exit status 0
+== mixed-version fleet pilot (4x4, OLD = CK1 at 50 %, NEW = Cage), seeds [0, 1, 2, 3, 4], traffic 5901-5932 x 8/16
+-- layout D (OLD agents [0, 2, 5, 7, 8, 10, 13, 15])
+arm | system | OLD group | NEW group | bytes delivered / episode | emulator buffer | flags / OLD decision | s / episode
+U1/PLAIN | +1.30 [-0.11, +2.87] (4/5 > 0) | -0.71 [-2.59, +1.24] (2/5 > 0) | +3.20 [+1.77, +4.72] (5/5 > 0) | 77652 | 0 | 0.000 | 0.832
+U2/PLAIN | +1.15 [-0.57, +2.82] (3/5 > 0) | -1.17 [-3.12, +0.82] (2/5 > 0) | +3.35 [+1.60, +5.07] (5/5 > 0) | 77652 | 0 | 0.000 | 0.832
+U2/EMU_OLD | +4.68 [+2.78, +6.31] (5/5 > 0) | +4.63 [+2.45, +6.37] (5/5 > 0) | +4.73 [+2.76, +6.74] (5/5 > 0) | 77652 | 4977 | 0.000 | 0.784
+U1/FB_OLD | +2.27 [+1.07, +3.29] (5/5 > 0) | +1.88 [+0.34, +3.46] (4/5 > 0) | +2.64 [+1.45, +3.78] (5/5 > 0) | 77652 | 0 | 0.994 | 0.862
+K1/ROLLBACK | +0.51 [-1.93, +2.44] (3/5 > 0) | +0.63 [-1.53, +2.48] (3/5 > 0) | +0.41 [-2.74, +2.81] (4/5 > 0) | 10400 | 0 | 0.000 | 0.596
+ALLOLD | +5.04 [+2.31, +7.30] (4/5 > 0) | +5.06 [+2.04, +7.76] (4/5 > 0) | +5.02 [+2.50, +7.02] (5/5 > 0) | 10400 | 0 | 0.000 | 0.597
+ALLNEW | +5.38 [+4.32, +6.33] (5/5 > 0) | +5.62 [+4.16, +6.93] (5/5 > 0) | +5.15 [+4.10, +6.27] (5/5 > 0) | 77652 | 0 | 0.000 | 0.819
+paired: EMU_OLD - U2/PLAIN system +3.53 [+1.95, +5.32] (5/5 > 0); EMU_OLD - FB_OLD system +2.41 [+1.13, +3.68] (5/5 > 0), OLD group +2.75 [+1.25, +4.13] (5/5 > 0)
+   (no verdict) EMU_OLD - U1/PLAIN: system +3.38 [+1.41, +5.57] (5/5 > 0), OLD +5.34 [+3.35, +7.71] (5/5 > 0), NEW +1.53 [-0.77, +3.95] (3/5 > 0)
+   (no verdict) EMU_OLD - K1/ROLLBACK: system +4.17 [+2.42, +6.47] (5/5 > 0), OLD +4.01 [+2.02, +6.47] (5/5 > 0), NEW +4.32 [+2.09, +6.99] (5/5 > 0)
+   (no verdict) EMU_OLD - ALLNEW: system -0.70 [-2.10, +0.45] (3/5 > 0), OLD -0.99 [-2.33, +0.21] (0/5 > 0), NEW -0.42 [-2.17, +1.14] (3/5 > 0)
+   (no verdict) EMU_OLD - ALLOLD: system -0.36 [-2.49, +1.18] (3/5 > 0), OLD -0.42 [-2.61, +1.10] (3/5 > 0), NEW -0.29 [-2.71, +1.63] (3/5 > 0)
+GO rule (D): (1) EMU_OLD > U2/PLAIN lower > 0: True; (2) EMU_OLD > FB_OLD lower > 0, or more OLD retention at no more bytes: True; (3) NEW group >= U1/PLAIN - 0.5: True -> GO
+-- layout C (OLD agents [0, 1, 4, 5, 8, 9, 12, 13])
+arm | system | OLD group | NEW group | bytes delivered / episode | emulator buffer | flags / OLD decision | s / episode
+U1/PLAIN | +1.93 [+0.69, +3.26] (5/5 > 0) | +0.59 [-1.86, +2.64] (4/5 > 0) | +3.20 [+0.80, +5.56] (4/5 > 0) | 77652 | 0 | 0.000 | 0.785
+U2/PLAIN | +1.92 [+0.74, +3.07] (5/5 > 0) | +0.64 [-1.86, +2.87] (3/5 > 0) | +3.15 [+1.08, +5.43] (4/5 > 0) | 77652 | 0 | 0.000 | 0.783
+U2/EMU_OLD | +4.63 [+2.83, +6.19] (5/5 > 0) | +4.50 [+1.61, +7.23] (4/5 > 0) | +4.62 [+2.62, +6.95] (5/5 > 0) | 77652 | 4977 | 0.000 | 0.737
+U1/FB_OLD | +2.17 [+0.90, +3.40] (5/5 > 0) | +0.07 [-0.97, +1.00] (2/5 > 0) | +4.24 [+1.75, +6.81] (5/5 > 0) | 77652 | 0 | 0.994 | 0.819
+K1/ROLLBACK | +0.52 [-1.22, +2.13] (3/5 > 0) | +2.84 [+0.31, +5.54] (4/5 > 0) | -2.03 [-5.33, +1.20] (1/5 > 0) | 10400 | 0 | 0.000 | 0.565
+ALLOLD | +5.04 [+2.31, +7.30] (4/5 > 0) | +5.80 [+2.55, +8.83] (5/5 > 0) | +4.15 [+1.27, +7.05] (4/5 > 0) | 10400 | 0 | 0.000 | 0.597
+ALLNEW | +5.38 [+4.32, +6.33] (5/5 > 0) | +5.31 [+3.43, +7.23] (5/5 > 0) | +5.33 [+3.62, +7.22] (5/5 > 0) | 77652 | 0 | 0.000 | 0.819
+paired: EMU_OLD - U2/PLAIN system +2.71 [+1.22, +4.23] (5/5 > 0); EMU_OLD - FB_OLD system +2.47 [+1.33, +3.62] (5/5 > 0), OLD group +4.43 [+1.77, +6.76] (4/5 > 0)
+   (no verdict) EMU_OLD - U1/PLAIN: system +2.70 [+1.14, +4.39] (5/5 > 0), OLD +3.91 [+1.27, +6.29] (4/5 > 0), NEW +1.42 [-0.69, +3.47] (4/5 > 0)
+   (no verdict) EMU_OLD - K1/ROLLBACK: system +4.11 [+2.42, +5.92] (5/5 > 0), OLD +1.66 [-0.02, +3.28] (4/5 > 0), NEW +6.65 [+4.33, +9.29] (5/5 > 0)
+   (no verdict) EMU_OLD - ALLNEW: system -0.74 [-1.98, +0.30] (1/5 > 0), OLD -0.81 [-2.84, +0.80] (3/5 > 0), NEW -0.71 [-1.84, +0.26] (1/5 > 0)
+   (no verdict) EMU_OLD - ALLOLD: system -0.40 [-2.25, +0.88] (4/5 > 0), OLD -1.30 [-3.63, +0.27] (1/5 > 0), NEW +0.47 [-1.33, +2.10] (3/5 > 0)
+GO rule (C): (1) EMU_OLD > U2/PLAIN lower > 0: True; (2) EMU_OLD > FB_OLD lower > 0, or more OLD retention at no more bytes: True; (3) NEW group >= U1/PLAIN - 0.5: True -> GO
+pilot verdict per layout: {'D': True, 'C': True} (GO opens a fresh multi-seed confirmation; it is not a benchmark win)
+mixed fleet queue end Sat Oct  3 21:02:47 EDT 2026

@@ -1,0 +1,19 @@
+Q7b start Fri Oct  2 23:10:07 EDT 2026
+lane t1 trained Sat Oct  3 00:45:16 EDT 2026
+lane t3 trained Sat Oct  3 00:45:52 EDT 2026
+lane t2 trained Sat Oct  3 00:46:38 EDT 2026
+eval start Sat Oct  3 00:46:38 EDT 2026
+t3 RL-C60 | g +2.67 | r -0.66 [-1.26, -0.17] | K_free 0.022 | K_contract 0.017 | OOS 0.015
+t3 RL-C80 | g +2.68 | r -0.58 [-1.04, -0.31] | K_free 0.036 | K_contract 0.027 | OOS 0.025
+t3 RL-C120 | g +2.79 | r -0.50 [-0.94, -0.11] | K_free 0.039 | K_contract 0.029 | OOS 0.029
+t3 RL-J | g +2.30 | r -0.33 [-0.86, 0.2] | K_free 0.005 | K_contract 0.004 | OOS 0.007
+frontier (mean over t; cap -> g, r): 30: +1.42/+1.61, 40: +2.08/+2.88, 50: +2.32/+4.05, 60: +2.39/+4.89, 80: +2.55/+6.02, 120: +2.62/+7.05, inf: +2.61/+10.89
+B1 replication: RL-H_t >= 5 % better than ACT and r(RL-H_t) lower > 0 for every t: NOT SUPPORTED {}
+B2 frontier monotone (<= 1 violation of <= 1 per curve) and some c <= 60 keeps >= 80 % of g with r <= half: SUPPORTED {"caps_ok": [50, 60]}
+B3 contract certificate ranks the regression (Spearman >= 0.7, > K_free) and is within x2 of cross-play OOS: NOT SUPPORTED {"spearman_contract": 0.36396396396396397, "spearman_free": 0.3984555984555985, "factor2": false, "n": 36}
+B4 FT: in-support (K_contract <= 0.02) yet regressed (r >= 10): SUPPORTED {"K_contract": 0.0, "r": 29.574030236115902}
+B4' FT: in-support and mismatched vs the FT specialist (m >= 10): SUPPORTED {"K_contract": 0.0, "mismatch": 13.067169254513768, "n": 20}
+B5 knee at the receiver support: p(50), p(60) <= 0.15, p(30) >= 2 p(50), r(30) >= 0.5 r(50): NOT SUPPORTED {"price": {"30": 0.45420074236310126, "40": 0.20236837728551493, "50": 0.11131349832253778, "60": 0.08294236529359367, "80": 0.024918845601221817, "120": -0.005546920580683068}, "r30": 1.6145927110578924, "r50": 4.05369426888475}
+reported (H2b): K_contract with the fleet present vs cross-play OOS: Spearman +0.94, mean ratio 0.77; human-traffic K_contract mean ratio 0.34; Spearman(K_contract with fleet, r) +0.52
+[03/10/2026 01:01:19] 125 predictions {'bad': 40, 'good': 70, 'info': 9, 'bad_caveat': 1, 'good_caveat': 1, 'void': 4}, errors 0
+Q7b end Sat Oct  3 01:01:19 EDT 2026

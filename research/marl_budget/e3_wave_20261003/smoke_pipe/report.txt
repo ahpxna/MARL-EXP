@@ -1,0 +1,20 @@
+== E6 (closed loop, dev 9001-9002 x 8/16, seeds [0]): ambiguous share 0.000000; EXACT_PACKET - K1 mean +0.0000 (per seed [0.0]); EXACT_PACKET - EXACT mean +0.0000; mismatched steps vs K1 0; missing 0 of 14032
+   decision: EXACT_PACKET replaces EXACT in E7 with no other change
+== E3 (panel 9001-9002 x 8/16, seeds [0]): gain vs Z
+K1/PLAIN | +9.89 [+8.59, +11.18] (1/1 > 0)
+U1/PLAIN | -0.36 [-2.62, +1.88] (0/1 > 0)
+U1/EMU_OLDER | -17.71 [-17.97, -17.44] (0/1 > 0) | missing 0.216, ambiguous 0
+U1/EMU_ABSENT | -17.90 [-23.78, -12.08] (0/1 > 0) | missing 0.216, ambiguous 0
+U1/EMU_FRESH | -1.70 [-3.91, +0.49] (0/1 > 0) | missing 0.216, ambiguous 0
+E3a EMU_FRESH - EMU_OLDER +16.01 [+13.53, +18.46] (1/1 > 0) -> SUPPORTED
+E3b (exploratory) EMU_ABSENT - EMU_OLDER -0.19 [-6.34, +5.89] (0/1 > 0); vs PLAIN: U1/EMU_OLDER -17.35 [-19.85, -14.82] (0/1 > 0), U1/EMU_ABSENT -17.54 [-21.16, -13.96] (0/1 > 0), U1/EMU_FRESH -1.34 [-1.39, -1.29] (0/1 > 0)
+E3c no emulator arm recovers >= 50 % of the CK1 hazard (+10.25): {'U1/EMU_OLDER': -1.69, 'U1/EMU_ABSENT': -1.71, 'U1/EMU_FRESH': -0.13} -> SUPPORTED
+== E11 (DEV 9002-9002): NEW-channel gain / OLD-channel gain (parent new, old in brackets)
+seed 0 (parent new -2.62, old +8.59)
+  SCRATCH_NEW | B=8: -230.70 / -230.70 | B=16: -166.98 / -216.38
+  SCRATCH_MIX | B=8: -230.70 / -230.70 | B=16: -159.08 / -215.65
+  SCRATCH_MIX_T | B=8: -87.04 / -75.84 | B=16: -73.94 / -58.43
+  FTNEW | B=8: -2.62 / +4.71 | B=16: +1.82 / -24.43
+  FTMIX | B=8: -2.01 / +2.77 | B=16: +0.34 / +10.45
+  PCT | B=8: -1.63 / +8.13 | B=16: +0.08 / +4.26
+E11 FT-mix (warm) - SCRATCH_MIX > 0 on NEW at every B <= 40 on every seed: [(0, 8, 228.69), (0, 16, 159.42)] -> SUPPORTED

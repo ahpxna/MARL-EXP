@@ -1,0 +1,27 @@
+nyc throttled queue start Sat Oct  3 23:04:06 EDT 2026
+pair 0 2 done Sat Oct  3 23:25:08 EDT 2026; free 8 GB
+pair 3 4 done Sat Oct  3 23:25:08 EDT 2026; free 8 GB
+pair 1 done Sat Oct  3 23:25:08 EDT 2026; free 8 GB
+nyc lanes done Sat Oct  3 23:25:08 EDT 2026
+missing distill_none_s3: stop
+REFUSED: 8 GB free
+REFUSED: 8 GB free
+REFUSED: 8 GB free
+missing distill_none_s4: stop
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_nyc_report.py", line 84, in <module>
+    main(p.parse_args())
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_nyc_report.py", line 34, in main
+    Z = {s: load(f'Z_s{s}', 'none', f'distill_none_s{s}') for s in seeds}
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/MARL_e3_nyc_report.py", line 20, in load
+    d = E / tag; m = json.loads((d / 'manifest.json').read_text())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'research/marl_budget/e3_nyc16x3_20261002/eval/Z_s0/manifest.json'
+nyc throttled queue end Sat Oct  3 23:25:09 EDT 2026

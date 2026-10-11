@@ -1,0 +1,28 @@
+== W8-1 SPDIAG: why the method fails on spider (descriptive; PROTOCOL_CITY_WAVE8_20261005)
+D1 light reaction (mean over runs): green_mean (s) / mean_halting
+  spider attempt 1: R 18.9 / 8.25; HYBK 28.7 / 6.58; TSIK 17.3 / 3.90; ADPK 17.3 / 7.93
+  spider attempt 2: R 18.9 / 8.25; HYBK 28.5 / 6.88; TSIK2 15.4 / 4.14; ADPK2 16.2 / 8.09
+  spider attempt 3: R 19.0 / 8.37; SVC3 19.0 / 8.35; TSIK3 18.3 / 8.19; ADPK3 18.2 / 8.15
+  grid4 TSI-2 panel (reference): R 15.0 / 2.91; HYB 17.1 / 1.63; TSI2 15.0 / 1.49; ADP2 14.4 / 2.70
+D2 forecast error at queried light-seconds (prediction - realized, s): n | MAE | bias | share |err| > 5 s   (grid4 reference: MAE 3.02 s published, C-109)
+  K=all kind= r=: n 80004 | MAE 21.48 | bias -15.50 | >5s 0.686
+  K=2 kind= r=: n 38328 | MAE 23.62 | bias -15.24 | >5s 0.732
+  K=2 kind=0 r=0: n 18486 | MAE 24.23 | bias -15.70 | >5s 0.747
+  K=2 kind=1 r=0: n 19164 | MAE 23.41 | bias -15.15 | >5s 0.723
+  K=2 kind=1 r=1: n 678 | MAE 12.95 | bias -5.23 | >5s 0.563
+  K=3 kind= r=: n 41676 | MAE 19.51 | bias -15.74 | >5s 0.644
+  K=3 kind=0 r=0: n 12217 | MAE 18.74 | bias -15.59 | >5s 0.636
+  K=3 kind=1 r=0: n 13892 | MAE 16.48 | bias -13.61 | >5s 0.561
+  K=3 kind=1 r=1: n 13892 | MAE 23.36 | bias -18.48 | >5s 0.731
+  K=3 kind=1 r=2: n 1675 | MAE 18.34 | bias -11.65 | >5s 0.669
+D3 value of exact timing (oracle - sigma* on the same open-loop replay; TUNE 1100-1103): agent fuel % / agent TL / human TL
+  RLK11: fuel -7.39 % (per seed -6.4, -8.7, -6.5, -7.9), agent TL -0.04, human TL -0.30; replay == recorded R (KH-1): False
+  RLK111: fuel -6.63 % (per seed -5.7, -6.4, -7.5, -7.0), agent TL +1.34, human TL +1.30; replay == recorded R (KH-1): False
+  grid4 reference: exact timing on the replayed learned-light schedule -6.57 % fuel (C-72 D-dir, delta 0), -5.60 % (X3, C-107)
+D4 harm by signal type (vs R, TUNE 1100-1103, mean over seeds): agent fuel % / city TL / agent TL / human TL
+  RLK11 FULL: fuel -1.70 % | city +0.76 | agent +1.36 | human +0.23
+  RLK11 K2ONLY: fuel +0.12 % | city +0.51 | agent +1.43 | human -0.33
+  RLK11 K3ONLY: fuel -1.80 % | city -0.13 | agent +0.16 | human -0.41
+  RLK111 FULL: fuel -1.82 % | city +0.26 | agent +0.95 | human -0.41
+  RLK111 K2ONLY: fuel +0.51 % | city +0.55 | agent +0.94 | human +0.14
+  RLK111 K3ONLY: fuel -2.43 % | city -0.36 | agent -0.37 | human -0.37

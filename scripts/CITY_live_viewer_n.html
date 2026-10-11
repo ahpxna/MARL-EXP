@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>City Live View</title>
+<style>
+  :root {
+    --bg: #0d1117; --road: #2a3039; --junction: #313844; --edge: #3b4350; --text: #e6edf3; --muted: #8b949e;
+    --panel: rgba(13, 17, 23, 0.86); --border: #30363d; --accent: #58a6ff;
+    --go: #3fb950; --yield: #a5f3fc; --amber: #d29922; --stop: #f85149; --agent: #d2a8ff; --human: #c9d1d9;
+    --car-move: #39c5cf; --car-slow: #e3b341; --car-stop: #ff7b72;
+  }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overflow: hidden;
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  canvas { display: block; width: 100vw; height: 100vh; cursor: grab; }
+  canvas.drag { cursor: grabbing; }
+  .panel { position: fixed; top: 12px; left: 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; min-width: 230px; max-width: calc(100vw - 48px); backdrop-filter: blur(6px); }
+  .panel h1 { font-size: 14px; margin: 0 0 2px; font-weight: 600; }
+  .panel .sub { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+  .grid { display: grid; grid-template-columns: auto auto; gap: 3px 16px; font-variant-numeric: tabular-nums; }
+  .grid .k { color: var(--muted); } .grid .v { text-align: right; }
+  .row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+  button, select { background: #21262d; color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px;
+    font: inherit; cursor: pointer; }
+  button:hover, select:hover { border-color: var(--accent); }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; color: var(--muted); font-size: 12px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+  .status { position: fixed; bottom: 12px; left: 12px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="panel">
+  <h1>grid4 · M3 night arms (05/10) · SUMO live</h1>
+  <div class="sub" id="mode">connecting…</div>
+  <div class="grid">
+    <span class="k">Sim time</span><span class="v" id="t">–</span>
+    <span class="k">Vehicles running</span><span class="v" id="running">–</span>
+    <span class="k">Arrived</span><span class="v" id="arrived">–</span>
+    <span class="k">Stopped</span><span class="v" id="halting">–</span>
+    <span class="k">Mean speed</span><span class="v" id="speed">–</span>
+    <span class="k">Teleports</span><span class="v" id="tele">–</span>
+  </div>
+  <div class="row">
+    <button id="pause">Pause</button>
+    <select id="rate" title="simulated seconds per real second">
+      <option value="1">1×</option><option value="2">2×</option><option value="5" selected>5×</option>
+      <option value="10">10×</option><option value="30">30×</option><option value="60">60×</option>
+    </select>
+    <button id="restart">Restart</button>
+    <button id="fit">Fit</button>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--car-move)"></span>car moving</span>
+    <span><span class="dot" style="background:var(--car-slow)"></span>slow</span>
+    <span><span class="dot" style="background:var(--car-stop)"></span>stopped</span>
+    <span><span class="dot" style="background:var(--agent)"></span>agent car (outline)</span>
+    <span><span class="dot" style="background:var(--go)"></span><span class="dot" style="background:var(--amber)"></span><span class="dot" style="background:var(--stop)"></span>signal bar</span>
+    <span><span class="dot" style="background:var(--yield)"></span>g = green but must yield (permissive left)</span>
+  </div>
+</div>
+<div class="status" id="status">wheel: zoom · drag: pan · double-click: fit</div>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const C = { road: css('--road'), junction: css('--junction'), go: css('--go'), yieldg: css('--yield'), amber: css('--amber'), stop: css('--stop'),
+              agent: css('--agent'), human: css('--human'), muted: css('--muted'),
+              cmove: css('--car-move'), cslow: css('--car-slow'), cstop: css('--car-stop') };
+  let net = null, view = { s: 1, x: 0, y: 0 }, base = null, prev = null, cur = null, tCur = 0, interval = 200, dpr = 1;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1; cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; base = null;
+  }
+  function fit() {
+    if (!net) return;
+    const [x0, y0, x1, y1] = net.bounds, w = cv.width, h = cv.height, s = 0.92 * Math.min(w / (x1 - x0), h / (y1 - y0));
+    view = { s, x: w / 2 - s * (x0 + x1) / 2, y: h / 2 + s * (y0 + y1) / 2 }; base = null;
+  }
+  const X = x => view.x + view.s * x, Y = y => view.y - view.s * y;
+
+  function drawBase() {             // static map cached in an offscreen canvas, rebuilt on zoom / pan / resize
+    base = document.createElement('canvas'); base.width = cv.width; base.height = cv.height;
+    const b = base.getContext('2d'); b.lineCap = 'round'; b.lineJoin = 'round';
+    b.fillStyle = C.junction;
+    for (const p of net.junctions) { b.beginPath(); p.forEach(([x, y], i) => i ? b.lineTo(X(x), Y(y)) : b.moveTo(X(x), Y(y))); b.fill(); }
+    b.strokeStyle = C.road;
+    for (const l of net.lanes) {
+      b.lineWidth = Math.max(1, l.w * view.s); b.beginPath();
+      l.s.forEach(([x, y], i) => i ? b.lineTo(X(x), Y(y)) : b.moveTo(X(x), Y(y))); b.stroke();
+    }
+    if (view.s > 0.9 * dpr) {        // street names once the view is close enough to read them
+      b.fillStyle = C.muted; b.font = `${11 * dpr}px -apple-system, sans-serif`; b.textAlign = 'center'; b.textBaseline = 'middle';
+      const seen = new Set();
+      for (const n of net.names) {
+        const k = n.n + Math.round(n.x / 400) + ':' + Math.round(n.y / 400); if (seen.has(k)) continue; seen.add(k);
+        let a = -n.a; if (a > Math.PI / 2) a -= Math.PI; if (a < -Math.PI / 2) a += Math.PI;
+        b.save(); b.translate(X(n.x), Y(n.y)); b.rotate(a); b.fillText(n.n, 0, -7 * dpr); b.restore();
+      }
+    }
+  }
+
+  function colorOf(v) { return v < 0.1 ? C.cstop : v < 3 ? C.cslow : C.cmove; }
+  function render() {
+    requestAnimationFrame(render);
+    if (!net) return;
+    if (!base) drawBase();
+    ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(base, 0, 0);
+    if (!cur) return;
+    // signal heads: a bar across each controlled lane at its stop line
+    const sig = cur.s;
+    net.heads.forEach((h, k) => {
+      const c = sig[k], col = c === 'G' ? C.go : c === 'g' ? C.yieldg : (c === 'y' || c === 'Y') ? C.amber : C.stop;
+      const nx = -Math.sin(h.a), ny = Math.cos(h.a), half = h.w / 2;
+      ctx.strokeStyle = col; ctx.lineWidth = Math.max(1.5 * dpr, 1.2 * view.s); ctx.beginPath();
+      ctx.moveTo(X(h.x + nx * half), Y(h.y + ny * half)); ctx.lineTo(X(h.x - nx * half), Y(h.y - ny * half)); ctx.stroke();
+    });
+    // vehicles, interpolated between the previous and the current step
+    const f = Math.min(1, (performance.now() - tCur) / interval), P = prev ? prev.map : null;
+    const L = Math.max(2.2 * dpr, 4.6 * view.s), W = Math.max(1.4 * dpr, 1.9 * view.s);
+    for (const v of cur.v) {
+      let [id, x, y, ang, sp, ag] = v; const p = P && P.get(id);
+      if (p && Math.hypot(p[1] - x, p[2] - y) < 60) {
+        x = p[1] + (x - p[1]) * f; y = p[2] + (y - p[2]) * f;
+        let d = ang - p[3]; if (d > 180) d -= 360; if (d < -180) d += 360; ang = p[3] + d * f;
+      }
+      const r = (ang - 90) * Math.PI / 180;   // SUMO angle: degrees clockwise from north
+      ctx.save(); ctx.translate(X(x), Y(y)); ctx.rotate(r);
+      ctx.fillStyle = colorOf(sp); ctx.fillRect(-L, -W / 2, L, W);
+      if (ag) { ctx.strokeStyle = C.agent; ctx.lineWidth = Math.max(1, 0.5 * view.s); ctx.strokeRect(-L, -W / 2, L, W); }
+      ctx.restore();
+    }
+  }
+
+  function fmt(t) { const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = Math.floor(t % 60);
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`; }
+  function onFrame(fr) {
+    fr.map = new Map(fr.v.map(v => [v[0], v]));
+    const now = performance.now(); if (cur) interval = Math.min(1000, Math.max(16, now - tCur));
+    prev = cur; cur = fr; tCur = now;
+    const i = fr.i;
+    if (!prev || prev.i.t !== i.t) {           // a repeated (held) frame must not wipe a warning
+      const m = document.getElementById('mode'); m.style.color = ''; m.style.fontWeight = '';
+      m.textContent = (i.label ? i.label + ' — ' : '') + `signals: ${i.signals} · vehicles: ${i.vehicles}`;
+    }
+    document.getElementById('t').textContent = fmt(i.t);
+    document.getElementById('running').textContent = i.running;
+    document.getElementById('arrived').textContent = i.arrived;
+    document.getElementById('halting').textContent = i.halting;
+    document.getElementById('speed').textContent = (i.mean_speed * 3.6).toFixed(1) + ' km/h';
+    document.getElementById('tele').textContent = i.teleports;
+    document.getElementById('pause').textContent = i.paused ? 'Play' : 'Pause';
+  }
+
+  // A dead server used to fail silently (frozen last frame, Restart doing nothing); say so in red instead.
+  function warn(msg) { const m = document.getElementById('mode'); m.textContent = msg; m.style.color = 'var(--stop)'; m.style.fontWeight = '600'; }
+  const control = q => fetch('/control?' + q).then(r => { if (!r.ok) throw 0; })
+    .catch(() => warn('Server của viewer này KHÔNG chạy — đang hiện khung hình cuối; Restart không có tác dụng.'));
+  // The simulation stops at --end and holds its last frame; tell the viewer instead of looking like a permanent jam.
+  let lastT = -1, lastChange = performance.now();
+  setInterval(() => {
+    if (!cur) return;
+    if (cur.i.t !== lastT) { lastT = cur.i.t; lastChange = performance.now(); return; }
+    if (!cur.i.paused && performance.now() - lastChange > 6000)
+      warn(`Mô phỏng dừng ở ${fmt(cur.i.t)} (hết giờ hoặc mất kết nối) — đây là khung hình cuối; bấm Restart để chạy lại.`);
+  }, 2000);
+  document.getElementById('pause').onclick = () => control('pause=' + (cur && cur.i.paused ? '0' : '1'));
+  document.getElementById('restart').onclick = () => control('restart=1');
+  document.getElementById('rate').onchange = e => control('speed=' + e.target.value);
+  document.getElementById('fit').onclick = fit;
+  cv.addEventListener('dblclick', fit);
+  cv.addEventListener('wheel', e => {
+    e.preventDefault(); const k = Math.exp(-e.deltaY * 0.0015), mx = e.offsetX * dpr, my = e.offsetY * dpr;
+    view.x = mx - (mx - view.x) * k; view.y = my - (my - view.y) * k; view.s *= k; base = null;
+  }, { passive: false });
+  let drag = null;
+  cv.addEventListener('pointerdown', e => { drag = [e.clientX, e.clientY, view.x, view.y]; cv.classList.add('drag'); cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => { if (!drag) return; view.x = drag[2] + (e.clientX - drag[0]) * dpr; view.y = drag[3] + (e.clientY - drag[1]) * dpr; base = null; });
+  cv.addEventListener('pointerup', () => { drag = null; cv.classList.remove('drag'); });
+  addEventListener('resize', () => { resize(); fit(); });
+
+  resize();
+  fetch('/net.json').then(r => r.json()).then(g => {
+    net = g; fit(); control('speed=' + document.getElementById('rate').value);
+    const es = new EventSource('/events');
+    es.onmessage = e => { const fr = JSON.parse(e.data); if (fr.v) onFrame(fr); };
+    es.onerror = () => warn('Mất kết nối tới server viewer (server đã tắt?) — đang hiện khung hình cuối.');
+  });
+  render();
+})();
+</script>
+</body>
+</html>

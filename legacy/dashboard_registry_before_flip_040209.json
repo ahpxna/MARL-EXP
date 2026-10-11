@@ -1,0 +1,392 @@
+{
+ "_doc": "Dashboard registry (02/10/2026 22:5x). ONE entry per experiment; scripts/DASH_build.py reads every report listed here, classifies each registered prediction line (SUPPORTED = tốt, NOT SUPPORTED = xấu, 'not tested', '(reported)' = chỉ báo cáo) and writes data.json. To add an experiment: append an entry (id, title, track, report; optional protocol, ledger, note, progress, chart, caveats). caveats: list of {match: substring of the prediction label, class: 'void' (do not count) | 'caveat' (count, show note), note}. progress kinds: 'iters' (glob of logs, regex with one integer group, total per log) | 'manifests' (glob, total).",
+ "banner": "Mọi kết quả là MÔ PHỎNG (CityFlow / SUMO) với các thành phần do mình tự train. Chưa có: log controller thật, trace J2735 thật, vehicle stack phát triển độc lập, dữ liệu cross-version của thành phố thật. NYC 16×3 = lưới cách điệu với khoảng cách block Manhattan + tập tuyến taxi thật (arrival vẽ lại).",
+ "experiments": [
+  {
+   "id": "nyc",
+   "title": "NYC 16×3 — mạng thứ ba (relay vs Z, rule A, train-match, upgrade hazard, fallback)",
+   "track": "MARL",
+   "network": "NYC 16×3",
+   "report": "research/marl_budget/e3_nyc16x3_20261002/report.txt",
+   "protocol": "research/marl_budget/PROTOCOL_E3_NYC16X3_20261002.md",
+   "progress": [
+    {
+     "label": "teacher (it / 2000)",
+     "kind": "iters",
+     "glob": "research/marl_budget/e3_nyc16x3_20261002/actors/set_full_s*.log",
+     "regex": "it (\\d+):",
+     "total": 2000
+    },
+    {
+     "label": "students (it / 500)",
+     "kind": "iters",
+     "glob": "research/marl_budget/e3_nyc16x3_20261002/actors/relayC*_st_s*.log",
+     "regex": "it (\\d+):",
+     "total": 500
+    },
+    {
+     "label": "eval xong",
+     "kind": "manifests",
+     "glob": "research/marl_budget/e3_nyc16x3_20261002/eval/*/manifest.json",
+     "total": 45
+    }
+   ]
+  },
+  {
+   "id": "fallback",
+   "title": "Số 3 — monitor support + fallback về Z (3×3, 4×4)",
+   "track": "MARL",
+   "network": "3×3, 4×4",
+   "report": "research/marl_budget/e3_fallback_20261002/report_3x3_4x4.txt",
+   "protocol": "research/marl_budget/PROTOCOL_E3_SUPPORT_FALLBACK_20261002.md",
+   "chart": "fallback",
+   "progress": [
+    {
+     "label": "ô xong",
+     "kind": "manifests",
+     "glob": "research/marl_budget/e3_fallback_20261002/[34]x[34]/*/manifest.json",
+     "total": 215
+    }
+   ]
+  },
+  {
+   "id": "emu",
+   "track": "MARL",
+   "network": "3×3 + 4×4",
+   "title": "G2/H1 — age emulation (bản sao cũ thật + tuổi thật) vs relabel cho receiver CK1 trên kênh nâng cấp",
+   "protocol": "research/marl_budget/PROTOCOL_E3_AGE_EMULATION_20261003.md",
+   "report": "research/marl_budget/e3_age_emulation_20261003/report.txt",
+   "progress": [
+    {
+     "glob": "research/marl_budget/e3_age_emulation_20261003/3x3/*/manifest.json",
+     "kind": "manifests",
+     "label": "3×3 xong",
+     "total": 40
+    },
+    {
+     "glob": "research/marl_budget/e3_age_emulation_20261003/4x4/*/manifest.json",
+     "kind": "manifests",
+     "label": "4×4 xong",
+     "total": 80
+    }
+   ]
+  },
+  {
+   "id": "testD",
+   "title": "Test D — 4×4 mixture (relayMIX vs Z, vs specialists)",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "(chờ)",
+   "report": "research/marl_budget/e3_mixq_D_report_20261002.txt",
+   "protocol": "research/marl_budget/PROTOCOL_E3_G4_MIX_20261002.md",
+   "chart": "testD",
+   "progress": [
+    {
+     "label": "train relayMIX (it / 500)",
+     "kind": "iters",
+     "glob": "research/marl_budget/e3_grid4x4_20260930/actors/relayMIX_st_s*.log",
+     "regex": "it (\\d+):",
+     "total": 500
+    },
+    {
+     "label": "eval xong",
+     "kind": "manifests",
+     "glob": "research/marl_budget/e3_g4_mix_20261002/*/manifest.json",
+     "total": 130
+    }
+   ]
+  },
+  {
+   "id": "testC",
+   "title": "Test C — 3×3 trộn hai kênh cực (iid + K1)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-287",
+   "report": "research/marl_budget/e3_mixq_C_report_20261002.txt",
+   "protocol": "research/marl_budget/PROTOCOL_E3_MIX2_20261002.md",
+   "chart": "testC",
+   "note": "Trộn hai cực thì an toàn ở mọi kênh, nhưng không phủ được các kênh giữa: support là tổ hợp JOINT."
+  },
+  {
+   "id": "g4tm",
+   "title": "4×4 train-match (K = 1)",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "L-286",
+   "report": "research/marl_budget/e3_g4_train_match_report_20261002.txt",
+   "chart": "g4tm",
+   "note": "Train đúng kênh cứu receiver ở K1 (+5.80); upgrade lên iid làm nó tụt (−3.55)."
+  },
+  {
+   "id": "switch",
+   "title": "Kênh đổi giữa episode (mixture receiver)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-285",
+   "report": "research/marl_budget/e3_switch_report_20261002.txt"
+  },
+  {
+   "id": "w1p",
+   "title": "W1 prospective",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-282",
+   "report": "research/marl_budget/e3_w1_prospective_report_20261002.txt",
+   "note": "W1 chỉ giữ thứ tự, không phải định luật định lượng."
+  },
+  {
+   "id": "tproj",
+   "title": "4×4 time projection",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "L-279",
+   "report": "research/marl_budget/e3_g4_time_projection_report_20261002.txt"
+  },
+  {
+   "id": "sproj",
+   "title": "Support projection (onefresh)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-274",
+   "report": "research/marl_budget/e3_support_projection_report_20261002.txt"
+  },
+  {
+   "id": "g4rep",
+   "title": "4×4 replication (relay vs Z)",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "L-270",
+   "report": "research/marl_budget/e3_g4_replication_report_20261001.txt"
+  },
+  {
+   "id": "g4constk",
+   "title": "4×4 const-K (K = 1 reversal)",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "L-270",
+   "report": "research/marl_budget/e3_g4_constk_report_20261001.txt"
+  },
+  {
+   "id": "g4r5",
+   "title": "4×4 R5 (dev net_Z sign)",
+   "track": "MARL",
+   "network": "4×4",
+   "ledger": "L-270",
+   "report": "research/marl_budget/e3_g4_r5_report_20261001.txt"
+  },
+  {
+   "id": "remap",
+   "title": "Age remap (interface repair)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-266",
+   "report": "research/marl_budget/e3_age_remap_report_20261002.txt"
+  },
+  {
+   "id": "riaoi",
+   "title": "Remote-inference AoI shift",
+   "track": "MARL",
+   "network": "testbed",
+   "ledger": "L-261",
+   "report": "research/marl_budget/ri_aoi_shift_report_20261002.txt"
+  },
+  {
+   "id": "rirole",
+   "title": "Age-role probe",
+   "track": "MARL",
+   "network": "testbed",
+   "ledger": "L-265",
+   "report": "research/marl_budget/ri_age_role_report_20261002.txt"
+  },
+  {
+   "id": "mix",
+   "title": "E4 mixture (4 kênh)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-256",
+   "report": "research/marl_budget/e3_mixed_channel_report_20261002.txt"
+  },
+  {
+   "id": "w1law",
+   "title": "W1 mismatch law (replication)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-258",
+   "report": "research/marl_budget/e3_mismatch_law_report_20261002.txt"
+  },
+  {
+   "id": "tm3",
+   "title": "Train-match 3×3 (5 seeds)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-250",
+   "report": "research/marl_budget/e3_train_match_report_20261001.txt"
+  },
+  {
+   "id": "arch",
+   "title": "Architecture control",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-252",
+   "report": "research/marl_budget/e3_arch_control_report_20261001.txt"
+  },
+  {
+   "id": "netcount",
+   "title": "Net count (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_net_count_report_20261001.txt"
+  },
+  {
+   "id": "freshval",
+   "title": "Fresh value (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_fresh_value_report_20261001.txt"
+  },
+  {
+   "id": "ageshift",
+   "title": "Age-response shift H-C (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "ledger": "L-237",
+   "report": "research/marl_budget/e3_age_response_shift_report_20261001.txt"
+  },
+  {
+   "id": "hold",
+   "title": "Hold prospective (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_hold_prospective_report_20261001.txt"
+  },
+  {
+   "id": "gate",
+   "title": "Gate prospective (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_gate_prospective_report_20261001.txt"
+  },
+  {
+   "id": "ageclip",
+   "title": "Age-clip prospective (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_ageclip_prospective_report_20261001.txt"
+  },
+  {
+   "id": "harm",
+   "title": "Harm prospective (01/10)",
+   "track": "MARL",
+   "network": "3×3",
+   "report": "research/marl_budget/e3_harm_prospective_report_20261001.txt"
+  },
+  {
+   "id": "q7b",
+   "title": "Q7b — Q7 qua 4 seed train, frontier compatible mode, certificate theo contract",
+   "track": "City",
+   "network": "SUMO grid4",
+   "report": "research/city_sim/q7b_contract_20261002/report.txt",
+   "protocol": "research/city_sim/PROTOCOL_CITY_Q7B_CONTRACT_20261002.md",
+   "progress": [
+    {
+     "label": "checkpoint đã train",
+     "kind": "manifests",
+     "glob": "research/city_sim/q7b_contract_20261002/*_t[0-9].pt",
+     "total": 13
+    },
+    {
+     "label": "eval xong",
+     "kind": "manifests",
+     "glob": "research/city_sim/q7b_contract_20261002/eval_t*.manifest.json",
+     "total": 4
+    }
+   ]
+  },
+  {
+   "id": "q7",
+   "title": "Q7 — đèn RL × fleet xe học (upgrade thật)",
+   "track": "City",
+   "network": "SUMO grid4",
+   "ledger": "C-7",
+   "report": "research/city_sim/q7_cross_version_20261002/report.txt",
+   "protocol": "research/city_sim/PROTOCOL_CITY_Q7_CROSS_VERSION_20261002.md",
+   "chart": "q7",
+   "note": "Đèn RL tốt hơn ACT 11% với xe người nhưng làm fleet đã triển khai hỏng nặng (time loss ×3); compatible mode sửa được.",
+   "caveats": [
+    {
+     "match": "Q7-5",
+     "class": "caveat",
+     "note": "191 điểm chủ yếu là chiều đèn → xe; chiều xe → đèn tách riêng (fleet L-RLH) chỉ +13 %."
+    },
+    {
+     "match": "Q7-3",
+     "class": "caveat",
+     "note": "log của đèn yếu (4.4 % xanh > 50 s) dù thiệt hại rất lớn."
+    }
+   ]
+  },
+  {
+   "id": "q5",
+   "title": "Q5 — cửa sổ commitment của đèn",
+   "track": "City",
+   "network": "queue model",
+   "ledger": "C-6",
+   "report": "research/city_sim/q5_commitment_20261002/report.txt",
+   "caveats": [
+    {
+     "match": "(0.25, 0.2)",
+     "class": "void",
+     "note": "demand bão hòa: đèn tham chiếu không phải tốt nhất → không tính"
+    },
+    {
+     "match": "(0.3, 0.25)",
+     "class": "void",
+     "note": "demand bão hòa → không tính"
+    }
+   ]
+  },
+  {
+   "id": "q4",
+   "title": "Q4 — retime một đèn của green wave",
+   "track": "City",
+   "network": "C0 corridor",
+   "ledger": "C-5",
+   "report": "research/city_sim/q4_corridor_20261002/report.txt",
+   "chart": "q4"
+  },
+  {
+   "id": "q2b",
+   "title": "Q2b — eco-driving × đèn cảm biến (robustness)",
+   "track": "City",
+   "network": "SUMO grid4",
+   "ledger": "C-4",
+   "report": "research/city_sim/q2b_eco_robustness_20261002/report.txt"
+  },
+  {
+   "id": "c0",
+   "title": "C0 — testbed đèn nâng cấp × xe học (Bayes chính xác)",
+   "track": "City",
+   "network": "C0",
+   "ledger": "C-3",
+   "report": "research/city_sim/c0_v3_20261002/report.txt"
+  },
+  {
+   "id": "q3",
+   "title": "Q3 — biểu đồ cơ bản thông tin (chữ U)",
+   "track": "City",
+   "network": "SUMO grid4",
+   "ledger": "C-2",
+   "report": "research/city_sim/q3_info_fd_20261002/report.txt",
+   "chart": "q3"
+  },
+  {
+   "id": "q2",
+   "title": "Q2 — eco-driving làm hỏng đèn cảm biến",
+   "track": "City",
+   "network": "SUMO grid4",
+   "ledger": "C-1",
+   "report": "research/city_sim/q2_eco_detection_20261002/report.txt",
+   "chart": "q2"
+  }
+ ]
+}

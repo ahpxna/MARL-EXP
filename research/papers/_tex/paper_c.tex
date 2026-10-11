@@ -1183,15 +1183,16 @@ grid $\eta\in\{0,0.01,\dots,1.2\}$ (\texttt{paperC\_budget\_recourse.json}, $6/6
 \item On $g_m$, $A$ becomes positive at the first grid point past each proved range, as
 Theorem~\ref{thm:awareexact} proves.
 \item On every instance and grid point, one exchange reaches $B$. For even $m$ this is
-Theorem~\ref{thm:awareexact}; for odd $m$ past $\eta_t$ and for repeated types it is numerical.
+Theorem~\ref{thm:awareexact}; for odd $m$ it is now \lean{recourse\_one\_odd\_all} (formalized after
+this run, every $\eta\ge0$); for repeated types it remains numerical.
 \item With counts $(1,1,2,2)$ or $(2,2,2,2)$ and $a/b\le2$, knowing the budget helps already at
 $\eta=0$.
 \end{itemize}
 By Proposition~\ref{prop:countmodel} these count programs have exactly the item-level values;
 the numbers are floating point. The saved artifact predates the formal count-to-item lift;
 its historical ``typed model'' label is narrower than the theorem now available.
-Figure~\ref{fig:crecourse} distinguishes the exact budget-aware curves from the numerical
-one-exchange observations where the latter remain unproved.
+Figure~\ref{fig:crecourse} distinguishes the exact budget-aware curves from the saved
+one-exchange LP values; on $g_m$ these are now proved in every size, and they remain unproved only for repeated types.
 
 \section{Evidence}
 \label{sec:evidence}
@@ -1336,7 +1337,7 @@ are retained as consistency checks, not global optimality certificates.
 \addplot+[cgreen,only marks,mark=triangle] coordinates {(0,1.75) (0.06,1.645) (0.12,1.54) (0.18,1.435) (0.24,1.33) (0.3,1.225) (0.36,1.12) (0.42,1.015) (0.48,0.91) (0.54,0.805) (0.6,0.7) (0.66,0.595) (0.72,0.49) (0.78,0.385) (0.84,0.28) (0.9,0.175) (0.96,0.07) (1.02,0) (1.08,0) (1.14,0) (1.2,0)};
 \addlegendentry{one edit: LP $V^{(1)}_m$}
 \addplot+[black!55,no marks,densely dotted,forget plot] coordinates {(0.428571429,0) (0.428571429,1)};
-\nextgroupplot[title={(b) Odd size: one exchange is numerical},xlabel={band $\eta$},ylabel={value$/V_m^{\rm free}$},xmin=0,xmax=1.2,ymin=-0.08,legend pos=north east]
+\nextgroupplot[title={(b) Odd size: one exchange (LP values)},xlabel={band $\eta$},ylabel={value$/V_m^{\rm free}$},xmin=0,xmax=1.2,ymin=-0.08,legend pos=north east]
 \addplot+[cblue,no marks,thick] coordinates {(0,4.28571429) (0.0109090909,4.24831169) (0.0218181818,4.21090909) (0.0327272727,4.17350649) (0.0436363636,4.1361039) (0.0545454545,4.0987013) (0.0654545455,4.0612987) (0.0763636364,4.0238961) (0.0872727273,3.98649351) (0.0981818182,3.94909091) (0.109090909,3.91168831) (0.12,3.87428571) (0.130909091,3.83688312) (0.141818182,3.79948052) (0.152727273,3.76207792) (0.163636364,3.72467532) (0.174545455,3.68727273) (0.185454545,3.64987013) (0.196363636,3.61246753) (0.207272727,3.57506494) (0.218181818,3.53766234) (0.229090909,3.50025974) (0.24,3.46285714) (0.250909091,3.42545455) (0.261818182,3.38805195) (0.272727273,3.35064935) (0.283636364,3.31324675) (0.294545455,3.27584416) (0.305454545,3.23844156) (0.316363636,3.20103896) (0.327272727,3.16363636) (0.338181818,3.12623377) (0.349090909,3.08883117) (0.36,3.05142857) (0.370909091,3.01402597) (0.381818182,2.97662338) (0.392727273,2.93922078) (0.403636364,2.90181818) (0.414545455,2.86441558) (0.425454545,2.82701299) (0.436363636,2.78961039) (0.447272727,2.75220779) (0.458181818,2.71480519) (0.469090909,2.6774026) (0.48,2.64) (0.490909091,2.6025974) (0.501818182,2.56519481) (0.512727273,2.52779221) (0.523636364,2.49038961) (0.534545455,2.45298701) (0.545454545,2.41558442) (0.556363636,2.37818182) (0.567272727,2.34077922) (0.578181818,2.30337662) (0.589090909,2.26597403) (0.6,2.22857143) (0.610909091,2.19116883) (0.621818182,2.15376623) (0.632727273,2.11636364) (0.643636364,2.07896104) (0.654545455,2.04155844) (0.665454545,2.00415584) (0.676363636,1.96675325) (0.687272727,1.92935065) (0.698181818,1.89194805) (0.709090909,1.85454545) (0.72,1.81714286) (0.730909091,1.77974026) (0.741818182,1.74233766) (0.752727273,1.70493506) (0.763636364,1.66753247) (0.774545455,1.63012987) (0.785454545,1.59272727) (0.796363636,1.55532468) (0.807272727,1.51792208) (0.818181818,1.48051948) (0.829090909,1.44311688) (0.84,1.40571429) (0.850909091,1.36831169) (0.861818182,1.33090909) (0.872727273,1.29350649) (0.883636364,1.2561039) (0.894545455,1.2187013) (0.905454545,1.1812987) (0.916363636,1.1438961) (0.927272727,1.10649351) (0.938181818,1.06909091) (0.949090909,1.03168831) (0.952380952,1.02040816) (0.96,1.01714286) (0.970909091,1.01246753) (0.981818182,1.00779221) (0.992727273,1.00311688) (1,1) (1.00363636,1) (1.01454545,1) (1.02545455,1) (1.03636364,1) (1.04727273,1) (1.05818182,1) (1.06909091,1) (1.08,1) (1.09090909,1) (1.10181818,1) (1.11272727,1) (1.12363636,1) (1.13454545,1) (1.14545455,1) (1.15636364,1) (1.16727273,1) (1.17818182,1) (1.18909091,1) (1.2,1)};
 \addlegendentry{commit: $V_m$}
 \addplot+[corange,no marks,thick,dashed] coordinates {(0,4.28571429) (0.0109090909,4.24831169) (0.0218181818,4.21090909) (0.0327272727,4.17350649) (0.0436363636,4.1361039) (0.0545454545,4.0987013) (0.0654545455,4.0612987) (0.0763636364,4.0238961) (0.0872727273,3.98649351) (0.0981818182,3.94909091) (0.109090909,3.91168831) (0.12,3.87428571) (0.130909091,3.83688312) (0.141818182,3.79948052) (0.152727273,3.76207792) (0.163636364,3.72467532) (0.174545455,3.68727273) (0.185454545,3.64987013) (0.196363636,3.61246753) (0.207272727,3.57506494) (0.218181818,3.53766234) (0.229090909,3.50025974) (0.24,3.46285714) (0.250909091,3.42545455) (0.261818182,3.38805195) (0.272727273,3.35064935) (0.283636364,3.31324675) (0.294545455,3.27584416) (0.305454545,3.23844156) (0.316363636,3.20103896) (0.327272727,3.16363636) (0.338181818,3.12623377) (0.349090909,3.08883117) (0.36,3.05142857) (0.370909091,3.01402597) (0.381818182,2.97662338) (0.392727273,2.93922078) (0.403636364,2.90181818) (0.414545455,2.86441558) (0.425454545,2.82701299) (0.436363636,2.78961039) (0.447272727,2.75220779) (0.458181818,2.71480519) (0.469090909,2.6774026) (0.48,2.64) (0.490909091,2.6025974) (0.501818182,2.56519481) (0.512727273,2.52779221) (0.523636364,2.49038961) (0.534545455,2.45298701) (0.545454545,2.41558442) (0.556363636,2.37818182) (0.567272727,2.34077922) (0.578181818,2.30337662) (0.589090909,2.26597403) (0.6,2.22857143) (0.610909091,2.19116883) (0.621818182,2.15376623) (0.632727273,2.11636364) (0.643636364,2.07896104) (0.654545455,2.04155844) (0.665454545,2.00415584) (0.676363636,1.96675325) (0.687272727,1.92935065) (0.698181818,1.89194805) (0.709090909,1.85454545) (0.72,1.81714286) (0.730909091,1.77974026) (0.741818182,1.74233766) (0.752727273,1.70493506) (0.763636364,1.66753247) (0.774545455,1.63012987) (0.785454545,1.59272727) (0.796363636,1.55532468) (0.807272727,1.51792208) (0.818181818,1.48051948) (0.829090909,1.44311688) (0.84,1.40571429) (0.850909091,1.36831169) (0.861818182,1.33090909) (0.872727273,1.29350649) (0.883636364,1.2561039) (0.894545455,1.2187013) (0.905454545,1.1812987) (0.916363636,1.1438961) (0.927272727,1.10649351) (0.938181818,1.06909091) (0.949090909,1.03168831) (0.952380952,1.02040816) (0.96,0.994285714) (0.970909091,0.956883117) (0.981818182,0.919480519) (0.992727273,0.882077922) (1,0.857142857) (1.00363636,0.847792208) (1.01454545,0.81974026) (1.02545455,0.791688312) (1.03636364,0.763636364) (1.04727273,0.735584416) (1.05818182,0.707532468) (1.06909091,0.679480519) (1.08,0.651428571) (1.09090909,0.623376623) (1.10181818,0.595324675) (1.11272727,0.567272727) (1.12363636,0.539220779) (1.13454545,0.511168831) (1.14545455,0.483116883) (1.15636364,0.455064935) (1.16727273,0.427012987) (1.17818182,0.398961039) (1.18909091,0.370909091) (1.2,0.342857143)};
@@ -1346,7 +1347,7 @@ are retained as consistency checks, not global optimality certificates.
 \addplot+[black!55,no marks,densely dotted,forget plot] coordinates {(0.952380952,0) (0.952380952,1.02040816)};
 \end{groupplot}
 \end{tikzpicture}
-\caption{When commitment costs something, and what one edit recovers. Here $m=8$ (left) and $m=7$ (right). Solid and dashed curves are the proved universal and budget-aware values; the dotted vertical line is the exact onset of a positive gap. Triangles are saved one-exchange LP values. Their equality to $B_m$ is proved for every even size and band; for odd size past $\eta_t$ it is an observation on the sampled grid, not a theorem. Both the initial and edited laws obey the marginal band.}
+\caption{When commitment costs something, and what one edit recovers. Here $m=8$ (left) and $m=7$ (right). Solid and dashed curves are the proved universal and budget-aware values; the dotted vertical line is the exact onset of a positive gap. Triangles are saved one-exchange LP values. Their equality to $B_m$ is proved for every size and band: even sizes by Theorem~\ref{thm:awareexact}, odd sizes by \lean{recourse\_one\_odd\_all} (formalized after these LP runs); the triangles remain the saved LP values. Both the initial and edited laws obey the marginal band.}
 \label{fig:crecourse}
 \end{figure*}
 
@@ -1409,11 +1410,13 @@ perturbation makes every weight distinct, and then $d=m$.
 $\max_{k}\mathbb{E}r_{k}$, and every ex-post one concerns $\mathbb{E}\max_{k}r_{k}$.
 \item[5)] \textbf{Budget information and recourse.} The value of knowing the budget is exact on
 $g_m$ at every band (Theorem~\ref{thm:awareexact}) and on four items at every band
-(Theorem~\ref{thm:fourrecourse}). One exchange reaches $B$ at every band on four items and, in
-even size, on $g_m$. For odd $m=5,7,9$ past $\eta_t$, and on counts $(1,1,2,2)$ and $(2,2,2,2)$ at
-the five tested ratios, this is observed numerically; the general one-exchange statement
-remains open. Recourse allows one budget reveal and one bounded revision, not a dynamically
-changing budget stream.
+(Theorem~\ref{thm:fourrecourse}). One exchange reaches $B$ at every band on four items and on $g_m$
+in every size $m\ge3$: even sizes as stated above, odd sizes by \lean{recourse\_one\_odd\_all} in
+\lean{LeanPaperCBudgetExchangeOddV2} (every $\eta\ge0$; formalized after the earlier numerical runs at
+$m=5,7,9$, which it subsumes). On the counts $(1,1,2,2)$ and $(2,2,2,2)$ the one-exchange property is
+observed numerically at the five tested ratios only; beyond $g_m$ and four items the general
+one-exchange statement remains open. Recourse allows one budget reveal and one bounded revision, not a
+dynamically changing budget stream.
 \end{enumerate}
 
 \section{Conclusion}

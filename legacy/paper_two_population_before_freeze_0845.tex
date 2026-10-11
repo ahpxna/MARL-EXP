@@ -1,0 +1,273 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,url,xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{graphicx}
+\newcommand{\pending}[1]{\textcolor{red}{[PENDING: #1]}}
+
+\title{Staged Upgrades of Two Learned Populations: Keeping a Learned Fleet's Benefit When the Signals It Relies On Are Upgraded\\[4pt]
+\large DRAFT (05/10/2026)}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Learned traffic signals and learned connected-vehicle fleets are deployed and upgraded on different schedules. We show, in SUMO, that a
+learned eco-driving fleet that saves fuel under the old signal controller loses that benefit when the signal is upgraded to a learned
+controller, and that the natural repairs fail: withdrawing the signal timing returns the fleet to its base driver, forecasting the learned
+signal's timing costs the fleet's own vehicles time, and making the signal commit to its timing costs the whole network more than the fleet
+recovers. The failure has a closed-loop cause that we isolate: once timing is published, eco-approaching vehicles stop being counted as
+waiting by the halting-based learned signal, the signal holds the other direction's green longer, and the forecast's own target shifts.
+We propose a \emph{two-sided interface} (TSI) that retrains neither population: the fleet receives a state-conditioned forecast that is
+exact wherever the schedule is determined, and the frozen signal receives a demand adapter that counts slow-moving vehicles; both
+interfaces are calibrated per deployed signal from training traffic only. In a pre-registered confirmation on five new signal seeds, four
+new frozen fleets and fresh traffic, TSI reduces the fleet's fuel by $3.85\%$ $[3.26, 4.43]$, city time loss by $0.55$\,s/veh and human
+time loss by $0.89$\,s/veh, with the fleet's time loss non-inferior ($-0.22$\,s/veh, one-sided $97.5\%$ upper bound $+0.04$ against a
+$+0.5$ margin). On the same panel it matches a fleet retrained under the new signal on fuel and beats it on every time endpoint; both
+interfaces are necessary, and the result holds for three receiver classes, fleet shares from 25 to 75\% (at 25\% the agent-time bound sits at the margin) and a 25\% demand increase. All
+results are in simulation. On a second network with multi-green learned lights the mechanism replicates (the service alone is strongly
+harmful and the adapter removes most of the harm), but TSI did not meet the time limits in two registered attempts.
+\end{abstract}
+
+\section{Introduction}
+A connected-vehicle fleet trained to use signal phase and timing (SPaT) is useful only while the signals keep publishing timing it can act
+on. Upgrading signals to learned adaptive controllers breaks this: the timing is no longer a static plan. Retraining the fleet each time a
+city upgrades its signals, or retraining the signals each time a manufacturer updates its fleet, is often not possible; the two populations
+are owned by different parties and released on different schedules. We ask whether a deployed learned fleet can keep its benefit when the
+learned signals it relies on are upgraded, \emph{without retraining either population}.
+\paragraph{Contributions.}
+(i) A staged-upgrade benchmark with two learned populations (learned keep/switch signals; PPO, search and rule eco-driving fleets),
+registered gates, and fresh-data confirmations (M1--M2).
+(ii) A negative map of light-side and information-only repairs: commitments, gates, confidence and horizon filters, predictable splits and
+per-decision commitment selection, each tested against the no-SPaT fallback; per-decision counterfactual credit is shown to be below the
+simulator's chaotic noise floor.
+(iii) A closed-loop diagnosis: publication of timing hides the fleet's demand from a halting-based learned signal, which lengthens greens and
+shifts the forecast's own target (a performative feedback), while exact timing on a fixed schedule costs the fleet no time.
+(iv) The two-sided interface TSI, confirmed on new signals, new fleets and fresh traffic, with component ablations, a same-panel comparison
+with fleet retraining, and scope tests across receiver classes, penetration and demand.
+
+\section{Setting}
+SUMO grid4 (16 signals, 1\,800 veh/h, 50\% fleet share, membership fixed per vehicle id); lights FT / ACT / learned (RL-H: a DQN that
+keeps or switches between two greens from halting and vehicle counts, holding with long phase durations); fleets: SUMO Krauss at
+imperfection $\sigma$ (non-learned family), ACC, and the learned fleets of M1 (R9, a four-parameter search policy; R10, a PPO speed
+residual on the lane-aware GLOSA rule). Determinism and provenance: PYTHONHASHSEED = 0, bit-identical always-SUMO across jobs (C-27).
+\paragraph{Seeds and panels.} Learned lights: development seeds k0 / k1, confirmation seeds t4--t8 (never used to choose any M3 service).
+Frozen fleets: development R10 s13 / s113, confirmation s213 / s313 / s413 / s513. Traffic: TRAIN 0--7 (fitting), DEV 600--611, SELECT
+650--655, TUNE 660--663 (per-light calibration), confirmation 700--719 (first attempt) and 720--739 (second attempt), demand shift
+740--749 (period 1.6\,s), scope 750--759; every panel was generated after a non-existence check, and no panel was used both to choose
+and to confirm.
+
+\section{Milestone M1: a learned fleet worth deploying}
+\paragraph{Criterion (registered).} Agent fuel superiority vs always-SUMO with agent and human time-loss margins (+0.5 s/veh),
+teleports and unfinished trips; strong baseline $\sigma^*$ chosen on SELECT; confirmation on four new policy seeds and fresh traffic.
+\paragraph{Evidence so far.} No earlier recipe was confirmed (C-21 \dots C-31, corrected C-37); one development checkpoint (R5h\_t0)
+passed on fresh traffic; the non-learned $\sigma$-family is a strong baseline ($\sigma=0.3$: $-2.5$ s/veh, $-2.2\%$ fuel).
+\paragraph{Table 1 (fleet benefit; C-54, C-55).} Fresh traffic (20 seeds, generated after registration), FT, 50\% agents; learned
+fleet = GLOSA-LD$\circ\sigma^*$, four policy parameters fitted by derivative-free search on training traffic (4 search seeds pooled).
+Differences of the learned fleet, agent fuel / agent time loss / human time loss (95\% CI):
+\begin{center}\small\begin{tabular}{lccc}\toprule
+comparator & fuel (\%) & agent TL (s/veh) & human TL (s/veh)\\\midrule
+always-SUMO & $-9.68$ [$-10.24$, $-9.00$] & $-3.48$ [$-3.77$, $-3.23$] & $-0.49$ [$-0.57$, $-0.41$]\\
+$\sigma^*=0.3$ & $-7.58$ [$-8.14$, $-6.89$] & $-0.78$ [$-1.03$, $-0.58$] & $-0.36$ [$-0.45$, $-0.26$]\\
+GLOSA (heuristic) & $-2.16$ [$-2.92$, $-1.35$] & $-3.03$ [$-3.88$, $-2.27$] & $-0.47$ [$-0.95$, $-0.07$]\\
+GLOSA$\circ\sigma^*$ (no lane release) & $+0.16$ [$-0.57$, $+0.99$] & $-0.77$ [$-1.46$, $-0.16$] & $-0.30$ [$-0.65$, $+0.00$]\\
+GLOSA-L$\circ\sigma^*$ (rule) & $-2.80$ [$-3.37$, $-2.06$] & $-0.18$ [$-0.41$, $+0.02$] & $-0.01$ [$-0.10$, $+0.08$]\\\bottomrule
+\end{tabular}\end{center}
+No teleports or unfinished trips for the learned fleet (GLOSA: 0.50, GLOSA$\circ\sigma^*$: 0.40 teleports per run). The fitted
+parameters mainly learn where to release control (the last $\approx$15\,m before a needed lane change); the fuel gain over the rule is the
+fuel the rule gives up by releasing early. Not RL; not compared with published eco-controllers; FT light only.
+\paragraph{An RL fleet on the same panel (C-57).} A PPO speed residual on the rule (acting only where the rule commands; dense per-agent
+cost; intervention-indexed discount, C-51), four new seeds pooled, against the rule: fuel $-1.70\%$ [$-2.33$, $-1.09$], agent time loss
+$-0.04$ [$-0.29$, $+0.19$], human $+0.02$ [$-0.08$, $+0.12$]; against always-SUMO $-8.66\%$ / $-3.33$ / $-0.47$; against $\sigma^*$
+$-6.54\%$ / $-0.64$ / $-0.33$; no teleports. It does not recover the fuel of GLOSA$\circ\sigma^*$ ($+1.29\%$ against it), which the fitted
+release distance does.
+\paragraph{Table 2 (SPaT ablation).} For the fitted GLOSA class, removing SPaT means the policy never commands and reduces to the
+$\sigma^*$ fleet; the comparison against $\sigma^*$ above is therefore the class-level SPaT ablation ($-7.6\%$ fuel). It does not separate
+information from representation. The PPO residual (R10, confirmed in M1, C-57) reduces to the $\sigma^*$ fleet exactly when no SPaT is
+published (bit-identical rows, M2 check KM2-2), so its benefit against $\sigma^*$ is likewise the class-level SPaT ablation.
+\paragraph{Diagnostics (appendix; C-39 \dots C-42).} D1: the ported phase reward (B) prefers physically better behaviour for large
+differences but does not encode the time-loss constraints (it ranks an infeasible fuel-for-time policy far above always-SUMO); PPO from
+scratch did not reach always-SUMO even on its training traffic. D2: a hand-written in-class controller (GLOSA target, no release) gives
+$-6.7\%$ fuel at equal agent time but harms human cars; a behaviour clone of the heuristic GLOSA trades fuel for time in closed loop.
+An evaluation bug (exit release missing in deterministic evaluation) was found by an identity check and fixed (C-41).
+A residual on the in-class controller with a crawl-proof group cost (v9) failed its pilot gate; its confirmation was not evaluated (C-47).
+Derivative-free policy search over a three-parameter GLOSA family on the deployment objective (fuel with time-loss penalties) returned
+the untuned heuristic itself for the pilot search seed; the heuristic fails the $\sigma^*$ comparison on agent time loss (+1.8\,s/veh,
+SELECT) and the human-time-loss margin on the width of its 5-seed bound (C-43).
+\paragraph{An actuation pitfall shared by every commanded fleet (C-45).} With SUMO's \texttt{setSpeed}, every commanded fleet we
+trained or wrote (GLOSA, an in-class controller, PPO, behaviour clones, earlier learned fleets) created teleports (2--17 per run), while
+SUMO drivers at any $\sigma$ created none. Each inspected event is a lane-change deadlock: an agent car stopped at the end of a lane that does
+not continue on its route. Releasing control whenever the car's current lane does not continue (a code predicate on SUMO's best-lanes
+offset) removed these deadlocks on every panel tested (C-46). This is trace and intervention evidence in this SUMO version; without a
+same-checkpoint factorial over the two interfaces we do not attribute the earlier learned fleets' time-loss failures to it in full (C-50).
+\paragraph{A strong same-information rule (C-46).} GLOSA on the $\sigma^*$ base driver with lane-aware release (command only on a lane
+that continues) is beneficial on fresh traffic (20 seeds): against $\sigma^*$, agent fuel $-5.0\%$ and agent / human time loss $-0.7$ /
+$-0.4$\,s/veh; against always-SUMO, $-7.1\%$ and $-3.3$ / $-0.5$; no teleports. It is a fixed rule, not learned, not compared with
+published eco-controllers, and without a SPaT ablation of its own it does not show that SPaT is necessary; it is the baseline a learned
+fleet must beat on the same base and interface.
+The learned four-parameter policy (R9) against this rule on fresh traffic is in Table~1 (C-54).
+
+\section{Milestone M2: is there a compatibility problem?}
+\paragraph{Design (target; partly run: M2a and M2b below; the adapted-fleet column is run as the retrained reference in M3; a learned $L_0$ has NOT been run).} Freeze the confirmed fleet $F_0$; lights $L_0$ (old) and $L_1$ (upgraded, learned), both beneficial in their
+reference condition; matrix $L_0/F_0$, $L_1/F_0$, $L_0/F_1$, $L_1/F_1$ with absolute effects and difference-in-differences; SPaT
+causal and correctly labelled (plan / guarantee / forecast with uncertainty).
+\paragraph{M2a: SPaT service withdrawn or misused (C-59, C-60; fresh traffic, 20 seeds; four light seeds PAIRED with four fleet
+seeds, not a factorial).} Scope of THIS panel: the old light is fixed-time (not a learned L0); it has no forecast arm (run later as M2b)
+and no adapted-fleet column (run later as the retrained reference in M3). The shares of SPaT calls marked valid are calls, not measured forecast errors. The learned light is a large
+upgrade over the fixed-time program with SUMO cars (city time loss $-33.7$\,s/veh, city fuel $-19.5\%$). Both confirmed fleets lose their
+own benefit. If the learned light correctly publishes no plan, each fleet falls back to its base driver and becomes identical to
+$\sigma^*$: the benefit drops from $-7.5\%$ (fitted fleet) and $-6.5\%$ (PPO fleet) agent fuel to exactly 0, with no harm. If the fleet
+keeps deriving SPaT from the static program, which the learned light no longer follows (30--43\% of its SPaT calls are marked valid
+outside the function's guaranteed scope; these are calls, not measured forecast errors), it is harmed against $\sigma^*$ under the same light: $+7.4\%$ / $+6.5\%$ fuel and $+1.7$ / $+1.6$\,s/veh agent time loss. In
+absolute terms the agents still gain from the upgrade; what is lost is the fleet's benefit against its counterfactual drivers.
+\paragraph{M2b: an empirical forecast from the learned light (C-61, C-71, C-72).} A conditional-quantile forecast of the learned light's
+green durations does not return the benefit to the frozen fleet. Two facts explain why this is hard: the original forecast was 1\,s early in
+the green branch on 100\% of points (a timing-convention error, fixed in a corrected provider; one yellow branch remains 1\,s early, C-84),
+and the frozen fleet is sensitive to timing errors, with asymmetric fuel and time effects in an open-loop oracle-shift diagnostic (exact
+timing $-6.6\%$ fuel; 2\,s early $-2.4\%$; 2\,s late $-4.2\%$ fuel but agent time loss $+1.5$\,s/veh; 8\,s late $+9.3\%$ and $+11.6$\,s/veh;
+C-72). The diagnostic uses another fleet and schedule than the retrained fleet, so it warns of the trade-off but does not predict it.
+\paragraph{Second network (C-81).} On an independent own-built network (SUMO \texttt{netgenerate} spider, 18 signals, six with three greens),
+upgrading the static programs to a learned all-green controller cuts city time loss by 58.9\,s/veh. The frozen rule fleet (GLOSA-L$\circ\sigma^*$,
+$-9.2\%$ agent fuel under the static programs) again loses its benefit: labelled $\to$ exactly $\sigma^*$ (no harm); naive $\to$ harmed
+($+7.2\%$ fuel, agent TL $+2.7$, human TL $+0.6$, upper $+0.8$).
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{figs_two_pop/fig1_m2_crossplay.pdf}
+\caption{The frozen fleet's benefit against $\sigma^*$ under the same light, before (FT) and after the learned-light upgrade. Labelled bars are
+exactly 0 (rows identical to $\sigma^*$). Crossed 95\% intervals; grid4 fresh 470--489 (four paired light/fleet seeds), spider fresh
+1000--1019 (two light seeds). Script \texttt{scripts/CITY\_fig\_m2\_crossplay.py}.}\end{figure}
+\paragraph{Known so far (not the target experiment).} Weak learned fleets regressed under light upgrades and a car-side reaction repair
+helped (C-14, C-16); non-learned fleet upgrades ($\sigma$, ACC) were not harmed by three learned-light families (C-30, C-32 \dots C-34).
+If $F_0$ shows no regression, the hazard hypothesis is rejected in this setting.
+
+\section{Milestone M3: keeping the frozen fleet's benefit without retraining either population}
+\paragraph{Endpoint (registered).} Agent fuel against R, the upgraded learned light publishing no SPaT (the frozen fleet then drives as
+$\sigma^*$), with city, agent and human time-loss non-inferiority at $+0.5$\,s/veh (one-sided upper bounds), teleports and unfinished
+trips; crossed bootstrap over light seed, fleet seed and traffic seed.
+
+\subsection{What does not work (negative map)}
+\paragraph{Light-side commitments.} Reward-shaped lights, fixed-window and ETA-triggered commitments, a predictable cycle and
+receiver-triggered precision commitment (RPC) failed their DEV gates; on fresh traffic WC5 and RPC are worse than the fallback
+($+2.98\%$ and $+9.26\%$ agent fuel, C-86). A $2\times2$ diagnostic of RPC (C-95) shows both suspected costs are real (the forced hold:
+$-4.54\%$ fuel when removed; withdrawing the message at yellow onset: $-2.80\%$ when kept, $-2.66\%$ with the light schedule fixed), yet the best
+cell is still $+3.06\%$: the commitment's own cost exceeds what the fleet recovers.
+\paragraph{Choosing commitments decision by decision.} Re-simulating full episodes from identical prefixes with one intervention
+(96 situations, five options, C-96) shows that one 5--15\,s commitment changes 640--900 of 1\,800 vehicles. Out of sample, no selection
+rule (sensitivity, cost, both, or a learned regressor) beats a random option, and the best fixed option does not beat a permutation null
+($p=0.29$; within-situation spread $0.235\%$ vs $0.040\%$ between options, C-98). Single-decision gains also do not add up: the
+additive prediction from single edits is meaningless next to RPC's realized $+9.4\%$ (C-101). Candidates must therefore be evaluated as
+whole policies over full episodes.
+\paragraph{Information-only repairs.} Abstaining where the forecast leaves its support (0.11\% of the fleet's queries, C-97), confidence and
+horizon gates (every gate moves along one fuel-for-agent-time frontier, C-104) and a predictable split controller tuned by CEM (it gives the
+fleet $-7.9\%$ fuel from exact timing but is itself $+2.1$\,s/veh worse than the learned light, C-116) do not reach a feasible point.
+
+\subsection{Diagnosis: publication hides demand from the learned light}
+A state-conditioned direct time-to-green forecaster (an MLP quantile model on phase, age, queue and recent green history, fitted on training
+traffic, C-99) lowers the query-weighted error by a third and gives the frozen fleet $-3.4\%$ fuel against R, but costs its vehicles
+$+2.3$\,s/veh while human time falls ($-1.3$). Three diagnostics locate the cause.
+(a) With SPaT published, mean halting on the served lanes falls from 2.9 to 1.6 and the learned light's greens lengthen (14.8 to 16.9\,s):
+eco-approaching vehicles move above the $0.1$\,m/s halting threshold that the light observes and was trained on. Counting slow vehicles
+(0.1--2\,m/s) as waiting in front of the frozen light cuts the agents' time cost by $0.8$\,s/veh (C-100).
+(b) On the light's recorded schedule replayed open loop, exact timing gives the fleet $-5.6\%$ fuel \emph{and} $-0.37$\,s/veh; the time
+cost is therefore a forecast error, not the fleet's own trade-off (C-107).
+(c) Publishing the forecast shifts its own target: at the fleet's queries the error is $3.02$\,s when published vs $1.70$\,s when computed
+but not used, and scored waits longer than 30\,s rise from $0.09\%$ to $3.34\%$ of queries (C-109); the demand adapter roughly halves this
+sensitivity ($+0.73$ vs $+1.32$\,s, difference $-0.59$\,s, C-122). Across the five confirmation lights, the residual time cost grows with the residual green lengthening
+(Figure~\ref{fig:mech}a, C-117).
+
+\subsection{Method: a two-sided interface (TSI)}
+Both learned populations keep their weights. (1) \emph{Fleet side}: a hybrid forecast, the program's exact answer where the schedule is
+determined (the green after a yellow) and the state-conditioned forecaster elsewhere, served at the median. (2) \emph{Light side}: a demand
+adapter in front of the frozen light's halting inputs, $q = h_{<0.1} + A\,n_{[0.1,2)} + B\,n_{[2,5)}$ on the served lanes. (3)
+\emph{Calibration per deployed light from training traffic only}: the forecaster is fitted on eight training episodes of that light; $(A,B)$
+is chosen on four tuning episodes by a pre-registered rule (agent, city and human time points $\le$ thresholds, then the most fuel). No
+quantity of the evaluation traffic, lights or fleets enters calibration.
+
+\subsection{Confirmation}
+A first registered attempt with one global adapter chosen on two development lights (C-110) failed on agent time only: on five new lights,
+four new fleets and fresh traffic (700--719), fuel $-4.56\%$, city $-0.20$, human $-1.23$, agent $+0.85$\,s/veh (upper $+1.27$, C-114). The
+second and last registered attempt (TSI as above, per-light calibration; traffic 720--739; $\alpha=0.025$ one-sided because it is a second
+attempt, Bonferroni bound $0.075$ over both) passed every limit (Table~\ref{tab:tsi}, Figure~\ref{fig:tsi}, C-118).
+\begin{table}[t]\centering\small
+\caption{TSI confirmation (C-118): five new learned-light seeds $\times$ four new frozen PPO fleets $\times$ 20 fresh traffic seeds, crossed
+95\% intervals; the primary test uses the upper end (one-sided 97.5\%). F1-B: the fleet retrained under the new light (more update rights),
+same panel.}\label{tab:tsi}
+\begin{tabular}{lcccc}\toprule
+vs R & agent fuel (\%) & city TL (s/veh) & agent TL (s/veh) & human TL (s/veh)\\\midrule
+TSI & $-3.85$ [$-4.43$, $-3.26$] & $-0.55$ [$-0.67$, $-0.44$] & $-0.22$ [$-0.44$, $+0.04$] & $-0.89$ [$-1.10$, $-0.67$]\\
+service only (HYB) & $-4.93$ & $+0.26$ & $+1.97$ & $-1.43$\\
+adapter only (ADP) & $+0.29$ & $-0.17$ & $-0.09$ & $-0.25$\\
+fleet retrained (F1-B) & $-3.18$ & $-0.17$ & $+0.28$ & $-0.62$\\\midrule
+TSI $-$ F1-B & $-0.68$ [$-1.70$, $+0.11$] & $-0.38$ [$-0.59$, $-0.18$] & $-0.50$ [$-0.88$, $-0.09$] & $-0.27$ [$-0.44$, $-0.06$]\\\bottomrule
+\end{tabular}\end{table}
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{figs_two_pop/fig3_tsi_components.pdf}
+\caption{TSI against the fallback R on the confirmation panel, with its two halves and the retrained fleet (95\% intervals; dashed: the
+$+0.5$\,s/veh margin). Script \texttt{scripts/CITY\_fig\_tsi.py}.}\label{fig:tsi}\end{figure}
+Both halves are necessary: the fleet-side service carries the fuel ($-4.12\%$ against the adapter alone) and the light-side adapter carries
+the agents' time ($-2.19$\,s/veh against the service alone). The per-light chosen adapters are $(1.5,0.25)$, $(1,0.5)$, $(1,0.5)$,
+$(1,0.25)$, $(1.5,0.5)$; agent time against R is within $[-0.47,+0.18]$\,s/veh on every light.
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{figs_two_pop/fig4_tsi_mechanism.pdf}
+\caption{Mechanism. (a) First TSI attempt (global adapter) and the service alone: per light, the agents' time cost grows with how much the
+learned light lengthens its greens (C-117). (b) On a fixed schedule exact timing saves fuel and time; the forecast's errors cost time, and in
+closed loop the light's reaction produces the fuel gain (C-100, C-107).}\label{fig:mech}\end{figure}
+
+\subsection{Scope}
+With the TSI design frozen (Figure~\ref{fig:scope}): a 25\% demand increase on fresh traffic, $-3.79\%$ fuel and $-0.27$\,s/veh agent
+time (C-120); a rule fleet, $-1.84\%$ and $+0.03$; a search-fitted fleet, $-1.38\%$ and $+0.13$; fleet shares of 25 and 75\%, $-4.13\%$
+/ $+0.07$ (upper $+0.50$, borderline) and $-4.75\%$ / $-0.58$ (C-121). Replacing the state forecaster by the age-only forecast with the same
+adapter harms ($+6.72\%$; TSI is $9.87$ points better), so the state forecaster is necessary. The reverse upgrade order is safe in this
+setting: a fleet retrained for the new light does no harm under the old light ($-2.23\%$ fuel, agent time $+0.15$, C-121).
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{figs_two_pop/fig5_tsi_scope.pdf}
+\caption{TSI with its design frozen across receiver classes, fleet shares and a demand shift (fresh traffic; 95\% intervals).}\label{fig:scope}\end{figure}
+
+\section{Milestone M4: a second setting}
+Spider network (own-built, \texttt{netgenerate}): a learned all-green light beats the static programs by 57\,s/veh (two seeds, C-76); the
+rule fleet saves $-9.2\%$ fuel against $\sigma^*$ (C-77), with agent / human time-loss non-inferiority not established on fresh traffic
+(upper $+0.55$ / $+0.52$ against the $+0.5$ margin, C-81);
+the four-parameter search fleet (R9) does NOT beat the rule there (C-80); the M2 loss and harm replicate with the rule fleet (C-81); fixed-window commitment is again worse than the
+no-SPaT fallback, with a different decomposition (no fleet contribution detected, C-82). The retrained-fleet check was not run there, because its registered condition (F1-A1 confirmed) failed. The
+earlier RESCO cologne8 attempt failed at the light baseline and is kept as a negative (C-35, C-36).
+\paragraph{TSI on the second network (C-123, C-124).} The same procedure (the forecaster generalized to two or three greens, the adapter
+in front of the multi-green learned light's current / next-green inputs, per-light calibration on new tuning traffic) was confirmed twice on
+fresh spider traffic with the rule fleet. The hidden-demand hazard is far larger there: the service alone raises the fleet's time loss by
+$+59.5$\,s/veh and its fuel by $+20.7\%$. The adapter removes almost all of it (TSI $-$ service: $-58.1$\,s/veh), but a residual cost
+remains: attempt 1, fuel $-1.66\%$ $[-1.99,-1.38]$, agent time loss $+1.33$\,s/veh (upper $+1.94$); attempt 2 with a wider adapter grid
+($\alpha=0.025$), fuel $-0.31\%$, agent $+1.43$\,s/veh. TSI therefore does \emph{not} meet the M3 limits on the second network; its
+mechanism replicates, and the two-parameter adapter appears too coarse for multi-green inputs (an untested explanation).
+
+\section{Related work}
+Joint or cooperative signal--vehicle learning retrains both populations (CoTV; HONEST-CAV, arXiv 2602.18740; SVCC). SPaT prediction for
+actuated and adaptive signals is established (time-to-green learning; deep ensembles with confidence; HONEST-CAV's policy-aware
+forecast); our forecaster is not new and matters only in combination. Observation adapters for frozen policies exist (DC-Ada; modular
+world models for traffic-signal transfer, arXiv 2501.02548); ours is a two-parameter physical count transform calibrated against a
+partner-induced shift. That published forecasts change their own target is the consistency problem of anticipatory route guidance (Bottom
+and Ben-Akiva) and of performative prediction (Perdomo et al.; Drusvyatskiy and Xiao); we identify its traffic-signal instance and show that
+a light-side input change reduces the sensitivity. The need for both interfaces matches a small-gain reading of the loop forecast $\to$ fleet
+$\to$ light $\to$ target (Jiang, Teel and Praly; Dashkovskiy, R\"uffer and Wirth), and the adapter can be read as restoring an experiment
+that Blackwell's ordering ranks as more informative for the light's decision (Blackwell 1953); both are motivation, not theorems about the
+learned light.
+
+\section{Limitations}
+Simulation only (SUMO, HBEFA fuel). The method is confirmed on one network family (grid4); on the second network (spider, multi-green
+lights, rule fleet) it reduced but did not remove the agents' time cost in two registered attempts (C-123, C-124). The confirmation that passed is a second attempt (family-wise bound $0.075$ with the first); the lights
+and fleets of the two attempts are the same checkpoints, the traffic is fresh. The demand adapter needs per-lane speed sensing at the light
+(speed bins on the served lanes). One learned-light family (keep/switch DQN on halting counts); a light trained on other inputs may not
+hide demand the same way. The convention-corrected provider still has a 1\,s early yellow branch (C-84); the hybrid is exact only for the
+green after a yellow (C-113). Per-decision analyses are limited by the simulator's chaotic divergence (C-98).
+
+\section*{References (to be completed)}
+\small
+D.~Blackwell. Equivalent comparisons of experiments. \emph{Ann. Math. Statist.} 24(2):265--272, 1953.\\
+J.~Bottom. Consistent anticipatory route guidance. PhD thesis, MIT, 2000.\\
+S.~Dashkovskiy, B.~R\"uffer, F.~Wirth. An ISS small gain theorem for general networks. \emph{Math. Control Signals Systems} 19:93--122, 2007.\\
+D.~Drusvyatskiy, L.~Xiao. Stochastic optimization with decision-dependent distributions. \emph{Math. Oper. Res.} 48(2):954--998, 2023.\\
+Z.-P.~Jiang, A.~R.~Teel, L.~Praly. Small-gain theorem for ISS systems and applications. \emph{Math. Control Signals Systems} 7(2):95--120, 1994.\\
+J.~Perdomo, T.~Zrnic, C.~Mendler-D\"unner, M.~Hardt. Performative prediction. \emph{ICML}, 2020.\\
+HONEST-CAV, arXiv 2602.18740; Adaptive modular world models for traffic-signal control, arXiv 2501.02548; DHCP, arXiv 2509.03118;
+time-to-green prediction (Genser et al., ETH); CoTV (Guo et al.); DC-Ada. \emph{Blackwell, Jiang--Teel--Praly and Drusvyatskiy--Xiao verified (05/10); the others still to be verified before submission.}
+\normalsize
+
+\appendix
+\section{Validation and pitfalls (QA)}
+Reward traces, sentinel readings, residual ratchet, horizon semantics, dominance labels (C-17, C-22, C-25, C-27, C-37, C-38).
+
+\end{document}

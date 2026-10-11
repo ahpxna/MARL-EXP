@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research Results Board</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root { --bg:#f6f6f3; --card:#ffffff; --ink:#1c1c1e; --muted:#6a6a70; --line:#e2e2de; --good:#2c7a4b; --good-bg:#e8f3ec;
+  --bad:#b0412c; --bad-bg:#f8ebe7; --warn:#9a6400; --warn-bg:#f7f0e1; --acc:#3a59a3; --void:#8a8a90; --bar:#dcdcd6; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#131315; --card:#1d1d21; --ink:#ececee; --muted:#9a9aa3;
+  --line:#2f2f35; --good:#62c08a; --good-bg:#1b2e23; --bad:#e3826d; --bad-bg:#33201c; --warn:#e2ad46; --warn-bg:#30281a; --acc:#8aa5ea;
+  --void:#77777e; --bar:#35353b; } }
+:root[data-theme="dark"] { --bg:#131315; --card:#1d1d21; --ink:#ececee; --muted:#9a9aa3; --line:#2f2f35; --good:#62c08a; --good-bg:#1b2e23;
+  --bad:#e3826d; --bad-bg:#33201c; --warn:#e2ad46; --warn-bg:#30281a; --acc:#8aa5ea; --void:#77777e; --bar:#35353b; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+header { padding:20px 24px 4px; max-width:1500px; margin:0 auto; }
+h1 { font-size:20px; margin:0 0 2px; } h2 { font-size:16px; margin:0 0 10px; } h3 { font-size:14px; margin:12px 0 6px; }
+.sub { color:var(--muted); font-size:13px; }
+.wrap { max-width:1500px; margin:0 auto; padding:8px 24px 40px; }
+.banner { border:1px solid var(--warn); background:var(--warn-bg); color:var(--ink); border-radius:8px; padding:8px 12px; margin:10px 0; font-size:13px; }
+.chips { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 4px; }
+.chip { border-radius:999px; padding:3px 12px; font-size:13px; border:1px solid var(--line); background:var(--card); }
+.chip b { font-variant-numeric:tabular-nums; }
+.c-good { color:var(--good); border-color:var(--good); } .c-bad { color:var(--bad); border-color:var(--bad); }
+.c-warn { color:var(--warn); border-color:var(--warn); } .c-void { color:var(--void); }
+.filters { display:flex; gap:6px; margin:8px 0 14px; flex-wrap:wrap; }
+.filters button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:6px; padding:3px 10px; cursor:pointer; }
+.filters button.on { border-color:var(--acc); color:var(--acc); font-weight:600; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(440px, 1fr)); gap:16px; }
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; min-width:0; }
+.good-col { border-top:3px solid var(--good); } .bad-col { border-top:3px solid var(--bad); }
+.exp { border-top:1px solid var(--line); padding-top:8px; margin-top:8px; }
+.exp:first-child { border-top:none; margin-top:0; padding-top:0; }
+.exp-title { font-weight:600; font-size:13px; }
+.meta { color:var(--muted); font-size:12px; }
+.pred { display:grid; grid-template-columns:auto 1fr; gap:6px; align-items:start; padding:3px 0; font-size:13px; }
+.badge { font-size:11px; font-weight:700; border-radius:4px; padding:0 6px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.b-good { background:var(--good-bg); color:var(--good); } .b-bad { background:var(--bad-bg); color:var(--bad); }
+.b-warn { background:var(--warn-bg); color:var(--warn); } .b-void { color:var(--void); border:1px solid var(--line); }
+.detail { color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+.note { color:var(--warn); font-size:12px; }
+.takeaway { font-size:12px; margin:2px 0 4px; }
+.prog { margin:4px 0; font-size:12px; }
+.barbg { background:var(--bar); border-radius:3px; height:6px; overflow:hidden; margin-top:2px; }
+.barfg { background:var(--acc); height:6px; }
+.lanes { display:flex; flex-wrap:wrap; gap:4px 12px; color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
+canvas { max-height:320px; }
+table { border-collapse:collapse; width:100%; font-size:12px; }
+th, td { text-align:left; padding:3px 6px; border-bottom:1px solid var(--line); }
+th { color:var(--muted); font-weight:600; }
+.scroll { overflow-x:auto; }
+.err { color:var(--bad); font-size:12px; }
+@media (max-width: 760px) { .cols { grid-template-columns:1fr; } .grid { grid-template-columns:1fr; }
+  header { padding:16px 16px 4px; } .wrap { padding:8px 16px 32px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Kết quả nghiên cứu — tốt / xấu / đang chạy</h1>
+  <div class="sub" id="gen">đang tải…</div>
+</header>
+<div class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <div class="chips" id="chips"></div>
+  <div class="filters" id="filters"></div>
+  <div class="card" id="runningCard"><h2>Đang chạy / chưa có kết quả</h2><div id="running"></div></div>
+  <div class="cols">
+    <div class="card good-col"><h2>✓ Kết quả tốt (dự đoán đăng ký trước đứng vững)</h2><div id="good"></div></div>
+    <div class="card bad-col"><h2>✗ Kết quả xấu (dự đoán đăng ký trước sai)</h2><div id="bad"></div></div>
+  </div>
+  <h2 style="margin-top:22px">Biểu đồ</h2>
+  <div class="grid" id="charts"></div>
+  <div class="card" style="margin-top:16px"><h2>Tất cả thí nghiệm</h2><div class="scroll"><table id="table"></table></div>
+    <div class="meta" style="margin-top:6px">Thêm thí nghiệm: một dòng trong research/dashboard/registry.json; builder: scripts/DASH_build.py (tự chạy lại định kỳ).</div></div>
+  <div id="errors" class="err"></div>
+</div>
+<script>
+let DATA = null, CHARTS = [], FILTER = 'all';
+try { FILTER = localStorage.getItem('rb_filter') || 'all'; } catch (e) {}
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BADGE = { good:['b-good','✓'], bad:['b-bad','✗'], good_caveat:['b-warn','✓*'], bad_caveat:['b-warn','✗*'], untested:['b-void','—'], info:['b-void','i'], void:['b-void','∅'] };
+const pal = () => [css('--acc'), css('--bad'), css('--good'), css('--warn'), css('--void')];
+const visible = e => FILTER === 'all' || e.track === FILTER;
+
+function predRow(p) {
+  const [c, t] = BADGE[p.cls] || ['b-void', '?'];
+  return `<div class="pred"><span class="badge ${c}">${t} ${esc(p.id)}</span><div>${esc(p.label.replace(p.id, '').trim())}` +
+    (p.detail ? `<div class="detail">${esc(p.detail)}</div>` : '') + (p.note ? `<div class="note">${esc(p.note)}</div>` : '') + `</div></div>`;
+}
+function expBlock(e, preds) {
+  return `<div class="exp"><div class="exp-title">${esc(e.title)}</div><div class="meta">${esc(e.track)} · ${esc(e.network || '')}` +
+    `${e.ledger ? ' · ' + esc(e.ledger) : ''}${e.updated ? ' · cập nhật ' + esc(e.updated) : ''}</div>` +
+    (e.note ? `<div class="takeaway">${esc(e.note)}</div>` : '') + preds.map(predRow).join('') + `</div>`;
+}
+function renderLists() {
+  const exps = DATA.experiments.filter(visible);
+  const good = [], bad = [];
+  for (const e of exps) {
+    const ps = e.predictions || [];
+    const g = ps.filter(p => p.cls === 'good' || p.cls === 'good_caveat'), b = ps.filter(p => p.cls === 'bad' || p.cls === 'bad_caveat');
+    if (g.length) good.push(expBlock(e, g)); if (b.length) bad.push(expBlock(e, b));
+  }
+  document.getElementById('good').innerHTML = good.join('') || '<div class="meta">—</div>';
+  document.getElementById('bad').innerHTML = bad.join('') || '<div class="meta">—</div>';
+  const run = [];
+  for (const e of exps) {
+    if (e.status === 'done' && !(e.progress || []).some(p => (p.items || []).some(i => !i.done) || (p.total && p.done < p.total))) continue;
+    let h = `<div class="exp"><div class="exp-title">${esc(e.title)} ${e.status === 'pending' ? '<span class="badge b-void">chưa có report</span>' : ''}` +
+      `${e.status === 'error' ? '<span class="err"> lỗi: ' + esc(e.error) + '</span>' : ''}</div>`;
+    for (const p of (e.progress || [])) {
+      if (p.error) { h += `<div class="err">${esc(p.label)}: ${esc(p.error)}</div>`; continue; }
+      if (p.items) {
+        const tot = p.items.length * p.total, done = p.items.reduce((a, i) => a + Math.min(i.it, p.total), 0);
+        const pct = tot ? Math.round(100 * done / tot) : 0;
+        h += `<div class="prog">${esc(p.label)}: ${p.items.length ? pct + ' %' : 'chưa bắt đầu'}<div class="barbg"><div class="barfg" style="width:${pct}%"></div></div>` +
+          `<div class="lanes">${p.items.map(i => `<span>${esc(i.name.replace(/_st_s|_s/, ' s'))} ${i.done ? '✓' : i.it}</span>`).join('')}</div></div>`;
+      } else {
+        const pct = p.total ? Math.round(100 * p.done / p.total) : 0;
+        h += `<div class="prog">${esc(p.label)}: ${p.done} / ${p.total}<div class="barbg"><div class="barfg" style="width:${pct}%"></div></div></div>`;
+      }
+    }
+    run.push(h + '</div>');
+  }
+  const R = DATA.running || {};
+  const procs = Object.entries(R).filter(([k]) => !k.startsWith('_')).map(([k, v]) => `${esc(k)}: ${v.n} tiến trình (lâu nhất ${esc(v.longest)})`);
+  document.getElementById('running').innerHTML = run.join('') + `<div class="meta" style="margin-top:8px">Tiến trình: ${procs.join(' · ') || 'không có'}` +
+    `${R._load ? ' · load ' + R._load.toFixed(1) : ''}</div>`;
+  const rows = exps.map(e => { const ps = e.predictions || []; const n = c => ps.filter(p => p.cls.startsWith(c)).length;
+    return `<tr><td>${esc(e.track)}</td><td>${esc(e.title)}</td><td>${esc(e.ledger || '')}</td><td class="c-good">${n('good')}</td><td class="c-bad">${n('bad')}</td>` +
+      `<td>${n('untested') + n('info') + n('void')}</td><td>${esc(e.updated || (e.status === 'pending' ? 'đang chờ' : ''))}</td></tr>`; });
+  document.getElementById('table').innerHTML = '<tr><th>track</th><th>thí nghiệm</th><th>ledger</th><th>tốt</th><th>xấu</th><th>khác</th><th>report</th></tr>' + rows.join('');
+}
+const ciPlugin = { id:'ci', afterDatasetsDraw(chart) {
+  const { ctx } = chart; ctx.save(); ctx.strokeStyle = css('--ink'); ctx.lineWidth = 1;
+  chart.data.datasets.forEach((ds, di) => { if (!ds.ci) return; const meta = chart.getDatasetMeta(di); if (meta.hidden) return; const y = chart.scales[ds.yAxisID || 'y'];
+    meta.data.forEach((el, i) => { const c = ds.ci[i]; if (!c) return; const x = el.x, a = y.getPixelForValue(c[0]), b = y.getPixelForValue(c[1]);
+      ctx.beginPath(); ctx.moveTo(x, a); ctx.lineTo(x, b); ctx.moveTo(x - 3, a); ctx.lineTo(x + 3, a); ctx.moveTo(x - 3, b); ctx.lineTo(x + 3, b); ctx.stroke(); }); });
+  ctx.restore(); } };
+function card(title, sub) {
+  const d = document.createElement('div'); d.className = 'card';
+  d.innerHTML = `<h2>${esc(title)}</h2>${sub ? `<div class="meta">${esc(sub)}</div>` : ''}<canvas></canvas>`;
+  document.getElementById('charts').appendChild(d); return d.querySelector('canvas');
+}
+function baseOpts(ylabel, xlabel) {
+  const grid = css('--line'), tick = css('--muted');
+  return { responsive:true, maintainAspectRatio:true, animation:false, plugins:{ legend:{ labels:{ color:tick } } },
+    scales:{ x:{ grid:{ color:grid }, ticks:{ color:tick }, title:{ display:!!xlabel, text:xlabel, color:tick } },
+             y:{ grid:{ color:grid }, ticks:{ color:tick }, title:{ display:!!ylabel, text:ylabel, color:tick } } } };
+}
+function gainBars(c, key) {
+  const arms = Object.keys(c.series || {}); if (!arms.length) throw new Error('không có dòng nào');
+  const Ks = ['K=1', 'K=2', 'K=3', 'iid'], P = pal();
+  return new Chart(card(c.title, 'gain vs Z (%) với CI 95 %; > 0 = relay tốt hơn compiled silence'), { type:'bar', plugins:[ciPlugin],
+    data:{ labels:Ks, datasets:arms.map((a, i) => ({ label:a, data:Ks.map(k => (c.series[a][k] || [null])[0]),
+      ci:Ks.map(k => c.series[a][k] ? [c.series[a][k][1], c.series[a][k][2]] : null), backgroundColor:P[i % P.length] + 'cc' })) },
+    options:baseOpts('gain vs Z (%)') });
+}
+function contrastChart(c) {
+  const rows = c.rows || []; if (!rows.length) throw new Error('không có dòng contrast');
+  const g = (r, m) => r.m[m] ? r.m[m].v : null, ci = (r, m) => (r.m[m] && r.m[m].lo != null) ? [r.m[m].lo, r.m[m].hi] : null;
+  const o = baseOpts('agent fuel (%)'); o.scales.y2 = { position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:css('--muted') }, title:{ display:true, text:'time loss (s/xe)', color:css('--muted') } };
+  o.scales.x.ticks.autoSkip = false; o.scales.x.ticks.maxRotation = 60; o.scales.x.ticks.minRotation = 30;
+  return new Chart(card(c.title, 'mỗi cột = một phép so trong report; CI 95 % (crossed bootstrap); fuel trái (%), time loss phải (s/xe)'), { type:'bar', plugins:[ciPlugin],
+    data:{ labels:rows.map(r => r.name), datasets:[
+      { label:'agent fuel %', data:rows.map(r => g(r, 'fuel')), ci:rows.map(r => ci(r, 'fuel')), backgroundColor:css('--acc') + 'cc', yAxisID:'y' },
+      { label:'agent TL', data:rows.map(r => g(r, 'agentTL')), ci:rows.map(r => ci(r, 'agentTL')), backgroundColor:css('--bad') + 'aa', yAxisID:'y2' },
+      { label:'human TL', data:rows.map(r => g(r, 'humanTL')), ci:rows.map(r => ci(r, 'humanTL')), backgroundColor:css('--good') + '88', yAxisID:'y2' },
+      { label:'city TL', data:rows.map(r => g(r, 'cityTL')), ci:rows.map(r => ci(r, 'cityTL')), backgroundColor:css('--warn') + '88', yAxisID:'y2' } ] }, options:o });
+}
+const gatePlugin = { id:'gate', beforeDatasetsDraw(chart) {
+  const { ctx, chartArea:a, scales:{ x, y } } = chart; const x5 = x.getPixelForValue(0.5), y0 = y.getPixelForValue(0);
+  ctx.save(); ctx.fillStyle = css('--good') + '22'; const l = a.left, r = Math.min(Math.max(x5, a.left), a.right), t = Math.min(Math.max(y0, a.top), a.bottom);
+  ctx.fillRect(l, t, r - l, a.bottom - t); ctx.strokeStyle = css('--muted'); ctx.setLineDash([4, 4]); ctx.beginPath();
+  if (x5 > a.left && x5 < a.right) { ctx.moveTo(x5, a.top); ctx.lineTo(x5, a.bottom); } if (y0 > a.top && y0 < a.bottom) { ctx.moveTo(a.left, y0); ctx.lineTo(a.right, y0); }
+  ctx.stroke(); ctx.restore(); } };
+function frontierChart(c) {
+  const pts = c.points || []; if (!pts.length) throw new Error('chưa có điểm'); const P = pal(), exps = [...new Set(pts.map(p => p.exp))];
+  const o = baseOpts('agent fuel vs R (%)', 'agent time loss vs R (s/xe)');
+  o.plugins.tooltip = { callbacks:{ label:t => { const p = t.raw.p; const f = p.fuel, a = p.agentTL;
+    return `${p.exp}: ${p.name} — fuel ${f.v}${f.lo != null ? ` [${f.lo}, ${f.hi}]` : ''} % · agent TL ${a.v}${a.lo != null ? ` [${a.lo}, ${a.hi}]` : ''}${a.up != null ? ` (up ${a.up})` : ''}`; } } };
+  return new Chart(card(c.title, 'vùng xanh = gate M3 theo ước lượng điểm (fuel < 0, agent TL < +0.5); gate thật dùng cận trên một phía (xem tooltip)' + ((c.excluded || []).length ? ` · ngoài khung (|agent TL| > 15 hoặc |fuel| > 30): ${c.excluded.join('; ')}` : '')), { type:'scatter', plugins:[gatePlugin],
+    data:{ datasets:exps.map((e, i) => ({ label:e, data:pts.filter(p => p.exp === e).map(p => ({ x:p.agentTL.v, y:p.fuel.v, p })), backgroundColor:P[i % P.length], pointRadius:5 })) }, options:o });
+}
+function renderCharts() {
+  CHARTS.forEach(ch => ch.destroy()); CHARTS = []; const box = document.getElementById('charts'); box.innerHTML = '';
+  const show = new Set(DATA.experiments.filter(visible).map(e => e.chart || e.id));
+  const cs = DATA.experiments.filter(visible).map(e => 'c_' + e.id).filter(k => DATA.charts[k]);
+  const order = ['_frontier', ...cs, 'q7', 'fallback', 'testD', 'g4tm', 'testC', 'q3', 'q2', 'q4'];
+  for (const k of order) {
+    const c = DATA.charts[k]; if (!c) continue;
+    const exp = DATA.experiments.find(e => e.id === k || (k === 'fallback' && e.id === 'fallback')); if (exp && !visible(exp)) continue;
+    try {
+      if (c.error) throw new Error(c.error);
+      if (c.kind === 'contrasts') { CHARTS.push(contrastChart(c)); continue; }
+      if (c.kind === 'frontier') { if (FILTER === 'MARL') continue; CHARTS.push(frontierChart(c)); continue; }
+      if (c.kind === 'gainbars') CHARTS.push(gainBars(c, k));
+      else if (c.kind === 'grouped') { const P = pal();
+        CHARTS.push(new Chart(card(c.title, 'time loss trung bình toàn mạng; mỗi nhóm = một loại đèn'), { type:'bar',
+          data:{ labels:c.categories, datasets:c.groups.map((g, i) => ({ label:g, data:c.values[g], backgroundColor:P[i] + 'cc' })) }, options:baseOpts(c.ylabel) })); }
+      else if (c.kind === 'lines') { const P = pal();
+        CHARTS.push(new Chart(card(c.title), { type:'line', data:{ labels:c.x, datasets:Object.entries(c.series).map(([n, v], i) =>
+          ({ label:n, data:v, borderColor:P[i % P.length], backgroundColor:P[i % P.length], tension:0.2 })) }, options:baseOpts(c.ylabel, c.xlabel) })); }
+      else if (c.kind === 'scatter') {
+        CHARTS.push(new Chart(card(c.title, 'mỗi điểm = một corridor; nhãn = offset'), { type:'scatter', data:{ datasets:[{ label:'Δ', data:c.points.map(p => ({ x:p.tv, y:p.delta, n:p.name })),
+          backgroundColor:css('--acc'), pointRadius:5 }] }, options:{ ...baseOpts(c.ylabel, c.xlabel), plugins:{ legend:{ display:false },
+          tooltip:{ callbacks:{ label:t => `${t.raw.n}: TV ${t.raw.x}, Δ ${t.raw.y}` } } } } })); }
+      else if (c.kind === 'fallback') {
+        for (const [net, arms] of Object.entries(c.nets)) { const labels = [], S = { RELAY:[], FB_S:[], FB_F:[], FB_R:[] }, CI = { RELAY:[], FB_S:[], FB_F:[], FB_R:[] };
+          for (const [arm, ks] of Object.entries(arms)) for (const [K, cells] of Object.entries(ks)) { labels.push(arm.replace('_st', '') + ' ' + K);
+            for (const s of Object.keys(S)) { S[s].push(cells[s] ? cells[s][0] : null); CI[s].push(cells[s] ? [cells[s][1], cells[s][2]] : null); } }
+          const P = [css('--void'), css('--good'), css('--bad'), css('--warn')];
+          CHARTS.push(new Chart(card(`${c.title} — ${net}`, 'gain vs Z (%): RELAY (không monitor) / fallback support / freshness / range'), { type:'bar', plugins:[ciPlugin],
+            data:{ labels, datasets:Object.keys(S).map((s, i) => ({ label:s, data:S[s], ci:CI[s], backgroundColor:P[i] + 'cc' })) }, options:baseOpts('gain vs Z (%)') })); } }
+    } catch (err) { const d = document.createElement('div'); d.className = 'card'; d.innerHTML = `<h2>${esc(c.title || k)}</h2><div class="err">chưa vẽ được: ${esc(err.message)}</div>`; box.appendChild(d); }
+  }
+}
+function renderTop() {
+  document.getElementById('gen').textContent = `dữ liệu dựng lúc ${DATA.generated} · trang tự tải lại mỗi 60 s`;
+  const b = document.getElementById('banner'); if (DATA.banner) { b.hidden = false; b.textContent = DATA.banner; }
+  const n = DATA.counts || {}, k = c => n[c] || 0;
+  document.getElementById('chips').innerHTML = `<span class="chip c-good">tốt <b>${k('good')}</b></span><span class="chip c-warn">tốt có lưu ý <b>${k('good_caveat')}</b></span>` +
+    `<span class="chip c-bad">xấu <b>${k('bad')}</b></span><span class="chip c-warn">xấu có lưu ý <b>${k('bad_caveat')}</b></span>` +
+    `<span class="chip c-void">không tính <b>${k('void')}</b></span><span class="chip c-void">chưa test / chỉ báo cáo <b>${k('untested') + k('info')}</b></span>`;
+  document.getElementById('filters').innerHTML = ['all', 'MARL', 'City'].map(f => `<button class="${f === FILTER ? 'on' : ''}" data-f="${f}">${f === 'all' ? 'Tất cả' : f}</button>`).join('');
+  document.querySelectorAll('#filters button').forEach(btn => btn.onclick = () => { FILTER = btn.dataset.f; try { localStorage.setItem('rb_filter', FILTER); } catch (e) {} render(); });
+  document.getElementById('errors').textContent = (DATA.errors || []).length ? 'Lỗi builder: ' + DATA.errors.join(' | ') : '';
+}
+function render() { if (!DATA) return; renderTop(); renderLists(); try { renderCharts(); } catch (e) { console.error(e); } }
+async function load() {
+  try { const r = await fetch('data.json?t=' + Date.now(), { cache:'no-store' }); if (!r.ok) throw new Error(r.status); DATA = await r.json(); render(); }
+  catch (e) { document.getElementById('gen').textContent = 'không tải được data.json (' + e.message + ') — sẽ thử lại'; }
+}
+load(); setInterval(load, 60000);
+</script>
+</body>
+</html>

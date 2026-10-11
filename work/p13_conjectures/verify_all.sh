@@ -130,6 +130,12 @@ MODS="$MODS LeanMarlEmulationV1 LeanMarlProvisioningV1 LeanMarlSupportV1 LeanMar
 MODS="$MODS LeanMarlAgeRoleV1"
 # Smoke-gated 02/10 13:38 (smokeMARLPROJ_20261002: SMOKE PASS); ledger L-276, L-280.
 MODS="$MODS LeanMarlProjectionV1 LeanMarlProvisioningInstancesV1"
+# Added 03/10/2026 13:1x (G7_FLOORS_SCOPE_20261003; ledger L-299); smoke-gated 04/10 00:43 (smokeMARLLEGACY_20261004: SMOKE PASS, 9 modules with dependencies, 55 audited theorems).
+MODS="$MODS LeanCityReceiverContractV1 LeanMarlDecisionDepthV1 LeanMarlCommValueV1 LeanMarlFrozenFloorV1 LeanMarlTaskVsReconV1"
+# Added 04/10/2026 00:44 (E9c legacy-view decoder; smokeMARLLEGACY2_20261004: SMOKE PASS, 21 audited theorems, standard axioms); ledger L-323.
+MODS="$MODS LeanMarlLegacyViewDecoderV1"
+# E12-a: smoke-gated 04/10 05:43 (smokeMARLEMU12A_20261004: SMOKE PASS, 10 audited theorems, prints 10 = theorems); ledger L-332.
+MODS="$MODS LeanMarlPacketEmulatorV1"
 
 WHITELIST='propext|Classical.choice|Quot.sound'
 

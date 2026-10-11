@@ -1,0 +1,19 @@
+start Sun Oct  4 21:12:57 EDT 2026 q 0.1
+traces done Sun Oct  4 21:12:58 EDT 2026
+Traceback (most recent call last):
+  File "/Users/phanan/cig-amf-main/scripts/CITY_f1a1_run.py", line 22, in <module>
+    target = sys.argv[1]; sys.argv = [target] + sys.argv[2:]; runpy.run_path(str(ROOT / target), run_name='__main__')
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/phanan/cig-amf-main/scripts/CITY_spat_forecast.py", line 137, in <module>
+    T = fit(sys.argv[4:]); Path(sys.argv[3]).write_text(json.dumps(T)); print('fit', k, 'files', T['n_files'], 'lights', len(T['per']))
+        ^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/scripts/CITY_spat_forecast.py", line 39, in fit
+    z = np.load(f, allow_pickle=True); ids = [str(x) for x in z['ids']]; P = z['phases']; G = greens_of(ids)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/phanan/cig-amf-main/external_envs/runtime/lib/python3.12/site-packages/numpy/lib/npyio.py", line 427, in load
+    fid = stack.enter_context(open(os_fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'research/city_sim/f1a1_20261004/traces/rlh4_s0.npz'

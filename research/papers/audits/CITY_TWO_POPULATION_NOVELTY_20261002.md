@@ -183,3 +183,54 @@ partner-only certificate (support exit + hazard shift, C0b) validated prospectiv
 max G_L s.t. H_C ≤ ε; (4) the communication bar.  C0 is a mechanism / witness test only; C1 (SUMO) must show (1) and (3) with a
 light that is genuinely better in isolation.  Lean: LeanCityConditionalShiftV1 (compiled 18:2x, 0 errors, standard axioms) is
 the formal witness of the semantics half — standard concept shift, not a contribution by itself.
+
+## 7. Two external reviews (user-pasted 22:4x and 22:5x): "decision-sufficient backward compatibility" — verified 22:5x
+Every corpus statement in the two reviews was checked against our files; every external citation through web search.
+**Corpus claims — all correct.** Paper A `sacrifice_cost_law` (N·sacrifice(w̄) ≥ 8rM·D, ROADMAP A-SAC); SUPPORT's three-world
+witness (pairwise safe sets intersect, the triple is empty; SUPPORT main.tex §"obstruction that pairwise reasoning cannot
+see"); MASTER's dichotomy is a witness (`hidden_shift_witness`); QUERY's leakage order depends on the query family; Functional's
+separability step is unproved (main.tex l. 1446); Q7 numbers (21.96 / 24.59 / 55.85; Δ_car 30.16 [22.11, 38.93]; keep 0.907;
+Δ_compat 6.37); Q7-3 4.4 % vs 18.6 %; SP1–SP3 and RM1–RM5 all NOT SUPPORTED; GTM5 −17.76; C0 S_exit 0.913 > K 0.783, φK 0.713 < K
+0.735; CUT 0.234 with CI over 0; Q5 at the undersaturated demand: no window, REVISE1 fails.
+**External citations — all exist and are described correctly:** SIL-C, "Policy Compatible Skill Incremental Learning via Lazy
+Learning Interface" (NeurIPS 2025; backward skill compatibility: frozen downstream policies keep using updated skills, mapping by
+trajectory-distribution similarity) — the CLOSEST neighbour for "backward compatibility of a frozen learned policy", to be cited;
+Kazemi et al., Assume-Guarantee RL (AAAI 2024, 38(19) 21223–21231; contracts as regular languages, composed satisfaction bounds);
+Dewes & Dimitrova, quantitative assume-guarantee contracts for MAS (AAAI 2025, doi 10.1609/aaai.v39i22.34480); Adalat,
+Hamel-De le Court & Belardinelli, contract-based compositional shielding for safe MARL (arXiv 2606.14130, June 2026; the pasted
+link pointed to an unrelated domain); Yu et al., ICAPS (ZSC score linear in training/test partner similarity, Pearson 0.874–0.905);
+Träuble et al., backward-compatible prediction updates (NeurIPS 2021, negative flips).  Added collision for "interaction order":
+combinatorial t-way interaction testing (Kuhn & Wallace, NIST: software failures triggered by t-way parameter interactions;
+covering arrays) and Helly-type intersection numbers.
+**What the reviews add (accepted):** (i) the framing — compatibility is DIRECTED (U ⇝ R), receiver-relative and
+decision-relative, not a scalar property of the upgraded component nor a universal distance; our negative results (Q7-3, C0b-2,
+C0c-2, W1 law L-282, receiver-specific clip L-285) become evidence for it rather than failures; (ii) three theorem targets:
+(T1) no receiver-free certificate — ALREADY in our Lean: LeanMarlSupportV1.upgrade_hazard has two training-optimal receivers f, g
+(risk 0 on Ptrain) with deployment risks 0 and 1 under the same Qdeploy (silent 1/2), so any K(Ptrain, Qdeploy) answers both
+the same; only a one-line corollary is missing; (T2) obstruction / common-safe-action characterisation per contract cell — this
+is SUPPORT / Paper B's decide-without-identifying applied to the cells of a receiver contract (re-instantiation, not new math);
+(T3) local-to-joint hierarchy s_compat (an order-s contract may be needed; Q4 is a witness with s = 2) — the genuinely new
+object, provable by a parity construction, to be positioned against t-way testing and k-wise independence; (iii) the two dual
+repairs — receiver-side (C0 fallback, #3 support fallback) and producer-side (Q7 compatible mode: a constraint in POLICY space,
+whereas E3's input projections failed); (iv) the price-of-compatibility frontier (Q7 gives one point: 90.7 % of the light's gain
+kept, car harm −79 %), with Bansal 2019's performance/compatibility tradeoff as prior art and Paper A as the rate template.
+**Corrections to the reviews:** (a) Q7 trained ONE network per component (DQN seeds fixed at 11 / 13 in
+scripts/CITY_q7_cross_version.py); its intervals cover evaluation traffic only, so Q7 is not yet central evidence — it needs a
+training-seed replication; (b) Q7-3's light statistic (share of green-seconds beyond 50 s) is not the receiver's exposure: cars
+decide every second while queued, so long phases are over-weighted at decision points (4.4 % of phase time vs 18.6 % of
+decisions) — the gap is itself receiver-relative (supports the framing) and is measurable from the upgrader's logs only if the
+receiver publishes its decision process / accepted region (a contract); (c) "input projection usually fails" holds on E3 but not
+in C0, where quantile relabelling HELPED (C0-5: 11.4 vs 29.3) — input-side repair is receiver/testbed-specific, not refuted in
+general; (d) the asymmetry "car → light only +13 %" compares a different fleet (L-RLH) and is one pair — not yet a directed-
+compatibility result; (e) Layer B's sufficiency condition is SUPPORT's own; the novelty is the receiver-contract scope and s_compat;
+(f) Q5's two saturated demands are void, as recorded (C-6).
+**Verdict:** adopt the framing for the CITY paper ("receiver-relative, decision-sufficient, possibly higher-order compatibility
+contracts between independently updated learned agents"), keep the MARL E3 paper's thesis "support, not freshness" (its support
+region is exactly a receiver contract).  Next, cheapest decisive first: Q7b (training-seed replication of Q7; the compatible-mode
+frontier over the forced-switch cap; the contract certificate = the receiver's published τ region weighted by its decision
+exposure, computed from the upgrader's own logs, registered before computing); Lean T1 corollary; Lean T3 parity witness.
+
+**Correction to §7 (b) (23:1x):** the exposure explanation of Q7-3 is a hypothesis that the Q7b smoke does not support
+(RL-H contract-with-exposure 0.036 from human-traffic logs vs 0.131 with the fleet present vs 0.19 cross-play): most of the gap
+is closed-loop — the upgraded light behaves differently when the frozen fleet drives (FAILURE_SYNTHESIS correction, H2b).  This
+strengthens "receiver-relative" further: the contract must include the receiver's behaviour, not only its region.

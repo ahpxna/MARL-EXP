@@ -1,0 +1,42 @@
+== B3-X all lights x all fleets (3250 runs)
+SELF-CHECK completeness: 26 lights x 25 fleets x 5 seeds, missing 0 []; bit-identity with the h0 panel: 390/390 shared runs [] -> PASS
+  train ALT-halt_k0    episodes 240  teleports first 5 [1826, 1997, 1961, 1890, 1833] last 5 [0, 2, 0, 2, 0]  last-10 r_L +nan r_F -1.201
+  train ALT-halt_k1    episodes 240  teleports first 5 [1687, 1940, 1755, 1771, 1727] last 5 [0, 1, 0, 0, 2]  last-10 r_L +nan r_F -1.110
+  train ALT-halt_k2    episodes 240  teleports first 5 [1787, 2119, 1844, 1893, 1716] last 5 [0, 0, 0, 0, 4]  last-10 r_L +nan r_F -1.078
+  train ALT-halt_k3    episodes 240  teleports first 5 [2, 0, 1, 4, 2] last 5 [0, 0, 6, 71, 0]  last-10 r_L +nan r_F -1.156
+  train L-RLH_t1       episodes 120  teleports first 5 [3, 3, 0, 0, 0] last 5 [2, 2, 2, 1, 0]  last-10 r_L +nan r_F -1.129
+  train L-RLH_t2       episodes 120  teleports first 5 [2, 6, 0, 4, 0] last 5 [0, 0, 0, 1, 0]  last-10 r_L +nan r_F -1.087
+  train L-RLH_t3       episodes 120  teleports first 5 [0, 14, 0, 16, 0] last 5 [2, 2, 4, 0, 3]  last-10 r_L +nan r_F -1.096
+  train SIM-delay_k0   episodes 120  teleports first 5 [0, 3, 0, 4, 2] last 5 [0, 2, 6, 2, 2]  last-10 r_L -0.112 r_F -1.123
+  train SIM-delay_k1   episodes 120  teleports first 5 [0, 5, 0, 0, 3] last 5 [3, 2, 4, 6, 2]  last-10 r_L -0.105 r_F -1.132
+  train SIM-delay_k2   episodes 120  teleports first 5 [0, 5, 0, 0, 0] last 5 [2, 0, 12, 4, 3]  last-10 r_L -0.122 r_F -1.098
+  train SIM-delay_k3   episodes 120  teleports first 5 [0, 3, 0, 0, 4] last 5 [0, 0, 0, 2, 2]  last-10 r_L -0.069 r_F -1.144
+  train SIM-halt_k0    episodes 120  teleports first 5 [0, 1, 17, 3, 0] last 5 [2, 3, 3, 2, 3]  last-10 r_L -0.036 r_F -1.101
+  train SIM-halt_k1    episodes 120  teleports first 5 [0, 3, 0, 0, 0] last 5 [0, 2, 1, 4, 0]  last-10 r_L -0.032 r_F -1.075
+  train SIM-halt_k2    episodes 120  teleports first 5 [0, 0, 0, 2, 0] last 5 [1, 0, 0, 0, 1]  last-10 r_L -0.025 r_F -1.093
+  train SIM-halt_k3    episodes 120  teleports first 5 [0, 0, 0, 0, 5] last 5 [0, 1, 0, 2, 8]  last-10 r_L -0.033 r_F -1.125
+Own-pair city time loss (s/veh; mean over 4 training indices x 5 seeds) and partner specificity Spec = off-diagonal - diagonal:
+  SIM-halt               own   31.39 (per index  40.40  25.69  36.40  23.08)  Spec   +1.38 [-10.83, +20.36] (1968 draws)
+  ALT-halt               own   35.92 (per index  49.17  23.14  35.49  35.89)  Spec   +2.42 [-2.08, +7.69] (1971 draws)
+  SIM-delay              own   39.92 (per index  43.01  39.43  47.00  30.25)  Spec   +0.06 [-6.61, +4.45] (1975 draws)
+  S1 (RL-H, L-RLH)       own   27.39 (per index  24.83  28.72  34.78  21.25)  Spec   -0.00 [-2.96, +2.91] (1971 draws)
+  S2 (RL-J, L-ACT)       own   30.00 (per index  24.36  36.38  34.71  24.54)  Spec   -0.13 [-5.12, +3.10] (1974 draws)
+  C50 (RL-C50, L-ACT)    own   32.11 (per index  32.60  37.56  34.35  23.94)  Spec   -0.14 [-2.71, +2.93] (1973 draws)
+  H (RL-H, L-ACT)        own   45.15 (per index  78.51  38.05  40.46  23.58)  Spec   -4.73 [-24.69, +5.76] (1972 draws)
+C-1 SIM-halt own - S1 own: +4.00 [-4.71, +14.44] -> NOT SUPPORTED
+C-2 Spec(SIM-halt) +1.38 [-10.83, +20.36] -> NOT SUPPORTED
+C-2b Spec(SIM-halt) - Spec(S1): +1.39 [-10.52, +20.34] (1978 draws) -> NOT SUPPORTED
+C-3 SIM-delay own - SIM-halt own: +8.53 [-2.60, +18.09] -> NOT SUPPORTED
+C-4 ALT-halt own - SIM-halt own: +4.53 [-5.72, +11.72]
+C-4 S2 (RL-J, L-ACT) own - S1 (RL-H, L-RLH) own: +2.60 [-0.78, +6.24]
+C-4 light gain with human traffic (ACT 24.59 s/veh minus light): FT -31.26, RL-H:0 +2.63, RL-H:1 +2.57, RL-H:2 +2.48, RL-H:3 +2.75, RL-C50:0 +2.39, RL-C50:1 +2.10, RL-C50:2 +2.34, RL-C50:3 +2.45, RL-J:0 +0.75, RL-J:1 +1.36, RL-J:2 +2.26, RL-J:3 +2.30, SIM-halt:0 +2.45, SIM-halt:1 +2.66, SIM-halt:2 +1.73, SIM-halt:3 +2.48, ALT-halt:0 +1.92, ALT-halt:1 +2.21, ALT-halt:2 +2.36, ALT-halt:3 +2.38, SIM-delay:0 +2.36, SIM-delay:1 +2.40, SIM-delay:2 +2.29, SIM-delay:3 +2.14
+C-4 fleets in an ACT city (TL with fleet, ACT light): human 24.59, L-ACT:0 24.97, L-ACT:1 27.91, L-ACT:2 26.30, L-ACT:3 25.63, L-FT:0 67.50, L-FT:1 79.73, L-FT:2 122.27, L-FT:3 97.66, L-RLH:0 28.75, L-RLH:1 38.92, L-RLH:2 33.15, L-RLH:3 24.94, SIM-halt:0 42.58, SIM-halt:1 30.90, SIM-halt:2 27.19, SIM-halt:3 27.32, ALT-halt:0 123.29, ALT-halt:1 25.96, ALT-halt:2 35.27, ALT-halt:3 57.20, SIM-delay:0 116.80, SIM-delay:1 81.29, SIM-delay:2 57.81, SIM-delay:3 57.93
+C-5 city TL: 26 x 25 cell means; shares light 0.10, fleet 0.38, interaction 0.52
+C-5 fleet approach cost: 26 x 24 cell means; shares light 0.05, fleet 0.34, interaction 0.60
+   within SIM-halt               4x4 city TL: light 0.19 fleet 0.50 interaction 0.32; agent vs human TL own pairs 35.59 / 27.20; teleports own 3.2
+   within ALT-halt               4x4 city TL: light 0.01 fleet 0.96 interaction 0.02; agent vs human TL own pairs 45.35 / 26.57; teleports own 1.9
+   within SIM-delay              4x4 city TL: light 0.08 fleet 0.90 interaction 0.02; agent vs human TL own pairs 51.57 / 28.35; teleports own 2.9
+   within S1 (RL-H, L-RLH)       4x4 city TL: light 0.00 fleet 0.98 interaction 0.01; agent vs human TL own pairs 30.56 / 24.23; teleports own 1.7
+   within S2 (RL-J, L-ACT)       4x4 city TL: light 0.23 fleet 0.62 interaction 0.15; agent vs human TL own pairs 34.29 / 25.72; teleports own 1.9
+   within C50 (RL-C50, L-ACT)    4x4 city TL: light 0.01 fleet 0.98 interaction 0.01; agent vs human TL own pairs 38.68 / 25.58; teleports own 2.0
+   within H (RL-H, L-ACT)        4x4 city TL: light 0.06 fleet 0.77 interaction 0.17; agent vs human TL own pairs 56.50 / 33.86; teleports own 8.8

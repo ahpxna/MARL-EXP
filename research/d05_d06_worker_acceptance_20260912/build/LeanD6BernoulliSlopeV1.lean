@@ -1,0 +1,267 @@
+import «LeanD6BernoulliTailV1»
+
+/-! # The three reference slopes.
+
+This closes the last step of the bridge. With
+`LeanD6BernoulliReferenceBridgeV1` (the gate as a polynomial, the factorisation)
+and `LeanD6BernoulliTailV1` (the binomial tail on disjoint blocks) all proved,
+each slope is now an assembly, not a new computation:
+
+    i in A          ->  (1-t)^|A| * tail(|B|)
+    i in others A j ->  (|B|+1-1) ... = the B-slope
+    i = j           ->  (the A-slope) - 1
+
+With `|A| = k` and `|others A j| = k - 1` these are exactly
+`a = c*(1+(k-2)*t)`, `b = c*(k-2)*t`, `a - 1`, for `c = (1-t)^(2k-2)`.
+
+The LINEAR part of `world` contributes its coefficient at EVERY reference: its
+slope is `coeff A j mu i` with no dependence on `t` whatsoever
+(`linear_slope`). Only the gate carries reference dependence.
+-/
+
+namespace CIGAMF.P13.D6ReferenceSlope
+open scoped BigOperators
+open Finset
+open CIGAMF.P13.D6Threshold CIGAMF.P13.D6ReferenceBridge CIGAMF.P13.D6ReferenceTail
+open CIGAMF.V4.ProductSurrogate CIGAMF.V4.ProductMixedDifference
+noncomputable section
+variable {n : ℕ}
+
+/-! ## Response is additive, and the linear part is reference-free -/
+
+theorem productResponse_add (q : I n → Bool → ℝ) (F G : (I n → Bool) → ℝ)
+    (i : I n) (u : Bool) :
+    productResponse q (fun x => F x+G x) i u
+      = productResponse q F i u+productResponse q G i u := by
+  unfold productResponse productExpectation
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun c _ => by ring)
+
+/-- The additive part contributes its own coefficient at EVERY product
+reference. This is why only the gate needs the Bernoulli computation. -/
+theorem linear_slope (q : I n → Bool → ℝ)
+    (hNorm : ∑ c : I n → Bool, jointWeight q c = 1) (c' : I n → ℝ) (i : I n) :
+    productResponse q (linear c') i true-productResponse q (linear c') i false=c' i := by
+  unfold productResponse productExpectation
+  rw [← Finset.sum_sub_distrib]
+  have hstep : ∀ c : I n → Bool,
+      jointWeight q c*linear c' (Function.update c i true)
+        -jointWeight q c*linear c' (Function.update c i false)
+        = jointWeight q c*c' i := by
+    intro c
+    have h := linear_difference c' c i true false
+    rw [bit_true, bit_false] at h
+    rw [← mul_sub, h]
+    ring
+  simp_rw [hstep]
+  rw [← Finset.sum_mul, hNorm, one_mul]
+
+/-! ## How `offProd`, `count` and `leOne` react to pinning one coordinate -/
+
+theorem offProd_update_mem (S : Finset (I n)) (i0 : I n) (hi : i0 ∈ S) (u : Bool)
+    (x : I n → Bool) :
+    offProd S (Function.update x i0 u)=(1-bit u)*offProd (S.erase i0) x := by
+  classical
+  unfold offProd
+  rw [← Finset.mul_prod_erase S (fun i => 1-bit (Function.update x i0 u i)) hi]
+  congr 1
+  · simp
+  · exact Finset.prod_congr rfl (fun i hi' => by
+      rw [Function.update_of_ne (Finset.ne_of_mem_erase hi')])
+
+theorem offProd_update_not_mem (S : Finset (I n)) (i0 : I n) (hi : i0 ∉ S) (u : Bool)
+    (x : I n → Bool) :
+    offProd S (Function.update x i0 u)=offProd S x := by
+  classical
+  unfold offProd
+  refine Finset.prod_congr rfl (fun i hiS => ?_)
+  have hne : i ≠ i0 := by rintro rfl; exact hi hiS
+  rw [Function.update_of_ne hne]
+
+theorem count_update_not_mem (B : Finset (I n)) (i0 : I n) (hi : i0 ∉ B) (u : Bool)
+    (x : I n → Bool) :
+    count B (Function.update x i0 u)=count B x := by
+  classical
+  unfold count
+  congr 1
+  refine Finset.filter_congr (fun i hiB => ?_)
+  have hne : i ≠ i0 := by rintro rfl; exact hi hiB
+  rw [Function.update_of_ne hne]
+
+theorem leOne_update_not_mem (B : Finset (I n)) (i0 : I n) (hi : i0 ∉ B) (u : Bool)
+    (x : I n → Bool) :
+    leOne B (Function.update x i0 u)=leOne B x := by
+  unfold leOne
+  rw [count_update_not_mem B i0 hi u x]
+
+theorem count_update_true_mem (B : Finset (I n)) (i : I n) (hi : i ∈ B) (x : I n → Bool) :
+    count B (Function.update x i true)=1+count (B.erase i) x := by
+  classical
+  have hpi : Function.update x i true i = true := by simp
+  have hfe : (B.erase i).filter (fun l => Function.update x i true l = true)
+      = (B.erase i).filter (fun l => x l = true) :=
+    Finset.filter_congr (fun l hl => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hl)])
+  unfold count
+  conv_lhs => rw [show B=insert i (B.erase i) from (Finset.insert_erase hi).symm]
+  rw [Finset.filter_insert, if_pos hpi, hfe,
+    Finset.card_insert_of_notMem (fun hmem =>
+      (Finset.notMem_erase i B) (Finset.mem_of_mem_filter i hmem))]
+  omega
+
+theorem count_update_false_mem (B : Finset (I n)) (i : I n) (hi : i ∈ B) (x : I n → Bool) :
+    count B (Function.update x i false)=count (B.erase i) x := by
+  classical
+  have hpi : ¬ (Function.update x i false i = true) := by simp
+  have hfe : (B.erase i).filter (fun l => Function.update x i false l = true)
+      = (B.erase i).filter (fun l => x l = true) :=
+    Finset.filter_congr (fun l hl => by rw [Function.update_of_ne (Finset.ne_of_mem_erase hl)])
+  unfold count
+  conv_lhs => rw [show B=insert i (B.erase i) from (Finset.insert_erase hi).symm]
+  rw [Finset.filter_insert, if_neg hpi, hfe]
+
+/-- Pinning a `B`-coordinate ON forces every other `B`-coordinate off. -/
+theorem leOne_update_true_mem (B : Finset (I n)) (i : I n) (hi : i ∈ B) (x : I n → Bool) :
+    leOne B (Function.update x i true)=offProd (B.erase i) x := by
+  rw [offProd_eq_one_iff]
+  unfold leOne
+  rw [count_update_true_mem B i hi x]
+  by_cases h : count (B.erase i) x = 0
+  · rw [if_pos (by omega), if_pos h]
+  · rw [if_neg (by omega), if_neg h]
+
+/-- Pinning a `B`-coordinate OFF just deletes it from the block. -/
+theorem leOne_update_false_mem (B : Finset (I n)) (i : I n) (hi : i ∈ B) (x : I n → Bool) :
+    leOne B (Function.update x i false)=leOne (B.erase i) x := by
+  unfold leOne
+  rw [count_update_false_mem B i hi x]
+
+/-! ## The gate slopes -/
+
+theorem gate_response (t : ℝ) (A : Finset (I n)) (j : I n) (i : I n) (u : Bool) :
+    productResponse (bern t) (gate A j) i u
+      = productExpectation (bern t)
+          (fun c => (1-bit (Function.update c i u j))
+            *(1-offProd A (Function.update c i u)*leOne (others A j) (Function.update c i u))) := by
+  unfold productResponse
+  exact congrArg _ (funext (fun c => gate_eq A j (Function.update c i u)))
+
+/-- Slope at the distinguished coordinate `j`. The whole gate switches off, so
+the slope is minus the probability that the gate would have fired. -/
+theorem slope_at_j (t : ℝ) (A : Finset (I n)) (j : I n) (hjA : j ∉ A)
+    (hB : 1 ≤ (others A j).card) :
+    productResponse (bern t) (gate A j) j true-productResponse (bern t) (gate A j) j false
+      = (1-t)^A.card*((1-t)^(others A j).card
+          +((others A j).card:ℝ)*t*(1-t)^((others A j).card-1))-1 := by
+  classical
+  have hjB : j ∉ others A j := by simp [others]
+  have hkey : ∀ (u : Bool) (c : I n → Bool),
+      (1-bit (Function.update c j u j))
+        *(1-offProd A (Function.update c j u)*leOne (others A j) (Function.update c j u))
+      = (1-bit u)*(1-offProd A c*leOne (others A j) c) := by
+    intro u c
+    rw [offProd_update_not_mem A j hjA u c, leOne_update_not_mem (others A j) j hjB u c]
+    simp
+  rw [gate_response, gate_response]
+  simp_rw [hkey]
+  rw [show (fun c : I n → Bool => (1-bit true)*(1-offProd A c*leOne (others A j) c))
+      = (fun _ : I n → Bool => (0:ℝ)) from funext (fun c => by simp [bit])]
+  rw [show (fun c : I n → Bool => (1-bit false)*(1-offProd A c*leOne (others A j) c))
+      = (fun c : I n → Bool => 1-offProd A c*leOne (others A j) c) from
+      funext (fun c => by simp [bit])]
+  have hzero : productExpectation (bern t) (fun _ : I n → Bool => (0:ℝ))=0 := by
+    unfold productExpectation; simp
+  have hone : productExpectation (bern t) (fun _ : I n → Bool => (1:ℝ))=1 := by
+    unfold productExpectation
+    rw [show (fun c : I n → Bool => jointWeight (bern t) c*(1:ℝ))
+        = (fun c : I n → Bool => jointWeight (bern t) c) from funext (fun c => by ring)]
+    exact bern_normalized t
+  have hdisj : Disjoint A (others A j) := by
+    rw [Finset.disjoint_left]
+    intro a haA haO
+    exact (Finset.mem_sdiff.mp (Finset.mem_of_mem_erase haO)).2 haA
+  rw [hzero, expect_sub (bern t) (fun _ => (1:ℝ))
+    (fun c => offProd A c*leOne (others A j) c), hone,
+    expect_offProd_mul_leOne t A (others A j) hdisj hB]
+  ring
+
+/-- Slope at a hidden coordinate `i` in `A`. -/
+theorem slope_at_A (t : ℝ) (A : Finset (I n)) (j : I n) (hjA : j ∉ A) (i : I n)
+    (hiA : i ∈ A) (hB : 1 ≤ (others A j).card) :
+    productResponse (bern t) (gate A j) i true-productResponse (bern t) (gate A j) i false
+      = (1-t)^A.card*((1-t)^(others A j).card
+          +((others A j).card:ℝ)*t*(1-t)^((others A j).card-1)) := by
+  classical
+  have hij : i ≠ j := by rintro rfl; exact hjA hiA
+  have hiB : i ∉ others A j := by
+    intro hc
+    exact (Finset.mem_sdiff.mp (Finset.mem_of_mem_erase hc)).2 hiA
+  have hkey : ∀ (u : Bool) (c : I n → Bool),
+      (1-bit (Function.update c i u j))
+        *(1-offProd A (Function.update c i u)*leOne (others A j) (Function.update c i u))
+      = (1-bit (c j))*(1-(1-bit u)*offProd (A.erase i) c*leOne (others A j) c) := by
+    intro u c
+    rw [Function.update_of_ne (Ne.symm hij), offProd_update_mem A i hiA u c,
+      leOne_update_not_mem (others A j) i hiB u c]
+  rw [gate_response, gate_response]
+  simp_rw [hkey]
+  rw [show (fun c : I n → Bool =>
+        (1-bit (c j))*(1-(1-bit true)*offProd (A.erase i) c*leOne (others A j) c))
+      = (fun c : I n → Bool => 1-bit (c j)) from funext (fun c => by simp [bit])]
+  rw [show (fun c : I n → Bool =>
+        (1-bit (c j))*(1-(1-bit false)*offProd (A.erase i) c*leOne (others A j) c))
+      = (fun c : I n → Bool =>
+        (1-bit (c j))-(1-bit (c j))*offProd (A.erase i) c*leOne (others A j) c) from
+      funext (fun c => by simp [bit]; ring)]
+  have hsing : ∀ c : I n → Bool, (1-bit (c j))=offProd {j} c := by
+    intro c; unfold offProd; simp
+  have hprod : ∀ c : I n → Bool,
+      (1-bit (c j))*offProd (A.erase i) c=offProd (insert j (A.erase i)) c := by
+    intro c
+    rw [hsing c]
+    have hd : Disjoint ({j} : Finset (I n)) (A.erase i) := by
+      rw [Finset.disjoint_left]
+      intro a ha hb
+      rw [Finset.mem_singleton] at ha
+      subst ha
+      exact hjA (Finset.mem_of_mem_erase hb)
+    rw [offProd_union {j} (A.erase i) hd c]
+    congr 1
+  rw [expect_sub (bern t) (fun c => 1-bit (c j))
+    (fun c => (1-bit (c j))*offProd (A.erase i) c*leOne (others A j) c)]
+  simp_rw [hprod]
+  have hcard : (insert j (A.erase i)).card=A.card := by
+    rw [Finset.card_insert_of_notMem (fun hc => hjA (Finset.mem_of_mem_erase hc)),
+      Finset.card_erase_of_mem hiA]
+    have : 1 ≤ A.card := Finset.card_pos.mpr ⟨i, hiA⟩
+    omega
+  have hdisj : Disjoint (insert j (A.erase i)) (others A j) := by
+    rw [Finset.disjoint_left]
+    intro a ha hb
+    rcases Finset.mem_insert.mp ha with h|h
+    · exact (Finset.ne_of_mem_erase hb) h
+    · exact (Finset.mem_sdiff.mp (Finset.mem_of_mem_erase hb)).2 (Finset.mem_of_mem_erase h)
+  rw [expect_offProd_mul_leOne t (insert j (A.erase i)) (others A j) hdisj hB, hcard]
+  have hj1 : productExpectation (bern t) (fun c : I n → Bool => 1-bit (c j))
+      = (1-t)^({j} : Finset (I n)).card := by
+    rw [show (fun c : I n → Bool => 1-bit (c j))=(offProd {j} : (I n → Bool) → ℝ) from
+      funext (fun c => (hsing c))]
+    exact expect_offProd t {j}
+  rw [hj1]
+  simp
+
+#print axioms productResponse_add
+#print axioms linear_slope
+#print axioms offProd_update_mem
+#print axioms offProd_update_not_mem
+#print axioms count_update_not_mem
+#print axioms leOne_update_not_mem
+#print axioms count_update_true_mem
+#print axioms count_update_false_mem
+#print axioms leOne_update_true_mem
+#print axioms leOne_update_false_mem
+#print axioms gate_response
+#print axioms slope_at_j
+#print axioms slope_at_A
+
+end
+end CIGAMF.P13.D6ReferenceSlope
