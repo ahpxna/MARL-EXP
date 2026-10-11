@@ -518,3 +518,87 @@ User: "port job 308 sang map đầy đủ luôn đi".
 **Test:** `MTF_BGFar_t<k>_s<f>`, grid lights × grid fleets with the re-fitted forecast, days 0–4, 100 runs. No AI is retrained; this is the interface-only arm.
 
 **Question MT-F1:** paired with MTF_BGar (same light, fleet and day; adapted grid forecast), does the on-site forecast lower the AI cars' fuel and delay?
+
+### MT-F incident and resume (11/10, 11:22)
+- **What happened:** the N2 forecaster fits of t60, t61 and t62 were killed (SIGKILL, `Killed: 9`) at 10:32–10:43. Five light pipelines were running at once and swap was nearly full (6.6 of 7.2 GB at 11:20 on a 16 GB machine; one fit holds about 1.3 GB). The fit logs end after the wrapper's start lines, so no fit output was lost. xargs then aborted, so the MT-F tests never started. t59 (closed-loop prep) and t63 (collection) were still running in the first run.
+- **Diagnostic:** the same t60 fit command, on the same inputs, is rerun alone into `retrain/forecast_full_grid/diag_fitkill/` with `/usr/bin/time -l`.
+- **Resume:** `scripts/RUN_mt_full_forecast_resume.sh`.
+  - Recipe, inputs and test are unchanged.
+  - It is launched only after the first run exits.
+  - Every finished step is skipped by its own file check.
+  - The remaining fits run one at a time.
+  - A t60 model from the diagnostic run is copied (not moved) into `cmodel/`.
+  - Then come the 20 MTF_BGFar jobs and the report.
+- **Deviation:** none in the method. Only the lane count of the fits (1 instead of 5) and the launch order change.
+
+### MT-F resume, corrected cause (11/10, 11:45)
+- **The cause is not concurrency.** Run alone, the t60 fit was killed again after 121 s at an **80 GB peak memory footprint** (`diag_fitkill/fit_t60.log`, `/usr/bin/time -l`). The t63 and t59 fits of the first run were killed the same way, so all five fits failed.
+- **Why:** `CITY_n2_fit.py` stores a dense light one-hot in every row. On the full map:
+  - each collection log covers T = 4 242 s and L = 511 lights, about 4.3 M rows per log;
+  - with 523 input columns, the six training logs need about 54 GB, the two validation logs about 18 GB, plus the concatenation copy.
+  - On the grid (16 lights) the same design needs well under 1 GB, which is why it never showed up before.
+- **Fix:** `scripts/CITY_n2_fit_lowmem.py`, the same fit without the stored one-hot.
+  - The same: rows, the 12 state features and their order, the one-hot as the last L inputs, `QNet`, the checkpoint format, seeds, initialisation, minibatch permutation, loss, Adam, early stopping, and the age-only comparison.
+  - The change: the first layer computes `W[:, :12] x + W[:, 12 + j] + b` by a column lookup instead of a product with the one-hot. This uses the same parameters and gradients; only the float summation order differs.
+  - At start, a self-check compares the lookup forward with `QNet` on the explicit one-hot.
+  - The validation loss and predictions are computed in batches.
+- **KMT7, the equivalence gate.** Both scripts are fitted on the grid W19 data of t59 (`scripts/CITY_n2_fit_lowmem_check.py`, output `diag_fitkill/kmt7/KMT7.json`). Criteria, fixed before the run:
+  - C1 (informational): the original rerun reproduces the stored W19 model.
+  - C2: the best validation pinball of the two fits differs by ≤ 0.5 %.
+  - C3: on every validation row, the median |Δ prediction| is ≤ 0.1 s and the 99th percentile ≤ 1 s.
+  - PASS = C2 and C3.
+- **Resume:** `scripts/RUN_mt_full_forecast_resume.sh`.
+  - It needs KMT7 PASS and all upstream outputs, which have been verified present for t59–t63.
+  - It fits the five forecasters one at a time with the lowmem script, then runs the 20 MTF_BGFar tests unchanged and the report.
+  - The killed fits' logs are kept (`cmodel/fit_t<k>.log`).
+- **Deviation:** the implementation of the fit (an equivalent computation, checked by KMT7) and the fit order. The method is unchanged.
+
+## Results MT-F (11/10 13:55; `eval_full/MTF_BGFar_*` and `MTF_BGar_*`, all COMPLETE; `report_mt_full.txt`)
+
+**Fits.** All five forecasters were fitted with `CITY_n2_fit_lowmem.py`, after KMT7 PASS.
+- KMT7 on grid t59: the lowmem model is bit-identical to the original's (validation pinball 2.70185 for the stored W19 model, the original rerun and the lowmem fit; prediction differences exactly 0 on 233 164 rows).
+- At full-map scale the start-up self-check gave a max |diff| of 0 for all five fits.
+- Validation pinball and median-quantile MAE, with the age-only table on the same rows in brackets:
+
+| Light | Validation pinball | Median-quantile MAE | Age-only MAE |
+|---|---|---|---|
+| t59 | 42.31 | 49.0 s | 50.7 s |
+| t60 | 5.61 | 8.3 s | 9.2 s |
+| t61 | 11.43 | 10.6 s | 12.2 s |
+| t62 | 6.69 | 11.0 s | 12.2 s |
+| t63 | 12.55 | 15.6 s | 19.4 s |
+
+**Provenance.**
+- Every MTF_BGFar run recorded the re-fitted model; for example, t60 has sha 70ab3b4afa1d, and the MTF_BGar t60 run recorded the grid model, 58d0673fa5cf.
+- The evaluator source and environment sha256 are identical in both arms, and the arguments differ only in the tag.
+- Upstream data: training days 10–17 only; tests on days 0–4.
+
+**MT-F1 (registered: all 100 pairs, MTF_BGFar − MTF_BGar, same light, fleet and day; percentile bootstrap, 2 000 draws, seed 0).** **No.** The re-fitted forecast is worse:
+
+| Measure | Difference [95% interval] | Re-fitted better in |
+|---|---|---|
+| Delay, all cars | +40.5 s [+20.1, +62.5] | 29/100 |
+| Delay, AI cars | +46.6 s [+25.4, +71.1] | 18/100 |
+| Fuel, AI cars | +20.4 g [+10.0, +32.7] | 67/100 |
+| Stuck cars removed | +34.8 per run [+13.2, +59.9] | — |
+
+**Why: light t59 (post hoc, descriptive).**
+- All 20 t59 pairs are worse: delay +200.9 s [+129.7, +272.8], AI-car fuel +116.9 g, 0/20 better.
+- The t59 pipeline ran on congested traffic from the start:
+  - light alone with human drivers (traces): 6–24 cars removed per run, against 0–4 for t60;
+  - closed-loop prep: 238–424 removed per run, against 46–169 for t60;
+  - collection with the prep forecast: delay 197–448 s and up to 292 removed, against about 130 s and 0–9 for t60.
+- So the t59 forecaster learned from jammed traffic, which it had partly produced itself. Its timing errors are about 50 s, and its forecast makes the test traffic jam. This is a feedback loop in the recipe's own data collection, not an implementation error: the age-only table fitted on the same data is just as wrong (50.7 s).
+
+**t60–t63 (post hoc, 80 pairs).**
+
+| Measure | Difference [95% interval] | Re-fitted better in |
+|---|---|---|
+| Delay, all cars | +0.4 s [−1.6, +2.1] | 29/80 |
+| Delay, AI cars | +2.1 s [−0.0, +4.0] | 18/80 |
+| AI-car fuel | −3.8 g [−4.9, −2.8], about −1.3 % | 67/80 |
+| All-car fuel | −2.9 g [−3.9, −2.0] | 71/80 |
+
+- Re-fitting helps fuel slightly where its data collection was clean, with no gain in delay.
+
+**Consequence.** The headline arm stays MTF_BGar (the grid forecast adapted without retraining), and nothing changes in the demo. This is a third instance of the pattern "learning on site from the deployed system's own traffic does not beat the transferred grid model" (MT-A3/A5 lights, Midtown fleets, now the forecast).

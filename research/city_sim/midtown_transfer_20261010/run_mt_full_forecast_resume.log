@@ -1,0 +1,53 @@
+MT-F resume start Sun Oct 11 11:45:53 EDT 2026
+fit t59 start Sun Oct 11 11:45:53 EDT 2026
+rows train 30971248 val 10001707 lights 511 d 523 (19s)
+self-check lookup vs one-hot forward: max |diff| 0.00e+00 on 4098 rows
+saved research/city_sim/midtown_transfer_20261010/retrain/forecast_full_grid/cmodel/n2_k59.pt (230s)
+fit t60 start Sun Oct 11 12:05:02 EDT 2026
+rows train 26073879 val 8550504 lights 511 d 523 (27s)
+self-check lookup vs one-hot forward: max |diff| 0.00e+00 on 4098 rows
+saved research/city_sim/midtown_transfer_20261010/retrain/forecast_full_grid/cmodel/n2_k60.pt (1349s)
+fit t61 start Sun Oct 11 12:34:04 EDT 2026
+rows train 25929326 val 9324588 lights 511 d 523 (15s)
+self-check lookup vs one-hot forward: max |diff| 0.00e+00 on 4097 rows
+saved research/city_sim/midtown_transfer_20261010/retrain/forecast_full_grid/cmodel/n2_k61.pt (478s)
+fit t62 start Sun Oct 11 12:48:52 EDT 2026
+rows train 25796419 val 8703877 lights 511 d 523 (15s)
+self-check lookup vs one-hot forward: max |diff| 0.00e+00 on 4098 rows
+saved research/city_sim/midtown_transfer_20261010/retrain/forecast_full_grid/cmodel/n2_k62.pt (443s)
+fit t63 start Sun Oct 11 13:02:27 EDT 2026
+rows train 31326356 val 10866147 lights 511 d 523 (18s)
+self-check lookup vs one-hot forward: max |diff| 0.00e+00 on 4098 rows
+saved research/city_sim/midtown_transfer_20261010/retrain/forecast_full_grid/cmodel/n2_k63.pt (676s)
+MT-F tests start Sun Oct 11 13:26:20 EDT 2026:       20 jobs
+Midtown report [MTF, eval_full] — test days 0-4 (SUMO, 4 800 random trips/h, base plan osm, two-green AI lights); means over every (seed, day) run
+
+arm                                                         runs     TL s   stop s   fuel g     tele    unfin   per-seed TL means
+FT (SUMO fixed-time)                                           5    644.4    526.9    547.2    234.8    309.2   644
+ACT (SUMO actuated)                                            5    161.9     70.6    328.0      1.6      0.0   162
+LIGHT grid-trained, transferred                               25    420.5    331.5    432.0    283.8    293.0   410 417 425 419 431
+LIGHT Midtown-trained MT-A3 (teleports on)                   missing (5 files)
+LIGHT grid-trained, max green 50 s (MT-D)                    missing (5 files)
+LIGHT grid-trained + actuated on the other signals (MT-E)     25    129.1     52.6    300.6      5.4      0.5   124 135 127 128 131
+LIGHT Midtown A4: shared from scratch, teleports off         missing (5 files)
+LIGHT Midtown A5-ft: shared fine-tuned from grid              25    448.0    363.6    443.3    513.8    315.5   552 420 426 408 435
+LIGHT Midtown A5-lg: grid shared + gated local               missing (5 files)
+LIGHT Midtown A5-ln: grid shared + local (no gate)           missing (5 files)
+LIGHT Midtown A5-lo: local only                              missing (5 files)
+FT + grid fleet (exact SPaT)                                 missing (4 files)
+FT + Midtown fleet (exact SPaT)                              missing (4 files)
+grid lights + grid fleets (adapted forecast)                 100    396.9    302.0    413.1    264.9    257.7   383 397 402 408 384 401 397 368 379 417 394 418 387 381 368 401 388 395 452 418
+grid lights + grid fleets, max green 50 s (MT-D)             missing (20 files)
+grid lights + grid fleets + actuated on the other signals (MT-E)   100    127.4     44.1    290.8      4.4      0.0   128 130 126 133 125 129 130 128 128 129 126 139 123 127 131 125 122 124 122 124
+… same, forecast re-fitted on the full map (MT-F, interface only)   100    167.9     78.8    308.0     39.2     36.8   415 289 293 323 127 127 126 127 125 127 126 128 128 130 126 127 128 129 126 131
+grid lights + Midtown fleets (adapted forecast)              missing (20 files)
+grid lights + grid fleets, forecast re-fitted on Midtown (interface only)   missing (20 files)
+A4 lights + Midtown fleets, own Midtown forecast             missing (20 files)
+A5-ft lights + Midtown fleets, own Midtown forecast          missing (20 files)
+
+Paired with the transferred grid light (negative = the Midtown-trained light is faster):
+  LIGHT grid-trained + actuated on the other signals (MT-E) TL − LIGHT-grid (same k, same day): -291.39 s  [-309.59, -271.86]  n=25
+  LIGHT Midtown A5-ft: shared fine-tuned from grid         TL − LIGHT-grid (same k, same day):  +27.53 s  [+2.53, +56.47]  n=25
+
+A5-lg gate (mean over the last 2 000 decisions of each episode): t59: first 0.889, last 0.780; t60: first 0.853, last 0.649; t61: first 0.876, last 0.770; t62: first 0.894, last 0.734; t63: first 0.901, last 0.709
+MT-F resume done Sun Oct 11 13:55:17 EDT 2026

@@ -59,7 +59,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 | Where the jam starts | 7-phase signal on E 57th St, 6-phase in the 1st Ave Tunnel, a fixed 4-phase signal on 2nd Ave | teleport log, `diag_maxg/tele_full_LG59_d0.json` |
 | Two-AI mismatch (paper result) | extra AI-car delay up to **+16 s/trip**; TSI-G: sumo-rl +5.4 → −0.2 s, MPLight +16.0 → +0.5 s (97% removed), RESCO IDQN +2.6 → −0.2 s; AI-car fuel −5 to −10% | grid panel: 20 days × 5 signals × 4 fleets |
 | Test grid | −71% delay, −93% stopped, −26% fuel vs fixed timing | grid panel |
-| Small beats big | Manhattan-retrained signals no better (−5.6 s, not significant, old map; +28 s on the full map); per-intersection gated policies +32 to +115 s (overfit) | MT-A3/A5 |
+| Small beats big | Manhattan-retrained signals no better (−5.6 s, not significant, old map; +28 s on the full map); per-intersection gated policies +32 to +115 s (overfit); forecast re-fitted on Manhattan +40 s (one model learned from jammed data) | MT-A3/A5, MT-F |
 
 ---
 
@@ -86,7 +86,10 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 
 **Manhattan details**
 - Clips: test day 0 is the median day of the actuated baseline (rule fixed in advance); signal model t59, fleet s1413.
-- The SPaT forecast the cars use was learned on the grid and adapted to Manhattan with no per-light identity. A version re-fitted on Manhattan traffic (MT-F, the interface only) is still running.
+- The SPaT forecast the cars use was learned on the grid and adapted to Manhattan with no per-light identity.
+- We also re-fitted the forecast on Manhattan traffic (MT-F, interface only, 100 paired runs). It did **not** help: +40 s delay.
+  - All of the loss comes from one signal model, whose training data was collected in jammed traffic, so its forecaster learned the jam.
+  - On the other four, it saved about 1% fuel with no change in delay.
 - An earlier demo used a partial OSM extract (248 signals); the full-map results replace it.
 
 **TSI-G**
