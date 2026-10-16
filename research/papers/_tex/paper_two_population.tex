@@ -940,7 +940,13 @@ forecast's information. In closed loop, the forecast run's schedule alone cost $
 partly recovered ($-15$, $-21$). Capping learned greens at 20\,s with a cap-aware forecast (W21-H) removed the forecast's time cost under
 AH ($+0.80$ [$-3.54$, $+3.84$] against $+10.75$) but not under B2D ($+5.39$ against $+6.00$), at a large cost to the signals ($+31$ to
 $+36$\,s/veh). Long greens thus carry the halting-count family's extra cost, as the stop-threshold loop predicts, while the cost shared by
-both families belongs to gliding on this map; with one fleet and five days these readings are descriptive.
+both families belongs to gliding on this map. Releasing glides to the base driver (W21-I) lowered that cost about equally whether the
+release was on blocks shorter than 100\,m ($+2.23$ and $+3.20$\,s/veh), on longer ones ($+3.23$, $+8.38$) or at random at the same rate
+($+1.62$, $+1.10$), and each release gave up most of the fuel saving; a per-edge probe (W21-J) found the extra time loss spread over block
+lengths in proportion to traffic, with no consistent spillback increase. The cost therefore scales with how much the fleet glides, not
+with where: on this map the grid-trained fleet's glides trade its own time for fuel, a property of the fleet's response rather than of
+short blocks. TSI-G (W21-K) lowered AH's cost from $+10.75$ to $+6.15$\,s/veh, less than half. With one fleet and five days these
+readings are descriptive.
 
 \subsection{M3: One-Sided Repairs That Fail}\label{sec:neg}
 \paragraph{Light-side commitments} Reward-shaped lights, fixed-window and ETA-triggered commitments, a predictable cycle and
@@ -1409,7 +1415,8 @@ old plan and the old timing kept the fleet's fuel benefit, but, as on every synt
 uses random demand, keeps the 56 multi-phase junctions on actuated programs and compares with SUMO's actuated controller, not the city's
 system; there the forecast alone cost the fleet about 9\,s/veh under both a halting-count family and a threshold-free one; the averaged
 forecaster identity, the published quantile and publication itself were ruled out; an oracle replay places that shared cost in gliding
-on this map when the signals cannot respond, and capping greens removed only the halting-count family's extra cost (W21-B to W21-H,
+on this map, capping greens removed only the halting-count family's extra cost, and release tests show that the cost scales with how
+much the grid-trained fleet glides rather than with block length, a fuel-for-time trade of the fleet on this map (W21-B to W21-K,
 descriptive).
 \item \emph{Signals.} The learned signals are keep-or-switch double DQNs. The sumo-rl and RESCO representations were re-implemented and
 trained by our recipe, not with the libraries' learners or action spaces. TSI-G needs each vehicle's fleet membership (V2X), has one site
@@ -1432,9 +1439,9 @@ trained policies and record provenance at capture.
 
 \subsection{Open Problems}
 \begin{itemize}\setlength\itemsep{1pt}
-\item \emph{The cost of gliding on a real map.} On the Midtown map even exact timing on a replayed schedule costs the fleet time
-(W21-G); which property of the map (short blocks, one-way avenues, the actuated junctions around the learned ones) makes gliding costly,
-and whether a fleet trained on such a map avoids it, is open.
+\item \emph{The cost of gliding on a real map.} On the Midtown map the grid-trained fleet's glides trade its time for fuel in
+proportion to how much it glides; short blocks and spillback were ruled out (W21-I, W21-J). Whether a fleet trained on such a map avoids
+the trade is open.
 \item \emph{Forecasts that anticipate their own effect.} One refit on logs collected with TSI published narrowed the publication shift on
 spider without passing, and two rounds on grid4 added fuel but cost agent time; whether repeated retraining converges with a learned signal
 in the loop \cite{perdomo2020} is open.

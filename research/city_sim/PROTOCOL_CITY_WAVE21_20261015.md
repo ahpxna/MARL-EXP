@@ -322,3 +322,45 @@ The site has no threshold-free control, so the reading is descriptive.
 - If SVc − Rc agent time loss is below half of SV − R (uncapped, same lights, fleet and days, W21-C/D), long greens drive the cost.
 - Otherwise the geometry, or another property of the map, does.
 - LGc − ACT and Rc − R report what the cap costs the signals.
+
+## Amendments W21-I, W21-J, W21-K (16/10/2026, before any of their code ran): which property of the Midtown map makes gliding costly; does TSI-G help there?
+
+**User (16/10):** run (1) "thả lướt theo chiều dài block" and (2) "đo nơi mất thời gian theo từng đoạn đường". Also asked whether TSI helps; W21-K answers that on the map itself.
+
+**Seen:**
+- W21-G: exact timing on a fixed schedule costs time.
+- W21-H: capping greens removes AH's cost, not B2D's.
+- Lengths of the 1,125 incoming edges of the two-green signals (measured 16/10): 62 % under 80 m (avenue blocks, median 67 m), 79 % under 150 m, 90 % under 250 m.
+
+**Common panel:** MT-E setting; AH t34–t38 and B2D t59–t63; fleet s1413; days 0–4; the grid forecaster at q 0.1. Wrapper `scripts/CITY_w21_glide_probe.py`. A glide is a fleet speed command more than 0.5 m/s below the allowed speed (as W10-3).
+
+### W21-I: release by block length
+
+Arms (the SV setting plus a release rule):
+- **RELs:** every glide on an edge shorter than 100 m is replaced by release to the base driver (`setSpeed(v, −1)`).
+- **RELl:** the same on edges of 100 m or more.
+- **RELr:** random release (deterministic hash of seed, vehicle and second). Its rate equals RELs's released share of glide-seconds, pooled over the family's runs.
+
+**Reading (descriptive):** short blocks drive the shared cost if, for both families:
+- RELs − R agent time loss is below half of SV − R (W21-C SERVEg − SHADOWg), and
+- RELs − R is below RELr − R.
+
+### W21-J: where the time is lost
+
+Arms **PRB_R** (fleet, no SPaT) and **PRB_SV** (forecast) with a read-only per-second probe. Per edge-length bin ([0, 50), [50, 100), [100, 200), ≥ 200 m), it records:
+- agent and human time-loss seconds, Σ max(0, 1 − v / v_allowed);
+- agent and human halted seconds;
+- human-seconds within 50 m behind a gliding agent;
+- lane spillback-seconds: a halted vehicle within 7.5 m of the lane's start.
+
+**Checks** (the probe only reads, so dynamics must be unchanged):
+- KW21-J1: PRB_R rows equal W21-C's SHADOWg rows.
+- KW21-J2: PRB_SV rows equal SERVEg rows.
+
+**Reading (descriptive):** where in the length distribution the PRB_SV − PRB_R excess of time loss and spillback accrues, compared with each bin's share of vehicle-seconds.
+
+### W21-K: TSI-G on the Midtown map
+
+**Arm:** BIS — AH with TSI-G (`--light-obs bis`, W20_CREEP = 3, Krauss drivers as calibrated in W20) and the SV provider.
+
+**Reading (descriptive):** TSI-G helps on the map if BIS − R agent time loss is below half of SV − R.
