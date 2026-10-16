@@ -18,7 +18,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 > This chart shows the damage on five standard signal designs: up to **16 extra seconds** per AI-car trip.
 > Our fix is a thin translation layer we call **TSI-G**: the signal sees each AI car as the human driver it replaced. **No retraining of either AI.** The extra delay goes from +5.4 to −0.2 seconds on sumo-rl's design, 97% of it disappears on MPLight's, and the AI cars burn 5–10% less fuel."
 
-*(point at the chart: red dots = without TSI-G, green = with; the 'wave' row is the control — it counts every car, so there was nothing to fix)*
+*(point at the chart: open circles = without TSI-G, filled = with; the 'wave' row is the control — it counts every car, so there was nothing to fix)*
 
 ### 3. The real test: Manhattan (60 s) — *tab "Midtown Manhattan", default comparison*
 > "Then we took both AIs — trained only on a 16-signal toy grid — and dropped them into the **full street map of Midtown Manhattan**, river to river: 567 signals, 206 kilometres of road. No retraining.
@@ -59,7 +59,7 @@ Demo: `demo/gridlock_to_green.html` (or http://localhost:8790/gridlock_to_green.
 | Where the jam starts | 7-phase signal on E 57th St, 6-phase in the 1st Ave Tunnel, a fixed 4-phase signal on 2nd Ave | teleport log, `diag_maxg/tele_full_LG59_d0.json` |
 | Two-AI mismatch (paper result) | extra AI-car delay up to **+16 s/trip**; TSI-G: sumo-rl +5.4 → −0.2 s, MPLight +16.0 → +0.5 s (97% removed), RESCO IDQN +2.6 → −0.2 s; AI-car fuel −5 to −10% | grid panel: 20 days × 5 signals × 4 fleets |
 | Test grid | −71% delay, −93% stopped, −26% fuel vs fixed timing | grid panel |
-| Small beats big | Manhattan-retrained signals no better (−5.6 s, not significant, old map; +28 s on the full map); per-intersection gated policies +32 to +115 s (overfit); forecast re-fitted on Manhattan +40 s (one model learned from jammed data) | MT-A3/A5, MT-F |
+| Small beats big | Manhattan-retrained signals no better (−5.6 s, not significant, old map; +28 s on the full map with the complex junctions on fixed plans, where both gridlocked); per-intersection gated policies +32 to +115 s (overfit); forecast re-fitted on Manhattan +40 s (one model learned from jammed data) | MT-A3/A5, MT-F |
 
 ---
 

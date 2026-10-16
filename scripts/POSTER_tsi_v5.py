@@ -34,7 +34,7 @@ NEW_TEXT = {
     30: ('Fig. 3.  Who pays for the forecast, and the repair.',
          " (A) Extra delay of the fleet's cars vs no SPaT (5 signals × 4 fleets × 20 fresh seeds; 95% intervals). Blue: TSI on RL-H, TSI-G elsewhere; it removes the delay except +0.5 s/veh on MPLight, just above the limit. Without a stop-based input no repair is needed. (B) Fleet fuel saved."),
     49: ('The repair works.',
-         ' Registered confirmation: TSI cut fleet fuel by 3.85% (HBEFA4; 95% CI 3.26–4.43), every time loss within the limit. Its default setting, fixed in advance, saves 5.6% (HBEFA4) and 3.3% (PHEMlight5) on new signals and fleets and tolerates a 1-s delay, 20–50% message loss and speed noise; recalibrated, TSI passed on a second network and a two-lane build of a third. Our ports of DC-Ada and FoRL miss the limits.'),
+         " Registered confirmation: TSI cut fleet fuel by 3.85% (HBEFA4; 95% CI 3.26–4.43), all limits met. Its default, fixed in advance, saves 5.6% (HBEFA4) and 3.3% (PHEMlight5) on new signals and fleets; with a per-signal quantile it tolerates a 1-s delay, 20–50% message loss and speed noise. Recalibrated, it passed on a second network and a two-lane build of a third; our DC-Ada and FoRL ports miss the limits."),
     31: ('We pinpoint the cause: the stop threshold.',
          " Trained by the same recipe, signals with no stop-thresholded input (speed groups, queue positions, RESCO's wave) need no repair: the forecast alone meets every limit and their greens do not lengthen, also with a delay reward or with scale constants halved or doubled."),
     33: ('TSI-G removes over 95% of the harm, no retraining.',

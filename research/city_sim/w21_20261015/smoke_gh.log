@@ -1,0 +1,35 @@
+W21-G/H start Fri Oct 16 08:58:52 EDT 2026; dir research/city_sim/w21_20261015/smoke_gh; lanes 3
+sources: scripts/CITY_w21_mt_replay.py:e8f571ab0dca scripts/DEMO_midtown.py:d1deddc045d2 scripts/CITY_eval4.py:92195f159407 scripts/CITY_m3_headroom.py:fa31af32a91f scripts/CITY_eval_f1.py:3b09b5aa39f4 scripts/CITY_eval_n4.py:f68333a82f03 
+KH-1 (replay of R's schedule with the fleet without SPaT reproduces R, t34): PASS
+G:        7 jobs
+G done Fri Oct 16 08:59:26 EDT 2026
+H:        6 jobs
+H done Fri Oct 16 09:00:00 EDT 2026
+== W21-G / W21-H: Midtown, fleet s1413, days [0], lights [34, 60]
+KH-1: SIGR reproduces SHADOWg (R) on 2 of 2 light-days
+-- AH (lights [34])
+  SV - R (closed loop, W21-C): agent TL +2.60 [+2.60, +2.60] s/veh, agent fuel -5.30 [-5.30, -5.30] %, human TL -0.04 [-0.04, -0.04]
+  R5  ORC - SIG on R's schedule (exact timing): agent TL +1.22 [+1.22, +1.22] s/veh, agent fuel -9.35 [-9.35, -9.35] %, human TL +0.94 [+0.94, +0.94]
+  schedule effect (SIG on SV's schedule - R): agent TL +3.98 [+3.98, +3.98] s/veh, agent fuel +1.01 [+1.01, +1.01] %, human TL +1.72 [+1.72, +1.72]
+  information effect (SV - SIG on its own schedule): agent TL -1.37 [-1.37, -1.37] s/veh, agent fuel -6.25 [-6.25, -6.25] %, human TL -1.77 [-1.77, -1.77]
+  ORC - SIG on SV's schedule (exact timing): agent TL -0.61 [-0.61, -0.61] s/veh, agent fuel -8.69 [-8.69, -8.69] %, human TL -1.22 [-1.22, -1.22]
+  H   SVc - Rc (greens capped at 20 s, cap-aware provider): agent TL +1.69 [+1.69, +1.69] s/veh, agent fuel -10.41 [-10.41, -10.41] %, human TL -0.57 [-0.57, -0.57]
+      Rc - R (what the cap costs, fleet without SPaT): agent TL +21.62 [+21.62, +21.62] s/veh, agent fuel +4.12 [+4.12, +4.12] %, human TL +22.54 [+22.54, +22.54]
+      mean green: SHADOWg 63.1 s, SERVEg 63.5 s, Rc 17.9 s, SVc 18.0 s
+      LGc - ACT city TL (all human): -58.90 s/veh
+      reading: capped cost +1.69 vs uncapped +2.60 s/veh -> not explained by green length (capped >= half of uncapped)
+      R5 reading: exact timing still costs (or does not save) the fleet time on this map -> the cost lies in the glide on this network, not in the forecast information
+-- B2D (lights [60])
+  SV - R (closed loop, W21-C): agent TL +5.24 [+5.24, +5.24] s/veh, agent fuel -7.66 [-7.66, -7.66] %, human TL +5.09 [+5.09, +5.09]
+  R5  ORC - SIG on R's schedule (exact timing): agent TL +0.66 [+0.66, +0.66] s/veh, agent fuel -11.03 [-11.03, -11.03] %, human TL -0.03 [-0.03, -0.03]
+  schedule effect (SIG on SV's schedule - R): agent TL +4.33 [+4.33, +4.33] s/veh, agent fuel -0.48 [-0.48, -0.48] %, human TL +2.11 [+2.11, +2.11]
+  information effect (SV - SIG on its own schedule): agent TL +0.91 [+0.91, +0.91] s/veh, agent fuel -7.22 [-7.22, -7.22] %, human TL +2.99 [+2.99, +2.99]
+  ORC - SIG on SV's schedule (exact timing): agent TL +1.60 [+1.60, +1.60] s/veh, agent fuel -10.84 [-10.84, -10.84] %, human TL +3.58 [+3.58, +3.58]
+  H   SVc - Rc (greens capped at 20 s, cap-aware provider): agent TL -2.12 [-2.12, -2.12] s/veh, agent fuel -11.94 [-11.94, -11.94] %, human TL -2.82 [-2.82, -2.82]
+      Rc - R (what the cap costs, fleet without SPaT): agent TL +20.61 [+20.61, +20.61] s/veh, agent fuel +3.43 [+3.43, +3.43] %, human TL +20.92 [+20.92, +20.92]
+      mean green: SHADOWg 46.6 s, SERVEg 47.5 s, Rc 17.9 s, SVc 17.9 s
+      LGc - ACT city TL (all human): -58.68 s/veh
+      reading: capped cost -2.12 vs uncapped +5.24 s/veh -> LONG GREENS drive the cost (capped < half of uncapped)
+      R5 reading: exact timing still costs (or does not save) the fleet time on this map -> the cost lies in the glide on this network, not in the forecast information
+W21-G/H done Fri Oct 16 09:00:01 EDT 2026
+EXIT GH 0

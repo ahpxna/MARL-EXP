@@ -1,0 +1,23 @@
+W21-C start Thu Oct 15 19:06:24 EDT 2026; dir research/city_sim/w21_20261015/smoke_c; lanes 6
+sources: scripts/DEMO_midtown.py:d1deddc045d2 scripts/CITY_w10_run.py:7707d382c556 scripts/CITY_w10_diag.py:99ab5b1a956a scripts/CITY_eval_n4.py:f68333a82f03 scripts/CITY_eval_f1.py:3b09b5aa39f4 scripts/CITY_m3_headroom.py:fa31af32a91f scripts/CITY_eval4.py:92195f159407 
+C1:        6 jobs x        1 days
+C1 done Thu Oct 15 19:06:47 EDT 2026
+KH-1 (SIG replay of the SHADOWg schedule reproduces SHADOWg, t34): FAIL [(0, 'timeloss'), (0, 'timeloss_agent'), (0, 'timeloss_human'), (0, 'fuel_agent'), (0, 'unfinished')]
+C3 skipped: KH-1 not passed (registered)
+== W21-C: Midtown diagnosis (MT-E setting, fleet s1413, days [0]; AH [34], B2D [60], refit [60])
+KW21-C0 exactness under FT (program SPaT): ttg c +0 exact 1.0000 (n 101082), ttr c +0 exact 1.0000 (n 16548) -> PASS
+-- C1 / C2: served-answer accounting (error = answer - realized; MAE s) and following exposure (held human-s per commanded agent-s)
+  AH, grid forecaster: shadow MAE 20.63 (ttg 3.44, ttr 40.42), bias -20.26, >5 s 0.440, n 49509 | served MAE 16.13 (ttg 3.78, ttr 41.43), bias -15.87, >5 s 0.388, n 71277 | publication shift -4.51 s
+      held per commanded agent-s: served 0.142, shadow 0.000 | agent TL serve - shadow +2.60 [+2.60, +2.60] s/veh; agent fuel -5.30 [-5.30, -5.30] %
+  B2D, grid forecaster: shadow MAE 12.40 (ttg 2.15, ttr 24.38), bias -11.92, >5 s 0.414, n 51689 | served MAE 9.60 (ttg 2.56, ttr 24.27), bias -9.21, >5 s 0.351, n 72915 | publication shift -2.80 s
+      held per commanded agent-s: served 0.131, shadow 0.000 | agent TL serve - shadow +5.24 [+5.24, +5.24] s/veh; agent fuel -7.66 [-7.66, -7.66] %
+  B2D t60-63, grid forecaster: shadow MAE 12.40 (ttg 2.15, ttr 24.38), bias -11.92, >5 s 0.414, n 51689 | served MAE 9.60 (ttg 2.56, ttr 24.27), bias -9.21, >5 s 0.351, n 72915 | publication shift -2.80 s
+      held per commanded agent-s: served 0.131, shadow 0.000 | agent TL serve - shadow +5.24 [+5.24, +5.24] s/veh; agent fuel -7.66 [-7.66, -7.66] %
+  B2D t60-63, refit forecaster: shadow MAE 8.95 (ttg 1.33, ttr 17.88), bias -7.34, >5 s 0.335, n 51689 | served MAE 6.72 (ttg 1.82, ttr 17.82), bias -5.25, >5 s 0.262, n 76504 | publication shift -2.23 s
+      held per commanded agent-s: served 0.128, shadow 0.000 | agent TL serve - shadow +6.84 [+6.84, +6.84] s/veh; agent fuel -9.31 [-9.31, -9.31] %
+  W10 references (grid / spider / rand3): shadow MAE 3.77 / 7.33 / 15.34 s; publication shift +0.14 / +7.80 / -2.60 s; held 0.057 / 0.286 / 0.050
+-- C3: oracle on the fixed schedule (R's own, replayed)
+  KH-1 (SIG replay of the SHADOWg schedule reproduces SHADOWg, t34): FAIL [(0, 'timeloss'), (0, 'timeloss_agent'), (0, 'timeloss_human'), (0, 'fuel_agent'), (0, 'unfinished')]
+  C3 not run or incomplete
+W21-C done Thu Oct 15 19:07:04 EDT 2026
+EXIT C 0

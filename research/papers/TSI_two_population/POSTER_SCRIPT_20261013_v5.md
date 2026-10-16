@@ -22,7 +22,7 @@
 | TSI-G (Results) | "repairs the community defaults" | "removes over 95% of the harm"; −0.2, −0.2 (đạt giới hạn), 0.5 (ngay trên giới hạn) | MPLight +0.51, cận trên +0.74 > +0.5: không đạt luật đăng ký (C-230) |
 | Why (Introduction) | "A car gliding on SPaT never counts" | "never enters these queue, waiting or pressure counts" | sumo-rl có density (đếm mọi xe); RESCO drq có số xe đang tới và tổng tốc độ |
 | Khuyến nghị cho thành phố | "speed or position inputs work with the forecast alone" | "any stop-based input needs TSI or TSI-G, even beside speed or density" | RESCO IDQN có đầu vào tốc độ mà vẫn bị hại 2.6 s |
-| The repair works | "transfers to two more networks, tolerates 80% detection" | "tolerates a 1-s delay, 20–50% message loss and speed noise; recalibrated, TSI passed on a second network and a two-lane build of a third" | Chuyển giao dùng hiệu chỉnh lại, không phải bản mặc định; 80% phát hiện chạm biên +0.56 (C-184) |
+| The repair works | "transfers to two more networks, tolerates 80% detection" | "with a per-signal quantile it tolerates a 1-s delay, 20–50% message loss and speed noise. Recalibrated, it passed on a second network and a two-lane build of a third" | Chuyển giao dùng hiệu chỉnh lại; thí nghiệm độ bền (W14-2) chạy trên bản quantile hiệu chỉnh theo từng đèn (TRB), không phải bản mặc định; 80% phát hiện chạm biên +0.56 (C-184) |
 | Nhiên liệu TSI-G | "5–10% fuel saved" | "5–10% (HBEFA4; 3–6% PHEMlight5)" | Cột PHEMlight5 trên chính Fig. 3B chỉ 2.8–5.6% |
 | −3.85% | không ghi mô hình nhiên liệu | "(HBEFA4; …)" | Cùng thiết kế đó +1.76% dưới PHEMlight5 (C-142) |
 | Fig. 3 | trục "extra wait", nhóm "counts only stopped cars" | trục "extra delay", nhóm "stop-based inputs", có vạch giới hạn +0.5 | Số vẽ là time loss; nhãn nhóm sai với sumo-rl / IDQN |
@@ -59,7 +59,7 @@
 | Với tài xế khớp quỹ đạo NGSIM | khoảng 1% (HBEFA4), không đo được dưới PHEMlight5 |
 | TSI, xác nhận đã đăng ký | −3.85% nhiên liệu (HBEFA4; 95% CI 3.26–4.43), mọi time loss trong giới hạn |
 | TSI mặc định trên đèn và đội xe mới | −5.6% (HBEFA4), −3.3% (PHEMlight5) |
-| Độ bền của bản mặc định | trễ 1 s, mất 20–50% tin, nhiễu tốc độ: vẫn đạt |
+| Độ bền của bản quantile hiệu chỉnh theo từng đèn (W14-2) | trễ 1 s, mất 20–50% tin, nhiễu tốc độ: vẫn đạt (bản mặc định cố định chưa được thử độ bền riêng) |
 | Chỉ công bố dự báo, đèn RL-H | xe đội chậm thêm 1.7 s/xe |
 | sumo-rl mặc định / RESCO IDQN / RESCO MPLight, chỉ dự báo | +5.4 / +2.6 / +16.0 s/xe |
 | Có TSI-G | −0.2 / −0.2 (đạt giới hạn) / +0.5 (ngay trên giới hạn); tiết kiệm 5–10% (HBEFA4), 3–6% (PHEMlight5) |
@@ -149,7 +149,7 @@
 | 3 | **Mỗi nửa riêng lẻ đều thất bại:** chỉ dự báo thì xe đội bị chậm; chỉ adapter thì không tiết kiệm nhiên liệu. | "Yes, each half alone fails, as the theorem predicts; that's why it's two-sided." |
 | 4 | **MPLight:** +0.51 s/xe [0.30, 0.71], cận trên đăng ký +0.74 > +0.5, nên NOT SHOWN (nay đã ghi trên poster). | "Half a second, just above our strict limit, so we count it as not passed, though the harm fell from sixteen seconds." |
 | 5 | **Chuyển giao:** spider một làn trượt 4 lần đăng ký; chỉ bản dựng lại hai làn mới qua, với (1, 0.5). rand3 qua ở lần thứ hai sau khi mở rộng dải adapter (chain bound 0.075). | "One single-lane network failed; with two lanes it passed. Single-lane roads with following traffic remain open." |
-| 6 | **Độ bền:** bản mặc định chịu trễ 1 s (−3.29%), mất 20% tin (−3.66%), mất 50% tin (−1.88%) và nhiễu tốc độ (−4.60%). Với 80% phát hiện thì tiết kiệm −4.76% nhưng thời gian xe đội chạm biên (+0.56). Bản TSI cũ thì yếu với trễ 1 s (còn −0.74%). | "Delay and message loss are fine for the default; with only 80% of cars detected the fleet's time reaches our limit." |
+| 6 | **Độ bền (W14-2, bản quantile hiệu chỉnh theo từng đèn, TRB):** chịu trễ 1 s (−3.29%), mất 20% tin (−3.66%), mất 50% tin (−1.88%) và nhiễu tốc độ (−4.60%). Với 80% phát hiện thì tiết kiệm −4.76% nhưng thời gian xe đội chạm biên (+0.56). Bản TSI cũ thì yếu với trễ 1 s (còn −0.74%). Bản mặc định cố định (1, 0.25) chưa được thử độ bền riêng. | "With the calibrated quantile, delay and message loss are fine; with only 80% of cars detected the fleet's time reaches our limit." |
 | 7 | **Đối thủ:** port DC-Ada tiết kiệm nhiên liệu tương đương nhưng xe đội chậm thêm 2.2 s/xe; port FoRL tiết kiệm 0.70% nhưng chậm thêm 0.52 s/xe. | "We ported them to our task; they save fuel but cost the fleet time beyond our limit. They are our ports, not the authors' code." |
 | 8 | **Đầu vào ngưỡng dừng là mặc định** của sumo-rl và RESCO (W20), nên vấn đề không phải do mình tự tạo ra. | Xem Q1, Q2. |
 | 9 | **Reward:** reward không dùng ngưỡng (độ trễ) làm tác hại giảm còn một nửa (+0.85 so với +1.70 s/xe), nhưng vẫn cần sửa. | "The reward's threshold accounts for about half; the input's threshold is the main cause." |

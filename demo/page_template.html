@@ -3,82 +3,81 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>When AIs Meet AIs</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&family=Overpass+Mono:wght@400;600&display=swap">
 <style>
-/* Three views (tabs), each a side-by-side comparison of two recorded simulations, its own result cards and its own chart.
-   Single dark look on purpose: night asphalt reads best on a projector. */
+/* Three views (tabs), each a side-by-side comparison of two recorded simulations, its own results and its own chart.
+   Plain light look (13/10/2026): black and grey on white; colour only where it carries meaning (stopped cars red, signal states). */
 :root {
-  --bg: #0f1214; --panel: #161a1d; --road: #262b30; --road-edge: #353b41; --fg: #e9ede9; --muted: #98a2a7;
-  --ai: #3fd3c9; --human: #d8d2c4; --stop: #ff5b4f; --go: #5fdb6c; --amber: #ffb547; --line: #2b3136; --grid: #262c31;
-  --display: "Overpass", "Highway Gothic", "Arial Narrow", system-ui, sans-serif;
-  --mono: "Overpass Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  color-scheme: dark;
+  --bg: #ffffff; --mapbg: #0b0d0f; --road: #262b30; --road-edge: #353b41; --fg: #161616; --muted: #666666;
+  --ai: #3fd3c9; --human: #d8d2c4; --stop: #ff5b4f; --go: #5fdb6c; --amber: #ffb547; --line: #dddddd; --grid: #ececec; --chartgrey: #9a9a9a;
+  --sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--fg); }
-body { font-family: var(--display); padding-block: 18px 28px; padding-inline: max(16px, 3vw); margin: 0; }
-.wrap { max-width: 1280px; margin-inline: auto; display: grid; gap: 16px; }
-header { display: grid; gap: 8px; }
-h1 { font-weight: 800; font-size: clamp(28px, 4vw, 50px); letter-spacing: 0.01em; margin: 0; line-height: 1.02; text-wrap: balance; }
-h1 .g { color: var(--go); }
-.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
-.tabs button { font-size: 15px; }
-.tabs button .n { color: var(--muted); font-weight: 400; margin-left: 6px; }
-.tabs button.on .n { color: var(--ai); }
-.sub { color: var(--muted); font-size: clamp(14px, 1.5vw, 18px); max-width: 78ch; margin: 0; }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.45; padding-block: 24px 32px; padding-inline: max(16px, 3vw); margin: 0; }
+.wrap { max-width: 1400px; margin-inline: auto; display: grid; gap: 18px; }
+header { display: grid; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+h1 { font-weight: 600; font-size: clamp(24px, 3vw, 32px); margin: 0; line-height: 1.15; }
+h1 .g { color: inherit; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.tabs button { background: none; border: none; border-bottom: 2px solid transparent; border-radius: 0; padding: 4px 0; font-size: 15px; color: var(--muted); }
+.tabs button.on { color: var(--fg); border-bottom-color: var(--fg); background: none; }
+.tabs button .n { color: var(--muted); margin-left: 6px; font-size: 13px; }
+.sub { color: var(--muted); font-size: 15px; max-width: 80ch; margin: 0; }
 .pickrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.pickrow label { color: var(--muted); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
-.stage { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.pickrow label { color: var(--muted); font-size: 14px; }
+.stage { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 @media (max-width: 760px) { .stage { grid-template-columns: 1fr; } }
-.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 10px; min-width: 0; align-content: start; }
-.ptop { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 10px; }
-.tag { font-weight: 800; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; white-space: nowrap; }
-.tag.base { background: #3a2a1d; color: #ffc98f; }
-.tag.ai { background: #12312f; color: var(--ai); }
-.ptitle { font-weight: 600; font-size: 16px; margin: 0; }
-canvas.map { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 6px; background: #0b0d0f; max-width: 100%; }
-.live { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.kv { display: grid; gap: 2px; align-content: start; }
-.kv .k { color: var(--muted); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
-.kv .v { font-family: var(--mono); font-size: clamp(17px, 2vw, 25px); font-weight: 600; font-variant-numeric: tabular-nums; }
-.kv .v.bad { color: var(--stop); } .kv .v.good { color: var(--go); }
+.panel { display: grid; gap: 8px; min-width: 0; align-content: start; }
+.ptop { display: grid; gap: 2px; align-content: start; min-height: 66px; }
+.tag { font-size: 13px; color: var(--muted); }
+.ptitle { font-weight: 600; font-size: 15px; margin: 0; }
+canvas.map { width: 100%; aspect-ratio: 1 / 1; display: block; background: var(--mapbg); border: 1px solid var(--line); max-width: 100%; }
+.live { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 16px; }
+.kv { display: grid; gap: 0; align-content: start; }
+.kv .k { color: var(--muted); font-size: 13px; }
+.kv .v { font-family: var(--mono); font-size: 18px; font-variant-numeric: tabular-nums; }
+.kv .v.good { font-weight: 600; }
 .caption { color: var(--muted); font-size: 14px; margin: 0; min-height: 3em; }
-.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-button, select { font-family: var(--display); font-size: 15px; font-weight: 600; color: var(--fg); background: #20262b; border: 1px solid #39424a; border-radius: 6px; padding: 7px 12px; cursor: pointer; }
-button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--ai); outline-offset: 2px; }
-button.on { background: #12312f; border-color: var(--ai); color: var(--ai); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 10px 0; }
+button, select { font-family: var(--sans); font-size: 14px; color: var(--fg); background: #fff; border: 1px solid #bdbdbd; border-radius: 3px; padding: 5px 10px; cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+button.on { background: var(--fg); border-color: var(--fg); color: #fff; }
 select:disabled { opacity: 0.6; cursor: default; }
-#scrub { flex: 1 1 160px; accent-color: var(--ai); min-width: 0; }
+#scrub { flex: 1 1 160px; accent-color: var(--fg); min-width: 0; }
 .clock { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--muted); min-width: 9ch; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 13px; }
-.dot { display: inline-block; width: 12px; height: 6px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
-.results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.dot { display: inline-block; width: 12px; height: 6px; margin-right: 6px; vertical-align: middle; }
+.results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 @media (max-width: 760px) { .results { grid-template-columns: 1fr; } }
-.res { border-top: 3px solid var(--go); padding-top: 10px; display: grid; gap: 4px; align-content: start; }
-.res.warn { border-top-color: var(--amber); }
-.res .big { font-family: var(--mono); font-weight: 600; font-size: clamp(34px, 5vw, 60px); line-height: 1; color: var(--go); font-variant-numeric: tabular-nums; }
-.res.warn .big { color: var(--amber); }
-.res .big.long { font-size: clamp(26px, 3.3vw, 42px); white-space: nowrap; }
-.res .what { font-weight: 600; font-size: 17px; }
-.res .from { color: var(--muted); font-family: var(--mono); font-size: 13px; }
-.chartbox { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; }
-.chartbox h2 { font-size: 16px; font-weight: 600; margin: 0; }
+.res { border-top: 1px solid var(--fg); padding-top: 8px; display: grid; gap: 2px; align-content: start; }
+.res.warn { border-top-style: dashed; }
+.res .big { font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 3vw, 34px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.res .big.long { font-size: clamp(20px, 2.2vw, 26px); white-space: nowrap; }
+.res .what { font-size: 15px; }
+.res .from { color: var(--muted); font-size: 13px; }
+.chartbox { display: grid; gap: 6px; border-top: 1px solid var(--line); padding-top: 12px; }
+.chartbox h2 { font-size: 15px; font-weight: 600; margin: 0; }
 .chartbox .note { color: var(--muted); font-size: 13px; margin: 0; }
 #chart { width: 100%; display: block; }
-#chart text { font-family: var(--display); }
+#chart text { font-family: var(--sans); }
 .foot { color: var(--muted); font-size: 12px; max-width: 120ch; margin: 0; }
-.trainwin { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(220px, 34vw); background: var(--panel);
-  border: 1px solid #39424a; border-radius: 10px; padding: 8px; display: grid; gap: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); z-index: 5; }
+.trainwin { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(220px, 34vw); background: #fff;
+  border: 1px solid #bdbdbd; padding: 8px; display: grid; gap: 6px; z-index: 5; }
 .trainwin[hidden] { display: none; }
 .trainwin .tw-top { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; }
-.trainwin .tw-tag { font-weight: 800; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber); }
+.trainwin .tw-tag { font-size: 12px; color: var(--muted); }
 .trainwin .tw-x { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-.trainwin .tw-ep { font-weight: 600; font-size: 12px; min-height: 2.4em; }
-.trainwin button { font-size: 12px; padding: 2px 8px; }
-#cT { width: 100%; aspect-ratio: 1 / 1; display: block; border-radius: 6px; }
+.trainwin .tw-ep { font-size: 12px; min-height: 2.4em; }
+.trainwin button { font-size: 12px; padding: 1px 6px; }
+#cT { width: 100%; aspect-ratio: 1 / 1; display: block; border: 1px solid var(--line); }
 #curve { width: 100%; height: 42px; display: block; }
-@media (max-width: 760px) { .trainwin { position: static; width: 100%; box-shadow: none; } }
+@media (max-width: 760px) { .trainwin { position: static; width: 100%; } }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+/* ?hl=1: underline the numbers to read first (for recordings) */
+body.hl #wL, body.hl #wR, body.hl #dL, body.hl #dR, body.hl .res .big { text-decoration: underline; text-decoration-color: var(--stop);
+  text-decoration-thickness: 3px; text-underline-offset: 6px; text-decoration-skip-ink: none; }
 </style>
 
 <div class="wrap">
@@ -143,7 +142,7 @@ select:disabled { opacity: 0.6; cursor: default; }
   const VIEWS = D.views, ORDER = D.order, NETS = D.nets, SCENES = D.scenes;
   const css = getComputedStyle(document.documentElement);
   const C = k => css.getPropertyValue(k).trim();
-  const COL = { road: C('--road'), edge: C('--road-edge'), ai: C('--ai'), human: C('--human'), stop: C('--stop'), go: C('--go'), amber: C('--amber'), muted: C('--muted'), grid: C('--grid'), fg: C('--fg') };
+  const COL = { chartgrey: C('--chartgrey'), road: C('--road'), edge: C('--road-edge'), ai: C('--ai'), human: C('--human'), stop: C('--stop'), go: C('--go'), amber: C('--amber'), muted: C('--muted'), grid: C('--grid'), fg: C('--fg') };
   const pad = 20, el = id => document.getElementById(id);
   function prep(scene) {                        // id -> entry per frame, for interpolation; ch / ca = car-seconds stopped before this frame (all cars / AI cars)
     const dt = scene.dt || 1; let ch = 0, ca = 0;
@@ -165,7 +164,7 @@ select:disabled { opacity: 0.6; cursor: default; }
     const ox = (w - 2 * pad - (bx1 - bx0) * s) / 2, oy = (w - 2 * pad - (by1 - by0) * s) / 2;
     const V = { ctx, w, s, net, X: x => pad + ox + (x - bx0) * s, Y: y => w - pad - oy - (y - by0) * s };
     const bg = document.createElement('canvas'); bg.width = canvas.width; bg.height = canvas.height;
-    const g = bg.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = '#0b0d0f'; g.fillRect(0, 0, w, w); g.lineCap = 'round';
+    const g = bg.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = C('--mapbg'); g.fillRect(0, 0, w, w); g.lineCap = 'round';
     const lanes = (col, lw) => { g.strokeStyle = col; g.lineWidth = lw; g.beginPath();
       for (const ln of net.lanes) ln.forEach((p, i) => i ? g.lineTo(V.X(p[0]), V.Y(p[1])) : g.moveTo(V.X(p[0]), V.Y(p[1]))); g.stroke(); };
     lanes(COL.edge, Math.max(2, 3.6 * s)); lanes(COL.road, Math.max(1.5, 3.0 * s));
@@ -175,7 +174,8 @@ select:disabled { opacity: 0.6; cursor: default; }
   function drawNet(V) { V.ctx.drawImage(V.bg, 0, 0, V.w, V.w); }
   function drawSignals(V, frame, tlsIds) {
     const { ctx, X, Y, s, net } = V, hl = Math.max(1.5, 2.2 / s);
-    ctx.lineWidth = Math.max(2, 2.2 * s);
+    if (s < 0.2) return;                         // whole-map scale: signal marks would be dots everywhere; the cars carry the picture
+    ctx.lineWidth = Math.max(1.5, 1.5 * s); ctx.globalAlpha = 0.55;   // signal marks stay quieter than the cars
     tlsIds.forEach((tid, i) => {
       const st = frame.s[i]; const links = net.tls[tid]; if (!links || !st) return;
       for (const [idx, x1, y1, x0, y0] of links) {
@@ -184,6 +184,7 @@ select:disabled { opacity: 0.6; cursor: default; }
         ctx.beginPath(); ctx.moveTo(X(x1 - uy * hl), Y(y1 + ux * hl)); ctx.lineTo(X(x1 + uy * hl), Y(y1 - ux * hl)); ctx.stroke();
       }
     });
+    ctx.globalAlpha = 1;
   }
   // allHuman: every car in this run is driven by SUMO's human model (the fleet is released), so none is drawn as AI
   function drawCars(V, scene, allHuman, t, q = 10) {
@@ -252,22 +253,22 @@ select:disabled { opacity: 0.6; cursor: default; }
     let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals); const padv = (hi - lo) * 0.04 || 1; lo -= padv; hi += padv;
     const X = v => left + (W - left - right) * (v - lo) / (hi - lo);
     let s = '';
-    for (const tk of niceTicks(lo, hi, 6)) s += `<line x1="${X(tk)}" x2="${X(tk)}" y1="${top - 8}" y2="${H - 24}" stroke="${tk === 0 ? '#59636b' : COL.grid}" stroke-width="1"/>` +
+    for (const tk of niceTicks(lo, hi, 6)) s += `<line x1="${X(tk)}" x2="${X(tk)}" y1="${top - 8}" y2="${H - 24}" stroke="${tk === 0 ? '#9a9a9a' : COL.grid}" stroke-width="1"/>` +
       `<text x="${X(tk)}" y="${H - 8}" fill="${COL.muted}" font-size="11" text-anchor="middle">${Number.isInteger(tk) ? String(tk).replace('-', '−') : fmt(tk)}</text>`;
     s += `<text x="${W - 4}" y="${H - 8}" fill="${COL.muted}" font-size="11" text-anchor="end">${ch.unit}</text>`;
     ch.rows.forEach((r, i) => {
       const y = top + i * rowH + rowH / 2;
       s += `<text x="${left - 10}" y="${y + 4}" fill="${COL.fg}" font-size="13" text-anchor="end">${r.label}</text>`;
       if (ch.kind === 'dots') {
-        const col = r.ai ? COL.ai : COL.amber;
+        const col = r.ai ? COL.fg : COL.chartgrey;
         for (const p of r.points) s += `<circle cx="${X(p)}" cy="${y}" r="4.5" fill="${col}" fill-opacity="0.55"><title>${r.label}: ${fmt(p)} ${ch.unit}</title></circle>`;
         s += `<line x1="${X(r.mean)}" x2="${X(r.mean)}" y1="${y - 11}" y2="${y + 11}" stroke="${COL.fg}" stroke-width="2.5"><title>mean ${fmt(r.mean)}</title></line>` +
           `<text x="${X(r.mean)}" y="${y - 14}" fill="${COL.fg}" font-size="11" text-anchor="middle">mean ${fmt(r.mean)}</text>`;
       } else {                                    // before (a) -> after (b); after-interval [lo, hi]
-        s += `<line x1="${X(r.a)}" x2="${X(r.b)}" y1="${y}" y2="${y}" stroke="#59636b" stroke-width="2"/>`;
-        if (r.lo !== undefined) s += `<line x1="${X(r.lo)}" x2="${X(r.hi)}" y1="${y}" y2="${y}" stroke="${r.pass ? COL.go : COL.amber}" stroke-width="8" stroke-linecap="round" stroke-opacity="0.4"/>`;
-        s += `<circle cx="${X(r.a)}" cy="${y}" r="6" fill="${COL.stop}"><title>without TSI-G: ${fmt(r.a)} ${ch.unit}</title></circle>` +
-          `<circle cx="${X(r.b)}" cy="${y}" r="6" fill="${r.pass ? COL.go : COL.amber}"><title>with TSI-G: ${fmt(r.b)} ${ch.unit}</title></circle>` +
+        s += `<line x1="${X(r.a)}" x2="${X(r.b)}" y1="${y}" y2="${y}" stroke="#9a9a9a" stroke-width="2"/>`;
+        if (r.lo !== undefined) s += `<line x1="${X(r.lo)}" x2="${X(r.hi)}" y1="${y}" y2="${y}" stroke="${r.pass ? COL.fg : COL.chartgrey}" stroke-width="8" stroke-linecap="round" stroke-opacity="0.4"/>`;
+        s += `<circle cx="${X(r.a)}" cy="${y}" r="5.5" fill="#fff" stroke="${COL.muted}" stroke-width="1.5"><title>without TSI-G: ${fmt(r.a)} ${ch.unit}</title></circle>` +
+          `<circle cx="${X(r.b)}" cy="${y}" r="6" fill="${r.pass ? COL.fg : COL.chartgrey}"><title>with TSI-G: ${fmt(r.b)} ${ch.unit}</title></circle>` +
           `<text x="${X(Math.max(r.a, r.b, r.hi ?? -1e9)) + 10}" y="${y + 4}" fill="${COL.muted}" font-size="12">${fmt(r.a)} → ${fmt(r.b)}</text>`;
       }
     });
@@ -308,10 +309,10 @@ select:disabled { opacity: 0.6; cursor: default; }
     const c = el('curve'), r = c.getBoundingClientRect(), dpr = window.devicePixelRatio || 1; c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr);
     const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, r.width, r.height);
     const ys = TR[item.kind].curve, n = ys.length, lo = Math.min(...ys), hi = Math.max(...ys), X = i => 4 + (r.width - 8) * i / (n - 1), Y = v => r.height - 6 - (r.height - 14) * (v - lo) / ((hi - lo) || 1);
-    g.strokeStyle = '#3a434a'; g.lineWidth = 1; g.beginPath(); g.moveTo(4, r.height - 6); g.lineTo(r.width - 4, r.height - 6); g.stroke();
-    g.strokeStyle = item.kind === 'light' ? COL.go : COL.ai; g.lineWidth = 1.5; g.beginPath(); ys.forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke();
-    g.fillStyle = COL.amber; g.beginPath(); g.arc(X(item.ep), Y(ys[item.ep]), 3.5, 0, 2 * Math.PI); g.fill();
-    g.fillStyle = '#98a2a7'; g.font = '10px ' + css.getPropertyValue('--mono'); g.fillText(TR[item.kind].label, 6, 10);
+    g.strokeStyle = '#cccccc'; g.lineWidth = 1; g.beginPath(); g.moveTo(4, r.height - 6); g.lineTo(r.width - 4, r.height - 6); g.stroke();
+    g.strokeStyle = COL.fg; g.lineWidth = 1.5; g.beginPath(); ys.forEach((v, i) => i ? g.lineTo(X(i), Y(v)) : g.moveTo(X(i), Y(v))); g.stroke();
+    g.fillStyle = COL.stop; g.beginPath(); g.arc(X(item.ep), Y(ys[item.ep]), 3.5, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = COL.muted; g.font = '10px ' + css.getPropertyValue('--mono'); g.fillText(TR[item.kind].label, 6, 10);
   }
   function renderT(dt) {
     if (!tw || !tw.open) return; const item = tw.seq[tw.i]; tw.t += dt * 20;
@@ -322,6 +323,7 @@ select:disabled { opacity: 0.6; cursor: default; }
   const _loop = loop;
   loop = function (now) { const dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); renderT(playing ? dt : 0); _loop(now); };
   window.addEventListener('resize', () => { if (tw && tw.open) { T = setup(el('cT'), NETS[TR.net], NETS[TR.net].bbox); drawCurve(tw.seq[tw.i]); } });
+  if (/[?&]hl(=|&|$)/.test(location.search)) document.body.classList.add('hl');
   setView(view); requestAnimationFrame(loop);
 })();
 </script>

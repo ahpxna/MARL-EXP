@@ -136,8 +136,8 @@ views = dict(
                      dict(big='−8.2 s', what='delay per trip, whole city', **{'from': 'with vs without TSI-G'})],
                      foot=('Grid panel: 20 traffic days × 5 signal models × 4 AI fleets. Signal: our DQN with RESCO MPLight\'s state and reward representation. A large partial repair: '
                            'the pre-registered limit on the remaining AI-car delay (upper bound +0.74 s) was not met. The clip (seed 1400) shows one run: AI-car delay 39.6 → 28.0 s.'))),
-             chart=dict(kind='ba', title='Extra delay of AI cars from the mismatch, five signal designs: without (red) → with TSI-G', unit='s per AI-car trip',
-                        note='Shaded: 95% interval with TSI-G; green = met the pre-registered repair limit, amber = not met. The wave state counts every car, so it has no mismatch to fix (control).',
+             chart=dict(kind='ba', title='Extra delay of AI cars from the mismatch, five signal designs: without TSI-G (open circle) → with TSI-G (filled)', unit='s per AI-car trip',
+                        note='Shaded: 95% interval with TSI-G; black = met the pre-registered repair limit, grey = not met. The wave state counts every car, so it has no mismatch to fix (control).',
                         rows=[dict(label='Our signal (halting counts)', a=1.70, b=-0.28, lo=-0.42, hi=-0.14, **{'pass': True}),
                               dict(label='sumo-rl default state', a=5.36, b=-0.18, lo=-0.77, hi=0.33, **{'pass': True}),
                               dict(label='RESCO IDQN / IPPO state', a=2.63, b=-0.23, lo=-0.37, hi=-0.09, **{'pass': True}),

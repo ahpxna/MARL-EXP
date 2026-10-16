@@ -38,7 +38,8 @@
 - **(a) Transfer.** The transfers used other calibrations, not the default fixed in advance:
   - **spider:** four registered failures on the one-lane build; then a two-lane rebuild passed with (A, B) = (1, 0.5), −1.49% (ledger lines 1430–1450).
   - **rand3:** a second attempt with an extended per-signal adapter grid passed, against the registered expectation, −2.17%; the chain bound over the two attempts is 0.075 (C-153).
-- **(b) Robustness.** For the default design (q 0.1), 80% detection **misses** the fleet-time limit (upper +0.56) (C-184). The "80% detection" tolerance belongs to the older design (C-142). The default does tolerate a 1-s delay (−3.29%), 20% loss (−3.66%), 50% loss (−1.88%) and 1 m/s speed noise (−4.60%).
+- **(b) Robustness.** For the quantile revision (q 0.1), 80% detection **misses** the fleet-time limit (upper +0.56) (C-184). The "80% detection" tolerance belongs to the older design (C-142). The quantile revision does tolerate a 1-s delay (−3.29%), 20% loss (−3.66%), 50% loss (−1.88%) and 1 m/s speed noise (−4.60%).
+  - *Correction, 13/10 recheck:* these W14-2 rows are the quantile revision TRB, whose adapters were chosen per signal; they are not the fixed default (1, 0.25), which had no separate robustness test. The v5 wording was fixed accordingly.
 - **Replace:** "Its default setting, fixed in advance, saves 5.6% (HBEFA4) and 3.3% (PHEMlight5) on new signals and fleets and tolerates a 1-s SPaT delay, 20–50% message loss and speed noise; recalibrated, TSI also passed on a second network and on a two-lane build of a third."
 
 ### A5. "with TSI-G, −0.2, −0.2 and 0.5, and 5–10% fuel saved" (col. 3)
