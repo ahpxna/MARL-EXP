@@ -389,3 +389,28 @@ Arms **PRB_R** (fleet, no SPaT) and **PRB_SV** (forecast) with a read-only per-s
 **Reading (descriptive):** compare SVm − R with W21-B's grid-fleet SV − R on the same lights, fleet seeds and days, for agent time loss and fuel.
 - The trade is avoided if the agent time-loss upper bound is < +0.5 s/veh with a fuel saving.
 - The trade is reduced if SVm − R is below half of the grid fleets' cost.
+
+## Amendment W21-L0 (16/10/2026 18:1x, before any W21-L0 run): does the W21-L gain come from learning the map, or only from dropping the grid-learned residual?
+
+**User (16/10):** "chạy phép thử rẻ đi".
+
+**Seen (C-254):**
+- The Midtown-trained fleets cut the forecast's time cost by about 60 %.
+- Their training reward barely moved in 200 episodes (for example −4.581 → −4.566).
+- Every W21-L fleet starts from a zero-initialised last actor layer (V9.NetR). So the deterministic policy at episode 0 is exactly the rule GLOSA-L∘σ* (CITY_fleet_v11 docstring, identity check K10-1), whatever the fleet seed.
+
+**Arm SV0:**
+- Fleet: the untrained W21-L init, saved by the W21-L trainer itself with `--episodes 0` (same code, same pairing of seed and light, name MTL0_s<seed>). Check KW21-L0a: every saved actor's last layer is exactly zero.
+- Evaluation: the same evaluator, SV service, lights (B2D t59–t63, AH t34–t38) and days 0–4 as W21-L.
+- Seeds: all four fleet seeds on t59. Check KW21-L0b: the four t59 cells are identical in every row field. If so, the other nine lights run s1413 only, and SV0 is replicated across the fleet axis. If not, the report refuses, and the runner is re-run with ALL=1 (all four seeds on every light).
+- R and SVgrid are W21-B's rows; SVm is W21-L's.
+
+**Reading (descriptive, agent time loss, 95 % crossed bootstrap over lights × fleets × days, B = 2 000):**
+- D_rule = SV0 − SVgrid; D_train = SVm − SV0.
+- "the gain is dropping the grid residual" if the D_rule upper bound < 0 and the D_train interval contains 0;
+- "the gain is learning the map" if the D_train upper bound < 0 and the D_rule interval contains 0 or lies above it;
+- "both" if both upper bounds < 0;
+- otherwise "unresolved".
+- Also reported: SV0 − R (agent / human time loss, agent fuel) and fuel for D_rule and D_train.
+
+**Size:** 13 cells × 5 days, about 15 min with 6 lanes. Smoke first (s1413, t59, day 0, `--smoke`).
