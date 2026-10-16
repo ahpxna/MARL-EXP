@@ -79,7 +79,8 @@ which senses each fleet vehicle as the human-driven twin it replaces (one site p
 four signal families and removed 97\% of the harm on MPLight.
 \item \emph{Boundaries, all reported.} Where the failure does not arise or the repair does not hold: a one-lane network, IDM driving,
 drivers matched to field trajectories (the fleet's own benefit falls to about 1\%), recorded Salt Lake City demand, and the full Midtown
-Manhattan map, where gliding costs the fleet time under every signal family, even with exact timing. Every experiment was registered before it ran, and
+Manhattan map, where the grid-trained fleet's gliding costs it time under every signal family; fleets trained on the map cut that
+cost by about 60\%. Every experiment was registered before it ran, and
 every failure is reported.
 \end{enumerate}
 Every qualification of these results is stated once, in Section~\ref{sec:limits}.
@@ -945,8 +946,14 @@ release was on blocks shorter than 100\,m ($+2.23$ and $+3.20$\,s/veh), on longe
 ($+1.62$, $+1.10$), and each release gave up most of the fuel saving; a per-edge probe (W21-J) found the extra time loss spread over block
 lengths in proportion to traffic, with no consistent spillback increase. The cost therefore scales with how much the fleet glides, not
 with where: on this map the grid-trained fleet's glides trade its own time for fuel, a property of the fleet's response rather than of
-short blocks. TSI-G (W21-K) lowered AH's cost from $+10.75$ to $+6.15$\,s/veh, less than half. With one fleet and five days these
-readings are descriptive.
+short blocks. TSI-G (W21-K) lowered AH's cost from $+10.75$ to $+6.15$\,s/veh, less than half. Four fleets trained on the full map in the
+deployment setting (W21-L; F1-B recipe, 200 episodes under the learned B2D signals with the deployed service) cut the forecast's cost to
+$+3.24$ (B2D) and $+3.87$\,s/veh (AH), against $+8.49$ and $+9.54$ for the grid fleets on the same cells (differences $-5.25$
+[$-10.72$, $-0.89$] and $-5.67$ [$-13.22$, $-0.05$]), with slightly more fuel saved ($-6.5\%$, $-5.9\%$) and no cost to human drivers;
+the remaining cost is not distinguishable from zero but its upper bounds ($+7.1$, $+8.4$) exceed the limit. Their training reward barely
+changed from the rule they start from, so part of this gain may come from not carrying the grid-learned residual. The Midtown cost is
+therefore mostly a property of the grid-trained fleet's response, which training on the map reduces by about 60\%. These readings are
+descriptive (one fleet seed for W21-C to W21-K, five days).
 
 \subsection{M3: One-Sided Repairs That Fail}\label{sec:neg}
 \paragraph{Light-side commitments} Reward-shaped lights, fixed-window and ETA-triggered commitments, a predictable cycle and
@@ -1416,8 +1423,8 @@ uses random demand, keeps the 56 multi-phase junctions on actuated programs and 
 system; there the forecast alone cost the fleet about 9\,s/veh under both a halting-count family and a threshold-free one; the averaged
 forecaster identity, the published quantile and publication itself were ruled out; an oracle replay places that shared cost in gliding
 on this map, capping greens removed only the halting-count family's extra cost, and release tests show that the cost scales with how
-much the grid-trained fleet glides rather than with block length, a fuel-for-time trade of the fleet on this map (W21-B to W21-K,
-descriptive).
+much the grid-trained fleet glides rather than with block length, a fuel-for-time trade of the grid-trained fleet on this map;
+fleets trained on the map cut it by about 60\% without meeting the limit (W21-B to W21-L, descriptive).
 \item \emph{Signals.} The learned signals are keep-or-switch double DQNs. The sumo-rl and RESCO representations were re-implemented and
 trained by our recipe, not with the libraries' learners or action spaces. TSI-G needs each vehicle's fleet membership (V2X), has one site
 parameter, was tested on grid4, and did not meet the limit on MPLight; with field-matched drivers it removed the threshold-specific part
@@ -1440,8 +1447,9 @@ trained policies and record provenance at capture.
 \subsection{Open Problems}
 \begin{itemize}\setlength\itemsep{1pt}
 \item \emph{The cost of gliding on a real map.} On the Midtown map the grid-trained fleet's glides trade its time for fuel in
-proportion to how much it glides; short blocks and spillback were ruled out (W21-I, W21-J). Whether a fleet trained on such a map avoids
-the trade is open.
+proportion to how much it glides; short blocks and spillback were ruled out (W21-I, W21-J), and fleets trained on the map cut the cost by about 60\%
+(W21-L). Whether longer or map-specific training removes the rest, or the gain comes only from dropping the grid-learned residual, is
+open.
 \item \emph{Forecasts that anticipate their own effect.} One refit on logs collected with TSI published narrowed the publication shift on
 spider without passing, and two rounds on grid4 added fuel but cost agent time; whether repeated retraining converges with a learned signal
 in the loop \cite{perdomo2020} is open.
@@ -1460,8 +1468,8 @@ stop threshold, which is in the default representations of sumo-rl and RESCO, an
 trajectories. Two interfaces repair it without retraining either population: a calibrated low-quantile forecast with a speed-binned count
 (TSI), confirmed and replicated on grid4, and a sensing layer that counts each fleet vehicle as the human-driven twin it replaces (TSI-G),
 which met every limit on three of four frozen signal families. The limits are stated once, in Section~\ref{sec:limits}: the evidence is
-simulation, the fleet's own fuel benefit is about one percent against field-matched drivers, and on a real street map gliding itself costs the fleet time
-under every signal family, even with exact timing. Before a fleet uses a learned signal's timing, one should check what the signal counts, and
+simulation, the fleet's own fuel benefit is about one percent against field-matched drivers, and on a real street map the grid-trained fleet's gliding costs it
+time under every signal family, a cost that training the fleet on the map cuts by about 60\%. Before a fleet uses a learned signal's timing, one should check what the signal counts, and
 evaluate the timing service together with the signal response it induces.
 
 \section*{Acknowledgment}

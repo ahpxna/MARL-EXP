@@ -364,3 +364,28 @@ Arms **PRB_R** (fleet, no SPaT) and **PRB_SV** (forecast) with a read-only per-s
 **Arm:** BIS — AH with TSI-G (`--light-obs bis`, W20_CREEP = 3, Krauss drivers as calibrated in W20) and the SV provider.
 
 **Reading (descriptive):** TSI-G helps on the map if BIS − R agent time loss is below half of SV − R.
+
+## Amendment W21-L (16/10/2026, before any W21-L training): does a fleet trained on the full Midtown map avoid the fuel-for-time trade?
+
+**User (16/10):** "train fleet trên Midtown luôn đi".
+
+**Seen:**
+- W21-I/J (C-253): the shared Midtown cost scales with how much the grid-trained fleet glides, not with block length.
+- MT-A3 (11/10): fleets trained on the partial extract under FT were worse than the grid fleets. That was a different setting: partial map, fixed-time signals.
+
+**Training** (`scripts/CITY_w21_train_fleet_mt.py`; the F1-B recipe on the full map in the MT-E setting):
+- Seeds: four fleets, s1413, s1513, s1613, s1713 (the grid fleets' seeds).
+- Init: scratch, the zero-init residual on the lane-aware rule.
+- Lights: each fleet is trained under one frozen B2D light, paired by index (t59, t60, t61, t62), with the 56 multi-phase junctions actuated.
+- SPaT: the deployed service, i.e. the grid forecaster at q 0.1 as adapted by DEMO_midtown.
+- Traffic: Midtown training days 10–17.
+- Recipe: F1-B's PPO; **N_EP = 200**, fixed from the one-episode timing measured before launch (16/10 14:5x: 26 s per 3600-s episode, peak 0.6 GB, 22 teleports, 511 learned signals, TRAIN days 10–17 confirmed in the log).
+- Checkpoints every 5 episodes; a resumed run continues from the last checkpoint.
+
+**Evaluation** (days 0–4, never used in training):
+- SVm: the Midtown fleets with the SV service, under all five B2D lights (t59–t63) and, secondarily, the five AH lights.
+- R is fleet-independent: without SPaT every fleet drives as its base driver (KM2-2). So W21-B's MTW_R rows are reused. Check KW21-L1: one Midtown-fleet R cell equals MTW_R (t59, s1413).
+
+**Reading (descriptive):** compare SVm − R with W21-B's grid-fleet SV − R on the same lights, fleet seeds and days, for agent time loss and fuel.
+- The trade is avoided if the agent time-loss upper bound is < +0.5 s/veh with a fuel saving.
+- The trade is reduced if SVm − R is below half of the grid fleets' cost.
