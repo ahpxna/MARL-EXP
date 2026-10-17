@@ -227,3 +227,43 @@ The W22-A decisions at p 0.95, including the wrong ones, used the biased estimat
   - "AH no bias in either arm" fails at 1200 s: −0.71 [−1.38, −0.09].
 - **Held:** RWV.
 - **Not the design:** the alternating start bit was balanced 5 / 5 over the days.
+
+## Amendment W22-E (17/10/2026 14:1x, before any W22-E run): predictions drawn from the post-hoc analyses
+
+**User (17/10):** asked whether randomising by day or area or "something else" is better, to dig into "hides or exaggerates depending on the signal type, more so in small tests", what the five failed predictions teach, whether the data suggest new predictions, and why W17 underestimates.
+
+**Seen, post hoc on existing rows** (`scripts/CITY_w22e_posthoc.py`, `e/report_w22e_posthoc.txt`, and the checks in this session's transcript):
+- **Exposure mapping on switchback windows** (own window, own previous window, neighbours' share, plus own × neighbour; signal × run fixed effects):
+  - on grid4 the local model reproduces the global green change: RMP 4.18 vs 4.19; AH 1.77 vs 1.51; SRL 2.21 vs 2.13; RDQ 2.20 vs 2.15;
+  - in W17 it does not: RMP 2.97 vs 4.44; AH 0.05 vs 0.66.
+  - The W17 gap is not the metric: the same window-weighted metric on the KC all / none rows gives +6.4 to +6.8 on that cell.
+  - It is not accumulation over the hour: SV − R green is the same in the first and last thirds, +6.30 / +6.33.
+  - It is not within-window lag: removing the burn-in leaves τ unchanged or larger in W17.
+- **Run-level greens:** 2 × (SWB run mean green − R) recovers the global change in both worlds (W17 RMP 4.20 vs 4.44; AH 0.61 vs 0.66). So in W17 part of the response depends on the network-wide share of gliding vehicles and is shared by treated and control windows: γ ≈ 1.0 s for RMP, 0.4 s for AH; ≈ 0 on grid4.
+- **Two-share (saturation) extrapolation** on W22-B (grid4): T̂₁ − Ĉ₀ from MIX at (0.3, 0.7) gives RMP 14.51 vs GTE 14.05 (naive 12.07), AH 1.38 vs 1.57 (naive 2.81), RWV −1.00 vs −0.96.
+- **Control spillover** C_p − R has the sign of the human drivers' global change H (SV − R) in 5 of 6 family-world cells; grid4 RWV is the exception, and small.
+- **Day-level randomisation** from SV / R rows (unpaired days) is unbiased. Days needed for 80 % power per unit: RMP < 1, AH median 2–4, RWV 8–10. Simulated days differ only by seed.
+
+**Predictions (registered now):**
+- **E1:** the two-share extrapolation from MIX at p 0.3 and 0.7 recovers GTE (bias interval contains 0) for SRL and RDQ on grid4 and for RMP, AH and RWV in W17. Pair (0.5, 0.7) is descriptive.
+- **E2:** the naive per-vehicle A/B test (p 0.5) overstates the harm (bias interval > 0) for SRL and RDQ. Both have H < 0 (humans gain, −0.61 / −1.21) and count waiting or halted vehicles like AH.
+- **E3:** in W17 the network-wide switchback (NSW, 600 s, p 0.5) gives a network green contrast for RMP and AH that is larger than the per-signal τ and whose interval contains the global change. The contrast is network-mean green in treated minus control windows (greens ≥ 60 s into a window, window-weighted).
+- **E4 (descriptive):** control spillover sign = sign(H) for SRL and RDQ.
+
+**Runs:**
+- grid4 MIX p 0.3 / 0.5 / 0.7 for SRL (t84–88) and RDQ (t89–93); fleets s1413, s1513; days 1400–1409.
+- W17 MIX p 0.3 / 0.7 for RMP, AH and RWV (p 0.5 exists, W22-C); fleets s2213, s2313; days 1420–1429.
+- W17 NSW for the same three families.
+- 150 jobs.
+
+**Checks:**
+- KW22-0 (grid4) and KW22-C1 / C2 (W17) with the current wrapper;
+- KW17-0 lines.
+
+## Result note W22-E (17/10/2026 17:50; ledger C-261)
+
+- **E1 held 5 / 5.**
+- **E2:** held for RDQ; failed for SRL (+0.49 [−0.04, +1.03]).
+- **E3:** held for RMP. For AH the criterion was met but the interval is uninformative.
+- **E4:** held for SRL and RDQ.
+- The two shares were run on the same simulated days.
