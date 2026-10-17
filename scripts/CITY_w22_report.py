@@ -8,7 +8,7 @@ ground truth R / SV rows of the same light, fleet and day from W19 (AH) or W20 (
      ground truth SV - R mean green (rows' green_mean).  Fisher labels from numpy default_rng(1).
   D2 (MIX): DM = treated - control fleet time loss, GTE = SV - R agent time loss, bias = DM - GTE; spillovers TL_C - R, TL_T - SV;
      crossed bootstrap 95 % over lights x fleets x days (2 000 draws, seed 0).
-Usage: CITY_w22_report.py <dir> "<FAM:k0-k1:src ...>" "<fleets>" "<days>"   (src = w19 | w20)"""
+Usage: CITY_w22_report.py <dir> "<FAM:k0-k1:src ...>" "<fleets>" "<days>"   (src = w19 | w20 | a conf directory)"""
 import hashlib, json, os, sys
 from pathlib import Path
 import numpy as np
@@ -63,7 +63,7 @@ fmt = lambda v: f'{v[0]:+.3f} [{v[1]:+.3f}, {v[2]:+.3f}]'  # noqa: E731
 out = [f'== W22: owner-side identification (SWB) and per-vehicle A/B bias (MIX); families {[f[0] for f in FAMS]}; fleets {FS}; days {DAYS}']
 res = {}; shares = []; wshares = []; withheld_zero = 0
 for fam, kr, src in FAMS:
-    k0, k1 = (int(x) for x in kr.split('-')); ks = list(range(k0, k1 + 1)); G = SRC[src]
+    k0, k1 = (int(x) for x in kr.split('-')); ks = list(range(k0, k1 + 1)); G = SRC[src] if src in SRC else Path(src)
     S = {(k, s): L(D / f'SWB_t{k}_s{s}.json') for k in ks for s in FS}; X = {(k, s): L(D / f'MIX_t{k}_s{s}.json') for k in ks for s in FS}
     R = {(k, s): L(G / f'R_t{k}_s{s}.json') for k in ks for s in FS}; V = {(k, s): L(G / f'SV_t{k}_s{s}.json') for k in ks for s in FS}
     shape = (len(ks), len(FS), len(DAYS)); TAU = np.zeros(shape); GRN = np.zeros(shape); DM = np.zeros(shape); GTE = np.zeros(shape)

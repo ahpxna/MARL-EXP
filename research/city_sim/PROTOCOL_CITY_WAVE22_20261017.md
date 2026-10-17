@@ -103,3 +103,58 @@ The signal's inputs, rewards and programs are not used.
   - RMP: understates, as predicted.
   - AH: overstates (prediction "uncertain").
   - RWV: no bias shown, as predicted.
+
+## Amendments W22-A, W22-B, W22-C (17/10/2026 02:0x, before any of their runs)
+
+**User (17/10):** "làm cả 3 bước tiếp theo đi". The three steps proposed after C-256:
+1. a size-based decision rule for D1, with its cost;
+2. a treated-share sweep and an alternative design for D2;
+3. a replication in the W17 field-matched world.
+
+**Battery guard (all three):** no new job starts while the Mac is discharging at ≤ 20 %. Re-running resumes, and a report runs only on a complete panel.
+
+**Order:** W22-C, then W22-A, then W22-B.
+
+### W22-A: deciding exposure by size, and what the test costs the fleet (grid4, fresh days 1410–1419, never used in W22)
+
+- **Threshold:** δ = 0.5 s of mean-green lengthening, the paper's 0.5 s/veh limit scale. **Chosen after seeing W22's τ values** (RWV +0.10, AH +1.69, RMP +3.85). It is therefore evaluated only on days 1410–1419 and in W22-C, which no W22 analysis has touched.
+- **Arms:** SWB at treated-window share p ∈ {0.5, 0.8, 0.95}, i.e. the owner forgoes SPaT in a share β = 1 − p of signal-windows. Tags `SWBp50`, `SWBp80`, `SWBp95`. Families RMP, SRL (t84–88), RDQ (t89–93), AH, RWV; fleets s1413, s1513; 5 lights each.
+- **Decision unit:** one deployed policy k with one fleet, 10 units per family. Per day d, τ_d = mean over signals of (treated − control mean green), with greens starting ≥ 60 s into a window.
+- **Rule, after n = 2…10 days:** Student-t 95 % interval of the mean of τ_d.
+  - "exposed" if the lower bound > δ;
+  - "not exposed" if the upper bound < δ;
+  - otherwise continue.
+  - Reported: the first n that decides, and its label. A normal-mixture confidence sequence with plug-in sd is also reported, descriptive and approximate.
+- **Truth label per unit:** SV − R mean green over the same days > δ (W19 / W20 rows).
+- **Cost:** fleet fuel and agent time loss of the SWB run against the SV run on the same light, fleet and day.
+- **Registered predictions:**
+  - at p = 0.5, every RMP / SRL / RDQ / AH unit is decided "exposed" within 3 days, and every RWV unit "not exposed" within 10 days, with no wrong decision;
+  - the days needed grow as p → 0.95;
+  - the fuel cost grows with β.
+
+### W22-B: how the per-vehicle A/B bias depends on the treated share, and a design that should not be biased (grid4, days 1400–1409, as W22)
+
+- **MIX arms:** p ∈ {0.1, 0.3, 0.7, 0.9}, tags `MIXp10` … `MIXp90`. W22's MIX is p = 0.5.
+- **NSW arm** (new wrapper kind `nsw:600:0.5`): network-wide switchback, in which all fleet vehicles use SPaT during window w = ⌊t/600⌋ iff u('nsw', day, w) < 0.5.
+  - Estimator: fleet time loss of trips departing ≥ 120 s into a treated window, minus the same for control windows.
+- **Families:** RMP, AH, RWV; fleets s1413, s1513; 5 lights.
+- **Bias(p)** = DM(p) − GTE and NSW − GTE, crossed bootstrap 95 %.
+- **Registered predictions:**
+  - RMP: DM(p) < GTE at every p, the gap largest at p = 0.1;
+  - RWV: no bias shown at any p;
+  - NSW: no bias shown for any family.
+
+### W22-C: replication in the W17 world (every car the jointly calibrated W17-0 IDM)
+
+- **Chain:** `CITY_w17_world.py → CITY_w9_run.py none → CITY_w20_run.py → CITY_w13_modes.py → CITY_w22_assign.py → CITY_eval_n4.py`, with W21-A's lights and forecasters (`w21_20261015/w17/`) and W17 FRESH5 fleets s2213, s2313. Days 1420–1429.
+- **Arms:** SWB (300 s, p 0.5) and MIX (p 0.5); families RMP, AH, RWV.
+- **Checks:**
+  - KW22-C1 / C2: all / none with the probe = W21-A's SV / R rows, t94 s2213, days 1420–1421;
+  - KW17-0: one world line per job;
+  - KW22-3.
+- **Ground truth:** W21-A's R / SV rows.
+- **Readings:** as D1 and D2.
+- **Predictions:**
+  - D1: RMP detected; AH detected with a smaller τ.
+  - D2: RMP bias < 0.
+  - W21-A greens: MPLight +22.7 %, AH +4.3 %, wave −0.1 %.

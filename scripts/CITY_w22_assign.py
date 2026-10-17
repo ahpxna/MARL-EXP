@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """W22 wrapper (PROTOCOL_CITY_WAVE22_20261017): fleet-side randomisation of SPaT use.  No file is edited.
-  W22_ASSIGN = all | none | veh:<p> | swb:<W>:<p>
+  W22_ASSIGN = all | none | veh:<p> | swb:<W>:<p> | nsw:<W>:<p>
     all       every fleet vehicle uses the published SPaT (identity check: = the SV arm)
     none      no fleet vehicle uses it (identity check: = the R arm)
     veh:p     fleet vehicle v uses it iff u('veh', seed, v) < p          (per-vehicle Bernoulli(p); the propensity is known)
     swb:W:p   fleet vehicles use the SPaT of light j during window w = floor(t / W) iff u('swb', seed, j, w) < p   (switchback per light)
+    nsw:W:p   every fleet vehicle uses SPaT during window w = floor(t / W) iff u('nsw', seed, w) < p (network-wide switchback; W22-B).
+              Rows also get w22.nsw: fleet time loss / fuel of trips departing >= W22_NB s (default 120) into a treated vs a control window.
   The provider is called for every query (it broadcasts to all; a control vehicle ignores the answer and is released to its base driver,
   exactly as under no SPaT), so the provider's own state is the SV arm's.
   W22_PROBE=1: read-only, per (light, window of W22_W s, default 300): number and summed duration of green intervals (a phase whose state has
@@ -19,10 +21,10 @@ ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 import scripts.CITY_eval4 as E4  # noqa: E402
 import scripts.CITY_env as CE  # noqa: E402
 import scripts.CITY_fleet_v11 as V11  # noqa: E402
-ASSIGN = os.environ.get('W22_ASSIGN', 'all'); KIND, _, PAR = ASSIGN.partition(':'); assert KIND in ('all', 'none', 'veh', 'swb'), ASSIGN
+ASSIGN = os.environ.get('W22_ASSIGN', 'all'); KIND, _, PAR = ASSIGN.partition(':'); assert KIND in ('all', 'none', 'veh', 'swb', 'nsw'), ASSIGN
 if KIND == 'veh':
     P = float(PAR); WS = None
-elif KIND == 'swb':
+elif KIND in ('swb', 'nsw'):
     WS, P = (float(x) for x in PAR.split(':'))
 else:
     P = 1.0 if KIND == 'all' else 0.0; WS = None
@@ -40,6 +42,10 @@ def treated_veh(seed, v):
 
 def treated_swb(seed, tid, w):
     return U('swb', seed, tid, int(w)) < P
+
+
+def treated_nsw(seed, w):
+    return U('nsw', seed, int(w)) < P
 
 
 _gnt = CE.ls.vehicle.getNextTLS
@@ -64,8 +70,10 @@ def gate(inner):
             ok = False
         elif KIND == 'veh':
             ok = treated_veh(ST['seed'], ST['cur'])
-        else:
+        elif KIND == 'swb':
             ok = treated_swb(ST['seed'], tid, CE.ls.simulation.getTime() // WS)
+        else:
+            ok = treated_nsw(ST['seed'], CE.ls.simulation.getTime() // WS)
         if ok:
             return s
         ST['withheld'] += 1; return dict(ttg=0.0, ttr=0.0, valid=False, source='w22-control')
@@ -130,7 +138,11 @@ TI = {}
 
 
 def read_tripinfo(path, agents=None):
-    rows = _rt(path) if agents is None else _rt(path, agents); TI['rows'] = rows; return rows      # greens still open at the end are not counted
+    rows = _rt(path) if agents is None else _rt(path, agents); TI['rows'] = rows      # greens still open at the end are not counted
+    if KIND == 'nsw':
+        import sumolib
+        TI['dep'] = {x.id: float(x.depart) for x in sumolib.xml.parse(str(path), 'tripinfo')}
+    return rows
 
 
 E4.read_tripinfo = read_tripinfo
@@ -154,9 +166,17 @@ def run(a, seed, end):
     m = lambda xs, k: float(np.nanmean([x[k] for x in xs])) if xs else float('nan')  # noqa: E731
     out.update(w22_assign=ASSIGN, w22=dict(n_T=len(T), n_C=len(C), tl_T=m(T, 'timeloss'), tl_C=m(C, 'timeloss'), fuel_T=m(T, 'fuel'), fuel_C=m(C, 'fuel'),
                                            queries=ST['q'], withheld=ST['withheld'], p=P, W=WS))
+    if KIND == 'nsw':
+        NB = float(os.environ.get('W22_NB', 120.0)); dep = TI.get('dep', {}); g = {0: [], 1: []}
+        for r in ag:
+            d = dep.get(r['id']); w = int(d // WS) if d is not None else None
+            if d is not None and d - w * WS >= NB:
+                g[int(treated_nsw(seed, w))].append(r)
+        out['w22']['nsw'] = dict(burn=NB, n_T=len(g[1]), n_C=len(g[0]), tl_T=m(g[1], 'timeloss'), tl_C=m(g[0], 'timeloss'), fuel_T=m(g[1], 'fuel'), fuel_C=m(g[0], 'fuel'))
     if PROBE:
         out['w22_win'] = dict(W=WP, burn=BURN, rows=[[tid, w, r[0], r[1], r[2], r[3], len(r[4]), len(r[5]),
-                                                      int(treated_swb(seed, tid, w)) if KIND == 'swb' else -1] for (tid, w), r in sorted(W.items())])
+                                                      int(treated_swb(seed, tid, w)) if KIND == 'swb' else (int(treated_nsw(seed, w)) if KIND == 'nsw' else -1)]
+                                                     for (tid, w), r in sorted(W.items())])
     return out
 
 

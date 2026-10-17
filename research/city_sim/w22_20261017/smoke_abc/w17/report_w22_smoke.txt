@@ -1,0 +1,9 @@
+== W22: owner-side identification (SWB) and per-vehicle A/B bias (MIX); families ['RMP']; fleets [2213]; days [1420]
+KW22-3 MIX treated share 0.450, runs with no withheld query 0; SWB treated window share 0.594 -> FAIL
+-- RMP (lights t94-t94)
+  D1 tau (treated - control windows, mean green s): +0.627 [+0.627, +0.627], Fisher one-sided p = 0.4263 (alpha 0.0167) -> not detected
+     ground truth SV - R mean green: +6.310 [+6.310, +6.310] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +20.130 [+20.130, +20.130] s/veh; GTE = SV - R: +17.437 [+17.437, +17.437]
+     bias = DM - GTE: +2.693 [+2.693, +2.693] -> the A/B test OVERSTATES the harm
+     spillover on control vehicles TL_C - R: -6.484 [-6.484, -6.484]; treated TL_T - SV: -3.791 [-3.791, -3.791]
+(smoke: truncated runs against full-length ground-truth rows; numbers meaningless, pipeline check only)
