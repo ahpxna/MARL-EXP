@@ -183,3 +183,47 @@ The signal's inputs, rewards and programs are not used.
   - "RWV: no bias shown at any p".
 - **Failed:** "NSW: no bias shown for any family", for RMP: bias −1.85 [−3.14, −0.63]. It held for AH and RWV.
 - **Not anticipated:** AH overstates at every share, +1.25 to +1.59.
+
+## Correction to the W22-A result note and C-257 (17/10/2026 12:4x; ledger C-259), found before any new run
+
+**The finding "τ shrinks as the forgone share falls … carry-over" is withdrawn as stated.** Re-analysis of the existing W22-A rows (no new run) shows the shrinkage is mostly an estimator artefact, a length-biased ratio.
+
+- The registered τ pools green durations per signal-day: sum of durations over sum of counts, i.e. weighted by the number of greens.
+- At p 0.95 a signal-day has on average 0.58 control windows. Most signal-days are dropped. Where they are kept, one control window (its own mean) is compared with the pooled, green-count-weighted mean of about 11 treated windows.
+- Within a window of fixed length, long greens mean few greens. So the green-weighted mean is below the window-weighted mean (Chebyshev's sum inequality), which biases τ downward when controls are rare.
+- With a window-weighted per-day estimator (E2), or pooling each signal over the 10 days (E3, E4), τ is nearly flat in p, e.g. RMP 3.93 / 4.08 / 3.87 (E4). RWV's −0.43 at p 0.95 becomes −0.10 to −0.15.
+- A residual shrinkage remains for RDQ (E4 2.28 → 1.79) and AH (1.57 → 1.42) at p 0.95. Its cause is not identified.
+
+The W22-A decisions at p 0.95, including the wrong ones, used the biased estimator. A post-hoc re-analysis with E2 is reported separately and labelled post hoc; the registered table is kept.
+
+## Amendment W22-D (17/10/2026 12:4x, before any W22-D run): longer, alternating network switchbacks for MPLight
+
+**User (17/10):** "làm cả 3 hướng tiếp theo đi"; the first is the network switchback with longer windows and burn-in.
+
+**Seen (C-258):** with 600-s Bernoulli windows the NSW estimate understated MPLight's global effect (−1.85 [−3.14, −0.63]) but not AH's or RWV's.
+
+**Arms** (new wrapper kind `nswa:W`, alternating design):
+- All fleet vehicles use SPaT in window w = ⌊t/W⌋ iff (w + b) is even, with b = 1[u('nswa', day) < 0.5]. Every day therefore has both kinds of window.
+- **NSWa900:** W 900 s, burn-in 225 s.
+- **NSWa1200:** W 1200 s, burn-in 300 s.
+- Estimator as NSW: fleet time loss of trips departing ≥ the burn-in into a treated window, minus control windows.
+
+**Panel:** families RMP, AH, RWV; fleets s1413, s1513; days 1400–1409; grid4 W20 setting.
+
+**Checks:** KW22-0 again with the edited wrapper (all / none = SV / R; MIX row = W22's).
+
+**Reading:** bias = estimate − GTE (SV − R agent time loss), crossed bootstrap 95 %.
+
+**Predictions:**
+- RMP's bias shrinks as W grows, and the NSWa1200 interval contains 0;
+- AH and RWV show no bias in either arm.
+
+**Size:** 3 × 5 × 2 × 2 = 60 jobs × 10 days, about 15 min.
+
+## Result note W22-D (17/10/2026 12:55; ledger C-260)
+
+- **Failed:**
+  - "RMP's bias shrinks as W grows and the NSWa1200 interval contains 0": −2.71 at 900 s, −1.96 at 1200 s.
+  - "AH no bias in either arm" fails at 1200 s: −0.71 [−1.38, −0.09].
+- **Held:** RWV.
+- **Not the design:** the alternating start bit was balanced 5 / 5 over the days.
