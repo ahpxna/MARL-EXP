@@ -175,3 +175,11 @@ The signal's inputs, rewards and programs are not used.
 - Not anticipated:
   - τ shrinks as the forgone share falls, through carry-over into rare control windows;
   - wrong decisions appear at p 0.95, all at n = 2.
+
+## Result note W22-B (17/10/2026 03:55; ledger C-258)
+
+- **Held:**
+  - "RMP: DM(p) < GTE", shown for p ≤ 0.7 with the gap largest at 0.1. At p 0.9 the interval contains 0.
+  - "RWV: no bias shown at any p".
+- **Failed:** "NSW: no bias shown for any family", for RMP: bias −1.85 [−3.14, −0.63]. It held for AH and RWV.
+- **Not anticipated:** AH overstates at every share, +1.25 to +1.59.
