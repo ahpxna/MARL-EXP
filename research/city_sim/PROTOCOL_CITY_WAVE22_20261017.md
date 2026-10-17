@@ -158,3 +158,20 @@ The signal's inputs, rewards and programs are not used.
   - D1: RMP detected; AH detected with a smaller τ.
   - D2: RMP bias < 0.
   - W21-A greens: MPLight +22.7 %, AH +4.3 %, wave −0.1 %.
+
+## Result note W22-A / W22-C (17/10/2026 02:50; ledger C-257). W22-B incomplete (battery guard)
+
+**W22-C:**
+- Held: "RMP detected", "AH detected with a smaller τ", "RMP bias < 0".
+- The switchback underestimates the global green change in this world.
+
+**W22-A:**
+- Held:
+  - "no wrong decision at p 0.5";
+  - "RWV not exposed within 10 days";
+  - "days grow as p → 0.95";
+  - "cost grows with the forgone share".
+- Failed: "every exposed-family unit decided within 3 days". The maximum was 7 days, and two SRL units were correctly "not exposed" by their own truth.
+- Not anticipated:
+  - τ shrinks as the forgone share falls, through carry-over into rare control windows;
+  - wrong decisions appear at p 0.95, all at n = 2.
