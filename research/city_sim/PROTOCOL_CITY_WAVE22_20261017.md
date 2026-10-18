@@ -267,3 +267,89 @@ The W22-A decisions at p 0.95, including the wrong ones, used the biased estimat
 - **E3:** held for RMP. For AH the criterion was met but the interval is uninformative.
 - **E4:** held for SRL and RDQ.
 - The two shares were run on the same simulated days.
+
+## Correction to the W22-E reading (18/10/2026 07:37; ledger C-263), found before any new run
+
+The W22-E post-hoc reading "W17 has a network-share component γ ≈ 1.0 / 0.4 s that grid4 lacks" compared the switchback's per-signal late-green window-weighted τ with the truth's pooled all-green metric. With one metric throughout:
+- (SWB treated − R) + (SWB control − R) reproduces SV − R in all six cells.
+- γ is present in both worlds: MPLight 0.50 (grid4) / 0.78 s (W17); AH 0.26 / 0.18 s.
+- The W17 shortfall of the registered τ is mostly that estimator. Its burn-in removes long greens just after a switch into a treated window.
+
+E3's result stands as registered: the NSW green contrast recovered MPLight's change. Its motivation is restated: NSW captures γ in either world.
+
+## Amendment W22-F (18/10/2026 07:38, before any W22-F run): four follow-ups
+
+**User (18/10):** "làm 1234, 4 làm trên mạng lớn hơn đi". The four follow-ups:
+1. a same-day two-share design;
+2. the sign rule and the two-share extrapolation on the other W19 families;
+3. a direct probe of the mechanism;
+4. area randomisation on a larger network.
+
+The only substantially larger network with trained families, fleets and a service is the full Midtown map (511 learned signals; MT-E setting as in W21-B). spider (18) and rand3 (21) are barely larger than grid4.
+
+**Battery guard and identity checks:**
+- The battery guard is as before.
+- The edited wrapper must reproduce SV / R and W22's MIX row on grid4 (KW22-0) and SV / R in W17 (KW22-C).
+- On Midtown, the all / none truth runs must reproduce W21-B's MTW_SV / MTW_R rows bit for bit on the row fields (KW22-F4).
+
+### F1: the same-day two-share design (S2D), grid4 RMP / AH / RWV / SRL / RDQ and W17 RMP / AH / RWV; fleets as W22-B / W22-C; 10 days
+- **Assignment:** a fleet vehicle departing before 1800 s uses SPaT with probability p_a, one departing later with probability p_b. (p_a, p_b) = (0.3, 0.7) on even days and (0.7, 0.3) on odd days (5 / 5). Wrapper kind `vt`; vehicle hash as MIX.
+- **Measured trips:**
+  - departures in [900, 1800) for the first share;
+  - departures in [2700, 3600) for the second share.
+  - The 900 s after the start and after the switch are burn-in.
+- **Estimator:** per day the two-share formula (0.3, 0.7) on the treated / control fleet means of the two measured windows, averaged over days.
+- **Truth:** SV − R agent time loss over the same two departure windows, from the rows' 900-s window sums.
+- **Predictions:**
+  - **F1a:** bias interval contains 0 in every cell.
+  - **F1b:** the error sd over random half-splits of the days is below the unpaired emulation's (C-262: 0.79–1.05 s/veh per unit). Computed as the unit-level sd of the 10-day mean (per-day sd / √10), against C-262's sd for the 5 + 5-day unpaired design.
+
+### F2: the other W19 families (grid4; B1H, B2H, AD, B1D, B2D, S05, S2, R1, R100; t39–t83, 5 lights each); fleets s1413, s1513; days 1400–1409
+- **Arms:** MIX at p 0.3 / 0.5 / 0.7.
+- **H (humans' SV − R) from existing rows:** B1H −0.12, B2H −0.31, AD −0.84, B1D −0.06, B2D −0.06, S05 −1.18, S2 −1.17, R1 −1.23, R100 −1.11.
+- **Predictions:**
+  - **F2a (sign):** naive A/B bias (p 0.5) > 0, interval excluding 0, for AD, S05, S2, R1 and R100 (|H| ≥ 0.8). No bias shown for B1H, B1D and B2D (|H| < 0.15). No prediction for B2H.
+  - **F2b (size):** for the five strong families, bias / (−H) lies in [0.5, 3.0]. Observed so far 0.75–2.9.
+  - **F2c:** two-share (0.3, 0.7) bias interval contains 0 for all nine.
+  - **F2d:** control spillover C(p) − R has the sign of H at p 0.5 and 0.7 for the five strong families.
+
+### F3: the mechanism behind γ and the W17 switch transient (grid4 and W17; RMP and AH; fleets as above; 4 days)
+- **Arms:** SWB (300 s, p 0.5), all, and none, each with an extended read-only probe (`W22_PROBE=2`):
+  - greens per (signal, window, 60-s offset bin);
+  - every approach passage (vehicle × signal) with: halted on the approach (speed < 0.1), the signal's window assignment at entry, the upstream signal's assignment at entry (−1 if none), and the vehicle class;
+  - vehicles in the network per window.
+- **Predictions:**
+  - **F3a (transient):** in W17 MPLight, greens starting in the first 60 s of a treated window are longer than the treated window's later greens. That excess exceeds grid4's.
+  - **F3b (mechanism of γ):** in SWB control windows, the halting share of fleet and human vehicles approaching a signal is below the none run's at the same signals, for MPLight in both worlds. The reduction is larger when the upstream signal was treated at entry than when it was not.
+  - **F3c (descriptive):** vehicles in the network: SWB lies between none and all.
+
+### F4: area randomisation on the full Midtown map (MT-E setting; families AH t34–38, the threshold loop present per W21-K; and B2D t59–63, no stop-thresholded input); fleets s1413, s1513; days 0–4
+- **Arms:** all, none (truth and the identity check KW22-F4), AREA, and MIX p 0.5.
+  - AREA (`area:4:2`): the 511 + 56 signals are split into four strips of equal count along their principal axis, i.e. Manhattan's length. Each day two strips are treated, chosen by hash, and fleet vehicles use the SPaT of signals in treated strips only.
+- **Outcome:** per-approach-passage delay of fleet vehicles: time-loss seconds on a signal's controlled incoming lanes per passage, by signal (probe `W22_PROBE=3`).
+- **Truth:** all − none per passage, averaged over signals.
+- **Estimators:**
+  - AREA: two-way fixed effects (strip, day) on strip-day mean per-passage delay, with a treated indicator, and a buffered variant excluding signals in the outer 10 % of each strip along the axis (descriptive);
+  - MIX: treated − control fleet vehicles' per-passage delay.
+- **Predictions:**
+  - **F4a:** MIX bias interval excludes 0 for AH, and contains 0 for B2D, whose Midtown cost is the GLOSA rule's own (W21-L0).
+  - **F4b:** the AREA bias interval contains 0 for both families, and |AREA bias| < |MIX bias| for AH.
+
+**Size:**
+- F1 80 jobs × 10 days;
+- F2 270 × 10;
+- F3 120 × 4;
+- F4 80 Midtown jobs × 5 days.
+
+About 3 h with 9 lanes on AC power. Smoke first, for every kind.
+
+## Result note W22-F (18/10/2026 11:57; ledger C-264, audit C-265)
+
+- **F1:** F1a held 8 / 8 (S2D bias intervals all contain 0). F1b failed 8 / 8 (unit sd 0.96–1.53 against the unpaired 0.79–1.05).
+- **F2:** F2a held 8 / 8, F2b 5 / 5 (bias / (−H) 1.08–1.38), F2c 9 / 9, F2d 5 / 5.
+- **F3:** F3a held. F3b failed: MPLight's control-window halting equals the none run's. F3c (descriptive): none < SWB < all in all four cells.
+- **F4:** F4a held 2 / 2. F4b held for AH and failed for B2D (+0.11 [+0.00, +0.22]).
+- **Audit (post hoc, C-265):**
+  - KW22-F2: 18 / 18 identical, so the W19 truth rows of the F2 families are reproduced by the W22-F chain.
+  - F1b's failure is not an artefact of the order term or of the windowed truth.
+  - The F4 unit bootstrap omits the shared daily strip draw. The design sd of the AREA cell mean is 0.12–0.23 s per passage, so neither F4b verdict is informative at 4 strips × 5 days.
