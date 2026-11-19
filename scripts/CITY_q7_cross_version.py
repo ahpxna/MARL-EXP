@@ -15,6 +15,7 @@ from torch import nn
 
 ROOT = Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))
 from scripts.CITY_env import NetInfo, LightRL, CarRL, run_episode, NA_CAR  # noqa: E402
+from scripts.cig_device import on_learner, to_dev  # noqa: E402
 
 NET_S = str(ROOT / 'research/city_sim/net/grid4.net.xml'); NET_A = str(ROOT / 'research/city_sim/net/grid4_actuated.net.xml')
 ROU = str(ROOT / 'research/city_sim/demand/grid4/rou_s{}.xml'); TRAIN_SEEDS = list(range(8)); EVAL_SEEDS = [100, 101, 102, 103, 104]
@@ -48,15 +49,16 @@ class DQN:
         if self.n < bs:
             return float('nan')
         tot = 0.0
-        for _ in range(steps):
-            j = self.rng.integers(0, self.n, bs); S, A, R, S2, D = (torch.as_tensor(x[j]) for x in (self.S, self.A, self.R, self.S2, self.D))
-            with torch.no_grad():
-                a2 = self.net(S2).argmax(1, keepdim=True); y = R + self.gamma * (1 - D) * self.tgt(S2).gather(1, a2)[:, 0]
-            q = self.net(S).gather(1, A[:, None])[:, 0]; loss = nn.functional.smooth_l1_loss(q, y)
-            self.opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(self.net.parameters(), 5.0); self.opt.step(); tot += loss.item()
-            with torch.no_grad():
-                for p, pt in zip(self.net.parameters(), self.tgt.parameters()):
-                    pt.mul_(0.99).add_(0.01 * p)
+        with on_learner([self.net, self.tgt], [self.opt]):
+            for _ in range(steps):
+                j = self.rng.integers(0, self.n, bs); S, A, R, S2, D = to_dev(*(x[j] for x in (self.S, self.A, self.R, self.S2, self.D)))
+                with torch.no_grad():
+                    a2 = self.net(S2).argmax(1, keepdim=True); y = R + self.gamma * (1 - D) * self.tgt(S2).gather(1, a2)[:, 0]
+                q = self.net(S).gather(1, A[:, None])[:, 0]; loss = nn.functional.smooth_l1_loss(q, y)
+                self.opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(self.net.parameters(), 5.0); self.opt.step(); tot += loss.item()
+                with torch.no_grad():
+                    for p, pt in zip(self.net.parameters(), self.tgt.parameters()):
+                        pt.mul_(0.99).add_(0.01 * p)
         return tot / steps
 
 

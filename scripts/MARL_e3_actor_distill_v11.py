@@ -87,6 +87,7 @@ from models.marl_comm_actor_quant import quantized
 from scripts.MARL_hetero_pilot_collect import N_DEC
 from scripts.MARL_e3_actor_train import Scenarios, TRAIN, SELECT
 import scripts.MARL_e3_actor_train_delivery_v7 as DV
+import scripts.cig_device as CD
 
 SOURCES = ['scripts/MARL_e3_actor_distill_v11.py', 'scripts/MARL_e3_actor_distill_v10.py', 'scripts/MARL_e3_actor_distill_v9.py', 'scripts/MARL_e3_actor_distill_v8.py', 'scripts/MARL_e3_actor_distill_v7.py', 'scripts/MARL_e3_actor_distill_v6.py', 'models/marl_relay_v2.py', 'scripts/MARL_e3_actor_distill_v5.py', 'scripts/MARL_e3_actor_distill_v4.py', 'models/marl_relay.py', 'models/marl_comm_actor_quant.py', 'scripts/MARL_e3_actor_distill_v3.py', 'scripts/MARL_e3_actor_distill_v2.py', 'scripts/MARL_e3_actor_distill.py', 'models/marl_comm_actor_variants.py', 'scripts/MARL_e3_actor_train_delivery_v7.py', 'models/marl_comm_actor.py', 'models/marl_comm_actor_set.py',
            'envs/external/cityflow_budgeted.py', 'envs/external/cityflow_hetero.py']
@@ -217,6 +218,7 @@ def main(a):
         start_it, best, attempt, t_off = S['it'] + 1, S['best'], S['attempt'] + 1, S['seconds']
         resumes = S['resumes'] + [dict(attempt=attempt, from_it=S['it'], time=time.ctime())]; cfg = S['config']
         print(f'RESUMED at iteration {S["it"]} (attempt {attempt}); every state restored', flush=True)
+    cfg['learner'] = CD.describe()
     (out / 'config.json').write_text(json.dumps(cfg, indent=1, default=str)); (out / 'schema.json').write_text(json.dumps(adapter.schema(), indent=1))
     log = open(out / 'log.jsonl', 'a'); t0 = time.perf_counter() - t_off; lossf = nn.CrossEntropyLoss()
     if resume:
@@ -231,13 +233,15 @@ def main(a):
         Y = torch.as_tensor(np.concatenate([np.stack([y for _, y in b]) for b in buf]), dtype=torch.long)
         Xf, Yf = X.reshape(-1, X.shape[-1]), Y.reshape(-1); Mf = mask.repeat(X.shape[0], 1)
         idx = np.arange(len(Yf)); losses = []
-        for _ in range(a.epochs):
-            rng.shuffle(idx)
-            for mb in np.array_split(idx, max(1, len(idx) // a.minibatch)):
-                mb = torch.as_tensor(mb); loss = lossf(student(Xf[mb], Mf[mb]), Yf[mb])
-                opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(student.parameters(), 1.0); opt.step(); losses.append(loss.item())
-        with torch.no_grad():
-            agree = float((student(Xf, Mf).argmax(-1) == Yf).float().mean())
+        with CD.on_learner([student], [opt]):                       # gradient phase on CIG_DEVICE; rollouts above stay on CPU
+            Xf, Yf, Mf = CD.to_dev(Xf, Yf, Mf)
+            for _ in range(a.epochs):
+                rng.shuffle(idx)
+                for mb in np.array_split(idx, max(1, len(idx) // a.minibatch)):
+                    mb = CD.to_dev(mb); loss = lossf(student(Xf[mb], Mf[mb]), Yf[mb])
+                    opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(student.parameters(), 1.0); opt.step(); losses.append(loss.item())
+            with torch.no_grad():
+                agree = float((student(Xf, Mf).argmax(-1) == Yf).float().mean())
         rec = dict(it=it, beta=beta, loss=float(np.mean(losses)), agree=agree, n=int(len(Yf)), seconds=time.perf_counter() - t0, attempt=attempt)
         if it % a.eval_every == 0 or it == a.iters:
             sel = float(np.mean([episode(sc, s, h, adapter, t_adapter, student, teacher, mask, 0.0, rng, False)[0] for s, h in SELECT]))

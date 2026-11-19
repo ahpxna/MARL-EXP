@@ -42,15 +42,16 @@ class DQNM(Q7.DQN):
         if self.n < bs:
             return float('nan')
         tot = 0.0; pairs = [(p, pt) for p, pt in zip(self.net.parameters(), self.tgt.parameters()) if p.requires_grad]
-        for _ in range(steps):
-            j = self.rng.integers(0, self.n, bs); S, A, R, S2, D = (torch.as_tensor(x[j]) for x in (self.S, self.A, self.R, self.S2, self.D))
-            with torch.no_grad():
-                a2 = self.net(S2).argmax(1, keepdim=True); y = R + self.gamma * (1 - D) * self.tgt(S2).gather(1, a2)[:, 0]
-            q = self.net(S).gather(1, A[:, None])[:, 0]; loss = nn.functional.smooth_l1_loss(q, y)
-            self.opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_([p for p, _ in pairs], 5.0); self.opt.step(); tot += loss.item()
-            with torch.no_grad():
-                for p, pt in pairs:
-                    pt.mul_(0.99).add_(0.01 * p)
+        with Q7.on_learner([self.net, self.tgt], [self.opt]):
+            for _ in range(steps):
+                j = self.rng.integers(0, self.n, bs); S, A, R, S2, D = Q7.to_dev(*(x[j] for x in (self.S, self.A, self.R, self.S2, self.D)))
+                with torch.no_grad():
+                    a2 = self.net(S2).argmax(1, keepdim=True); y = R + self.gamma * (1 - D) * self.tgt(S2).gather(1, a2)[:, 0]
+                q = self.net(S).gather(1, A[:, None])[:, 0]; loss = nn.functional.smooth_l1_loss(q, y)
+                self.opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_([p for p, _ in pairs], 5.0); self.opt.step(); tot += loss.item()
+                with torch.no_grad():
+                    for p, pt in pairs:
+                        pt.mul_(0.99).add_(0.01 * p)
         return tot / steps
 
 

@@ -22,6 +22,7 @@ from torch import nn
 import scripts.CITY_env as CE
 from scripts.CITY_env import ZONE, _stable_u
 from scripts.CITY_spat_feature import spat
+from scripts.cig_device import on_learner, to_dev
 
 INVALID = -1073741824.0; LO, HI = -3.0, 2.6; OBS_DIM = 13; MG_PER_L = 745000.0; EXP_CAP = 30.0; GAMMA, LAM = 0.99, 0.95
 MU = dict(m1=-100.0, m2=-5.0, m3=5.0, m4=-5.0, m5=5.0, m6=-10.0, m7=-7.0, m8=-3.0, m9=1000.0, m10=4.0, m11=-10.0, delta=0.01)
@@ -261,15 +262,16 @@ def gae(segments, net, gamma=GAMMA, lam=LAM, scale=REWARD_SCALE):
 
 
 def ppo_update(net, opt, batch, epochs=4, mb=4096, clip=0.2, vcoef=0.5, ent=0.0, gclip=0.5, rng=None):
-    O, U, LP0, A, R = (torch.as_tensor(x) for x in batch); A = (A - A.mean()) / (A.std() + 1e-8); n = len(O); out = []
+    O, U, LP0, A, R = to_dev(*batch); A = (A - A.mean()) / (A.std() + 1e-8); n = len(O); out = []
     rng = rng or np.random.default_rng(0)
-    for _ in range(epochs):
-        idx = rng.permutation(n)
-        for s in range(0, n, mb):
-            j = torch.as_tensor(idx[s:s + mb]); d = net.dist(O[j]); lp = d.log_prob(U[j]); ratio = torch.exp(lp - LP0[j])
-            pl = -torch.min(ratio * A[j], torch.clamp(ratio, 1 - clip, 1 + clip) * A[j]).mean(); vl = ((net.value(O[j]) - R[j]) ** 2).mean()
-            loss = pl + vcoef * vl - ent * d.entropy().mean(); opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(net.parameters(), gclip); opt.step()
-            out.append((pl.item(), vl.item(), (ratio - 1).abs().mean().item()))
+    with on_learner([net], [opt]):
+        for _ in range(epochs):
+            idx = rng.permutation(n)
+            for s in range(0, n, mb):
+                j = to_dev(idx[s:s + mb]); d = net.dist(O[j]); lp = d.log_prob(U[j]); ratio = torch.exp(lp - LP0[j])
+                pl = -torch.min(ratio * A[j], torch.clamp(ratio, 1 - clip, 1 + clip) * A[j]).mean(); vl = ((net.value(O[j]) - R[j]) ** 2).mean()
+                loss = pl + vcoef * vl - ent * d.entropy().mean(); opt.zero_grad(); loss.backward(); nn.utils.clip_grad_norm_(net.parameters(), gclip); opt.step()
+                out.append((pl.item(), vl.item(), (ratio - 1).abs().mean().item()))
     return np.mean(out, axis=0) if out else (float('nan'),) * 3
 
 
