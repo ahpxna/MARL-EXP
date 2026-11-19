@@ -1,0 +1,80 @@
+W22-ABC start Sat Oct 17 13:33:41 EDT 2026; out research/city_sim/w22_20261017;  -InternalBattery-0 (id=23724131)	100%; charged; 0:00 remain
+sources: scripts/CITY_w22_assign.py:4c3bf07ae521 scripts/CITY_w22_report.py:ff05b3013059 scripts/CITY_w22a_report.py:9efd5d3c1936 scripts/CITY_w22b_report.py:2e5e654845e8 scripts/CITY_eval_n4.py:f68333a82f03 scripts/CITY_w20_run.py:4bfd1e0baca9 scripts/CITY_w9_run.py:c0253f1fd09e scripts/CITY_w13_modes.py:04c2d0ea0e1f scripts/CITY_w17_world.py:2c8731bb0872 
+IDENTICAL K0_all_t94_s1413.json vs SV_t94_s1413.json
+IDENTICAL K0_none_t94_s1413.json vs R_t94_s1413.json
+IDENTICAL K0_mix_t94_s1413.json vs MIX_t94_s1413.json
+KW22-0 PASS
+IDENTICAL KC_all_t94_s2213.json vs SV_t94_s2213.json
+IDENTICAL KC_none_t94_s2213.json vs R_t94_s2213.json
+KW22-C1/C2 PASS
+W22-C jobs:       60
+KW17-0 lines:       60 (jobs       60)
+== W22: owner-side identification (SWB) and per-vehicle A/B bias (MIX); families ['RMP', 'AH', 'RWV']; fleets [2213, 2313]; days [1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429]
+KW22-3 MIX treated share 0.506, runs with no withheld query 0; SWB treated window share 0.509 -> PASS
+-- RMP (lights t94-t98)
+  D1 tau (treated - control windows, mean green s): +3.203 [+1.965, +4.735], Fisher one-sided p = 0.0005 (alpha 0.0167) -> the owner DETECTS the response
+     ground truth SV - R mean green: +4.438 [+3.073, +5.963] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +12.765 [+9.686, +15.986] s/veh; GTE = SV - R: +14.047 [+11.106, +17.240]
+     bias = DM - GTE: -1.282 [-2.380, -0.244] -> the A/B test UNDERSTATES the harm
+     spillover on control vehicles TL_C - R: +0.561 [+0.094, +1.040]; treated TL_T - SV: -0.721 [-1.374, -0.049]
+-- AH (lights t34-t38)
+  D1 tau (treated - control windows, mean green s): +0.158 [-0.330, +0.615], Fisher one-sided p = 0.0035 (alpha 0.0167) -> the owner DETECTS the response
+     ground truth SV - R mean green: +0.656 [+0.384, +0.940] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +2.484 [+1.763, +3.268] s/veh; GTE = SV - R: +1.811 [+1.426, +2.242]
+     bias = DM - GTE: +0.673 [+0.093, +1.208] -> the A/B test OVERSTATES the harm
+     spillover on control vehicles TL_C - R: -0.329 [-0.667, +0.038]; treated TL_T - SV: +0.344 [+0.066, +0.643]
+-- RWV (lights t99-t103)
+  D1 tau (treated - control windows, mean green s): -0.281 [-0.525, -0.063], Fisher one-sided p = 1.0000 (alpha 0.0167) -> not detected
+     ground truth SV - R mean green: -0.016 [-0.055, +0.026] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +0.866 [+0.349, +1.345] s/veh; GTE = SV - R: +0.919 [+0.689, +1.136]
+     bias = DM - GTE: -0.053 [-0.567, +0.475] -> no bias shown
+     spillover on control vehicles TL_C - R: +0.020 [-0.298, +0.353]; treated TL_T - SV: -0.033 [-0.314, +0.291]
+W22-C done Sat Oct 17 13:33:54 EDT 2026
+W22-A jobs:      150
+== W22-A: exposure decided by size (delta 0.5 s) from the owner switchback; p levels [50, 80, 95]; fleets [1413, 1513]; days [1410, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419]
+-- RMP (t94-t98)
+  p 0.50 (forgo 0.50): tau +3.63 s (truth +4.22); t-rule: exposed 10, not 0, undecided 0, WRONG 0, days median 3.0 max 4 | CS: exposed 10, not 0, undecided 0, wrong 0, days median 2.0 | cost vs SV: fuel +2.31 %, agent TL -7.13 s/veh, fuel benefit kept 0.48
+  p 0.80 (forgo 0.20): tau +3.35 s (truth +4.22); t-rule: exposed 10, not 0, undecided 0, WRONG 0, days median 3.0 max 5 | CS: exposed 10, not 0, undecided 0, wrong 0, days median 2.0 | cost vs SV: fuel +0.91 %, agent TL -2.67 s/veh, fuel benefit kept 0.80
+  p 0.95 (forgo 0.05): tau +2.63 s (truth +4.22); t-rule: exposed 8, not 0, undecided 2, WRONG 0, days median 6.5 max 9 | CS: exposed 7, not 1, undecided 2, wrong 1, days median 7.0 | cost vs SV: fuel +0.26 %, agent TL -0.61 s/veh, fuel benefit kept 0.94
+-- SRL (t84-t88)
+  p 0.50 (forgo 0.50): tau +2.06 s (truth +2.13); t-rule: exposed 8, not 2, undecided 0, WRONG 0, days median 3.0 max 4 | CS: exposed 8, not 2, undecided 0, wrong 0, days median 2.0 | cost vs SV: fuel +3.61 %, agent TL -2.38 s/veh, fuel benefit kept 0.47
+  p 0.80 (forgo 0.20): tau +1.70 s (truth +2.13); t-rule: exposed 8, not 2, undecided 0, WRONG 0, days median 3.5 max 8 | CS: exposed 7, not 2, undecided 1, wrong 0, days median 2.0 | cost vs SV: fuel +1.38 %, agent TL -0.92 s/veh, fuel benefit kept 0.80
+  p 0.95 (forgo 0.05): tau +1.26 s (truth +2.13); t-rule: exposed 3, not 2, undecided 5, WRONG 0, days median 6.0 max 8 | CS: exposed 2, not 2, undecided 6, wrong 0, days median 4.5 | cost vs SV: fuel +0.34 %, agent TL -0.25 s/veh, fuel benefit kept 0.95
+-- RDQ (t89-t93)
+  p 0.50 (forgo 0.50): tau +2.07 s (truth +2.15); t-rule: exposed 10, not 0, undecided 0, WRONG 0, days median 3.0 max 3 | CS: exposed 10, not 0, undecided 0, wrong 0, days median 2.0 | cost vs SV: fuel +2.74 %, agent TL -1.29 s/veh, fuel benefit kept 0.50
+  p 0.80 (forgo 0.20): tau +1.67 s (truth +2.15); t-rule: exposed 10, not 0, undecided 0, WRONG 0, days median 6.5 max 10 | CS: exposed 7, not 0, undecided 3, wrong 0, days median 5.0 | cost vs SV: fuel +1.08 %, agent TL -0.52 s/veh, fuel benefit kept 0.81
+  p 0.95 (forgo 0.05): tau +0.98 s (truth +2.15); t-rule: exposed 0, not 1, undecided 9, WRONG 1, days median 2.0 max 2 | CS: exposed 0, not 2, undecided 8, wrong 2, days median 2.0 | cost vs SV: fuel +0.27 %, agent TL -0.15 s/veh, fuel benefit kept 0.95
+-- AH (t34-t38)
+  p 0.50 (forgo 0.50): tau +1.46 s (truth +1.52); t-rule: exposed 10, not 0, undecided 0, WRONG 0, days median 3.0 max 7 | CS: exposed 10, not 0, undecided 0, wrong 0, days median 2.0 | cost vs SV: fuel +3.03 %, agent TL -0.75 s/veh, fuel benefit kept 0.48
+  p 0.80 (forgo 0.20): tau +1.25 s (truth +1.52); t-rule: exposed 7, not 0, undecided 3, WRONG 0, days median 6.0 max 8 | CS: exposed 5, not 0, undecided 5, wrong 0, days median 4.0 | cost vs SV: fuel +1.22 %, agent TL -0.21 s/veh, fuel benefit kept 0.79
+  p 0.95 (forgo 0.05): tau +0.57 s (truth +1.52); t-rule: exposed 0, not 0, undecided 10, WRONG 0, days median None max None | CS: exposed 0, not 1, undecided 9, wrong 1, days median 2.0 | cost vs SV: fuel +0.25 %, agent TL -0.13 s/veh, fuel benefit kept 0.96
+-- RWV (t99-t103)
+  p 0.50 (forgo 0.50): tau +0.03 s (truth +0.03); t-rule: exposed 0, not 10, undecided 0, WRONG 0, days median 4.0 max 6 | CS: exposed 0, not 10, undecided 0, wrong 0, days median 3.5 | cost vs SV: fuel +4.31 %, agent TL +0.50 s/veh, fuel benefit kept 0.48
+  p 0.80 (forgo 0.20): tau -0.15 s (truth +0.03); t-rule: exposed 0, not 10, undecided 0, WRONG 0, days median 4.0 max 7 | CS: exposed 0, not 10, undecided 0, wrong 0, days median 3.0 | cost vs SV: fuel +1.59 %, agent TL +0.16 s/veh, fuel benefit kept 0.81
+  p 0.95 (forgo 0.05): tau -0.43 s (truth +0.03); t-rule: exposed 0, not 10, undecided 0, WRONG 0, days median 5.0 max 8 | CS: exposed 0, not 10, undecided 0, wrong 0, days median 3.0 | cost vs SV: fuel +0.42 %, agent TL +0.01 s/veh, fuel benefit kept 0.95
+W22-A done Sat Oct 17 13:33:55 EDT 2026
+W22-B jobs:      150
+== W22-B: per-vehicle A/B bias by treated share [10, 30, 70, 90] (+ 50 from W22) and the network-wide switchback; fleets [1413, 1513]; days [1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1408, 1409]
+-- RMP (t94-t98); GTE = SV - R agent TL +14.05 [+9.59, +18.94] s/veh
+  MIX p 0.1: DM +11.31 [+7.29, +15.50]; bias -2.74 [-4.60, -0.76] -> UNDERSTATES; control TL_C - R +0.09 [-0.10, +0.31]; treated TL_T - SV -2.65 [-4.35, -0.72]
+  MIX p 0.3: DM +11.71 [+7.78, +16.19]; bias -2.34 [-3.63, -1.12] -> UNDERSTATES; control TL_C - R +0.28 [+0.05, +0.52]; treated TL_T - SV -2.05 [-3.23, -0.93]
+  MIX p 0.5: DM +12.07 [+8.15, +16.23]; bias -1.97 [-3.28, -0.62] -> UNDERSTATES; control TL_C - R +0.63 [+0.15, +1.09]; treated TL_T - SV -1.34 [-2.31, -0.41]
+  MIX p 0.7: DM +12.77 [+8.59, +17.35]; bias -1.28 [-2.23, -0.24] -> UNDERSTATES; control TL_C - R +0.66 [+0.11, +1.18]; treated TL_T - SV -0.61 [-1.19, -0.00]
+  MIX p 0.9: DM +13.39 [+8.91, +18.34]; bias -0.65 [-1.67, +0.44] -> no bias shown; control TL_C - R +0.45 [-0.52, +1.32]; treated TL_T - SV -0.20 [-0.59, +0.13]
+  NSW (600 s, burn-in 120 s): estimate +12.20 [+8.20, +16.75]; bias -1.85 [-3.14, -0.63] -> UNDERSTATES
+-- AH (t34-t38); GTE = SV - R agent TL +1.57 [+0.77, +2.57] s/veh
+  MIX p 0.1: DM +3.02 [+1.63, +4.42]; bias +1.46 [+0.62, +2.32] -> OVERSTATES; control TL_C - R -0.13 [-0.29, +0.03]; treated TL_T - SV +1.33 [+0.53, +2.21]
+  MIX p 0.3: DM +2.85 [+1.73, +4.05]; bias +1.29 [+0.75, +1.87] -> OVERSTATES; control TL_C - R -0.36 [-0.62, -0.15]; treated TL_T - SV +0.93 [+0.42, +1.45]
+  MIX p 0.5: DM +2.81 [+1.64, +4.01]; bias +1.25 [+0.68, +1.82] -> OVERSTATES; control TL_C - R -0.69 [-1.02, -0.38]; treated TL_T - SV +0.56 [+0.20, +0.93]
+  MIX p 0.7: DM +2.86 [+1.62, +4.15]; bias +1.29 [+0.69, +1.93] -> OVERSTATES; control TL_C - R -0.95 [-1.37, -0.47]; treated TL_T - SV +0.34 [+0.05, +0.63]
+  MIX p 0.9: DM +3.16 [+1.95, +4.30]; bias +1.59 [+0.88, +2.30] -> OVERSTATES; control TL_C - R -1.45 [-2.07, -0.79]; treated TL_T - SV +0.14 [-0.15, +0.36]
+  NSW (600 s, burn-in 120 s): estimate +1.23 [+0.29, +2.30]; bias -0.34 [-1.12, +0.46] -> no bias shown
+-- RWV (t99-t103); GTE = SV - R agent TL -0.96 [-1.20, -0.72] s/veh
+  MIX p 0.1: DM -0.72 [-1.26, -0.11]; bias +0.24 [-0.33, +0.81] -> no bias shown; control TL_C - R -0.07 [-0.25, +0.10]; treated TL_T - SV +0.17 [-0.30, +0.69]
+  MIX p 0.3: DM -0.85 [-1.35, -0.35]; bias +0.12 [-0.34, +0.57] -> no bias shown; control TL_C - R -0.07 [-0.32, +0.19]; treated TL_T - SV +0.05 [-0.24, +0.37]
+  MIX p 0.5: DM -0.90 [-1.30, -0.50]; bias +0.07 [-0.33, +0.47] -> no bias shown; control TL_C - R -0.11 [-0.37, +0.18]; treated TL_T - SV -0.04 [-0.34, +0.22]
+  MIX p 0.7: DM -0.70 [-1.22, -0.20]; bias +0.26 [-0.31, +0.83] -> no bias shown; control TL_C - R -0.23 [-0.68, +0.19]; treated TL_T - SV +0.03 [-0.19, +0.26]
+  MIX p 0.9: DM -0.18 [-1.08, +0.68]; bias +0.78 [-0.15, +1.74] -> no bias shown; control TL_C - R -0.75 [-1.50, -0.04]; treated TL_T - SV +0.03 [-0.21, +0.28]
+  NSW (600 s, burn-in 120 s): estimate -0.83 [-1.58, -0.05]; bias +0.14 [-0.66, +0.89] -> no bias shown
+W22-B done Sat Oct 17 13:34:00 EDT 2026
+W22-ABC end Sat Oct 17 13:34:00 EDT 2026;  -InternalBattery-0 (id=23724131)	100%; charged; 0:00 remain

@@ -1,0 +1,41 @@
+W22-F start Sun Oct 18 07:42:48 EDT 2026; out research/city_sim/w22_20261017/smoke_f;  -InternalBattery-0 (id=23724131)	100%; discharging; (no est
+sources: scripts/CITY_w22f_assign.py:44ead86a1a9b scripts/CITY_w22f_report.py:cd6713f20b00 scripts/CITY_eval_n4.py:f68333a82f03 scripts/CITY_w20_run.py:4bfd1e0baca9 scripts/CITY_w9_run.py:c0253f1fd09e scripts/CITY_w13_modes.py:04c2d0ea0e1f scripts/CITY_w17_world.py:2c8731bb0872 scripts/DEMO_midtown.py:d1deddc045d2 
+W22-F F3 jobs:       12 Sun Oct 18 07:42:48 EDT 2026
+== W22-F F3: switch transient, halting shares by signal / upstream assignment, vehicles in the network
+-- grid4 RMP: first-60-s greens minus later greens: treated windows +5.07 [+5.07, +5.07] s, control windows +11.15 [+11.15, +11.15] s
+  halting share on approaches: SWB control windows 0.4768 vs none run 0.4579, difference +0.0189 [+0.0189, +0.0189]
+  within SWB control windows, upstream treated minus upstream control: -0.0018 [-0.0018, -0.0018]
+  vehicles in the network (mean): none 48.3, SWB 50.3, all 50.5
+(smoke: truncated runs; numbers meaningless, pipeline check only)
+W22-F F3 done Sun Oct 18 07:42:57 EDT 2026
+W22-F F1 jobs:        8 Sun Oct 18 07:42:57 EDT 2026
+/Users/phanan/cig-amf-main/scripts/CITY_w22f_report.py:73: RuntimeWarning: Mean of empty slice
+  E[i, j, n] = np.nanmean([errs[days.index(x)] for x in pr])
+/Users/phanan/cig-amf-main/scripts/CITY_w22f_report.py:30: RuntimeWarning: Mean of empty slice
+  bs = [np.nanmean(M[np.ix_(rng.integers(0, M.shape[0], M.shape[0]), rng.integers(0, M.shape[1], M.shape[1]), rng.integers(0, M.shape[2], M.shape[2]))]) for _ in range(B)]
+/Users/phanan/cig-amf-main/scripts/CITY_w22f_report.py:31: RuntimeWarning: Mean of empty slice
+  return float(np.nanmean(M)), float(np.percentile(bs, 2.5)), float(np.percentile(bs, 97.5))
+/Users/phanan/cig-amf-main/scripts/CITY_w22f_report.py:74: RuntimeWarning: Mean of empty slice
+  b = boot3(E); sd = float(np.nanmean(unit_sd)); res[f'{world}_{fam}'] = dict(bias=b, unit_sd=sd)
+== W22-F F1: same-day two shares (vt:1800); measured departures [900, 1800) and [2700, 3600); truth = equal-weight SV - R over them
+  grid4 RMP: S2D bias +nan [+nan, +nan] -> F1a FAILED | unit-level sd of the 10-day mean error nan s/veh -> F1b not below 0.79
+  W17 RMP: S2D bias +nan [+nan, +nan] -> F1a FAILED | unit-level sd of the 10-day mean error nan s/veh -> F1b not below 0.79
+(smoke: truncated runs; numbers meaningless, pipeline check only)
+W22-F F1 done Sun Oct 18 07:43:04 EDT 2026
+W22-F F2 jobs:        3 Sun Oct 18 07:43:04 EDT 2026
+== W22-F F2: other W19 families (MIX p 0.3 / 0.5 / 0.7), grid4 days 1400-1409
+-- AD (t49-t49): GTE -0.38 [-0.38, -0.38]; H -0.62 [-0.62, -0.62] (registered -0.84)
+  naive A/B bias +1.44 [+1.44, +1.44] -> F2a HELD bias/(-H) 1.71 -> F2b HELD
+  two-share (0.3, 0.7) bias -2.27 [-2.27, -2.27] -> F2c FAILED
+  control spillover p 0.5 -3.39 [-3.39, -3.39], p 0.7 -6.88 [-6.88, -6.88] F2d HELD
+(smoke: truncated runs; numbers meaningless, pipeline check only)
+W22-F F2 done Sun Oct 18 07:43:07 EDT 2026
+W22-F F4 jobs:        4 Sun Oct 18 07:43:07 EDT 2026
+== W22-F F4: area randomisation on the full Midtown map (MT-E setting), days 0-4
+KW22-F4 all / none = W21-B MTW_SV / MTW_R: 0 of 0 (row, day) identical (smoke: skipped)
+-- AH: per-passage fleet delay GTE (all - none) +0.03 [+0.03, +0.03] s
+  AREA (strip x day fixed effects) bias +2.10 [+2.10, +2.10]; buffered (inner 80 % of each strip) bias +1.96 [+1.96, +1.96] (descriptive)
+  MIX (per-vehicle A/B) bias -0.25 [-0.25, -0.25]
+(smoke: truncated runs; numbers meaningless, pipeline check only)
+W22-F F4 done Sun Oct 18 07:43:22 EDT 2026
+W22-F end Sun Oct 18 07:43:22 EDT 2026;  -InternalBattery-0 (id=23724131)	100%; discharging; (no est

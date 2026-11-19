@@ -1,0 +1,20 @@
+== W22: owner-side identification (SWB) and per-vehicle A/B bias (MIX); families ['RMP', 'AH', 'RWV']; fleets [1413, 1513]; days [1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1408, 1409]
+KW22-3 MIX treated share 0.512, runs with no withheld query 0; SWB treated window share 0.482 -> PASS
+-- RMP (lights t94-t98)
+  D1 tau (treated - control windows, mean green s): +3.850 [+2.460, +5.586], Fisher one-sided p = 0.0005 (alpha 0.0167) -> the owner DETECTS the response
+     ground truth SV - R mean green: +4.185 [+2.722, +6.007] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +12.074 [+8.147, +16.332] s/veh; GTE = SV - R: +14.045 [+9.575, +18.941]
+     bias = DM - GTE: -1.971 [-3.232, -0.628] -> the A/B test UNDERSTATES the harm
+     spillover on control vehicles TL_C - R: +0.631 [+0.143, +1.081]; treated TL_T - SV: -1.340 [-2.289, -0.376]
+-- AH (lights t34-t38)
+  D1 tau (treated - control windows, mean green s): +1.693 [+1.162, +2.399], Fisher one-sided p = 0.0005 (alpha 0.0167) -> the owner DETECTS the response
+     ground truth SV - R mean green: +1.509 [+1.016, +2.105] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): +2.814 [+1.637, +4.043] s/veh; GTE = SV - R: +1.566 [+0.771, +2.549]
+     bias = DM - GTE: +1.249 [+0.681, +1.839] -> the A/B test OVERSTATES the harm
+     spillover on control vehicles TL_C - R: -0.693 [-1.032, -0.410]; treated TL_T - SV: +0.556 [+0.195, +0.925]
+-- RWV (lights t99-t103)
+  D1 tau (treated - control windows, mean green s): +0.103 [-0.117, +0.317], Fisher one-sided p = 0.0010 (alpha 0.0167) -> the owner DETECTS the response
+     ground truth SV - R mean green: +0.019 [-0.026, +0.060] s
+  D2 per-vehicle A/B DM (treated - control fleet TL): -0.895 [-1.285, -0.499] s/veh; GTE = SV - R: -0.964 [-1.198, -0.726]
+     bias = DM - GTE: +0.069 [-0.316, +0.488] -> no bias shown
+     spillover on control vehicles TL_C - R: -0.105 [-0.392, +0.148]; treated TL_T - SV: -0.036 [-0.337, +0.241]

@@ -1,0 +1,13 @@
+== W22-E: two-share extrapolation, naive A/B for SRL / RDQ, W17 network switchback
+-- grid4 SRL (t84-t84); GTE +7.25 [+7.25, +7.25] s/veh; H (humans SV - R) -0.07 [-0.07, -0.07]
+  E1 two-share (0.3, 0.7) bias +1.92 [+1.92, +1.92] -> biased
+     two-share (0.5, 0.7) bias -0.74 [-0.74, -0.74] (descriptive)
+  naive A/B (p 0.5) bias +1.50 [+1.50, +1.50] -> OVERSTATES
+  E4 control spillover C(p) - R: p 0.3 -3.50 [-3.50, -3.50], p 0.5 -4.37 [-4.37, -4.37], p 0.7 -6.26 [-6.26, -6.26] -> sign = sign(H): True
+-- W17 RMP (t94-t94); GTE +17.44 [+17.44, +17.44] s/veh; H (humans SV - R) +1.00 [+1.00, +1.00]
+  E1 two-share (0.3, 0.7) bias -6.97 [-6.97, -6.97] -> biased
+     two-share (0.5, 0.7) bias +0.00 [+0.00, +0.00] (descriptive)
+  naive A/B (p 0.5) bias +0.00 [+0.00, +0.00] -> no bias shown
+  E4 control spillover C(p) - R: p 0.3 -3.34 [-3.34, -3.34], p 0.5 +0.00 [+0.00, +0.00], p 0.7 -7.03 [-7.03, -7.03] -> sign = sign(H): False
+  E3 NSW network green contrast +nan [+nan, +nan] s vs truth +6.31 [+6.31, +6.31] and per-signal SWB tau +3.20 -> not held
+(smoke: truncated runs against full-length ground truth; numbers meaningless, pipeline check only)

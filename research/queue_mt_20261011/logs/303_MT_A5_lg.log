@@ -1,0 +1,30 @@
+train start Sun Oct 11 03:30:56 EDT 2026
+test start Sun Oct 11 03:52:36 EDT 2026
+Midtown report — test days 0-4 (SUMO, 4 800 random trips/h, base plan osm, two-green AI lights); means over every (seed, day) run
+
+arm                                                         runs     TL s   stop s   fuel g     tele    unfin   per-seed TL means
+FT (SUMO fixed-time)                                           5    293.8    208.5    322.7      6.8      0.8   294
+ACT (SUMO actuated)                                            5    143.7     71.0    254.4     37.0      0.4   144
+LIGHT grid-trained, transferred                               25    109.8     45.4    232.1     19.3      5.4   101 129 107 108 104
+LIGHT Midtown-trained MT-A3 (teleports on)                    25    128.4     68.0    240.6    153.2     11.4   124 116 106 138 158
+LIGHT Midtown A4: shared from scratch, teleports off          25    111.3     50.6    232.3     57.2      7.5   123 103 109 123 98
+LIGHT Midtown A5-ft: shared fine-tuned from grid              25    104.2     44.0    228.9     43.4      0.6   111 98 94 101 118
+LIGHT Midtown A5-lg: grid shared + gated local                25    163.5    104.6    254.7    143.6     75.8   118 184 125 103 288
+LIGHT Midtown A5-ln: grid shared + local (no gate)           missing (5 files)
+LIGHT Midtown A5-lo: local only                              missing (5 files)
+FT + grid fleet (exact SPaT)                                 missing (4 files)
+FT + Midtown fleet (exact SPaT)                              missing (4 files)
+grid lights + grid fleets (adapted forecast)                 100    107.9     35.7    222.5     19.4      0.9   112 101 100 109 116 101 119 105 101 101 108 104 111 116 109 115 104 104 116 105
+grid lights + Midtown fleets (adapted forecast)              missing (20 files)
+grid lights + grid fleets, forecast re-fitted on Midtown (interface only)   missing (20 files)
+A4 lights + Midtown fleets, own Midtown forecast             missing (20 files)
+A5-ft lights + Midtown fleets, own Midtown forecast          missing (20 files)
+
+Paired with the transferred grid light (negative = the Midtown-trained light is faster):
+  LIGHT Midtown-trained MT-A3 (teleports on)               TL − LIGHT-grid (same k, same day):  +18.60 s  [+4.96, +31.67]  n=25
+  LIGHT Midtown A4: shared from scratch, teleports off     TL − LIGHT-grid (same k, same day):   +1.56 s  [-11.03, +13.59]  n=25
+  LIGHT Midtown A5-ft: shared fine-tuned from grid         TL − LIGHT-grid (same k, same day):   -5.60 s  [-18.11, +6.22]  n=25
+  LIGHT Midtown A5-lg: grid shared + gated local           TL − LIGHT-grid (same k, same day):  +53.78 s  [+15.29, +116.74]  n=25
+
+A5-lg gate (mean over the last 2 000 decisions of each episode): t59: first 0.889, last 0.780; t60: first 0.853, last 0.649; t61: first 0.876, last 0.770; t62: first 0.894, last 0.734; t63: first 0.901, last 0.709
+job done Sun Oct 11 03:54:36 EDT 2026

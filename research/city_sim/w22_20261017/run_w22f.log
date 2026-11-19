@@ -1,0 +1,92 @@
+W22-F start Sun Oct 18 07:43:55 EDT 2026; out research/city_sim/w22_20261017/f;  -InternalBattery-0 (id=23724131)	100%; discharging; (no est
+sources: scripts/CITY_w22f_assign.py:44ead86a1a9b scripts/CITY_w22f_report.py:cd6713f20b00 scripts/CITY_eval_n4.py:f68333a82f03 scripts/CITY_w20_run.py:4bfd1e0baca9 scripts/CITY_w9_run.py:c0253f1fd09e scripts/CITY_w13_modes.py:04c2d0ea0e1f scripts/CITY_w17_world.py:2c8731bb0872 scripts/DEMO_midtown.py:d1deddc045d2 
+IDENTICAL K0_all_t94_s1413.json vs SV_t94_s1413.json
+IDENTICAL K0_none_t94_s1413.json vs R_t94_s1413.json
+IDENTICAL K0_mix_t94_s1413.json vs MIX_t94_s1413.json
+IDENTICAL KC_all_t94_s2213.json vs SV_t94_s2213.json
+IDENTICAL KC_none_t94_s2213.json vs R_t94_s2213.json
+KW22-0 and KW22-C1/C2 PASS (new wrapper)
+W22-F F1 jobs:       80 Sun Oct 18 07:44:23 EDT 2026
+== W22-F F1: same-day two shares (vt:1800); measured departures [900, 1800) and [2700, 3600); truth = equal-weight SV - R over them
+  grid4 RMP: S2D bias +0.80 [-1.43, +2.89] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.47 s/veh -> F1b not below 0.79
+  grid4 AH: S2D bias -0.06 [-2.33, +1.72] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.13 s/veh -> F1b not below 0.79
+  grid4 RWV: S2D bias -0.20 [-2.00, +1.50] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 0.96 s/veh -> F1b not below 0.79
+  grid4 SRL: S2D bias -0.32 [-1.91, +1.21] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.21 s/veh -> F1b not below 0.79
+  grid4 RDQ: S2D bias +0.20 [-1.91, +2.31] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.23 s/veh -> F1b not below 0.79
+  W17 RMP: S2D bias -0.61 [-3.44, +2.05] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.53 s/veh -> F1b not below 0.79
+  W17 AH: S2D bias -0.03 [-2.31, +2.03] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.21 s/veh -> F1b not below 0.79
+  W17 RWV: S2D bias +0.59 [-1.07, +2.10] -> F1a HELD (contains 0) | unit-level sd of the 10-day mean error 1.14 s/veh -> F1b not below 0.79
+W22-F F1 done Sun Oct 18 08:06:17 EDT 2026
+W22-F F3 jobs:      120 Sun Oct 18 08:06:17 EDT 2026
+== W22-F F3: switch transient, halting shares by signal / upstream assignment, vehicles in the network
+-- grid4 RMP: first-60-s greens minus later greens: treated windows +0.61 [+0.21, +1.03] s, control windows +1.33 [+1.09, +1.60] s
+  halting share on approaches: SWB control windows 0.4676 vs none run 0.4682, difference -0.0006 [-0.0033, +0.0022]
+  within SWB control windows, upstream treated minus upstream control: +0.0049 [-0.0021, +0.0112]
+  vehicles in the network (mean): none 50.7, SWB 52.1, all 53.6
+-- grid4 AH: first-60-s greens minus later greens: treated windows +0.21 [-0.09, +0.48] s, control windows +1.92 [+1.52, +2.35] s
+  halting share on approaches: SWB control windows 0.3048 vs none run 0.3038, difference +0.0009 [-0.0022, +0.0038]
+  within SWB control windows, upstream treated minus upstream control: -0.0005 [-0.0039, +0.0029]
+  vehicles in the network (mean): none 47.2, SWB 47.3, all 47.4
+-- W17 RMP: first-60-s greens minus later greens: treated windows +2.56 [+1.98, +3.10] s, control windows +0.97 [+0.58, +1.36] s
+  halting share on approaches: SWB control windows 0.4260 vs none run 0.4263, difference -0.0003 [-0.0027, +0.0021]
+  within SWB control windows, upstream treated minus upstream control: +0.0043 [+0.0009, +0.0079]
+  vehicles in the network (mean): none 50.4, SWB 51.8, all 53.3
+-- W17 AH: first-60-s greens minus later greens: treated windows +1.31 [+1.01, +1.60] s, control windows +0.42 [+0.18, +0.66] s
+  halting share on approaches: SWB control windows 0.2541 vs none run 0.2576, difference -0.0035 [-0.0057, -0.0013]
+  within SWB control windows, upstream treated minus upstream control: -0.0094 [-0.0138, -0.0051]
+  vehicles in the network (mean): none 46.8, SWB 47.0, all 47.1
+F3a HELD: W17 RMP treated-window excess +2.56 vs grid4 +0.61
+F3b FAILED (MPLight, both worlds: SWB control-window halting below the none run, and lower when upstream treated)
+W22-F F3 done Sun Oct 18 08:36:58 EDT 2026
+W22-F F4 jobs:       80 Sun Oct 18 08:36:59 EDT 2026
+== W22-F F4: area randomisation on the full Midtown map (MT-E setting), days 0-4
+KW22-F4 all / none = W21-B MTW_SV / MTW_R: 200 of 200 (row, day) identical -> PASS
+-- AH: per-passage fleet delay GTE (all - none) +0.21 [+0.07, +0.36] s
+  AREA (strip x day fixed effects) bias +0.00 [-0.27, +0.27]; buffered (inner 80 % of each strip) bias +0.01 [-0.24, +0.27] (descriptive)
+  MIX (per-vehicle A/B) bias -0.19 [-0.34, -0.03]
+  F4a HELD (MIX biased for AH); F4b HELD (AREA contains 0 and |AREA| < |MIX|)
+-- B2D: per-passage fleet delay GTE (all - none) +0.02 [-0.09, +0.12] s
+  AREA (strip x day fixed effects) bias +0.11 [+0.00, +0.22]; buffered (inner 80 % of each strip) bias +0.15 [+0.05, +0.25] (descriptive)
+  MIX (per-vehicle A/B) bias -0.07 [-0.15, +0.02]
+  F4a HELD (MIX unbiased for B2D); F4b FAILED (AREA contains 0)
+W22-F F4 done Sun Oct 18 10:48:07 EDT 2026
+W22-F F2 jobs:      270 Sun Oct 18 10:48:08 EDT 2026
+== W22-F F2: other W19 families (MIX p 0.3 / 0.5 / 0.7), grid4 days 1400-1409
+-- B1H (t39-t43): GTE -0.28 [-0.54, -0.06]; H -0.12 [-0.28, +0.07] (registered -0.12)
+  naive A/B bias +0.08 [-0.50, +0.66] -> F2a HELD (no bias shown) 
+  two-share (0.3, 0.7) bias -0.14 [-0.58, +0.31] -> F2c HELD
+  control spillover p 0.5 -0.09 [-0.43, +0.25], p 0.7 -0.14 [-0.55, +0.26] 
+-- B2H (t44-t48): GTE -0.34 [-0.60, -0.07]; H -0.31 [-0.49, -0.12] (registered -0.31)
+  naive A/B bias +0.21 [-0.19, +0.68] -> (no prediction) 
+  two-share (0.3, 0.7) bias +0.11 [-0.28, +0.48] -> F2c HELD
+  control spillover p 0.5 -0.08 [-0.33, +0.12], p 0.7 -0.28 [-0.57, +0.01] 
+-- AD (t49-t53): GTE +0.76 [+0.11, +1.56]; H -0.84 [-1.26, -0.47] (registered -0.84)
+  naive A/B bias +1.16 [+0.51, +1.90] -> F2a HELD bias/(-H) 1.38 -> F2b HELD
+  two-share (0.3, 0.7) bias -0.03 [-0.53, +0.48] -> F2c HELD
+  control spillover p 0.5 -0.64 [-0.97, -0.29], p 0.7 -0.84 [-1.28, -0.40] F2d HELD
+-- B1D (t54-t58): GTE -0.30 [-0.52, -0.05]; H -0.06 [-0.23, +0.10] (registered -0.06)
+  naive A/B bias +0.00 [-0.43, +0.48] -> F2a HELD (no bias shown) 
+  two-share (0.3, 0.7) bias -0.09 [-0.57, +0.40] -> F2c HELD
+  control spillover p 0.5 -0.01 [-0.29, +0.24], p 0.7 -0.01 [-0.41, +0.35] 
+-- B2D (t59-t63): GTE -0.57 [-0.75, -0.40]; H -0.06 [-0.22, +0.11] (registered -0.06)
+  naive A/B bias +0.03 [-0.35, +0.51] -> F2a HELD (no bias shown) 
+  two-share (0.3, 0.7) bias +0.17 [-0.24, +0.57] -> F2c HELD
+  control spillover p 0.5 -0.03 [-0.30, +0.20], p 0.7 -0.08 [-0.37, +0.21] 
+-- S05 (t64-t68): GTE +1.84 [+1.02, +2.64]; H -1.18 [-1.58, -0.83] (registered -1.18)
+  naive A/B bias +1.31 [+0.69, +1.86] -> F2a HELD bias/(-H) 1.11 -> F2b HELD
+  two-share (0.3, 0.7) bias -0.21 [-0.81, +0.43] -> F2c HELD
+  control spillover p 0.5 -0.61 [-0.92, -0.28], p 0.7 -0.84 [-1.28, -0.37] F2d HELD
+-- S2 (t69-t73): GTE +2.04 [+1.24, +2.90]; H -1.17 [-1.46, -0.81] (registered -1.17)
+  naive A/B bias +1.36 [+0.75, +2.00] -> F2a HELD bias/(-H) 1.16 -> F2b HELD
+  two-share (0.3, 0.7) bias +0.10 [-0.56, +0.72] -> F2c HELD
+  control spillover p 0.5 -0.73 [-1.06, -0.44], p 0.7 -0.99 [-1.40, -0.55] F2d HELD
+-- R1 (t74-t78): GTE +1.78 [+0.85, +2.73]; H -1.23 [-1.58, -0.93] (registered -1.23)
+  naive A/B bias +1.33 [+0.69, +1.92] -> F2a HELD bias/(-H) 1.08 -> F2b HELD
+  two-share (0.3, 0.7) bias -0.11 [-0.65, +0.45] -> F2c HELD
+  control spillover p 0.5 -0.71 [-1.01, -0.45], p 0.7 -0.90 [-1.27, -0.48] F2d HELD
+-- R100 (t79-t83): GTE +2.36 [+1.10, +3.93]; H -1.11 [-1.44, -0.78] (registered -1.11)
+  naive A/B bias +1.26 [+0.75, +1.84] -> F2a HELD bias/(-H) 1.14 -> F2b HELD
+  two-share (0.3, 0.7) bias -0.20 [-0.75, +0.36] -> F2c HELD
+  control spillover p 0.5 -0.67 [-0.96, -0.38], p 0.7 -0.97 [-1.49, -0.47] F2d HELD
+W22-F F2 done Sun Oct 18 11:44:18 EDT 2026
+W22-F end Sun Oct 18 11:44:18 EDT 2026;  -InternalBattery-0 (id=23724131)	100%; charged; 0:00 remain

@@ -1,0 +1,375 @@
+\input{preamble}
+\usepackage{multirow}
+\emergencystretch=1.5em
+% DRAFT 18/10/2026. Every number traces to research/city_sim/w22_20261017 (ledger C-256..C-265; C-263 corrects C-261's W17 reading,
+% C-265 audits W22-F); every proposition to work/p13_conjectures/LeanCityOwnerTestV1..V3.lean. Bibliography details of the
+% interference/switchback references must be verified against the publishers' records before submission.
+
+\begin{document}
+
+\title{Can a Fleet Tell That a Learned Traffic Signal Responds to It?\\
+Owner-Side Switchbacks and Biased A/B Tests of Signal-Timing Services}
+
+\author{\IEEEauthorblockN{Vu Phan An Nguyen}
+\IEEEauthorblockA{\textit{Rider University} \\
+Lawrenceville, NJ, USA}}
+
+\maketitle
+
+\begin{abstract}
+A connected fleet that eco-drives on a city's signal phase and timing (SPaT) cannot see inside the city's learned signal controller,
+yet whether that controller responds to the fleet's driving decides whether a timing forecast stays valid. In SUMO, with learned
+signals whose inputs count only stopped vehicles, we randomise the fleet's own use of SPaT. First, can the fleet's owner identify the
+signal's response from data it holds? A switchback over signal $\times$ 300-s windows recovers the green lengthening (MPLight $+3.85$\,s
+against $+4.19$\,s globally; AH $+1.69$ against $+1.51$; a threshold-free control $+0.10$ against $+0.02$), and a size-based rule decided
+all 50 policy--fleet units correctly on fresh days. In both driver worlds part of the response depends on the network-wide share of
+gliding vehicles, which a per-signal switchback cannot see. Second, does the usual per-vehicle A/B test measure the service's harm? Not
+where the signal responds: it understated MPLight's harm by up to 2.7\,s/veh and overstated AH's, in both driver worlds, in the
+direction of the human drivers' change under the service, a rule that then held in all eight further families it was registered for.
+Testing at two treated shares and extrapolating linearly recovered the global effect in all fourteen registered cells; running both
+shares on one day, alternating their order, stayed unbiased but was noisier than using separate days. On the full Midtown map (567
+signals) the per-vehicle test missed nearly all of AH's harm, and randomising four strips a day was too noisy at five days to judge.
+Network switchbacks did not remove MPLight's bias even with 1200-s windows. Errors in our own analyses are reported; the propositions
+are checked in Lean.
+\end{abstract}
+
+\begin{IEEEkeywords}
+traffic signal control, SPaT, GLOSA, interference, switchback experiments, A/B testing, causal inference, connected vehicles, SUMO
+\end{IEEEkeywords}
+
+\section{Introduction}\label{sec:intro}
+Signal phase and timing (SPaT) lets connected vehicles approach a signal at a speed that avoids a stop \cite{katsaros2011,asadi2011}.
+When the signal is a learned controller, its timing is a decision taken from what it observes, and a fleet that glides changes what
+it observes. Our companion study \cite{nguyen2026tsi} found that learned signals whose inputs count a vehicle only once it has stopped
+(below 0.1\,m/s) serve a gliding fleet's approach later and lengthen the other greens, so the fleet's forecast defeats itself; the
+inputs of sumo-rl and RESCO \cite{ault2021} are of this kind. Its practical advice, check what the signal counts, needs the signal's
+internals. The fleet and the city are different owners, and the fleet's owner has only its own vehicles, the published SPaT and the
+signal states its vehicles see.
+
+This paper asks what the fleet's owner can learn from its own data. Two causal questions arise. \emph{Identification:} does the signal
+respond to the fleet's use of SPaT, and by how much? \emph{Evaluation:} if the owner tests the service the usual way, by switching it on
+for a random half of its vehicles, does the comparison measure what full deployment would do? The second is an interference question
+\cite{savje2021,hu2022,eckles2017}: the signal reallocates green time in response to the treated vehicles, and every vehicle at the
+signal receives that response. The same structure biases A/B tests in two-sided marketplaces \cite{johari2022}, in recommender
+training loops \cite{si2023,brennan2023}, and in congestion-control experiments over shared links \cite{spang2021}; we found no study of it
+for a responsive traffic signal, and GLOSA field evaluations compare a few vehicles with and without advice \cite{stevanovic2013}, too few
+to move the signal.
+
+\paragraph{Contributions}
+\begin{enumerate}\setlength\itemsep{1pt}
+\item \emph{Owner-side identification.} A switchback over signal-windows, using only owner-observable data, recovers the learned
+signal's green response to within about 10\% on a 16-signal grid and detects it for the exposed families (Section~\ref{sec:d1}). A
+size-based rule decides exposure without a wrong decision at a forgone SPaT share of 0.5 and 0.2. In both driver worlds part of the
+response depends on the network-wide share of gliding vehicles, which only a network-wide design sees.
+\item \emph{Biased A/B tests, and a fix.} A per-vehicle A/B test misestimates the service's harm wherever the signal responds, in a
+direction that depends on the signal family, follows the sign of the human drivers' change (registered on nine further families), and
+replicates across driver worlds and on the full Midtown map; two A/B tests at different shares, extrapolated linearly, recover the
+global effect, including in a same-day design that a deployment can run, at a cost in precision; a network-wide switchback removes the
+bias only when the signal's response does not build up beyond the window, which for MPLight it did even at 1200\,s (Section~\ref{sec:d2}).
+\item \emph{Estimator pitfalls and propositions.} Pooling green durations per signal-day is biased downward when control windows
+are rare; we found this in our own registered analysis and prove its cause. Lean also checks the A/B accounting identity, the
+design-dependence of a switchback contrast under a concave exposure response, the cost--time trade-off of the owner's test, the
+two-share extrapolation and what day and half-day effects do to it (Section~\ref{sec:theory}).
+\end{enumerate}
+Every experiment was registered before it ran (protocol W22 and amendments A--F); failed predictions and withdrawn readings are listed
+in Section~\ref{sec:limits}.
+
+\section{Setting}\label{sec:setting}
+We reuse the companion study's grid4 world \cite{nguyen2026tsi}: SUMO \cite{lopez2018}, 16 signals, Krauss drivers, random demand,
+fresh traffic days 1400--1419, a frozen PPO residual fleet on the GLOSA rule (two of its four seeds), and the deployed SPaT service, a
+learned forecast at the 0.1 quantile. Three signal families span the exposure: MPLight (RMP), whose pressure input counts halted
+vehicles and is strongly exposed; the halting-count family AH, weakly exposed; and the threshold-free \texttt{wave} family (RWV), a
+control. Five frozen policies per family are trained by one recipe. A replication uses the companion's W17 world, in which every car is
+an IDM jointly calibrated to field trajectories, with policies, forecasts and fleets trained there. The \emph{ground truth} is the
+companion's global comparison on the same policy, fleet and day: all fleet vehicles use SPaT (SV) against none (R). Mean green
+lengthens by $+4.19$ (RMP), $+1.51$ (AH) and $+0.02$\,s (RWV) on grid4, and the fleet's time loss changes by $+14.05$, $+1.57$ and
+$-0.96$\,s/veh. Two further sets test generality. Nine families from the companion's design study vary AH's input (speed bands B1,
+distance-to-stop-line bands B2 with no halting count), its reward (vehicle delay D), and the scales of its observation (S05, S2) and
+reward (R1, R100). A larger test uses the full OpenStreetMap extract of Midtown Manhattan (567 signals, 511 of them learned) in the
+companion's deployment setting, with AH and B2D signals, test days 0--4 and the fleet's delay per signal passage as the outcome.
+
+\section{Designs, Estimands and Checks}\label{sec:design}
+A wrapper randomises the fleet's \emph{use} of SPaT without editing any evaluator: the service answers every query, and a vehicle in
+control ignores the answer and drives as its base driver, exactly as without SPaT. Assignments are hashes of the day and unit, so the
+propensity is known.
+\begin{itemize}\setlength\itemsep{1pt}
+\item \textbf{MIX}$(p)$: each fleet vehicle uses SPaT with probability $p$ (the per-vehicle A/B test).
+\item \textbf{SWB}$(p)$: during each 300-s window, fleet vehicles use the SPaT of signal $j$ with probability $p$, independently per
+signal-window (a switchback per signal).
+\item \textbf{NSW}: all fleet vehicles use SPaT in a 600-s window with probability 0.5 (network switchback); \textbf{NSWa}$(W)$: windows of
+$W$\,s alternate from a random start.
+\item \textbf{S2D}: a same-day two-share design. Vehicles departing in the first half hour use SPaT with probability $0.3$, later ones
+with $0.7$, the order reversed on alternate days; trips departing in the 15 minutes after the start and after the switch are not measured.
+\item \textbf{AREA} (Midtown): the signals are cut into four strips of equal count along the map's principal axis; each day two strips,
+drawn at random, are treated, and fleet vehicles use the SPaT of signals in treated strips only.
+\end{itemize}
+The owner observes the signal states its vehicles see, hence green durations. The switchback contrast $\tau$ is the mean green
+duration in treated minus control windows of a signal, over greens starting at least 60\,s into a window, averaged over signals.
+A one-sided Fisher randomisation test re-draws the window labels under the sharp null that greens do not depend on the fleet's
+SPaT use \cite{imbens2015}. The A/B contrast is the treated minus control fleet vehicles' mean time loss; its bias is the contrast
+minus the global effect SV $-$ R.
+
+\emph{Checks.} With every vehicle treated or none, the wrapper reproduced the SV and R rows bit for bit (time losses, fuel, counts,
+teleports, the fleet's action digest and mean green) on grid4, in the W17 world and on Midtown (200 of 200 row-days) after each edit of
+the wrapper, and, checked after the runs, for the first policy of each of the nine further families (18 of 18). Treated shares were
+$0.51$ (MIX) and $0.48$--$0.51$ (SWB).
+Intervals are 95\% crossed bootstraps over policies $\times$ fleets $\times$ days unless stated.
+
+\section{Formal Results}\label{sec:theory}
+All statements below are proved in Lean 4 with Mathlib (modules \texttt{LeanCityOwnerTestV1}--\texttt{V3}); axioms are confined to
+\texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}, and each hypothesis set is shown satisfiable.
+
+\begin{proposition}[Length-biased pooling]\label{prop:pool}
+Let windows $i\in s$ hold $n_i>0$ greens of mean duration $m_i$. If $n$ and $m$ antivary, in particular if greens tile a window of fixed
+length, $n_i=L/(m_i+c)$ with $L,c>0$, then $\sum_i n_i m_i/\sum_i n_i \le \frac{1}{|s|}\sum_i m_i$. Consequently, the contrast between
+the pooled mean of the treated windows and a single control window is at most the window-weighted contrast.
+\end{proposition}
+\noindent The proof is Chebyshev's sum inequality. When the forgone share is $0.05$ a signal-day has on average $0.58$ control windows, so
+the registered per-signal-day estimator compares one control window with about eleven pooled treated windows and is biased downward.
+
+\begin{proposition}[A/B accounting]\label{prop:ab}
+With $T_p,C_p$ the treated and control means at share $p$ and $T_1,C_0$ the all-treated and none-treated means,
+$(T_p-C_p)-(T_1-C_0)=(T_p-T_1)-(C_p-C_0)$: the A/B test understates the global effect iff the treated vehicles' spillover
+$T_p-T_1$ is below the control vehicles' $C_p-C_0$.
+\end{proposition}
+
+\begin{proposition}[Design-dependence]\label{prop:design}
+Let a window's response be $g$ of its exposure, with own weight $a\in[0,1]$ and background $(1-a)p$, and $g$ concave on $[0,1]$. The
+switchback contrast $\Delta(p)=g(a+(1-a)p)-g((1-a)p)$ is antitone in $p$, so a design with rarer control windows estimates a smaller
+effect and cannot detect what a design with more control windows misses; with $g(0)=0$, $\Delta(1)\le a\,g(1)\le\Delta(0)$; a linear
+response gives $\Delta\equiv\kappa a$.
+\end{proposition}
+
+\begin{proposition}[Cost and time]\label{prop:cost}
+With per-day information $p(1-p)$ and an additive per-window benefit $B$, the benefit forgone until a fixed precision is
+$(1-p)B\cdot c/(p(1-p))=cB/p$, decreasing in the treated share $p$, while the days needed, $c/(p(1-p))\ge 4c$, are smallest at $p=1/2$.
+\end{proposition}
+\noindent Proposition~\ref{prop:cost} matches the measured share of the fuel benefit the owner kept during the test, $0.47$--$0.50$,
+$0.79$--$0.81$ and $0.94$--$0.96$ at $p=0.5,0.8,0.95$.
+
+\begin{proposition}[Two-share extrapolation]\label{prop:two}
+If the treated and control means are affine in the treated share, $T_p=t_0+t_1p$ and $C_p=c_0+c_1p$, then for any shares $p_1<p_2$
+\[\begin{aligned}&\Big(T_{p_2}+\tfrac{1-p_2}{p_2-p_1}(T_{p_2}-T_{p_1})\Big)\\&\quad-\Big(C_{p_1}-\tfrac{p_1}{p_2-p_1}(C_{p_2}-C_{p_1})\Big)=T_1-C_0,\end{aligned}\]
+while the naive contrast misses it by $-(1-p)t_1-p\,c_1$. If $T$ and $C$ are within $\varepsilon$ of affine at $p_1,p_2,0,1$, the
+extrapolation error is at most $\varepsilon\,(4+2(1-p_2+p_1)/(p_2-p_1))$.
+\end{proposition}
+\noindent This is the logic of randomised-saturation designs \cite{baird2018,hudgens2008}; the propositions here and below are in module
+\texttt{LeanCityOwnerTestV2}.
+
+\begin{proposition}[What a within-run switchback cannot see]\label{prop:global}
+If a window's green duration is $\mu+\tau_\ell Z+\gamma G$, with $Z$ its own assignment and $G$ the network-wide treated share, a
+switchback within one run measures $\tau_\ell$, the global effect is $\tau_\ell+\gamma$, and twice the run mean over the no-SPaT baseline at
+$G=1/2$ recovers $\tau_\ell+\gamma$.
+\end{proposition}
+
+\begin{proposition}[Two shares on days and half-days]\label{prop:sameday}
+Add to the affine means of Proposition~\ref{prop:two} a day effect common to both groups. With the two shares on different days, with
+effects $\delta_A$ and $\delta_B$, the extrapolation errs by exactly $(\delta_B-\delta_A)/(p_2-p_1)$, that is $2.5(\delta_B-\delta_A)$ at
+$(0.3,0.7)$; on the same day the day effect cancels. If instead each half $h$ of the day adds $\theta_h$ to the treated and $\varphi_h$ to
+the control means, one order of the shares errs by
+$\theta_2+\tfrac{1-p_2}{p_2-p_1}(\theta_2-\theta_1)-\varphi_1+\tfrac{p_1}{p_2-p_1}(\varphi_2-\varphi_1)$, while the mean over the two orders
+equals the global effect averaged over the halves exactly.
+\end{proposition}
+\noindent Module \texttt{LeanCityOwnerTestV3}. A common half-day shift ($\theta_h=\varphi_h$) thus enters one order with a factor 2.5,
+which is why S2D alternates the order.
+
+\section{Results}\label{sec:results}
+\subsection{Identification from the Owner's Data}\label{sec:d1}
+Table~\ref{tab:d1} gives the switchback contrast against the global green change. On grid4 the owner recovered the response within
+about 10\% for the exposed families, and the Fisher test detected it (MPLight $z\approx49$, AH $z\approx29$). It also detected the
+threshold-free control's $+0.10$\,s ($z\approx2.9$), a response forty times smaller whose sign depended on the burn-in; the sharp-null
+test detects existence, not exposure. In the W17 world the registered estimate was smaller than the global change for all three
+families. With the truth's own metric (all greens, pooled), the switchback's treated and control windows add up to the global change in
+all six cells (Table~\ref{tab:d1}, last column): control windows' greens are lengthened too, by half of the network-share component
+$\gamma$ of Proposition~\ref{prop:global}, about $0.5$ (grid4) and $0.8$\,s (W17) for MPLight and $0.3$ and $0.2$\,s for AH. A per-signal
+switchback cannot see $\gamma$; a network-wide switchback recovered MPLight's green change in W17 ($+4.76$ [$+2.76$, $+7.54$] against
+$+4.44$), while for AH its interval was too wide to inform. The rest of the W17 shortfall is the registered estimator. In W17, greens
+starting in the first 60\,s of a treated window are $2.56$ [$1.98$, $3.10$]\,s longer than the window's later greens (grid4 $0.61$), so
+the 60-s burn-in removes treated green. Net of control windows, this lowers $\tau$ by about $0.3$\,s; without the burn-in the
+window-weighted $\tau$ rises from $3.24$ to $3.52$. An earlier reading of ours, that $\gamma$ exists only with field-matched drivers,
+compared two metrics and is withdrawn. What carries $\gamma$ is open. The halting share of vehicles approaching a signal in its control
+windows equalled that of the run without SPaT within $\pm0.003$ for MPLight in both worlds (a registered prediction that failed), while
+the number of vehicles in the network rose with the treated share (none $50.7$, switchback $52.1$, all $53.6$ on grid4). MPLight's
+pressure also subtracts the queues on its out-lanes, which we did not probe.
+
+\begin{table}[t]\centering\caption{Owner-side switchback (SWB, $p=0.5$): green contrast $\tau$ (s) against the global change SV $-$ R}\label{tab:d1}
+\footnotesize\resizebox{\columnwidth}{!}{\begin{tabular}{@{}llrrrr@{}}\toprule
+World & Family & $\tau$ (registered) & $\tau$ (window-wtd.) & SV $-$ R & $\Delta_T+\Delta_C$$^\dagger$ \\\midrule
+grid4 & MPLight & $+3.85$ [$+2.46$, $+5.59$] & $+3.97$ & $+4.19$ & $+4.14$ \\
+grid4 & AH & $+1.69$ [$+1.16$, $+2.40$] & $+1.79$ & $+1.51$ & $+1.55$ \\
+grid4 & \texttt{wave} & $+0.10$ [$-0.12$, $+0.32$] & $+0.10$ & $+0.02$ & $+0.02$ \\
+W17 & MPLight & $+3.20$ [$+1.97$, $+4.74$] & $+3.24$ & $+4.44$ & $+4.46$ \\
+W17 & AH & $+0.16$ [$-0.33$, $+0.62$] & $+0.18$ & $+0.66$ & $+0.62$ \\
+W17 & \texttt{wave} & $-0.28$ [$-0.53$, $-0.06$] & $-0.28$ & $-0.02$ & $+0.05$ \\\bottomrule
+\multicolumn{6}{@{}l}{\scriptsize $^\dagger$ post hoc: (treated windows $-$ R) $+$ (control windows $-$ R), all greens pooled, as the truth.}
+\end{tabular}}\end{table}
+
+\emph{Deciding by size.} On fresh days 1410--1419, ten policy--fleet units per family were labelled \emph{exposed} once a Student-$t$
+interval of the daily contrasts lay above $\delta=0.5$\,s, and \emph{not exposed} once it lay below (Table~\ref{tab:dec}). With the
+registered estimator, giving up SPaT in half the windows decided all 50 units correctly in a median of 3 days (at most 7); at a
+forgone share of $0.2$ there was again no wrong decision; at $0.05$ most units stayed undecided and wrong decisions appeared. The
+apparent shrinkage of $\tau$ with the treated share (MPLight $3.63\to2.63$) is mostly the bias of Proposition~\ref{prop:pool}: with the
+window-weighted estimator (post hoc), $\tau$ is nearly flat ($3.83$, $3.92$, $3.48$) and one wrong decision remains at $0.05$.
+
+\begin{table}[t]\centering\caption{Size-based decisions (50 units; days 1410--1419): wrong / undecided / range of the families' median days}\label{tab:dec}
+\footnotesize\resizebox{\columnwidth}{!}{\begin{tabular}{@{}lccc@{}}\toprule
+Forgone share & 0.5 & 0.2 & 0.05 \\\midrule
+Registered estimator & 0 / 0 / 3--4 & 0 / 3 / 3--6.5 & 1 / 26 / 2--6.5 \\
+Window-weighted (post hoc) & 0 / 0 / 2.5--5 & 0 / 1 / 3--5 & 1 / 23 / 4--9 \\
+Fuel benefit kept & 0.48 & 0.80 & 0.95 \\\bottomrule
+\end{tabular}}\end{table}
+
+\subsection{Per-Vehicle A/B Tests}\label{sec:d2}
+Table~\ref{tab:ab} gives the bias of the per-vehicle contrast. Under MPLight the test understated the harm at every treated share,
+most when few vehicles were treated ($-2.74$\,s/veh at $p=0.1$, about a fifth of the harm): a few gliding vehicles do not move the
+signal, so a small test misses the feedback. Under AH it overstated the harm at every share ($+1.25$ to $+1.59$): control vehicles gained
+from the treated ones' gliding ($C_p-C_0$ from $-0.13$ to $-1.45$), which Proposition~\ref{prop:ab} turns into an overstatement. Under the
+threshold-free control no bias was shown. In the W17 world the signs replicated (MPLight $-1.28$, AH $+0.67$, \texttt{wave} $-0.05$).
+
+\begin{table}[t]\centering\caption{Per-vehicle A/B bias (s/veh) against SV $-$ R; grid4, days 1400--1409}\label{tab:ab}
+\footnotesize\begin{tabular}{@{}lrrrrr@{}}\toprule
+Treated share & 0.1 & 0.3 & 0.5 & 0.7 & 0.9 \\\midrule
+MPLight & $-2.74^*$ & $-2.34^*$ & $-1.97^*$ & $-1.28^*$ & $-0.65$ \\
+AH & $+1.46^*$ & $+1.29^*$ & $+1.25^*$ & $+1.29^*$ & $+1.59^*$ \\
+\texttt{wave} & $+0.24$ & $+0.12$ & $+0.07$ & $+0.26$ & $+0.78$ \\\bottomrule
+\multicolumn{6}{@{}l}{\scriptsize $^*$ interval excludes 0}
+\end{tabular}\end{table}
+
+\emph{The direction of the bias.} Proposition~\ref{prop:ab} splits the bias into the treated and control vehicles' spillovers. Under
+MPLight the treated vehicles fare better in a mixed world than when all glide ($T_p-T_1$ from $-2.65$ at $p=0.1$ to $-0.20$ at $0.9$): the
+feedback needs many gliding vehicles, so a small test misses it. Under AH they fare worse ($+1.33$ to $+0.14$) while control vehicles gain:
+a signal that serves halted vehicles first lets the counted vehicles go ahead of the uncounted ones. The control vehicles' spillover had the
+sign of the human drivers' change under the service in every registered cell (grid4 MPLight, AH, SRL, RDQ; W17 MPLight, AH), so a city that
+sees its drivers gain when the fleet uses SPaT can expect the fleet's A/B test to overstate the harm. As registered, the naive test
+overstated it for RDQ ($+1.24$ [$+0.63$, $+1.94$]); for SRL the sign was right but the interval reached zero ($+0.49$ [$-0.04$, $+1.03$]).
+We then registered the rule on the nine further families (Table~\ref{tab:w19}), and it held in all eight it covered. Where the human
+drivers gained at least $0.8$\,s/veh (AD, S05, S2, R1, R100), the naive test overstated the harm by $1.1$--$1.4$ times that gain, and the
+control vehicles gained $0.6$--$1.0$\,s/veh at shares $0.5$ and $0.7$. Where the humans' change was below $0.15$\,s (B1H, B1D, B2D), no
+bias was shown.
+
+\begin{table}[t]\centering\caption{Nine further families (registered; grid4, days 1400--1409; s/veh): the humans' change H, the global
+effect, and the biases of the naive A/B test ($p=0.5$) and of the two-share extrapolation}\label{tab:w19}
+\footnotesize\resizebox{\columnwidth}{!}{\begin{tabular}{@{}llrrrr@{}}\toprule
+Family & Varies & H & GTE & naive A/B bias & two-share bias \\\midrule
+B1H & speed bands & $-0.12$ & $-0.28$ & $+0.08$ [$-0.50$, $+0.66$] & $-0.14$ [$-0.58$, $+0.31$] \\
+B2H & distance bands & $-0.31$ & $-0.34$ & $+0.21$ [$-0.19$, $+0.68$] & $+0.11$ [$-0.28$, $+0.48$] \\
+AD & delay reward & $-0.84$ & $+0.76$ & $+1.16$ [$+0.51$, $+1.90$] & $-0.03$ [$-0.53$, $+0.48$] \\
+B1D & B1, delay & $-0.06$ & $-0.30$ & $+0.00$ [$-0.43$, $+0.48$] & $-0.09$ [$-0.57$, $+0.40$] \\
+B2D & B2, delay & $-0.06$ & $-0.57$ & $+0.03$ [$-0.35$, $+0.51$] & $+0.17$ [$-0.24$, $+0.57$] \\
+S05 & observation $\times2$ & $-1.18$ & $+1.84$ & $+1.31$ [$+0.69$, $+1.86$] & $-0.21$ [$-0.81$, $+0.43$] \\
+S2 & observation $\times\frac12$ & $-1.17$ & $+2.04$ & $+1.36$ [$+0.75$, $+2.00$] & $+0.10$ [$-0.56$, $+0.72$] \\
+R1 & reward $\times10$ & $-1.23$ & $+1.78$ & $+1.33$ [$+0.69$, $+1.92$] & $-0.11$ [$-0.65$, $+0.45$] \\
+R100 & reward $\times\frac1{10}$ & $-1.11$ & $+2.36$ & $+1.26$ [$+0.75$, $+1.84$] & $-0.20$ [$-0.75$, $+0.36$] \\\bottomrule
+\end{tabular}}\end{table}
+
+\emph{Two shares.} Because $T_p$ and $C_p$ were close to linear in $p$, we registered Proposition~\ref{prop:two}'s extrapolation from
+shares $0.3$ and $0.7$ after seeing it work post hoc on Table~\ref{tab:ab}'s runs (MPLight $14.51$ against $14.05$; AH $1.38$ against $1.57$).
+On two families and a driver world not used to devise it, its bias interval contained zero in all five cells (Table~\ref{tab:two}),
+and again in all nine further families (Table~\ref{tab:w19}). These two shares were run on the same simulated days, which no deployment
+can do. Re-splitting the rows so that the shares fall on different days (five each, post hoc) left the error centred near zero but with
+a per-unit standard deviation of $0.7$--$1.0$\,s/veh, because the extrapolation multiplies a day-to-day difference by $2.5$
+(Proposition~\ref{prop:sameday}). The registered same-day design S2D removes the day effect and was unbiased in all eight cells (bias
+$-0.61$ to $+0.80$, every interval containing zero). Its alternation mattered: the two orders' mean errors differed by up to
+$3.4$\,s/veh, so a single order would have been off by up to $1.7$\,s/veh. But S2D was \emph{noisier} than separate days (per-unit
+standard deviation of the 10-day mean $1.0$--$1.6$ against $0.7$--$0.9$\,s/veh, post hoc on the same cells; a registered prediction
+that failed). Each share is measured on a quarter of each hour, fewer than half the vehicles per share, and the extrapolation's weights
+amplify vehicle-level noise. Our simulated days differ only by the demand seed, so the day effect that S2D removes is small here. Real
+days vary more.
+
+\begin{table}[t]\centering\caption{Two-share extrapolation (0.3, 0.7) against the global effect (s/veh); registered cells}\label{tab:two}
+\footnotesize\resizebox{\columnwidth}{!}{\begin{tabular}{@{}llrrr@{}}\toprule
+World & Family & GTE & two-share bias & naive A/B bias \\\midrule
+grid4 & SRL & $+4.64$ & $+0.00$ [$-0.81$, $+0.80$] & $+0.49$ [$-0.04$, $+1.03$] \\
+grid4 & RDQ & $+2.38$ & $+0.09$ [$-0.42$, $+0.65$] & $+1.24$ [$+0.63$, $+1.94$] \\
+W17 & MPLight & $+14.05$ & $-0.04$ [$-0.68$, $+0.56$] & $-1.28$ [$-2.34$, $-0.14$] \\
+W17 & AH & $+1.81$ & $+0.02$ [$-0.39$, $+0.43$] & $+0.67$ [$+0.12$, $+1.22$] \\
+W17 & \texttt{wave} & $+0.92$ & $+0.19$ [$-0.22$, $+0.57$] & $-0.05$ [$-0.58$, $+0.46$] \\\bottomrule
+\end{tabular}}\end{table}
+
+\emph{Whole days.} Randomising whole days between the service and no service is unbiased by construction; with the day-to-day spread of our
+simulated days (0.5--0.65\,s/veh) a unit needs about 2--4 days for AH and 8--10 for the control at 80\% power, but real days vary more.
+
+\emph{Areas, on a larger network.} On the full Midtown map the outcome is the fleet's delay per signal passage. Under AH, deployment cost
+$+0.21$ [$+0.07$, $+0.36$]\,s per passage, and the per-vehicle A/B test missed nearly all of it (bias $-0.19$ [$-0.34$, $-0.03$]).
+Under B2D, whose cost on this map is the GLOSA rule's own, neither the effect ($+0.02$) nor the A/B bias ($-0.07$ [$-0.15$, $+0.02$]) was
+distinguishable from zero, both as registered. The area design gave bias $+0.00$ for AH and $+0.11$ [$+0.00$, $+0.22$] for B2D, against
+a registered prediction of no bias. Neither reading is informative. Every policy--fleet unit shares each day's strip draw, which our unit
+bootstrap ignores. Re-drawing the strips on the all and none rows (post hoc) gives the cell mean a design standard deviation of $0.23$
+(AH) and $0.12$\,s (B2D), as large as the effects, and AH's realised draw happened to offset an interference-and-noise term of $-0.32$.
+At four strips, five days are far too few.
+
+\emph{Network switchbacks.} Switching the service for the whole fleet in 600-s windows recovered the global effect for AH (bias $-0.34$
+[$-1.12$, $+0.46$]) and the control ($+0.14$), but not for MPLight ($-1.85$ [$-3.14$, $-0.63$]). Longer alternating windows did not help: MPLight's bias was $-2.71$
+[$-4.36$, $-1.34$] with 900-s and $-1.96$ [$-3.51$, $-0.68$] with 1200-s windows, and AH's became $-0.71$ [$-1.38$, $-0.09$] at 1200\,s,
+while the control stayed unbiased. The start of the alternation was balanced over days (5 / 5), so a time trend within the hour does not
+explain it; we read it as a response that builds up over the whole hour, queues growing under lengthened greens, which windows of 10--20
+minutes never reach. For such a controller the owner's evaluation needs randomisation over whole days or areas; areas were tested only
+on Midtown, and not for MPLight.
+
+\section{Related Work}\label{sec:related}
+Interference makes a unit's outcome depend on others' treatments, so the estimand depends on the design
+\cite{savje2021,hu2022}; cluster and graph randomisation reduce the bias \cite{eckles2017}. Switchback designs randomise over time and
+must handle carry-over \cite{bojinov2023}. Two-stage and randomised-saturation designs vary the treated share across clusters to separate direct from spillover
+effects \cite{hudgens2008,baird2018}; our two-share extrapolation applies that idea over days and half-days. Marketplace experiments show that the bias of customer- and listing-side randomisation
+depends on market balance \cite{johari2022}, and shared training pipelines bias A/B tests of recommenders \cite{si2023,brennan2023}. The
+closest structure is A/B testing of congestion control over a shared bottleneck, where tests misjudged the direction of some metrics
+\cite{spang2021}. Here the shared resource is green time and the interference runs through a learned controller's sensing. Performative
+prediction studies forecasts that change their target \cite{perdomo2020,narang2023,mandal2023}; the companion study found such a loop
+for SPaT \cite{nguyen2026tsi}. GLOSA evaluations under actuated signals report unreliable timing \cite{stevanovic2013} but use
+within-vehicle comparisons.
+
+\section{Limitations and Failed Predictions}\label{sec:limits}
+\begin{itemize}\setlength\itemsep{1pt}
+\item \emph{Simulation only}, one 16-signal grid, one field-matched world and, for two families, the Midtown map; fleets, signals and
+forecasts are frozen policies from one recipe. Only the fleet's \emph{use} of SPaT is randomised; real deployments add detector errors
+and partial penetration.
+\item \emph{The network-share component} $\gamma$ is measured in both worlds but not explained: it does not run through the halting share
+at a signal's approaches, and MPLight's out-lane term was not probed. MPLight's network-switchback bias on grid4 is not explained either.
+The two-share extrapolation assumes near-linearity in the share. Its registered successes ran both shares on the same simulated days;
+the same-day design a deployment can run is unbiased but noisier.
+\item \emph{Area randomisation} was run with four strips and five days. Its intervals omitted the shared daily draw, and its design noise
+is as large as the effects.
+\item \emph{The threshold $\delta=0.5$\,s} was chosen after the first panel had been seen; it was evaluated only on fresh days and in the
+W17 world. The confidence sequence uses a plug-in variance and is approximate.
+\item \emph{Registered predictions that failed:} the threshold-free control was detected; ``every exposed unit within 3 days'' (the
+maximum was 7); ``no network-switchback bias for any family'' (MPLight); ``MPLight's bias shrinks with longer windows'' and ``AH unbiased at 900 and 1200\,s'' (AH at 1200\,s); ``the naive test overstates SRL's harm'' (right sign, interval reaching zero); ``the same-day
+design is more precise than separate days'' (all eight cells); ``control-window halting falls below the run without SPaT'' (MPLight);
+``no area bias for B2D'' (an interval too narrow, reaching zero). Two readings we first recorded were withdrawn: that cheap tests are
+biased through carry-over (it was the estimator bias of Proposition~\ref{prop:pool}), and that the network-share component exists only
+with field-matched drivers (it compared two metrics).
+\item \emph{The propositions} are deterministic statements about the models stated; that SUMO windows tile exactly and that the real
+exposure response is concave are not established, and the corrected estimates are nearly flat in the treated share.
+\end{itemize}
+
+\section{Conclusion}\label{sec:concl}
+A fleet's owner does not need the city's controller to learn whether it responds: randomising its own vehicles' use of SPaT over
+signal-windows recovers the response and supports a decision at a cost it can choose. The same responsiveness makes the obvious
+evaluation, a per-vehicle A/B test, unreliable in a direction that depends on the controller and that the human drivers' change
+predicts. Before trusting a timing service's measured effect, randomise at the level at which the controller responds, or test at two
+shares and extrapolate, alternating their order within days if days cannot be separated. Pool by window rather than by green. On a
+large map, randomise many areas over many days, and count the shared draw in the interval.
+
+\begin{thebibliography}{00}\footnotesize
+\bibitem{asadi2011} B.~Asadi, A.~Vahidi. Predictive cruise control: Utilizing upcoming traffic signal information for improving fuel economy and reducing trip time. \emph{IEEE Trans. Control Syst. Technol.} 19(3):707--714, 2011.
+\bibitem{ault2021} J.~Ault, G.~Sharon. Reinforcement learning benchmarks for traffic signal control. \emph{NeurIPS Datasets and Benchmarks Track}, 2021.
+\bibitem{baird2018} S.~Baird, J.~A.~Bohren, C.~McIntosh, B.~\"Ozler. Optimal design of experiments in the presence of interference. \emph{Rev. Econ. Stat.} 100(5):844--860, 2018.
+\bibitem{bojinov2023} I.~Bojinov, D.~Simchi-Levi, J.~Zhao. Design and analysis of switchback experiments. \emph{Management Science} 69(7):3759--3777, 2023.
+\bibitem{brennan2023} J.~Brennan, V.~Mirrokni, J.~Pouget-Abadie. A study of symbiosis bias in A/B tests of recommendation algorithms. arXiv:2309.07107, 2023.
+\bibitem{eckles2017} D.~Eckles, B.~Karrer, J.~Ugander. Design and analysis of experiments in networks: Reducing bias from interference. \emph{J. Causal Inference} 5(1), 2017.
+\bibitem{hudgens2008} M.~G.~Hudgens, M.~E.~Halloran. Toward causal inference with interference. \emph{J. Am. Stat. Assoc.} 103(482):832--842, 2008.
+\bibitem{hu2022} Y.~Hu, S.~Li, S.~Wager. Average direct and indirect causal effects under interference. \emph{Biometrika} 109(4):1165--1172, 2022.
+\bibitem{imbens2015} G.~W.~Imbens, D.~B.~Rubin. \emph{Causal Inference for Statistics, Social, and Biomedical Sciences}. Cambridge University Press, 2015.
+\bibitem{johari2022} R.~Johari, H.~Li, I.~Liskovich, G.~Y.~Weintraub. Experimental design in two-sided platforms: An analysis of bias. \emph{Management Science} 68(10):7069--7089, 2022.
+\bibitem{katsaros2011} K.~Katsaros, R.~Kernchen, M.~Dianati, D.~Rieck. Performance study of a Green Light Optimized Speed Advisory (GLOSA) application using an integrated cooperative ITS simulation platform. \emph{Proc. IWCMC}, 2011.
+\bibitem{lopez2018} P.~A.~Lopez et al. Microscopic traffic simulation using SUMO. \emph{Proc. IEEE ITSC}, 2018.
+\bibitem{mandal2023} D.~Mandal, S.~Triantafyllou, G.~Radanovic. Performative reinforcement learning. \emph{Proc. ICML}, 2023.
+\bibitem{narang2023} A.~Narang, E.~Faulkner, D.~Drusvyatskiy, M.~Fazel, L.~J.~Ratliff. Multiplayer performative prediction: Learning in decision-dependent games. \emph{J. Mach. Learn. Res.} 24(202), 2023.
+\bibitem{nguyen2026tsi} V.~P.~A.~Nguyen. When gliding cars leave the queue: Learned traffic signals that count stopped vehicles defeat eco-driving fleets, and repairs without retraining. Manuscript, 2026.
+\bibitem{perdomo2020} J.~Perdomo, T.~Zrnic, C.~Mendler-D\"unner, M.~Hardt. Performative prediction. \emph{Proc. ICML}, PMLR 119:7599--7609, 2020.
+\bibitem{savje2021} F.~S\"avje, P.~M.~Aronow, M.~G.~Hudgens. Average treatment effects in the presence of unknown interference. \emph{Ann. Statist.} 49(2):673--701, 2021.
+\bibitem{si2023} N.~Si. Tackling interference induced by data training loops in A/B tests: A weighted training approach. arXiv:2310.17496, 2023.
+\bibitem{spang2021} B.~Spang, V.~Hannan, S.~Kunamalla, T.-Y.~Huang, N.~McKeown, R.~Johari. Unbiased experiments in congested networks. \emph{Proc. ACM IMC}, 2021.
+\bibitem{stevanovic2013} A.~Stevanovic, J.~Stevanovic, C.~Kergaye. Green light optimized speed advisory systems: Impact of signal phasing information accuracy. \emph{Transp. Res. Rec.} 2390:53--59, 2013.
+\end{thebibliography}
+
+\end{document}
